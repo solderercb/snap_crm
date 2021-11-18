@@ -1,0 +1,13 @@
+#Use glob syntax
+syntax: glob
+
+sqlcreds.h
+build-*
+*.pro.user*
+debug/*
+release/*
+Makefile
+Makefile.Debug
+Makefile.Release
+ui_*.h
+.qmake.stash
