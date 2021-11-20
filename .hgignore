@@ -11,3 +11,5 @@ Makefile.Debug
 Makefile.Release
 ui_*.h
 .qmake.stash
+object_script.test.Debug
+object_script.test.Release

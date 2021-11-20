@@ -21,6 +21,7 @@
 #include <QMenu>
 #include <QToolButton>
 #include "sqlcreds.h"
+#include "ui_bottoolbarwidget.h"
 
 namespace Ui {
 class MainWindow;

@@ -26,15 +26,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
+    bottoolbarwidget.cpp \
 				mainwindow.cpp \
     loginwindow.cpp \
     my_widget.cpp
 
 HEADERS  += mainwindow.h \
+    bottoolbarwidget.h \
     loginwindow.h \
     my_widget.h
 
 FORMS    += mainwindow.ui \
+    bottoolbarwidget.ui \
     loginwindow.ui
 
 DISTFILES +=

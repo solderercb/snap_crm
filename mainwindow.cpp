@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "bottoolbarwidget.h"
 
 #define NO_LOGIN
 
@@ -70,7 +71,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->pushButton_9->setStyleSheet("::hover { border: 2px solid #8f8f91; border-radius: 6px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f6f7fa, stop: 1 #dadbde);}"); // LOL работает
 
-	AppDB = QSqlDatabase::addDatabase("QMYSQL");
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy.setHeightForWidth(ui->tab_test->sizePolicy().hasHeightForWidth());
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
+    ui->tab_test->setSizePolicy(sizePolicy);
+    QGridLayout* gridLayout_2 = new QGridLayout(ui->tab_test);
+    gridLayout_2->setSpacing(1);
+    gridLayout_2->setContentsMargins(0, 0, 0, 0);
+    gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+    gridLayout_2->SetMaximumSize;
+
+    BotToolbarWidget* BotToolbarWidget_ = new BotToolbarWidget(ui->tab_workshop);
+    gridLayout_2->addWidget(BotToolbarWidget_, 6, 0, 1, 4, Qt::AlignBottom);
+
+    AppDB = QSqlDatabase::addDatabase("QMYSQL");
 	DBConnectionOK = 0;
 
 	comboboxSourceModel = new QStandardItemModel();
