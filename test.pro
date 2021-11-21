@@ -29,15 +29,18 @@ SOURCES += main.cpp\
     bottoolbarwidget.cpp \
 				mainwindow.cpp \
     loginwindow.cpp \
-    my_widget.cpp
+    my_widget.cpp \
+    tabrepairnew.cpp
 
 HEADERS  += mainwindow.h \
     bottoolbarwidget.h \
     loginwindow.h \
-    my_widget.h
+    my_widget.h \
+    tabrepairnew.h
 
 FORMS    += mainwindow.ui \
     bottoolbarwidget.ui \
-    loginwindow.ui
+    loginwindow.ui \
+    tabrepairnew.ui
 
 DISTFILES +=
