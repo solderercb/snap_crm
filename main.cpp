@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 //    mw2.show();
 
 
-    QObject::connect(&windowLogin,SIGNAL(ConnectToDB(QString,QString,uchar)),&windowMain,SLOT(ConnectToDB(QString,QString,uchar)));
+    QObject::connect(&windowLogin,SIGNAL(ConnectToDB(QString,QString,QString, uint,QString,QString)),&windowMain,SLOT(ConnectToDB(QString,QString,QString, uint,QString,QString)));
 	QObject::connect(&windowMain,SIGNAL(DBConnectErr(QString)),&windowLogin,SLOT(DBConnectErr(QString)));
 	QObject::connect(&windowMain,SIGNAL(DBConnectOK()),&windowMain,SLOT(show()));
 	QObject::connect(&windowMain,SIGNAL(DBConnectOK()),&windowLogin,SLOT(close()));

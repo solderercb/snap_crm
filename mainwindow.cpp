@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "bottoolbarwidget.h"
+#include "tabrepairnew.h"
 
 #define NO_LOGIN
 
@@ -86,9 +87,6 @@ MainWindow::MainWindow(QWidget *parent) :
     BotToolbarWidget* BotToolbarWidget_ = new BotToolbarWidget(ui->tab_workshop);
     gridLayout_2->addWidget(BotToolbarWidget_, 6, 0, 1, 4, Qt::AlignBottom);
 
-    AppDB = QSqlDatabase::addDatabase("QMYSQL");
-	DBConnectionOK = 0;
-
 	comboboxSourceModel = new QStandardItemModel();
 	ui->comboBoxSourceWarehouse->setModel(comboboxSourceModel);
 	comboboxDestModel = new QStandardItemModel();
@@ -131,7 +129,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QObject::connect(ui->btnLogin,SIGNAL(clicked(bool)),this,SLOT(btnClick()));
 
 #ifdef NO_LOGIN
-    ConnectToDB(SQL_USER,SQL_PSWD,0);
+    ConnectToDB(SQL_USER, SQL_PSWD, SQL_HOST, SQL_PORT, SQL_DB, "connMain");
 #endif
 	get_warehouses_list();
 	btnClick();
@@ -139,8 +137,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-	AppDB.close();
-	AppDB.removeDatabase(AppDB.connectionName());
+    dbConnection->destroy();
 	delete tableConsignmentsModel;
 	delete tableGoodsModel;
 	delete tree_model;
@@ -148,36 +145,21 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-void MainWindow::ConnectToDB(const QString &username, const QString &password, const uchar DB_ID)
+void MainWindow::ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName )
 {
-		AppDB.setUserName(username);
-		AppDB.setPassword(password);
-        AppDB.setHostName(SQL_HOST);
-        AppDB.setPort(SQL_PORT);
-        AppDB.setDatabaseName(SQL_DB);
-//		AppDB.setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=5;MYSQL_OPT_READ_TIMEOUT=1");
-
-		DBConnectionOK = AppDB.open();
-		if (!DBConnectionOK)
-		{
-			qDebug("DB connect failed.");
-			emit this->DBConnectErr(AppDB.lastError().databaseText());
-		}
-		else
-		{
-			qDebug("DB successfully opened.");
-			emit this->DBConnectOK();
-		};
+    dbConnection = DBConnection::getInstance(this, username, password, ipaddr, port, dbName, connName);
 }
 
 void MainWindow::btnClick()
 {
     enum {store_cats_id, store_cats_parent, store_cats_name, store_cats_position};
 
-	if (!DBConnectionOK)
-		return;
+    if (!(dbConnection->connectOK))
+    {
+        return;
+    }
 
-	QSqlQuery* cat_tree = new QSqlQuery;
+    QSqlQuery* cat_tree = new QSqlQuery(QSqlDatabase::database("connMain"));
     QStandardItem* parentItem;
     QStandardItem* childItem;
     QVector<uint32_t> store_cats_ids;
@@ -236,8 +218,10 @@ void MainWindow::on_treeView_activated(const QModelIndex &index)
 
 void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_code)
 {
-	if (!DBConnectionOK)
-		return;
+    if (!(dbConnection->connectOK))
+    {
+        return;
+    }
 
 	QVariant a = ui->treeView->model()->data(index, Qt::UserRole+1);
 	QVariant b = ui->treeView->model()->data(index, Qt::UserRole+2);
@@ -247,7 +231,7 @@ void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_co
 										 + b.toString()); // Работает. НЕ ТРОГАТЬ!
 
 	tableGoodsModel->setRowCount(0); // Удаляем имеющиеся строки
-	QSqlQuery* goods = new QSqlQuery;
+    QSqlQuery* goods = new QSqlQuery(QSqlDatabase::database("connMain"));
 	QString query;
 	QStandardItem* newCol;
 
@@ -272,10 +256,12 @@ void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_co
 
 void MainWindow::get_warehouses_list()
 {
-	if (!DBConnectionOK)
-		return;
+    if (!(dbConnection->connectOK))
+    {
+        return;
+    }
 
-    QSqlQuery* warehouse_list = new QSqlQuery;
+    QSqlQuery* warehouse_list = new QSqlQuery(QSqlDatabase::database("connMain"));
 	QString query;
 	QStandardItem *newRow;
 	QStandardItem *newRow2;
@@ -345,13 +331,15 @@ void MainWindow::on_tableConsignments_clicked(const QModelIndex &index)
 
 void MainWindow::readConsignments(const QModelIndex &index, const QString &warehouse_code)
 {
-	if (!DBConnectionOK)
-		return;
+    if (!(dbConnection->connectOK))
+    {
+        return;
+    }
 
 	ui->label->setText("Art: " + index.model()->index(index.row(),0).data().toString());
 
 	tableConsignmentsModel->setRowCount(0); // Удаляем имеющиеся строки
-	QSqlQuery* consignments = new QSqlQuery;
+    QSqlQuery* consignments = new QSqlQuery(QSqlDatabase::database("connMain"));
 	QString query;
 	QStandardItem* newCol;
 //	"Артикул" << "Наименование" << "Примечание" << "Кол-во" << "Реализация" << "Резерв" << "Цена" << "Место"

@@ -236,8 +236,21 @@
         </layout>
        </item>
        <item row="0" column="4">
-        <layout class="QGridLayout" name="gridLayout_8" rowstretch="0,0,0,0,0">
-         <item row="2" column="0">
+        <layout class="QGridLayout" name="gridLayout_8" rowstretch="0,0,0,0,0,0,0">
+         <item row="3" column="0">
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>500</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Совпадение клиента</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
           <widget class="QGroupBox" name="groupBox_3">
            <property name="title">
             <string>Данные о устройстве</string>
@@ -303,7 +316,7 @@
            </layout>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="6" column="0">
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -381,7 +394,7 @@
            </layout>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="5" column="0">
           <widget class="QGroupBox" name="groupBox_4">
            <property name="title">
             <string>Финансы</string>
@@ -478,7 +491,7 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QGroupBox" name="groupBox">
            <property name="title">
             <string>Клиент</string>
@@ -607,6 +620,25 @@
            </layout>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_6">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>500</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Совпадение устройства</string>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -716,5 +748,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBox_5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>comboBox_7</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>216</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>180</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

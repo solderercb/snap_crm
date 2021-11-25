@@ -22,6 +22,7 @@
 #include <QToolButton>
 #include "sqlcreds.h"
 #include "ui_bottoolbarwidget.h"
+#include "dbconnection.h"
 
 namespace Ui {
 class MainWindow;
@@ -39,8 +40,7 @@ signals:
 public:
 	explicit MainWindow(QWidget *parent = 0); // Конструктор
 	~MainWindow();	// Деструктор
-	QSqlDatabase AppDB;
-	bool DBConnectionOK;
+    DBConnection* dbConnection;
 
 private:
 	Ui::MainWindow *ui; // Указатель на класс MainWindow
@@ -57,7 +57,7 @@ private:
 	QStringList tableConsignmentsHeaders;
 
 public slots:
-	void ConnectToDB(const QString &username, const QString &password, const uchar DB_ID);
+    void ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName);
 
 private slots:
 	void btnClick();

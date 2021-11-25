@@ -17,7 +17,7 @@ LoginWindow::~LoginWindow()
 
 void LoginWindow::ConnectToDB()
 {
-	emit this->ConnectToDB(ui->editLogin->text(), ui->editPassword->text(), 1);
+    emit this->ConnectToDB(ui->editLogin->text(), ui->editPassword->text(), ui->editIPaddr->text(), ui->editPort->text().toUInt(), ui->editDBName->text(), "connectionDefault");
 }
 
 void LoginWindow::slotCancelClick()

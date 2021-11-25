@@ -12,7 +12,7 @@ class LoginWindow : public QWidget
 	Q_OBJECT
 
 signals:
-	void ConnectToDB(const QString &username, const QString &password, const uchar DB_ID);
+    void ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName);
 	void btnCancelClick();
 
 public:
