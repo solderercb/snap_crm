@@ -15,11 +15,13 @@ LoginWindow::~LoginWindow()
 	delete ui;
 }
 
+// SLOT
 void LoginWindow::ConnectToDB()
 {
     emit this->ConnectToDB(ui->editLogin->text(), ui->editPassword->text(), ui->editIPaddr->text(), ui->editPort->text().toUInt(), ui->editDBName->text(), "connectionDefault");
 }
 
+// SLOT
 void LoginWindow::slotCancelClick()
 {
 	qDebug("Application close.");

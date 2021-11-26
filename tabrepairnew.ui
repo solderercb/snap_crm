@@ -26,109 +26,38 @@
        </property>
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,0,0">
-         <item row="5" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBox_4">
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string>Данные не важны</string>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBox">
+         <item row="12" column="0" colspan="3">
+          <widget class="QComboBox" name="comboBoxCompany">
            <property name="editable">
             <bool>true</bool>
            </property>
            <property name="currentText">
-            <string>Мастером назначить</string>
+            <string>Организация</string>
            </property>
-           <property name="placeholderText">
-            <string>asdf</string>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="3">
+          <widget class="QCheckBox" name="checkBoxIsQuick">
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string>Быстрый ремонт</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBox_2">
+          <widget class="QCheckBox" name="checkBoxWasInOtherWorkshop">
            <property name="layoutDirection">
             <enum>Qt::RightToLeft</enum>
            </property>
            <property name="text">
             <string>Было в другом СЦ</string>
-           </property>
-          </widget>
-         </item>
-         <item row="19" column="0" colspan="2">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Печать ПКО</string>
-           </property>
-          </widget>
-         </item>
-         <item row="20" column="2">
-          <widget class="QSpinBox" name="spinBox"/>
-         </item>
-         <item row="15" column="1" colspan="2">
-          <widget class="QComboBox" name="comboBox_5">
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-           <property name="currentText">
-            <string>Наличные</string>
-           </property>
-          </widget>
-         </item>
-         <item row="15" column="0">
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Оплата</string>
-           </property>
-          </widget>
-         </item>
-         <item row="18" column="2" alignment="Qt::AlignRight">
-          <widget class="QCheckBox" name="checkBox_8">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="12" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBox_2">
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-           <property name="currentText">
-            <string>Ячейка</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBox_7">
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string>Было в другом СЦ</string>
-           </property>
-          </widget>
-         </item>
-         <item row="19" column="2" alignment="Qt::AlignRight">
-          <widget class="QCheckBox" name="checkBox_9">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="16" column="0">
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Документ</string>
            </property>
           </widget>
          </item>
          <item row="2" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBox_3">
+          <widget class="QCheckBox" name="checkBoxIsHighPriority">
            <property name="layoutDirection">
             <enum>Qt::RightToLeft</enum>
            </property>
@@ -137,7 +66,21 @@
            </property>
           </widget>
          </item>
-         <item row="21" column="0" colspan="3">
+         <item row="18" column="0" colspan="2">
+          <widget class="QLabel" name="labelStickersCount">
+           <property name="text">
+            <string>Стикеров</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="0">
+          <widget class="QLabel" name="labelDoc">
+           <property name="text">
+            <string>Документ</string>
+           </property>
+          </widget>
+         </item>
+         <item row="19" column="0" colspan="3">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -150,28 +93,8 @@
            </property>
           </spacer>
          </item>
-         <item row="6" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBox_5">
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string>Ранее было в ремонте</string>
-           </property>
-          </widget>
-         </item>
-         <item row="14" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBox_4">
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-           <property name="currentText">
-            <string>Организация</string>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBox_3">
+         <item row="11" column="0" colspan="3">
+          <widget class="QComboBox" name="comboBoxOffice">
            <property name="editable">
             <bool>true</bool>
            </property>
@@ -180,28 +103,81 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBox">
+         <item row="10" column="0" colspan="3">
+          <widget class="QComboBox" name="comboBoxPresetBox">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentText">
+            <string>Ячейка</string>
+           </property>
+          </widget>
+         </item>
+         <item row="13" column="1" colspan="2">
+          <widget class="QComboBox" name="comboBoxPresetPaymentAccount">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentText">
+            <string>Наличные</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="3">
+          <widget class="QCheckBox" name="checkBoxWasEarlier">
            <property name="layoutDirection">
             <enum>Qt::RightToLeft</enum>
            </property>
            <property name="text">
-            <string>Быстрый ремонт</string>
+            <string>Ранее было в ремонте</string>
            </property>
           </widget>
          </item>
-         <item row="16" column="1" colspan="2">
-          <widget class="QComboBox" name="comboBox_6"/>
-         </item>
-         <item row="18" column="0" colspan="2">
-          <widget class="QLabel" name="label_10">
+         <item row="8" column="0" colspan="3">
+          <widget class="QLineEdit" name="lineEditPrevRepair">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
-            <string>Чек при выдаче</string>
+            <string>Предыдущий ремонт</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="3">
+          <widget class="QComboBox" name="comboBoxPresetEngineer">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentText">
+            <string>Мастером назначить</string>
+           </property>
+           <property name="placeholderText">
+            <string>asdf</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="1" colspan="2">
+          <widget class="QComboBox" name="comboBoxDoc">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="18" column="2">
+          <widget class="QSpinBox" name="spinBoxStickersCount"/>
+         </item>
+         <item row="5" column="0" colspan="3">
+          <widget class="QCheckBox" name="checkBoxIsImportantData">
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string>Данные не важны</string>
            </property>
           </widget>
          </item>
          <item row="7" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBox_6">
+          <widget class="QCheckBox" name="checkBoxIsWarranty">
            <property name="layoutDirection">
             <enum>Qt::RightToLeft</enum>
            </property>
@@ -210,26 +186,30 @@
            </property>
           </widget>
          </item>
-         <item row="20" column="0" colspan="2">
-          <widget class="QLabel" name="label_11">
+         <item row="13" column="0">
+          <widget class="QLabel" name="labelPaymentAccount">
            <property name="text">
-            <string>Стикеров</string>
+            <string>Оплата</string>
            </property>
           </widget>
          </item>
-         <item row="10" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBox_7">
-           <property name="enabled">
-            <bool>false</bool>
+         <item row="16" column="0" colspan="3">
+          <widget class="QCheckBox" name="checkBoxIsCheckNeeded">
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
            </property>
-           <property name="editable">
-            <bool>true</bool>
+           <property name="text">
+            <string>Чек при выдаче</string>
            </property>
-           <property name="currentText">
-            <string>Предыдущий ремонт</string>
+          </widget>
+         </item>
+         <item row="17" column="0" colspan="3">
+          <widget class="QCheckBox" name="checkBoxIsCashReceiptDocNeeded">
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
            </property>
-           <property name="placeholderText">
-            <string>asdf</string>
+           <property name="text">
+            <string>Печать ПКО</string>
            </property>
           </widget>
          </item>
@@ -238,7 +218,7 @@
        <item row="0" column="4">
         <layout class="QGridLayout" name="gridLayout_8" rowstretch="0,0,0,0,0,0,0">
          <item row="3" column="0">
-          <widget class="QGroupBox" name="groupBox_5">
+          <widget class="QGroupBox" name="groupBoxClientCoincidence">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -251,15 +231,15 @@
           </widget>
          </item>
          <item row="4" column="0">
-          <widget class="QGroupBox" name="groupBox_3">
+          <widget class="QGroupBox" name="groupBoxDeviceDescription">
            <property name="title">
             <string>Данные о устройстве</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_15">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_14">
+             <layout class="QGridLayout" name="gridLayoutDeviceDescription">
               <item row="0" column="2" colspan="2">
-               <widget class="QComboBox" name="comboBox_26">
+               <widget class="QComboBox" name="comboBoxIncomingSet">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -272,7 +252,7 @@
                </widget>
               </item>
               <item row="0" column="0" colspan="2">
-               <widget class="QComboBox" name="comboBox_25">
+               <widget class="QComboBox" name="comboBoxProblem">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -285,14 +265,14 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="3">
-               <widget class="QLineEdit" name="lineEdit_24">
+               <widget class="QLineEdit" name="lineEditAdditional">
                 <property name="text">
                  <string>Дополнительно для квитанции</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="4" colspan="2">
-               <widget class="QComboBox" name="comboBox_27">
+               <widget class="QComboBox" name="comboBoxExterior">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -305,7 +285,7 @@
                </widget>
               </item>
               <item row="1" column="3" colspan="3">
-               <widget class="QLineEdit" name="lineEdit_23">
+               <widget class="QLineEdit" name="lineEditInsideComment">
                 <property name="text">
                  <string>Внутренние примечания</string>
                 </property>
@@ -333,7 +313,7 @@
           </spacer>
          </item>
          <item row="0" column="0">
-          <widget class="QGroupBox" name="groupBox_2">
+          <widget class="QGroupBox" name="groupBoxDevice">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -345,9 +325,9 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_19">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_18">
+             <layout class="QGridLayout" name="gridLayoutDevice">
               <item row="0" column="0">
-               <widget class="QComboBox" name="comboBox_13">
+               <widget class="QComboBox" name="comboBoxDevice">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -357,7 +337,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBox_14">
+               <widget class="QComboBox" name="comboBoxManuf">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -367,7 +347,7 @@
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QComboBox" name="comboBox_15">
+               <widget class="QComboBox" name="comboBoxModel">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -377,7 +357,7 @@
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="lineEdit">
+               <widget class="QLineEdit" name="lineEditSN">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -395,15 +375,15 @@
           </widget>
          </item>
          <item row="5" column="0">
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="groupBoxFinances">
            <property name="title">
             <string>Финансы</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_17">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_16" columnstretch="1,0,1,0">
+             <layout class="QGridLayout" name="gridLayoutFinances" columnstretch="1,0,1,0">
               <item row="1" column="0">
-               <widget class="QCheckBox" name="checkBox_22">
+               <widget class="QCheckBox" name="checkBoxIsPrepay">
                 <property name="layoutDirection">
                  <enum>Qt::RightToLeft</enum>
                 </property>
@@ -413,14 +393,14 @@
                </widget>
               </item>
               <item row="1" column="3">
-               <widget class="QPushButton" name="pushButton_7">
+               <widget class="QPushButton" name="pushButtonCashReceipt">
                 <property name="text">
                  <string>Принять</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_25">
+               <widget class="QLineEdit" name="lineEditPrepaySumm">
                 <property name="inputMask">
                  <string>000000,00</string>
                 </property>
@@ -442,7 +422,7 @@
                </widget>
               </item>
               <item row="1" column="2">
-               <widget class="QComboBox" name="comboBox_28">
+               <widget class="QComboBox" name="comboBoxPrepayAccount">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -455,7 +435,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBox_23">
+               <widget class="QCheckBox" name="checkBoxIsEstPrice">
                 <property name="layoutDirection">
                  <enum>Qt::RightToLeft</enum>
                 </property>
@@ -465,7 +445,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_26">
+               <widget class="QLineEdit" name="lineEditEstPrice">
                 <property name="inputMask">
                  <string>000000,00</string>
                 </property>
@@ -492,53 +472,53 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QGroupBox" name="groupBox">
+          <widget class="QGroupBox" name="groupBoxClient">
            <property name="title">
-            <string>Клиент</string>
+            <string>Клиент (частное лицо)</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_13">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_12" columnstretch="1,1,1,1,1,1,1,1,0">
+             <layout class="QGridLayout" name="gridLayoutClient" columnstretch="1,1,1,1,1,1,1,1,0">
               <property name="sizeConstraint">
                <enum>QLayout::SetMaximumSize</enum>
               </property>
               <item row="3" column="2" colspan="2">
-               <widget class="QLineEdit" name="lineEdit_7">
+               <widget class="QLineEdit" name="lineEditClientAddress">
                 <property name="text">
                  <string>Адрес</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="6" colspan="2">
-               <widget class="QLineEdit" name="lineEdit_6">
+               <widget class="QLineEdit" name="lineEditClientPhone2">
                 <property name="text">
                  <string>Доплонительный номер тел.</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="4" colspan="2">
-               <widget class="QLineEdit" name="lineEdit_4">
+               <widget class="QLineEdit" name="lineEditClientPatronymic">
                 <property name="text">
                  <string>Отчество</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QLineEdit" name="lineEdit_2">
+               <widget class="QLineEdit" name="lineEditClientLastName">
                 <property name="text">
                  <string>Фамилия</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="2" colspan="2">
-               <widget class="QLineEdit" name="lineEdit_3">
+               <widget class="QLineEdit" name="lineEditClientFirstName">
                 <property name="text">
                  <string>Имя</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="0" colspan="2">
-               <widget class="QComboBox" name="comboBox_17">
+               <widget class="QComboBox" name="comboBoxClientAd">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -551,21 +531,21 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="pushButtonClientFromDB">
                 <property name="text">
                  <string>Клиент из списка</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="6" colspan="2">
-               <widget class="QLineEdit" name="lineEdit_5">
+               <widget class="QLineEdit" name="lineEditClientPhone1">
                 <property name="text">
-                 <string>Номер елефона</string>
+                 <string>Номер телефона</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBox_19">
+               <widget class="QCheckBox" name="checkBoxClientType">
                 <property name="layoutDirection">
                  <enum>Qt::RightToLeft</enum>
                 </property>
@@ -575,20 +555,20 @@
                </widget>
               </item>
               <item row="1" column="8">
-               <widget class="QComboBox" name="comboBox_18"/>
+               <widget class="QComboBox" name="comboBoxClientPhone1Type"/>
               </item>
               <item row="3" column="4" colspan="2">
-               <widget class="QLineEdit" name="lineEdit_8">
+               <widget class="QLineEdit" name="lineEditClientEmail">
                 <property name="text">
                  <string>e-mail</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="8">
-               <widget class="QComboBox" name="comboBox_16"/>
+               <widget class="QComboBox" name="comboBoxClientPhone2Type"/>
               </item>
               <item row="0" column="2">
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="pushButtonClientCredsClearAll">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -621,7 +601,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBox_6">
+          <widget class="QGroupBox" name="groupBoxDeviceCoincidence">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -747,23 +727,108 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comboBoxDevice</tabstop>
+  <tabstop>comboBoxManuf</tabstop>
+  <tabstop>comboBoxModel</tabstop>
+  <tabstop>lineEditSN</tabstop>
+  <tabstop>lineEditClientLastName</tabstop>
+  <tabstop>lineEditClientFirstName</tabstop>
+  <tabstop>lineEditClientPatronymic</tabstop>
+  <tabstop>lineEditClientPhone1</tabstop>
+  <tabstop>comboBoxClientPhone1Type</tabstop>
+  <tabstop>comboBoxClientAd</tabstop>
+  <tabstop>lineEditClientAddress</tabstop>
+  <tabstop>lineEditClientEmail</tabstop>
+  <tabstop>lineEditClientPhone2</tabstop>
+  <tabstop>comboBoxClientPhone2Type</tabstop>
+  <tabstop>comboBoxProblem</tabstop>
+  <tabstop>comboBoxIncomingSet</tabstop>
+  <tabstop>comboBoxExterior</tabstop>
+  <tabstop>lineEditAdditional</tabstop>
+  <tabstop>lineEditInsideComment</tabstop>
+  <tabstop>checkBoxIsQuick</tabstop>
+  <tabstop>checkBoxWasInOtherWorkshop</tabstop>
+  <tabstop>checkBoxIsHighPriority</tabstop>
+  <tabstop>checkBoxIsImportantData</tabstop>
+  <tabstop>checkBoxWasEarlier</tabstop>
+  <tabstop>checkBoxIsWarranty</tabstop>
+  <tabstop>lineEditPrevRepair</tabstop>
+  <tabstop>comboBoxPresetEngineer</tabstop>
+  <tabstop>comboBoxPresetBox</tabstop>
+  <tabstop>spinBoxStickersCount</tabstop>
+  <tabstop>checkBoxIsEstPrice</tabstop>
+  <tabstop>lineEditEstPrice</tabstop>
+  <tabstop>checkBoxIsPrepay</tabstop>
+  <tabstop>lineEditPrepaySumm</tabstop>
+  <tabstop>comboBoxPrepayAccount</tabstop>
+  <tabstop>pushButtonCashReceipt</tabstop>
+  <tabstop>comboBoxOffice</tabstop>
+  <tabstop>comboBoxCompany</tabstop>
+  <tabstop>comboBoxPresetPaymentAccount</tabstop>
+  <tabstop>comboBoxDoc</tabstop>
+  <tabstop>checkBoxIsCheckNeeded</tabstop>
+  <tabstop>checkBoxIsCashReceiptDocNeeded</tabstop>
+  <tabstop>checkBoxClientType</tabstop>
+  <tabstop>pushButtonClientFromDB</tabstop>
+  <tabstop>pushButtonClientCredsClearAll</tabstop>
+  <tabstop>CentnerButton3_2</tabstop>
+  <tabstop>CentnerButton2_2</tabstop>
+  <tabstop>CentnerButton1_2</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>checkBox_5</sender>
+   <sender>checkBoxClientType</sender>
    <signal>toggled(bool)</signal>
-   <receiver>comboBox_7</receiver>
-   <slot>setEnabled(bool)</slot>
+   <receiver>tabRepairNew</receiver>
+   <slot>changeClientType()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>216</x>
-     <y>116</y>
+     <x>332</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>180</x>
-     <y>186</y>
+     <x>63</x>
+     <y>8</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxWasEarlier</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>enableLineEditPrevRepair()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>219</x>
+     <y>109</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>99</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxIsWarranty</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>enableLineEditPrevRepair()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>191</x>
+     <y>-3</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>changeClientType()</slot>
+  <slot>enableLineEditPrevRepair()</slot>
+ </slots>
 </ui>

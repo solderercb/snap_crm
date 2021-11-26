@@ -13,7 +13,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QTextCodec::setCodecForLocale(codec);
 
-	ui->setupUi(this);
+#ifdef NO_LOGIN
+    ConnectToDB(SQL_USER, SQL_PSWD, SQL_HOST, SQL_PORT, SQL_DB, "connMain");
+#endif
+
+    ui->setupUi(this);
+    this->resize(960,640);
     ui->tab_store_items->showMaximized();
 
     /* Кнопка Ремонты и меню */
@@ -84,8 +89,28 @@ MainWindow::MainWindow(QWidget *parent) :
     gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
     gridLayout_2->SetMaximumSize;
 
+    QPushButton* pushButton05 = new QPushButton();
+    pushButton05->setText("pushButton05");
+    pushButton05->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+    gridLayout_2->addWidget(pushButton05, 0, 0, 3, 1);
+    QPushButton* pushButton04 = new QPushButton();
+    pushButton04->setText("pushButton04");
+    gridLayout_2->addWidget(pushButton04, 1, 2, 1, 1);
+    QPushButton* pushButton03 = new QPushButton();
+    pushButton03->setText("pushButton03");
+    gridLayout_2->addWidget(pushButton03, 2, 2, 1, 1);
+    QPushButton* pushButton02 = new QPushButton();
+    pushButton02->setText("pushButton02");
+    gridLayout_2->addWidget(pushButton02, 3, 3, 1, 1);
+    QPushButton* pushButton01 = new QPushButton();
+    pushButton01->setText("pushButton01");
+    gridLayout_2->addWidget(pushButton01, 5, 3, 1, 1);
     BotToolbarWidget* BotToolbarWidget_ = new BotToolbarWidget(ui->tab_workshop);
     gridLayout_2->addWidget(BotToolbarWidget_, 6, 0, 1, 4, Qt::AlignBottom);
+
+    tabRepairNew *subwindow = new tabRepairNew();
+    subwindow->setObjectName(QString::fromUtf8("subwindow"));
+    ui->mdiArea->addSubWindow(subwindow);
 
 	comboboxSourceModel = new QStandardItemModel();
 	ui->comboBoxSourceWarehouse->setModel(comboboxSourceModel);
@@ -128,11 +153,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	QObject::connect(ui->btnLogin,SIGNAL(clicked(bool)),this,SLOT(btnClick()));
 
-#ifdef NO_LOGIN
-    ConnectToDB(SQL_USER, SQL_PSWD, SQL_HOST, SQL_PORT, SQL_DB, "connMain");
-#endif
-	get_warehouses_list();
-	btnClick();
+    get_warehouses_list();
+    btnClick();
 }
 
 MainWindow::~MainWindow()
@@ -199,7 +221,7 @@ void MainWindow::btnClick()
                 while (store_cats_ids[j] != parent)
                     j++;
                 parentItem = store_cats[j];
-                qDebug() << store_cats[i]->text().toStdWString() << " and it's parent " << store_cats[j]->text().toStdWString();
+//                qDebug() << store_cats[i]->text().toStdWString() << " and it's parent " << store_cats[j]->text().toStdWString();
                 store_cats[j]->appendRow(store_cats[i]);
             }
 //        }

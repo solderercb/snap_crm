@@ -586,11 +586,6 @@
         <string>Дочернее окно</string>
        </property>
       </widget>
-      <widget class="tabRepairNew" name="subwindow">
-       <property name="windowTitle">
-        <string>Subwindow</string>
-       </property>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -629,14 +624,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="1" margin="0"/>
- <customwidgets>
-  <customwidget>
-   <class>tabRepairNew</class>
-   <extends>QWidget</extends>
-   <header>tabrepairnew.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
  <designerdata>
