@@ -23,10 +23,14 @@ private:
     void getDevices();
     DBConnection* dbConnection;
     QStandardItemModel* comboboxDevicesModel;
+    QStandardItemModel* comboboxDeviceMakersModel;
+    QStandardItemModel* comboboxDeviceModelsModel;
 
 private slots:
     void changeClientType();
     void enableLineEditPrevRepair();
+    void changeDeviceType();
+    void changeDeviceMaker();
 
 };
 

@@ -337,7 +337,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBoxManuf">
+               <widget class="QComboBox" name="comboBoxDeviceMaker">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -347,7 +347,7 @@
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QComboBox" name="comboBoxModel">
+               <widget class="QComboBox" name="comboBoxDeviceModel">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -729,8 +729,8 @@
  </widget>
  <tabstops>
   <tabstop>comboBoxDevice</tabstop>
-  <tabstop>comboBoxManuf</tabstop>
-  <tabstop>comboBoxModel</tabstop>
+  <tabstop>comboBoxDeviceMaker</tabstop>
+  <tabstop>comboBoxDeviceModel</tabstop>
   <tabstop>lineEditSN</tabstop>
   <tabstop>lineEditClientLastName</tabstop>
   <tabstop>lineEditClientFirstName</tabstop>
@@ -826,9 +826,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>comboBoxDevice</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>changeDeviceType()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>387</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>368</x>
+     <y>7</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxDeviceMaker</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>changeDeviceMaker()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>566</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>539</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
   <slot>enableLineEditPrevRepair()</slot>
+  <slot>changeDeviceType()</slot>
+  <slot>changeDeviceMaker()</slot>
  </slots>
 </ui>
