@@ -19,12 +19,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
     this->resize(960,640);
-    ui->tab_store_items->showMaximized();
 
     /* Кнопка Ремонты и меню */
     QMenu *workshop_menu = new QMenu();
     QAction *workshop_new = new QAction("Принять", this);
     workshop_menu->addAction(workshop_new);
+    QObject::connect(workshop_new,SIGNAL(triggered()),this,SLOT(createTabRepairNew()));
     QAction *workshop_refill = new QAction("Заправка", this);
     workshop_menu->addAction(workshop_refill);
     QAction *workshop_price = new QAction("Прайс-лист", this);
@@ -66,51 +66,25 @@ MainWindow::MainWindow(QWidget *parent) :
     goods_button->setFixedSize(96,48);
     ui->toolBar->addWidget(goods_button);
 
-    ui->dockWidget_3->setTitleBarWidget(new QWidget());
-//    QToolBar *tab_toolbar=new QToolBar("toolbar",ui->dockWidgetContents_2);
-//    tab_toolbar->setMinimumSize(QSize(0, 48));
-//    tab_toolbar->setIconSize(QSize(96, 48));
-//    tab_toolbar->setAllowedAreas(Qt::BottomToolBarArea);
-//    tab_toolbar->setMovable(1);
-//    tab_toolbar->addAction("action1");
-//    tab_toolbar->addAction("action2");
 
-    ui->pushButton_9->setStyleSheet("::hover { border: 2px solid #8f8f91; border-radius: 6px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f6f7fa, stop: 1 #dadbde);}"); // LOL работает
-
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHeightForWidth(ui->tab_test->sizePolicy().hasHeightForWidth());
-    sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-    sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
-    ui->tab_test->setSizePolicy(sizePolicy);
-    QGridLayout* gridLayout_2 = new QGridLayout(ui->tab_test);
-    gridLayout_2->setSpacing(1);
-    gridLayout_2->setContentsMargins(0, 0, 0, 0);
-    gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
-    gridLayout_2->SetMaximumSize;
+//    ui->pushButton_9->setStyleSheet("::hover { border: 2px solid #8f8f91; border-radius: 6px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f6f7fa, stop: 1 #dadbde);}"); // LOL работает
 
     QPushButton* pushButton05 = new QPushButton();
     pushButton05->setText("pushButton05");
     pushButton05->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
-    gridLayout_2->addWidget(pushButton05, 0, 0, 3, 1);
+    ui->gridLayout_4->addWidget(pushButton05, 0, 0, 3, 1);
     QPushButton* pushButton04 = new QPushButton();
     pushButton04->setText("pushButton04");
-    gridLayout_2->addWidget(pushButton04, 1, 2, 1, 1);
+    ui->gridLayout_4->addWidget(pushButton04, 1, 2, 1, 1);
     QPushButton* pushButton03 = new QPushButton();
     pushButton03->setText("pushButton03");
-    gridLayout_2->addWidget(pushButton03, 2, 2, 1, 1);
+    ui->gridLayout_4->addWidget(pushButton03, 2, 2, 1, 1);
     QPushButton* pushButton02 = new QPushButton();
     pushButton02->setText("pushButton02");
-    gridLayout_2->addWidget(pushButton02, 3, 3, 1, 1);
+    ui->gridLayout_4->addWidget(pushButton02, 3, 3, 1, 1);
     QPushButton* pushButton01 = new QPushButton();
     pushButton01->setText("pushButton01");
-    gridLayout_2->addWidget(pushButton01, 5, 3, 1, 1);
-    BotToolbarWidget* BotToolbarWidget_ = new BotToolbarWidget(ui->tab_workshop);
-    gridLayout_2->addWidget(BotToolbarWidget_, 6, 0, 1, 4, Qt::AlignBottom);
-
-    tabRepairNew *subwindow = new tabRepairNew();
-    subwindow->setObjectName(QString::fromUtf8("subwindow"));
-    ui->mdiArea->addSubWindow(subwindow);
+    ui->gridLayout_4->addWidget(pushButton01, 5, 3, 1, 1);
 
 	comboboxSourceModel = new QStandardItemModel();
 	ui->comboBoxSourceWarehouse->setModel(comboboxSourceModel);
@@ -389,14 +363,27 @@ void MainWindow::readConsignments(const QModelIndex &index, const QString &wareh
 
 void MainWindow::on_workshop_button_triggered()
 {
+    qDebug() << "Слот вызова вкладки Ремонты";
     // create new subwindow
 //    QMdiSubWindow *subWindow1 = new QMdiSubWindow(ui->mdiArea);
     // create new widget for the mdi window ( the inner )
     QWidget *myWidget = new QWidget();
-    ui->mdiArea->addSubWindow(myWidget);
+    ui->tabWidget->addTab(myWidget, "myWidget");
 //    QPushButton* pushButton = new QPushButton(myWidget);
 //    subWindow1->show();
     myWidget->show();
 
 }
 
+void MainWindow::createTabRepairNew()
+{
+    tabRepairNew *subwindow = tabRepairNew::getInstance();
+    ui->tabWidget->addTab(subwindow, "Приём в ремонт");
+    ui->tabWidget->setCurrentWidget(subwindow);
+}
+
+void MainWindow::closeTab(int index)
+{
+    delete ui->tabWidget->widget(index);
+    ui->tabWidget->removeTab(index);
+}

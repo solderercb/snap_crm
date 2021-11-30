@@ -68,6 +68,8 @@ private slots:
 	void on_tableConsignments_clicked(const QModelIndex &index);
 	void on_tableGoods_clicked(const QModelIndex &index);
     void on_workshop_button_triggered();
+    void createTabRepairNew();
+    void closeTab(int index);
 };
 
 #endif // MAINWINDOW_H

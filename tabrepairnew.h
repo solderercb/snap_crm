@@ -16,10 +16,12 @@ class tabRepairNew : public QWidget
 
 public:
     explicit tabRepairNew(QWidget *parent = nullptr);
+    static tabRepairNew* getInstance(QWidget *parent = nullptr);
     ~tabRepairNew();
 
 private:
     Ui::tabRepairNew *ui;
+    static tabRepairNew* p_instance;
     void getDevices();
     DBConnection* dbConnection;
     QStandardItemModel* comboboxDevicesModel;

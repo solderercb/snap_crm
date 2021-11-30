@@ -1,16 +1,16 @@
 #include "tabrepairnew.h"
 #include "ui_tabrepairnew.h"
-#include "bottoolbarwidget.h"
+
+tabRepairNew* tabRepairNew::p_instance = nullptr;
 
 tabRepairNew::tabRepairNew(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::tabRepairNew)
 {
-    enum {store_cats_id, store_cats_parent, store_cats_name, store_cats_position};
-
     ui->setupUi(this);
-//    BotToolbarWidget* botToolbarWidget_ = new BotToolbarWidget(ui->botToolbar);
-//    ui->gridLayout->addWidget(botToolbarWidget_, 30, 0, 1, 5, Qt::AlignBottom);
+    this->setWindowTitle("Приём в ремонт");
+    this->setAttribute(Qt::WA_DeleteOnClose);
+
     ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
     ui->groupBoxClientCoincidence->hide();  // по умолчанию группу "Совпадение клиента" не показываем
 
@@ -36,16 +36,16 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     device_list->exec(query);
 
 //    newRow = new QStandardItem();
-//    newRow->setText("All");
+//    newRow->setText("");
 //    newRow->setData("0",Qt::UserRole+1);
-//    comboboxDevicesModel->appendRow(newRow);	// Добавляем строку в модель comboBox (склад-источник)
+//    comboboxDevicesModel->appendRow(newRow);	// Добавляем пустую строку в модель comboBox (тип уст-ва)
 
     while(device_list->next())
     {
         newRow = new QStandardItem();
         newRow->setText(device_list->value(0).toString());
         newRow->setData(device_list->value(1).toString(),Qt::UserRole+1);
-        comboboxDevicesModel->appendRow(newRow);	// Добавляем строку в модель comboBox (устройство)
+        comboboxDevicesModel->appendRow(newRow);	// Добавляем строку в модель comboBox (тип уст-ва)
     }
 
     delete device_list;
@@ -53,7 +53,18 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
 
 tabRepairNew::~tabRepairNew()
 {
+    delete comboboxDeviceMakersModel;
+    delete comboboxDeviceModelsModel;
+    delete comboboxDevicesModel;
     delete ui;
+    p_instance = nullptr;   // Обязательно блять!
+}
+
+tabRepairNew* tabRepairNew::getInstance(QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна
+{
+if( !p_instance )
+  p_instance = new tabRepairNew(parent);
+return p_instance;
 }
 
 void tabRepairNew::getDevices()
