@@ -21,7 +21,6 @@
 #include <QMenu>
 #include <QToolButton>
 #include "sqlcreds.h"
-#include "ui_bottoolbarwidget.h"
 #include "dbconnection.h"
 
 namespace Ui {
@@ -67,7 +66,7 @@ private slots:
 	void on_tableGoods_activated(const QModelIndex &index);
 	void on_tableConsignments_clicked(const QModelIndex &index);
 	void on_tableGoods_clicked(const QModelIndex &index);
-    void on_workshop_button_triggered();
+    void createTabRepairs();
     void createTabRepairNew();
     void closeTab(int index);
 };

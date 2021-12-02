@@ -375,5 +375,6 @@
  </designerdata>
  <slots>
   <slot>closeTab(int)</slot>
+  <slot>createTabRepairs()</slot>
  </slots>
 </ui>

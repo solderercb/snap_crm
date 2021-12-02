@@ -28,6 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
     bottoolbarwidget.cpp \
     dbconnection.cpp \
+    lineedit.cpp \
 				mainwindow.cpp \
     loginwindow.cpp \
     my_widget.cpp \
@@ -36,6 +37,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     bottoolbarwidget.h \
     dbconnection.h \
+    lineedit.h \
     loginwindow.h \
     my_widget.h \
     tabrepairnew.h

@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QToolButton>
+#include <QStyle>
 #include "dbconnection.h"
 
 namespace Ui {
@@ -30,9 +32,10 @@ private:
 
 private slots:
     void changeClientType();
-    void enableLineEditPrevRepair();
+    void showLineEditPrevRepair();
     void changeDeviceType();
     void changeDeviceMaker();
+    void clearClientCreds();
 
 };
 

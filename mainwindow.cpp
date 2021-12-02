@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "bottoolbarwidget.h"
 #include "tabrepairnew.h"
+#include "lineedit.h"
 
 #define NO_LOGIN
 
@@ -32,12 +33,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *workshop_editor = new QAction("Групповой редактор ремонтов", this);
     workshop_menu->addAction(workshop_editor);
     QToolButton* workshop_button = new QToolButton();
-    QObject::connect(workshop_button,SIGNAL(clicked()),this,SLOT(on_workshop_button_triggered()));
+//    QAction *workshop = new QAction("Ремонты", this);
+//    workshop_button->addAction(workshop);
     workshop_button->setMenu(workshop_menu);
     workshop_button->setPopupMode(QToolButton::MenuButtonPopup);
     workshop_button->setText("Ремонты");
     workshop_button->setFixedSize(96,48);
     ui->toolBar->addWidget(workshop_button);
+    QObject::connect(workshop_button, SIGNAL(clicked()), this, SLOT(createTabRepairs()));
 
     /* Кнопка Товары и меню */
     QMenu *goods_menu = new QMenu();
@@ -66,9 +69,6 @@ MainWindow::MainWindow(QWidget *parent) :
     goods_button->setFixedSize(96,48);
     ui->toolBar->addWidget(goods_button);
 
-
-//    ui->pushButton_9->setStyleSheet("::hover { border: 2px solid #8f8f91; border-radius: 6px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f6f7fa, stop: 1 #dadbde);}"); // LOL работает
-
     QPushButton* pushButton05 = new QPushButton();
     pushButton05->setText("pushButton05");
     pushButton05->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
@@ -85,6 +85,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton* pushButton01 = new QPushButton();
     pushButton01->setText("pushButton01");
     ui->gridLayout_4->addWidget(pushButton01, 5, 3, 1, 1);
+
+    QString buttons = "Edit,Search,Clear";
+    myLineEdit* test_le = new myLineEdit(this, &buttons);
+    ui->gridLayout_4->addWidget(test_le, 6, 3, 1, 1);
 
 	comboboxSourceModel = new QStandardItemModel();
 	ui->comboBoxSourceWarehouse->setModel(comboboxSourceModel);
@@ -361,7 +365,7 @@ void MainWindow::readConsignments(const QModelIndex &index, const QString &wareh
 }
 
 
-void MainWindow::on_workshop_button_triggered()
+void MainWindow::createTabRepairs()
 {
     qDebug() << "Слот вызова вкладки Ремонты";
     // create new subwindow
@@ -372,7 +376,6 @@ void MainWindow::on_workshop_button_triggered()
 //    QPushButton* pushButton = new QPushButton(myWidget);
 //    subWindow1->show();
     myWidget->show();
-
 }
 
 void MainWindow::createTabRepairNew()

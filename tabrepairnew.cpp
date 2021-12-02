@@ -11,8 +11,51 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
 
+    QToolButton* toolButtonSelectPrevRepair = new QToolButton(ui->lineEditPrevRepair);
+    QPixmap pixmap(":magnifier.ico");
+    toolButtonSelectPrevRepair->setIcon(QIcon(pixmap));
+    toolButtonSelectPrevRepair->setIconSize(pixmap.size());
+    toolButtonSelectPrevRepair->setCursor(Qt::ArrowCursor);
+    toolButtonSelectPrevRepair->setStyleSheet("QToolButton"
+                              "{"
+                              "border: none; padding: 0px;"
+                              "}");
+
+    setStyleSheet(QString("QLineEdit"
+                          "{"
+                          "border: 1px solid;"
+                          "border-color: rgb(148, 168, 199);"
+                          "border-radius: 10px;"
+                          "background: white;"
+                          "padding-left: %1px;"
+                          "}").arg(toolButtonSelectPrevRepair->sizeHint().width() - 4));
+
+    setMinimumSize(0, 25);
+
+
     ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
     ui->groupBoxClientCoincidence->hide();  // по умолчанию группу "Совпадение клиента" не показываем
+    ui->labelPrevRepairFromOldDB->hide();   // по умолчанию поля "Предыдущий ремонт" не показываем
+    ui->lineEditPrevRepairFromOldDB->hide();
+    ui->lineEditPrevRepair->hide();
+
+    ui->lineEditEstPrice->setDisabled(true);
+    ui->lineEditPrepaySumm->setDisabled(true);
+    ui->comboBoxPrepayAccount->setDisabled(true);
+    ui->pushButtonCashReceipt->setDisabled(true);
+    ui->comboBoxProblem->lineEdit()->setPlaceholderText("неисправность");
+    ui->comboBoxIncomingSet->lineEdit()->setPlaceholderText("комплектность");
+    ui->comboBoxExterior->lineEdit()->setPlaceholderText("внешний вид");
+    ui->comboBoxClientAd->lineEdit()->setPlaceholderText("источник обращения");
+    ui->comboBoxDevice->lineEdit()->setPlaceholderText("устройство");
+    ui->comboBoxDeviceMaker->lineEdit()->setPlaceholderText("производитель");
+    ui->comboBoxDeviceModel->lineEdit()->setPlaceholderText("модель");
+    ui->comboBoxPresetEngineer->lineEdit()->setPlaceholderText("назначить инженером");
+    ui->comboBoxPresetBox->lineEdit()->setPlaceholderText("ячейка");
+    ui->comboBoxOffice->lineEdit()->setPlaceholderText("офис");
+    ui->comboBoxCompany->lineEdit()->setPlaceholderText("организация");
+    ui->comboBoxPresetPaymentAccount->lineEdit()->setPlaceholderText("тип оплаты");
+    ui->comboBoxPrepayAccount->lineEdit()->setPlaceholderText("тип оплаты");
 
     ui->comboBoxPresetEngineer->addItem("aaaa");
     ui->comboBoxPresetEngineer->addItem("bbbb");
@@ -83,7 +126,7 @@ void tabRepairNew::changeClientType()
         ui->groupBoxClient->setTitle("Клиент (юридическое лицо)");
         ui->lineEditClientFirstName->hide();    // скрываем поле "Имя"
         ui->lineEditClientPatronymic->hide();    // скрываем поле "Отчество"
-        ui->lineEditClientLastName->setText("Название организации");
+        ui->lineEditClientLastName->setPlaceholderText("Название организации");
         index = ui->gridLayoutClient->indexOf(ui->lineEditClientLastName);  // получаем индекс поля "Фамилия" в объекте компоновки
         ui->gridLayoutClient->getItemPosition(index, &row, &col, &span_row, &span_col); // получаем координаты поля
         ui->gridLayoutClient->addWidget(ui->lineEditClientLastName, row, col, span_row, 6); // заменяем поле "Фамилия" самим собой, но растягиваем его по ширине на 6 столбцов (занимаем столбцы полей "Имя" и "Отчество")
@@ -94,21 +137,27 @@ void tabRepairNew::changeClientType()
         index = ui->gridLayoutClient->indexOf(ui->lineEditClientLastName);  // получаем индекс поля "Фамилия" в объекте компоновки
         ui->gridLayoutClient->getItemPosition(index, &row, &col, &span_row, &span_col); // получаем координаты поля
         ui->gridLayoutClient->addWidget(ui->lineEditClientLastName, row, col, span_row, 2); // заменяем поле "Фамилия" самим собой, но сжимаем его по ширине до двух столбцов
-        ui->lineEditClientLastName->setText("Фамилия");
+        ui->lineEditClientLastName->setPlaceholderText("Фамилия");
         ui->lineEditClientFirstName->show();    // показываем поле "Имя"
         ui->lineEditClientPatronymic->show();    // показываем поле "Отчество"
     }
 }
 
-void tabRepairNew::enableLineEditPrevRepair()
+void tabRepairNew::showLineEditPrevRepair()
 {
     if(ui->checkBoxWasEarlier->checkState() || ui->checkBoxIsWarranty->checkState())
     {
-        ui->lineEditPrevRepair->setEnabled(true);
+        ui->lineEditPrevRepair->show();
+//        ui->labelPrevRepairFromOldDB->show();
+//        ui->lineEditPrevRepairFromOldDB->show();
+//        ui->lineEditPrevRepair->show();
     }
     else
     {
-        ui->lineEditPrevRepair->setDisabled(true);
+        ui->lineEditPrevRepair->hide();
+//        ui->labelPrevRepairFromOldDB->hide();
+//        ui->lineEditPrevRepairFromOldDB->hide();
+//        ui->lineEditPrevRepair->hide();
     }
 
 }
@@ -166,4 +215,16 @@ void tabRepairNew::changeDeviceMaker()
     }
 
     delete query_result;
+}
+
+void tabRepairNew::clearClientCreds()
+{
+    ui->lineEditClientLastName->clear();
+    ui->lineEditClientFirstName->clear();
+    ui->lineEditClientPatronymic->clear();
+    ui->lineEditClientPhone1->clear();
+    ui->comboBoxClientAd->setCurrentIndex(0); // Выбираем первый эл-т в списке
+    ui->lineEditClientAddress->clear();
+    ui->lineEditClientEmail->clear();
+    ui->lineEditClientPhone2->clear();
 }
