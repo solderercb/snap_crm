@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "bottoolbarwidget.h"
 #include "tabrepairnew.h"
-#include "lineedit.h"
+#include "mylineedit.h"
 
 #define NO_LOGIN
 
@@ -86,9 +86,11 @@ MainWindow::MainWindow(QWidget *parent) :
     pushButton01->setText("pushButton01");
     ui->gridLayout_4->addWidget(pushButton01, 5, 3, 1, 1);
 
-    QString buttons = "Edit,Search,Clear";
-    myLineEdit* test_le = new myLineEdit(this, &buttons);
-    ui->gridLayout_4->addWidget(test_le, 6, 3, 1, 1);
+
+    tabRepairNew *subwindow = tabRepairNew::getInstance();
+
+    ui->tabWidget->addTab(subwindow, "Приём в ремонт");
+    ui->tabWidget->setCurrentWidget(subwindow);
 
 	comboboxSourceModel = new QStandardItemModel();
 	ui->comboBoxSourceWarehouse->setModel(comboboxSourceModel);

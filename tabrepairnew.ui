@@ -169,7 +169,7 @@
           </widget>
          </item>
          <item row="8" column="0" colspan="3">
-          <widget class="QLineEdit" name="lineEditPrevRepair">
+          <widget class="myLineEdit" name="lineEditPrevRepair">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -805,6 +805,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>myLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>mylineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>comboBoxDevice</tabstop>
   <tabstop>comboBoxDeviceMaker</tabstop>

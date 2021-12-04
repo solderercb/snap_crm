@@ -11,28 +11,6 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    QToolButton* toolButtonSelectPrevRepair = new QToolButton(ui->lineEditPrevRepair);
-    QPixmap pixmap(":magnifier.ico");
-    toolButtonSelectPrevRepair->setIcon(QIcon(pixmap));
-    toolButtonSelectPrevRepair->setIconSize(pixmap.size());
-    toolButtonSelectPrevRepair->setCursor(Qt::ArrowCursor);
-    toolButtonSelectPrevRepair->setStyleSheet("QToolButton"
-                              "{"
-                              "border: none; padding: 0px;"
-                              "}");
-
-    setStyleSheet(QString("QLineEdit"
-                          "{"
-                          "border: 1px solid;"
-                          "border-color: rgb(148, 168, 199);"
-                          "border-radius: 10px;"
-                          "background: white;"
-                          "padding-left: %1px;"
-                          "}").arg(toolButtonSelectPrevRepair->sizeHint().width() - 4));
-
-    setMinimumSize(0, 25);
-
-
     ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
     ui->groupBoxClientCoincidence->hide();  // по умолчанию группу "Совпадение клиента" не показываем
     ui->labelPrevRepairFromOldDB->hide();   // по умолчанию поля "Предыдущий ремонт" не показываем
@@ -56,6 +34,7 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxCompany->lineEdit()->setPlaceholderText("организация");
     ui->comboBoxPresetPaymentAccount->lineEdit()->setPlaceholderText("тип оплаты");
     ui->comboBoxPrepayAccount->lineEdit()->setPlaceholderText("тип оплаты");
+    ui->lineEditPrevRepair->setButtons("Search, DownArrow");
 
     ui->comboBoxPresetEngineer->addItem("aaaa");
     ui->comboBoxPresetEngineer->addItem("bbbb");
