@@ -28,11 +28,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
     bottoolbarwidget.cpp \
     dbconnection.cpp \
-    mainwindow.cpp \
+				mainwindow.cpp \
     loginwindow.cpp \
     my_widget.cpp \
     mylineedit.cpp \
-    tabrepairnew.cpp
+    repairstablemodel.cpp \
+    tabrepairnew.cpp \
+    tabrepairs.cpp
 
 HEADERS  += mainwindow.h \
     bottoolbarwidget.h \
@@ -40,11 +42,14 @@ HEADERS  += mainwindow.h \
     loginwindow.h \
     my_widget.h \
     mylineedit.h \
-    tabrepairnew.h
+    repairstablemodel.h \
+    tabrepairnew.h \
+    tabrepairs.h
 
 FORMS    += mainwindow.ui \
     bottoolbarwidget.ui \
     loginwindow.ui \
-    tabrepairnew.ui
+    tabrepairnew.ui \
+    tabrepairs.ui
 
 DISTFILES +=

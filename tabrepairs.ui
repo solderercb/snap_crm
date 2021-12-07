@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>tabRepairs</class>
+ <widget class="QWidget" name="tabRepairs">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
+     </property>
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0,0">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMaximumSize</enum>
+       </property>
+       <item row="0" column="3">
+        <layout class="QGridLayout" name="gridLayout_8" rowstretch="0"/>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QWidget" name="botToolbar" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <property name="verticalSpacing">
+         <number>15</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::HLine</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,0,1,0" columnminimumwidth="0,0,0,0,200">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="LeftGridLayout_2" columnstretch="0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="0" column="2">
+           <layout class="QGridLayout" name="CentralGridLayout_2">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="buttonRepairNew">
+              <property name="text">
+               <string>Принять</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="buttonShowParamsPopupMenu">
+              <property name="text">
+               <string>Параметры</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="buttonRefreshTable">
+              <property name="text">
+               <string>Обновить</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="buttonPrint">
+              <property name="text">
+               <string>Печать</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_1">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>70</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>70</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="4">
+           <layout class="QGridLayout" name="RightGridLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="lineEditSearch">
+              <property name="placeholderText">
+               <string>Поиск</string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>buttonShowParamsPopupMenu</tabstop>
+  <tabstop>buttonRefreshTable</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>lineEditSearch</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>tabRepairs</receiver>
+   <slot>lineEditSearchTextChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>860</x>
+     <y>732</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1020</x>
+     <y>723</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditSearch</sender>
+   <signal>returnPressed()</signal>
+   <receiver>tabRepairs</receiver>
+   <slot>lineEditSearchReturnPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>893</x>
+     <y>733</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1022</x>
+     <y>707</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>changeClientType()</slot>
+  <slot>enableLineEditPrevRepair()</slot>
+  <slot>changeDeviceType()</slot>
+  <slot>changeDeviceMaker()</slot>
+  <slot>buttonSelectExistingClientHandler()</slot>
+  <slot>clearClientCreds()</slot>
+  <slot>showClientsMatch()</slot>
+  <slot>showLineEditPrevRepair()</slot>
+  <slot>lineEditPrevRepairButtonsHandler(int)</slot>
+  <slot>tableItemDoubleClick(QTableWidgetItem*)</slot>
+  <slot>lineEditSearchTextChanged(QString)</slot>
+  <slot>lineEditSearchReturnPressed()</slot>
+ </slots>
+</ui>

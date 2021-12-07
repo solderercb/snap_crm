@@ -810,6 +810,9 @@
    <class>myLineEdit</class>
    <extends>QLineEdit</extends>
    <header>mylineedit.h</header>
+   <slots>
+    <signal>buttonClicked(int)</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -915,7 +918,7 @@
    <sender>pushButtonClientFromDB</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>createTabSelectExistingClient()</slot>
+   <slot>buttonSelectExistingClientHandler()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>428</x>
@@ -1071,15 +1074,32 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lineEditPrevRepair</sender>
+   <signal>buttonClicked(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>lineEditPrevRepairButtonsHandler(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>62</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
   <slot>enableLineEditPrevRepair()</slot>
   <slot>changeDeviceType()</slot>
   <slot>changeDeviceMaker()</slot>
-  <slot>createTabSelectExistingClient()</slot>
+  <slot>buttonSelectExistingClientHandler()</slot>
   <slot>clearClientCreds()</slot>
   <slot>showClientsMatch()</slot>
   <slot>showLineEditPrevRepair()</slot>
+  <slot>lineEditPrevRepairButtonsHandler(int)</slot>
  </slots>
 </ui>

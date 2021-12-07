@@ -35,6 +35,8 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxPresetPaymentAccount->lineEdit()->setPlaceholderText("тип оплаты");
     ui->comboBoxPrepayAccount->lineEdit()->setPlaceholderText("тип оплаты");
     ui->lineEditPrevRepair->setButtons("Search, DownArrow");
+    ui->lineEditPrevRepair->setReadOnly(true);
+    ui->lineEditPrevRepair->setText("23812");
 
     ui->comboBoxPresetEngineer->addItem("aaaa");
     ui->comboBoxPresetEngineer->addItem("bbbb");
@@ -206,4 +208,28 @@ void tabRepairNew::clearClientCreds()
     ui->lineEditClientAddress->clear();
     ui->lineEditClientEmail->clear();
     ui->lineEditClientPhone2->clear();
+}
+
+void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
+{
+    if (button == 0)
+        emit createTabSelectPrevRepair();
+    else if (button ==1)
+    {
+        if (!ui->lineEditPrevRepairFromOldDB->isVisible())
+        {
+            ui->lineEditPrevRepairFromOldDB->show();
+            ui->labelPrevRepairFromOldDB->show();
+        }
+        else
+        {
+            ui->lineEditPrevRepairFromOldDB->hide();
+            ui->labelPrevRepairFromOldDB->hide();
+        }
+    }
+}
+
+void tabRepairNew::buttonSelectExistingClientHandler()
+{
+    emit createTabSelectExistingClient();
 }

@@ -68,6 +68,7 @@ private slots:
 	void on_tableGoods_clicked(const QModelIndex &index);
     void createTabRepairs();
     void createTabRepairNew();
+    void createTabClients();
     void closeTab(int index);
 };
 
