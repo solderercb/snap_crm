@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>tabRepairs</class>
- <widget class="QWidget" name="tabRepairs">
+ <class>tabRepair</class>
+ <widget class="QWidget" name="tabRepair">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -55,7 +55,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,0,1,0" columnminimumwidth="0,0,0,0,200">
+         <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,0,1,0" columnminimumwidth="0,0,0,0,0">
           <item row="0" column="0">
            <layout class="QGridLayout" name="LeftGridLayout_2" columnstretch="0">
             <property name="sizeConstraint">
@@ -65,38 +65,38 @@
           </item>
           <item row="0" column="2">
            <layout class="QGridLayout" name="CentralGridLayout_2">
-            <item row="0" column="0">
-             <widget class="QPushButton" name="buttonRepairNew">
-              <property name="text">
-               <string>Принять</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4">
+            <item row="0" column="3">
              <widget class="QPushButton" name="buttonShowParamsPopupMenu">
               <property name="text">
-               <string>Параметры</string>
+               <string>Медиа</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
              <widget class="QPushButton" name="buttonRefreshTable">
               <property name="text">
-               <string>Обновить</string>
+               <string>Клиент</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="buttonRepairNew">
+              <property name="text">
+               <string>Позвонить</string>
               </property>
              </widget>
             </item>
             <item row="0" column="2">
              <widget class="QPushButton" name="buttonPrint">
               <property name="text">
-               <string>Печать</string>
+               <string>История</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="3">
-             <widget class="Line" name="line">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>Администрирование</string>
               </property>
              </widget>
             </item>
@@ -139,16 +139,6 @@
             <property name="sizeConstraint">
              <enum>QLayout::SetFixedSize</enum>
             </property>
-            <item row="0" column="0">
-             <widget class="QLineEdit" name="lineEditSearch">
-              <property name="placeholderText">
-               <string>Поиск</string>
-              </property>
-              <property name="clearButtonEnabled">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
          </layout>
@@ -165,56 +155,7 @@
   <tabstop>buttonRefreshTable</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>lineEditSearch</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>tabRepairs</receiver>
-   <slot>lineEditSearchTextChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>860</x>
-     <y>732</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1020</x>
-     <y>723</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditSearch</sender>
-   <signal>returnPressed()</signal>
-   <receiver>tabRepairs</receiver>
-   <slot>lineEditSearchReturnPressed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>893</x>
-     <y>733</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1022</x>
-     <y>707</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableView</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>tabRepairs</receiver>
-   <slot>tableItemDoubleClick(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>344</x>
-     <y>96</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>353</x>
-     <y>2</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>changeClientType()</slot>
   <slot>enableLineEditPrevRepair()</slot>

@@ -34,9 +34,10 @@ private:
     DBConnection* dbConnection;
     void updateTableWidget();
     QTableView* tableView;
+    QSqlQueryModel* repairs_table;
 
 private slots:
-    void tableItemDoubleClick(QTableWidgetItem*);
+    void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();
 

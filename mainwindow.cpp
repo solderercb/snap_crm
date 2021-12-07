@@ -4,6 +4,7 @@
 #include "tabrepairnew.h"
 #include "ui_tabrepairnew.h"
 #include "tabrepairs.h"
+#include "tabrepair.h"
 #include "mylineedit.h"
 
 #define NO_LOGIN
@@ -88,15 +89,9 @@ MainWindow::MainWindow(QWidget *parent) :
     pushButton01->setText("pushButton01");
     ui->gridLayout_4->addWidget(pushButton01, 5, 3, 1, 1);
 
-    tabRepairNew *subwindow = tabRepairNew::getInstance();
-    ui->tabWidget->addTab(subwindow, "Приём в ремонт");
-    ui->tabWidget->setCurrentWidget(subwindow);
-    QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair()), this, SLOT(createTabRepairs()));
-    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient()), this, SLOT(createTabClients()));
-
-    tabRepairs *subwindow2 = tabRepairs::getInstance();
-    ui->tabWidget->addTab(subwindow2, "Ремонты");
-    ui->tabWidget->setCurrentWidget(subwindow2);
+    createTabRepairNew();
+    createTabRepairs();
+//    createTabRepair();
 
     comboboxSourceModel = new QStandardItemModel();
 	ui->comboBoxSourceWarehouse->setModel(comboboxSourceModel);
@@ -376,12 +371,20 @@ void MainWindow::readConsignments(const QModelIndex &index, const QString &wareh
 
 void MainWindow::createTabRepairs()
 {
-    qDebug() << "Слот вызова вкладки Ремонты";
+//    qDebug() << "Слот вызова вкладки Ремонты";
     tabRepairs *subwindow = tabRepairs::getInstance();
     ui->tabWidget->addTab(subwindow, "Ремонты");
     ui->tabWidget->setCurrentWidget(subwindow);
-//    QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair()), this, SLOT(createTabRepairs()));
-//    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient()), this, SLOT(createTabClients()));
+    QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabRepair(int)));
+}
+
+void MainWindow::createTabRepair(int repair_id)
+{
+//    qDebug() << "Слот вызова вкладки Ремонт X";
+    tabRepair *subwindow = tabRepair::getInstance();
+    ui->tabWidget->addTab(subwindow, "Ремонт " + QString::number(repair_id));
+    ui->tabWidget->setCurrentWidget(subwindow);
+//    QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabRepair(int)));
 }
 
 void MainWindow::createTabRepairNew()
@@ -389,6 +392,8 @@ void MainWindow::createTabRepairNew()
     tabRepairNew *subwindow = tabRepairNew::getInstance();
     ui->tabWidget->addTab(subwindow, "Приём в ремонт");
     ui->tabWidget->setCurrentWidget(subwindow);
+    QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair()), this, SLOT(createTabRepairs()));
+//    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient()), this, SLOT(createTabClients()));
 }
 
 void MainWindow::createTabClients()

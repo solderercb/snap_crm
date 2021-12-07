@@ -129,16 +129,10 @@ void tabRepairNew::showLineEditPrevRepair()
     if(ui->checkBoxWasEarlier->checkState() || ui->checkBoxIsWarranty->checkState())
     {
         ui->lineEditPrevRepair->show();
-//        ui->labelPrevRepairFromOldDB->show();
-//        ui->lineEditPrevRepairFromOldDB->show();
-//        ui->lineEditPrevRepair->show();
     }
     else
     {
         ui->lineEditPrevRepair->hide();
-//        ui->labelPrevRepairFromOldDB->hide();
-//        ui->lineEditPrevRepairFromOldDB->hide();
-//        ui->lineEditPrevRepair->hide();
     }
 
 }
