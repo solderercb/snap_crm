@@ -6,6 +6,7 @@
 #include <QStandardItem>
 #include <QToolButton>
 #include <QStyle>
+#include <QSqlQueryModel>
 #include "dbconnection.h"
 
 namespace Ui {
@@ -30,9 +31,10 @@ private:
     static tabRepairNew* p_instance;
     void getDevices();
     DBConnection* dbConnection;
-    QStandardItemModel* comboboxDevicesModel;
-    QStandardItemModel* comboboxDeviceMakersModel;
-    QStandardItemModel* comboboxDeviceModelsModel;
+//    QStandardItemModel* comboboxDevicesModel;
+    QSqlQueryModel* comboboxDevicesModel;
+    QSqlQueryModel* comboboxDeviceMakersModel;
+    QSqlQueryModel* comboboxDeviceModelsModel;
 
 private slots:
     void changeClientType();

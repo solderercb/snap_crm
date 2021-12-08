@@ -45,34 +45,17 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
         le->setClearButtonEnabled(true);
     }
 
-    comboboxDevicesModel = new QStandardItemModel();
+    comboboxDevicesModel = new QSqlQueryModel();
     ui->comboBoxDevice->setModel(comboboxDevicesModel);
-    comboboxDeviceMakersModel = new QStandardItemModel();
+    comboboxDeviceMakersModel = new QSqlQueryModel();
     ui->comboBoxDeviceMaker->setModel(comboboxDeviceMakersModel);
-    comboboxDeviceModelsModel = new QStandardItemModel();
+    comboboxDeviceModelsModel = new QSqlQueryModel();
     ui->comboBoxDeviceModel->setModel(comboboxDeviceModelsModel);
 
-    QSqlQuery* device_list = new QSqlQuery(QSqlDatabase::database("connMain"));
     QString query;
-    QStandardItem *newRow;
 
-    query = QString("SELECT `name`, `id` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`;");
-    device_list->exec(query);
-
-//    newRow = new QStandardItem();
-//    newRow->setText("");
-//    newRow->setData("0",Qt::UserRole+1);
-//    comboboxDevicesModel->appendRow(newRow);	// Добавляем пустую строку в модель comboBox (тип уст-ва)
-
-    while(device_list->next())
-    {
-        newRow = new QStandardItem();
-        newRow->setText(device_list->value(0).toString());
-        newRow->setData(device_list->value(1).toString(),Qt::UserRole+1);
-        comboboxDevicesModel->appendRow(newRow);	// Добавляем строку в модель comboBox (тип уст-ва)
-    }
-
-    delete device_list;
+    query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
+    comboboxDevicesModel->setQuery(query, QSqlDatabase::database("connMain"));
 }
 
 tabRepairNew::~tabRepairNew()
@@ -139,57 +122,24 @@ void tabRepairNew::showLineEditPrevRepair()
 
 void tabRepairNew::changeDeviceType()
 {
-    comboboxDeviceMakersModel->clear();
-    int deviceId = ui->comboBoxDevice->currentData(Qt::UserRole+1).toInt();
-    QSqlQuery* query_result = new QSqlQuery(QSqlDatabase::database("connMain"));
-    QString query, device_makers_list;
-    QStandardItem *newRow;
 
-    query = QString("SELECT `company_list` FROM `devices` WHERE `id` = %1;").arg(deviceId);
-    query_result->exec(query);
-    query_result->first();
-    device_makers_list = query_result->value(0).toString();
-    query = QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1);").arg(device_makers_list);
-    query_result->exec(query);
+    int comboBoxDeviceIndex = ui->comboBoxDevice->currentIndex();
+    QString query;
 
-    while(query_result->next())
-    {
-        newRow = new QStandardItem();
-        newRow->setText(query_result->value(0).toString());
-        newRow->setData(query_result->value(1).toString(),Qt::UserRole+1);
-        comboboxDeviceMakersModel->appendRow(newRow);	// Добавляем строку в модель comboBox (устройство)
-    }
-
-    delete query_result;
+    query = QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1);").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
+    comboboxDeviceMakersModel->setQuery(query, QSqlDatabase::database("connMain"));
 }
 
 void tabRepairNew::changeDeviceMaker()
 {
-
-    comboboxDeviceModelsModel->clear();
-
-    int deviceId = ui->comboBoxDevice->currentData(Qt::UserRole+1).toInt();
-    int deviceMakerId = ui->comboBoxDeviceMaker->currentData(Qt::UserRole+1).toInt();
-    QSqlQuery* query_result = new QSqlQuery(QSqlDatabase::database("connMain"));
+    int comboBoxDeviceIndex = ui->comboBoxDevice->currentIndex();
+    int comboBoxDeviceMakerIndex = ui->comboBoxDeviceMaker->currentIndex();
+    int deviceId = comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt();
+    int deviceMakerId = comboboxDeviceMakersModel->index(comboBoxDeviceMakerIndex, 1).data().toInt();
     QString query;
-    QStandardItem *newRow;
 
-    newRow = new QStandardItem();
-    newRow->setText("");
-    comboboxDeviceModelsModel->appendRow(newRow);	// Добавляем пустую строку в модель comboBox (модель устройства)
-
-    query = QString("SELECT `name`, `id` FROM `device_models` WHERE `device` = %1 AND `maker` = %2;").arg(deviceId).arg(deviceMakerId);
-    query_result->exec(query);
-
-    while(query_result->next())
-    {
-        newRow = new QStandardItem();
-        newRow->setText(query_result->value(0).toString());
-        newRow->setData(query_result->value(1).toString(),Qt::UserRole+1);
-        comboboxDeviceModelsModel->appendRow(newRow);	// Добавляем строку в модель comboBox (устройство)
-    }
-
-    delete query_result;
+    query = QString("SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM `device_models` WHERE `device` = %1 AND `maker` = %2);").arg(deviceId).arg(deviceMakerId);
+    comboboxDeviceModelsModel->setQuery(query, QSqlDatabase::database("connMain"));
 }
 
 void tabRepairNew::clearClientCreds()

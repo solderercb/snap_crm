@@ -16,6 +16,9 @@ tabRepairs::tabRepairs(bool type, QWidget *parent) :
     repairs_table = new repairsTableModel();
     ui->tableView->setModel(repairs_table);
     updateTableWidget();
+    ui->tableView->horizontalHeader()->moveSection(10,4);
+    connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int, int, int)), this, SLOT(tableSectionMoved(int, int, int)));
+    connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int, int, int)), this, SLOT(tableSectionResized(int, int, int)));
 }
 
 tabRepairs::~tabRepairs()
@@ -61,6 +64,7 @@ void tabRepairs::updateTableWidget()
                     `Hidden`\
                   FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE `out_date` IS NULL AND `company` = 1 ORDER BY `id` DESC;", QSqlDatabase::database("connMain"));
 
+        ui->tableView->horizontalHeader()->hideSection(11); // прячем столбец с кодом статуса
 //    repairs_table->setHeaderData(0, Qt::Horizontal, tr("Name"));
 //    repairs_table->setHeaderData(1, Qt::Horizontal, tr("Salary"));
 }
@@ -78,6 +82,18 @@ void tabRepairs::lineEditSearchTextChanged(QString)
 void tabRepairs::lineEditSearchReturnPressed()
 {
 
+}
+
+/* В слоте будем сохранять настроенное пользователем положение столбца */
+void tabRepairs::tableSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
+{
+    qDebug() << "Slot tableSectionMoved(int, int, int)";
+}
+
+/* В слоте будем сохранять настроенную пользователем ширину столбца */
+void tabRepairs::tableSectionResized(int logicalIndex, int oldSize, int newSize)
+{
+    qDebug() << "Slot tableSectionResized(int, int, int)";
 }
 
 tabRepairs* tabRepairs::getInstance(QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна

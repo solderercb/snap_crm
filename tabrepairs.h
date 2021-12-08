@@ -40,6 +40,8 @@ private slots:
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();
+    void tableSectionMoved(int, int, int);
+    void tableSectionResized(int, int, int);
 
 };
 

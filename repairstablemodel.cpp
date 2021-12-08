@@ -3,9 +3,10 @@
 repairsTableModel::repairsTableModel(QObject *parent)
     : QSqlQueryModel(parent)
 {
-    enum {store_cats_id, store_cats_parent, store_cats_name, store_cats_position};
     uint32_t i = 0, j = 0;
     QSqlQuery* status_colors = new QSqlQuery(QSqlDatabase::database("connMain"));
+
+    /* Подключать лишние модули (для обработки JSON) не наш метод :-) парсим данные в запросе */
     QString query = QString(
     "\
     SELECT\r\n\
