@@ -37,12 +37,14 @@ signals:
 
 
 public:
-	explicit MainWindow(QWidget *parent = 0); // Конструктор
-	~MainWindow();	// Деструктор
+    static MainWindow* getInstance(QWidget *parent = nullptr);
+    ~MainWindow();	// Деструктор
     DBConnection* dbConnection;
 
 private:
-	Ui::MainWindow *ui; // Указатель на класс MainWindow
+    explicit MainWindow(QWidget *parent = 0); // Конструктор
+    Ui::MainWindow *ui; // Указатель на класс MainWindow
+    static MainWindow* p_instance;
 	void readGoods(const QModelIndex &index, const QString &warehouse_code);
 	void readConsignments(const QModelIndex &index, const QString &warehouse_code);
 	void get_warehouses_list();
@@ -57,6 +59,7 @@ private:
 
 public slots:
     void ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName);
+    void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
 
 private slots:
 	void btnClick();
@@ -66,10 +69,10 @@ private slots:
 	void on_tableGoods_activated(const QModelIndex &index);
 	void on_tableConsignments_clicked(const QModelIndex &index);
 	void on_tableGoods_clicked(const QModelIndex &index);
-    void createTabRepairs(int type = 0);
 
     void createTabRepair(int);
     void createTabRepairNew();
+    void reactivateTabRepairNew(int);
     void createTabClients(int type = 0);
     void closeTab(int index);
 };

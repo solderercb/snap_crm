@@ -8,13 +8,14 @@
 #include "mylineedit.h"
 
 #define NO_LOGIN
+MainWindow* MainWindow::p_instance = nullptr;
 
 // Тело конструктора MainWindow(QWidget *parent)
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
-	QTextCodec *codec = QTextCodec::codecForName("UTF8");
+    QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QTextCodec::setCodecForLocale(codec);
 
 #ifdef NO_LOGIN
@@ -89,8 +90,11 @@ MainWindow::MainWindow(QWidget *parent) :
     pushButton01->setText("pushButton01");
     ui->gridLayout_4->addWidget(pushButton01, 5, 3, 1, 1);
 
-    createTabRepairNew();
-    createTabRepairs(0);
+    // ТУТА нужно быть аккуратным! Если в конструкторе tabRepairs создаётся связь со слотом объекта MainWindow, то получим цикл.
+    // лучше создавать вкладки по-умолчанию в main.cpp
+//    createTabRepairs(0);
+
+//    createTabRepairNew();
 //    createTabRepairs(1);
 //    createTabRepair();
 
@@ -147,6 +151,15 @@ MainWindow::~MainWindow()
 	delete tree_model;
 	delete comboboxSourceModel;
 	delete ui;
+    p_instance = nullptr;
+}
+
+MainWindow* MainWindow::getInstance(QWidget *parent)   // singleton: MainWindow только один объект
+{
+    if( !p_instance )
+      p_instance = new MainWindow(parent);
+
+    return p_instance;
 }
 
 void MainWindow::ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName )
@@ -372,26 +385,29 @@ void MainWindow::readConsignments(const QModelIndex &index, const QString &wareh
 
 void MainWindow::createTabRepairs(int type)
 {
-    qDebug() << "Слот вызова вкладки Ремонты, type = " << type;
+    const QString tabLabels[] = {"Ремонты", "Выбрать ремонт"};
     tabRepairs *subwindow = tabRepairs::getInstance(type);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, tabLabels[type]);
+
     if (type == 0)
     {
-        ui->tabWidget->addTab(subwindow, "Ремонты");
+        //
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabRepair(int)));
     }
     else
     {
-        qDebug() << "I'm here";
-        ui->tabWidget->addTab(subwindow, "Выбрать ремонт");
+        // Сигнал экземпляра вкладки выбора предыдущего ремонта подключаем к слоту вкладки нового ремонта для вставки номера в соотв. поле
+        // и к слоту MainWindow, в котором происходит преключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabRepairNew::getInstance(), SLOT(setPrevRepair(int)));
+        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(reactivateTabRepairNew(int)));
     }
 
-    ui->tabWidget->setCurrentWidget(subwindow);
+    ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Ремонты/Выбрать ремонт
 }
 
 void MainWindow::createTabRepair(int repair_id)
 {
-//    qDebug() << "Слот вызова вкладки Ремонт X";
     tabRepair *subwindow = tabRepair::getInstance();
     ui->tabWidget->addTab(subwindow, "Ремонт " + QString::number(repair_id));
     ui->tabWidget->setCurrentWidget(subwindow);
@@ -400,10 +416,15 @@ void MainWindow::createTabRepair(int repair_id)
 void MainWindow::createTabRepairNew()
 {
     tabRepairNew *subwindow = tabRepairNew::getInstance();
-    ui->tabWidget->addTab(subwindow, "Приём в ремонт");
-    ui->tabWidget->setCurrentWidget(subwindow);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, "Приём в ремонт");
+    ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int)), this, SLOT(createTabRepairs(int)));
-//    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int)), this, SLOT(createTabClients(int)));
+}
+
+void MainWindow::reactivateTabRepairNew(int)
+{
+    ui->tabWidget->setCurrentWidget(tabRepairNew::getInstance());
 }
 
 void MainWindow::createTabClients(int type)

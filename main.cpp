@@ -9,38 +9,22 @@ void InitDBConnectionClass();
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
-	LoginWindow windowLogin;
-	MainWindow windowMain;
+    LoginWindow *windowLogin = new LoginWindow;
+    MainWindow *windowMain = MainWindow::getInstance();
+    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
 
-//    MyWidget mw1{new MyWidget};
-//    mw1.setWindowTitle("ctor: MyWidget(MyWidget*)");
-//    mw1.show();
-
-//    MyMainWindow mmw1{&mw1};
-//    mmw1.setWindowTitle("ctor: MyMainWindow(MyWidget*)");
-//    mmw1.show();
-
-//    MyMainWindow mmw2{&mmw1};
-//    mmw2.setWindowTitle("ctor: MyMainWindow(MyMainWindow*)");
-//    mmw2.show();
-
-//    MyWidget mw2{&mmw2};
-//    mw2.setWindowTitle("ctor: MyWidget(MyMainWindow*)");
-//    mw2.show();
-
-
-    QObject::connect(&windowLogin,SIGNAL(ConnectToDB(QString,QString,QString, uint,QString,QString)),&windowMain,SLOT(ConnectToDB(QString,QString,QString, uint,QString,QString)));
-	QObject::connect(&windowMain,SIGNAL(DBConnectErr(QString)),&windowLogin,SLOT(DBConnectErr(QString)));
-	QObject::connect(&windowMain,SIGNAL(DBConnectOK()),&windowMain,SLOT(show()));
-	QObject::connect(&windowMain,SIGNAL(DBConnectOK()),&windowLogin,SLOT(close()));
-	QObject::connect(&windowLogin,SIGNAL(btnCancelClick()),&app,SLOT(quit()));
+    QObject::connect(windowLogin,SIGNAL(ConnectToDB(QString,QString,QString, uint,QString,QString)),windowMain,SLOT(ConnectToDB(QString,QString,QString, uint,QString,QString)));
+    QObject::connect(windowMain,SIGNAL(DBConnectErr(QString)),windowLogin,SLOT(DBConnectErr(QString)));
+    QObject::connect(windowMain,SIGNAL(DBConnectOK()),windowMain,SLOT(show()));
+    QObject::connect(windowMain,SIGNAL(DBConnectOK()),windowLogin,SLOT(close()));
+    QObject::connect(windowLogin,SIGNAL(btnCancelClick()),&app,SLOT(quit()));
 
 
 
 #ifdef NO_LOGIN
-	windowMain.show();
+    windowMain->show();
 #elif
-	windowLogin.show();
+    windowLogin->show();
 #endif
 
 	return app.exec();

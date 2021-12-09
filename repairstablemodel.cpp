@@ -46,8 +46,6 @@ repairsTableModel::repairsTableModel(QObject *parent)
         if(status_ids_tmp[i] > j)
             j = status_ids_tmp[i]; // здесь будем хранить максимальный id статуса
         i++;
-
-//        qDebug() << cat_tree->value(store_cats_id).toInt();
     }
     status_ids.resize(j+1);
     for(i=0; i < status_ids_tmp.size(); i++)
@@ -121,7 +119,6 @@ QVariant repairsTableModel::data(const QModelIndex &index, int role) const
 //        return false;         // а возвращаемое значение устанавливает состояние: 0 - выкл, 1 - част., 2 - вкл.
     if (role == Qt::DisplayRole and index.column() == 10)      // если для роли Qt::DisplayRole подменять текст, то всё ОК
     {
-//        qDebug() << "state: " << status[status_ids[this->index(index.row(), index.column()+1).data().toInt()]]->text();
         return QVariant(status[status_ids[this->index(index.row(), index.column()+1).data().toInt()]]->text());
 //        return QVariant("aaa");
     }

@@ -1,5 +1,6 @@
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
+#include "mainwindow.h"
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
 
@@ -7,7 +8,6 @@ tabRepairs::tabRepairs(bool type, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::tabRepairs)
 {
-    qDebug() << "Конструктор tabRepairs, type = " << type;
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
     _type = type;
@@ -17,20 +17,27 @@ tabRepairs::tabRepairs(bool type, QWidget *parent) :
     ui->tableView->setModel(repairs_table);
     updateTableWidget();
     ui->tableView->horizontalHeader()->moveSection(10,4);
+    if (type == 1)
+    {
+        ui->buttonPrint->hide();
+        ui->buttonRepairNew->hide();
+    }
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int, int, int)), this, SLOT(tableSectionMoved(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int, int, int)), this, SLOT(tableSectionResized(int, int, int)));
+    connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(tableSortingChanged(int, Qt::SortOrder)));
+
+    // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.
+    connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
 }
 
 tabRepairs::~tabRepairs()
 {
     p_instance[this->_type] = nullptr;   // Обязательно блять!
-    qDebug() << "tabRepairs::~tabRepairs(), type = " << this->_type;
     delete ui;
 }
 
 tabRepairs* tabRepairs::getInstance(bool type, QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна
 {
-    qDebug() << "tabRepairs::getInstance, type = " << type << ", p_instance = " << p_instance[type];
     if( !p_instance[type] )
       p_instance[type] = new tabRepairs(type, parent);
     return p_instance[type];
@@ -38,8 +45,6 @@ tabRepairs* tabRepairs::getInstance(bool type, QWidget *parent)   // singleton: 
 
 void tabRepairs::updateTableWidget()
 {
-//    qDebug() << "updateTable func";
-
     repairs_table->setQuery("SELECT\
                     CONCAT_WS(' ', IF(`is_warranty`, 'Г', ''), IF(`is_repeat`, 'П', ''), IF(`express_repair`, 'С', ''), IF(`informed_status`, '*', '')) AS 'marks',\
                     t1.`id`,\
@@ -80,9 +85,9 @@ void tabRepairs::updateTableWidget()
 
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
 {
-    emit doubleClicked(_type, repairs_table->index(item.row(), 1).data().toInt());
-//    if (type == 1)
-//        deleteLater();
+    emit doubleClicked(repairs_table->index(item.row(), 1).data().toInt());
+    if (_type == 1)
+        deleteLater();
 }
 
 void tabRepairs::lineEditSearchTextChanged(QString)
@@ -105,5 +110,10 @@ void tabRepairs::tableSectionMoved(int logicalIndex, int oldVisualIndex, int new
 void tabRepairs::tableSectionResized(int logicalIndex, int oldSize, int newSize)
 {
     qDebug() << "Slot tableSectionResized(int, int, int)";
+}
+
+void tabRepairs::tableSortingChanged(int, Qt::SortOrder)
+{
+    qDebug() << "Slot tableSortingChanged(int, Qt::SortOrder)";
 }
 

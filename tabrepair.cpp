@@ -33,7 +33,6 @@ void tabRepair::updateTableWidget()
 
 void tabRepair::worksTreeDoubleClicked(QModelIndex item)
 {
-    qDebug() << "Work/Good id: " << works_table->index(item.row(), 1).data().toInt();
 //    emit this->worksTreeDoubleClicked(ui->tableWidget->item(item->row(), item->column())->text().toInt());
 }
 

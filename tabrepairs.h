@@ -21,7 +21,7 @@ class tabRepairs : public QWidget
     Q_OBJECT
 
 signals:
-    void doubleClicked(int, int);
+    void doubleClicked(int);
 
 public:
     explicit tabRepairs(bool type = 0, QWidget *parent = nullptr);
@@ -43,6 +43,7 @@ private slots:
     void lineEditSearchReturnPressed();
     void tableSectionMoved(int, int, int);
     void tableSectionResized(int, int, int);
+    void tableSortingChanged(int, Qt::SortOrder);
 
 };
 
