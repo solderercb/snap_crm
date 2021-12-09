@@ -18,8 +18,8 @@ class tabRepairNew : public QWidget
     Q_OBJECT
 
 signals:
-    void createTabSelectPrevRepair();
-    void createTabSelectExistingClient();
+    void createTabSelectPrevRepair(int);
+    void createTabSelectExistingClient(int);
 
 public:
     explicit tabRepairNew(QWidget *parent = nullptr);
@@ -43,6 +43,7 @@ private slots:
     void changeDeviceMaker();
     void clearClientCreds();
     void lineEditPrevRepairButtonsHandler(int);
+    void setPrevRepair(int);
     void buttonSelectExistingClientHandler();
 
 };

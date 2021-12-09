@@ -157,7 +157,7 @@ void tabRepairNew::clearClientCreds()
 void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
 {
     if (button == 0)
-        emit createTabSelectPrevRepair();
+        emit createTabSelectPrevRepair(1);
     else if (button ==1)
     {
         if (!ui->lineEditPrevRepairFromOldDB->isVisible())
@@ -173,7 +173,12 @@ void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
     }
 }
 
+void tabRepairNew::setPrevRepair(int repairNum)
+{
+    ui->lineEditPrevRepair->setText(QString::number(repairNum));
+}
+
 void tabRepairNew::buttonSelectExistingClientHandler()
 {
-    emit createTabSelectExistingClient();
+    emit createTabSelectExistingClient(1);
 }

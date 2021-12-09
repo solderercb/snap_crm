@@ -1,16 +1,16 @@
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
 
-tabRepairs* tabRepairs::p_instance = nullptr;
+tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
 
 tabRepairs::tabRepairs(bool type, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::tabRepairs)
 {
+    qDebug() << "Конструктор tabRepairs, type = " << type;
     ui->setupUi(this);
-    this->setWindowTitle("Ремонты");
     this->setAttribute(Qt::WA_DeleteOnClose);
-
+    _type = type;
     ui->tableView->horizontalHeader()->setSectionsMovable(true);  // возможность двигать столбцы (ну шоб как АСЦ было :-) )
     ui->tableView->verticalHeader()->hide();
     repairs_table = new repairsTableModel();
@@ -23,8 +23,17 @@ tabRepairs::tabRepairs(bool type, QWidget *parent) :
 
 tabRepairs::~tabRepairs()
 {
+    p_instance[this->_type] = nullptr;   // Обязательно блять!
+    qDebug() << "tabRepairs::~tabRepairs(), type = " << this->_type;
     delete ui;
-    p_instance = nullptr;   // Обязательно блять!
+}
+
+tabRepairs* tabRepairs::getInstance(bool type, QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна
+{
+    qDebug() << "tabRepairs::getInstance, type = " << type << ", p_instance = " << p_instance[type];
+    if( !p_instance[type] )
+      p_instance[type] = new tabRepairs(type, parent);
+    return p_instance[type];
 }
 
 void tabRepairs::updateTableWidget()
@@ -71,7 +80,9 @@ void tabRepairs::updateTableWidget()
 
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
 {
-    emit doubleClicked(repairs_table->index(item.row(), 1).data().toInt());
+    emit doubleClicked(_type, repairs_table->index(item.row(), 1).data().toInt());
+//    if (type == 1)
+//        deleteLater();
 }
 
 void tabRepairs::lineEditSearchTextChanged(QString)
@@ -94,12 +105,5 @@ void tabRepairs::tableSectionMoved(int logicalIndex, int oldVisualIndex, int new
 void tabRepairs::tableSectionResized(int logicalIndex, int oldSize, int newSize)
 {
     qDebug() << "Slot tableSectionResized(int, int, int)";
-}
-
-tabRepairs* tabRepairs::getInstance(QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна
-{
-if( !p_instance )
-  p_instance = new tabRepairs(0, parent);
-return p_instance;
 }
 

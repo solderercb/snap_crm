@@ -21,16 +21,17 @@ class tabRepairs : public QWidget
     Q_OBJECT
 
 signals:
-    void doubleClicked(int);
+    void doubleClicked(int, int);
 
 public:
     explicit tabRepairs(bool type = 0, QWidget *parent = nullptr);
-    static tabRepairs* getInstance(QWidget *parent = nullptr);
+    static tabRepairs* getInstance(bool type, QWidget *parent = nullptr);
     ~tabRepairs();
 
 private:
     Ui::tabRepairs *ui;
-    static tabRepairs* p_instance;
+    static tabRepairs* p_instance[2];
+    bool _type;
     DBConnection* dbConnection;
     void updateTableWidget();
     QTableView* tableView;
