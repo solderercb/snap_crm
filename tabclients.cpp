@@ -41,10 +41,14 @@ tabClients::tabClients(bool type, QWidget *parent) :
     clientsTypesList->appendRow( clientTypeSelector[6] );
     clientTypeSelector[7] << new QStandardItem("Архивные") << new QStandardItem("7") << new QStandardItem("t1.`state` = 0");
     clientsTypesList->appendRow( clientTypeSelector[7] );
-
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
     ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
+
+    clientsAdTypesList = new QSqlQueryModel(this);
+    clientsAdTypesList->setQuery("SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC);", QSqlDatabase::database("connMain"));
+    ui->comboBoxAdvertising->setModel(clientsAdTypesList);
+    ui->comboBoxAdvertising->setModelColumn(0);
 
     query_static = "SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', IFNULL(t2.`phone`, '') AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` AND t2.`type` = 1"; // default query
 //    query_where_static = "";    // default WHERE part of query
@@ -85,6 +89,7 @@ void tabClients::lineEditSearchSetFocus()
 
 void tabClients::updateTableWidget()
 {
+    qDebug() << "updateTableWidget()";
     query.clear();
 
     /* Собираем условия для запроса */
@@ -92,6 +97,9 @@ void tabClients::updateTableWidget()
     if (query_where_static.length() > 0)    // если предустановлен дефолтный фильтр
         query_where << query_where_static;
     query_where << clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text();  // добавляем условие для выбранной категории клиентов
+    if (ui->comboBoxAdvertising->currentIndex() > 0 )
+//        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data().toString();
+        query_where << QString("`visit_source` = %1").arg(clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data().toString());
     if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
         query_where << QString("(LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1') OR t1.`id` = '%1' OR t2.`phone` REGEXP '%1' OR t2.`phone_clean` REGEXP '%1')").arg(ui->lineEditSearch->text());
 
@@ -107,6 +115,12 @@ void tabClients::clientTypeChanged(QModelIndex index)
     updateTableWidget();
 }
 
+void tabClients::clientAdvertisingChanged(int index)
+{
+    qDebug() << "SLOT clientAdvertisingChanged(int index), index = " << ui->comboBoxAdvertising->currentIndex();
+    updateTableWidget();
+}
+
 void tabClients::tableItemDoubleClick(QModelIndex item)
 {
     emit doubleClicked(clientsTable->index(item.row(), 1).data().toInt());
@@ -116,7 +130,7 @@ void tabClients::tableItemDoubleClick(QModelIndex item)
 
 void tabClients::lineEditSearchTextChanged(QString search_str)
 {
-//    qDebug() << "tabClients::lineEditSearchTextChanged(QString search_str), search_str = " << search_str;
+//    qDebug() << "SLOT tabClients::lineEditSearchTextChanged(QString search_str), search_str = " << search_str;
     updateTableWidget();
 }
 
@@ -128,13 +142,13 @@ void tabClients::lineEditSearchReturnPressed()
 /* В слоте будем сохранять настроенное пользователем положение столбца */
 void tabClients::tableSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
 {
-    qDebug() << "Slot tableSectionMoved(int, int, int)";
+    qDebug() << "SLOT tableSectionMoved(int, int, int)";
 }
 
 /* В слоте будем сохранять настроенную пользователем ширину столбца */
 void tabClients::tableSectionResized(int logicalIndex, int oldSize, int newSize)
 {
-    qDebug() << "Slot tableSectionResized(int, int, int)";
+    qDebug() << "SLOT tableSectionResized(int, int, int)";
 }
 
 /*
@@ -145,7 +159,7 @@ void tabClients::tableSortingChanged(int index, Qt::SortOrder order)
 {
     QString order_str;
 
-//    qDebug() << "Slot tableSortingChanged(int, Qt::SortOrder)";
+//    qDebug() << "SLOT tableSortingChanged(int, Qt::SortOrder)";
     query_order.clear();
 
     if (order == Qt::AscendingOrder)

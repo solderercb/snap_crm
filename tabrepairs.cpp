@@ -97,7 +97,23 @@ void tabRepairs::lineEditSearchTextChanged(QString)
 
 void tabRepairs::lineEditSearchReturnPressed()
 {
+    QString s = ui->lineEditSearch->text();
+    int pos = 0;
+    QSqlQuery* num_validator = new QSqlQuery(QSqlDatabase::database("connMain"));   // запрос к БД для проверки валидности введённого номера ремонта
+    QRegularExpression re("\\d+");  // только цифры
+    QRegularExpressionValidator v(re, 0);
 
+    if(v.validate(s, pos) == QValidator::Acceptable)   // если введены только цифры
+    {
+        num_validator->exec(QString("SELECT 1 FROM workshop WHERE `id` = %1").arg(s));  // проверяем если ли в таблице workshop ремонт с таким номером
+        if (num_validator->size() > 0)  // если возвращено не ноль строк
+        {
+            emit doubleClicked(s.toInt());  // посылаем сигнал открытия карты ремонта или вставки номера ремонта в поле формы приёма в ремонт
+            if (_type == 1)
+                deleteLater();
+        }
+    }
+    delete num_validator;   // подчищаем за собой
 }
 
 /* В слоте будем сохранять настроенное пользователем положение столбца */

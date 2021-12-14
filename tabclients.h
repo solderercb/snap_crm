@@ -48,10 +48,12 @@ private:
     QStringList query_group;
     QStringList query_order;
     QStandardItemModel* clientsTypesList;
+    QSqlQueryModel* clientsAdTypesList;
     QList<QStandardItem*> clientTypeSelector[8];
 
 private slots:
     void clientTypeChanged(QModelIndex);
+    void clientAdvertisingChanged(int);
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();

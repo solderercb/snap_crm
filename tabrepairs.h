@@ -9,6 +9,7 @@
 #include <QTableWidget>
 #include <QLabel>
 #include <QSqlQueryModel>
+#include <QRegularExpressionValidator>
 #include "repairstablemodel.h"
 #include "dbconnection.h"
 
