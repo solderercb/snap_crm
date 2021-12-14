@@ -281,6 +281,13 @@
  <tabstops>
   <tabstop>buttonShowParamsPopupMenu</tabstop>
   <tabstop>buttonRefreshTable</tabstop>
+  <tabstop>tableView</tabstop>
+  <tabstop>buttonClientNew</tabstop>
+  <tabstop>buttonPrint</tabstop>
+  <tabstop>listViewClientsType</tabstop>
+  <tabstop>pushButtonToggleProperties</tabstop>
+  <tabstop>comboBoxAdvertising</tabstop>
+  <tabstop>lineEditSearch</tabstop>
  </tabstops>
  <resources/>
  <connections>

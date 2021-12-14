@@ -468,6 +468,7 @@ void MainWindow::createTabClients(int type)
     }
 
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Ремонты/Выбрать ремонт
+    subwindow->lineEditSearchSetFocus();
 
 }
 

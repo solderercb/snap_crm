@@ -27,6 +27,7 @@ signals:
 public:
     explicit tabClients(bool type = 0, QWidget *parent = nullptr);
     static tabClients* getInstance(bool type, QWidget *parent = nullptr);
+    void lineEditSearchSetFocus();
     ~tabClients();
 
 private:

@@ -13,13 +13,11 @@ tabClients::tabClients(bool type, QWidget *parent) :
     _type = type;
     ui->tableView->horizontalHeader()->setSectionsMovable(true);  // возможность двигать столбцы (ну шоб как АСЦ было :-) )
     ui->tableView->verticalHeader()->hide();
-    clientsTable = new repairsTableModel();
+    clientsTable = new QSqlQueryModel();
 //    proxyModel = new QSortFilterProxyModel();
 //    proxyModel->setSourceModel(clientsTable);
 //    proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     ui->tableView->setModel(clientsTable);
-    updateTableWidget();
-    ui->tableView->horizontalHeader()->moveSection(10,4);
     if (type == 1)
     {
         ui->buttonPrint->hide();
@@ -46,6 +44,7 @@ tabClients::tabClients(bool type, QWidget *parent) :
 
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
+    ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
 
     query_static = "SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', IFNULL(t2.`phone`, '') AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` AND t2.`type` = 1"; // default query
 //    query_where_static = "";    // default WHERE part of query
@@ -78,27 +77,33 @@ tabClients* tabClients::getInstance(bool type, QWidget *parent)   // singleton: 
     return p_instance[type];
 }
 
+void tabClients::lineEditSearchSetFocus()
+{
+//    ui->lineEditSearch->setFocusPolicy(Qt::StrongFocus);
+    ui->lineEditSearch->setFocus();
+}
+
 void tabClients::updateTableWidget()
 {
     query.clear();
 
+    /* Собираем условия для запроса */
+    query_where.clear();
+    if (query_where_static.length() > 0)    // если предустановлен дефолтный фильтр
+        query_where << query_where_static;
+    query_where << clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text();  // добавляем условие для выбранной категории клиентов
+    if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
+        query_where << QString("(LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1') OR t1.`id` = '%1' OR t2.`phone` REGEXP '%1' OR t2.`phone_clean` REGEXP '%1')").arg(ui->lineEditSearch->text());
+
     query << query_static << (query_where.count()>0?"WHERE " + query_where.join(" AND "):"") << "GROUP BY" << query_group.join(", ") << "ORDER BY" << query_order.join(", ");
-    qDebug() << query.join(' ');
+//    qDebug() << query.join(' ');
     clientsTable->setQuery(query.join(' '), QSqlDatabase::database("connMain"));
     ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));
-//    ui->tableView->horizontalHeader()->hideSection(11); // прячем столбец с кодом статуса
-//    clientsTable->setHeaderData(0, Qt::Horizontal, tr("Name"));
-//    clientsTable->setHeaderData(1, Qt::Horizontal, tr("Salary"));
 }
 
 void tabClients::clientTypeChanged(QModelIndex index)
 {
-    qDebug() << "clientTypeChanged(QModelIndex): item1 =" << clientsTypesList->index(index.row(), 0).data() << ", item2 = " << clientsTypesList->index(index.row(), 1).data() << "item3 = " << clientsTypesList->index(index.row(), 2).data();
-    query_where.clear();
-    if (query_where_static.length() > 0)    // если предустановлен дефолтный фильтр
-        query_where << query_where_static;
-    query_where << clientsTypesList->item(index.row(), 2)->text();  // добавляем условие фильтра для выбранной категории клиентов
-    qDebug() << query.join(' ');
+//    qDebug() << "clientTypeChanged(QModelIndex): item1 =" << clientsTypesList->index(index.row(), 0).data() << ", item2 = " << clientsTypesList->index(index.row(), 1).data() << "item3 = " << clientsTypesList->index(index.row(), 2).data();
     updateTableWidget();
 }
 
@@ -109,9 +114,10 @@ void tabClients::tableItemDoubleClick(QModelIndex item)
         deleteLater();
 }
 
-void tabClients::lineEditSearchTextChanged(QString)
+void tabClients::lineEditSearchTextChanged(QString search_str)
 {
-
+//    qDebug() << "tabClients::lineEditSearchTextChanged(QString search_str), search_str = " << search_str;
+    updateTableWidget();
 }
 
 void tabClients::lineEditSearchReturnPressed()
@@ -139,7 +145,7 @@ void tabClients::tableSortingChanged(int index, Qt::SortOrder order)
 {
     QString order_str;
 
-    qDebug() << "Slot tableSortingChanged(int, Qt::SortOrder)";
+//    qDebug() << "Slot tableSortingChanged(int, Qt::SortOrder)";
     query_order.clear();
 
     if (order == Qt::AscendingOrder)
@@ -157,7 +163,6 @@ void tabClients::tableSortingChanged(int index, Qt::SortOrder order)
         case 6: query_order << "t2.`phone`" + order_str; break;
     }
 
-    qDebug() << query.join(' ');
     updateTableWidget();
 }
 
