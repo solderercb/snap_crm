@@ -1,6 +1,7 @@
 #include "tabclients.h"
 #include "ui_tabclients.h"
 #include "mainwindow.h"
+#include "com_sql_queries.h"
 
 tabClients* tabClients::p_instance[] = {nullptr,nullptr};
 
@@ -45,10 +46,10 @@ tabClients::tabClients(bool type, QWidget *parent) :
     ui->listViewClientsType->setModelColumn(0);
     ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
 
-    clientsAdTypesList = new QSqlQueryModel(this);
-    clientsAdTypesList->setQuery("SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC);", QSqlDatabase::database("connMain"));
-    ui->comboBoxAdvertising->setModel(clientsAdTypesList);
-    ui->comboBoxAdvertising->setModelColumn(0);
+    clientAdTypesList = new QSqlQueryModel(this);
+    clientAdTypesList->setQuery(QUERY_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
+    ui->comboBoxClientAdType->setModel(clientAdTypesList);
+    ui->comboBoxClientAdType->setModelColumn(0);
 
     query_static = "SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', IFNULL(t2.`phone`, '') AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` AND t2.`type` = 1"; // default query
 //    query_where_static = "";    // default WHERE part of query
@@ -97,9 +98,9 @@ void tabClients::updateTableWidget()
     if (query_where_static.length() > 0)    // если предустановлен дефолтный фильтр
         query_where << query_where_static;
     query_where << clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text();  // добавляем условие для выбранной категории клиентов
-    if (ui->comboBoxAdvertising->currentIndex() > 0 )
+    if (ui->comboBoxClientAdType->currentIndex() > 0 )
 //        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data().toString();
-        query_where << QString("`visit_source` = %1").arg(clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data().toString());
+        query_where << QString("`visit_source` = %1").arg(clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString());
     if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
         query_where << QString("(LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1') OR t1.`id` = '%1' OR t2.`phone` REGEXP '%1' OR t2.`phone_clean` REGEXP '%1')").arg(ui->lineEditSearch->text());
 
@@ -117,13 +118,13 @@ void tabClients::clientTypeChanged(QModelIndex index)
 
 void tabClients::clientAdvertisingChanged(int index)
 {
-    qDebug() << "SLOT clientAdvertisingChanged(int index), index = " << ui->comboBoxAdvertising->currentIndex();
+    qDebug() << "SLOT clientAdvertisingChanged(int index), index = " << ui->comboBoxClientAdType->currentIndex();
     updateTableWidget();
 }
 
 void tabClients::tableItemDoubleClick(QModelIndex item)
 {
-    emit doubleClicked(clientsTable->index(item.row(), 1).data().toInt());
+    emit doubleClicked(clientsTable->index(item.row(), 0).data().toInt());
     if (_type == 1)
         deleteLater();
 }

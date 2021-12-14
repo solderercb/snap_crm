@@ -40,6 +40,7 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     bottoolbarwidget.h \
+    com_sql_queries.h \
     dbconnection.h \
     loginwindow.h \
     my_widget.h \

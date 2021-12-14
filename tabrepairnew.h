@@ -35,6 +35,12 @@ private:
     QSqlQueryModel* comboboxDevicesModel;
     QSqlQueryModel* comboboxDeviceMakersModel;
     QSqlQueryModel* comboboxDeviceModelsModel;
+    QSqlQueryModel* clientModel;
+    QSqlQueryModel* clientPhonesModel;
+    QSqlQueryModel* clientAdTypesList;
+    QStandardItemModel* clientPhoneTypesList;
+    QList<QStandardItem*> clientPhoneTypesSelector[2];
+    int exist_client_id;
 
 private slots:
     void changeClientType();

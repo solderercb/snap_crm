@@ -48,8 +48,8 @@ private:
     QStringList query_group;
     QStringList query_order;
     QStandardItemModel* clientsTypesList;
-    QSqlQueryModel* clientsAdTypesList;
     QList<QStandardItem*> clientTypeSelector[8];
+    QSqlQueryModel* clientAdTypesList;
 
 private slots:
     void clientTypeChanged(QModelIndex);
