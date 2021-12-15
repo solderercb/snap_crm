@@ -72,6 +72,8 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxClientPhone2Type->setModelColumn(0);
     ui->comboBoxClientPhone2Type->setCurrentIndex(clientPhoneTypesList->index(0, 0).row());    // по умолчанию выбираем "мобильный"
 
+    clientsMatchTable = new QSqlQueryModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
+
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
     comboboxDevicesModel->setQuery(query, QSqlDatabase::database("connMain"));
 }
@@ -233,4 +235,24 @@ void tabRepairNew::fillClientCreds(int id)
 void tabRepairNew::buttonSelectExistingClientHandler()
 {
     emit createTabSelectExistingClient(1);
+}
+
+void tabRepairNew::findMatchingCllient()
+{
+    if(ui->lineEditClientLastName->text().length() > 3 || ui->lineEditClientPhone1->text().length() > 3)
+    {
+        QString query;
+        ui->tableViewClientMatch->setModel(clientsMatchTable);
+        query = "SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', GROUP_CONCAT(IFNULL(t2.`phone`, '') ORDER BY t2.`type` DESC, t2.`id` DESC SEPARATOR '\r\n')  AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` GROUP BY t1.`id`";
+        clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
+        if (clientsMatchTable->rowCount() > 0)
+            ui->groupBoxClientCoincidence->show();
+        else
+            ui->groupBoxClientCoincidence->hide();
+    }
+    else
+    {
+        clientsMatchTable->clear();
+        ui->groupBoxClientCoincidence->hide();
+    }
 }

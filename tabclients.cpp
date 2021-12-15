@@ -72,6 +72,7 @@ tabClients::tabClients(bool type, QWidget *parent) :
 tabClients::~tabClients()
 {
     p_instance[this->_type] = nullptr;   // Обязательно блять!
+    clientsTable->clear();
     delete ui;
 }
 
@@ -179,5 +180,10 @@ void tabClients::tableSortingChanged(int index, Qt::SortOrder order)
     }
 
     updateTableWidget();
+}
+
+void tabClients::togglePropertiesPanel()
+{
+
 }
 

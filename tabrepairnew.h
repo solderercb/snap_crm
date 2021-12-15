@@ -40,6 +40,7 @@ private:
     QSqlQueryModel* clientAdTypesList;
     QStandardItemModel* clientPhoneTypesList;
     QList<QStandardItem*> clientPhoneTypesSelector[2];
+    QSqlQueryModel* clientsMatchTable;
     int exist_client_id;
 
 private slots:
@@ -52,6 +53,7 @@ private slots:
     void setPrevRepair(int);
     void fillClientCreds(int);
     void buttonSelectExistingClientHandler();
+    void findMatchingCllient();
 
 };
 

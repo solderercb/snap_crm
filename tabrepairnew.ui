@@ -256,6 +256,51 @@
            <property name="title">
             <string>Совпадение клиента</string>
            </property>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="QTableView" name="tableViewClientMatch">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::DoubleClicked</set>
+              </property>
+              <property name="tabKeyNavigation">
+               <bool>false</bool>
+              </property>
+              <property name="showDropIndicator" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+              <attribute name="horizontalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item row="4" column="0">
@@ -950,7 +995,7 @@
    <sender>lineEditClientLastName</sender>
    <signal>textChanged(QString)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>showClientsMatch()</slot>
+   <slot>findMatchingCllient()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>355</x>
@@ -966,7 +1011,7 @@
    <sender>lineEditClientPhone1</sender>
    <signal>textChanged(QString)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>showClientsMatch()</slot>
+   <slot>findMatchingCllient()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>833</x>
@@ -986,11 +1031,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>494</x>
-     <y>351</y>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
      <x>555</x>
-     <y>349</y>
+     <y>561</y>
     </hint>
    </hints>
   </connection>
@@ -1002,11 +1047,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>499</x>
-     <y>373</y>
+     <y>585</y>
     </hint>
     <hint type="destinationlabel">
      <x>559</x>
-     <y>376</y>
+     <y>588</y>
     </hint>
    </hints>
   </connection>
@@ -1018,11 +1063,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>408</x>
-     <y>371</y>
+     <y>583</y>
     </hint>
     <hint type="destinationlabel">
      <x>746</x>
-     <y>377</y>
+     <y>589</y>
     </hint>
    </hints>
   </connection>
@@ -1034,11 +1079,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>380</x>
-     <y>374</y>
+     <y>586</y>
     </hint>
     <hint type="destinationlabel">
      <x>981</x>
-     <y>380</y>
+     <y>592</y>
     </hint>
    </hints>
   </connection>
@@ -1090,6 +1135,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tableViewClientMatch</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>889</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1019</x>
+     <y>264</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -1098,8 +1159,9 @@
   <slot>changeDeviceMaker()</slot>
   <slot>buttonSelectExistingClientHandler()</slot>
   <slot>clearClientCreds()</slot>
-  <slot>showClientsMatch()</slot>
+  <slot>findMatchingCllient()</slot>
   <slot>showLineEditPrevRepair()</slot>
   <slot>lineEditPrevRepairButtonsHandler(int)</slot>
+  <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
  </slots>
 </ui>

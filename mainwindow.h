@@ -20,6 +20,7 @@
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QToolButton>
+#include <QTimer>
 #include "sqlcreds.h"
 #include "dbconnection.h"
 
@@ -56,6 +57,10 @@ private:
 	QStringList tableGoodsHeaders;
 	QStandardItemModel *tableConsignmentsModel; // Модель таблицы, отображающей партии товара
 	QStringList tableConsignmentsHeaders;
+#ifdef QT_DEBUG
+    QTimer *test_scheduler, *test_scheduler2;
+    uint test_scheduler_counter = 0;
+#endif
 
 public slots:
     void ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName);
@@ -74,7 +79,12 @@ private slots:
     void createTabRepairNew();
     void reactivateTabRepairNew(int);
     void createTabClients(int type = 0);
+    void createTabClient(int);
     void closeTab(int index);
+#ifdef QT_DEBUG
+    void test_scheduler_handler();
+    void test_scheduler2_handler();
+#endif
 };
 
 #endif // MAINWINDOW_H

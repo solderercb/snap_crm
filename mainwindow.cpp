@@ -160,6 +160,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     get_warehouses_list();
     btnClick();
+
+#ifdef QT_DEBUG
+    test_scheduler = new QTimer();
+    test_scheduler->setSingleShot(true);
+    test_scheduler2 = new QTimer();
+    test_scheduler2->setSingleShot(true);
+    QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
+    QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
+    test_scheduler->start(200);
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -472,7 +482,29 @@ void MainWindow::createTabClients(int type)
 
 }
 
+void MainWindow::createTabClient(int)
+{
+
+}
+
 void MainWindow::closeTab(int index)
 {
     delete ui->tabWidget->widget(index);
 }
+
+#ifdef QT_DEBUG
+void MainWindow::test_scheduler_handler()  // обработик таймера открытия вкладки
+{
+    qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
+    createTabClients(0);
+    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
+
+}
+
+void MainWindow::test_scheduler2_handler()  // обработик таймера закрытия вкладки
+{
+    qDebug() << "test_scheduler2_handler(), clientTabId = " << ui->tabWidget->indexOf(tabClients::getInstance(0));
+    closeTab(ui->tabWidget->indexOf(tabClients::getInstance(0)));
+    test_scheduler->start(1000);    //  перезапускаем таймер открытия вкладки
+}
+#endif
