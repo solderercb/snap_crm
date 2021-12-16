@@ -11,7 +11,8 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
     LoginWindow *windowLogin = new LoginWindow;
     MainWindow *windowMain = MainWindow::getInstance();
-    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
+//    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
+    windowMain->createTabRepairNew(); // по-умолчанию создаём вкладку Ремонты
 
     QObject::connect(windowLogin,SIGNAL(ConnectToDB(QString,QString,QString, uint,QString,QString)),windowMain,SLOT(ConnectToDB(QString,QString,QString, uint,QString,QString)));
     QObject::connect(windowMain,SIGNAL(DBConnectErr(QString)),windowLogin,SLOT(DBConnectErr(QString)));

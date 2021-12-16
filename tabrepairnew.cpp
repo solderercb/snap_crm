@@ -61,9 +61,9 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxClientAdType->setModelColumn(0);
 
     clientPhoneTypesList = new QStandardItemModel(this);
-    clientPhoneTypesSelector[0] << new QStandardItem("мобильный") << new QStandardItem("1");
+    clientPhoneTypesSelector[0] << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem("(+38) 999 999-99-99"); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
     clientPhoneTypesList->appendRow( clientPhoneTypesSelector[0] );
-    clientPhoneTypesSelector[1] << new QStandardItem("городской") << new QStandardItem("2");
+    clientPhoneTypesSelector[1] << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem("99-99-99");
     clientPhoneTypesList->appendRow( clientPhoneTypesSelector[1] );
     ui->comboBoxClientPhone1Type->setModel(clientPhoneTypesList);
     ui->comboBoxClientPhone1Type->setModelColumn(0);
@@ -219,15 +219,15 @@ void tabRepairNew::fillClientCreds(int id)
     clientPhonesModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     // заполняем типы телефонов. Пока так, потом придумаю что-то более элегантное
-    if(clientPhonesModel->rowCount() > 1)
+    if(clientPhonesModel->rowCount() > 1)   // если результат содержит более одной строки, то в поле доп. номера записываем данные из второй строки результатов
     {
-        ui->lineEditClientPhone2->setText(clientPhonesModel->index(1, 0).data().toString());
-        ui->comboBoxClientPhone2Type->setCurrentIndex(clientPhoneTypesList->index((clientPhonesModel->index(1, 1).data().toInt() - 1), 0).row());    // по умолчанию выбираем "мобильный"
+        ui->comboBoxClientPhone2Type->setCurrentIndex(clientPhoneTypesList->index((clientPhonesModel->index(1, 1).data().toInt() - 1), 0).row());    // сначала устанавливаем тип в комбобоксе, чтобы применилась маска к полю
+        ui->lineEditClientPhone2->setText(clientPhonesModel->index(1, 0).data().toString());    // теперь устанавливаем номер телефона
     }
     if(clientPhonesModel->rowCount() > 0)
     {
+        ui->comboBoxClientPhone1Type->setCurrentIndex(clientPhoneTypesList->index((clientPhonesModel->index(0, 1).data().toInt() - 1), 0).row());    //
         ui->lineEditClientPhone1->setText(clientPhonesModel->index(0, 0).data().toString());
-        ui->comboBoxClientPhone1Type->setCurrentIndex(clientPhoneTypesList->index((clientPhonesModel->index(0, 1).data().toInt() - 1), 0).row());    // по умолчанию выбираем "мобильный"
     }
 
 }
@@ -237,22 +237,69 @@ void tabRepairNew::buttonSelectExistingClientHandler()
     emit createTabSelectExistingClient(1);
 }
 
-void tabRepairNew::findMatchingCllient()
+void tabRepairNew::findMatchingCllient(QString text)
 {
-    if(ui->lineEditClientLastName->text().length() > 3 || ui->lineEditClientPhone1->text().length() > 3)
+    QString lineEditClientPhone1DisplayText = ui->lineEditClientPhone1->displayText();  // отображаемый текст
+    QString currentPhone1InputMask = clientPhoneTypesList->index(ui->comboBoxClientPhone1Type->currentIndex(), 2).data().toString().replace(QRegularExpression("[09]"), "_");   // в маске телефона меняем 0 и 9 на подчеркивание; 0 и 9 — это специальные маскировочные символы (см. справку QLineEdit, inputMask)
+    QString enteredByUserDigits;    // строка символов, которые ввёл пользователь (т. е. текст отображаемый в lineEdit над которым выполнена операция т. н. XOR с заданной маской
+    QStringList query_where;    // список условий для запроса к БД
+    QString query;  // весь запрос к БД
+    int i;
+
+    //    qDebug() << "currentPhone1InputMask " << currentPhone1InputMask << " lineEditClientPhone1DisplayText " << lineEditClientPhone1DisplayText;
+    for (i = 0; i < currentPhone1InputMask.length(); i++ )  // определяем какие символы ввёл пользователь
     {
-        QString query;
-        ui->tableViewClientMatch->setModel(clientsMatchTable);
-        query = "SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', GROUP_CONCAT(IFNULL(t2.`phone`, '') ORDER BY t2.`type` DESC, t2.`id` DESC SEPARATOR '\r\n')  AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` GROUP BY t1.`id`";
+        if(currentPhone1InputMask.at(i) != lineEditClientPhone1DisplayText.at(i))
+            enteredByUserDigits.append(lineEditClientPhone1DisplayText.at(i));
+    }
+
+//    qDebug() << "enteredByUserDigits " << enteredByUserDigits;
+    if(ui->lineEditClientLastName->text().length() >= 3 || enteredByUserDigits.length() >= 3 )  // если пользователь ввёл более двух символов в одно из полей
+    {
+        query_where.clear();
+        if (ui->lineEditClientLastName->text().length() > 3 )
+            query_where << QString("LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1')").arg(ui->lineEditClientLastName->text());   // условие поиска по фамилии, имени и отчеству
+        if (enteredByUserDigits.length() > 3 )
+            query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(lineEditClientPhone1DisplayText, enteredByUserDigits);   // условие поиска по телефонному номеру
+
+        ui->tableViewClientMatch->setModel(clientsMatchTable);  // указываем модель таблицы
+        query = QString("SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', GROUP_CONCAT(IFNULL(t2.`phone`, '') ORDER BY t2.`type` DESC, t2.`id` DESC SEPARATOR '\r\n')  AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` WHERE `state` = 1 %1 GROUP BY t1.`id`;").arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
         clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
+        ui->tableViewClientMatch->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
         if (clientsMatchTable->rowCount() > 0)
-            ui->groupBoxClientCoincidence->show();
+            ui->groupBoxClientCoincidence->show();  // только если возвращены результаты, показываем таблицу совпадения клиента
         else
-            ui->groupBoxClientCoincidence->hide();
+            ui->groupBoxClientCoincidence->hide();  // иначе прячем таблицу
     }
     else
     {
-        clientsMatchTable->clear();
+        clientsMatchTable->clear(); // если кол-во введённых пользователем символов меньше трёх, то удаляем результаты предыдущего запроса и прячем таблицу.
         ui->groupBoxClientCoincidence->hide();
+    }
+}
+
+void tabRepairNew::phone1TypeChanged(int index)
+{
+    phoneTypeChanged(1, index);
+}
+
+void tabRepairNew::phone2TypeChanged(int index)
+{
+    phoneTypeChanged(2, index);
+}
+
+void tabRepairNew::clientMatchTableDoubleClicked(QModelIndex item)
+{
+    fillClientCreds(clientsMatchTable->index(item.row(), 0).data().toInt());
+    ui->groupBoxClientCoincidence->hide();  // прячем таблицу совпадения клиента
+}
+
+void tabRepairNew::phoneTypeChanged(int type, int index)
+{
+    switch (type)
+    {
+        // т. к. полей для телефона всего два, то нет смысла городить какую-то универсальную конструкцию.
+        case 1: ui->lineEditClientPhone1->setInputMask(""); ui->lineEditClientPhone1->setInputMask(clientPhoneTypesList->index(index, 2).data().toString() + ";_"); break;  // Here ";_" for filling blank characters with underscore
+        case 2: ui->lineEditClientPhone2->setInputMask(""); ui->lineEditClientPhone2->setInputMask(clientPhoneTypesList->index(index, 2).data().toString() + ";_"); break;
     }
 }

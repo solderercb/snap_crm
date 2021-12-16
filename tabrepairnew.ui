@@ -257,10 +257,25 @@
             <string>Совпадение клиента</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_6">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <property name="horizontalSpacing">
+             <number>5</number>
+            </property>
             <item row="0" column="0">
              <widget class="QTableView" name="tableViewClientMatch">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -283,10 +298,16 @@
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
               <property name="wordWrap">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <attribute name="horizontalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
                <bool>false</bool>
               </attribute>
               <attribute name="horizontalHeaderHighlightSections">
@@ -656,8 +677,11 @@
               </item>
               <item row="1" column="6" colspan="2">
                <widget class="QLineEdit" name="lineEditClientPhone1">
+                <property name="inputMask">
+                 <string>(+38) 999 999-99-99;_</string>
+                </property>
                 <property name="text">
-                 <string/>
+                 <string>(+38)  --</string>
                 </property>
                 <property name="placeholderText">
                  <string>Номер телефона</string>
@@ -993,9 +1017,9 @@
   </connection>
   <connection>
    <sender>lineEditClientLastName</sender>
-   <signal>textChanged(QString)</signal>
+   <signal>textEdited(QString)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>findMatchingCllient()</slot>
+   <slot>findMatchingCllient(QString)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>355</x>
@@ -1009,9 +1033,9 @@
   </connection>
   <connection>
    <sender>lineEditClientPhone1</sender>
-   <signal>textChanged(QString)</signal>
+   <signal>textEdited(QString)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>findMatchingCllient()</slot>
+   <slot>findMatchingCllient(QString)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>833</x>
@@ -1031,7 +1055,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>494</x>
-     <y>563</y>
+     <y>555</y>
     </hint>
     <hint type="destinationlabel">
      <x>555</x>
@@ -1067,7 +1091,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>746</x>
-     <y>589</y>
+     <y>581</y>
     </hint>
    </hints>
   </connection>
@@ -1083,7 +1107,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>981</x>
-     <y>592</y>
+     <y>584</y>
     </hint>
    </hints>
   </connection>
@@ -1151,6 +1175,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>comboBoxClientPhone1Type</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>phone1TypeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>970</x>
+     <y>153</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1022</x>
+     <y>152</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxClientPhone2Type</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>phone2TypeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>960</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1020</x>
+     <y>180</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -1159,9 +1215,12 @@
   <slot>changeDeviceMaker()</slot>
   <slot>buttonSelectExistingClientHandler()</slot>
   <slot>clearClientCreds()</slot>
-  <slot>findMatchingCllient()</slot>
+  <slot>findMatchingCllient(QString)</slot>
   <slot>showLineEditPrevRepair()</slot>
   <slot>lineEditPrevRepairButtonsHandler(int)</slot>
   <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
+  <slot>phone1TypeChanged(int)</slot>
+  <slot>phone2TypeChanged(int)</slot>
+  <slot>phoneTypeChanged(int,int)</slot>
  </slots>
 </ui>

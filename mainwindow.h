@@ -65,6 +65,7 @@ private:
 public slots:
     void ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName);
     void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
+    void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
 
 private slots:
 	void btnClick();
@@ -76,7 +77,6 @@ private slots:
 	void on_tableGoods_clicked(const QModelIndex &index);
 
     void createTabRepair(int);
-    void createTabRepairNew();
     void reactivateTabRepairNew(int);
     void createTabClients(int type = 0);
     void createTabClient(int);

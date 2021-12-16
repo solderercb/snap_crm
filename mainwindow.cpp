@@ -495,16 +495,16 @@ void MainWindow::closeTab(int index)
 #ifdef QT_DEBUG
 void MainWindow::test_scheduler_handler()  // обработик таймера открытия вкладки
 {
-    qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
-    createTabClients(0);
-    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
+//    qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
+//    createTabClients(0);
+//    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 
 }
 
 void MainWindow::test_scheduler2_handler()  // обработик таймера закрытия вкладки
 {
-    qDebug() << "test_scheduler2_handler(), clientTabId = " << ui->tabWidget->indexOf(tabClients::getInstance(0));
-    closeTab(ui->tabWidget->indexOf(tabClients::getInstance(0)));
-    test_scheduler->start(1000);    //  перезапускаем таймер открытия вкладки
+//    qDebug() << "test_scheduler2_handler(), clientTabId = " << ui->tabWidget->indexOf(tabClients::getInstance(0));
+//    closeTab(ui->tabWidget->indexOf(tabClients::getInstance(0)));
+//    test_scheduler->start(1000);    //  перезапускаем таймер открытия вкладки
 }
 #endif
