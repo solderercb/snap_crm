@@ -269,7 +269,7 @@
             <property name="bottomMargin">
              <number>5</number>
             </property>
-            <property name="horizontalSpacing">
+            <property name="spacing">
              <number>5</number>
             </property>
             <item row="0" column="0">
@@ -284,7 +284,7 @@
                <enum>Qt::ScrollBarAlwaysOff</enum>
               </property>
               <property name="editTriggers">
-               <set>QAbstractItemView::DoubleClicked</set>
+               <set>QAbstractItemView::NoEditTriggers</set>
               </property>
               <property name="tabKeyNavigation">
                <bool>false</bool>
@@ -305,13 +305,16 @@
                <bool>true</bool>
               </property>
               <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
+               <bool>true</bool>
               </attribute>
               <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>false</bool>
+               <bool>true</bool>
               </attribute>
               <attribute name="horizontalHeaderHighlightSections">
                <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
               </attribute>
               <attribute name="verticalHeaderVisible">
                <bool>false</bool>
@@ -474,7 +477,7 @@
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="lineEditSN">
+               <widget class="myLineEdit" name="lineEditSN">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -764,6 +767,72 @@
            <property name="checkable">
             <bool>false</bool>
            </property>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QTableView" name="tableViewDeviceMatch">
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="tabKeyNavigation">
+               <bool>false</bool>
+              </property>
+              <property name="showDropIndicator" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="cornerButtonEnabled">
+               <bool>false</bool>
+              </property>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="horizontalHeaderMinimumSectionSize">
+               <number>50</number>
+              </attribute>
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>150</number>
+              </attribute>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -943,7 +1012,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>332</x>
-     <y>126</y>
+     <y>264</y>
     </hint>
     <hint type="destinationlabel">
      <x>63</x>
@@ -991,7 +1060,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>428</x>
-     <y>125</y>
+     <y>263</y>
     </hint>
     <hint type="destinationlabel">
      <x>615</x>
@@ -1007,7 +1076,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>475</x>
-     <y>125</y>
+     <y>263</y>
     </hint>
     <hint type="destinationlabel">
      <x>800</x>
@@ -1019,11 +1088,11 @@
    <sender>lineEditClientLastName</sender>
    <signal>textEdited(QString)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>findMatchingCllient(QString)</slot>
+   <slot>findMatchingClient(QString)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>355</x>
-     <y>154</y>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
      <x>413</x>
@@ -1035,11 +1104,11 @@
    <sender>lineEditClientPhone1</sender>
    <signal>textEdited(QString)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>findMatchingCllient(QString)</slot>
+   <slot>findMatchingClient(QString)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>833</x>
-     <y>158</y>
+     <y>296</y>
     </hint>
     <hint type="destinationlabel">
      <x>671</x>
@@ -1055,11 +1124,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>494</x>
-     <y>555</y>
+     <y>627</y>
     </hint>
     <hint type="destinationlabel">
      <x>555</x>
-     <y>561</y>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -1071,11 +1140,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>499</x>
-     <y>585</y>
+     <y>657</y>
     </hint>
     <hint type="destinationlabel">
      <x>559</x>
-     <y>588</y>
+     <y>660</y>
     </hint>
    </hints>
   </connection>
@@ -1087,11 +1156,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>408</x>
-     <y>583</y>
+     <y>655</y>
     </hint>
     <hint type="destinationlabel">
      <x>746</x>
-     <y>581</y>
+     <y>653</y>
     </hint>
    </hints>
   </connection>
@@ -1103,11 +1172,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>380</x>
-     <y>586</y>
+     <y>658</y>
     </hint>
     <hint type="destinationlabel">
      <x>981</x>
-     <y>584</y>
+     <y>656</y>
     </hint>
    </hints>
   </connection>
@@ -1167,7 +1236,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>889</x>
-     <y>311</y>
+     <y>449</y>
     </hint>
     <hint type="destinationlabel">
      <x>1019</x>
@@ -1183,7 +1252,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>970</x>
-     <y>153</y>
+     <y>291</y>
     </hint>
     <hint type="destinationlabel">
      <x>1022</x>
@@ -1199,11 +1268,59 @@
    <hints>
     <hint type="sourcelabel">
      <x>960</x>
-     <y>178</y>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>1020</x>
      <y>180</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditSN</sender>
+   <signal>buttonClicked(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>lineEditSNClearHandler(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>935</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1020</x>
+     <y>46</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditSN</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>findMatchingDevice(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>886</x>
+     <y>50</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1020</x>
+     <y>21</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableViewDeviceMatch</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>fillDeviceCreds(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>920</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1020</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -1215,12 +1332,15 @@
   <slot>changeDeviceMaker()</slot>
   <slot>buttonSelectExistingClientHandler()</slot>
   <slot>clearClientCreds()</slot>
-  <slot>findMatchingCllient(QString)</slot>
+  <slot>findMatchingClient(QString)</slot>
   <slot>showLineEditPrevRepair()</slot>
   <slot>lineEditPrevRepairButtonsHandler(int)</slot>
   <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
   <slot>phone1TypeChanged(int)</slot>
   <slot>phone2TypeChanged(int)</slot>
   <slot>phoneTypeChanged(int,int)</slot>
+  <slot>lineEditSNClearHandler(int)</slot>
+  <slot>findMatchingDevice(QString)</slot>
+  <slot>fillDeviceCreds(QModelIndex)</slot>
  </slots>
 </ui>
