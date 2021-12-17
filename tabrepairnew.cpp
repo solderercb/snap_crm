@@ -54,6 +54,8 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxDeviceMaker->setModel(comboboxDeviceMakersModel);
     comboboxDeviceModelsModel = new QSqlQueryModel();
     ui->comboBoxDeviceModel->setModel(comboboxDeviceModelsModel);
+    comboboxProblemModel = new QSqlQueryModel();
+    ui->comboBoxProblem->setModel(comboboxProblemModel);
 
     clientAdTypesList = new QSqlQueryModel(this);
     clientAdTypesList->setQuery(QUERY_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
@@ -149,6 +151,19 @@ void tabRepairNew::changeDeviceType()
 
     query = QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1);").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
     comboboxDeviceMakersModel->setQuery(query, QSqlDatabase::database("connMain"));
+
+    // Заполнение модели выпадающего списка неисправностей
+    query = QString("\
+        SELECT '' AS 'name'\
+        UNION ALL\
+        (SELECT\
+          TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t1.`fault_list`,',',enumerator.`number`),',',1)) AS 'name'\
+        FROM (SELECT `fault_list` FROM `devices` WHERE `id` = %1) AS t1\
+        JOIN enumerator\
+        ON\
+          (LENGTH(REPLACE(t1.`fault_list`, ',', ''))-LENGTH(t1.`fault_list`) <= enumerator.`number`+1));\
+    ").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    comboboxProblemModel->setQuery(query, QSqlDatabase::database("connMain"));
 }
 
 void tabRepairNew::changeDeviceMaker()

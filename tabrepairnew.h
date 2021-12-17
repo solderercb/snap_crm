@@ -35,6 +35,7 @@ private:
     QSqlQueryModel* comboboxDevicesModel;
     QSqlQueryModel* comboboxDeviceMakersModel;
     QSqlQueryModel* comboboxDeviceModelsModel;
+    QSqlQueryModel* comboboxProblemModel;
     QSqlQueryModel* clientModel;
     QSqlQueryModel* clientPhonesModel;
     QSqlQueryModel* clientAdTypesList;
