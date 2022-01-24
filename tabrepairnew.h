@@ -7,6 +7,8 @@
 #include <QToolButton>
 #include <QStyle>
 #include <QSqlQueryModel>
+#include <QDate>
+#include <QDateEdit>
 #include "dbconnection.h"
 
 namespace Ui {
@@ -36,6 +38,8 @@ private:
     QSqlQueryModel* comboboxDeviceMakersModel;
     QSqlQueryModel* comboboxDeviceModelsModel;
     QSqlQueryModel* comboboxProblemModel;
+    QSqlQueryModel* comboBoxIncomingSetModel;
+    QSqlQueryModel* comboBoxExteriorModel;
     QSqlQueryModel* clientModel;
     QSqlQueryModel* clientPhonesModel;
     QSqlQueryModel* clientAdTypesList;
@@ -43,6 +47,7 @@ private:
     QList<QStandardItem*> clientPhoneTypesSelector[2];
     QSqlQueryModel* clientsMatchTable;
     QSqlQueryModel* devicesMatchTable;
+    QVector<QWidget*> additionalFieldsWidgets;
     int exist_client_id;
     void phoneTypeChanged(int, int);
 

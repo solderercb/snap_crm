@@ -26,6 +26,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
+    SSetComboBox/ssetcombobox.cpp \
     bottoolbarwidget.cpp \
     dbconnection.cpp \
 				mainwindow.cpp \
@@ -39,6 +40,7 @@ SOURCES += main.cpp\
     tabrepairs.cpp
 
 HEADERS  += mainwindow.h \
+    SSetComboBox/ssetcombobox.h \
     bottoolbarwidget.h \
     com_sql_queries.h \
     dbconnection.h \

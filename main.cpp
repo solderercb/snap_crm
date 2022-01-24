@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
 
 
 #ifdef NO_LOGIN
-    windowMain->showMaximized();
+//    windowMain->showMaximized();
+    windowMain->show();
 #elif
     windowLogin->show();
 #endif

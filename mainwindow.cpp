@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     ui->setupUi(this);
-    this->resize(960,640);
+    this->resize(1440,800);
 
     /* Кнопка Ремонты и меню */
     QMenu *workshop_menu = new QMenu();
@@ -94,11 +94,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QPushButton* pushButton05 = new QPushButton();
     pushButton05->setText("pushButton05");
-    pushButton05->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
-    ui->gridLayout_4->addWidget(pushButton05, 0, 0, 3, 1);
+//    pushButton05->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+    ui->gridLayout_4->addWidget(pushButton05, 0, 0, 1, 1);
     QPushButton* pushButton04 = new QPushButton();
     pushButton04->setText("pushButton04");
-    ui->gridLayout_4->addWidget(pushButton04, 1, 2, 1, 1);
+    ui->gridLayout_4->addWidget(pushButton04, 1, 1, 1, 1);
     QPushButton* pushButton03 = new QPushButton();
     pushButton03->setText("pushButton03");
     ui->gridLayout_4->addWidget(pushButton03, 2, 2, 1, 1);
@@ -107,7 +107,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->gridLayout_4->addWidget(pushButton02, 3, 3, 1, 1);
     QPushButton* pushButton01 = new QPushButton();
     pushButton01->setText("pushButton01");
-    ui->gridLayout_4->addWidget(pushButton01, 5, 3, 1, 1);
+    ui->gridLayout_4->addWidget(pushButton01, 4, 4, 1, 1);
+
 
     // ТУТА нужно быть аккуратным! Если в конструкторе tabRepairs создаётся связь со слотом объекта MainWindow, то получим цикл.
     // лучше создавать вкладки по-умолчанию в main.cpp
@@ -508,3 +509,4 @@ void MainWindow::test_scheduler2_handler()  // обработик таймера
 //    test_scheduler->start(1000);    //  перезапускаем таймер открытия вкладки
 }
 #endif
+

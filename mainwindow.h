@@ -20,7 +20,11 @@
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QToolButton>
+#include <QComboBox>
+#include <QMap>
 #include <QTimer>
+#include <QCompleter>
+#include <QFontMetrics>
 #include "sqlcreds.h"
 #include "dbconnection.h"
 
@@ -85,6 +89,7 @@ private slots:
     void test_scheduler_handler();
     void test_scheduler2_handler();
 #endif
+
 };
 
 #endif // MAINWINDOW_H

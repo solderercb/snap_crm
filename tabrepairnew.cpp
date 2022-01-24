@@ -9,6 +9,12 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui(new Ui::tabRepairNew)
 {
     QString query;
+    // Обычные комбобоксы, которые нельзя редактировать, отображаются как неактивные элементы. Назначаем им стиль отображения как у редактируемых.
+    QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
+            QComboBox::drop-down {  border: 0px;}\
+            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
+            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
+            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
 
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
@@ -28,8 +34,10 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxIncomingSet->lineEdit()->setPlaceholderText("комплектность");
     ui->comboBoxExterior->lineEdit()->setPlaceholderText("внешний вид");
     ui->comboBoxClientAdType->lineEdit()->setPlaceholderText("источник обращения");
-    ui->comboBoxDevice->lineEdit()->setPlaceholderText("устройство");
-    ui->comboBoxDeviceMaker->lineEdit()->setPlaceholderText("производитель");
+    ui->comboBoxDevice->setPlaceholderText("устройство");
+    ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxDeviceMaker->setPlaceholderText("производитель");
+    ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxDeviceModel->lineEdit()->setPlaceholderText("модель");
     ui->comboBoxPresetEngineer->lineEdit()->setPlaceholderText("назначить инженером");
     ui->comboBoxPresetBox->lineEdit()->setPlaceholderText("ячейка");
@@ -56,6 +64,10 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxDeviceModel->setModel(comboboxDeviceModelsModel);
     comboboxProblemModel = new QSqlQueryModel();
     ui->comboBoxProblem->setModel(comboboxProblemModel);
+    comboBoxIncomingSetModel = new QSqlQueryModel();
+    ui->comboBoxIncomingSet->setModel(comboBoxIncomingSetModel);
+    comboBoxExteriorModel = new QSqlQueryModel();
+    ui->comboBoxExterior->setModel(comboBoxExteriorModel);
 
     clientAdTypesList = new QSqlQueryModel(this);
     clientAdTypesList->setQuery(QUERY_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
@@ -79,6 +91,8 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
 
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
     comboboxDevicesModel->setQuery(query, QSqlDatabase::database("connMain"));
+    ui->comboBoxDevice->setCurrentIndex(-1);
+
 }
 
 tabRepairNew::~tabRepairNew()
@@ -86,6 +100,11 @@ tabRepairNew::~tabRepairNew()
     delete comboboxDeviceMakersModel;
     delete comboboxDeviceModelsModel;
     delete comboboxDevicesModel;
+    for(int i=additionalFieldsWidgets.size()-1;i>=0;i--)   // в случае ошибочного выбора категории уст-ва, нужно удалить ранее добавленные виджеты доп. полей
+    {
+        delete additionalFieldsWidgets[i];
+        additionalFieldsWidgets.removeAt(i);
+    }
     delete ui;
     p_instance = nullptr;   // Обязательно блять!
 }
@@ -147,7 +166,19 @@ void tabRepairNew::changeDeviceType()
 {
 
     int comboBoxDeviceIndex = ui->comboBoxDevice->currentIndex();
+    int additionalFieldRow = 2, additionaFieldCol = 0;
+    int additionalFieldType = 0;
+    QSizePolicy *additionalFieldsSizePolicy = new QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     QString query;
+
+//    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(before)";
+    for(int i=additionalFieldsWidgets.size()-1;i>=0;i--)   // в случае ошибочного выбора категории уст-ва, нужно удалить ранее добавленные виджеты доп. полей
+    {
+//        qDebug() << "Removing widget; fieldId = " << additionalFieldsWidgets[i]->property("fieldId").toInt() << "; fieldType = " << additionalFieldsWidgets[i]->property("fieldType").toInt();
+        delete additionalFieldsWidgets[i];
+        additionalFieldsWidgets.removeAt(i);
+    }
+//    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(after)";
 
     query = QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1);").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
     comboboxDeviceMakersModel->setQuery(query, QSqlDatabase::database("connMain"));
@@ -164,6 +195,121 @@ void tabRepairNew::changeDeviceType()
           (LENGTH(REPLACE(t1.`fault_list`, ',', ''))-LENGTH(t1.`fault_list`) <= enumerator.`number`+1));\
     ").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboboxProblemModel->setQuery(query, QSqlDatabase::database("connMain"));
+    ui->comboBoxDeviceMaker->setCurrentIndex(-1);
+
+
+    // Заполнение модели выпадающего списка комплектности
+    query = QString("\
+        SELECT '' AS 'name'\
+        UNION ALL\
+        (SELECT\
+          TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t1.`complect_list`,',',enumerator.`number`),',',1)) AS 'name'\
+        FROM (SELECT `complect_list` FROM `devices` WHERE `id` = %1) AS t1\
+        JOIN enumerator\
+        ON\
+          (LENGTH(REPLACE(t1.`complect_list`, ',', ''))-LENGTH(t1.`complect_list`) <= enumerator.`number`+1));\
+    ").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    comboBoxIncomingSetModel->setQuery(query, QSqlDatabase::database("connMain"));
+    ui->comboBoxIncomingSet->setCurrentIndex(-1);
+
+    // Заполнение модели выпадающего списка внешнего вида
+    query = QString("\
+        SELECT '' AS 'name'\
+        UNION ALL\
+        (SELECT\
+          TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t1.`look_list`,',',enumerator.`number`),',',1)) AS 'name'\
+        FROM (SELECT `look_list` FROM `devices` WHERE `id` = %1) AS t1\
+        JOIN enumerator\
+        ON\
+          (LENGTH(REPLACE(t1.`look_list`, ',', ''))-LENGTH(t1.`look_list`) <= enumerator.`number`+1));\
+    ").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    comboBoxExteriorModel->setQuery(query, QSqlDatabase::database("connMain"));
+    ui->comboBoxExterior->setCurrentIndex(-1);
+
+    // создание доп. полей для выбранной категории уст-ва
+    QSqlQuery* additionalFieldsList = new QSqlQuery(QSqlDatabase::database("connMain"));
+
+    query = QString("SELECT `name`, `def_values`, `type`, `id`,  `required`,  `printable`  FROM `fields` WHERE `_f` = 0 AND FIND_IN_SET(%1,`devices`) AND `archive` = 0 ORDER BY `id`;").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    additionalFieldsList->exec(query);
+
+    while(additionalFieldsList->next())
+    {
+        additionalFieldType = additionalFieldsList->value(2).toInt();
+        QWidget *additionalFieldWidget;
+        if (additionalFieldType == 1)
+        {
+            QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
+            additionalFieldWidget = additionalFieldLineEdit;
+            additionalFieldLineEdit->setPlaceholderText(additionalFieldsList->value(0).toString());
+        } else if (additionalFieldType == 2)
+        {
+            QComboBox *additionalFieldComboBox = new QComboBox(this);
+            additionalFieldWidget = additionalFieldComboBox;
+            QStandardItemModel* additionalFieldComboBoxModel = new QStandardItemModel();
+            // TODO: нужно проверить удаляется ли модель при удалении вджета
+            QStringList additionalFieldComboBoxItems = additionalFieldsList->value(1).toString().split('\n');
+            QStandardItem *newRow;
+            QFontMetrics *fm = new QFontMetrics(this->font());
+            int itemTextWidth, dropDownListWidth = 0;
+
+            additionalFieldComboBox->setModel(additionalFieldComboBoxModel);
+//            if (additionalFieldComboBoxItems.at(0) != "")   // Принудительно добавляем пустую строку
+//            {
+//                newRow = new QStandardItem();
+//                newRow->setText("");
+//                additionalFieldComboBoxModel->appendRow(newRow);
+//            }
+            for (int i=0; i<additionalFieldComboBoxItems.size(); i++)
+            {
+                newRow = new QStandardItem();
+                newRow->setText(additionalFieldComboBoxItems.at(i));
+                additionalFieldComboBoxModel->appendRow(newRow);
+
+                // определяем наибольшую длину текста в списке элементов
+                itemTextWidth = fm->size(Qt::TextSingleLine, additionalFieldComboBoxItems.at(i)).width() + 10;
+                if (itemTextWidth > dropDownListWidth)
+                    dropDownListWidth = itemTextWidth;
+            }
+            delete fm;  // больше не нужен
+            additionalFieldComboBox->setMinimumWidth(100);
+            additionalFieldComboBox->view()->setMinimumWidth(dropDownListWidth);
+            additionalFieldComboBox->setCurrentIndex(-1);
+            additionalFieldComboBox->setEditable(true);
+            additionalFieldComboBox->lineEdit()->setPlaceholderText(additionalFieldsList->value(0).toString());
+        } else if (additionalFieldType == 3)
+        {
+            QDateEdit *additionalFieldDateTimeEdit = new QDateEdit(QDate::currentDate());
+            additionalFieldWidget = additionalFieldDateTimeEdit;
+            additionalFieldDateTimeEdit->setCalendarPopup(true);
+        } else if (additionalFieldType == 4)
+        {
+            // TODO: В АСЦ не реализовано, поэтому используем заглушку из лайнэдита
+            QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
+            additionalFieldWidget = additionalFieldLineEdit;
+            additionalFieldLineEdit->setPlaceholderText(additionalFieldsList->value(0).toString());
+            additionalFieldLineEdit->setEnabled(false);
+        }
+        else
+            additionalFieldWidget = new QWidget();  // на случай ошибок в БД
+
+        additionalFieldWidget->setSizePolicy(*additionalFieldsSizePolicy);
+        additionalFieldsWidgets.append(additionalFieldWidget);
+        ui->gridLayoutDeviceDescription->addWidget(additionalFieldWidget, additionalFieldRow, additionaFieldCol, 1, 1);
+        additionalFieldWidget->setProperty("fieldId", additionalFieldsList->value(3).toInt());
+        additionalFieldWidget->setProperty("fieldType", additionalFieldType);
+        additionalFieldWidget->setProperty("fieldRequired", additionalFieldsList->value(4).toBool());
+        additionalFieldWidget->setProperty("fieldPrintable", additionalFieldsList->value(5).toBool());
+
+        if (++additionaFieldCol > 5)
+        {
+            additionalFieldRow++;
+            additionaFieldCol = 0;
+        }
+    }
+
+//    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(end of function)";
+//    delete additionalFieldsList;
+
 }
 
 void tabRepairNew::changeDeviceMaker()

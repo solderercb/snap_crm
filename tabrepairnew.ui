@@ -334,43 +334,54 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_15">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayoutDeviceDescription">
-              <item row="0" column="2" colspan="2">
-               <widget class="QComboBox" name="comboBoxIncomingSet">
-                <property name="editable">
-                 <bool>true</bool>
+             <layout class="QGridLayout" name="gridLayoutDeviceDescription" columnstretch="1,1,1,1,1,1">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetMinimumSize</enum>
+              </property>
+              <item row="1" column="3" colspan="3">
+               <widget class="QLineEdit" name="lineEditInsideComment">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="currentText">
-                 <string extracomment="Ист"/>
+                <property name="text">
+                 <string/>
                 </property>
                 <property name="placeholderText">
-                 <string extracomment="dfgdasf">Комплектность</string>
+                 <string>Внутренние примечания</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0" colspan="2">
-               <widget class="QComboBox" name="comboBoxProblem">
-                <property name="editable">
-                 <bool>true</bool>
+               <widget class="SSetComboBox" name="comboBoxProblem">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="currentText">
-                 <string/>
+               </widget>
+              </item>
+              <item row="0" column="4" colspan="2">
+               <widget class="SSetComboBox" name="comboBoxExterior">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="currentIndex">
-                 <number>-1</number>
-                </property>
-                <property name="placeholderText">
-                 <string>Неисправность</string>
-                </property>
-                <item>
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
                </widget>
               </item>
               <item row="1" column="0" colspan="3">
                <widget class="QLineEdit" name="lineEditAdditional">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -379,26 +390,13 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="4" colspan="2">
-               <widget class="QComboBox" name="comboBoxExterior">
-                <property name="editable">
-                 <bool>true</bool>
-                </property>
-                <property name="currentText">
-                 <string extracomment="Ист"/>
-                </property>
-                <property name="placeholderText">
-                 <string extracomment="dfgdasf">Состояние</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3" colspan="3">
-               <widget class="QLineEdit" name="lineEditInsideComment">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>Внутренние примечания</string>
+              <item row="0" column="2" colspan="2">
+               <widget class="SSetComboBox" name="comboBoxIncomingSet">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
                </widget>
               </item>
@@ -439,11 +437,20 @@
              <layout class="QGridLayout" name="gridLayoutDevice">
               <item row="0" column="0">
                <widget class="QComboBox" name="comboBoxDevice">
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
                 <property name="editable">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="currentText">
                  <string/>
+                </property>
+                <property name="insertPolicy">
+                 <enum>QComboBox::NoInsert</enum>
                 </property>
                 <property name="placeholderText">
                  <string>Тип</string>
@@ -453,7 +460,7 @@
               <item row="0" column="1">
                <widget class="QComboBox" name="comboBoxDeviceMaker">
                 <property name="editable">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="currentText">
                  <string/>
@@ -537,7 +544,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="cursorPosition">
-                 <number>0</number>
+                 <number>9</number>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -582,7 +589,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="cursorPosition">
-                 <number>0</number>
+                 <number>9</number>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -952,6 +959,11 @@
     <signal>buttonClicked(int)</signal>
    </slots>
   </customwidget>
+  <customwidget>
+   <class>SSetComboBox</class>
+   <extends>QComboBox</extends>
+   <header>SSetComboBox\ssetcombobox.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>comboBoxDevice</tabstop>
@@ -968,9 +980,6 @@
   <tabstop>lineEditClientEmail</tabstop>
   <tabstop>lineEditClientPhone2</tabstop>
   <tabstop>comboBoxClientPhone2Type</tabstop>
-  <tabstop>comboBoxProblem</tabstop>
-  <tabstop>comboBoxIncomingSet</tabstop>
-  <tabstop>comboBoxExterior</tabstop>
   <tabstop>lineEditAdditional</tabstop>
   <tabstop>lineEditInsideComment</tabstop>
   <tabstop>checkBoxIsQuick</tabstop>

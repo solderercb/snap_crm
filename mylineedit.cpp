@@ -31,7 +31,7 @@ void myLineEdit::setButtons(QString buttons)
         for (i = 0; i < buttonsCount; i++)
         {
             lineEditButtons[i] = new QToolButton(this);
-            lineEditButtons[i]->setIconSize(QSize(16,16));
+            lineEditButtons[i]->setIconSize(QSize(12,12));
             lineEditButtons[i]->setCursor(Qt::ArrowCursor);
             lineEditButtons[i]->setStyleSheet("QToolButton { border: none; padding: 0px; }");
             lineEditButtons[i]->setStyleSheet("::hover { border: 1px solid #5798C6; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f6f7fa, stop: 1 #dadbde);}"); // LOL работает
@@ -40,19 +40,23 @@ void myLineEdit::setButtons(QString buttons)
 
             if (buttonsList.value(i) == "Clear")
             {
+                // ✖ или 🗙 или ⌫
                 lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
             }
             else if (buttonsList.value(i) == "DownArrow")
             {
+                // ▼
                 lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_TitleBarUnshadeButton));
             }
             else if (buttonsList.value(i) == "Edit")
             {
+                // 🖉
                 QPixmap pixmap("pencil.png");
                 lineEditButtons[i]->setIcon(QIcon(pixmap));
             }
             else if (buttonsList.value(i) == "Search")
             {
+                // 🔍
                 QPixmap pixmap("magnifier.png");
                 lineEditButtons[i]->setIcon(QIcon(pixmap));
             }
