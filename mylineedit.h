@@ -8,10 +8,6 @@
 #include <QVector>
 #include <QSignalMapper>
 
-namespace Ui {
-class myLineEdit;
-}
-
 class myLineEdit : public QLineEdit
 {
     Q_OBJECT
@@ -20,7 +16,10 @@ class myLineEdit : public QLineEdit
 public:
     myLineEdit(QWidget *parent = nullptr);
     void setButtons(QString buttons);
+    void resize(const QSize &);
+    void resize(int, int);
     QString buttons();
+    void tmp_set_buttons_style_sheet(const QString&);
     ~myLineEdit();
 
 signals:
@@ -39,7 +38,9 @@ private:
     QVector<QToolButton*> lineEditButtons;
     QToolButton* lineEditButton_;
     QSignalMapper *signalMapper;
-//    Ui::myLineEdit *ui;
+    int frameWidth;
+    QSize sz;
+    QSize buttonSize;
 };
 
 

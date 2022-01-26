@@ -2,9 +2,8 @@
 
 myLineEdit::myLineEdit(QWidget *parent)
     : QLineEdit(parent)
-//    ,
-//      ui(new Ui::myLineEdit)
 {
+    frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
 }
 
 void myLineEdit::setButtons(QString buttons)
@@ -31,43 +30,41 @@ void myLineEdit::setButtons(QString buttons)
         for (i = 0; i < buttonsCount; i++)
         {
             lineEditButtons[i] = new QToolButton(this);
-            lineEditButtons[i]->setIconSize(QSize(12,12));
+//            lineEditButtons[i]->setIconSize(QSize(12,12));
             lineEditButtons[i]->setCursor(Qt::ArrowCursor);
-            lineEditButtons[i]->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-            lineEditButtons[i]->setStyleSheet("::hover { border: 1px solid #5798C6; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f6f7fa, stop: 1 #dadbde);}"); // LOL работает
+            lineEditButtons[i]->setStyleSheet("QToolButton { border: 0px;}    QToolButton::hover { border: 1px solid #0078D7;  background-color: #E5F1FB;}");
             signalMapper->setMapping(lineEditButtons[i], i);
             QObject::connect(lineEditButtons[i], SIGNAL(clicked()), signalMapper, SLOT(map()));
 
             if (buttonsList.value(i) == "Clear")
             {
                 // ✖ или 🗙 или ⌫
-                lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
+//                lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
+                lineEditButtons[i]->setText("🗙");
             }
             else if (buttonsList.value(i) == "DownArrow")
             {
                 // ▼
-                lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_TitleBarUnshadeButton));
+//                lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_TitleBarUnshadeButton));
+                lineEditButtons[i]->setText("▼");
             }
             else if (buttonsList.value(i) == "Edit")
             {
                 // 🖉
-                QPixmap pixmap("pencil.png");
-                lineEditButtons[i]->setIcon(QIcon(pixmap));
+//                QPixmap pixmap("pencil.png");
+//                lineEditButtons[i]->setIcon(QIcon(pixmap));
+                lineEditButtons[i]->setText("🖉");
             }
             else if (buttonsList.value(i) == "Search")
             {
                 // 🔍
-                QPixmap pixmap("magnifier.png");
-                lineEditButtons[i]->setIcon(QIcon(pixmap));
+//                QPixmap pixmap("magnifier.png");
+//                lineEditButtons[i]->setIcon(QIcon(pixmap));
+                lineEditButtons[i]->setText("🔍");
             }
 
         }
 
-        int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
-        setStyleSheet(QString("QLineEdit { padding-right: %1px; } ").arg(lineEditButtons[0]->sizeHint().width() + frameWidth + 1));
-        QSize msz = minimumSizeHint();
-        setMinimumSize(qMax(msz.width(), lineEditButtons[0]->sizeHint().height() + frameWidth * 2 + 2),
-                       qMax(msz.height(), lineEditButtons[0]->sizeHint().height() + frameWidth * 2 + 2));
     }
 
 }
@@ -77,19 +74,48 @@ QString myLineEdit::buttons()
 
 }
 
+void myLineEdit::tmp_set_buttons_style_sheet(const QString &styleSheet)
+{
+    int i = 0;
+
+    if (this->buttonsCount)
+    {
+        for (i = 0; i < this->buttonsCount; i++)
+        {
+            (this->lineEditButtons[i])->setStyleSheet(styleSheet);
+        }
+    }
+}
+
+void myLineEdit::resize(const QSize &size)
+{
+    sz.setHeight(size.height());
+    sz.setWidth(sizeHint().width());
+    buttonSize = {size.height() - frameWidth, size.height() - frameWidth};  // обновляем значение
+    QLineEdit::resize( size );
+}
+
+void myLineEdit::resize(int w, int h)
+{
+    resize(QSize(w, h));
+}
+
 void myLineEdit::resizeEvent(QResizeEvent *)
 {
     int i = 0;
+    buttonSize.setHeight(this->height());
+    buttonSize.setWidth(this->height());
     if (this->buttonsCount)
     {
-        QSize sz = this->lineEditButtons[i]->sizeHint();
-        int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
         for (i = 0; i < this->buttonsCount; i++)
         {
-            (this->lineEditButtons[i])->move(rect().right() - frameWidth - sz.width()*(this->buttonsCount - i),
-                              (rect().bottom() + 1 - sz.height())/2);
+            this->lineEditButtons[i]->resize(buttonSize.width(), buttonSize.height());
+            (this->lineEditButtons[i])->move( rect().right() + 1 - buttonSize.width()*(this->buttonsCount - i),
+                                               (rect().height() - buttonSize.width())/2 );
         }
     }
+    setTextMargins(0,0, (this->height() + frameWidth)*buttonsCount, 0) ; // лучше задавать отступ справа так, а не с пом. setStyleSheet, т. к. в вышестоящей функции может потребоваться изменить внешний вид
+
 }
 
 void myLineEdit::updateCloseButton(const QString& text)
@@ -111,5 +137,4 @@ void myLineEdit::slotButtonClicked(int buttonId)
 
 myLineEdit::~myLineEdit()
 {
-//    delete ui;
 }
