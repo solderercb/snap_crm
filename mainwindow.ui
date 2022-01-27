@@ -233,71 +233,72 @@
        <attribute name="title">
         <string>Tab 2</string>
        </attribute>
-       <widget class="QPushButton" name="pushButton_5">
-        <property name="geometry">
-         <rect>
-          <x>455</x>
-          <y>210</y>
-          <width>444</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>PushButton</string>
-        </property>
-       </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>5</x>
-          <y>0</y>
-          <width>445</width>
-          <height>422</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
-         </property>
-         <item>
-          <widget class="QCommandLinkButton" name="commandLinkButton">
-           <property name="text">
-            <string>CommandLinkButton</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCommandLinkButton" name="commandLinkButton_2">
-           <property name="text">
-            <string>CommandLinkButton</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QDateEdit" name="dateEdit">
-        <property name="geometry">
-         <rect>
-          <x>565</x>
-          <y>70</y>
-          <width>110</width>
-          <height>22</height>
-         </rect>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,1,1">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+          <item row="0" column="0" colspan="2">
+           <widget class="QCommandLinkButton" name="commandLinkButton">
+            <property name="text">
+             <string>CommandLinkButton</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QCommandLinkButton" name="commandLinkButton_2">
+            <property name="text">
+             <string>CommandLinkButton</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="myLineEdit" name="testStyleSheetLineEdit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QTextEdit" name="textEditStyleSheet"/>
+          </item>
+          <item row="5" column="0">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>126</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="2">
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>PushButton</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QPushButton" name="pushButton_5">
+            <property name="text">
+             <string>PushButton</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
@@ -347,6 +348,16 @@
   </widget>
  </widget>
  <layoutdefault spacing="1" margin="0"/>
+ <customwidgets>
+  <customwidget>
+   <class>myLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>mylineedit.h</header>
+   <slots>
+    <signal>buttonClicked(int)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -362,6 +373,22 @@
     <hint type="destinationlabel">
      <x>147</x>
      <y>19</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>applyStyleSheet()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>872</x>
+     <y>265</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>928</x>
+     <y>231</y>
     </hint>
    </hints>
   </connection>
@@ -386,5 +413,6 @@
  <slots>
   <slot>closeTab(int)</slot>
   <slot>createTabRepairs()</slot>
+  <slot>applyStyleSheet()</slot>
  </slots>
 </ui>

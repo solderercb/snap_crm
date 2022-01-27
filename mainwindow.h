@@ -32,6 +32,18 @@ namespace Ui {
 class MainWindow;
 }
 
+class tabBarEventFilter : public QObject
+{
+    Q_OBJECT
+signals:
+
+public:
+    tabBarEventFilter(QObject*);
+private:
+protected:
+    bool eventFilter(QObject*, QEvent*) override;
+};
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -85,6 +97,7 @@ private slots:
     void createTabClients(int type = 0);
     void createTabClient(int);
     void closeTab(int index);
+    void applyStyleSheet();
 #ifdef QT_DEBUG
     void test_scheduler_handler();
     void test_scheduler2_handler();

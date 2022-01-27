@@ -9,6 +9,27 @@
 #include "mylineedit.h"
 
 #define NO_LOGIN
+tabBarEventFilter::tabBarEventFilter(QObject *parent) :
+    QObject(parent)
+{
+}
+
+bool tabBarEventFilter::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress)  // закрытие вкладки по клику средней кнопкой мыши (колёсиком)
+    {
+        QTabBar *tabBar = static_cast<QTabBar*>(watched);
+        QMouseEvent *mouseButtonPress = static_cast<QMouseEvent*>(event);
+
+        if (mouseButtonPress->button() == Qt::MiddleButton)
+        {
+//            qDebug() << watched->objectName() << ": viewEventFilter: " << event << "; tab = " << tabBar->tabAt(mouseButtonPress->position().toPoint());
+            emit tabBar->tabCloseRequested(tabBar->tabAt(mouseButtonPress->position().toPoint()));
+        }
+    }
+    return false;
+}
+
 MainWindow* MainWindow::p_instance = nullptr;
 
 // Тело конструктора MainWindow(QWidget *parent)
@@ -24,6 +45,10 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     ui->setupUi(this);
+
+    tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)
+    ui->tabWidget->tabBar()->installEventFilter(tabBarEventFilterObj);
+
     this->resize(1440,800);
 
     /* Кнопка Ремонты и меню */
