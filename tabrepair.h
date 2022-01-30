@@ -10,7 +10,6 @@
 #include <QLabel>
 #include <QSqlQueryModel>
 #include <QSqlTableModel>
-#include "dbconnection.h"
 
 namespace Ui {
 class tabRepair;
@@ -31,7 +30,6 @@ public:
 private:
     Ui::tabRepair *ui;
     static tabRepair* p_instance;
-    DBConnection* dbConnection;
     void updateTableWidget();
 //    QTableView* tableView;
     QSqlQueryModel* works_table;

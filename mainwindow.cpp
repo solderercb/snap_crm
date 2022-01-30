@@ -8,7 +8,6 @@
 #include "tabclients.h"
 #include "mylineedit.h"
 
-#define NO_LOGIN
 tabBarEventFilter::tabBarEventFilter(QObject *parent) :
     QObject(parent)
 {
@@ -39,10 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QTextCodec::setCodecForLocale(codec);
-
-#ifdef NO_LOGIN
-    ConnectToDB(SQL_USER, SQL_PSWD, SQL_HOST, SQL_PORT, SQL_DB, "connMain");
-#endif
 
     ui->setupUi(this);
 
@@ -187,6 +182,8 @@ MainWindow::MainWindow(QWidget *parent) :
     get_warehouses_list();
     btnClick();
 
+    initGlobalModels();
+
 #ifdef QT_DEBUG
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
@@ -200,13 +197,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    dbConnection->destroy();
 	delete tableConsignmentsModel;
 	delete tableGoodsModel;
 	delete tree_model;
 	delete comboboxSourceModel;
 	delete ui;
     p_instance = nullptr;
+    delete permissionsModel;
+    delete companiesModel;
+    delete officesModel;
+    delete warehousesModel;
+    delete usersModel;
+    delete managersModel;
+    delete engineersModel;
+    delete boxesModel;
+    QSqlDatabase::database("connMain").close();
 }
 
 MainWindow* MainWindow::getInstance(QWidget *parent)   // singleton: MainWindow только один объект
@@ -217,16 +222,11 @@ MainWindow* MainWindow::getInstance(QWidget *parent)   // singleton: MainWindow 
     return p_instance;
 }
 
-void MainWindow::ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName )
-{
-    dbConnection = DBConnection::getInstance(this, username, password, ipaddr, port, dbName, connName);
-}
-
 void MainWindow::btnClick()
 {
     enum {store_cats_id, store_cats_parent, store_cats_name, store_cats_position};
 
-    if (!(dbConnection->connectOK))
+    if (!(QSqlDatabase::database("connMain").isOpen()))
     {
         return;
     }
@@ -291,7 +291,7 @@ void MainWindow::on_treeView_activated(const QModelIndex &index)
 
 void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_code)
 {
-    if (!(dbConnection->connectOK))
+    if (!(QSqlDatabase::database("connMain").isOpen()))
     {
         return;
     }
@@ -329,7 +329,7 @@ void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_co
 
 void MainWindow::get_warehouses_list()
 {
-    if (!(dbConnection->connectOK))
+    if (!(QSqlDatabase::database("connMain").isOpen()))
     {
         return;
     }
@@ -361,7 +361,23 @@ void MainWindow::get_warehouses_list()
 
 	ui->comboBoxDestWarehouse->setCurrentIndex(1); // По умолчанию складом-приёмником является второй элемент в списке
 
-	delete warehouse_list;
+    delete warehouse_list;
+}
+
+void MainWindow::initGlobalModels()
+{
+    QString query;
+
+    permissionsModel  = new QSqlQueryModel();
+    companiesModel    = new QSqlQueryModel();
+    officesModel      = new QSqlQueryModel();
+    warehousesModel   = new QSqlQueryModel();
+    usersModel        = new QSqlQueryModel();
+    managersModel     = new QSqlQueryModel();
+    engineersModel    = new QSqlQueryModel();
+    boxesModel        = new QSqlQueryModel();
+
+    query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
 }
 
 // При смене склада обновляем таблицу
@@ -404,7 +420,7 @@ void MainWindow::on_tableConsignments_clicked(const QModelIndex &index)
 
 void MainWindow::readConsignments(const QModelIndex &index, const QString &warehouse_code)
 {
-    if (!(dbConnection->connectOK))
+    if (!(QSqlDatabase::database("connMain").isOpen()))
     {
         return;
     }
@@ -463,14 +479,14 @@ void MainWindow::createTabRepairs(int type)
 
 void MainWindow::createTabRepair(int repair_id)
 {
-    tabRepair *subwindow = tabRepair::getInstance();
+    tabRepair *subwindow = tabRepair::getInstance(this);
     ui->tabWidget->addTab(subwindow, "Ремонт " + QString::number(repair_id));
     ui->tabWidget->setCurrentWidget(subwindow);
 }
 
 void MainWindow::createTabRepairNew()
 {
-    tabRepairNew *subwindow = tabRepairNew::getInstance();
+    tabRepairNew *subwindow = tabRepairNew::getInstance(this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, "Приём в ремонт");
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
@@ -486,7 +502,7 @@ void MainWindow::reactivateTabRepairNew(int)
 void MainWindow::createTabClients(int type)
 {
     const QString tabLabels[] = {"Клиенты", "Выбрать клиента"};
-    tabClients *subwindow = tabClients::getInstance(type);
+    tabClients *subwindow = tabClients::getInstance(type, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, tabLabels[type]);
 

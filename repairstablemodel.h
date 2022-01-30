@@ -2,11 +2,11 @@
 #define REPAIRSTABLEMODEL_H
 
 #include <QAbstractTableModel>
+#include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QColor>
 #include <QStandardItemModel>
 #include <QStandardItem>
-#include "dbconnection.h"
 
 class repairsTableModel : public QSqlQueryModel
 {

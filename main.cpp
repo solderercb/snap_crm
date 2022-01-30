@@ -1,33 +1,25 @@
 #include "loginwindow.h"
 #include "mainwindow.h"
-#include "my_widget.h"
 #include <QApplication>
-#define NO_LOGIN
-
-void InitDBConnectionClass();
+#include "windowsdispatcher.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
-    LoginWindow *windowLogin = new LoginWindow;
-    MainWindow *windowMain = MainWindow::getInstance();
-//    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
-    windowMain->createTabRepairNew(); // по-умолчанию создаём вкладку Ремонты
+    windowsDispatcher *windowsDispatcherObj = new windowsDispatcher(nullptr);   // в main.cpp не может быть слотов, приходится создавать лишний объект
+    QTextCodec *codec = QTextCodec::codecForName("UTF8");
+    QTextCodec::setCodecForLocale(codec);
 
-    QObject::connect(windowLogin,SIGNAL(ConnectToDB(QString,QString,QString, uint,QString,QString)),windowMain,SLOT(ConnectToDB(QString,QString,QString, uint,QString,QString)));
-    QObject::connect(windowMain,SIGNAL(DBConnectErr(QString)),windowLogin,SLOT(DBConnectErr(QString)));
-    QObject::connect(windowMain,SIGNAL(DBConnectOK()),windowMain,SLOT(show()));
-    QObject::connect(windowMain,SIGNAL(DBConnectOK()),windowLogin,SLOT(close()));
+    LoginWindow *windowLogin = new LoginWindow();
+
+    QObject::connect(windowLogin,SIGNAL(DBConnectOK()),windowsDispatcherObj,SLOT(connectOK()));
     QObject::connect(windowLogin,SIGNAL(btnCancelClick()),&app,SLOT(quit()));
 
-
-
-#ifdef NO_LOGIN
-//    windowMain->showMaximized();
-    windowMain->show();
-#elif
     windowLogin->show();
+#ifdef NO_LOGIN     // NO_LOGIN объявляется в loginwindow.h
+    windowLogin->debugLogin();
 #endif
+
 
 	return app.exec();
 }

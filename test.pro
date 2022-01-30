@@ -31,13 +31,13 @@ SOURCES += main.cpp\
     dbconnection.cpp \
 				mainwindow.cpp \
     loginwindow.cpp \
-    my_widget.cpp \
     mylineedit.cpp \
     repairstablemodel.cpp \
     tabclients.cpp \
     tabrepair.cpp \
     tabrepairnew.cpp \
-    tabrepairs.cpp
+    tabrepairs.cpp \
+    windowsdispatcher.cpp
 
 HEADERS  += mainwindow.h \
     SSetComboBox/ssetcombobox.h \
@@ -45,13 +45,13 @@ HEADERS  += mainwindow.h \
     com_sql_queries.h \
     dbconnection.h \
     loginwindow.h \
-    my_widget.h \
     mylineedit.h \
     repairstablemodel.h \
     tabclients.h \
     tabrepair.h \
     tabrepairnew.h \
-    tabrepairs.h
+    tabrepairs.h \
+    windowsdispatcher.h
 
 FORMS    += mainwindow.ui \
     bottoolbarwidget.ui \

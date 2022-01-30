@@ -6,10 +6,10 @@
 #include <QStandardItem>
 #include <QToolButton>
 #include <QStyle>
+#include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QDate>
 #include <QDateEdit>
-#include "dbconnection.h"
 
 namespace Ui {
 class tabRepairNew;
@@ -32,7 +32,6 @@ private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
     void getDevices();
-    DBConnection* dbConnection;
 //    QStandardItemModel* comboboxDevicesModel;
     QSqlQueryModel* comboboxDevicesModel;
     QSqlQueryModel* comboboxDeviceMakersModel;

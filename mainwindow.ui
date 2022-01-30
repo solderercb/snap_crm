@@ -51,7 +51,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -383,8 +383,8 @@
    <slot>applyStyleSheet()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>872</x>
-     <y>265</y>
+     <x>611</x>
+     <y>267</y>
     </hint>
     <hint type="destinationlabel">
      <x>928</x>

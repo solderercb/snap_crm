@@ -2,6 +2,12 @@
 #define LOGINWINDOW_H
 
 #include <QWidget>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QTextCodec>
+
+#define NO_LOGIN
 
 namespace Ui {
 class LoginWindow;
@@ -12,22 +18,26 @@ class LoginWindow : public QWidget
 	Q_OBJECT
 
 signals:
-    void ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName);
 	void btnCancelClick();
+    void DBConnectOK();
 
 public:
 	explicit LoginWindow(QWidget *parent = 0);
 	~LoginWindow();
+#ifdef NO_LOGIN
+    void debugLogin();
+#endif
 
 private:
 	Ui::LoginWindow *ui;
-
-public slots:
-	void DBConnectErr(const QString &message);
+    QSqlDatabase connMain;
+    QSqlDatabase connNtfy;
+//    QSqlDatabase connThird;
+//    QSqlDatabase connFourth;
 
 private slots:
-	void ConnectToDB();
-	void slotCancelClick();
+    void btnLoginHandler();
+    void btnCancelHandler();
 };
 
 #endif // LOGINWINDOW_H

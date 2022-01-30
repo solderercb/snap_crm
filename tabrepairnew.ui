@@ -457,19 +457,6 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QComboBox" name="comboBoxDeviceMaker">
-                <property name="editable">
-                 <bool>false</bool>
-                </property>
-                <property name="currentText">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>Производитель</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="2">
                <widget class="QComboBox" name="comboBoxDeviceModel">
                 <property name="editable">
@@ -480,6 +467,19 @@
                 </property>
                 <property name="placeholderText">
                  <string>Модель</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="comboBoxDeviceMaker">
+                <property name="editable">
+                 <bool>false</bool>
+                </property>
+                <property name="currentText">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>Производитель</string>
                 </property>
                </widget>
               </item>
@@ -1286,18 +1286,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEditSN</sender>
-   <signal>buttonClicked(int)</signal>
+   <sender>tableViewDeviceMatch</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>lineEditSNClearHandler(int)</slot>
+   <slot>fillDeviceCreds(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>935</x>
-     <y>47</y>
+     <x>920</x>
+     <y>148</y>
     </hint>
     <hint type="destinationlabel">
      <x>1020</x>
-     <y>46</y>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -1318,18 +1318,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>tableViewDeviceMatch</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
+   <sender>lineEditSN</sender>
+   <signal>buttonClicked(int)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>fillDeviceCreds(QModelIndex)</slot>
+   <slot>lineEditSNClearHandler(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>920</x>
-     <y>148</y>
+     <x>935</x>
+     <y>47</y>
     </hint>
     <hint type="destinationlabel">
      <x>1020</x>
-     <y>106</y>
+     <y>46</y>
     </hint>
    </hints>
   </connection>

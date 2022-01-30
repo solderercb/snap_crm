@@ -11,7 +11,6 @@
 #include <QSqlQueryModel>
 #include <QRegularExpressionValidator>
 #include "repairstablemodel.h"
-#include "dbconnection.h"
 
 namespace Ui {
 class tabRepairs;
@@ -33,7 +32,6 @@ private:
     Ui::tabRepairs *ui;
     static tabRepairs* p_instance[2];
     bool _type;
-    DBConnection* dbConnection;
     void updateTableWidget();
     QTableView* tableView;
     QSqlQueryModel* repairs_table;

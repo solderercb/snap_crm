@@ -10,8 +10,6 @@
 #include <QLabel>
 #include <QSqlQueryModel>
 #include <QSortFilterProxyModel>
-#include "repairstablemodel.h"
-#include "dbconnection.h"
 
 namespace Ui {
 class tabClients;
@@ -34,7 +32,6 @@ private:
     Ui::tabClients *ui;
     static tabClients* p_instance[2];
     bool _type;
-    DBConnection* dbConnection;
     void updateTableWidget();
     QTableView* tableView;
     QSqlQueryModel* clientsTable;

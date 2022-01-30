@@ -25,8 +25,7 @@
 #include <QTimer>
 #include <QCompleter>
 #include <QFontMetrics>
-#include "sqlcreds.h"
-#include "dbconnection.h"
+#include "windowsdispatcher.h"
 
 namespace Ui {
 class MainWindow;
@@ -56,11 +55,21 @@ signals:
 public:
     static MainWindow* getInstance(QWidget *parent = nullptr);
     ~MainWindow();	// Деструктор
-    DBConnection* dbConnection;
+    QSqlQueryModel* permissionsModel;
+    QSqlQueryModel* companiesModel;
+    QSqlQueryModel* officesModel;
+    QSqlQueryModel* warehousesModel;
+    QSqlQueryModel* usersModel;
+    QSqlQueryModel* managersModel;
+    QSqlQueryModel* engineersModel;
+    QSqlQueryModel* boxesModel;
+//    QSqlQueryModel* Model;
+//    QSqlQueryModel* Model;
+//    QSqlQueryModel* Model;
 
 private:
-    explicit MainWindow(QWidget *parent = 0); // Конструктор
-    Ui::MainWindow *ui; // Указатель на класс MainWindow
+    explicit MainWindow(QWidget *parent = 0);
+    Ui::MainWindow *ui;
     static MainWindow* p_instance;
 	void readGoods(const QModelIndex &index, const QString &warehouse_code);
 	void readConsignments(const QModelIndex &index, const QString &warehouse_code);
@@ -73,13 +82,13 @@ private:
 	QStringList tableGoodsHeaders;
 	QStandardItemModel *tableConsignmentsModel; // Модель таблицы, отображающей партии товара
 	QStringList tableConsignmentsHeaders;
+    void initGlobalModels();    // общие модели данных: организации, офисы, склады, сотрудники (все, менеджеры, инженеры) и др.
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2;
     uint test_scheduler_counter = 0;
 #endif
 
 public slots:
-    void ConnectToDB(const QString &username, const QString &password, const QString &ipaddr, const uint &port, const QString &dbName, const QString &connName);
     void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
     void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
 
