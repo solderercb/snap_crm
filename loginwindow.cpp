@@ -14,7 +14,6 @@ LoginWindow::LoginWindow(QWidget *parent) :
 
 LoginWindow::~LoginWindow()
 {
-    qDebug() << "deleting loginWindow";
     delete ui;
 }
 
@@ -40,7 +39,6 @@ void LoginWindow::btnLoginHandler()
 //    connFourth = QSqlDatabase::addDatabase("QMYSQL", "connFourth");
 //    connections.append(&connFourth);
 
-    qDebug() << QSqlDatabase::connectionNames() << " ||| " << connMain << "(" << &connMain << ") ||| " << QSqlDatabase::drivers();
     for (int i=0; i<connections.size(); i++)
     {
 #ifdef NO_LOGIN
@@ -78,6 +76,5 @@ void LoginWindow::btnLoginHandler()
 
 void LoginWindow::btnCancelHandler()
 {
-	qDebug("Application close.");
 	emit this->btnCancelClick();
 }

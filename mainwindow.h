@@ -106,7 +106,6 @@ private slots:
     void createTabClients(int type = 0);
     void createTabClient(int);
     void closeTab(int index);
-    void applyStyleSheet();
 #ifdef QT_DEBUG
     void test_scheduler_handler();
     void test_scheduler2_handler();

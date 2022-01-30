@@ -9,7 +9,6 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
 
 void windowsDispatcher::connectOK()
 {
-    qDebug() << "windowsDispatcher::connectOK()";
     MainWindow *windowMain = MainWindow::getInstance();
     windowMain->show();
     windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты

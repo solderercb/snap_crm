@@ -376,22 +376,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>pushButton_5</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>applyStyleSheet()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>611</x>
-     <y>267</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>928</x>
-     <y>231</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <designerdata>
   <property name="gridDeltaX">
@@ -413,6 +397,5 @@
  <slots>
   <slot>closeTab(int)</slot>
   <slot>createTabRepairs()</slot>
-  <slot>applyStyleSheet()</slot>
  </slots>
 </ui>
