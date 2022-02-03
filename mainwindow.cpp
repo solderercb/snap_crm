@@ -7,6 +7,7 @@
 #include "tabrepair.h"
 #include "tabclients.h"
 #include "mylineedit.h"
+#include "com_sql_queries.h"
 
 tabBarEventFilter::tabBarEventFilter(QObject *parent) :
     QObject(parent)
@@ -31,15 +32,21 @@ bool tabBarEventFilter::eventFilter(QObject *watched, QEvent *event)
 
 MainWindow* MainWindow::p_instance = nullptr;
 
-// Тело конструктора MainWindow(QWidget *parent)
-MainWindow::MainWindow(QWidget *parent) :
-	QMainWindow(parent),
+MainWindow::MainWindow(windowsDispatcher *parent) :
+    QMainWindow(nullptr),
 	ui(new Ui::MainWindow)
 {
     QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QTextCodec::setCodecForLocale(codec);
 
     ui->setupUi(this);
+    windowsDispatcherObj = parent;
+    companiesModel       = parent->companiesModel;
+    officesModel         = parent->officesModel;
+    userData             = parent->userData;
+    permissions          = parent->permissions;
+
+    initGlobalModels();
 
     tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)
     ui->tabWidget->tabBar()->installEventFilter(tabBarEventFilterObj);
@@ -182,8 +189,6 @@ MainWindow::MainWindow(QWidget *parent) :
     get_warehouses_list();
     btnClick();
 
-    initGlobalModels();
-
 #ifdef QT_DEBUG
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
@@ -203,18 +208,15 @@ MainWindow::~MainWindow()
 	delete comboboxSourceModel;
 	delete ui;
     p_instance = nullptr;
-    delete permissionsModel;
-    delete companiesModel;
-    delete officesModel;
     delete warehousesModel;
     delete usersModel;
     delete managersModel;
     delete engineersModel;
-    delete boxesModel;
+    delete repairBoxesModel;
     QSqlDatabase::database("connMain").close();
 }
 
-MainWindow* MainWindow::getInstance(QWidget *parent)   // singleton: MainWindow только один объект
+MainWindow* MainWindow::getInstance(windowsDispatcher *parent)   // singleton: MainWindow только один объект
 {
     if( !p_instance )
       p_instance = new MainWindow(parent);
@@ -368,14 +370,22 @@ void MainWindow::initGlobalModels()
 {
     QString query;
 
-    permissionsModel  = new QSqlQueryModel();
-    companiesModel    = new QSqlQueryModel();
-    officesModel      = new QSqlQueryModel();
     warehousesModel   = new QSqlQueryModel();
     usersModel        = new QSqlQueryModel();
     managersModel     = new QSqlQueryModel();
     engineersModel    = new QSqlQueryModel();
-    boxesModel        = new QSqlQueryModel();
+    itemBoxesModel    = new QSqlQueryModel();
+    repairBoxesModel  = new QSqlQueryModel();
+    paymentSystemsModel = new QSqlQueryModel();
+
+    qDebug() << "current_office (main) = " << userData->value("current_office").toInt();
+
+    warehousesModel->setQuery(QUERY_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    usersModel->setQuery(QUERY_USERS, QSqlDatabase::database("connMain"));
+    managersModel->setQuery(QUERY_MANAGERS, QSqlDatabase::database("connMain"));
+    engineersModel->setQuery(QUERY_ENGINEERS, QSqlDatabase::database("connMain"));
+//    itemBoxesModel->setQuery(QUERY_ITEM_BOXES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    repairBoxesModel->setQuery(QUERY_REPAIR_BOXES, QSqlDatabase::database("connMain"));
 
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
 }

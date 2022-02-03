@@ -29,7 +29,7 @@
          <item row="13" column="0" colspan="3">
           <widget class="QComboBox" name="comboBoxCompany">
            <property name="editable">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="currentText">
             <string/>
@@ -109,7 +109,7 @@
          <item row="12" column="0" colspan="3">
           <widget class="QComboBox" name="comboBoxOffice">
            <property name="editable">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="currentText">
             <string/>
@@ -122,7 +122,7 @@
          <item row="11" column="0" colspan="3">
           <widget class="QComboBox" name="comboBoxPresetBox">
            <property name="editable">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="currentText">
             <string/>
@@ -145,7 +145,7 @@
          <item row="14" column="1" colspan="2">
           <widget class="QComboBox" name="comboBoxPresetPaymentAccount">
            <property name="editable">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="currentText">
             <string/>
@@ -184,7 +184,7 @@
          <item row="10" column="0" colspan="3">
           <widget class="QComboBox" name="comboBoxPresetEngineer">
            <property name="editable">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="currentText">
             <string/>
@@ -305,7 +305,7 @@
                <bool>true</bool>
               </property>
               <attribute name="horizontalHeaderVisible">
-               <bool>true</bool>
+               <bool>false</bool>
               </attribute>
               <attribute name="horizontalHeaderCascadingSectionResizes">
                <bool>true</bool>
@@ -557,7 +557,7 @@
               <item row="1" column="2">
                <widget class="QComboBox" name="comboBoxPrepayAccount">
                 <property name="editable">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="currentText">
                  <string extracomment="Ист"/>

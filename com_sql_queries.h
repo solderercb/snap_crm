@@ -1,6 +1,14 @@
 #ifndef COM_SQL_QUERIES_H
 #define COM_SQL_QUERIES_H
 
-#define QUERY_CLIENT_AD_TYPES   "SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC);"
-#define QUERY_CLIENT_PHONES(id) "SELECT `phone`, `mask` FROM `tel` WHERE `customer` = " + QString::number((id)) + " ORDER BY `type` DESC, `id` DESC LIMIT 2"
+#define QUERY_CLIENT_AD_TYPES       "SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC);"
+#define QUERY_CLIENT_PHONES(id)     "SELECT `phone`, `mask` FROM `tel` WHERE `customer` = " + QString::number((id)) + " ORDER BY `type` DESC, `id` DESC LIMIT 2"
+#define QUERY_USER_DATA(username)   QString("SELECT  `users`.`id`, GROUP_CONCAT(`role_id`) AS 'roles', `name`,  `surname`,  `patronymic`,  `office`,  `def_office`,  `def_store`,  `def_item_state`,  `def_employee`,  `def_status`,  `def_ws_filter`,  `salary_rate`,  `pay_day`,  `pay_day_off`,  `pay_repair`,  `pay_repair_quick`,  `pay_sale`,  `pay_repair_q_sale`,  `pay_cartridge_refill`,  `pay_device_in`,  `pay_device_out`,  `pay_4_sale_in_repair`,  `row_color`,  `ge_highlight_color`,  `color_label_ws`,  `workspace_mode`,  `preview_before_print`,  `new_rep_doc_copies`,  `auto_refresh_workspace`,  `refresh_time`,  `xls_c1`,  `xls_c2`,  `xls_c3`,  `xls_c4`,  `xls_c5`,  `xls_c6`,  `xls_c7`,  `xls_c8`,  `xls_c9`,  `xls_c10`,  `xls_c11`,  `xls_c12`,  `xls_c13`,  `xls_c14`,  `xls_c15`,  `display_out`,  `display_complete`,  `new_on_top`,  `issued_color`, `fields_cfg`,  `save_state_on_close`,  `group_store_items`,  `track_activity`,  `card_on_call`,  `inn`,  `inform_comment`,  `inform_status`,  `kkt`,  `pinpad`,  `advance_disable`,  `salary_disable`,  `kkm_pass`,  `prefer_regular`,  `fontsize`,  `rowheight`,  `animation` FROM `users` LEFT JOIN `roles_users` ON `users`.`id` = `roles_users`.`user_id` WHERE `username` = '%1' GROUP BY `users`.`id`  LIMIT 1;").arg((username))
+#define QUERY_WAREHOUSES(office)    QString("SELECT `name`, `id`, `type`, `description`, `sub_type`, `it_vis_pn`, `it_vis_notes`, `it_vis_description`, `it_vis_sn`, `it_vis_barcode`, `it_vis_photo`, `it_vis_warranty`, `it_vis_warranty_dealer`, `active`FROM `stores` WHERE `office` = %1;").arg((office))
+#define QUERY_USERS                 QString("SELECT  `id`,  `username`,  `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` WHERE `status` = 1;")
+#define QUERY_MANAGERS              QString("SELECT  `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (3, 6) GROUP BY t1.`id`;")
+#define QUERY_ENGINEERS             QString("SELECT  `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (2, 5) GROUP BY t1.`id`;")
+#define QUERY_ITEM_BOXES(warehouse) QString("SELECT `id`, `name`, `places`, `color` FROM `boxes` WHERE `store_id` = 1 AND `non_items` = 0;").arg((warehouse))
+#define QUERY_REPAIR_BOXES          QString("SELECT `id`, `name`, `places`, `color` FROM `boxes` WHERE `non_items` = 1;")
+
 #endif // COM_SQL_QUERIES_H

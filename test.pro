@@ -28,6 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
     SSetComboBox/ssetcombobox.cpp \
     bottoolbarwidget.cpp \
+    chooseofficewindow.cpp \
 				mainwindow.cpp \
     loginwindow.cpp \
     mylineedit.cpp \
@@ -41,6 +42,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     SSetComboBox/ssetcombobox.h \
     bottoolbarwidget.h \
+    chooseofficewindow.h \
     com_sql_queries.h \
     loginwindow.h \
     mylineedit.h \
@@ -53,6 +55,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     bottoolbarwidget.ui \
+    chooseofficewindow.ui \
     loginwindow.ui \
     tabclients.ui \
     tabrepair.ui \

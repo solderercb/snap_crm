@@ -4,7 +4,7 @@
 
 tabRepairNew* tabRepairNew::p_instance = nullptr;
 
-tabRepairNew::tabRepairNew(QWidget *parent) :
+tabRepairNew::tabRepairNew(MainWindow *parent) :
     QWidget(parent),
     ui(new Ui::tabRepairNew)
 {
@@ -19,6 +19,15 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
+
+    companiesModel      = parent->companiesModel;
+    officesModel        = parent->officesModel;
+    userData            = parent->userData;
+    permissions         = parent->permissions;
+    managersModel       = parent->managersModel;
+    engineersModel      = parent->engineersModel;
+    repairBoxesModel    = parent->repairBoxesModel;
+    paymentSystemsModel = parent->paymentSystemsModel;
 
     ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
     ui->groupBoxClientCoincidence->hide();  // по умолчанию группу "Совпадение клиента" не показываем
@@ -39,22 +48,40 @@ tabRepairNew::tabRepairNew(QWidget *parent) :
     ui->comboBoxDeviceMaker->setPlaceholderText("производитель");
     ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxDeviceModel->lineEdit()->setPlaceholderText("модель");
-    ui->comboBoxPresetEngineer->lineEdit()->setPlaceholderText("назначить инженером");
-    ui->comboBoxPresetBox->lineEdit()->setPlaceholderText("ячейка");
-    ui->comboBoxOffice->lineEdit()->setPlaceholderText("офис");
-    ui->comboBoxCompany->lineEdit()->setPlaceholderText("организация");
-    ui->comboBoxPresetPaymentAccount->lineEdit()->setPlaceholderText("тип оплаты");
-    ui->comboBoxPrepayAccount->lineEdit()->setPlaceholderText("тип оплаты");
+    ui->comboBoxPresetEngineer->setPlaceholderText("назначить инженером");
+    ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPresetBox->setPlaceholderText("ячейка");
+    ui->comboBoxPresetBox->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxOffice->setPlaceholderText("офис");
+    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxCompany->setPlaceholderText("организация");
+    ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPresetPaymentAccount->setPlaceholderText("тип оплаты");
+    ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPrepayAccount->setPlaceholderText("тип оплаты");
+    ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditPrevRepair->setButtons("Search, DownArrow");
     ui->lineEditPrevRepair->setReadOnly(true);
     ui->lineEditSN->setButtons("Clear");
 
-    ui->comboBoxPresetEngineer->addItem("aaaa");
-    ui->comboBoxPresetEngineer->addItem("bbbb");
     if(QLineEdit *le = ui->comboBoxPresetEngineer->lineEdit())    // Рисуем кнопку очистки в комбобоксе (это работает)
     {
         le->setClearButtonEnabled(true);
     }
+
+    ui->comboBoxCompany->setModel(companiesModel);
+    ui->comboBoxOffice->setModel(officesModel);
+    int i = 0;
+    qDebug() << "current_office = " << userData->value("current_office").toInt();
+    while (userData->value("current_office").toInt() != officesModel->record(i).value("id").toInt())
+    {
+        qDebug() << "officesModel->record(" << i << ").value(\"id\").toInt() = " << officesModel->record(i).value("id").toInt();
+        i++;
+    };
+    ui->comboBoxOffice->setCurrentIndex(i);
+    ui->comboBoxPresetEngineer->setModel(engineersModel);
+    ui->comboBoxPresetEngineer->setCurrentIndex(-1);
+    ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
 
     comboboxDevicesModel = new QSqlQueryModel();
     ui->comboBoxDevice->setModel(comboboxDevicesModel);
@@ -109,7 +136,7 @@ tabRepairNew::~tabRepairNew()
     p_instance = nullptr;   // Обязательно блять!
 }
 
-tabRepairNew* tabRepairNew::getInstance(QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна
+tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
 {
 if( !p_instance )
   p_instance = new tabRepairNew(parent);

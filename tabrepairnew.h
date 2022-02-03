@@ -10,6 +10,7 @@
 #include <QSqlQueryModel>
 #include <QDate>
 #include <QDateEdit>
+#include "mainwindow.h"
 
 namespace Ui {
 class tabRepairNew;
@@ -24,8 +25,8 @@ signals:
     void createTabSelectExistingClient(int);
 
 public:
-    explicit tabRepairNew(QWidget *parent = nullptr);
-    static tabRepairNew* getInstance(QWidget *parent = nullptr);
+    explicit tabRepairNew(MainWindow *parent = nullptr);
+    static tabRepairNew* getInstance(MainWindow *parent = nullptr);
     ~tabRepairNew();
 
 private:
@@ -49,6 +50,14 @@ private:
     QVector<QWidget*> additionalFieldsWidgets;
     int exist_client_id;
     void phoneTypeChanged(int, int);
+    QMap<QString, QVariant> *userData;
+    QMap<QString, bool> *permissions;
+    QSqlQueryModel* companiesModel;
+    QSqlQueryModel* officesModel;
+    QSqlQueryModel* managersModel;
+    QSqlQueryModel* engineersModel;
+    QSqlQueryModel* repairBoxesModel;
+    QSqlQueryModel* paymentSystemsModel;
 
 private slots:
     void changeClientType();

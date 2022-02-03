@@ -53,22 +53,25 @@ signals:
 
 
 public:
-    static MainWindow* getInstance(QWidget *parent = nullptr);
+    static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();	// Деструктор
-    QSqlQueryModel* permissionsModel;
+    windowsDispatcher *windowsDispatcherObj;    // для доступа к моделям данных пользователя, компаний, офисов
+    QMap<QString, QVariant> *userData;
+    QMap<QString, bool> *permissions;
     QSqlQueryModel* companiesModel;
     QSqlQueryModel* officesModel;
     QSqlQueryModel* warehousesModel;
     QSqlQueryModel* usersModel;
     QSqlQueryModel* managersModel;
     QSqlQueryModel* engineersModel;
-    QSqlQueryModel* boxesModel;
-//    QSqlQueryModel* Model;
+    QSqlQueryModel* itemBoxesModel;
+    QSqlQueryModel* repairBoxesModel;
+    QSqlQueryModel* paymentSystemsModel;
 //    QSqlQueryModel* Model;
 //    QSqlQueryModel* Model;
 
 private:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(windowsDispatcher *parent = nullptr);
     Ui::MainWindow *ui;
     static MainWindow* p_instance;
 	void readGoods(const QModelIndex &index, const QString &warehouse_code);

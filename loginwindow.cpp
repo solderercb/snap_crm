@@ -66,11 +66,22 @@ void LoginWindow::btnLoginHandler()
     else
     {
         qDebug("DB successfully opened.");
-        for (int i = 1; i<connections.size(); i++)  // открываем вспомогательные соединения
-            connections[i]->open();
-        emit this->DBConnectOK();
-        this->hide();
-        this->deleteLater();
+        QSqlQuery queryCheckUser = QSqlQuery(QSqlDatabase::database("connMain"));   // проверка состояния учетной записи пользователя (база программы, а не mysql)
+        queryCheckUser.exec(QString("SELECT `id` FROM `users` WHERE `username` = '%1' AND `state` = 1 AND `is_bot` = 0 LIMIT 1;").arg(QSqlDatabase::database("connMain").userName()));
+        queryCheckUser.first();
+        if (queryCheckUser.isValid())
+        {
+            for (int i = 1; i<connections.size(); i++)  // открываем вспомогательные соединения
+                connections[i]->open();
+            emit this->DBConnectOK();
+            this->hide();
+            this->deleteLater();
+        }
+        else
+        {
+            ui->labelStatus->setText("Учетная запись отключена");
+            ui->labelStatus->setStyleSheet("color: red; font: bold;");
+        }
     }
 }
 
