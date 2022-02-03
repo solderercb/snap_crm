@@ -1,6 +1,9 @@
 ﻿#include "windowsdispatcher.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
 #include "chooseofficewindow.h"
+#ifdef QT_DEBUG
+    #define AUTO_CHOOSE_OFFICE
+#endif
 
 windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject(parent)
@@ -35,7 +38,7 @@ void windowsDispatcher::connectOK()
         userData->insert(queryUserData->record().fieldName(i), queryUserData->value(i));
     }
 
-    queryPermissions->exec(QString("SELECT `permission_id` FROM `permissions_roles` WHERE `role_id` IN (%1)").arg(queryUserData->value("roles").toString()));
+    queryPermissions->exec(QUERY_PERMISSIONS(queryUserData->value("roles").toString()));
     permissions = new QMap<QString, bool>;
     while (queryPermissions->next())
     {
@@ -43,8 +46,8 @@ void windowsDispatcher::connectOK()
     }
 
     // Список компаний.
-    companiesModel->setQuery("SELECT  `name`,  `id`,  `type`,  `inn`,  `kpp`,  `ogrn`,  `ur_address`,  `site`,  `email`,  `logo`,  `banks`,  `is_default`,  `status`,  `director`,  `accountant`,  `tax_form`,  `description` FROM `companies` WHERE `id` = 1;", QSqlDatabase::database("connMain"));
-    officesModel->setQuery(QString("SELECT  t1.`name`, CONCAT(t1.`name`, ' (', t2.`name`, ')') AS 'name_full',  t1.`id`,  t1.`state`,  `address`,  `phone`,  t1.`logo` AS 'off_logo',  t2.`logo` AS 'comp_logo',  `administrator`,  `created`,  `phone2`,  `default_company`,  `card_payment`,  `use_boxes`,  `paint_repairs`,  `warranty_sn` FROM `offices` AS t1 LEFT JOIN `companies` AS t2 ON t1.`default_company` = t2.`id` WHERE t1.`state` = 1 AND `default_company`  = %1;").arg(1), QSqlDatabase::database("connMain"));
+    companiesModel->setQuery(QUERY_COMPANIES, QSqlDatabase::database("connMain"));
+    officesModel->setQuery(QUERY_OFFICES(1), QSqlDatabase::database("connMain"));
 
     // TODO: добавить разрешение выбора компании при входе
     if (permissions->contains("59"))  // Менять офис при входе
@@ -59,9 +62,16 @@ void windowsDispatcher::connectOK()
 
 void windowsDispatcher::createChooseOfficeWindow()
 {
+#ifdef AUTO_CHOOSE_OFFICE
+#define AUTO_OFFICE_ID 1
+    userData->insert("current_office", officesModel->record(AUTO_OFFICE_ID).value("id").toInt());
+    userData->insert("current_office_name", officesModel->record(AUTO_OFFICE_ID).value("name").toString());
+    createMainWindow();
+#else
     chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
     QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));
     windowChooseOffice->show();
+#endif
 }
 
 void windowsDispatcher::createMainWindow()

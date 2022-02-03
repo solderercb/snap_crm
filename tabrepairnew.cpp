@@ -10,11 +10,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 {
     QString query;
     // Обычные комбобоксы, которые нельзя редактировать, отображаются как неактивные элементы. Назначаем им стиль отображения как у редактируемых.
-    QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
-            QComboBox::drop-down {  border: 0px;}\
-            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
-            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
-            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
 
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
@@ -24,6 +19,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     officesModel        = parent->officesModel;
     userData            = parent->userData;
     permissions         = parent->permissions;
+    comSettings         = parent->comSettings;
     managersModel       = parent->managersModel;
     engineersModel      = parent->engineersModel;
     repairBoxesModel    = parent->repairBoxesModel;
@@ -44,25 +40,19 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxExterior->lineEdit()->setPlaceholderText("внешний вид");
     ui->comboBoxClientAdType->lineEdit()->setPlaceholderText("источник обращения");
     ui->comboBoxDevice->setPlaceholderText("устройство");
-    ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxDeviceMaker->setPlaceholderText("производитель");
-    ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxDeviceModel->lineEdit()->setPlaceholderText("модель");
     ui->comboBoxPresetEngineer->setPlaceholderText("назначить инженером");
-    ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetBox->setPlaceholderText("ячейка");
-    ui->comboBoxPresetBox->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxOffice->setPlaceholderText("офис");
-    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxCompany->setPlaceholderText("организация");
-    ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetPaymentAccount->setPlaceholderText("тип оплаты");
-    ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPrepayAccount->setPlaceholderText("тип оплаты");
-    ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditPrevRepair->setButtons("Search, DownArrow");
     ui->lineEditPrevRepair->setReadOnly(true);
     ui->lineEditSN->setButtons("Clear");
+
+    setDefaultStyleSheets();
 
     if(QLineEdit *le = ui->comboBoxPresetEngineer->lineEdit())    // Рисуем кнопку очистки в комбобоксе (это работает)
     {
@@ -73,15 +63,21 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxOffice->setModel(officesModel);
     int i = 0;
     qDebug() << "current_office = " << userData->value("current_office").toInt();
-    while (userData->value("current_office").toInt() != officesModel->record(i).value("id").toInt())
-    {
-        qDebug() << "officesModel->record(" << i << ").value(\"id\").toInt() = " << officesModel->record(i).value("id").toInt();
-        i++;
-    };
+    while (userData->value("current_office").toInt() != officesModel->record(i++).value("id").toInt())
+//    {
+//        qDebug() << "officesModel->record(" << i << ").value(\"id\").toInt() = " << officesModel->record(i).value("id").toInt();
+//        i++;
+//    };
     ui->comboBoxOffice->setCurrentIndex(i);
     ui->comboBoxPresetEngineer->setModel(engineersModel);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
+    ui->comboBoxPresetPaymentAccount->setCurrentIndex(-1);
+    ui->comboBoxPrepayAccount->setModel(paymentSystemsModel);
+    ui->comboBoxPrepayAccount->setCurrentIndex(-1);
+    ui->comboBoxPresetBox->setModel(repairBoxesModel);
+    ui->comboBoxPresetBox->setCurrentIndex(-1);
+    ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
 
     comboboxDevicesModel = new QSqlQueryModel();
     ui->comboBoxDevice->setModel(comboboxDevicesModel);
@@ -102,9 +98,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxClientAdType->setModelColumn(0);
 
     clientPhoneTypesList = new QStandardItemModel(this);
-    clientPhoneTypesSelector[0] << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem("(+38) 999 999-99-99"); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
+    clientPhoneTypesSelector[0] << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem(comSettings->value("phone_mask1").toString()); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
     clientPhoneTypesList->appendRow( clientPhoneTypesSelector[0] );
-    clientPhoneTypesSelector[1] << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem("99-99-99");
+    clientPhoneTypesSelector[1] << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
     clientPhoneTypesList->appendRow( clientPhoneTypesSelector[1] );
     ui->comboBoxClientPhone1Type->setModel(clientPhoneTypesList);
     ui->comboBoxClientPhone1Type->setModelColumn(0);
@@ -116,8 +112,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     clientsMatchTable = new QSqlQueryModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
     devicesMatchTable = new QSqlQueryModel();       // таблица совпадения устройства (по серийному номеру)
 
-    query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
-    comboboxDevicesModel->setQuery(query, QSqlDatabase::database("connMain"));
+    comboboxDevicesModel->setQuery(QUERY_DEVICES, QSqlDatabase::database("connMain"));
     ui->comboBoxDevice->setCurrentIndex(-1);
 
 }
@@ -134,6 +129,24 @@ tabRepairNew::~tabRepairNew()
     }
     delete ui;
     p_instance = nullptr;   // Обязательно блять!
+}
+
+void tabRepairNew::setDefaultStyleSheets()
+{
+    QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
+            QComboBox::drop-down {  border: 0px;}\
+            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
+            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
+            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
+
+        ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheet);
+        ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheet);
+        ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
+        ui->comboBoxPresetBox->setStyleSheet(commonComboBoxStyleSheet);
+        ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
+        ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
+        ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
+        ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheet);
 }
 
 tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
@@ -207,56 +220,30 @@ void tabRepairNew::changeDeviceType()
     }
 //    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(after)";
 
-    query = QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1);").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
+    query = QUERY_DEVICE_MAKERS(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
     comboboxDeviceMakersModel->setQuery(query, QSqlDatabase::database("connMain"));
+    ui->comboBoxDeviceMaker->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка неисправностей
-    query = QString("\
-        SELECT '' AS 'name'\
-        UNION ALL\
-        (SELECT\
-          TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t1.`fault_list`,',',enumerator.`number`),',',1)) AS 'name'\
-        FROM (SELECT `fault_list` FROM `devices` WHERE `id` = %1) AS t1\
-        JOIN enumerator\
-        ON\
-          (LENGTH(REPLACE(t1.`fault_list`, ',', ''))-LENGTH(t1.`fault_list`) <= enumerator.`number`+1));\
-    ").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_DEVICE_FAULTS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboboxProblemModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxDeviceMaker->setCurrentIndex(-1);
 
 
     // Заполнение модели выпадающего списка комплектности
-    query = QString("\
-        SELECT '' AS 'name'\
-        UNION ALL\
-        (SELECT\
-          TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t1.`complect_list`,',',enumerator.`number`),',',1)) AS 'name'\
-        FROM (SELECT `complect_list` FROM `devices` WHERE `id` = %1) AS t1\
-        JOIN enumerator\
-        ON\
-          (LENGTH(REPLACE(t1.`complect_list`, ',', ''))-LENGTH(t1.`complect_list`) <= enumerator.`number`+1));\
-    ").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_DEVICE_SET(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboBoxIncomingSetModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxIncomingSet->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка внешнего вида
-    query = QString("\
-        SELECT '' AS 'name'\
-        UNION ALL\
-        (SELECT\
-          TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t1.`look_list`,',',enumerator.`number`),',',1)) AS 'name'\
-        FROM (SELECT `look_list` FROM `devices` WHERE `id` = %1) AS t1\
-        JOIN enumerator\
-        ON\
-          (LENGTH(REPLACE(t1.`look_list`, ',', ''))-LENGTH(t1.`look_list`) <= enumerator.`number`+1));\
-    ").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_DEVICE_EXTERIOR(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboBoxExteriorModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxExterior->setCurrentIndex(-1);
 
     // создание доп. полей для выбранной категории уст-ва
     QSqlQuery* additionalFieldsList = new QSqlQuery(QSqlDatabase::database("connMain"));
 
-    query = QString("SELECT `name`, `def_values`, `type`, `id`,  `required`,  `printable`  FROM `fields` WHERE `_f` = 0 AND FIND_IN_SET(%1,`devices`) AND `archive` = 0 ORDER BY `id`;").arg(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_DEVICE_ADD_FIELDS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     additionalFieldsList->exec(query);
 
     while(additionalFieldsList->next())
@@ -347,7 +334,7 @@ void tabRepairNew::changeDeviceMaker()
     int deviceMakerId = comboboxDeviceMakersModel->index(comboBoxDeviceMakerIndex, 1).data().toInt();
     QString query;
 
-    query = QString("SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM `device_models` WHERE `device` = %1 AND `maker` = %2);").arg(deviceId).arg(deviceMakerId);
+    query = QIERY_DEVICE_MODELS.arg(deviceId).arg(deviceMakerId);
     comboboxDeviceModelsModel->setQuery(query, QSqlDatabase::database("connMain"));
 }
 
@@ -395,7 +382,7 @@ void tabRepairNew::fillClientCreds(int id)
     clientPhonesModel = new QSqlQueryModel();
 
     QString query;
-    query = QString("SELECT  `id`,  `name`,  `surname`,  `patronymic`,  `agent_phone_mask`,  `agent2_phone_mask`,  `address`,  `post_index`,  `type`,  `memorial`,  `notes`,  `prefer_cashless`,  `visit_source`,  `ur_name`,  `email`,  `balance`,  `price_col`,  `repairs`,  `purchases` FROM `clients` WHERE `id` = %1").arg(id);
+    query = QUERY_CLIENT(id);
     clientModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     clearClientCreds();
@@ -433,16 +420,16 @@ void tabRepairNew::fillDeviceCreds(QModelIndex index)
 
     // пример запроса:
     // SELECT   t1.`id`,   CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',   `fault`,   `serial_number`,   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',   t1.`type`,   t1.`maker`,   t1.`model`,   t1.`client` AS 'client_id'   FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE `serial_number` REGEXP '.*' ORDER BY `id` DESC;
-    repair = devicesMatchTable->index(index.row(), 0).data().toInt();
-    device = devicesMatchTable->index(index.row(), 5).data().toInt();
-    deviceMaker = devicesMatchTable->index(index.row(), 6).data().toInt();
-    deviceModel = devicesMatchTable->index(index.row(), 7).data().toInt();
-    client = devicesMatchTable->index(index.row(), 8).data().toInt();
+    repair = devicesMatchTable->record(index.row()).value("id").toInt();
+    device = devicesMatchTable->record(index.row()).value("type").toInt();
+    deviceMaker = devicesMatchTable->record(index.row()).value("maker").toInt();
+    deviceModel = devicesMatchTable->record(index.row()).value("model").toInt();
+    client = devicesMatchTable->record(index.row()).value("client_id").toInt();
 
     fillClientCreds(client);
-    if (ui->comboBoxDevice->currentIndex() == 0)        // только если пользователь не выбрал тип уст-ва
+    if (ui->comboBoxDevice->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
     {
-        for (i = 1; i < comboboxDevicesModel->rowCount(); i++)  // перебираем все типы уст-в в поисках нужного id (начинаем с 1, т. к. первый эл-т — пустышка)
+        for (i = 0; i < comboboxDevicesModel->rowCount(); i++)  // перебираем все типы уст-в в поисках нужного id
         {
             if (comboboxDevicesModel->index(i, 1).data().toInt() == device)
                 break;
@@ -451,18 +438,19 @@ void tabRepairNew::fillDeviceCreds(QModelIndex index)
         // TODO: сделать запросы к БД асинхронными. Готовые классы https://github.com/micjabbour/MSqlQuery
         // на данный момент по локальной сети всё работает быстро, поэтому не буду заморачиваться
 
-        for (i = 0; i < comboboxDeviceMakersModel->rowCount(); i++)  // перебираем всех производителей уст-в в поисках нужного id (здесь начинаем с 0, т. к. элемент-пустышка принудительно не добавляется)
+        for (i = 0; i < comboboxDeviceMakersModel->rowCount(); i++)  // перебираем всех производителей уст-в в поисках нужного id
         {
             if (comboboxDeviceMakersModel->index(i, 1).data().toInt() == deviceMaker)
                 break;
         }
         ui->comboBoxDeviceMaker->setCurrentIndex(i);
-        for (i = 0; i < comboboxDeviceModelsModel->rowCount(); i++)  // перебираем все модели уст-в в поисках нужной id (здесь тоже начинаем с 0, т. к. элемент-пустышка принудительно не добавляется)
+        for (i = 0; i < comboboxDeviceModelsModel->rowCount(); i++)  // перебираем все модели уст-в в поисках нужной id
         {
             if (comboboxDeviceModelsModel->index(i, 1).data().toInt() == deviceModel)
                 break;
         }
         ui->comboBoxDeviceModel->setCurrentIndex(i);
+        ui->lineEditSN->setText(devicesMatchTable->record(index.row()).value("serial_number").toString());
     }
     setPrevRepair(repair);  // устанавливаем номер предыдущего ремонта в соотв. поле
     ui->checkBoxWasEarlier->setCheckState(Qt::Checked);     // ставим галочку "Ранее было в ремонте" чтобы поле с номером ремонта отобразилось
@@ -503,7 +491,7 @@ void tabRepairNew::findMatchingClient(QString text)
             query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(lineEditClientPhone1DisplayText, enteredByUserDigits);   // условие поиска по телефонному номеру
 
         ui->tableViewClientMatch->setModel(clientsMatchTable);  // указываем модель таблицы
-        query = QString("SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', GROUP_CONCAT(IFNULL(t2.`phone`, '') ORDER BY t2.`type` DESC, t2.`id` DESC SEPARATOR '\r\n')  AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` WHERE `state` = 1 %1 GROUP BY t1.`id`;").arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
+        query = QUERY_CLIENT_MATCH.arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
         clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
 
         // изменяем размер столбцов под соедржимое.
@@ -533,19 +521,7 @@ void tabRepairNew::findMatchingDevice(QString text)
 
         // TODO: сейчас regexp будет работать неправильно, т. к. производится преобразование регистра для расширения диапазона поиска
         // Возможно нужно доработать этот механизм, чтобы рег. выражения работали полноценно
-        query = QString("\
-            SELECT\
-              t1.`id`,\
-              CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',\
-              `fault`,\
-              `serial_number`,\
-              CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\
-              t1.`type`,\
-              t1.`maker`,\
-              t1.`model`,\
-              t1.`client` AS 'client_id'\
-            FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE LCASE(`serial_number`) REGEXP LCASE('%1') ORDER BY `id` DESC;\
-        ").arg(text);
+        query = QUERY_DEVICE_MATCH(text);
         devicesMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
 
         // прячем столбцы с кодами типа уст-ва, производителем, моделью и клиентом (они запрашиваются для автозаполнения полей при выборе совпадающего)
@@ -596,6 +572,32 @@ void tabRepairNew::lineEditSNClearHandler(int)
 
     devicesMatchTable->clear(); // то удаляем результаты предыдущего запроса и прячем таблицу.
     ui->groupBoxDeviceCoincidence->hide();
+}
+
+int tabRepairNew::createRepair()
+{
+    QString commonComboBoxStyleSheetRed = "QComboBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}\
+            QComboBox::drop-down {  border: 0px;}\
+            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
+            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
+            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
+    QString commonLineEditStyleSheetRed = "QComboBox {  border: 2px solid red;  padding: 1px 18px 1px 3px;}";
+
+    setDefaultStyleSheets();
+
+    if (ui->comboBoxDevice->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
+    {
+        ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheetRed);
+        return 1;
+    }
+
+    return 0;
+}
+
+void tabRepairNew::createRepairClose()
+{
+    if (!createRepair())
+        this->deleteLater();
 }
 
 void tabRepairNew::phoneTypeChanged(int type, int index)

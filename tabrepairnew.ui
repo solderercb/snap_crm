@@ -305,7 +305,7 @@
                <bool>true</bool>
               </property>
               <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
+               <bool>true</bool>
               </attribute>
               <attribute name="horizontalHeaderCascadingSectionResizes">
                <bool>true</bool>
@@ -897,6 +897,9 @@
             </item>
             <item row="0" column="1">
              <widget class="QPushButton" name="CentnerButton1_2">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Фотографии</string>
               </property>
@@ -1333,6 +1336,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>CentnerButton3_2</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>createRepairClose()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>598</x>
+     <y>734</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1019</x>
+     <y>703</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>CentnerButton2_2</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>createRepair()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>518</x>
+     <y>735</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1021</x>
+     <y>735</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -1351,5 +1386,7 @@
   <slot>lineEditSNClearHandler(int)</slot>
   <slot>findMatchingDevice(QString)</slot>
   <slot>fillDeviceCreds(QModelIndex)</slot>
+  <slot>createRepair()</slot>
+  <slot>createRepairClose()</slot>
  </slots>
 </ui>

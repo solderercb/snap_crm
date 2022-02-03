@@ -32,6 +32,7 @@ public:
 private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
+    void setDefaultStyleSheets();
     void getDevices();
 //    QStandardItemModel* comboboxDevicesModel;
     QSqlQueryModel* comboboxDevicesModel;
@@ -52,6 +53,7 @@ private:
     void phoneTypeChanged(int, int);
     QMap<QString, QVariant> *userData;
     QMap<QString, bool> *permissions;
+    QMap<QString, QVariant> *comSettings;
     QSqlQueryModel* companiesModel;
     QSqlQueryModel* officesModel;
     QSqlQueryModel* managersModel;
@@ -76,6 +78,8 @@ private slots:
     void phone2TypeChanged(int);
     void clientMatchTableDoubleClicked(QModelIndex);
     void lineEditSNClearHandler(int);
+    int createRepair();
+    void createRepairClose();
 
 };
 

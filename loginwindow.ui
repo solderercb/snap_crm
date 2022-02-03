@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Вход</string>
+   <string>SNAP CRM :: Авторизация</string>
   </property>
   <widget class="QWidget" name="verticalLayoutWidget_2">
    <property name="geometry">

@@ -46,6 +46,7 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     userData             = parent->userData;
     permissions          = parent->permissions;
 
+    setWindowTitle("SNAP CRM ["+userData->value("current_office_name").toString()+"] ["+QSqlDatabase::database("connMain").userName()+"]");
     initGlobalModels();
 
     tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)
@@ -370,6 +371,7 @@ void MainWindow::initGlobalModels()
 {
     QString query;
 
+    queryCommonSettings = new QSqlQuery(QSqlDatabase::database("connMain"));
     warehousesModel   = new QSqlQueryModel();
     usersModel        = new QSqlQueryModel();
     managersModel     = new QSqlQueryModel();
@@ -380,12 +382,25 @@ void MainWindow::initGlobalModels()
 
     qDebug() << "current_office (main) = " << userData->value("current_office").toInt();
 
+    queryCommonSettings->exec(QUERY_COMMON_SETTINGS);
+    comSettings = new QMap<QString, QVariant>;
+    queryCommonSettings->first();
+    // Переписываем результаты запроса в специальный массив
+    // это необходимо, т. к. данные общих настроек могут быть дополнены.
+    // Кроме того, есть параметры, хранящиеся в AppData и эти настройки превалируют над настройками, сохранёнными в БД.
+    // TODO: чтение найла настроек в AppData
+    for (int i = 0; i < queryCommonSettings->record().count(); i++)
+    {
+        comSettings->insert(queryCommonSettings->record().fieldName(i), queryCommonSettings->value(i));
+    }
+
     warehousesModel->setQuery(QUERY_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     usersModel->setQuery(QUERY_USERS, QSqlDatabase::database("connMain"));
     managersModel->setQuery(QUERY_MANAGERS, QSqlDatabase::database("connMain"));
     engineersModel->setQuery(QUERY_ENGINEERS, QSqlDatabase::database("connMain"));
 //    itemBoxesModel->setQuery(QUERY_ITEM_BOXES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     repairBoxesModel->setQuery(QUERY_REPAIR_BOXES, QSqlDatabase::database("connMain"));
+    paymentSystemsModel->setQuery(QUERY_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
 
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
 }

@@ -58,6 +58,8 @@ public:
     windowsDispatcher *windowsDispatcherObj;    // для доступа к моделям данных пользователя, компаний, офисов
     QMap<QString, QVariant> *userData;
     QMap<QString, bool> *permissions;
+    QSqlQuery *queryCommonSettings;
+    QMap<QString, QVariant> *comSettings;
     QSqlQueryModel* companiesModel;
     QSqlQueryModel* officesModel;
     QSqlQueryModel* warehousesModel;

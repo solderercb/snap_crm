@@ -41,6 +41,7 @@ void chooseOfficeWindow::accept()
     if (comboBoxOfficeIndex >= 0)
     {
         userData->insert("current_office", officesModel->record(comboBoxOfficeIndex).value("id").toInt());
+        userData->insert("current_office_name", officesModel->record(comboBoxOfficeIndex).value("name").toString());
         emit officeChoosed();
         this->deleteLater();
     }
