@@ -145,26 +145,23 @@ void tabRepairNew::getDevices()
 
 void tabRepairNew::changeClientType()
 {
-    int index, row, col, span_row, span_col;
 
     if(ui->checkBoxClientType->checkState())
     {
         ui->groupBoxClient->setTitle("Клиент (юридическое лицо)");
-        ui->lineEditClientFirstName->hide();    // скрываем поле "Имя"
+        ui->lineEditClientFirstName->setPlaceholderText("Название организации");
+        ui->lineEditClientLastName->hide();    // скрываем поле "Фамилия"
         ui->lineEditClientPatronymic->hide();    // скрываем поле "Отчество"
-        ui->lineEditClientLastName->setPlaceholderText("Название организации");
-        index = ui->gridLayoutClient->indexOf(ui->lineEditClientLastName);  // получаем индекс поля "Фамилия" в объекте компоновки
-        ui->gridLayoutClient->getItemPosition(index, &row, &col, &span_row, &span_col); // получаем координаты поля
-        ui->gridLayoutClient->addWidget(ui->lineEditClientLastName, row, col, span_row, 6); // заменяем поле "Фамилия" самим собой, но растягиваем его по ширине на 6 столбцов (занимаем столбцы полей "Имя" и "Отчество")
+        ui->gridLayoutClient->addWidget(ui->lineEditClientFirstName, 1, 0, 1, 6); // заменяем поле "Фамилия" самим собой, но растягиваем его по ширине на 6 столбцов (занимаем столбцы полей "Имя" и "Отчество")
     }
     else
     {
         ui->groupBoxClient->setTitle("Клиент (частное лицо)");
-        index = ui->gridLayoutClient->indexOf(ui->lineEditClientLastName);  // получаем индекс поля "Фамилия" в объекте компоновки
-        ui->gridLayoutClient->getItemPosition(index, &row, &col, &span_row, &span_col); // получаем координаты поля
-        ui->gridLayoutClient->addWidget(ui->lineEditClientLastName, row, col, span_row, 2); // заменяем поле "Фамилия" самим собой, но сжимаем его по ширине до двух столбцов
-        ui->lineEditClientLastName->setPlaceholderText("Фамилия");
-        ui->lineEditClientFirstName->show();    // показываем поле "Имя"
+        ui->gridLayoutClient->addWidget(ui->lineEditClientLastName, 1, 0, 1, 2);
+        ui->gridLayoutClient->addWidget(ui->lineEditClientFirstName, 1, 2, 1, 2); // заменяем поле "Фамилия" самим собой, но сжимаем его по ширине до двух столбцов
+        ui->gridLayoutClient->addWidget(ui->lineEditClientPatronymic, 1, 4, 1, 2);
+        ui->lineEditClientFirstName->setPlaceholderText("Фамилия");
+        ui->lineEditClientLastName->show();    // показываем поле "Имя"
         ui->lineEditClientPatronymic->show();    // показываем поле "Отчество"
     }
 }
@@ -368,6 +365,12 @@ void tabRepairNew::fillClientCreds(int id)
     clientModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     clearClientCreds();
+
+    if (clientModel->record(0).value("type").toBool())
+        ui->checkBoxClientType->setChecked(true);
+    else
+        ui->checkBoxClientType->setChecked(false);
+    changeClientType();
 
     exist_client_id = id;
     ui->lineEditClientFirstName->setText(clientModel->index(0, 1).data().toString());
