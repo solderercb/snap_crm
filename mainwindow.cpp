@@ -380,8 +380,6 @@ void MainWindow::initGlobalModels()
     repairBoxesModel  = new QSqlQueryModel();
     paymentSystemsModel = new QSqlQueryModel();
 
-    qDebug() << "current_office (main) = " << userData->value("current_office").toInt();
-
     queryCommonSettings->exec(QUERY_COMMON_SETTINGS);
     comSettings = new QMap<QString, QVariant>;
     queryCommonSettings->first();

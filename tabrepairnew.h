@@ -49,7 +49,7 @@ private:
     QSqlQueryModel* clientsMatchTable;
     QSqlQueryModel* devicesMatchTable;
     QVector<QWidget*> additionalFieldsWidgets;
-    int exist_client_id;
+    int exist_client_id = 0;
     void phoneTypeChanged(int, int);
     QMap<QString, QVariant> *userData;
     QMap<QString, bool> *permissions;

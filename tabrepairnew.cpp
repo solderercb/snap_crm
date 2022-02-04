@@ -62,13 +62,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxOffice->setModel(officesModel);
     int i = 0;
-    qDebug() << "current_office = " << userData->value("current_office").toInt();
-    while (userData->value("current_office").toInt() != officesModel->record(i++).value("id").toInt())
-//    {
-//        qDebug() << "officesModel->record(" << i << ").value(\"id\").toInt() = " << officesModel->record(i).value("id").toInt();
-//        i++;
-//    };
-    ui->comboBoxOffice->setCurrentIndex(i);
+    while (userData->value("current_office").toInt() != officesModel->record(i++).value("id").toInt());
+
+    ui->comboBoxOffice->setCurrentIndex(i-1);
     ui->comboBoxPresetEngineer->setModel(engineersModel);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
@@ -87,6 +83,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxDeviceModel->setModel(comboboxDeviceModelsModel);
     comboboxProblemModel = new QSqlQueryModel();
     ui->comboBoxProblem->setModel(comboboxProblemModel);
+    ui->comboBoxProblem->setCurrentIndex(-1);
     comboBoxIncomingSetModel = new QSqlQueryModel();
     ui->comboBoxIncomingSet->setModel(comboBoxIncomingSetModel);
     comboBoxExteriorModel = new QSqlQueryModel();
@@ -96,6 +93,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     clientAdTypesList->setQuery(QUERY_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setModelColumn(0);
+    ui->comboBoxClientAdType->setCurrentIndex(-1);
 
     clientPhoneTypesList = new QStandardItemModel(this);
     clientPhoneTypesSelector[0] << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem(comSettings->value("phone_mask1").toString()); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
@@ -129,24 +127,6 @@ tabRepairNew::~tabRepairNew()
     }
     delete ui;
     p_instance = nullptr;   // Обязательно блять!
-}
-
-void tabRepairNew::setDefaultStyleSheets()
-{
-    QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
-            QComboBox::drop-down {  border: 0px;}\
-            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
-            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
-            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
-
-        ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheet);
-        ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheet);
-        ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
-        ui->comboBoxPresetBox->setStyleSheet(commonComboBoxStyleSheet);
-        ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
-        ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
-        ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
-        ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheet);
 }
 
 tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
@@ -227,7 +207,7 @@ void tabRepairNew::changeDeviceType()
     // Заполнение модели выпадающего списка неисправностей
     query = QUERY_DEVICE_FAULTS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboboxProblemModel->setQuery(query, QSqlDatabase::database("connMain"));
-    ui->comboBoxDeviceMaker->setCurrentIndex(-1);
+    ui->comboBoxProblem->setCurrentIndex(-1);
 
 
     // Заполнение модели выпадающего списка комплектности
@@ -336,16 +316,18 @@ void tabRepairNew::changeDeviceMaker()
 
     query = QIERY_DEVICE_MODELS.arg(deviceId).arg(deviceMakerId);
     comboboxDeviceModelsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    ui->comboBoxDeviceModel->setCurrentIndex(-1);
 }
 
 void tabRepairNew::clearClientCreds()
 {
+    exist_client_id = 0;
     ui->lineEditClientLastName->clear();
     ui->lineEditClientFirstName->clear();
     ui->lineEditClientPatronymic->clear();
     ui->lineEditClientPhone1->clear();
     ui->comboBoxClientPhone1Type->setCurrentIndex(clientPhoneTypesList->index(0, 0).row());     // устанавливаем первый элемент выпадающего списка
-    ui->comboBoxClientAdType->setCurrentIndex(0); // Выбираем первый эл-т в списке
+    ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->lineEditClientAddress->clear();
     ui->lineEditClientEmail->clear();
     ui->lineEditClientPhone2->clear();
@@ -574,24 +556,175 @@ void tabRepairNew::lineEditSNClearHandler(int)
     ui->groupBoxDeviceCoincidence->hide();
 }
 
+void tabRepairNew::setDefaultStyleSheets()
+{
+    QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
+            QComboBox::drop-down {  border: 0px;}\
+            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
+            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
+            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
+    QString commonLineEditStyleSheet = "";
+    QString commonDateEditStyleSheet = "";
+
+    ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxDeviceModel->setStyleSheet(commonComboBoxStyleSheet);
+    ui->lineEditSN->setStyleSheet(commonLineEditStyleSheet);
+    ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheet);
+    ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheet);
+    ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheet);
+    ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheet);
+    ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheet);
+    ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheet);
+    ui->lineEditClientPhone1->setStyleSheet(commonLineEditStyleSheet);
+    ui->comboBoxProblem->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxIncomingSet->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxExterior->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPresetBox->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
+
+    for(int i=0; i< additionalFieldsWidgets.size(); i++)   // установка стилей доп. полей
+    {
+        if ( additionalFieldsWidgets[i]->property("fieldRequired").toBool() )
+        {
+            if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QComboBox", Qt::CaseSensitive) == 0 )
+            {
+                additionalFieldsWidgets[i]->setStyleSheet(commonComboBoxStyleSheet);
+            }
+            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QLineEdit", Qt::CaseSensitive) == 0 )
+                additionalFieldsWidgets[i]->setStyleSheet(commonLineEditStyleSheet);
+            // Дату не окрашиваем, даже если она обязательна, т. к. не продуман механизм проверки
+//            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QDateEdit", Qt::CaseSensitive) == 0 )
+//                    additionalFieldsWidgets[i]->setStyleSheet(commonDateEditStyleSheet);   // Дату не окрашиваем, даже если она обязательна, т. к. не продуман механизм проверки
+        }
+    }
+
+}
+
 int tabRepairNew::createRepair()
 {
+    int error = 0;
     QString commonComboBoxStyleSheetRed = "QComboBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}\
             QComboBox::drop-down {  border: 0px;}\
             QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
             QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
             QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
-    QString commonLineEditStyleSheetRed = "QComboBox {  border: 2px solid red;  padding: 1px 18px 1px 3px;}";
+    QString commonLineEditStyleSheetRed = "QLineEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
+    QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 
     setDefaultStyleSheets();
 
-    if (ui->comboBoxDevice->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
+    if (ui->comboBoxDevice->currentIndex() < 0)        // если не выбран тип уст-ва
     {
         ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheetRed);
-        return 1;
+        error = 1;
+    }
+    if (ui->comboBoxDeviceMaker->currentIndex() < 0)        // если не выбран производителя
+    {
+        ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 2;
+    }
+    if (ui->comboBoxDeviceModel->currentIndex() < 0 && ui->comboBoxDeviceModel->currentText() == "")        // если не выбрана или не написана модель
+    {
+        ui->comboBoxDeviceModel->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 3;
+    }
+    if (ui->lineEditSN->text() == "" && comSettings->value("is_sn_req").toBool())   // если не записан серийный номер, а он обязателен
+    {
+        ui->lineEditSN->setStyleSheet(commonLineEditStyleSheetRed);
+        error = 4;
+    }
+    if (ui->lineEditClientLastName->text() == "")       // если не указана фамилия (или название организации)
+    {
+        ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheetRed);
+        error = 5;
+    }
+    if (ui->lineEditClientFirstName->text() == "" && ui->checkBoxClientType->checkState() == 0)     // если не указано имя (только для физ. лиц)
+    {
+        ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
+        error = 6;
+    }
+    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->value("is_patronymic_required").toBool())   // если не указано отчество и оно обязятельно (только для физ. лиц)
+    {
+        ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
+        error = 7;
+    }
+    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->value("visit_source_force").toBool() && !exist_client_id)        // если не указан источник обращения, а он обязателен и клиент новый
+    {
+        ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 8;
+    }
+    if (ui->lineEditClientAddress->text() == "" && comSettings->value("address_required").toBool() && !exist_client_id)   // если не указан адрес, а он обязателен и клиент новый
+    {
+        ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheetRed);
+        error = 9;
+    }
+    if (ui->lineEditClientEmail->text() == "" && comSettings->value("email_required").toBool() && !exist_client_id)   // если не указан email, а он обязателен и клиент новый
+    {
+        ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheetRed);
+        error = 10;
+    }
+    if (!ui->lineEditClientPhone1->hasAcceptableInput() && comSettings->value("phone_required").toBool())   // если не указано отчество и оно обязятельно (только для физ. лиц)
+    {
+        ui->lineEditClientPhone1->setStyleSheet(commonLineEditStyleSheetRed);
+        error = 11;
+    }
+    if (ui->comboBoxProblem->text() == "")        // если не указана(ы) неисправность(и)
+    {
+        ui->comboBoxProblem->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 12;
+    }
+    if (ui->comboBoxIncomingSet->text() == "")        // если не указана комплектность
+    {
+        ui->comboBoxIncomingSet->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 13;
+    }
+    if (ui->comboBoxExterior->text() == "")        // если не указано состояние (внешинй вид)
+    {
+        ui->comboBoxExterior->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 14;
+    }
+    if (ui->comboBoxPresetEngineer->currentIndex() < 0 && comSettings->value("is_master_set_on_new").toBool())        // если не выбран инженер, а он обязателен
+    {
+        ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 15;
+    }
+    for(int i=0; i< additionalFieldsWidgets.size(); i++)   // установка стилей доп. полей
+    {
+        if ( additionalFieldsWidgets[i]->property("fieldRequired").toBool() )
+        {
+            if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QComboBox", Qt::CaseSensitive) == 0 )
+            {
+                if (static_cast<QComboBox*>(additionalFieldsWidgets[i])->currentIndex() < 0)
+                {
+                    additionalFieldsWidgets[i]->setStyleSheet(commonComboBoxStyleSheetRed);
+                }
+            }
+            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QLineEdit", Qt::CaseSensitive) == 0 )
+            {
+                if (static_cast<QLineEdit*>(additionalFieldsWidgets[i])->text() == "")
+                    additionalFieldsWidgets[i]->setStyleSheet(commonLineEditStyleSheetRed);
+            }
+            // Дату не окрашиваем, даже если она обязательна, т. к. не продуман механизм проверки
+//            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QDateEdit", Qt::CaseSensitive) == 0 )
+//            {
+//                if (static_cast<QDateEdit>(additionalFieldsWidgets[i]).text() == "")
+//                    additionalFieldsWidgets[i]->setStyleSheet(commonDateEditStyleSheetRed);
+//            }
+        }
     }
 
-    return 0;
+    if (error)
+    {
+        qDebug() << "Ошибка создания карты ремонта: не все обязательные поля заполнены (error " << error << ")";
+        return error;
+    }
+
 }
 
 void tabRepairNew::createRepairClose()
