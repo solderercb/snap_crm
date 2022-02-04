@@ -4,6 +4,44 @@
 
 tabRepairNew* tabRepairNew::p_instance = nullptr;
 
+groupBoxEventFilter::groupBoxEventFilter(QObject *parent) :
+    QObject(parent)
+{
+}
+
+bool groupBoxEventFilter::eventFilter(QObject *watched, QEvent *event)
+{
+//    qDebug() << watched->objectName() << ": viewEventFilter: " << event;
+
+    // когда указатель находится на заголовке (по всей ширине groupBox'а), устанавливаем курсор в виде руки с указательным пальцем
+    // TODO: проверить сколько эта метода жрёт ресурсов
+    QGroupBox *groupBox = static_cast<QGroupBox*>(watched);
+    if (event->type() == QEvent::HoverMove)
+    {
+        QPoint point = static_cast<QHoverEvent*>(event)->position().toPoint();
+        if (point.x() > 0 && point.x() < groupBox->width() && point.y() >0 && point.y() < 20)
+            groupBox->setCursor(Qt::PointingHandCursor);
+        else
+            groupBox->unsetCursor();
+    }
+
+    // Нажатие левой кнопкой мыши на заголовке groupBox'а скрывает/показывает таблицу (при скрытии groupBox сжимается по вертикали)
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent *mouseButtonPress = static_cast<QMouseEvent*>(event);
+
+        if (mouseButtonPress->button() == Qt::LeftButton)
+        {
+            if (mouseButtonPress->position().toPoint().x() > 0 && mouseButtonPress->position().toPoint().x() < groupBox->width() && mouseButtonPress->position().toPoint().y() >0 && mouseButtonPress->position().toPoint().y() < 20)
+            {
+                QTableView *table = groupBox->findChild<QTableView*>();
+                table->setVisible(!table->isVisible());
+            }
+        }
+    }
+    return false;
+}
+
 tabRepairNew::tabRepairNew(MainWindow *parent) :
     QWidget(parent),
     ui(new Ui::tabRepairNew)
@@ -25,6 +63,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     repairBoxesModel    = parent->repairBoxesModel;
     paymentSystemsModel = parent->paymentSystemsModel;
 
+    groupBoxEventFilter *groupBoxEventFilterObj = new groupBoxEventFilter(this);
+    ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilterObj);
+    ui->groupBoxDeviceCoincidence->installEventFilter(groupBoxEventFilterObj);
     ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
     ui->groupBoxClientCoincidence->hide();  // по умолчанию группу "Совпадение клиента" не показываем
     ui->labelPrevRepairFromOldDB->hide();   // по умолчанию поля "Предыдущий ремонт" не показываем
@@ -316,7 +357,7 @@ void tabRepairNew::changeDeviceMaker()
     ui->comboBoxDeviceModel->setCurrentIndex(-1);
 }
 
-void tabRepairNew::clearClientCreds()
+void tabRepairNew::clearClientCreds(bool hideCoincidence)
 {
     exist_client_id = 0;
     ui->lineEditClientLastName->clear();
@@ -329,6 +370,8 @@ void tabRepairNew::clearClientCreds()
     ui->lineEditClientEmail->clear();
     ui->lineEditClientPhone2->clear();
     ui->comboBoxClientPhone2Type->setCurrentIndex(clientPhoneTypesList->index(0, 0).row());     // устанавливаем первый элемент выпадающего списка
+    if (hideCoincidence)
+        ui->groupBoxClientCoincidence->hide();
 }
 
 void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
@@ -350,11 +393,6 @@ void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
     }
 }
 
-void tabRepairNew::setPrevRepair(int repairNum)
-{
-    ui->lineEditPrevRepair->setText(QString::number(repairNum));
-}
-
 void tabRepairNew::fillClientCreds(int id)
 {
     clientModel = new QSqlQueryModel();
@@ -364,7 +402,7 @@ void tabRepairNew::fillClientCreds(int id)
     query = QUERY_CLIENT(id);
     clientModel->setQuery(query, QSqlDatabase::database("connMain"));
 
-    clearClientCreds();
+    clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
 
     if (clientModel->record(0).value("type").toBool())
         ui->checkBoxClientType->setChecked(true);
@@ -373,12 +411,12 @@ void tabRepairNew::fillClientCreds(int id)
     changeClientType();
 
     exist_client_id = id;
-    ui->lineEditClientFirstName->setText(clientModel->index(0, 1).data().toString());
-    ui->lineEditClientLastName->setText(clientModel->index(0, 2).data().toString());
-    ui->lineEditClientPatronymic->setText(clientModel->index(0, 3).data().toString());
-    ui->lineEditClientAddress->setText(clientModel->index(0, 6).data().toString());
-    ui->lineEditClientEmail->setText(clientModel->index(0, 14).data().toString());
-    ui->lineEditClientEmail->setText(clientModel->index(0, 14).data().toString());
+    ui->lineEditClientFirstName->setText(clientModel->record(0).value("name").toString());
+    ui->lineEditClientLastName->setText(clientModel->record(0).value("surname").toString());
+    ui->lineEditClientPatronymic->setText(clientModel->record(0).value("patronymic").toString());
+    ui->lineEditClientAddress->setText(clientModel->record(0).value("address").toString());
+    ui->lineEditClientEmail->setText(clientModel->record(0).value("email").toString());
+//    ui->lineEditClientEmail->setText(clientModel->record(0).value("").toString());
 
     query = QString(QUERY_CLIENT_PHONES(id));
     clientPhonesModel->setQuery(query, QSqlDatabase::database("connMain"));
@@ -398,21 +436,24 @@ void tabRepairNew::fillClientCreds(int id)
     ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
 }
 
-void tabRepairNew::fillDeviceCreds(QModelIndex index)
+void tabRepairNew::fillDeviceCreds(int id)
 {
     int i;
     int repair, device, deviceMaker, deviceModel, client;
+    queryDevice = new QSqlQueryModel();
 
-    // пример запроса:
-    // SELECT   t1.`id`,   CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',   `fault`,   `serial_number`,   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',   t1.`type`,   t1.`maker`,   t1.`model`,   t1.`client` AS 'client_id'   FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE `serial_number` REGEXP '.*' ORDER BY `id` DESC;
-    repair = devicesMatchTable->record(index.row()).value("id").toInt();
-    device = devicesMatchTable->record(index.row()).value("type").toInt();
-    deviceMaker = devicesMatchTable->record(index.row()).value("maker").toInt();
-    deviceModel = devicesMatchTable->record(index.row()).value("model").toInt();
-    client = devicesMatchTable->record(index.row()).value("client_id").toInt();
+    QString query;
+    query = QUERY_DEVICE(id);
+    queryDevice->setQuery(query, QSqlDatabase::database("connMain"));
+
+    repair = queryDevice->record(0).value("id").toInt();
+    device = queryDevice->record(0).value("type").toInt();
+    deviceMaker = queryDevice->record(0).value("maker").toInt();
+    deviceModel = queryDevice->record(0).value("model").toInt();
+    client = queryDevice->record(0).value("client").toInt();
 
     fillClientCreds(client);
-    if (ui->comboBoxDevice->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
+//    if (ui->comboBoxDevice->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
     {
         for (i = 0; i < comboboxDevicesModel->rowCount(); i++)  // перебираем все типы уст-в в поисках нужного id
         {
@@ -435,13 +476,11 @@ void tabRepairNew::fillDeviceCreds(QModelIndex index)
                 break;
         }
         ui->comboBoxDeviceModel->setCurrentIndex(i);
-        ui->lineEditSN->setText(devicesMatchTable->record(index.row()).value("serial_number").toString());
+        ui->lineEditSN->setText(queryDevice->record(0).value("serial_number").toString());
     }
-    setPrevRepair(repair);  // устанавливаем номер предыдущего ремонта в соотв. поле
+    ui->lineEditPrevRepair->setText(QString::number(repair));  // устанавливаем номер предыдущего ремонта в соотв. поле
     ui->checkBoxWasEarlier->setCheckState(Qt::Checked);     // ставим галочку "Ранее было в ремонте" чтобы поле с номером ремонта отобразилось
 
-    devicesMatchTable->clear(); // если кол-во введённых пользователем символов меньше трёх, то удаляем результаты предыдущего запроса и прячем таблицу.
-    ui->groupBoxDeviceCoincidence->hide();
     ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
 }
 
@@ -470,9 +509,9 @@ void tabRepairNew::findMatchingClient(QString text)
     if(ui->lineEditClientLastName->text().length() >= 3 || enteredByUserDigits.length() >= 3 )  // если пользователь ввёл более двух символов в одно из полей
     {
         query_where.clear();
-        if (ui->lineEditClientLastName->text().length() > 3 )
+        if (ui->lineEditClientLastName->text().length() >= 3 )
             query_where << QString("LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1')").arg(ui->lineEditClientLastName->text());   // условие поиска по фамилии, имени и отчеству
-        if (enteredByUserDigits.length() > 3 )
+        if (enteredByUserDigits.length() >= 3 )
             query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(lineEditClientPhone1DisplayText, enteredByUserDigits);   // условие поиска по телефонному номеру
 
         ui->tableViewClientMatch->setModel(clientsMatchTable);  // указываем модель таблицы
@@ -484,7 +523,10 @@ void tabRepairNew::findMatchingClient(QString text)
         // при изменении размера окна и тултип для длинного текста (несколько телефонов в одной ячейке). Этот класс использовать везде
         ui->tableViewClientMatch->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
         if (clientsMatchTable->rowCount() > 0)
+        {
             ui->groupBoxClientCoincidence->show();  // только если возвращены результаты, показываем таблицу совпадения клиента
+            ui->tableViewClientMatch->show();       // может случиться ситуация, когда таблица будет скрыта, поэтому принудительно отображаем её
+        }
         else
             ui->groupBoxClientCoincidence->hide();  // иначе прячем таблицу
     }
@@ -521,7 +563,10 @@ void tabRepairNew::findMatchingDevice(QString text)
         ui->tableViewDeviceMatch->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
         if (devicesMatchTable->rowCount() > 0)
+        {
             ui->groupBoxDeviceCoincidence->show();  // только если возвращены результаты, показываем таблицу совпадения устройства
+            ui->tableViewDeviceMatch->show();       // может случиться ситуация, когда таблица будет скрыта, поэтому принудительно отображаем её
+        }
         else
             ui->groupBoxDeviceCoincidence->hide();  // иначе прячем таблицу
     }
@@ -542,10 +587,19 @@ void tabRepairNew::phone2TypeChanged(int index)
     phoneTypeChanged(2, index);
 }
 
+void tabRepairNew::deviceMatchTableDoubleClicked(QModelIndex item)
+{
+    fillDeviceCreds(devicesMatchTable->index(item.row(), 0).data().toInt());
+//    ui->groupBoxClientCoincidence->hide();  // прячем таблицу совпадения клиента
+    ui->tableViewDeviceMatch->hide();   // прячем таблицу, а не весь groupBox (вдруг пользователь промахнётся)
+    ui->groupBoxClientCoincidence->hide();  // прячем таблицу совпадения клиента (если она по какой-то причине отображается)
+}
+
 void tabRepairNew::clientMatchTableDoubleClicked(QModelIndex item)
 {
     fillClientCreds(clientsMatchTable->index(item.row(), 0).data().toInt());
-    ui->groupBoxClientCoincidence->hide();  // прячем таблицу совпадения клиента
+//    ui->groupBoxClientCoincidence->hide();  // прячем таблицу совпадения клиента
+    ui->tableViewClientMatch->hide();   // прячем таблицу, а не весь groupBox (вдруг пользователь промахнётся)
 }
 
 void tabRepairNew::lineEditSNClearHandler(int)
@@ -652,7 +706,7 @@ int tabRepairNew::createRepair()
         ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
         error = 6;
     }
-    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->value("is_patronymic_required").toBool())   // если не указано отчество и оно обязятельно (только для физ. лиц)
+    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->value("is_patronymic_required").toBool() && !exist_client_id)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
     {
         ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
         error = 7;
