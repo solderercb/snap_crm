@@ -5,13 +5,17 @@
 
 tabClients* tabClients::p_instance[] = {nullptr,nullptr};
 
-tabClients::tabClients(bool type, QWidget *parent) :
+tabClients::tabClients(bool type, MainWindow *parent) :
     QWidget(parent),
     ui(new Ui::tabClients)
 {
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
     _type = type;
+    userData            = parent->userData;
+    permissions         = parent->permissions;
+    comSettings         = parent->comSettings;
+
     ui->tableView->horizontalHeader()->setSectionsMovable(true);  // возможность двигать столбцы (ну шоб как АСЦ было :-) )
     ui->tableView->verticalHeader()->hide();
     clientsTable = new QSqlQueryModel();
@@ -44,10 +48,13 @@ tabClients::tabClients(bool type, QWidget *parent) :
     clientsTypesList->appendRow( clientTypeSelector[7] );
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
-    ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
+    if (userData->value("prefer_regular").toBool())
+        ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(4, 0));
+    else
+        ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
 
     clientAdTypesList = new QSqlQueryModel(this);
-    clientAdTypesList->setQuery(QUERY_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
+    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setModelColumn(0);
 
@@ -76,7 +83,7 @@ tabClients::~tabClients()
     delete ui;
 }
 
-tabClients* tabClients::getInstance(bool type, QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна
+tabClients* tabClients::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
 {
     if( !p_instance[type] )
       p_instance[type] = new tabClients(type, parent);

@@ -25,7 +25,7 @@ void windowsDispatcher::connectOK()
     companiesModel  = new QSqlQueryModel();
     officesModel    = new QSqlQueryModel();
 
-    queryUserData->exec(QUERY_USER_DATA(QSqlDatabase::database("connMain").userName()));    // данные пользователя, которые потребуются ему в работе (кроме личных данных: телефон, фото, дата рождения, паспорт и т. п.)
+    queryUserData->exec(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()));    // данные пользователя, которые потребуются ему в работе (кроме личных данных: телефон, фото, дата рождения, паспорт и т. п.)
     userData = new QMap<QString, QVariant>;
     queryUserData->first();
 
@@ -38,7 +38,7 @@ void windowsDispatcher::connectOK()
         userData->insert(queryUserData->record().fieldName(i), queryUserData->value(i));
     }
 
-    queryPermissions->exec(QUERY_PERMISSIONS(queryUserData->value("roles").toString()));
+    queryPermissions->exec(QUERY_SEL_PERMISSIONS(queryUserData->value("roles").toString()));
     permissions = new QMap<QString, bool>;
     while (queryPermissions->next())
     {
@@ -46,8 +46,8 @@ void windowsDispatcher::connectOK()
     }
 
     // Список компаний.
-    companiesModel->setQuery(QUERY_COMPANIES, QSqlDatabase::database("connMain"));
-    officesModel->setQuery(QUERY_OFFICES(1), QSqlDatabase::database("connMain"));
+    companiesModel->setQuery(QUERY_SEL_COMPANIES, QSqlDatabase::database("connMain"));
+    officesModel->setQuery(QUERY_SEL_OFFICES(1), QSqlDatabase::database("connMain"));
 
     // TODO: добавить разрешение выбора компании при входе
     if (permissions->contains("59"))  // Менять офис при входе

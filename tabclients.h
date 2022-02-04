@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QSqlQueryModel>
 #include <QSortFilterProxyModel>
+#include "mainwindow.h"
 
 namespace Ui {
 class tabClients;
@@ -23,8 +24,8 @@ signals:
     void doubleClicked(int);
 
 public:
-    explicit tabClients(bool type = 0, QWidget *parent = nullptr);
-    static tabClients* getInstance(bool type, QWidget *parent = nullptr);
+    explicit tabClients(bool type = 0, MainWindow *parent = nullptr);
+    static tabClients* getInstance(bool type, MainWindow *parent = nullptr);
     void lineEditSearchSetFocus();
     ~tabClients();
 
@@ -47,6 +48,9 @@ private:
     QStandardItemModel* clientsTypesList;
     QList<QStandardItem*> clientTypeSelector[8];
     QSqlQueryModel* clientAdTypesList;
+    QMap<QString, QVariant> *userData;
+    QMap<QString, bool> *permissions;
+    QMap<QString, QVariant> *comSettings;
 
 private slots:
     void clientTypeChanged(QModelIndex);

@@ -380,7 +380,7 @@ void MainWindow::initGlobalModels()
     repairBoxesModel  = new QSqlQueryModel();
     paymentSystemsModel = new QSqlQueryModel();
 
-    queryCommonSettings->exec(QUERY_COMMON_SETTINGS);
+    queryCommonSettings->exec(QUERY_SEL_COMMON_SETTINGS);
     comSettings = new QMap<QString, QVariant>;
     queryCommonSettings->first();
     // Переписываем результаты запроса в специальный массив
@@ -392,13 +392,13 @@ void MainWindow::initGlobalModels()
         comSettings->insert(queryCommonSettings->record().fieldName(i), queryCommonSettings->value(i));
     }
 
-    warehousesModel->setQuery(QUERY_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
-    usersModel->setQuery(QUERY_USERS, QSqlDatabase::database("connMain"));
-    managersModel->setQuery(QUERY_MANAGERS, QSqlDatabase::database("connMain"));
-    engineersModel->setQuery(QUERY_ENGINEERS, QSqlDatabase::database("connMain"));
-//    itemBoxesModel->setQuery(QUERY_ITEM_BOXES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
-    repairBoxesModel->setQuery(QUERY_REPAIR_BOXES, QSqlDatabase::database("connMain"));
-    paymentSystemsModel->setQuery(QUERY_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
+    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
+    managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database("connMain"));
+    engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
+//    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
+    paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
 
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
 }

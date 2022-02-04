@@ -131,7 +131,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxExterior->setModel(comboBoxExteriorModel);
 
     clientAdTypesList = new QSqlQueryModel(this);
-    clientAdTypesList->setQuery(QUERY_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
+    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setModelColumn(0);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
@@ -151,7 +151,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     clientsMatchTable = new QSqlQueryModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
     devicesMatchTable = new QSqlQueryModel();       // таблица совпадения устройства (по серийному номеру)
 
-    comboboxDevicesModel->setQuery(QUERY_DEVICES, QSqlDatabase::database("connMain"));
+    comboboxDevicesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
     ui->comboBoxDevice->setCurrentIndex(-1);
 
 }
@@ -238,30 +238,30 @@ void tabRepairNew::changeDeviceType()
     }
 //    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(after)";
 
-    query = QUERY_DEVICE_MAKERS(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
+    query = QUERY_SEL_DEVICE_MAKERS(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
     comboboxDeviceMakersModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxDeviceMaker->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка неисправностей
-    query = QUERY_DEVICE_FAULTS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_SEL_DEVICE_FAULTS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboboxProblemModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxProblem->setCurrentIndex(-1);
 
 
     // Заполнение модели выпадающего списка комплектности
-    query = QUERY_DEVICE_SET(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_SEL_DEVICE_SET(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboBoxIncomingSetModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxIncomingSet->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка внешнего вида
-    query = QUERY_DEVICE_EXTERIOR(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_SEL_DEVICE_EXTERIOR(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     comboBoxExteriorModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxExterior->setCurrentIndex(-1);
 
     // создание доп. полей для выбранной категории уст-ва
     QSqlQuery* additionalFieldsList = new QSqlQuery(QSqlDatabase::database("connMain"));
 
-    query = QUERY_DEVICE_ADD_FIELDS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
+    query = QUERY_SEL_DEVICE_ADD_FIELDS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
     additionalFieldsList->exec(query);
 
     while(additionalFieldsList->next())
@@ -352,13 +352,14 @@ void tabRepairNew::changeDeviceMaker()
     int deviceMakerId = comboboxDeviceMakersModel->index(comboBoxDeviceMakerIndex, 1).data().toInt();
     QString query;
 
-    query = QIERY_DEVICE_MODELS.arg(deviceId).arg(deviceMakerId);
+    query = QUERY_SEL_DEVICE_MODELS.arg(deviceId).arg(deviceMakerId);
     comboboxDeviceModelsModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxDeviceModel->setCurrentIndex(-1);
 }
 
 void tabRepairNew::clearClientCreds(bool hideCoincidence)
 {
+    setDefaultStyleSheets();
     exist_client_id = 0;
     ui->lineEditClientLastName->clear();
     ui->lineEditClientFirstName->clear();
@@ -399,7 +400,7 @@ void tabRepairNew::fillClientCreds(int id)
     clientPhonesModel = new QSqlQueryModel();
 
     QString query;
-    query = QUERY_CLIENT(id);
+    query = QUERY_SEL_CLIENT(id);
     clientModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
@@ -418,7 +419,7 @@ void tabRepairNew::fillClientCreds(int id)
     ui->lineEditClientEmail->setText(clientModel->record(0).value("email").toString());
 //    ui->lineEditClientEmail->setText(clientModel->record(0).value("").toString());
 
-    query = QString(QUERY_CLIENT_PHONES(id));
+    query = QString(QUERY_SEL_CLIENT_PHONES(id));
     clientPhonesModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     // заполняем типы телефонов. Пока так, потом придумаю что-то более элегантное
@@ -443,7 +444,7 @@ void tabRepairNew::fillDeviceCreds(int id)
     queryDevice = new QSqlQueryModel();
 
     QString query;
-    query = QUERY_DEVICE(id);
+    query = QUERY_SEL_DEVICE(id);
     queryDevice->setQuery(query, QSqlDatabase::database("connMain"));
 
     repair = queryDevice->record(0).value("id").toInt();
@@ -515,7 +516,7 @@ void tabRepairNew::findMatchingClient(QString text)
             query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(lineEditClientPhone1DisplayText, enteredByUserDigits);   // условие поиска по телефонному номеру
 
         ui->tableViewClientMatch->setModel(clientsMatchTable);  // указываем модель таблицы
-        query = QUERY_CLIENT_MATCH.arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
+        query = QUERY_SEL_CLIENT_MATCH.arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
         clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
 
         // изменяем размер столбцов под соедржимое.
@@ -548,7 +549,7 @@ void tabRepairNew::findMatchingDevice(QString text)
 
         // TODO: сейчас regexp будет работать неправильно, т. к. производится преобразование регистра для расширения диапазона поиска
         // Возможно нужно доработать этот механизм, чтобы рег. выражения работали полноценно
-        query = QUERY_DEVICE_MATCH(text);
+        query = QUERY_SEL_DEVICE_MATCH(text);
         devicesMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
 
         // прячем столбцы с кодами типа уст-ва, производителем, моделью и клиентом (они запрашиваются для автозаполнения полей при выборе совпадающего)

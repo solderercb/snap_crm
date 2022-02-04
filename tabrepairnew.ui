@@ -1292,7 +1292,7 @@
    <sender>tableViewDeviceMatch</sender>
    <signal>doubleClicked(QModelIndex)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>fillDeviceCreds(QModelIndex)</slot>
+   <slot>deviceMatchTableDoubleClicked(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>920</x>
@@ -1388,5 +1388,6 @@
   <slot>fillDeviceCreds(QModelIndex)</slot>
   <slot>createRepair()</slot>
   <slot>createRepairClose()</slot>
+  <slot>deviceMatchTableDoubleClicked(QModelIndex)</slot>
  </slots>
 </ui>
