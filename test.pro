@@ -29,7 +29,7 @@ SOURCES += main.cpp\
     SSetComboBox/ssetcombobox.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
-				mainwindow.cpp \
+    mainwindow.cpp \
     loginwindow.cpp \
     mylineedit.cpp \
     repairstablemodel.cpp \

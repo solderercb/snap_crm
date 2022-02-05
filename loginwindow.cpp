@@ -30,13 +30,13 @@ void LoginWindow::btnLoginHandler()
     QTextCodec::setCodecForLocale(codec);
     QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 
-    connMain = QSqlDatabase::addDatabase("QMYSQL", "connMain");
+    connMain = QSqlDatabase::addDatabase("QMYSQL", "connMain");       // это соединение для получения данных (ремонты, клиенты и т. д.)
     connections.append(&connMain);
     connNtfy = QSqlDatabase::addDatabase("QMYSQL", "connNtfy");
     connections.append(&connNtfy);
-//    connThird = QSqlDatabase::addDatabase("QMYSQL", "connThird");     // в АСЦ сразу четыре соединения, зачем — ХЗ; понадобятся, тогда включим.
-//    connections.append(&connThird);
-//    connFourth = QSqlDatabase::addDatabase("QMYSQL", "connFourth");
+    connThird = QSqlDatabase::addDatabase("QMYSQL", "connThird");     // это соединение для записи данных в БД и вспом. операций
+    connections.append(&connThird);
+//    connFourth = QSqlDatabase::addDatabase("QMYSQL", "connFourth"); // в АСЦ сразу четыре соединения, зачем — ХЗ; понадобятся, тогда включим.
 //    connections.append(&connFourth);
 
     for (int i=0; i<connections.size(); i++)

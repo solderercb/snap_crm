@@ -10,6 +10,10 @@
 #include <QSqlQueryModel>
 #include <QDate>
 #include <QDateEdit>
+#ifdef QT_DEBUG
+#include <QTimer>
+#include <QRandomGenerator>
+#endif
 #include "mainwindow.h"
 
 namespace Ui {
@@ -40,6 +44,9 @@ public:
     explicit tabRepairNew(MainWindow *parent = nullptr);
     static tabRepairNew* getInstance(MainWindow *parent = nullptr);
     ~tabRepairNew();
+#ifdef QT_DEBUG
+    void randomFill();
+#endif
 
 private:
     Ui::tabRepairNew *ui;
@@ -73,6 +80,10 @@ private:
     QSqlQueryModel* engineersModel;
     QSqlQueryModel* repairBoxesModel;
     QSqlQueryModel* paymentSystemsModel;
+#ifdef QT_DEBUG
+    QTimer *test_scheduler, *test_scheduler2;
+    uint test_scheduler_counter = 0;
+#endif
 
 private slots:
     void changeClientType();
@@ -93,6 +104,10 @@ private slots:
     void lineEditSNClearHandler(int);
     int createRepair();
     void createRepairClose();
+#ifdef QT_DEBUG
+    void test_scheduler_handler();
+    void test_scheduler2_handler();
+#endif
 };
 
 #endif // TABREPAIRNEW_H

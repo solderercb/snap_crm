@@ -20,7 +20,7 @@
 #define QUERY_SEL_DEVICE(id)                QString("SELECT  `id`,  `type`,  `maker`,  `model`, `serial_number`,  `client` FROM `workshop` WHERE `id` = %1").arg((id))
 #define QUERY_SEL_DEVICES                   QString("SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`;")
 #define QUERY_SEL_DEVICE_MAKERS(device)     QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1);").arg((device))
-#define QUERY_SEL_DEVICE_MODELS             QString("SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM `device_models` WHERE `device` = %1 AND `maker` = %2);")
+#define QUERY_SEL_DEVICE_MODELS             QString("SELECT `name`, `id` FROM `device_models` WHERE `device` = %1 AND `maker` = %2;")
 #define QUERY_SEL_DEVICE_FAULTS(device)     QString("\
                                                 SELECT '' AS 'name'\
                                                 UNION ALL\
@@ -65,5 +65,11 @@
                                                   t1.`client` AS 'client_id'\
                                                 FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE LCASE(`serial_number`) REGEXP LCASE('%1') ORDER BY `id` DESC;\
                                                 ").arg((text))
+#define QUERY_SEL_LAST_INSERT_ID            QString("SELECT LAST_INSERT_ID();")
+#define QUERY_BEGIN                         QString("BEGIN;")
+#define QUERY_COMMIT                        QString("COMMIT;")
+#define QUERY_ROLLBACK                      QString("ROLLBACK;")
+#define QUERY_INS_DEVICE_MODEL              QString("INSERT INTO `device_models` (`name`, `position`, `maker`, `device`) VALUES ('%1', %2, %3, %4);)")
+
 
 #endif // COM_SQL_QUERIES_H

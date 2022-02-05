@@ -32,7 +32,7 @@ private:
 	Ui::LoginWindow *ui;
     QSqlDatabase connMain;
     QSqlDatabase connNtfy;
-//    QSqlDatabase connThird;
+    QSqlDatabase connThird;
 //    QSqlDatabase connFourth;
 
 private slots:

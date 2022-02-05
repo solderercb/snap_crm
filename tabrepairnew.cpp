@@ -1,6 +1,9 @@
 #include "tabrepairnew.h"
 #include "ui_tabrepairnew.h"
 #include "com_sql_queries.h"
+#ifdef QT_DEBUG
+#include "clients4test.h"
+#endif
 
 tabRepairNew* tabRepairNew::p_instance = nullptr;
 
@@ -154,6 +157,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     comboboxDevicesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
     ui->comboBoxDevice->setCurrentIndex(-1);
 
+#ifdef QT_DEBUG
+    randomFill();
+#endif
 }
 
 tabRepairNew::~tabRepairNew()
@@ -666,7 +672,10 @@ void tabRepairNew::setDefaultStyleSheets()
 
 int tabRepairNew::createRepair()
 {
+    qDebug() << "tabRepairNew::createRepair(): ui->comboBoxDeviceModel->currentIndex() = " << ui->comboBoxDeviceModel->currentIndex() << "; ui->comboBoxDeviceModel->currentText() = " << ui->comboBoxDeviceModel->currentText();
     int error = 0;
+    int deviceTypeIndex, deviceMakerIndex, deviceModelIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     QString commonComboBoxStyleSheetRed = "QComboBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}\
             QComboBox::drop-down {  border: 0px;}\
             QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
@@ -677,17 +686,17 @@ int tabRepairNew::createRepair()
 
     setDefaultStyleSheets();
 
-    if (ui->comboBoxDevice->currentIndex() < 0)        // если не выбран тип уст-ва
+    if ( (deviceTypeIndex = ui->comboBoxDevice->currentIndex()) < 0 )        // если не выбран тип уст-ва
     {
         ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 1;
     }
-    if (ui->comboBoxDeviceMaker->currentIndex() < 0)        // если не выбран производителя
+    if ( (deviceMakerIndex = ui->comboBoxDeviceMaker->currentIndex()) < 0 )        // если не выбран производителя
     {
         ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 2;
     }
-    if (ui->comboBoxDeviceModel->currentIndex() < 0 && ui->comboBoxDeviceModel->currentText() == "")        // если не выбрана или не написана модель
+    if ( (deviceModelIndex = ui->comboBoxDeviceModel->currentIndex()) < 0 && ui->comboBoxDeviceModel->currentText() == "" )        // если не выбрана или не написана модель
     {
         ui->comboBoxDeviceModel->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 3;
@@ -783,6 +792,29 @@ int tabRepairNew::createRepair()
         return error;
     }
 
+    qDebug() << "comboboxDeviceModelsModel->record(deviceModelIndex).value(\"name\").toString()" << comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString();
+
+    query->exec(QUERY_BEGIN);
+
+    // пользователь мог выбрать модель из списка, а затем отредаткировать её, поэтому пробуем найти модель в списке
+    deviceModelIndex = comboboxDeviceModelsModel->rowCount();
+    while (--deviceModelIndex >= 0 && comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText());
+    // если не выбрана модель из списка, создаём новую. Или если была выбрана модель из списка, а затем текст был отредактирован, тоже записываем в таблицу новую модель.
+    if ( deviceModelIndex < 0 ||  (comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText()) )
+    {
+        query->exec(QUERY_INS_DEVICE_MODEL.arg(ui->comboBoxDeviceModel->currentText()).arg("NULL").arg(comboboxDeviceMakersModel->record(deviceMakerIndex).value("id").toInt()).arg(comboboxDevicesModel->record(deviceTypeIndex).value("id").toInt()));
+        query->exec(QUERY_SEL_LAST_INSERT_ID);
+        query->first();
+        qDebug() << "LAST_INSERT_ID() = " << query->value(0).toInt();
+    }
+    else
+        qDebug() << "model already exists";
+    query->exec(QUERY_ROLLBACK);
+//    query->exec();
+//    query->exec();
+//    query->exec();
+//    query->exec();
+//    query->exec();
 }
 
 void tabRepairNew::createRepairClose()
@@ -800,3 +832,170 @@ void tabRepairNew::phoneTypeChanged(int type, int index)
         case 2: ui->lineEditClientPhone2->setInputMask(""); ui->lineEditClientPhone2->setInputMask(clientPhoneTypesList->index(index, 2).data().toString() + ";_"); break;
     }
 }
+
+#ifdef QT_DEBUG
+void tabRepairNew::randomFill()
+{
+    initClients4Test();
+
+    test_scheduler = new QTimer();
+    test_scheduler->setSingleShot(true);
+    test_scheduler2 = new QTimer();
+    test_scheduler2->setSingleShot(true);
+    QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
+    QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
+    test_scheduler->start(200);
+//    clients4Test = new QVector<QStringList*>;
+//    QStringList client4Test;
+//    client4Test = new QStringList();
+//    *client4Test<<""<<""<<"";
+//    client4Test->append("");
+//    client4Test->append("");
+//    client4Test->append("");
+//    clients4Test->append(client4Test);
+}
+
+void tabRepairNew::test_scheduler_handler()  //
+{
+
+    int i;
+    if (test_scheduler_counter == 0)
+    {
+        i = comboboxDevicesModel->rowCount();
+        ui->comboBoxDevice->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+    }
+    else if (test_scheduler_counter == 1)
+    {
+        i = comboboxDeviceMakersModel->rowCount();
+        ui->comboBoxDeviceMaker->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+    }
+    else if (test_scheduler_counter == 2)   // модель
+    {
+        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся моделей или случайное число
+        {
+            i = comboboxDeviceModelsModel->rowCount();
+            ui->comboBoxDeviceModel->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+        }
+        else
+        {
+            ui->comboBoxDeviceModel->setCurrentText(QString::number(QRandomGenerator::global()->bounded(140737488355328)));
+        }
+    }
+    else if (test_scheduler_counter == 3)   // серийный номер
+    {
+        ui->lineEditSN->setText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+    }
+    else if (test_scheduler_counter == 4)
+    {
+        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
+        {
+            fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
+            if (ui->lineEditClientLastName->text() == "")
+                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // если попался id несуществующего клиета
+            else if (ui->lineEditClientLastName->text() == "")
+                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // и еще раз, на всякий пожарный
+        }
+        else
+        {
+            i = QRandomGenerator::global()->bounded(clients4Test->size());
+            ui->lineEditClientLastName->setText(clients4Test->value(i)->at(0));
+            ui->lineEditClientFirstName->setText(clients4Test->value(i)->at(1));
+            ui->lineEditClientPatronymic->setText(clients4Test->value(i)->at(2));
+            if (QRandomGenerator::global()->bounded(100) > 50)
+            {
+                ui->comboBoxClientPhone1Type->setCurrentIndex(1);
+                ui->lineEditClientPhone1->setText(clients4Test->value(i)->at(4));
+            }
+            else
+            {
+                ui->comboBoxClientPhone1Type->setCurrentIndex(0);
+                ui->lineEditClientPhone1->setText(clients4Test->value(i)->at(3));
+            }
+            i = QRandomGenerator::global()->bounded(clientAdTypesList->rowCount());
+            ui->comboBoxClientAdType->setCurrentIndex(i);
+        }
+    }
+    else if (test_scheduler_counter == 5)
+    {
+        ui->comboBoxProblem->setFocus();
+        i = comboboxProblemModel->rowCount();
+        ui->comboBoxProblem->setCurrentText(comboboxProblemModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
+        if (ui->comboBoxProblem->currentText() == "")
+            ui->comboBoxProblem->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+        QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
+        QCoreApplication::postEvent(ui->comboBoxProblem->lineEdit(), newEvent);
+        QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+        QCoreApplication::postEvent(ui->comboBoxProblem->view(), newEvent2);
+    }
+    else if (test_scheduler_counter == 6)
+    {
+        ui->comboBoxIncomingSet->setFocus();
+        i = comboBoxIncomingSetModel->rowCount();
+        ui->comboBoxIncomingSet->setCurrentText(comboBoxIncomingSetModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
+        if (ui->comboBoxIncomingSet->currentText() == "")
+            ui->comboBoxIncomingSet->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+        QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
+        QCoreApplication::postEvent(ui->comboBoxIncomingSet->lineEdit(), newEvent);
+        QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+        QCoreApplication::postEvent(ui->comboBoxIncomingSet->view(), newEvent2);
+    }
+    else if (test_scheduler_counter == 7)
+    {
+        ui->comboBoxExterior->setFocus();
+        i = comboBoxIncomingSetModel->rowCount();
+        ui->comboBoxExterior->setCurrentText(comboBoxExteriorModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
+        if (ui->comboBoxExterior->currentText() == "")
+            ui->comboBoxExterior->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+        QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
+        QCoreApplication::postEvent(ui->comboBoxExterior->lineEdit(), newEvent);
+        QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+        QCoreApplication::postEvent(ui->comboBoxExterior->view(), newEvent2);
+    }
+    else if (test_scheduler_counter == 8)
+    {
+        for(int j=0; j< additionalFieldsWidgets.size(); j++)   // автозаполнение обязательных доп. полей
+        {
+            if ( additionalFieldsWidgets[j]->property("fieldRequired").toBool() )
+            {
+                if ( QString(additionalFieldsWidgets[j]->metaObject()->className()).compare("QComboBox", Qt::CaseSensitive) == 0 )
+                {
+                    QAbstractItemModel *addFldTmpModel = (static_cast<QComboBox*>(additionalFieldsWidgets[j]))->model();
+                    i = addFldTmpModel->rowCount();
+                    (static_cast<QComboBox*>(additionalFieldsWidgets[j]))->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+                }
+                else if ( QString(additionalFieldsWidgets[j]->metaObject()->className()).compare("QLineEdit", Qt::CaseSensitive) == 0 )
+                {
+                    (static_cast<QLineEdit*>(additionalFieldsWidgets[j]))->setText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+                }
+            }
+        }
+    }
+    else if (test_scheduler_counter == 9)
+    {
+        i = engineersModel->rowCount();
+        ui->comboBoxPresetEngineer->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+    }
+    else if (test_scheduler_counter == 10)
+    {}
+    else if (test_scheduler_counter == 11)
+    {}
+    else if (test_scheduler_counter == 12)
+    {}
+//    else if (test_scheduler_counter == 13)
+//    {
+//        createRepair();
+//    }
+    test_scheduler_counter++;
+//    qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
+//    createTabClients(0);
+    test_scheduler->start(200);    //  (пере-)запускаем таймер
+
+}
+
+void tabRepairNew::test_scheduler2_handler()  // обработик таймера закрытия вкладки
+{
+//    qDebug() << "test_scheduler2_handler(), clientTabId = " << ui->tabWidget->indexOf(tabClients::getInstance(0));
+//    closeTab(ui->tabWidget->indexOf(tabClients::getInstance(0)));
+//    test_scheduler->start(1000);    //  перезапускаем таймер открытия вкладки
+}
+#endif
