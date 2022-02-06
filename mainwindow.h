@@ -71,6 +71,10 @@ public:
     QSqlQueryModel* paymentSystemsModel;
 //    QSqlQueryModel* Model;
 //    QSqlQueryModel* Model;
+#ifdef QT_DEBUG
+    QTimer *test_scheduler, *test_scheduler2;
+    uint test_scheduler_counter = 0;
+#endif
 
 private:
     explicit MainWindow(windowsDispatcher *parent = nullptr);
@@ -88,10 +92,6 @@ private:
 	QStandardItemModel *tableConsignmentsModel; // Модель таблицы, отображающей партии товара
 	QStringList tableConsignmentsHeaders;
     void initGlobalModels();    // общие модели данных: организации, офисы, склады, сотрудники (все, менеджеры, инженеры) и др.
-#ifdef QT_DEBUG
-    QTimer *test_scheduler, *test_scheduler2;
-    uint test_scheduler_counter = 0;
-#endif
 
 public slots:
     void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.

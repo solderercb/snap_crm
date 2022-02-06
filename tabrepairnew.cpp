@@ -65,6 +65,10 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     engineersModel      = parent->engineersModel;
     repairBoxesModel    = parent->repairBoxesModel;
     paymentSystemsModel = parent->paymentSystemsModel;
+#ifdef QT_DEBUG
+    main_window_test_scheduler = parent->test_scheduler;
+    main_window_test_scheduler2 = parent->test_scheduler2;
+#endif
 
     groupBoxEventFilter *groupBoxEventFilterObj = new groupBoxEventFilter(this);
     ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilterObj);
@@ -167,11 +171,24 @@ tabRepairNew::~tabRepairNew()
     delete comboboxDeviceMakersModel;
     delete comboboxDeviceModelsModel;
     delete comboboxDevicesModel;
-    for(int i=additionalFieldsWidgets.size()-1;i>=0;i--)   // в случае ошибочного выбора категории уст-ва, нужно удалить ранее добавленные виджеты доп. полей
+    for(int i=additionalFieldsWidgets.size()-1;i>=0;i--)   // удаляем доп. поля
     {
         delete additionalFieldsWidgets[i];
         additionalFieldsWidgets.removeAt(i);
     }
+    delete comboboxProblemModel;
+    delete comboBoxIncomingSetModel;
+    delete comboBoxExteriorModel;
+    delete clientsMatchTable;
+    delete devicesMatchTable;
+    delete clientAdTypesList;
+    for(int i=clientPhoneTypesList->rowCount()-1;i>=0;i--)   // типы телефонов; фиг знает, может быть и достаточно удалить clientPhoneTypesList
+        for (int j=clientPhoneTypesSelector[i].size()-1; j>=0; j--)     // каждый QStandartItem
+            delete clientPhoneTypesSelector[i].value(j);
+    delete clientPhoneTypesList;
+    for(int i=clients4Test->size()-1;i>=0;i--)
+        delete clients4Test->value(i);
+    delete clients4Test;
     delete ui;
     p_instance = nullptr;   // Обязательно блять!
 }
@@ -441,6 +458,9 @@ void tabRepairNew::fillClientCreds(int id)
     }
 
     ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
+
+    clientPhonesModel->deleteLater();
+    clientModel->deleteLater();
 }
 
 void tabRepairNew::fillDeviceCreds(int id)
@@ -489,6 +509,8 @@ void tabRepairNew::fillDeviceCreds(int id)
     ui->checkBoxWasEarlier->setCheckState(Qt::Checked);     // ставим галочку "Ранее было в ремонте" чтобы поле с номером ремонта отобразилось
 
     ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
+
+    queryDevice->deleteLater();
 }
 
 void tabRepairNew::buttonSelectExistingClientHandler()
@@ -672,7 +694,7 @@ void tabRepairNew::setDefaultStyleSheets()
 
 int tabRepairNew::createRepair()
 {
-    qDebug() << "tabRepairNew::createRepair(): ui->comboBoxDeviceModel->currentIndex() = " << ui->comboBoxDeviceModel->currentIndex() << "; ui->comboBoxDeviceModel->currentText() = " << ui->comboBoxDeviceModel->currentText();
+//    qDebug() << "tabRepairNew::createRepair(): ui->comboBoxDeviceModel->currentIndex() = " << ui->comboBoxDeviceModel->currentIndex() << "; ui->comboBoxDeviceModel->currentText() = " << ui->comboBoxDeviceModel->currentText();
     int error = 0;
     int deviceTypeIndex, deviceMakerIndex, deviceModelIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
@@ -792,7 +814,7 @@ int tabRepairNew::createRepair()
         return error;
     }
 
-    qDebug() << "comboboxDeviceModelsModel->record(deviceModelIndex).value(\"name\").toString()" << comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString();
+//    qDebug() << "comboboxDeviceModelsModel->record(deviceModelIndex).value(\"name\").toString()" << comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString();
 
     query->exec(QUERY_BEGIN);
 
@@ -871,13 +893,14 @@ void tabRepairNew::test_scheduler_handler()  //
     }
     else if (test_scheduler_counter == 2)   // модель
     {
-        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся моделей или случайное число
+        i = comboboxDeviceModelsModel->rowCount();
+        if (QRandomGenerator::global()->bounded(100) > 50 && i)  // 50/50 или выбираем из уже имеющихся моделей или случайное число (проверка i нужна, т. к. список может быть вообще пуст)
         {
-            i = comboboxDeviceModelsModel->rowCount();
             ui->comboBoxDeviceModel->setCurrentIndex(QRandomGenerator::global()->bounded(i));
         }
         else
         {
+//            qDebug() << "генерирую случайное число в качестве модели уст-ва, i = " << i;
             ui->comboBoxDeviceModel->setCurrentText(QString::number(QRandomGenerator::global()->bounded(140737488355328)));
         }
     }
@@ -885,7 +908,7 @@ void tabRepairNew::test_scheduler_handler()  //
     {
         ui->lineEditSN->setText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
     }
-    else if (test_scheduler_counter == 4)
+    else if (test_scheduler_counter == 4)   // клиент
     {
         if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {
@@ -895,13 +918,13 @@ void tabRepairNew::test_scheduler_handler()  //
             else if (ui->lineEditClientLastName->text() == "")
                 fillClientCreds(QRandomGenerator::global()->bounded(7538)); // и еще раз, на всякий пожарный
         }
-        else
+        else    // ввод данных из тестового списка
         {
             i = QRandomGenerator::global()->bounded(clients4Test->size());
             ui->lineEditClientLastName->setText(clients4Test->value(i)->at(0));
             ui->lineEditClientFirstName->setText(clients4Test->value(i)->at(1));
             ui->lineEditClientPatronymic->setText(clients4Test->value(i)->at(2));
-            if (QRandomGenerator::global()->bounded(100) > 50)
+            if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или телефон мобильный или городской (это для проверки масок
             {
                 ui->comboBoxClientPhone1Type->setCurrentIndex(1);
                 ui->lineEditClientPhone1->setText(clients4Test->value(i)->at(4));
@@ -911,11 +934,11 @@ void tabRepairNew::test_scheduler_handler()  //
                 ui->comboBoxClientPhone1Type->setCurrentIndex(0);
                 ui->lineEditClientPhone1->setText(clients4Test->value(i)->at(3));
             }
-            i = QRandomGenerator::global()->bounded(clientAdTypesList->rowCount());
+            i = QRandomGenerator::global()->bounded(clientAdTypesList->rowCount()); // если клиент новый, то случайно выбираем источник обращения
             ui->comboBoxClientAdType->setCurrentIndex(i);
         }
     }
-    else if (test_scheduler_counter == 5)
+    else if (test_scheduler_counter == 5)   // неисправность
     {
         ui->comboBoxProblem->setFocus();
         i = comboboxProblemModel->rowCount();
@@ -927,7 +950,7 @@ void tabRepairNew::test_scheduler_handler()  //
         QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
         QCoreApplication::postEvent(ui->comboBoxProblem->view(), newEvent2);
     }
-    else if (test_scheduler_counter == 6)
+    else if (test_scheduler_counter == 6)   // космолектность
     {
         ui->comboBoxIncomingSet->setFocus();
         i = comboBoxIncomingSetModel->rowCount();
@@ -939,7 +962,7 @@ void tabRepairNew::test_scheduler_handler()  //
         QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
         QCoreApplication::postEvent(ui->comboBoxIncomingSet->view(), newEvent2);
     }
-    else if (test_scheduler_counter == 7)
+    else if (test_scheduler_counter == 7)   // внешний вид
     {
         ui->comboBoxExterior->setFocus();
         i = comboBoxIncomingSetModel->rowCount();
@@ -970,7 +993,7 @@ void tabRepairNew::test_scheduler_handler()  //
             }
         }
     }
-    else if (test_scheduler_counter == 9)
+    else if (test_scheduler_counter == 9)   // инженер
     {
         i = engineersModel->rowCount();
         ui->comboBoxPresetEngineer->setCurrentIndex(QRandomGenerator::global()->bounded(i));
@@ -980,15 +1003,19 @@ void tabRepairNew::test_scheduler_handler()  //
     else if (test_scheduler_counter == 11)
     {}
     else if (test_scheduler_counter == 12)
-    {}
-//    else if (test_scheduler_counter == 13)
-//    {
-//        createRepair();
-//    }
-    test_scheduler_counter++;
+    {
+    }
+    else if (test_scheduler_counter == 13)
+    {
+        createRepair();
+        main_window_test_scheduler2->start(1000);    // запускаем таймер закрытия вкладки приёма в ремонт
+    }
+    if (test_scheduler_counter < 13)
+    {
+        test_scheduler_counter++;
+        test_scheduler->start(400);    //  (пере-)запускаем таймер
+    }
 //    qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
-//    createTabClients(0);
-    test_scheduler->start(200);    //  (пере-)запускаем таймер
 
 }
 

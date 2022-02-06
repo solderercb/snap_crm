@@ -81,7 +81,7 @@ private:
     QSqlQueryModel* repairBoxesModel;
     QSqlQueryModel* paymentSystemsModel;
 #ifdef QT_DEBUG
-    QTimer *test_scheduler, *test_scheduler2;
+    QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
 #endif
 
