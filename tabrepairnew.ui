@@ -205,7 +205,7 @@
           <widget class="QSpinBox" name="spinBoxStickersCount"/>
          </item>
          <item row="5" column="0" colspan="3">
-          <widget class="QCheckBox" name="checkBoxIsImportantData">
+          <widget class="QCheckBox" name="checkBoxIsNonImportantData">
            <property name="layoutDirection">
             <enum>Qt::RightToLeft</enum>
            </property>
@@ -305,7 +305,7 @@
                <bool>true</bool>
               </property>
               <attribute name="horizontalHeaderVisible">
-               <bool>true</bool>
+               <bool>false</bool>
               </attribute>
               <attribute name="horizontalHeaderCascadingSectionResizes">
                <bool>true</bool>
@@ -375,7 +375,7 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="3">
-               <widget class="QLineEdit" name="lineEditAdditional">
+               <widget class="QLineEdit" name="lineEditExtNotes">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -514,7 +514,20 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_17">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayoutFinances" columnstretch="1,0,1,0">
+             <layout class="QGridLayout" name="gridLayoutFinances" columnstretch="1,1,0,1,0" columnminimumwidth="0,0,0,0,0">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetDefaultConstraint</enum>
+              </property>
+              <item row="1" column="4">
+               <widget class="QPushButton" name="pushButtonCashReceipt">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Принять</string>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="0">
                <widget class="QCheckBox" name="checkBoxIsPrepay">
                 <property name="layoutDirection">
@@ -525,29 +538,49 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="3">
-               <widget class="QPushButton" name="pushButtonCashReceipt">
-                <property name="text">
-                 <string>Принять</string>
+              <item row="0" column="2">
+               <widget class="QLineEdit" name="lineEditEstPrice">
+                <property name="enabled">
+                 <bool>false</bool>
                 </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEditPrepaySumm">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="acceptDrops">
+                 <bool>false</bool>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="inputMethodHints">
+                 <set>Qt::ImhNone</set>
+                </property>
                 <property name="inputMask">
-                 <string>000000,00</string>
+                 <string notr="true">000000</string>
                 </property>
                 <property name="text">
-                 <string>0,00</string>
+                 <string notr="true">0</string>
+                </property>
+                <property name="maxLength">
+                 <number>6</number>
                 </property>
                 <property name="frame">
                  <bool>true</bool>
                 </property>
                 <property name="cursorPosition">
-                 <number>9</number>
+                 <number>6</number>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="placeholderText">
+                 <string notr="true"/>
+                </property>
+                <property name="cursorMoveStyle">
+                 <enum>Qt::VisualMoveStyle</enum>
                 </property>
                 <property name="clearButtonEnabled">
                  <bool>true</bool>
@@ -555,16 +588,67 @@
                </widget>
               </item>
               <item row="1" column="2">
+               <widget class="QLineEdit" name="lineEditPrepaySumm">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="inputMask">
+                 <string notr="true">000000</string>
+                </property>
+                <property name="text">
+                 <string notr="true">0</string>
+                </property>
+                <property name="frame">
+                 <bool>true</bool>
+                </property>
+                <property name="cursorPosition">
+                 <number>6</number>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="placeholderText">
+                 <string notr="true"/>
+                </property>
+                <property name="clearButtonEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
                <widget class="QComboBox" name="comboBoxPrepayAccount">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="editable">
                  <bool>false</bool>
                 </property>
                 <property name="currentText">
-                 <string extracomment="Ист"/>
+                 <string/>
+                </property>
+                <property name="currentIndex">
+                 <number>-1</number>
                 </property>
                 <property name="placeholderText">
-                 <string extracomment="dfgdasf">Тип оплаты</string>
+                 <string>тип оплаты</string>
                 </property>
+                <item>
+                 <property name="text">
+                  <string>New Item</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item row="0" column="0">
@@ -577,25 +661,22 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEditEstPrice">
-                <property name="inputMask">
-                 <string>000000,00</string>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="comboBoxPrepayReason">
+                <property name="enabled">
+                 <bool>false</bool>
                 </property>
-                <property name="text">
-                 <string>0,00</string>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="frame">
-                 <bool>true</bool>
+                <property name="currentIndex">
+                 <number>-1</number>
                 </property>
-                <property name="cursorPosition">
-                 <number>9</number>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                </property>
-                <property name="clearButtonEnabled">
-                 <bool>true</bool>
+                <property name="placeholderText">
+                 <string>основание</string>
                 </property>
                </widget>
               </item>
@@ -744,11 +825,24 @@
                   <height>0</height>
                  </size>
                 </property>
+                <property name="toolTip">
+                 <string>очистить</string>
+                </property>
                 <property name="layoutDirection">
                  <enum>Qt::LeftToRight</enum>
                 </property>
                 <property name="text">
-                 <string>X</string>
+                 <string>🗙</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QPushButton" name="pushButtonCreateTabClient">
+                <property name="toolTip">
+                 <string>открыть карточку клиента</string>
+                </property>
+                <property name="text">
+                 <string>👤</string>
                 </property>
                </widget>
               </item>
@@ -983,12 +1077,12 @@
   <tabstop>lineEditClientEmail</tabstop>
   <tabstop>lineEditClientPhone2</tabstop>
   <tabstop>comboBoxClientPhone2Type</tabstop>
-  <tabstop>lineEditAdditional</tabstop>
+  <tabstop>lineEditExtNotes</tabstop>
   <tabstop>lineEditInsideComment</tabstop>
   <tabstop>checkBoxIsQuick</tabstop>
   <tabstop>checkBoxWasInOtherWorkshop</tabstop>
   <tabstop>checkBoxIsHighPriority</tabstop>
-  <tabstop>checkBoxIsImportantData</tabstop>
+  <tabstop>checkBoxIsNonImportantData</tabstop>
   <tabstop>checkBoxWasEarlier</tabstop>
   <tabstop>checkBoxIsWarranty</tabstop>
   <tabstop>lineEditPrevRepair</tabstop>
@@ -1139,56 +1233,8 @@
      <y>627</y>
     </hint>
     <hint type="destinationlabel">
-     <x>555</x>
+     <x>795</x>
      <y>633</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxIsPrepay</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lineEditPrepaySumm</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>499</x>
-     <y>657</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>559</x>
-     <y>660</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxIsPrepay</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>comboBoxPrepayAccount</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>408</x>
-     <y>655</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>746</x>
-     <y>653</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxIsPrepay</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButtonCashReceipt</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>380</x>
-     <y>658</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>981</x>
-     <y>656</y>
     </hint>
    </hints>
   </connection>
@@ -1368,6 +1414,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>checkBoxIsPrepay</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>enablePrepayWidgets(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1021</x>
+     <y>662</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonCreateTabClient</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>buttonCreateTabClientHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>574</x>
+     <y>266</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1020</x>
+     <y>233</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonCashReceipt</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>createRepairClose()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>980</x>
+     <y>652</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1019</x>
+     <y>621</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -1389,5 +1483,7 @@
   <slot>createRepair()</slot>
   <slot>createRepairClose()</slot>
   <slot>deviceMatchTableDoubleClicked(QModelIndex)</slot>
+  <slot>enablePrepayWidgets(bool)</slot>
+  <slot>buttonCreateTabClientHandler()</slot>
  </slots>
 </ui>

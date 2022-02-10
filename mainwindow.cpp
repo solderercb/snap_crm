@@ -516,6 +516,7 @@ void MainWindow::createTabRepairNew()
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int)), this, SLOT(createTabRepairs(int)));
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int)), this, SLOT(createTabClients(int)));
+    QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
 }
 
 void MainWindow::reactivateTabRepairNew(int)
@@ -548,9 +549,9 @@ void MainWindow::createTabClients(int type)
 
 }
 
-void MainWindow::createTabClient(int)
+void MainWindow::createTabClient(int id)
 {
-
+    qDebug() << "Сейчас должна была бы открыться карточка клиента" << id;
 }
 
 void MainWindow::closeTab(int index)
@@ -563,7 +564,8 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 {
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 //    createTabClients(0);
-    createTabRepairNew();
+    if (test_scheduler_counter < 375)
+        createTabRepairNew();
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 
 }

@@ -71,7 +71,49 @@
 #define QUERY_BEGIN                         QString("BEGIN;")
 #define QUERY_COMMIT                        QString("COMMIT;")
 #define QUERY_ROLLBACK                      QString("ROLLBACK;")
-#define QUERY_INS_DEVICE_MODEL              QString("INSERT INTO `device_models` (`name`, `position`, `maker`, `device`) VALUES ('%1', %2, %3, %4);)")
+#define QUERY_INS_DEVICE_MODEL              QString("INSERT INTO `device_models` (`name`, `position`, `maker`, `device`) VALUES ('%1', %2, %3, %4);")
+#define QUERY_INS_CLIENT                    QString("INSERT INTO `clients` (`creator`, `name`, `surname`, `patronymic`, `agent_phone_mask`, `agent2_phone_mask`, `address`, `post_index`, `passport_num`, `passport_date`, `passport_organ`, `state`, `type`, `birthday`, `memorial`, `notes`, `is_regular`, `is_dealer`, `balance_enable`, `prefer_cashless`, `take_long`, `ignore_calls`, `is_bad`, `is_realizator`, `is_agent`, `visit_source`, `photo_id`, `INN`, `KPP`, `OGRN`, `web_password`, `ur_name`, `email`, `icq`, `skype`, `viber`, `telegram`, `site`, `whatsapp`, `agent_name`, `agent_surname`, `agent_patronymic`, `agent_phone`, `agent_phone_clean`, `agent2_name`, `agent2_surname`, `agent2_patronymic`, `agent2_phone`, `agent2_phone_clean`, `created`, `balance`, `price_col`, `repairs`, `purchases`, `token`) VALUES\
+                                                                            (%1, '%2', '%3', '%4', 1, 1, '%5', NULL, NULL, NULL, NULL, 1, %6, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, %7, NULL, NULL, NULL, NULL, '%8', '', '%9', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NOW(), 0, 0, 1, 0, NULL);")
+#define QUERY_INS_USER_ACTIVITY(action)     QString("INSERT INTO `users_activity` (`user_id`, `datetime_`, `address`, `notes`, `app_version`, `machine_name`) VALUES (%1, NOW(), SUBSTRING_INDEX(USER(), '@', -1), '%2', '%3', '%4');").arg(userData->value("id").toInt()).arg((action)).arg(APP_VER).arg("TODO:hostname")
+#define QUERY_INS_WORKSHOP                  QString("INSERT INTO `workshop` (\
+                                                `Hidden`, `Title`, `client`, `type`, `maker`, `model`, `serial_number`, `company`, `office`, `start_office`, `manager`, `current_manager`, `master`, `diagnostic_result`, `in_date`, `out_date`, `state`, `new_state`, `user_lock`, `lock_datetime`, `express_repair`, `quick_repair`, `is_warranty`, `is_repeat`, `payment_system`, `is_card_payment`, `can_format`, `print_check`, `box`, `warranty_label`, `ext_notes`, `is_prepaid`, `prepaid_type`, `prepaid_summ`, `prepaid_order`, `is_pre_agreed`, `is_debt`, `pre_agreed_amount`, `repair_cost`, `real_repair_cost`, `parts_cost`, `fault`, `complect`, `look`, `thirs_party_sc`, `last_save`, `last_status_changed`, `warranty_days`, `barcode`, `reject_reason`, `informed_status`, `image_ids`, `color`, `order_moving`, `early`, `ext_early`, `issued_msg`, `sms_inform`, `invoice`, `cartridge`, `vendor_id`, `termsControl`\
+                                                ) VALUES(\
+                                                0, '%1', %2, %3, %4, %5, '%6', %7, %8, %8, %9, %9, %10, '', NOW(), NULL, 1, 0, NULL, NULL, %11, %12, %13, %14, %15, %16, %17, %18, %19, NULL, '%20', %21, %22, %23, NULL, %24, 0, %25, 0, 0, 0, '%26', '%27', '%28', %29, NOW(), NULL, 0, '%30', '', 0, '', NULL, NULL, %31, '%32', NULL, 1, NULL, NULL, NULL, 1\
+                                                );")
+#define QUERY_INS_REPAIR_COMMENT            QString("INSERT INTO `comments` (\
+                                                `text`, `created`, `user`, `remont`, `client`, `task_id`, `part_request`\
+                                                ) VALUES (\
+                                                '%1', NOW(), %2, %3, NULL, NULL, NULL\
+                                                );")
+
+// запись в журнал действий: Устройство принято в ремонт, Деталь добавлена в ремонт, Деталь продана в ремонте; UOCRI = user,office,client,repair,item, т. е. связанные ключи других таблиц
+#define QUERY_INS_LOG(G,T,U,O,C,R,I,D,B,t)  QString("INSERT INTO `logs` (\
+                                                `group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`\
+                                                ) VALUES (\
+                                                %1, %2, 0, %3, NOW(), NULL, NULL, %4, %5, %6, %7, %8, NULL, %9, '%10'\
+                                                );").arg(G)\
+                                                .arg(T)\
+                                                .arg(U)\
+                                                .arg(O)\
+                                                .arg(C)\
+                                                .arg(R)\
+                                                .arg(I)\
+                                                .arg(D)\
+                                                .arg(B)\
+                                                .arg(t)
+#define QUERY_INS_CASH(T,S,s,C,U,O,t,R,A)   QString("INSERT INTO `cash_orders` (\
+                                                `created`, `type`, `summa`, `summa_str`, `invoice`, `client`, `to_user`, `user`, `company`, `office`, `notes`, `repair`, `document`, `img`, `payment_system`, `card_fee`, `is_backdate`, `card_info`, `customer_email`, `fdn`, `payment_item_sign`\
+                                                ) VALUES (\
+                                                NOW(), %1, %2, '%3', NULL, %4, NULL, %5, 1, %6, '%7', %8, NULL, NULL, %9, 0, 0, NULL, '', NULL, NULL\
+                                                );").arg(T)\
+                                                .arg(S)\
+                                                .arg(s)\
+                                                .arg(C)\
+                                                .arg(U)\
+                                                .arg(O)\
+                                                .arg(t)\
+                                                .arg(R)\
+                                                .arg(A)\
 
 
 #endif // COM_SQL_QUERIES_H
