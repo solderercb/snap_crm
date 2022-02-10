@@ -1,0 +1,30 @@
+﻿#include <winver.h>
+#include "appver.h"
+
+IDI_ICON1 ICON "snap.ico"      // ХЗ почему ругается, но работает
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     VER_FILEVERSION
+PRODUCTVERSION  VER_PRODUCTVERSION
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", VER_COMPANYNAME_STR
+      VALUE "FileDescription", VER_FILEDESCRIPTION_STR
+      VALUE "FileVersion", APP_VER
+      VALUE "InternalName", VER_INTERNALNAME_STR
+      VALUE "LegalCopyright", VER_LEGALCOPYRIGHT_STR
+      VALUE "LegalTrademarks1",   VER_LEGALTRADEMARKS1_STR
+      VALUE "LegalTrademarks2",   VER_LEGALTRADEMARKS2_STR
+      VALUE "OriginalFilename", VER_ORIGINALFILENAME_STR
+      VALUE "ProductName", VER_PRODUCTNAME_STR
+      VALUE "ProductVersion", APP_VER
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x419, 1251
+  END
+END
