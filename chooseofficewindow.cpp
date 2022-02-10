@@ -1,3 +1,4 @@
+#include "appver.h"
 #include "chooseofficewindow.h"
 #include "ui_chooseofficewindow.h"
 

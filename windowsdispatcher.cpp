@@ -1,4 +1,5 @@
-﻿#include "windowsdispatcher.h"
+﻿#include "appver.h"
+#include "windowsdispatcher.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
 #include "chooseofficewindow.h"
 #ifdef QT_DEBUG

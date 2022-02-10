@@ -1,3 +1,4 @@
+#include "appver.h"
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
 #include "sqlcreds.h"

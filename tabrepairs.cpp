@@ -1,3 +1,4 @@
+#include "appver.h"
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
 #include "mainwindow.h"

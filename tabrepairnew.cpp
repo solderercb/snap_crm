@@ -1,3 +1,4 @@
+#include "appver.h"
 #include "tabrepairnew.h"
 #include "ui_tabrepairnew.h"
 #include "com_sql_queries.h"

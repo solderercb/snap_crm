@@ -1,3 +1,4 @@
+#include "appver.h"
 #include "tabclients.h"
 #include "ui_tabclients.h"
 #include "mainwindow.h"
