@@ -173,6 +173,8 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
     comboboxDevicesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
     ui->comboBoxDevice->setCurrentIndex(-1);
+    msgBox.setText("Ошибка");
+    msgBox.setIcon(QMessageBox::Critical);
 
 #ifdef QT_DEBUG
     test_scheduler = new QTimer();
@@ -185,6 +187,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     randomFill();
 #endif
     query->exec(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
+    query->exec(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toInt()));
 }
 
 tabRepairNew::~tabRepairNew()
@@ -749,8 +752,9 @@ int tabRepairNew::createRepair()
 //    qDebug() << "tabRepairNew::createRepair(): ui->comboBoxDeviceModel->currentIndex() = " << ui->comboBoxDeviceModel->currentIndex() << "; ui->comboBoxDeviceModel->currentText() = " << ui->comboBoxDeviceModel->currentText();
     int error = 0;
     int deviceTypeIndex, deviceMakerIndex, deviceModelIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
-    int prevRepair, deviceType, deviceMaker, deviceModel, client, user, office, company, repair, engineer, payment_system, prepaySumm, box;
-    bool isPrepay, isEstPrice, isWarranty, isRepeat;
+    int deviceType, deviceMaker, deviceModel, client, user, office, company, repair, engineer, payment_system, prepaySumm, box;
+    bool isPrepay, isEstPrice, isWarranty, isRepeat, nDBErr = 1, nIntegrityErr = 1;
+    QString prevRepair = "NULL", prevRepairFromOldDB = "NULL";
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     setDefaultStyleSheets();
@@ -880,10 +884,15 @@ int tabRepairNew::createRepair()
         }
     }
     if ( (isRepeat = ui->checkBoxWasEarlier->isChecked()) ) // если установлен флаг "Ранее было в ремонте", то обязательно должен быть указан номер ремонта; однако, это не касается гарантийного ремонта
-        if ( (prevRepair = ui->lineEditPrevRepair->text().toInt()) == 0 )
+        if ( (prevRepair = ui->lineEditPrevRepair->text() ) == "" )
         {
-            ui->lineEditPrevRepair->setStyleSheet(commonLineEditStyleSheetRed);
-            error = 19;
+            if ( (prevRepairFromOldDB = ui->lineEditPrevRepairFromOldDB->text()) == "" )  // также допускается не выбирать предыдущий ремонт, если указан номер ремонта в старой системе CRM
+            {
+                ui->lineEditPrevRepair->setStyleSheet(commonLineEditStyleSheetRed);
+                error = 19;
+            }
+            else
+                prevRepair = "NULL";
         }
 
     if (error)
@@ -902,30 +911,7 @@ int tabRepairNew::createRepair()
     box = (ui->comboBoxPresetBox->currentIndex() < 0)?0:repairBoxesModel->record(ui->comboBoxPresetBox->currentIndex()).value("id").toInt();
     isWarranty = ui->checkBoxIsWarranty->isChecked();
 
-    qDebug() << QString("presetted engineer: %1").arg((engineer == 0)?"NULL":QString::number(engineer));
-    qDebug() << QString("express_repair: %1").arg(ui->checkBoxIsHighPriority->isChecked());
-    qDebug() << QString("quick_repair: %1").arg(ui->checkBoxIsQuick->isChecked());
-    qDebug() << QString("is_warranty: %1").arg(isWarranty);
-    qDebug() << QString("is_repeat: %1; early: %2").arg(isRepeat).arg(isRepeat?QString::number(prevRepair):"NULL");
-    qDebug() << QString("payment_system: %1").arg(payment_system);
-    qDebug() << QString("is_card_payment: %1").arg((payment_system == -1)?1:0);
-    qDebug() << QString("can_format: %1").arg(ui->checkBoxIsNonImportantData->isChecked());
-    qDebug() << QString("print_check: %1").arg(ui->checkBoxIsCheckNeeded->isChecked());
-    qDebug() << QString("presetted box: %1").arg((box == 0)?"NULL":QString::number(box));
-    qDebug() << QString("ext_notes: %1").arg(ui->lineEditExtNotes->text());
-    qDebug() << QString("is_pre_agreed: %1; pre_agreed_amount: %2").arg(isEstPrice).arg((isEstPrice)?ui->lineEditEstPrice->text().toInt():0);
-    qDebug() << QString("is_prepaid: %1; prepaid_type: %2; prepaid_summ: %3").arg(isPrepay).arg((isPrepay)?ui->comboBoxPrepayReason->currentData(Qt::UserRole+1).toInt():0).arg((isPrepay)?prepaySumm:0);
-    qDebug() << QString("fault: %1").arg(ui->comboBoxProblem->currentText());
-    qDebug() << QString("complect: %1").arg(ui->comboBoxIncomingSet->currentText());
-    qDebug() << QString("look: %1").arg(ui->comboBoxExterior->currentText());
-    qDebug() << QString("ext_early: %1").arg(ui->lineEditPrevRepairFromOldDB->text());
-    qDebug() << QString("thirs_party_sc: %1").arg(ui->checkBoxWasInOtherWorkshop->isChecked());
-    qDebug() << QString("int_notes: %1").arg(ui->lineEditInsideComment->text());
-    qDebug() << QString(": %1");
-    qDebug() << ui->comboBoxDevice->currentText() + " " + ui->comboBoxDeviceMaker->currentText() + " " + ui->comboBoxDeviceModel->currentText();
-    qDebug() << "" << ui->checkBoxIsNonImportantData->isChecked();
-
-    query->exec(QUERY_BEGIN);
+    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
 
     // пользователь мог выбрать модель из списка, а затем отредаткировать её, поэтому пробуем найти модель в списке
     deviceModelIndex = comboboxDeviceModelsModel->rowCount();
@@ -933,24 +919,22 @@ int tabRepairNew::createRepair()
     // если не выбрана модель из списка, создаём новую. Или если была выбрана модель из списка, а затем текст был отредактирован, тоже записываем в таблицу новую модель.
     if ( deviceModelIndex < 0 ||  (comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText()) )
     {
-        query->exec(QUERY_INS_DEVICE_MODEL
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_DEVICE_MODEL
                     .arg(ui->comboBoxDeviceModel->currentText())
                     .arg("NULL")
                     .arg(comboboxDeviceMakersModel->record(deviceMakerIndex).value("id").toInt())
                     .arg(comboboxDevicesModel->record(deviceTypeIndex).value("id").toInt()));
-        query->exec(QUERY_SEL_LAST_INSERT_ID);
-        query->first();
-        deviceModel = query->value(0).toInt();
+        QUERY_LAST_INS_ID(query,nDBErr,deviceModel);
         qDebug() << "Новая модель уст-ва: LAST_INSERT_ID() = " << deviceModel;
     }
     else
     {
         deviceModel = comboboxDeviceModelsModel->record(deviceModelIndex).value("id").toInt();
-//        qDebug() << "model already exists";
+        qDebug() << "model already exists";
     }
     if (exist_client_id == 0)
     {
-        query->exec(QUERY_INS_CLIENT
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_CLIENT
                     .arg(user)
                     .arg(ui->lineEditClientFirstName->text())
                     .arg(ui->lineEditClientLastName->text())
@@ -960,16 +944,14 @@ int tabRepairNew::createRepair()
                     .arg(clientAdTypesList->record(ui->comboBoxClientAdType->currentIndex()).value("id").toInt())
                     .arg(genUserWebPass())
                     .arg(ui->lineEditClientAddress->text()));
-        query->exec(QUERY_SEL_LAST_INSERT_ID);
-        query->first();
-        exist_client_id = query->value(0).toInt();
+        QUERY_LAST_INS_ID(query,nDBErr,exist_client_id);
         qDebug() << "Новый клиент: LAST_INSERT_ID() = " << exist_client_id;
-        qDebug() << QUERY_INS_LOG("NULL",2,user,office,exist_client_id,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт");
-//        query->exec(QUERY_INS_LOG("NULL",2,user,office,exist_client_id,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт"));
+//        qDebug() << QUERY_INS_LOG("NULL",2,user,office,exist_client_id,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт");
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",2,user,office,exist_client_id,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт"));
     }
 
 //    qDebug() << (QUERY_INS_WORKSHOP
-    query->exec(QUERY_INS_WORKSHOP
+    QUERY_EXEC(query,nDBErr)(QUERY_INS_WORKSHOP
                 .arg(ui->comboBoxDevice->currentText() + " " + ui->comboBoxDeviceMaker->currentText() + " " + ui->comboBoxDeviceModel->currentText())
                 .arg(exist_client_id)
                 .arg(comboboxDevicesModel->record(deviceTypeIndex).value("id").toInt())
@@ -1000,31 +982,29 @@ int tabRepairNew::createRepair()
                 .arg(ui->comboBoxExterior->currentText())
                 .arg(ui->checkBoxWasInOtherWorkshop->isChecked())
                 .arg("TODO: ")
-                .arg(isRepeat?QString::number(prevRepair):"NULL")
-                .arg(ui->lineEditPrevRepairFromOldDB->text()));
-    query->exec(QUERY_SEL_LAST_INSERT_ID);
-    query->first();
-    repair = query->value(0).toInt();
+                .arg(prevRepair)
+                .arg(prevRepairFromOldDB));
+    QUERY_LAST_INS_ID(query,nDBErr,repair);
     qDebug() << "Новый ремонт: LAST_INSERT_ID() = " << repair;
-    qDebug() << QUERY_INS_LOG("NULL",3,user,office,exist_client_id,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair));
-//    query->exec(QUERY_INS_LOG("NULL",3,user,office,exist_client_id,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair)));
+//    qDebug() << QUERY_INS_LOG("NULL",3,user,office,exist_client_id,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair));
+    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,exist_client_id,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair)));
     if (ui->lineEditInsideComment->text() != "" )
     {
-        query->exec(QUERY_INS_REPAIR_COMMENT
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_REPAIR_COMMENT
                 .arg(ui->lineEditInsideComment->text())
                 .arg(user)
                 .arg(repair));
-        qDebug() << QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL","Добавлен внутренний комментарий к ремонту №"+QString::number(repair));
-//        query->exec(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL","Добавлен внутренний комментарий к ремонту №"+QString::number(repair));;)
+//        qDebug() << QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL","Добавлен внутренний комментарий к ремонту №"+QString::number(repair));
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL","Добавлен внутренний комментарий к ремонту №"+QString::number(repair)));
     }
 
     if (isPrepay)
     {
-        qDebug() << (QUERY_INS_CASH(
-//        query->exec(QUERY_INS_CASH(
+//        qDebug() << (QUERY_INS_CASH(
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_CASH(
                                    12,
                                    ui->lineEditPrepaySumm->text(),
-                                   "TODO:",
+                                   "TODO: сумма прописью",
                                    exist_client_id,
                                    user,
                                    office,
@@ -1033,16 +1013,78 @@ int tabRepairNew::createRepair()
                                    paymentSystemsModel->record(ui->comboBoxPrepayAccount->currentIndex()).value("id").toInt()
                                    )
                     );
+        // финансы — очень важная вещь, поэтому нужно верифицировать записанные данные
+        QUERY_EXEC(query,nDBErr)(QUERY_VRFY_CASH(
+                                   12,
+                                   ui->lineEditPrepaySumm->text(),
+                                   "TODO: сумма прописью",
+                                   exist_client_id,
+                                   user,
+                                   office,
+                                   QString("Предоплата за ремонт №%1 в размере %2%3").arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString()),
+                                   repair,
+                                   paymentSystemsModel->record(ui->comboBoxPrepayAccount->currentIndex()).value("id").toInt()
+                                   )
+                    );
+
+        QUERY_EXEC_VRFY(query,nIntegrityErr);
+        if (!nIntegrityErr)
+        {
+//            qDebug() << "Ошибка целостности данных!";
+            msgBox.setText(QString("Ошибка целостности данных!"));
+            msgBox.exec();
+        }
+//        else
+//            qDebug() << "Верификация данных: ОК";
+
         // TODO: Признак предмета расчета
+        // В журнале делаю запись о предоплате, думаю это будет удобно; ASC CRM такую запись вроде бы не делает :-(
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL",QString("Внесена предоплата \"%1\" за ремонт №%2 в размере %3%4").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString())));
     }
 
-    query->exec(QUERY_ROLLBACK);
-//    query->exec();
-//    query->exec();
-//    query->exec();
-//    query->exec();
-//    query->exec();
+    if (nDBErr == 0)   // в случае ошибки выполнения запроса нужно всё откатить
+    {
+        qDebug() << QString("Ошибка выполнения запроса\r\n%1").arg(query->lastError().text());
+        msgBox.setText(QString("Ошибка выполнения запроса\r\n%1").arg(query->lastError().text()));
+        query->exec(QUERY_ROLLBACK);
+        msgBox.exec();
+    }
+    else
+        query->exec(QUERY_COMMIT);
+
+//    QUERY_EXEC(query,nDBErr)();
+//    QUERY_EXEC(query,nDBErr)();
+//    QUERY_EXEC(query,nDBErr)();
+//    QUERY_EXEC(query,nDBErr)();
+//    QUERY_EXEC(query,nDBErr)();
     delete query;
+    // TODO: очистить всё, кроме данных клиента
+    ui->comboBoxProblem->clearEditText();
+    ui->comboBoxIncomingSet->clearEditText();
+    ui->comboBoxExterior->clearEditText();
+    ui->lineEditSN->setText("");
+    ui->lineEditPrevRepair->setText("");
+    ui->lineEditPrevRepairFromOldDB->setText("");
+    ui->checkBoxIsQuick->setCheckState(Qt::Unchecked);
+    ui->checkBoxWasInOtherWorkshop->setCheckState(Qt::Unchecked);
+    ui->checkBoxIsHighPriority->setCheckState(Qt::Unchecked);
+    ui->checkBoxIsNonImportantData->setCheckState(Qt::Unchecked);
+    ui->checkBoxWasEarlier->setCheckState(Qt::Unchecked);
+    ui->checkBoxIsWarranty->setCheckState(Qt::Unchecked);
+    ui->comboBoxPresetEngineer->setCurrentIndex(-1);
+    ui->comboBoxPresetBox->setCurrentIndex(-1);
+    ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
+    ui->lineEditExtNotes->setText("");
+    ui->lineEditInsideComment->setText("");
+    ui->checkBoxIsEstPrice->setCheckState(Qt::Unchecked);
+    ui->checkBoxIsPrepay->setCheckState(Qt::Unchecked);
+    ui->comboBoxPrepayReason->setCurrentIndex(-1);
+    ui->lineEditPrepaySumm->setText("0");
+    ui->comboBoxPrepayAccount->setCurrentIndex(-1);
+    ui->lineEditEstPrice->setText("0");
+    ui->comboBoxDevice->setCurrentIndex(-1);
+    ui->comboBoxDeviceMaker->setCurrentIndex(-1);
+    ui->comboBoxDeviceModel->setCurrentIndex(-1);
 }
 
 void tabRepairNew::createRepairClose()

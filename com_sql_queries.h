@@ -4,7 +4,7 @@
 #include "appver.h"
 
 #define QUERY_SEL_CLIENT(id)                QString("SELECT  `id`,  `name`,  `surname`,  `patronymic`,  `agent_phone_mask`,  `agent2_phone_mask`,  `address`,  `post_index`,  `type`,  `memorial`,  `notes`,  `prefer_cashless`,  `visit_source`,  `ur_name`,  `email`,  `balance`,  `price_col`,  `repairs`,  `purchases` FROM `clients` WHERE `id` = %1 AND `state` = 1").arg((id))
-#define QUERY_SEL_CLIENT_AD_TYPES           QString("SELECT '' AS 'name', '' AS 'id' UNION ALL (SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC);")
+#define QUERY_SEL_CLIENT_AD_TYPES           QString("SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC;")
 #define QUERY_SEL_CLIENT_MATCH              QString("SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', GROUP_CONCAT(IFNULL(t2.`phone`, '') ORDER BY t2.`type` DESC, t2.`id` DESC SEPARATOR '\r\n')  AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` WHERE `state` = 1 %1 GROUP BY t1.`id`;")
 #define QUERY_SEL_CLIENT_PHONES(id)         QString("SELECT `phone`, `mask` FROM `tel` WHERE `customer` = " + QString::number((id)) + " ORDER BY `type` DESC, `id` DESC LIMIT 2")
 #define QUERY_SEL_USER_DATA(username)       QString("SELECT `users`.`id`, GROUP_CONCAT(`role_id`) AS 'roles', `name`,  `surname`,  `patronymic`,  `office`,  `def_office`,  `def_store`,  `def_item_state`,  `def_employee`,  `def_status`,  `def_ws_filter`,  `salary_rate`,  `pay_day`,  `pay_day_off`,  `pay_repair`,  `pay_repair_quick`,  `pay_sale`,  `pay_repair_q_sale`,  `pay_cartridge_refill`,  `pay_device_in`,  `pay_device_out`,  `pay_4_sale_in_repair`,  `row_color`,  `ge_highlight_color`,  `color_label_ws`,  `workspace_mode`,  `preview_before_print`,  `new_rep_doc_copies`,  `auto_refresh_workspace`,  `refresh_time`,  `xls_c1`,  `xls_c2`,  `xls_c3`,  `xls_c4`,  `xls_c5`,  `xls_c6`,  `xls_c7`,  `xls_c8`,  `xls_c9`,  `xls_c10`,  `xls_c11`,  `xls_c12`,  `xls_c13`,  `xls_c14`,  `xls_c15`,  `display_out`,  `display_complete`,  `new_on_top`,  `issued_color`, `fields_cfg`,  `save_state_on_close`,  `group_store_items`,  `track_activity`,  `card_on_call`,  `inn`,  `inform_comment`,  `inform_status`,  `kkt`,  `pinpad`,  `advance_disable`,  `salary_disable`,  `kkm_pass`,  `prefer_regular`,  `fontsize`,  `rowheight`,  `animation` FROM `users` LEFT JOIN `roles_users` ON `users`.`id` = `roles_users`.`user_id` WHERE `username` = '%1' GROUP BY `users`.`id`  LIMIT 1;").arg((username))
@@ -68,6 +68,21 @@
                                                 FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE LCASE(`serial_number`) REGEXP LCASE('%1') ORDER BY `id` DESC;\
                                                 ").arg((text))
 #define QUERY_SEL_LAST_INSERT_ID            QString("SELECT LAST_INSERT_ID();")
+#define QUERY_EXEC(obj,flag)                qDebug() << "nDBErr=" << (flag) << ". Executing query..."; if ((flag)) (flag) = (obj)->exec
+
+// верификация записанных в БД данных; производится примитивно, путём сравнения записанных данных с данными, которые были переданы в запросе;
+// если данные совпадают, то сервер должен вернуть 55AA55AAh (1437226410d), иначе 00h; ХЗ, может такое контрольное значение избыточно, ну а вдруг;
+// далее, если контрольное число совпадает, flag устанавливаем в 1, иначе — 0.
+#define QUERY_EXEC_VRFY(obj,flag)           qDebug() << "nDBErr=" << (flag) << ". Checking integrity..."; if ((flag)){\
+                                                (obj)->first();\
+                                                qDebug() << "Integrity magic number: " << (obj)->value(0).toInt();\
+                                                (flag) = ((obj)->value(0).toInt() == 21930)?1:0;}
+
+// QSqlQuery::lastInsertId() почему-то не работает, поэтому так:
+#define QUERY_LAST_INS_ID(obj,flag,id)      qDebug() << "nDBErr=" << (flag) << ". Executing SELECT LAST_INSERT_ID() query..."; if ((flag)){\
+                                                (flag) = (obj)->exec("SELECT LAST_INSERT_ID();");\
+                                                if ((flag)){(obj)->first();\
+                                                    (id) = (obj)->value(0).toInt();}}
 #define QUERY_BEGIN                         QString("BEGIN;")
 #define QUERY_COMMIT                        QString("COMMIT;")
 #define QUERY_ROLLBACK                      QString("ROLLBACK;")
@@ -75,6 +90,7 @@
 #define QUERY_INS_CLIENT                    QString("INSERT INTO `clients` (`creator`, `name`, `surname`, `patronymic`, `agent_phone_mask`, `agent2_phone_mask`, `address`, `post_index`, `passport_num`, `passport_date`, `passport_organ`, `state`, `type`, `birthday`, `memorial`, `notes`, `is_regular`, `is_dealer`, `balance_enable`, `prefer_cashless`, `take_long`, `ignore_calls`, `is_bad`, `is_realizator`, `is_agent`, `visit_source`, `photo_id`, `INN`, `KPP`, `OGRN`, `web_password`, `ur_name`, `email`, `icq`, `skype`, `viber`, `telegram`, `site`, `whatsapp`, `agent_name`, `agent_surname`, `agent_patronymic`, `agent_phone`, `agent_phone_clean`, `agent2_name`, `agent2_surname`, `agent2_patronymic`, `agent2_phone`, `agent2_phone_clean`, `created`, `balance`, `price_col`, `repairs`, `purchases`, `token`) VALUES\
                                                                             (%1, '%2', '%3', '%4', 1, 1, '%5', NULL, NULL, NULL, NULL, 1, %6, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, %7, NULL, NULL, NULL, NULL, '%8', '', '%9', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NOW(), 0, 0, 1, 0, NULL);")
 #define QUERY_INS_USER_ACTIVITY(action)     QString("INSERT INTO `users_activity` (`user_id`, `datetime_`, `address`, `notes`, `app_version`, `machine_name`) VALUES (%1, NOW(), SUBSTRING_INDEX(USER(), '@', -1), '%2', '%3', '%4');").arg(userData->value("id").toInt()).arg((action)).arg(APP_VER).arg("TODO:hostname")
+#define QUERY_UPD_LAST_USER_ACTIVITY(id)    QString("UPDATE `users` SET `last_activity`=NOW() WHERE `id` = %1;").arg((id))
 #define QUERY_INS_WORKSHOP                  QString("INSERT INTO `workshop` (\
                                                 `Hidden`, `Title`, `client`, `type`, `maker`, `model`, `serial_number`, `company`, `office`, `start_office`, `manager`, `current_manager`, `master`, `diagnostic_result`, `in_date`, `out_date`, `state`, `new_state`, `user_lock`, `lock_datetime`, `express_repair`, `quick_repair`, `is_warranty`, `is_repeat`, `payment_system`, `is_card_payment`, `can_format`, `print_check`, `box`, `warranty_label`, `ext_notes`, `is_prepaid`, `prepaid_type`, `prepaid_summ`, `prepaid_order`, `is_pre_agreed`, `is_debt`, `pre_agreed_amount`, `repair_cost`, `real_repair_cost`, `parts_cost`, `fault`, `complect`, `look`, `thirs_party_sc`, `last_save`, `last_status_changed`, `warranty_days`, `barcode`, `reject_reason`, `informed_status`, `image_ids`, `color`, `order_moving`, `early`, `ext_early`, `issued_msg`, `sms_inform`, `invoice`, `cartridge`, `vendor_id`, `termsControl`\
                                                 ) VALUES(\
@@ -113,7 +129,17 @@
                                                 .arg(O)\
                                                 .arg(t)\
                                                 .arg(R)\
-                                                .arg(A)\
-
+                                                .arg(A)
+#define QUERY_VRFY_CASH(T,S,s,C,U,O,t,R,A)  QString("SELECT IF(`type` = %1 AND `summa` = %2 /*AND `summa_str` = %3*/ AND `client` = %4 AND `user` = %5 AND `office` = %6 /*AND `notes` = %7*/ AND `repair` = %8 AND `payment_system` = %9, 21930, 0)\
+                                                    FROM `cash_orders`\
+                                                    WHERE `id` = LAST_INSERT_ID();").arg(T)\
+                                                .arg(S)\
+                                                .arg(s)\
+                                                .arg(C)\
+                                                .arg(U)\
+                                                .arg(O)\
+                                                .arg(t)\
+                                                .arg(R)\
+                                                .arg(A)
 
 #endif // COM_SQL_QUERIES_H
