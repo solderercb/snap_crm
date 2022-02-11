@@ -89,6 +89,11 @@
 #define QUERY_INS_DEVICE_MODEL              QString("INSERT INTO `device_models` (`name`, `position`, `maker`, `device`) VALUES ('%1', %2, %3, %4);")
 #define QUERY_INS_CLIENT                    QString("INSERT INTO `clients` (`creator`, `name`, `surname`, `patronymic`, `agent_phone_mask`, `agent2_phone_mask`, `address`, `post_index`, `passport_num`, `passport_date`, `passport_organ`, `state`, `type`, `birthday`, `memorial`, `notes`, `is_regular`, `is_dealer`, `balance_enable`, `prefer_cashless`, `take_long`, `ignore_calls`, `is_bad`, `is_realizator`, `is_agent`, `visit_source`, `photo_id`, `INN`, `KPP`, `OGRN`, `web_password`, `ur_name`, `email`, `icq`, `skype`, `viber`, `telegram`, `site`, `whatsapp`, `agent_name`, `agent_surname`, `agent_patronymic`, `agent_phone`, `agent_phone_clean`, `agent2_name`, `agent2_surname`, `agent2_patronymic`, `agent2_phone`, `agent2_phone_clean`, `created`, `balance`, `price_col`, `repairs`, `purchases`, `token`) VALUES\
                                                                             (%1, '%2', '%3', '%4', 1, 1, '%5', NULL, NULL, NULL, NULL, 1, %6, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, %7, NULL, NULL, NULL, NULL, '%8', '', '%9', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NOW(), 0, 0, 1, 0, NULL);")
+#define QUERY_INS_PHONE(P,p,M,C,T,t)        QString("INSERT INTO `tel` (\
+                                                `phone`, `phone_clean`, `mask`, `customer`, `type`, `note`\
+                                                ) VALUES (\
+                                                '%1','%2',%3,%4,%5,'%6'\
+                                                );").arg(P).arg(p).arg(M).arg(C).arg(T).arg(t)
 #define QUERY_INS_USER_ACTIVITY(action)     QString("INSERT INTO `users_activity` (`user_id`, `datetime_`, `address`, `notes`, `app_version`, `machine_name`) VALUES (%1, NOW(), SUBSTRING_INDEX(USER(), '@', -1), '%2', '%3', '%4');").arg(userData->value("id").toInt()).arg((action)).arg(APP_VER).arg("TODO:hostname")
 #define QUERY_UPD_LAST_USER_ACTIVITY(id)    QString("UPDATE `users` SET `last_activity`=NOW() WHERE `id` = %1;").arg((id))
 #define QUERY_INS_WORKSHOP                  QString("INSERT INTO `workshop` (\

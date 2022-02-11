@@ -947,6 +947,8 @@ int tabRepairNew::createRepair()
         QUERY_LAST_INS_ID(query,nDBErr,exist_client_id);
         qDebug() << "Новый клиент: LAST_INSERT_ID() = " << exist_client_id;
 //        qDebug() << QUERY_INS_LOG("NULL",2,user,office,exist_client_id,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт");
+        // TODO: запись телефонного номера нового клиента!
+
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",2,user,office,exist_client_id,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт"));
     }
 
@@ -1058,33 +1060,35 @@ int tabRepairNew::createRepair()
 //    QUERY_EXEC(query,nDBErr)();
 //    QUERY_EXEC(query,nDBErr)();
     delete query;
-    // TODO: очистить всё, кроме данных клиента
-    ui->comboBoxProblem->clearEditText();
-    ui->comboBoxIncomingSet->clearEditText();
-    ui->comboBoxExterior->clearEditText();
-    ui->lineEditSN->setText("");
-    ui->lineEditPrevRepair->setText("");
-    ui->lineEditPrevRepairFromOldDB->setText("");
-    ui->checkBoxIsQuick->setCheckState(Qt::Unchecked);
-    ui->checkBoxWasInOtherWorkshop->setCheckState(Qt::Unchecked);
-    ui->checkBoxIsHighPriority->setCheckState(Qt::Unchecked);
-    ui->checkBoxIsNonImportantData->setCheckState(Qt::Unchecked);
-    ui->checkBoxWasEarlier->setCheckState(Qt::Unchecked);
-    ui->checkBoxIsWarranty->setCheckState(Qt::Unchecked);
-    ui->comboBoxPresetEngineer->setCurrentIndex(-1);
-    ui->comboBoxPresetBox->setCurrentIndex(-1);
-    ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
-    ui->lineEditExtNotes->setText("");
-    ui->lineEditInsideComment->setText("");
-    ui->checkBoxIsEstPrice->setCheckState(Qt::Unchecked);
-    ui->checkBoxIsPrepay->setCheckState(Qt::Unchecked);
-    ui->comboBoxPrepayReason->setCurrentIndex(-1);
-    ui->lineEditPrepaySumm->setText("0");
-    ui->comboBoxPrepayAccount->setCurrentIndex(-1);
-    ui->lineEditEstPrice->setText("0");
-    ui->comboBoxDevice->setCurrentIndex(-1);
-    ui->comboBoxDeviceMaker->setCurrentIndex(-1);
-    ui->comboBoxDeviceModel->setCurrentIndex(-1);
+    // очистить всё, кроме данных клиента
+//    ui->comboBoxProblem->clearEditText();
+//    ui->comboBoxIncomingSet->clearEditText();
+//    ui->comboBoxExterior->clearEditText();
+//    ui->lineEditSN->setText("");
+//    ui->lineEditPrevRepair->setText("");
+//    ui->lineEditPrevRepairFromOldDB->setText("");
+//    ui->checkBoxIsQuick->setCheckState(Qt::Unchecked);
+//    ui->checkBoxWasInOtherWorkshop->setCheckState(Qt::Unchecked);
+//    ui->checkBoxIsHighPriority->setCheckState(Qt::Unchecked);
+//    ui->checkBoxIsNonImportantData->setCheckState(Qt::Unchecked);
+//    ui->checkBoxWasEarlier->setCheckState(Qt::Unchecked);
+//    ui->checkBoxIsWarranty->setCheckState(Qt::Unchecked);
+//    ui->checkBoxIsCashReceiptDocNeeded->setCheckState(Qt::Unchecked);
+//    ui->checkBoxIsCheckNeeded->setCheckState(Qt::Unchecked);
+//    ui->comboBoxPresetEngineer->setCurrentIndex(-1);
+//    ui->comboBoxPresetBox->setCurrentIndex(-1);
+//    ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
+//    ui->lineEditExtNotes->setText("");
+//    ui->lineEditInsideComment->setText("");
+//    ui->checkBoxIsEstPrice->setCheckState(Qt::Unchecked);
+//    ui->checkBoxIsPrepay->setCheckState(Qt::Unchecked);
+//    ui->comboBoxPrepayReason->setCurrentIndex(-1);
+//    ui->lineEditPrepaySumm->setText("0");
+//    ui->comboBoxPrepayAccount->setCurrentIndex(-1);
+//    ui->lineEditEstPrice->setText("0");
+//    ui->comboBoxDevice->setCurrentIndex(-1);
+//    ui->comboBoxDeviceMaker->setCurrentIndex(-1);
+//    ui->comboBoxDeviceModel->setCurrentIndex(-1);
 }
 
 void tabRepairNew::createRepairClose()
@@ -1149,15 +1153,15 @@ void tabRepairNew::test_scheduler_handler()  //
     }
     else if (test_scheduler_counter == 4)   // клиент
     {
-//        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
-//        {
-//            fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
-//            if (ui->lineEditClientLastName->text() == "")
-//                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // если попался id несуществующего клиета
-//            else if (ui->lineEditClientLastName->text() == "")
-//                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // и еще раз, на всякий пожарный
-//        }
-//        else    // ввод данных из тестового списка
+        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
+        {
+            fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
+            if (ui->lineEditClientLastName->text() == "")
+                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // если попался id несуществующего клиета
+            else if (ui->lineEditClientLastName->text() == "")
+                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // и еще раз, на всякий пожарный
+        }
+        else    // ввод данных из тестового списка
         {
             i = QRandomGenerator::global()->bounded(clients4Test->size());
             ui->lineEditClientLastName->setText(clients4Test->value(i)->at(0));
@@ -1240,16 +1244,61 @@ void tabRepairNew::test_scheduler_handler()  //
     }
     else if (test_scheduler_counter == 10)
     {
+        // в случайном порядке включаем разные флаги
+        i = QRandomGenerator::global()->bounded(16384);
+        ui->checkBoxIsQuick->setChecked((i>>0)&0x01);
+        ui->checkBoxWasInOtherWorkshop->setChecked((i>>1)&0x01);
+        ui->checkBoxIsHighPriority->setChecked((i>>2)&0x01);
+        ui->checkBoxIsNonImportantData->setChecked((i>>3)&0x01);
+        ui->checkBoxWasEarlier->setChecked((i>>4)&0x01);
+        ui->checkBoxIsWarranty->setChecked((i>>5)&0x01);
+        ui->checkBoxIsEstPrice->setChecked((i>>6)&0x01);
+        ui->checkBoxIsPrepay->setChecked((i>>7)&0x01);
+        ui->checkBoxIsCashReceiptDocNeeded->setChecked((i>>8)&0x01);
+        ui->checkBoxIsCheckNeeded->setChecked((i>>9)&0x01);
+        if (ui->checkBoxWasEarlier->isChecked())
+        {
+            if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или берём ремонт из базы или записываем значение "из другой БД"
+            { // в данном случае это просто чтобы проверка обязательных полей проходила успешно; вызова функции заполнения полей значениями предыдущего ремонта не будет (пока)
+                QSqlQuery query;
+                query.exec(QString("SELECT `id` FROM `workshop` WHERE `state` IN (8,12,16) AND `id` < %1 ORDER BY `id` DESC LIMIT 1 ").arg(QRandomGenerator::global()->bounded(24900)));
+                query.first();
+                if(query.isValid())
+                    ui->lineEditPrevRepair->setText(query.value(0).toString());
+                else
+                    ui->checkBoxWasEarlier->setChecked(0);  // это если вдруг не выбран номер
+            }
+            else
+            {
+                ui->lineEditPrevRepairFromOldDB->show();
+                ui->lineEditPrevRepairFromOldDB->setText(QString::number(QRandomGenerator::global()->bounded(1000000)));
+            }
+        }
+        if (ui->checkBoxIsEstPrice->isChecked())
+        {
+            ui->lineEditEstPrice->setText(QString::number(QRandomGenerator::global()->bounded(100)*50));
+
+        }
+        if (ui->checkBoxIsPrepay->isChecked())
+        {
+            i = prepayReasonsModel->rowCount();
+            ui->comboBoxPrepayReason->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+            ui->lineEditPrepaySumm->setText(QString::number(QRandomGenerator::global()->bounded(100)*50));
+            i = paymentSystemsModel->rowCount();
+            ui->comboBoxPrepayAccount->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+        }
+
+    }
+    else if (test_scheduler_counter == 11)
+    {
         createRepair();
 //        main_window_test_scheduler2->start(500);    // запускаем таймер закрытия вкладки приёма в ремонт
     }
-    else if (test_scheduler_counter == 11)
-    {}
     else if (test_scheduler_counter == 12)
     {}
     else if (test_scheduler_counter == 13)
     {}
-    if (test_scheduler_counter < 10)
+    if (test_scheduler_counter < 11)
     {
         test_scheduler_counter++;
         test_scheduler->start(400);    //  (пере-)запускаем таймер
