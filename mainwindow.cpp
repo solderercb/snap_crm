@@ -392,6 +392,14 @@ void MainWindow::initGlobalModels()
     {
         comSettings->insert(queryCommonSettings->record().fieldName(i), queryCommonSettings->value(i));
     }
+    queryCommonSettings->exec(QUERY_SEL_COMMON_SETTINGS2);  // вторая "порция" общих настроек ( в ASC CRM настроки из табил. config начиная с v3.7.18.969 schemaversion 258 постепенно "переезжают" в табл. settings; нова ятаблица имеет приоритет
+    while(queryCommonSettings->next())
+    {
+        if (comSettings->contains(queryCommonSettings->value(0).toString()))
+            comSettings->value(queryCommonSettings->value(0).toString()) = queryCommonSettings->value(1);
+        else
+            comSettings->insert(queryCommonSettings->value(0).toString(), queryCommonSettings->value(1));
+    }
 
     warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
