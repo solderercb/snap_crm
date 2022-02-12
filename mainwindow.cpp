@@ -401,6 +401,19 @@ void MainWindow::initGlobalModels()
             comSettings->insert(queryCommonSettings->value(0).toString(), queryCommonSettings->value(1));
     }
 
+    for (int i=0; i < comSettings->value("phone_mask1").toString().size(); i++)     // В ASC CRM (а точнее в DevExpress) маски ввода в lineEdit работают не так, как в Qt
+        if (comSettings->value("phone_mask1").toString().at(i) == '0')              // В Qt: 0 - это необязательная цифра, а 9 — обязательная цифра. Чтобы работала проверка
+        {                                                                           // введённого номера телефона (если в настройках установлен флаг обязательности), нужно изменить маску.
+            qDebug() << "МАСКА ТЕЛЕФОНА 1!!!";                                      // (это заглушка для отладки)
+            break;                                                                  // TODO: добавить хитрую подсказку для полей ввода номера, если обнаруживается такое несовпадение
+        }
+    for (int i=0; i < comSettings->value("phone_mask2").toString().size(); i++)
+        if (comSettings->value("phone_mask2").toString().at(i) == '0')
+        {
+            qDebug() << "МАСКА ТЕЛЕФОНА 2!!!";
+            break;
+        }
+
     warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
     managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database("connMain"));
