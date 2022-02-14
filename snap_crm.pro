@@ -10,7 +10,7 @@ QT      += core5compat
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = test
+TARGET = snap
 TEMPLATE = app
 
 RC_FILE = resources.rc
@@ -64,5 +64,3 @@ FORMS    += mainwindow.ui \
     tabrepair.ui \
     tabrepairnew.ui \
     tabrepairs.ui
-
-DISTFILES +=
