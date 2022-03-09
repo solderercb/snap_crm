@@ -47,11 +47,10 @@ bool groupBoxEventFilter::eventFilter(QObject *watched, QEvent *event)
 }
 
 tabRepairNew::tabRepairNew(MainWindow *parent) :
-    QWidget(parent),
+    tabCommon(parent),
     ui(new Ui::tabRepairNew)
 {
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    // Обычные комбобоксы, которые нельзя редактировать, отображаются как неактивные элементы. Назначаем им стиль отображения как у редактируемых.
 
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
@@ -178,12 +177,16 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     msgBox.setIcon(QMessageBox::Critical);
 
 #ifdef QT_DEBUG
+    initClients4Test();
+
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
     test_scheduler2 = new QTimer();
     test_scheduler2->setSingleShot(true);
     QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
+
+//    randomFill();
 #endif
 
     query->exec(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
@@ -192,6 +195,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
 tabRepairNew::~tabRepairNew()
 {
+    delete ui;
     delete comboboxDeviceMakersModel;
     delete comboboxDeviceModelsModel;
     delete comboboxDevicesModel;
@@ -212,16 +216,21 @@ tabRepairNew::~tabRepairNew()
         for (int j=clientPhoneTypesSelector[i].size()-1; j>=0; j--)     // каждый QStandartItem
             delete clientPhoneTypesSelector[i].value(j);
     delete clientPhoneTypesList;
-    for(int i=clients4Test->size()-1;i>=0;i--)
-        delete clients4Test->value(i);
-    delete clients4Test;
     delete groupBoxEventFilterObj;
-    delete ui;
     #ifdef QT_DEBUG
         delete test_scheduler;
         delete test_scheduler2;
+        for(int i=clients4Test->size()-1;i>=0;i--)
+            delete clients4Test->value(i);
+        delete clients4Test;
     #endif
     p_instance = nullptr;   // Обязательно блять!
+}
+
+bool tabRepairNew::tabCloseRequest()
+{
+    // TODO: сделать проверку не сохранённых данных перед закрытием
+    return 1;
 }
 
 tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
@@ -1135,8 +1144,6 @@ void tabRepairNew::phoneTypeChanged(int type, int index)
 #ifdef QT_DEBUG
 void tabRepairNew::randomFill()
 {
-    initClients4Test();
-
     test_scheduler->start(200);
 }
 

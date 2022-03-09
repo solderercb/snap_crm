@@ -5,8 +5,8 @@
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
 
-tabRepairs::tabRepairs(bool type, QWidget *parent) :
-    QWidget(parent),
+tabRepairs::tabRepairs(bool type, MainWindow *parent) :
+    tabCommon(parent),
     ui(new Ui::tabRepairs)
 {
     ui->setupUi(this);
@@ -37,7 +37,7 @@ tabRepairs::~tabRepairs()
     delete ui;
 }
 
-tabRepairs* tabRepairs::getInstance(bool type, QWidget *parent)   // singleton: вкладка приёма в ремонт может быть только одна
+tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
 {
     if( !p_instance[type] )
       p_instance[type] = new tabRepairs(type, parent);

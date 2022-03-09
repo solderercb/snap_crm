@@ -10,13 +10,14 @@
 #include <QLabel>
 #include <QSqlQueryModel>
 #include <QRegularExpressionValidator>
+#include "tabcommon.h"
 #include "repairstablemodel.h"
 
 namespace Ui {
 class tabRepairs;
 }
 
-class tabRepairs : public QWidget
+class tabRepairs : public tabCommon
 {
     Q_OBJECT
 
@@ -24,8 +25,8 @@ signals:
     void doubleClicked(int);
 
 public:
-    explicit tabRepairs(bool type = 0, QWidget *parent = nullptr);
-    static tabRepairs* getInstance(bool type, QWidget *parent = nullptr);
+    explicit tabRepairs(bool type = 0, MainWindow *parent = nullptr);
+    static tabRepairs* getInstance(bool type, MainWindow *parent = nullptr);
     ~tabRepairs();
 
 private:

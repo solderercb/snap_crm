@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "bottoolbarwidget.h"
+#include "tabcommon.h"
 #include "tabrepairnew.h"
 #include "ui_tabrepairnew.h"
 #include "tabrepairs.h"
@@ -577,7 +578,18 @@ void MainWindow::createTabClient(int id)
 
 void MainWindow::closeTab(int index)
 {
-    delete ui->tabWidget->widget(index);
+    QWidget *w = ui->tabWidget->widget(index);
+    if (QString(w->metaObject()->className()).compare("QWidget", Qt::CaseSensitive) != 0)  // Временное: на момент первоначальной разработки могут использоваться обычные QWidget-вкладки и при их закрытии приложение будет падать
+    {
+        tabCommon &tab = *(static_cast<tabCommon*>(w)); // мои классы ОБЯЗАТЕЛЬНО должны наследовать tabCommon
+        if (tab.tabCloseRequest())   // Перед закрытием  вкладки нужно проверить нет ли несохранённых данных
+        {
+            delete w;
+//            ui->tabWidget->removeTab(index);
+            return;
+        }
+    }
+    delete w;
 }
 
 #ifdef QT_DEBUG

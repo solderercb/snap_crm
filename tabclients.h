@@ -11,12 +11,13 @@
 #include <QSqlQueryModel>
 #include <QSortFilterProxyModel>
 #include "mainwindow.h"
+#include "tabcommon.h"
 
 namespace Ui {
 class tabClients;
 }
 
-class tabClients : public QWidget
+class tabClients : public tabCommon
 {
     Q_OBJECT
 

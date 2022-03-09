@@ -7,7 +7,7 @@
 tabClients* tabClients::p_instance[] = {nullptr,nullptr};
 
 tabClients::tabClients(bool type, MainWindow *parent) :
-    QWidget(parent),
+    tabCommon(parent),
     ui(new Ui::tabClients)
 {
     ui->setupUi(this);

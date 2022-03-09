@@ -7,7 +7,7 @@
 #define APP_MAJOR 0
 #define APP_MINOR 0
 #define APP_PATCH 0
-#define APP_COMMIT 47
+#define APP_COMMIT 48
 
 #define APP_VER                     STR(APP_MAJOR.APP_MINOR.APP_PATCH.APP_COMMIT)   // препроцессор создаст из этой конструкции строку
 //#define PROJECT_VERSION             APP_MAJOR.APP_MINOR.APP_PATCH.APP_COMMIT  // это не нужно, но оставлю для истории

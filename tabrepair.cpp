@@ -4,8 +4,8 @@
 
 tabRepair* tabRepair::p_instance = nullptr;
 
-tabRepair::tabRepair(int repair_id, QWidget *parent) :
-    QWidget(parent),
+tabRepair::tabRepair(int repair_id, MainWindow *parent) :
+    tabCommon(parent),
     ui(new Ui::tabRepair)
 {
     ui->setupUi(this);
@@ -47,7 +47,7 @@ void tabRepair::worksTreeDoubleClicked(QModelIndex item)
 
 //}
 
-tabRepair* tabRepair::getInstance(QWidget *parent)   // singleton: одна вкладка для ремонта
+tabRepair* tabRepair::getInstance(MainWindow *parent)   // singleton: одна вкладка для ремонта
 {
 if( !p_instance )
   p_instance = new tabRepair(0, parent);

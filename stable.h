@@ -1,0 +1,37 @@
+#if defined __cplusplus
+#include <QAbstractItemView>
+#include <QAbstractTableModel>
+#include <QColor>
+#include <QComboBox>
+#include <QCompleter>
+#include <QCoreApplication>
+#include <QDate>
+#include <QDateEdit>
+#include <QDialog>
+#include <QDockWidget>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMouseEvent>
+#include <QObject>
+#include <QRandomGenerator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QSignalMapper>
+#include <QSortFilterProxyModel>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlQueryModel>
+#include <QSqlRecord>
+#include <QSqlTableModel>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QStringList>
+#include <QStyle>
+#include <QTableWidget>
+#include <QTextCodec>
+#include <QTimer>
+#include <QToolButton>
+#include <QVector>
+#include <QWidget>
+#endif

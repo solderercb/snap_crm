@@ -15,6 +15,7 @@
 #include <QTimer>
 #endif
 #include "mainwindow.h"
+#include "tabcommon.h"
 
 namespace Ui {
     class tabRepairNew;
@@ -32,7 +33,7 @@ protected:
     bool eventFilter(QObject*, QEvent*) override;
 };
 
-class tabRepairNew : public QWidget
+class tabRepairNew : public tabCommon
 {
     Q_OBJECT
 
@@ -45,6 +46,7 @@ public:
     explicit tabRepairNew(MainWindow *parent = nullptr);
     static tabRepairNew* getInstance(MainWindow *parent = nullptr);
     ~tabRepairNew();
+    virtual bool tabCloseRequest();
 #ifdef QT_DEBUG
     void randomFill();
 #endif
