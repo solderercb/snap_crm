@@ -68,6 +68,63 @@
                                                   t1.`client` AS 'client_id'\
                                                 FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE LCASE(`serial_number`) REGEXP LCASE('%1') ORDER BY `id` DESC;\
                                                 ").arg((text))
+
+#define QUERY_SEL_CLIENTS_STATIC            QString("\
+                                                SELECT\
+                                                  t1.`id`,\
+                                                  CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO',\
+                                                  t1.`balance`,\
+                                                  t1.`repairs`,\
+                                                  t1.`purchases`,\
+                                                  IF(t1.`type` = 1, 'Ю', '') AS 'type',\
+                                                  IFNULL(t2.`phone`, '') AS 'phone'\
+                                                FROM `clients` AS t1\
+                                                LEFT JOIN `tel` AS t2\
+                                                ON t1.`id` = t2.`customer`\
+                                                  AND t2.`type` = 1")
+
+#define QUERY_SEL_WORKSHOP_STATIC           QString("\
+                                                SELECT\
+                                                   CONCAT_WS(' ', IF(`is_warranty`, 'Г', ''), IF(`is_repeat`, 'П', ''), IF(`express_repair`, 'С', ''), IF(`informed_status`, '*', '')) AS 'marks',\
+                                                   t1.`id`,\
+                                                   `Title`,\
+                                                   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\
+                                                   CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',\
+                                                   `serial_number`,\
+                                                   `office`,\
+                                                   `manager`,\
+                                                   `master`,\
+                                                   `in_date`,\
+                                                   t1.`state`,\
+                                                   t1.`state`,\
+                                                   `new_state`,\
+                                                   `user_lock`,\
+                                                   `lock_datetime`,\
+                                                   `quick_repair`,\
+                                                   `box`,\
+                                                   `repair_cost`,\
+                                                   `fault`,\
+                                                   `thirs_party_sc`,\
+                                                   `last_save`,\
+                                                   `last_status_changed`,\
+                                                   `warranty_days`,\
+                                                   `color`,\
+                                                   `early`,\
+                                                   `ext_early`,\
+                                                   `issued_msg`,\
+                                                   `vendor_id`,\
+                                                   `termsControl`,\
+                                                   `Hidden`\
+                                                FROM `workshop` AS t1\
+                                                LEFT JOIN `devices` AS t2\
+                                                   ON t1.`type` = t2.`id`\
+                                                LEFT JOIN `device_makers` AS t3\
+                                                   ON t1.maker = t3.`id`\
+                                                LEFT JOIN `device_models` AS t4\
+                                                   ON t1.model = t4.`id`\
+                                                LEFT JOIN `clients` AS t5\
+                                                   ON t1.`client` = t5.`id`;")
+
 #define QUERY_SEL_LAST_INSERT_ID            QString("SELECT LAST_INSERT_ID();")
 #define QUERY_EXEC(obj,flag)                qDebug() << "nDBErr=" << (flag) << ". Executing query..."; if ((flag)) (flag) = (obj)->exec
 

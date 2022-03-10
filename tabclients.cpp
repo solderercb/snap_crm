@@ -59,7 +59,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setModelColumn(0);
 
-    query_static = "SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', IFNULL(t2.`phone`, '') AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` AND t2.`type` = 1"; // default query
+    query_static = QUERY_SEL_CLIENTS_STATIC; // default query
 //    query_where_static = "";    // default WHERE part of query
 //    query_where << query_where_static;
     query_group_static = "t1.`id`";    // default GROUP part of query
