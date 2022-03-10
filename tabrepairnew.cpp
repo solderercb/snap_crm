@@ -55,7 +55,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
-
     companiesModel      = parent->companiesModel;
     officesModel        = parent->officesModel;
     userData            = parent->userData;
@@ -186,7 +185,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
 
-//    randomFill();
+    randomFill();
 #endif
 
     query->exec(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
@@ -900,7 +899,10 @@ int tabRepairNew::createRepair()
                 error = 19;
             }
             else
+            {
                 prevRepair = "NULL";
+                prevRepairFromOldDB = "\'" + prevRepairFromOldDB + "\'";
+            }
         }
 
     if (error)
@@ -1072,7 +1074,7 @@ int tabRepairNew::createRepair()
 
         // TODO: Признак предмета расчета
         // В журнале делаю запись о предоплате, думаю это будет удобно; ASC CRM такую запись вроде бы не делает :-(
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL",QString("Внесена предоплата \"%1\" за ремонт №%2 в размере %3%4").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString())));
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL",QString("Внесена предоплата за ремонт №%2 в размере %3%4 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString())));
     }
 
     if (nDBErr == 0)   // в случае ошибки выполнения запроса нужно всё откатить
@@ -1114,6 +1116,11 @@ int tabRepairNew::createRepair()
         ui->comboBoxDevice->setCurrentIndex(-1);
         ui->comboBoxDeviceMaker->setCurrentIndex(-1);
         ui->comboBoxDeviceModel->setCurrentIndex(-1);
+
+        QMap<QString, QVariant> report_vars;
+        report_vars.insert("type", "new_rep");
+        report_vars.insert("repair_id", repair);
+        emit generatePrintout(report_vars);
     }
 
     delete query;
@@ -1300,11 +1307,11 @@ void tabRepairNew::test_scheduler_handler()  //
         {
             if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или берём ремонт из базы или записываем значение "из другой БД"
             { // в данном случае это просто чтобы проверка обязательных полей проходила успешно; вызова функции заполнения полей значениями предыдущего ремонта не будет (пока)
-                QSqlQuery query;
-                query.exec(QString("SELECT `id` FROM `workshop` WHERE `state` IN (8,12,16) AND `id` < %1 ORDER BY `id` DESC LIMIT 1 ").arg(QRandomGenerator::global()->bounded(24900)));
-                query.first();
-                if(query.isValid())
-                    ui->lineEditPrevRepair->setText(query.value(0).toString());
+                QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+                query->exec(QString("SELECT `id` FROM `workshop` WHERE `state` IN (8,12,16) AND `id` < %1 ORDER BY `id` DESC LIMIT 1 ").arg(QRandomGenerator::global()->bounded(24900)));
+                query->first();
+                if(query->isValid())
+                    ui->lineEditPrevRepair->setText(query->value(0).toString());
                 else
                     ui->checkBoxWasEarlier->setChecked(0);  // это если вдруг не выбран номер
             }
@@ -1331,7 +1338,8 @@ void tabRepairNew::test_scheduler_handler()  //
     }
     else if (test_scheduler_counter == 11)
     {
-        createRepair();
+//        createRepair();
+        createRepairClose();
 //        main_window_test_scheduler2->start(500);    // запускаем таймер закрытия вкладки приёма в ремонт
     }
     else if (test_scheduler_counter == 12)

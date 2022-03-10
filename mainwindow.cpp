@@ -8,6 +8,7 @@
 #include "tabrepairs.h"
 #include "tabrepair.h"
 #include "tabclients.h"
+#include "tabprintdialog.h"
 #include "mylineedit.h"
 #include "com_sql_queries.h"
 
@@ -539,6 +540,19 @@ void MainWindow::createTabRepairNew()
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int)), this, SLOT(createTabRepairs(int)));
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int)), this, SLOT(createTabClients(int)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString, QVariant>)), this, SLOT(createTabPrint(QMap<QString, QVariant>)));
+}
+
+void MainWindow::createTabPrint(QMap<QString, QVariant> report_vars)
+{
+    report_vars.detach();
+    qDebug() << "MainWindow::createTabPrint()";
+    qDebug() << report_vars;
+    tabPrintDialog *printDialog;
+
+    printDialog = new tabPrintDialog(this, report_vars);
+    ui->tabWidget->addTab(printDialog, "Print");
+    ui->tabWidget->setCurrentWidget(printDialog);
 }
 
 void MainWindow::reactivateTabRepairNew(int)
@@ -598,7 +612,13 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 //    createTabClients(0);
     if (test_scheduler_counter < 375)
-        createTabRepairNew();
+    {
+//        createTabRepairNew();
+        QMap<QString, QVariant> report_vars;
+        report_vars.insert("repair_id", 24944);
+        report_vars.insert("type", "new_rep");
+        createTabPrint(report_vars);
+    }
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 
 }

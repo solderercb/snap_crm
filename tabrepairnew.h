@@ -41,6 +41,7 @@ signals:
     void createTabSelectPrevRepair(int);
     void createTabSelectExistingClient(int);
     void createTabClient(int);
+    void generatePrintout(QMap<QString, QVariant>);
 
 public:
     explicit tabRepairNew(MainWindow *parent = nullptr);
@@ -54,6 +55,7 @@ public:
 private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
+    MainWindow *parent;
     void setDefaultStyleSheets();
     void getDevices();
     QString genUserWebPass() const;
@@ -91,6 +93,7 @@ private:
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
 #endif
+
     groupBoxEventFilter *groupBoxEventFilterObj;
     QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
             QComboBox::drop-down {  border: 0px;}\

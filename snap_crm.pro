@@ -7,6 +7,9 @@
 QT	+= core gui
 QT	+= sql
 QT      += core5compat
+QT      += printsupport
+QT      += xml
+QT      += qml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -38,6 +41,7 @@ SOURCES += main.cpp\
     repairstablemodel.cpp \
     tabclients.cpp \
     tabcommon.cpp \
+    tabprintdialog.cpp \
     tabrepair.cpp \
     tabrepairnew.cpp \
     tabrepairs.cpp \
@@ -56,6 +60,7 @@ HEADERS  += \
     repairstablemodel.h \
     tabclients.h \
     tabcommon.h \
+    tabprintdialog.h \
     tabrepair.h \
     tabrepairnew.h \
     tabrepairs.h \
@@ -66,6 +71,19 @@ FORMS    += mainwindow.ui \
     chooseofficewindow.ui \
     loginwindow.ui \
     tabclients.ui \
+    tabprintdialog.ui \
     tabrepair.ui \
     tabrepairnew.ui \
     tabrepairs.ui
+
+LIB_DIR = $$PWD/lib6
+
+CONFIG(release, debug|release): LIBS += -L$$LIB_DIR -llimereport -lKernel32
+else:CONFIG(debug, debug|release): LIBS += -L$$LIB_DIR -llimereportd -lKernel32
+
+INCLUDEPATH += $$LIB_DIR/include
+DEPENDPATH += $$LIB_DIR/include
+
+BIN_DIR ~= s,/,\\,g
+LIB_DIR ~= s,/,\\,g
+QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
