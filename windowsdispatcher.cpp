@@ -64,7 +64,7 @@ void windowsDispatcher::connectOK()
 void windowsDispatcher::createChooseOfficeWindow()
 {
 #ifdef AUTO_CHOOSE_OFFICE
-#define AUTO_OFFICE_ID 1
+#define AUTO_OFFICE_ID 0
     userData->insert("current_office", officesModel->record(AUTO_OFFICE_ID).value("id").toInt());
     userData->insert("current_office_name", officesModel->record(AUTO_OFFICE_ID).value("name").toString());
     createMainWindow();

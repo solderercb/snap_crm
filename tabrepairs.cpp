@@ -1,7 +1,8 @@
 #include "appver.h"
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
-#include "mainwindow.h"
+#include "com_sql_queries.h"
+//#include "mainwindow.h"
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
 
@@ -9,7 +10,16 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairs)
 {
+    qDebug() << "tabRepairs::tabRepairs(): parent =" << parent;
     ui->setupUi(this);
+
+    userData            = parent->userData;
+    officesModel        = parent->officesModel;
+
+    filterSettings = new QMap<QString, int>;
+    repairTableFilterMenu *widgetAction = new repairTableFilterMenu(this);
+    ui->buttonShowParamsPopupMenu->addAction(widgetAction);
+
     this->setAttribute(Qt::WA_DeleteOnClose);
     _type = type;
     ui->tableView->horizontalHeader()->setSectionsMovable(true);  // возможность двигать столбцы (ну шоб как АСЦ было :-) )
@@ -23,12 +33,40 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
         ui->buttonPrint->hide();
         ui->buttonRepairNew->hide();
     }
+
+    query_static = QUERY_SEL_WORKSHOP_STATIC;     // default query
+    query_where_static = "`out_date` IS NULL AND `company` = 1";    // default WHERE part of query
+    query_where << query_where_static;
+    query_group_static = "t1.`id`";    // default GROUP part of query
+    query_group << query_group_static;
+    query_order_static = "t1.`id` DESC";   // default ORDER part of query
+    query_order << query_order_static;
+
+    // officesModel беру из MainWindow
+    QSqlQueryModel *statusesModel = new QSqlQueryModel();
+    statusesModel->setQuery("SELECT 1;", QSqlDatabase::database("connMain"));
+    QSqlQueryModel *employeesModel = new QSqlQueryModel();
+    employeesModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
+
+    QSqlQueryModel *clientsModel = new QSqlQueryModel();
+    clientsModel->setQuery("SELECT 1;", QSqlDatabase::database("connMain"));
+    widgetAction->setComboBoxOfficeModel(officesModel);
+    widgetAction->setComboBoxStatusModel(statusesModel);
+    widgetAction->setComboBoxEmployeeModel(employeesModel);
+    widgetAction->setComboBoxClientModel(clientsModel);
+//    widgetAction->setComboBoxXModel(repairModel);
+    widgetAction->setFilter(filterSettings);
+
+
+    connect(widgetAction, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int, int, int)), this, SLOT(tableSectionMoved(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int, int, int)), this, SLOT(tableSectionResized(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(tableSortingChanged(int, Qt::SortOrder)));
 
     // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.
     connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
+
+    updateTableWidget();
 }
 
 tabRepairs::~tabRepairs()
@@ -46,38 +84,26 @@ tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleto
 
 void tabRepairs::updateTableWidget()
 {
-    repairs_table->setQuery("SELECT\
-                    CONCAT_WS(' ', IF(`is_warranty`, 'Г', ''), IF(`is_repeat`, 'П', ''), IF(`express_repair`, 'С', ''), IF(`informed_status`, '*', '')) AS 'marks',\
-                    t1.`id`,\
-                    `Title`,\
-                    CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\
-                    CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',\
-                    `serial_number`,\
-                    `office`,\
-                    `manager`,\
-                    `master`,\
-                    `in_date`,\
-                    t1.`state`,\
-                    t1.`state`,\
-                    `new_state`,\
-                    `user_lock`,\
-                    `lock_datetime`,\
-                    `quick_repair`,\
-                    `box`,\
-                    `repair_cost`,\
-                    `fault`,\
-                    `thirs_party_sc`,\
-                    `last_save`,\
-                    `last_status_changed`,\
-                    `warranty_days`,\
-                    `color`,\
-                    `early`,\
-                    `ext_early`,\
-                    `issued_msg`,\
-                    `vendor_id`,\
-                    `termsControl`,\
-                    `Hidden`\
-                  FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE `out_date` IS NULL AND `company` = 1 ORDER BY `id` DESC;", QSqlDatabase::database("connMain"));
+    qDebug() << "tabRepairs::updateTableWidget()";
+    query.clear();
+
+    /* Собираем условия для запроса */
+    query_where.clear();
+    if (query_where_static.length() > 0)    // если предустановлен дефолтный фильтр
+        query_where << query_where_static;
+//    query_where << clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text();  // добавляем условие для выбранной категории клиентов
+//    if (ui->comboBoxClientAdType->currentIndex() > 0 )
+////        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data().toString();
+//        query_where << QString("`visit_source` = %1").arg(clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString());
+//    if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
+//        query_where << QString("(LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1') OR t1.`id` = '%1' OR t2.`phone` REGEXP '%1' OR t2.`phone_clean` REGEXP '%1')").arg(ui->lineEditSearch->text());
+
+    query << query_static << (query_where.count()>0?"WHERE " + query_where.join(" AND "):"") << (query_group.count()>0?"GROUP BY " + query_group.join(", "):"") << (query_group.count()>0?"ORDER BY " + query_order.join(", "):"");
+    qDebug() << query.join(' ');
+//    clientsTable->setQuery(query.join(' '), QSqlDatabase::database("connMain"));
+//    ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));
+
+    repairs_table->setQuery(query.join(' '), QSqlDatabase::database("connMain"));
 
         ui->tableView->horizontalHeader()->hideSection(11); // прячем столбец с кодом статуса
 //    repairs_table->setHeaderData(0, Qt::Horizontal, tr("Name"));
@@ -89,6 +115,11 @@ void tabRepairs::tableItemDoubleClick(QModelIndex item)
     emit doubleClicked(repairs_table->index(item.row(), 1).data().toInt());
     if (_type == 1)
         deleteLater();
+}
+
+void tabRepairs::filterMenuClosed()
+{
+//    qDebug() << *filterSettings;
 }
 
 void tabRepairs::lineEditSearchTextChanged(QString)

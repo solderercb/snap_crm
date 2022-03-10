@@ -37,6 +37,7 @@ SOURCES += main.cpp\
     chooseofficewindow.cpp \
     mainwindow.cpp \
     loginwindow.cpp \
+    models/repairtablefiltermenu.cpp \
     mylineedit.cpp \
     repairstablemodel.cpp \
     tabclients.cpp \
@@ -48,6 +49,7 @@ SOURCES += main.cpp\
     windowsdispatcher.cpp
 
 HEADERS  += \
+    models/repairtablefiltermenu.h \
     stable.h \
     mainwindow.h \
     SSetComboBox/ssetcombobox.h \
@@ -70,6 +72,7 @@ FORMS    += mainwindow.ui \
     bottoolbarwidget.ui \
     chooseofficewindow.ui \
     loginwindow.ui \
+    models/repairtablefiltermenu.ui \
     tabclients.ui \
     tabprintdialog.ui \
     tabrepair.ui \

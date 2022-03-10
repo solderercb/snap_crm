@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>popupm</class>
+ <widget class="QWidget" name="popupm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>180</width>
+    <height>240</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="0">
+    <widget class="QComboBox" name="comboBoxEmployee">
+     <property name="placeholderText">
+      <string>все сотрудники</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="checkBoxOnlyMyOrders">
+     <property name="text">
+      <string>только мои заказы</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QComboBox" name="comboBoxOffice">
+     <property name="placeholderText">
+      <string>офис</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QComboBox" name="comboBoxStatus">
+     <property name="placeholderText">
+      <string>все статусы</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QComboBox" name="comboBoxClients">
+     <property name="placeholderText">
+      <string>все клиенты</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QComboBox" name="comboBoxX">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="placeholderText">
+      <string>-нет-</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

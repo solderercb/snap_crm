@@ -4,7 +4,6 @@
 #include "bottoolbarwidget.h"
 #include "tabcommon.h"
 #include "tabrepairnew.h"
-#include "ui_tabrepairnew.h"
 #include "tabrepairs.h"
 #include "tabrepair.h"
 #include "tabclients.h"
@@ -39,6 +38,7 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     QMainWindow(nullptr),
 	ui(new Ui::MainWindow)
 {
+    qDebug() << "MainWindow::MainWindow(): this =" << this;
     QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QTextCodec::setCodecForLocale(codec);
 
@@ -504,7 +504,7 @@ void MainWindow::readConsignments(const QModelIndex &index, const QString &wareh
 void MainWindow::createTabRepairs(int type)
 {
     const QString tabLabels[] = {"Ремонты", "Выбрать ремонт"};
-    tabRepairs *subwindow = tabRepairs::getInstance(type);
+    tabRepairs *subwindow = tabRepairs::getInstance(type, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, tabLabels[type]);
 
@@ -614,10 +614,10 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
     if (test_scheduler_counter < 375)
     {
 //        createTabRepairNew();
-        QMap<QString, QVariant> report_vars;
-        report_vars.insert("repair_id", 24944);
-        report_vars.insert("type", "new_rep");
-        createTabPrint(report_vars);
+//        QMap<QString, QVariant> report_vars;
+//        report_vars.insert("repair_id", 24944);
+//        report_vars.insert("type", "new_rep");
+//        createTabPrint(report_vars);
     }
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 

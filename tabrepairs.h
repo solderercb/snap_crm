@@ -10,8 +10,11 @@
 #include <QLabel>
 #include <QSqlQueryModel>
 #include <QRegularExpressionValidator>
+#include <QFrame>
+#include <QWidgetAction>
 #include "tabcommon.h"
 #include "repairstablemodel.h"
+#include "models/repairtablefiltermenu.h"
 
 namespace Ui {
 class tabRepairs;
@@ -31,13 +34,25 @@ public:
 
 private:
     Ui::tabRepairs *ui;
+    QSqlQueryModel* officesModel;
+    QMap<QString, QVariant> *userData;
+    QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
     bool _type;
     void updateTableWidget();
     QTableView* tableView;
     QSqlQueryModel* repairs_table;
+    QString query_static;
+    QString query_where_static;
+    QString query_group_static;
+    QString query_order_static;
+    QStringList query;
+    QStringList query_where;
+    QStringList query_group;
+    QStringList query_order;
 
 private slots:
+    void filterMenuClosed();
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();

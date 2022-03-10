@@ -14,7 +14,7 @@
 #define QUERY_SEL_COMPANIES                 QString("SELECT  `name`,  `id`,  `type`,  `inn`,  `kpp`,  `ogrn`,  `ur_address`,  `site`,  `email`,  `logo`,  `banks`,  `is_default`,  `status`,  `director`,  `accountant`,  `tax_form`,  `description` FROM `companies` WHERE `id` = 1;")
 #define QUERY_SEL_OFFICES(id)               QString("SELECT  t1.`name`, CONCAT(t1.`name`, ' (', t2.`name`, ')') AS 'name_full',  t1.`id`,  t1.`state`,  `address`,  `phone`,  t1.`logo` AS 'off_logo',  t2.`logo` AS 'comp_logo',  `administrator`,  `created`,  `phone2`,  `default_company`,  `card_payment`,  `use_boxes`,  `paint_repairs`,  `warranty_sn` FROM `offices` AS t1 LEFT JOIN `companies` AS t2 ON t1.`default_company` = t2.`id` WHERE t1.`state` = 1 AND `default_company`  = %1;").arg((id))
 #define QUERY_SEL_WAREHOUSES(office)        QString("SELECT `name`, `id`, `type`, `description`, `sub_type`, `it_vis_pn`, `it_vis_notes`, `it_vis_description`, `it_vis_sn`, `it_vis_barcode`, `it_vis_photo`, `it_vis_warranty`, `it_vis_warranty_dealer`, `active`FROM `stores` WHERE `office` = %1;").arg((office))
-#define QUERY_SEL_USERS                     QString("SELECT `id`,  `username`,  `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` WHERE `status` = 1;")
+#define QUERY_SEL_USERS                     QString("SELECT `username`, `id`,  `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` WHERE `state` = 1;")
 #define QUERY_SEL_MANAGERS                  QString("SELECT `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (3, 6) GROUP BY t1.`id`;")
 #define QUERY_SEL_ENGINEERS                 QString("SELECT `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (2, 5) GROUP BY t1.`id`;")
 #define QUERY_SEL_ITEM_BOXES(warehouse)     QString("SELECT `name`, `id`, `places`, `color` FROM `boxes` WHERE `store_id` = 1 AND `non_items` = 0 ORDER BY `name`;").arg((warehouse))
@@ -81,7 +81,7 @@
                                                 FROM `clients` AS t1\
                                                 LEFT JOIN `tel` AS t2\
                                                 ON t1.`id` = t2.`customer`\
-                                                  AND t2.`type` = 1")
+                                                  AND t2.`type` = 1")   // Здесь не должно быть точки с запятой!
 
 #define QUERY_SEL_WORKSHOP_STATIC           QString("\
                                                 SELECT\
@@ -123,7 +123,9 @@
                                                 LEFT JOIN `device_models` AS t4\
                                                    ON t1.model = t4.`id`\
                                                 LEFT JOIN `clients` AS t5\
-                                                   ON t1.`client` = t5.`id`;")
+                                                   ON t1.`client` = t5.`id`")   // Здесь не должно быть точки с запятой!
+
+#define QUERY_SEL_REPAIR_DATA(id)           QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` WHERE workshop.`id` = %1;").arg((id))
 
 #define QUERY_SEL_LAST_INSERT_ID            QString("SELECT LAST_INSERT_ID();")
 #define QUERY_EXEC(obj,flag)                qDebug() << "nDBErr=" << (flag) << ". Executing query..."; if ((flag)) (flag) = (obj)->exec
