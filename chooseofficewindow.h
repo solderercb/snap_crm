@@ -21,10 +21,6 @@ public:
 private:
     Ui::chooseOfficeWindow *ui;
     windowsDispatcher *windowsDispatcherObj;    // для доступа к моделям данных пользователя, компаний, офисов
-    QSqlQueryModel* companiesModel;
-    QSqlQueryModel* officesModel;
-    QMap<QString, QVariant> *userData;
-    QMap<QString, bool> *permissions;
 
 private slots:
     void accept();

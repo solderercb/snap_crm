@@ -79,15 +79,6 @@ private:
     QVector<QWidget*> additionalFieldsWidgets;
     int client = 0;
     void phoneTypeChanged(int, int);
-    QMap<QString, QVariant> *userData;
-    QMap<QString, bool> *permissions;
-    QMap<QString, QVariant> *comSettings;
-    QSqlQueryModel* companiesModel;
-    QSqlQueryModel* officesModel;
-    QSqlQueryModel* managersModel;
-    QSqlQueryModel* engineersModel;
-    QSqlQueryModel* repairBoxesModel;
-    QSqlQueryModel* paymentSystemsModel;
     QMessageBox msgBox;
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;

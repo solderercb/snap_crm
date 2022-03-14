@@ -17,11 +17,7 @@ public:
     QString test = "QString test";
     QSqlQuery *queryUserData;
     QSqlQuery* queryPermissions;
-    QMap<QString, QVariant> *userData;
-    QMap<QString, QVariant> *userLocalData;
-    QMap<QString, bool> *permissions;
-    QSqlQueryModel* companiesModel;
-    QSqlQueryModel* officesModel;
+
 public slots:
     void connectOK();
     void createChooseOfficeWindow();

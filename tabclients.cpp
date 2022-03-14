@@ -1,3 +1,4 @@
+#include "global.h"
 #include "appver.h"
 #include "tabclients.h"
 #include "ui_tabclients.h"
@@ -13,9 +14,6 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
     _type = type;
-    userData            = parent->userData;
-    permissions         = parent->permissions;
-    comSettings         = parent->comSettings;
 
     ui->tableView->horizontalHeader()->setSectionsMovable(true);  // возможность двигать столбцы (ну шоб как АСЦ было :-) )
     ui->tableView->verticalHeader()->hide();

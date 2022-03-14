@@ -34,8 +34,6 @@ public:
 
 private:
     Ui::tabRepairs *ui;
-    QSqlQueryModel* officesModel;
-    QMap<QString, QVariant> *userData;
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
     bool _type;

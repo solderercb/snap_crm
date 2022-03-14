@@ -37,8 +37,6 @@ public:
     bool loadTemplateFromDB();
     bool initReportDataSources();
     bool loadTmpReportTemplate(QString);
-    QMap<QString, QVariant> *userData;
-    QMap<QString, QVariant> *comSettings;
     QMap<QString, QVariant> report_vars;
 
 private:

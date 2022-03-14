@@ -1,3 +1,4 @@
+#include "global.h"
 #include "appver.h"
 #include "chooseofficewindow.h"
 #include "ui_chooseofficewindow.h"
@@ -9,10 +10,6 @@ chooseOfficeWindow::chooseOfficeWindow(windowsDispatcher *parent) :
     ui->setupUi(this);
 
     windowsDispatcherObj = parent;
-    companiesModel       = parent->companiesModel;
-    officesModel         = parent->officesModel;
-    userData             = parent->userData;
-    permissions          = parent->permissions;
 
     ui->companiesComboBox->hide();
 //    ui->companiesComboBox->setModel(windowsDispatcherObj->companiesModel);

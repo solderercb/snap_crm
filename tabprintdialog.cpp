@@ -1,3 +1,4 @@
+#include "global.h"
 #include "tabprintdialog.h"
 #include "ui_tabprintdialog.h"
 #include "com_sql_queries.h"
@@ -9,8 +10,6 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
 {
     ui->setupUi(this);
     printer = new QPrinter(QPrinter::HighResolution);
-    userData = parent->userData;
-    comSettings = parent->comSettings;
     report = new LimeReport::ReportEngine();
     report_type = report_vars.value("type").toString();
     if (!loadTemplateFromFile())

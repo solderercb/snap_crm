@@ -1,3 +1,4 @@
+#include "global.h"
 #include "appver.h"
 #include "tabrepairnew.h"
 #include "ui_tabrepairnew.h"
@@ -55,15 +56,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
-    companiesModel      = parent->companiesModel;
-    officesModel        = parent->officesModel;
-    userData            = parent->userData;
-    permissions         = parent->permissions;
-    comSettings         = parent->comSettings;
-    managersModel       = parent->managersModel;
-    engineersModel      = parent->engineersModel;
-    repairBoxesModel    = parent->repairBoxesModel;
-    paymentSystemsModel = parent->paymentSystemsModel;
 #ifdef QT_DEBUG
     main_window_test_scheduler = parent->test_scheduler;
     main_window_test_scheduler2 = parent->test_scheduler2;

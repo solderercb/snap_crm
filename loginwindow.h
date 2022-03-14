@@ -13,7 +13,7 @@
 #include <QFile>
 #include <QStandardPaths>
 #include "windowsdispatcher.h"
-//#define NO_LOGIN
+#define NO_LOGIN
 #define ASC_SETTINGS_PATH   "VLab/ASC.exe_Url_1ttwwpflaim4gbzvmtfpiarttwuebugu"    // путь к файлу настроек АЦС для пути к приложению "C:\Program Files (x86)\ASCApp\ASC.exe"
 
 namespace Ui {
@@ -39,8 +39,6 @@ public:
 
 private:
 	Ui::LoginWindow *ui;
-    QMap<QString, QVariant> *userData;
-//    QMap<QString, QVariant> *userLocalData;
     QSqlDatabase connMain;
     QSqlDatabase connNtfy;
     QSqlDatabase connThird;

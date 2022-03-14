@@ -1,3 +1,4 @@
+#include "global.h"
 #include "appver.h"
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
@@ -12,9 +13,6 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 {
     qDebug() << "tabRepairs::tabRepairs(): parent =" << parent;
     ui->setupUi(this);
-
-    userData            = parent->userData;
-    officesModel        = parent->officesModel;
 
     filterSettings = new QMap<QString, int>;
     repairTableFilterMenu *widgetAction = new repairTableFilterMenu(this);
@@ -42,7 +40,6 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     query_order_static = "t1.`id` DESC";   // default ORDER part of query
     query_order << query_order_static;
 
-    // officesModel беру из MainWindow
     QSqlQueryModel *statusesModel = new QSqlQueryModel();
     statusesModel->setQuery("SELECT 1;", QSqlDatabase::database("connMain"));
     QSqlQueryModel *employeesModel = new QSqlQueryModel();

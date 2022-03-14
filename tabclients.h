@@ -49,9 +49,6 @@ private:
     QStandardItemModel* clientsTypesList;
     QList<QStandardItem*> clientTypeSelector[8];
     QSqlQueryModel* clientAdTypesList;
-    QMap<QString, QVariant> *userData;
-    QMap<QString, bool> *permissions;
-    QMap<QString, QVariant> *comSettings;
 
 private slots:
     void clientTypeChanged(QModelIndex);

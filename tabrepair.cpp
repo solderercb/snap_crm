@@ -1,3 +1,4 @@
+#include "global.h"
 #include "appver.h"
 #include "tabrepair.h"
 #include "ui_tabrepair.h"

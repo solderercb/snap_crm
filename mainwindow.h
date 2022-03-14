@@ -55,22 +55,7 @@ signals:
 public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();	// Деструктор
-    windowsDispatcher *windowsDispatcherObj;    // для доступа к моделям данных пользователя, компаний, офисов
-    QMap<QString, QVariant> *userData;
-    QMap<QString, bool> *permissions;
     QSqlQuery *queryCommonSettings;
-    QMap<QString, QVariant> *comSettings;
-    QSqlQueryModel* companiesModel;
-    QSqlQueryModel* officesModel;
-    QSqlQueryModel* warehousesModel;
-    QSqlQueryModel* usersModel;
-    QSqlQueryModel* managersModel;
-    QSqlQueryModel* engineersModel;
-    QSqlQueryModel* itemBoxesModel;
-    QSqlQueryModel* repairBoxesModel;
-    QSqlQueryModel* paymentSystemsModel;
-//    QSqlQueryModel* Model;
-//    QSqlQueryModel* Model;
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2;
     uint test_scheduler_counter = 0;

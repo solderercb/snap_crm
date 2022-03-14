@@ -1,4 +1,5 @@
-﻿#include "appver.h"
+﻿#include "global.h"
+#include "appver.h"
 #include "windowsdispatcher.h"
 #include "loginwindow.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
@@ -11,11 +12,6 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject(parent)
 {
     setObjectName("windowsDispatcherObj");
-    userData = new QMap<QString, QVariant>;
-    userLocalData = new QMap<QString, QVariant>;
-    permissions = new QMap<QString, bool>;
-    companiesModel  = new QSqlQueryModel();
-    officesModel    = new QSqlQueryModel();
 
     LoginWindow *windowLogin = new LoginWindow(this);
 
@@ -34,8 +30,6 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
 windowsDispatcher::~windowsDispatcher()
 {
     delete queryPermissions;
-    delete companiesModel;
-    delete officesModel;
 }
 
 void windowsDispatcher::connectOK()

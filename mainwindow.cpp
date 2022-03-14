@@ -1,3 +1,4 @@
+#include "global.h"
 #include "appver.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -43,11 +44,6 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
 	QTextCodec::setCodecForLocale(codec);
 
     ui->setupUi(this);
-    windowsDispatcherObj = parent;
-    companiesModel       = parent->companiesModel;
-    officesModel         = parent->officesModel;
-    userData             = parent->userData;
-    permissions          = parent->permissions;
 
     setWindowTitle("SNAP CRM ["+userData->value("current_office_name").toString()+"] ["+QSqlDatabase::database("connMain").userName()+"]");
     initGlobalModels();
@@ -375,13 +371,6 @@ void MainWindow::initGlobalModels()
     QString query;
 
     queryCommonSettings = new QSqlQuery(QSqlDatabase::database("connMain"));
-    warehousesModel   = new QSqlQueryModel();
-    usersModel        = new QSqlQueryModel();
-    managersModel     = new QSqlQueryModel();
-    engineersModel    = new QSqlQueryModel();
-    itemBoxesModel    = new QSqlQueryModel();
-    repairBoxesModel  = new QSqlQueryModel();
-    paymentSystemsModel = new QSqlQueryModel();
 
     queryCommonSettings->exec(QUERY_SEL_COMMON_SETTINGS);
     comSettings = new QMap<QString, QVariant>;
