@@ -1067,6 +1067,7 @@
   <tabstop>comboBoxDeviceMaker</tabstop>
   <tabstop>comboBoxDeviceModel</tabstop>
   <tabstop>lineEditSN</tabstop>
+  <tabstop>pushButtonClientFromDB</tabstop>
   <tabstop>lineEditClientLastName</tabstop>
   <tabstop>lineEditClientFirstName</tabstop>
   <tabstop>lineEditClientPatronymic</tabstop>
@@ -1077,8 +1078,19 @@
   <tabstop>lineEditClientEmail</tabstop>
   <tabstop>lineEditClientPhone2</tabstop>
   <tabstop>comboBoxClientPhone2Type</tabstop>
+  <tabstop>comboBoxProblem</tabstop>
+  <tabstop>comboBoxIncomingSet</tabstop>
+  <tabstop>comboBoxExterior</tabstop>
   <tabstop>lineEditExtNotes</tabstop>
   <tabstop>lineEditInsideComment</tabstop>
+  <tabstop>checkBoxIsEstPrice</tabstop>
+  <tabstop>lineEditEstPrice</tabstop>
+  <tabstop>checkBoxIsPrepay</tabstop>
+  <tabstop>comboBoxPrepayReason</tabstop>
+  <tabstop>lineEditPrepaySumm</tabstop>
+  <tabstop>comboBoxPrepayAccount</tabstop>
+  <tabstop>CentnerButton2_2</tabstop>
+  <tabstop>CentnerButton3_2</tabstop>
   <tabstop>checkBoxIsQuick</tabstop>
   <tabstop>checkBoxWasInOtherWorkshop</tabstop>
   <tabstop>checkBoxIsHighPriority</tabstop>
@@ -1086,27 +1098,23 @@
   <tabstop>checkBoxWasEarlier</tabstop>
   <tabstop>checkBoxIsWarranty</tabstop>
   <tabstop>lineEditPrevRepair</tabstop>
+  <tabstop>lineEditPrevRepairFromOldDB</tabstop>
   <tabstop>comboBoxPresetEngineer</tabstop>
   <tabstop>comboBoxPresetBox</tabstop>
-  <tabstop>spinBoxStickersCount</tabstop>
-  <tabstop>checkBoxIsEstPrice</tabstop>
-  <tabstop>lineEditEstPrice</tabstop>
-  <tabstop>checkBoxIsPrepay</tabstop>
-  <tabstop>lineEditPrepaySumm</tabstop>
-  <tabstop>comboBoxPrepayAccount</tabstop>
-  <tabstop>pushButtonCashReceipt</tabstop>
   <tabstop>comboBoxOffice</tabstop>
   <tabstop>comboBoxCompany</tabstop>
   <tabstop>comboBoxPresetPaymentAccount</tabstop>
   <tabstop>comboBoxDoc</tabstop>
   <tabstop>checkBoxIsCheckNeeded</tabstop>
   <tabstop>checkBoxIsCashReceiptDocNeeded</tabstop>
+  <tabstop>spinBoxStickersCount</tabstop>
+  <tabstop>tableViewDeviceMatch</tabstop>
   <tabstop>checkBoxClientType</tabstop>
-  <tabstop>pushButtonClientFromDB</tabstop>
   <tabstop>pushButtonClientCredsClearAll</tabstop>
-  <tabstop>CentnerButton3_2</tabstop>
-  <tabstop>CentnerButton2_2</tabstop>
+  <tabstop>pushButtonCreateTabClient</tabstop>
+  <tabstop>tableViewClientMatch</tabstop>
   <tabstop>CentnerButton1_2</tabstop>
+  <tabstop>pushButtonCashReceipt</tabstop>
  </tabstops>
  <resources/>
  <connections>

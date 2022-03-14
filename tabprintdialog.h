@@ -55,7 +55,6 @@ private:
 private slots:
     void some_func();
     void on_pushButtonPrint_clicked();
-    void on_comboBoxPrinters_currentIndexChanged(const QString &arg1);
     void on_comboBoxPrinters_currentTextChanged(const QString &arg1);
     void on_labelPrinterSettings_linkActivated(const QString &link);
     void pageSetupAccepted();

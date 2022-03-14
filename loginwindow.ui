@@ -181,6 +181,9 @@
      </item>
      <item row="7" column="1" colspan="2">
       <widget class="QComboBox" name="comboboxPreset">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -263,8 +266,26 @@
   <tabstop>graphicsLogo</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>editPassword</sender>
+   <signal>returnPressed()</signal>
+   <receiver>LoginWindow</receiver>
+   <slot>editPassword_onReturnPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>298</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>596</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <slots>
   <signal>showMainWindow()</signal>
+  <slot>editPassword_onReturnPressed()</slot>
  </slots>
 </ui>

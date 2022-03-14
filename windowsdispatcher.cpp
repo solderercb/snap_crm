@@ -1,5 +1,6 @@
 ﻿#include "appver.h"
 #include "windowsdispatcher.h"
+#include "loginwindow.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
 #include "chooseofficewindow.h"
 #ifdef QT_DEBUG
@@ -10,6 +11,24 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject(parent)
 {
     setObjectName("windowsDispatcherObj");
+    userData = new QMap<QString, QVariant>;
+    userLocalData = new QMap<QString, QVariant>;
+    permissions = new QMap<QString, bool>;
+    companiesModel  = new QSqlQueryModel();
+    officesModel    = new QSqlQueryModel();
+
+    LoginWindow *windowLogin = new LoginWindow(this);
+
+    QObject::connect(windowLogin,SIGNAL(DBConnectOK()),this,SLOT(connectOK()));
+    QObject::connect(windowLogin,SIGNAL(btnCancelClick()),this,SIGNAL(quit()));
+
+    windowLogin->show();
+#ifdef QT_DEBUG
+#ifdef NO_LOGIN     // NO_LOGIN объявляется в loginwindow.h
+    windowLogin->debugLogin();
+#endif
+#endif
+
 }
 
 windowsDispatcher::~windowsDispatcher()
@@ -23,11 +42,8 @@ void windowsDispatcher::connectOK()
 {
     queryUserData   = new QSqlQuery(QSqlDatabase::database("connMain"));
     queryPermissions= new QSqlQuery(QSqlDatabase::database("connMain"));
-    companiesModel  = new QSqlQueryModel();
-    officesModel    = new QSqlQueryModel();
 
     queryUserData->exec(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()));    // данные пользователя, которые потребуются ему в работе (кроме личных данных: телефон, фото, дата рождения, паспорт и т. п.)
-    userData = new QMap<QString, QVariant>;
     queryUserData->first();
 
     // Переписываем результаты запроса в специальный массив
@@ -40,7 +56,6 @@ void windowsDispatcher::connectOK()
     }
 
     queryPermissions->exec(QUERY_SEL_PERMISSIONS(queryUserData->value("roles").toString()));
-    permissions = new QMap<QString, bool>;
     while (queryPermissions->next())
     {
         permissions->insert(queryPermissions->value(0).toString(), 1);    // разрешённые пользователю действия хранятся в объекте QMap, не перечисленные действия не разрешены
@@ -53,25 +68,30 @@ void windowsDispatcher::connectOK()
     // TODO: добавить разрешение выбора компании при входе
     if (permissions->contains("59"))  // Менять офис при входе
     {
+
         createChooseOfficeWindow();
     }
     else
     {
+        userData->insert("current_office", officesModel->record(userData->value("office").toInt()-1).value("id").toInt());
+        userData->insert("current_office_name", officesModel->record(userData->value("office").toInt()-1).value("name").toString());
         createMainWindow();
     }
 }
 
 void windowsDispatcher::createChooseOfficeWindow()
 {
+#ifndef QT_DEBUG
+    chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
+    QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));
+    windowChooseOffice->show();
+#else
 #ifdef AUTO_CHOOSE_OFFICE
 #define AUTO_OFFICE_ID 0
     userData->insert("current_office", officesModel->record(AUTO_OFFICE_ID).value("id").toInt());
     userData->insert("current_office_name", officesModel->record(AUTO_OFFICE_ID).value("name").toString());
     createMainWindow();
-#else
-    chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
-    QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));
-    windowChooseOffice->show();
+#endif
 #endif
 }
 

@@ -13,8 +13,18 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
     comSettings = parent->comSettings;
     report = new LimeReport::ReportEngine();
     report_type = report_vars.value("type").toString();
-    loadTemplateFromFile();
-    initReportDataSources();
+    if (!loadTemplateFromFile())
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QString("Не удалось найти файл отчета"));
+        msgBox.exec();
+    }
+    if (!initReportDataSources())
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QString("Не удалось иницициализировать модели данных отчета"));
+        msgBox.exec();
+    }
 
     ui->comboBoxPrinters->addItems(QPrinterInfo::availablePrinterNames());
     if (userData->contains("defaultDocumentPrinter"))
@@ -22,6 +32,8 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
         qDebug() << "defaultDocumentPrinter: " << userData->value("defaultDocumentPrinter").toString();
         ui->comboBoxPrinters->setCurrentText(userData->value("defaultDocumentPrinter").toString());
     }
+    ui->gridLayoutTab->setColumnStretch(1, 1);
+    ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
 }
 
 tabPrintDialog::~tabPrintDialog()
@@ -63,22 +75,30 @@ bool tabPrintDialog::loadTmpReportTemplate(QString filename)
 bool tabPrintDialog::selectTemplateFile()
 {
     if (report_type == "new_rep")
-        CurrentFile.setFileName(QApplication::applicationDirPath() + "\\demo_reports\\priemka.lrxml");
+        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/priemka.lrxml");
     else if (report_type == "sticker1")
-        CurrentFile.setFileName(QApplication::applicationDirPath() + "\\demo_reports\\24x14.lrxml");
+        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/24x14.lrxml");
 //    else if (report_type == "")
-//            loadTemplateFromFile(QApplication::applicationDirPath() + "\\demo_reports\\priemka.lrxml");
+//            loadTemplateFromFile(QApplication::applicationDirPath() + "/demo_reports/priemka.lrxml");
 //    else if (report_type == "")
-//            loadTemplateFromFile(QApplication::applicationDirPath() + "\\demo_reports\\priemka.lrxml");
+//            loadTemplateFromFile(QApplication::applicationDirPath() + "/demo_reports/priemka.lrxml");
 //    else if (report_type == "")
-//            loadTemplateFromFile(QApplication::applicationDirPath() + "\\demo_reports\\priemka.lrxml");
+//            loadTemplateFromFile(QApplication::applicationDirPath() + "/demo_reports/priemka.lrxml");
+    else
+        return 0;
+
+    return 1;
 }
 
 bool tabPrintDialog::loadTemplateFromFile()
 {
-    selectTemplateFile();
+    if (!selectTemplateFile())
+        return 0;
     if(!report->loadFromFile(CurrentFile.fileName()))
-        qDebug() << "Can't open file";
+    {
+        return 0;
+    }
+    return 1;
 }
 
 bool tabPrintDialog::loadTemplateFromDB()
@@ -89,7 +109,7 @@ bool tabPrintDialog::loadTemplateFromDB()
 void tabPrintDialog::some_func()
 {
 
-    if (!report->loadFromFile(QApplication::applicationDirPath() + "\\demo_reports\\simple_list.lrxml"))
+    if (!report->loadFromFile(QApplication::applicationDirPath() + "/demo_reports/simple_list.lrxml"))
         qDebug() << "Can't open .lrxml";
 
 }
@@ -159,13 +179,15 @@ bool tabPrintDialog::initReportDataSources()
 //    else if (report_type == "")
 //    {
 //    }
+    else
+        return 0;
 
     previewWindow =  report->createPreviewWidget();
 
     // Вкладка предпросмотра  на подобие MS Office: слева в столбик параметры печати, а справа непосредсвтенно превью
     ui->gridLayoutTab->addWidget(previewWindow, 0, 1);
-    ui->gridLayoutTab->setColumnStretch(1, 1);
-    ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
+
+    return 1;
 }
 
 void tabPrintDialog::on_pushButtonPrint_clicked()
@@ -199,12 +221,6 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
     report->printReport(printer);   // TODO: разобраться, что возвращает данная функция
     if (report_type == "new_rep")
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL","Печать квитанции к ремонту №"+report_vars.value("repair_id").toString()));
-}
-
-
-void tabPrintDialog::on_comboBoxPrinters_currentIndexChanged(const QString &arg1)
-{
-    printer->setPrinterName(arg1);
 }
 
 

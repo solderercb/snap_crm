@@ -5,13 +5,12 @@
 #-------------------------------------------------
 
 QT	+= core gui
+QT      += widgets
 QT	+= sql
 QT      += core5compat
 QT      += printsupport
 QT      += xml
 QT      += qml
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = snap
 TEMPLATE = app
@@ -35,6 +34,7 @@ SOURCES += main.cpp\
     SSetComboBox/ssetcombobox.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
+    global.cpp \
     mainwindow.cpp \
     loginwindow.cpp \
     models/repairtablefiltermenu.cpp \
@@ -49,6 +49,7 @@ SOURCES += main.cpp\
     windowsdispatcher.cpp
 
 HEADERS  += \
+    global.h \
     models/repairtablefiltermenu.h \
     stable.h \
     mainwindow.h \
@@ -80,13 +81,20 @@ FORMS    += mainwindow.ui \
     tabrepairs.ui
 
 LIB_DIR = $$PWD/lib6
-
-CONFIG(release, debug|release): LIBS += -L$$LIB_DIR -llimereport -lKernel32
-else:CONFIG(debug, debug|release): LIBS += -L$$LIB_DIR -llimereportd -lKernel32
-
 INCLUDEPATH += $$LIB_DIR/include
 DEPENDPATH += $$LIB_DIR/include
+PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
+
+CONFIG(release, debug|release) {
+    BUILD_TYPE = release
+    LIBS += -L$$LIB_DIR -llimereport -lKernel32
+}else{
+    BUILD_TYPE = debug
+    LIBS += -L$$LIB_DIR -llimereportd -lKernel32
+}
 
 BIN_DIR ~= s,/,\\,g
 LIB_DIR ~= s,/,\\,g
+QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
 QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
+CONFIG(release, debug|release): QMAKE_POST_LINK += $$QMAKE_COPY \"$${PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)

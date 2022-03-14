@@ -9,13 +9,16 @@
 class windowsDispatcher : public QObject
 {
     Q_OBJECT
+signals:
+    void quit();
 public:
-    windowsDispatcher(QObject*);
+    windowsDispatcher(QObject* parent = nullptr);
     virtual ~windowsDispatcher();
     QString test = "QString test";
     QSqlQuery *queryUserData;
     QSqlQuery* queryPermissions;
     QMap<QString, QVariant> *userData;
+    QMap<QString, QVariant> *userLocalData;
     QMap<QString, bool> *permissions;
     QSqlQueryModel* companiesModel;
     QSqlQueryModel* officesModel;
