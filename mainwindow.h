@@ -103,7 +103,6 @@ private slots:
 	void on_treeView_activated(const QModelIndex &index);
 	void on_comboBoxSourceWarehouse_currentIndexChanged(int index);
 	void on_tableGoods_activated(const QModelIndex &index);
-	void on_tableConsignments_clicked(const QModelIndex &index);
 	void on_tableGoods_clicked(const QModelIndex &index);
 
     void createTabRepair(int);

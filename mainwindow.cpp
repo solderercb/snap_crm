@@ -238,8 +238,8 @@ void MainWindow::btnClick()
     }
 
     QSqlQuery* cat_tree = new QSqlQuery(QSqlDatabase::database("connMain"));
-    QStandardItem* parentItem;
-    QStandardItem* childItem;
+//    QStandardItem* parentItem;
+//    QStandardItem* childItem;
     QVector<uint32_t> store_cats_ids;
     QVector<QStandardItem*> store_cats;
     uint32_t parent = 0, i = 0, j = 0;
@@ -269,14 +269,14 @@ void MainWindow::btnClick()
     {
 //        if (store_cats[i])  // обработку производим только тех эл-тов массива, в которых содержится указатель на объект
 //        {
-            childItem = store_cats[i];
+//            childItem = store_cats[i];
             parent = store_cats[i]->data(Qt::UserRole+2).toInt();
             if(parent)  // если записан parent
             {
                 j = 0;
                 while (store_cats_ids[j] != parent)
                     j++;
-                parentItem = store_cats[j];
+//                parentItem = store_cats[j];
 //                qDebug() << store_cats[i]->text().toStdWString() << " and it's parent " << store_cats[j]->text().toStdWString();
                 store_cats[j]->appendRow(store_cats[i]);
             }
@@ -458,11 +458,6 @@ void MainWindow::on_tableGoods_activated(const QModelIndex &index)
 void MainWindow::on_tableGoods_clicked(const QModelIndex &index)
 {
 	readConsignments(index, ui->comboBoxSourceWarehouse->currentData(Qt::UserRole+1).toString());
-}
-
-void MainWindow::on_tableConsignments_clicked(const QModelIndex &index)
-{
-	;
 }
 
 void MainWindow::readConsignments(const QModelIndex &index, const QString &warehouse_code)

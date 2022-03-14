@@ -31,7 +31,7 @@ public:
     explicit tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv = {{"type","dummy"}});
     ~tabPrintDialog();
     virtual bool tabCloseRequest();
-    bool loadReportTemplate(QByteArray*, QMap<QString, QVariant>&);
+    bool loadReportTemplate(QByteArray*);
     bool selectTemplateFile();
     bool loadTemplateFromFile();
     bool loadTemplateFromDB();

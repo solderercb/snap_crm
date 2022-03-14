@@ -87,13 +87,13 @@ bool LoginWindow::genSettingsFilePath()
 //    qDebug() << "settingsPath(hash): " << settingsPath.path();
     if (selMostRecentSettingFile(settingsPath))     // если найдутся файлы настроек предыдущих версий приложения, то settingsPath будет обновлена,
         prevAppVerSettingsFile.setFileName(settingsPath.path() + "/user.config"); // а в переменную будет записан путь к файлу настроек
-    qDebug() << "prevAppVerSettingsFile: " << prevAppVerSettingsFile.fileName();
+//    qDebug() << "prevAppVerSettingsFile: " << prevAppVerSettingsFile.fileName();
     settingsPath.setPath(tmp + "/" + APP_VER);  // устанавливаем путь, соответствующий текущий текущей версии приложения
     if (!settingsPath.exists())                 // C:/Users/user/AppData/Local/snap/<MD5-hash>/<APP_VER>
         settingsPath.mkpath(settingsPath.path());
 
     settingsFile.setFileName(settingsPath.path() + "/user.config");
-    qDebug() << "settingsFile: " << settingsFile.fileName();
+//    qDebug() << "settingsFile: " << settingsFile.fileName();
     if(!settingsFile.exists())
         return 0;
     return 1;
@@ -105,7 +105,7 @@ bool LoginWindow::genAscSettingsFilePath()
 //    qDebug() << "settingsAscPath:" << settingsAscPath.path();
     if (selMostRecentSettingFile(settingsAscPath))     // если найдутся файлы настроек АСЦ, то settingsPath будет обновлена,
         settingsAscFile.setFileName(settingsAscPath.path() + "/user.config"); // а в переменную будет записан путь к файлу настроек
-    qDebug() << "settingsAscFile: " << settingsAscFile.fileName();
+//    qDebug() << "settingsAscFile: " << settingsAscFile.fileName();
     if (!settingsAscFile.exists())
         return 0;
     return 1;
@@ -118,7 +118,7 @@ bool LoginWindow::readSettings(QFile &file)
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        qDebug() << "Can't open settings file";
+//        qDebug() << "Can't open settings file";
         return 0;
     }
     if (!settingsDOM->setContent(&file)) {
@@ -130,7 +130,7 @@ bool LoginWindow::readSettings(QFile &file)
     // print out the element names of all elements that are direct children
     // of the outermost element.
     docElem = settingsDOM->documentElement();   // root
-    qDebug() << "root: " << docElem.tagName();
+//    qDebug() << "root: " << docElem.tagName();
 
     QDomNode n = docElem.firstChild();
     readSettingsNode(n);
@@ -183,7 +183,7 @@ bool LoginWindow::saveSettings()
     QMap<QString, QVariant>::const_iterator setting = userLocalData->constBegin();
     while (setting != userLocalData->constEnd())
     {
-        qDebug() << setting.key() << ":" << setting.value();
+//        qDebug() << setting.key() << ":" << setting.value();
         domElement = new QDomElement;
         *domElement = settingsDOM->createElement("setting");
         domElement->setAttribute("name", setting.key());
@@ -201,11 +201,11 @@ bool LoginWindow::saveSettings()
     }
 
     QString xml = settingsDOM->toString();
-    qDebug() << xml;
+//    qDebug() << xml;
 
     if (!settingsFile.open(QIODevice::ReadWrite))
     {
-        qDebug() << "Can't create settings file";
+//        qDebug() << "Can't create settings file";
         return 0;
     }
     settingsFile.resize(xml.size());
@@ -250,7 +250,7 @@ void LoginWindow::btnLoginHandler()
     // приложение, а любознательный пользователь, обнаруживший исходные коды проекта в Интернет, опять же не мог получить доступ непосредственно к базе
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(ui->editPassword->text().toUtf8(), ui->editPassword->text().length());
-    qDebug() << hash.result().toHex();
+//    qDebug() << hash.result().toHex();
 
     for (int i=0; i<connections.size(); i++)
     {
