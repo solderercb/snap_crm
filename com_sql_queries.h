@@ -54,7 +54,7 @@
                                                 ON\
                                                   (LENGTH(REPLACE(t1.`look_list`, ',', ''))-LENGTH(t1.`look_list`) <= enumerator.`number`+1));\
                                                 ").arg((device))
-#define QUERY_SEL_DEVICE_ADD_FIELDS(device) QString("SELECT `name`, `def_values`, `type`, `id`,  `required`,  `printable`  FROM `fields` WHERE `_f` = 0 AND FIND_IN_SET(%1,`devices`) AND `archive` = 0 ORDER BY `id`;").arg((device))
+#define QUERY_SEL_DEVICE_ADD_FIELDS(device) QString("SELECT `name`, REPLACE(`def_values`,'\r','') AS 'def_values', `type`, `id`,  `required`,  `printable`  FROM `fields` WHERE `_f` = 0 AND FIND_IN_SET(%1,`devices`) AND `archive` = 0 ORDER BY `id`;").arg((device))
 #define QUERY_SEL_DEVICE_MATCH(text)        QString("\
                                                 SELECT\
                                                   t1.`id`,\
@@ -128,18 +128,20 @@
 #define QUERY_SEL_REPAIR_DATA(id)           QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` WHERE workshop.`id` = %1;").arg((id))
 
 #define QUERY_SEL_LAST_INSERT_ID            QString("SELECT LAST_INSERT_ID();")
-#define QUERY_EXEC(obj,flag)                qDebug() << "nDBErr=" << (flag) << ". Executing query..."; if ((flag)) (flag) = (obj)->exec
+
+// ACHTUNG! ACHTUNG! если в выражениях ниже не закомментирован вызов функции qDebug(), а выражение используется в теле условного оператора БЕЗ ЗАКЛЮЧЕНИЯ в {}, то работа программы будет неправильной
+#define QUERY_EXEC(obj,flag)                /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Executing query...";*/ if ((flag)) (flag) = (obj)->exec
 
 // верификация записанных в БД данных; производится примитивно, путём сравнения записанных данных с данными, которые были переданы в запросе;
 // если данные совпадают, то сервер должен вернуть 55AA55AAh (1437226410d), иначе 00h; ХЗ, может такое контрольное значение избыточно, ну а вдруг;
 // далее, если контрольное число совпадает, flag устанавливаем в 1, иначе — 0.
-#define QUERY_EXEC_VRFY(obj,flag)           qDebug() << "nDBErr=" << (flag) << ". Checking integrity..."; if ((flag)){\
+#define QUERY_EXEC_VRFY(obj,flag)           /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Checking integrity...";*/ if ((flag)){\
                                                 (obj)->first();\
-                                                qDebug() << "Integrity magic number: " << (obj)->value(0).toInt();\
+                                                /*qDebug() << "Integrity magic number: " << (obj)->value(0).toInt();*/\
                                                 (flag) = ((obj)->value(0).toInt() == 21930)?1:0;}
 
 // QSqlQuery::lastInsertId() почему-то не работает, поэтому так:
-#define QUERY_LAST_INS_ID(obj,flag,id)      qDebug() << "nDBErr=" << (flag) << ". Executing SELECT LAST_INSERT_ID() query..."; if ((flag)){\
+#define QUERY_LAST_INS_ID(obj,flag,id)      /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Executing SELECT LAST_INSERT_ID() query...";*/ if ((flag)){\
                                                 (flag) = (obj)->exec("SELECT LAST_INSERT_ID();");\
                                                 if ((flag)){(obj)->first();\
                                                     (id) = (obj)->value(0).toInt();}}
@@ -159,7 +161,7 @@
 #define QUERY_INS_WORKSHOP                  QString("INSERT INTO `workshop` (\
                                                 `Hidden`, `Title`, `client`, `type`, `maker`, `model`, `serial_number`, `company`, `office`, `start_office`, `manager`, `current_manager`, `master`, `diagnostic_result`, `in_date`, `out_date`, `state`, `new_state`, `user_lock`, `lock_datetime`, `express_repair`, `quick_repair`, `is_warranty`, `is_repeat`, `payment_system`, `is_card_payment`, `can_format`, `print_check`, `box`, `warranty_label`, `ext_notes`, `is_prepaid`, `prepaid_type`, `prepaid_summ`, `prepaid_order`, `is_pre_agreed`, `is_debt`, `pre_agreed_amount`, `repair_cost`, `real_repair_cost`, `parts_cost`, `fault`, `complect`, `look`, `thirs_party_sc`, `last_save`, `last_status_changed`, `warranty_days`, `barcode`, `reject_reason`, `informed_status`, `image_ids`, `color`, `order_moving`, `early`, `ext_early`, `issued_msg`, `sms_inform`, `invoice`, `cartridge`, `vendor_id`, `termsControl`\
                                                 ) VALUES(\
-                                                0, '%1', %2, %3, %4, %5, '%6', %7, %8, %8, %9, %9, %10, '', NOW(), NULL, 1, 0, NULL, NULL, %11, %12, %13, %14, %15, %16, %17, %18, %19, NULL, '%20', %21, %22, %23, NULL, %24, 0, %25, 0, 0, 0, '%26', '%27', '%28', %29, NOW(), NULL, 0, '%30', '', 0, '', NULL, NULL, %31, %32, NULL, 1, NULL, NULL, NULL, 1\
+                                                0, '%1', %2, %3, %4, %5, '%6', %7, %8, %8, %9, %9, %10, '', NOW(), NULL, 0, 0, NULL, NULL, %11, %12, %13, %14, %15, %16, %17, %18, %19, NULL, '%20', %21, %22, %23, NULL, %24, 0, %25, 0, 0, 0, '%26', '%27', '%28', %29, NOW(), NULL, 0, '%30', '', 0, '', NULL, NULL, %31, %32, NULL, 1, NULL, NULL, NULL, 1\
                                                 );")
 #define QUERY_INS_REPAIR_COMMENT            QString("INSERT INTO `comments` (\
                                                 `text`, `created`, `user`, `remont`, `client`, `task_id`, `part_request`\
@@ -206,5 +208,10 @@
                                                 .arg(t)\
                                                 .arg(R)\
                                                 .arg(A)
+
+#define QUERY_INS_FIELDS(T, R, I, t)  QString("INSERT INTO `field_values` (`field_id`, `repair_id`, `item_id`, `value`) VALUES (%1, %2, %3, '%4');").arg(T)\
+                                                .arg(R)\
+                                                .arg(I)\
+                                                .arg(t)
 
 #endif // COM_SQL_QUERIES_H

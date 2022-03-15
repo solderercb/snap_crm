@@ -9,6 +9,8 @@
 
 tabRepairNew* tabRepairNew::p_instance = nullptr;
 
+enum addlField {LineEdit = 1, ComboBox, DateEdit, dummy};
+
 groupBoxEventFilter::groupBoxEventFilter(QObject *parent) :
     QObject(parent)
 {
@@ -177,7 +179,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
 
-    randomFill();
+    test_scheduler->start(200);
 #endif
 
     query->exec(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
@@ -347,12 +349,12 @@ void tabRepairNew::changeDeviceType()
     {
         additionalFieldType = additionalFieldsList->value(2).toInt();
         QWidget *additionalFieldWidget;
-        if (additionalFieldType == 1)
+        if (additionalFieldType == addlField::LineEdit)
         {
             QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
             additionalFieldWidget = additionalFieldLineEdit;
             additionalFieldLineEdit->setPlaceholderText(additionalFieldsList->value(0).toString());
-        } else if (additionalFieldType == 2)
+        } else if (additionalFieldType == addlField::ComboBox)
         {
             QComboBox *additionalFieldComboBox = new QComboBox(this);
             additionalFieldWidget = additionalFieldComboBox;
@@ -387,12 +389,12 @@ void tabRepairNew::changeDeviceType()
             additionalFieldComboBox->setCurrentIndex(-1);
             additionalFieldComboBox->setEditable(true);
             additionalFieldComboBox->lineEdit()->setPlaceholderText(additionalFieldsList->value(0).toString());
-        } else if (additionalFieldType == 3)
+        } else if (additionalFieldType == addlField::DateEdit)
         {
             QDateEdit *additionalFieldDateTimeEdit = new QDateEdit(QDate::currentDate());
             additionalFieldWidget = additionalFieldDateTimeEdit;
             additionalFieldDateTimeEdit->setCalendarPopup(true);
-        } else if (additionalFieldType == 4)
+        } else if (additionalFieldType == addlField::dummy)
         {
             // TODO: В АСЦ не реализовано, поэтому используем заглушку из лайнэдита
             QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
@@ -837,15 +839,16 @@ int tabRepairNew::createRepair()
     {
         if ( additionalFieldsWidgets[i]->property("fieldRequired").toBool() )
         {
-            if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QComboBox", Qt::CaseSensitive) == 0 )
+            // TODO: добавить в БД поле для задания маски ввода
+            if ( additionalFieldsWidgets[i]->property("fieldType").toInt() == addlField::ComboBox )
             {
-                if (static_cast<QComboBox*>(additionalFieldsWidgets[i])->currentIndex() < 0)
+                if (static_cast<QComboBox*>(additionalFieldsWidgets[i])->currentText() == "")
                 {
                     additionalFieldsWidgets[i]->setStyleSheet(commonComboBoxStyleSheetRed);
                     error = 16;
                 }
             }
-            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QLineEdit", Qt::CaseSensitive) == 0 )
+            else if ( additionalFieldsWidgets[i]->property("fieldType").toInt() == addlField::LineEdit )
             {
                 if (static_cast<QLineEdit*>(additionalFieldsWidgets[i])->text() == "")
                 {
@@ -854,7 +857,7 @@ int tabRepairNew::createRepair()
                 }
             }
             // Дату не окрашиваем, даже если она обязательна, т. к. не продуман механизм проверки
-//            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QDateEdit", Qt::CaseSensitive) == 0 )
+//            else if ( additionalFieldsWidgets[i]->property("fieldType").toInt() == addlField::DateEdit )
 //            {
 //                if (static_cast<QDateEdit>(additionalFieldsWidgets[i]).text() == "")
 //                {
@@ -862,6 +865,14 @@ int tabRepairNew::createRepair()
 //                    error = 16;
 //                }
 //            }
+            else if ( additionalFieldsWidgets[i]->property("fieldType").toInt() == addlField::dummy )
+            {
+                if (static_cast<QLineEdit*>(additionalFieldsWidgets[i])->text() == "")
+                {
+                    additionalFieldsWidgets[i]->setStyleSheet(commonLineEditStyleSheetRed);
+                    error = 16;
+                }
+            }
         }
     }
     if ( (isEstPrice = ui->checkBoxIsEstPrice->isChecked()) )   // если установлен флаг "Клиент ознакомлен с возможной стоимостью"
@@ -930,7 +941,7 @@ int tabRepairNew::createRepair()
     else
     {
         deviceModel = comboboxDeviceModelsModel->record(deviceModelIndex).value("id").toInt();
-        qDebug() << "model already exists";
+//        qDebug() << "model already exists";
     }
     if (client == 0)
     {
@@ -945,7 +956,7 @@ int tabRepairNew::createRepair()
                     .arg(genUserWebPass())
                     .arg(ui->lineEditClientAddress->text()));
         QUERY_LAST_INS_ID(query,nDBErr,client);
-        qDebug() << "Новый клиент: LAST_INSERT_ID() = " << client;
+//        qDebug() << "Новый клиент: LAST_INSERT_ID() = " << client;
 //        qDebug() << QUERY_INS_LOG("NULL",2,user,office,client,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт");
 
         // запись телефонных номеров в таблицу tel
@@ -958,7 +969,7 @@ int tabRepairNew::createRepair()
                 if(phone1.at(i).isDigit())
                     phone1c.append(phone1.at(i));
             }
-            qDebug() << "phone1c: " << phone1c;
+//            qDebug() << "phone1c: " << phone1c;
             QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone1,phone1c,clientPhoneTypesList->index(ui->comboBoxClientPhone1Type->currentIndex(), 1).data().toInt(),client,1,""));
         }
         if (ui->lineEditClientPhone2->hasAcceptableInput())
@@ -970,7 +981,7 @@ int tabRepairNew::createRepair()
                 if(phone2.at(i).isDigit())
                     phone2c.append(phone2.at(i));
             }
-            qDebug() << "phone2c: " << phone2c;
+//            qDebug() << "phone2c: " << phone2c;
             QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone2,phone2c,clientPhoneTypesList->index(ui->comboBoxClientPhone2Type->currentIndex(), 1).data().toInt(),client,0,""));
         }
 
@@ -1012,7 +1023,7 @@ int tabRepairNew::createRepair()
                 .arg(prevRepair)
                 .arg(prevRepairFromOldDB));
     QUERY_LAST_INS_ID(query,nDBErr,repair);
-    qDebug() << "Новый ремонт: LAST_INSERT_ID() = " << repair;
+//    qDebug() << "Новый ремонт: LAST_INSERT_ID() = " << repair;
 //    qDebug() << QUERY_INS_LOG("NULL",3,user,office,client,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair));
     QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,client,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair)));
     if (ui->lineEditInsideComment->text() != "" )
@@ -1060,6 +1071,7 @@ int tabRepairNew::createRepair()
 //            qDebug() << "Ошибка целостности данных!";
             msgBox.setText(QString("Ошибка целостности данных!"));
             msgBox.exec();
+            nDBErr = 0;
         }
 //        else
 //            qDebug() << "Верификация данных: ОК";
@@ -1067,6 +1079,34 @@ int tabRepairNew::createRepair()
         // TODO: Признак предмета расчета
         // В журнале делаю запись о предоплате, думаю это будет удобно; ASC CRM такую запись вроде бы не делает :-(
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL",QString("Внесена предоплата за ремонт №%2 в размере %3%4 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString())));
+    }
+
+    for(int i=0; i< additionalFieldsWidgets.size(); i++)   // запись значений доп. полей
+    {
+        QString text = "";
+        switch (additionalFieldsWidgets[i]->property("fieldType").toInt())  {
+            case addlField::ComboBox: {
+                QComboBox *qw = static_cast<QComboBox*>(additionalFieldsWidgets[i]);
+                text = qw->currentText();
+                break;}
+            case addlField::LineEdit: {
+                QLineEdit *qw = static_cast<QLineEdit*>(additionalFieldsWidgets[i]);
+                text = qw->text();
+                break;}
+            case addlField::DateEdit: {
+                QDateEdit *qw = static_cast<QDateEdit*>(additionalFieldsWidgets[i]);
+                text = qw->text();
+                break;}
+            case addlField::dummy: {
+                QLineEdit *qw = static_cast<QLineEdit*>(additionalFieldsWidgets[i]);
+                text = qw->text();
+                break;}
+        }
+        if (text.length() > 0)
+        {
+//            qDebug() << "additional field text:" << text << "; text.length() =" << text.length();
+            QUERY_EXEC(query,nDBErr)(QUERY_INS_FIELDS(additionalFieldsWidgets[i]->property("fieldId").toInt(), repair, "NULL", text));
+        }
     }
 
     if (nDBErr == 0)   // в случае ошибки выполнения запроса нужно всё откатить
@@ -1143,12 +1183,6 @@ void tabRepairNew::phoneTypeChanged(int type, int index)
 #ifdef QT_DEBUG
 void tabRepairNew::randomFill()
 {
-    test_scheduler->start(200);
-}
-
-void tabRepairNew::test_scheduler_handler()  //
-{
-
     int i;
     if (test_scheduler_counter == 0)
     {
@@ -1345,6 +1379,11 @@ void tabRepairNew::test_scheduler_handler()  //
     }
 //    qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 
+}
+
+void tabRepairNew::test_scheduler_handler()  //
+{
+    randomFill();
 }
 
 void tabRepairNew::test_scheduler2_handler()  // обработик таймера закрытия вкладки

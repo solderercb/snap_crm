@@ -26,10 +26,10 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
     }
 
     ui->comboBoxPrinters->addItems(QPrinterInfo::availablePrinterNames());
-    if (userData->contains("defaultDocumentPrinter"))
+    if (userData->contains("DocsPrinter"))
     {
-        qDebug() << "defaultDocumentPrinter: " << userData->value("defaultDocumentPrinter").toString();
-        ui->comboBoxPrinters->setCurrentText(userData->value("defaultDocumentPrinter").toString());
+        qDebug() << "DocsPrinter: " << userLocalData->value("DocsPrinter").toString();
+        ui->comboBoxPrinters->setCurrentText(userLocalData->value("DocsPrinter").toString());
     }
     ui->gridLayoutTab->setColumnStretch(1, 1);
     ui->gridLayoutTab->setColumnMinimumWidth(0, 200);

@@ -220,13 +220,11 @@ void LoginWindow::editPassword_onReturnPressed()
         btnLoginHandler();
 }
 
-#ifdef QT_DEBUG
-#ifdef NO_LOGIN
+#ifdef NO_LOGIN_
 void LoginWindow::debugLogin()
 {
     btnLoginHandler();
 }
-#endif
 #endif
 
 void LoginWindow::btnLoginHandler()
@@ -254,19 +252,22 @@ void LoginWindow::btnLoginHandler()
 
     for (int i=0; i<connections.size(); i++)
     {
-
-    connections[i]->setUserName(ui->editLogin->text());
-    connections[i]->setPassword(hash.result().toHex());
-    connections[i]->setHostName(ui->editIPaddr->text());
-    connections[i]->setPort(ui->editPort->text().toUInt());
-    connections[i]->setDatabaseName(ui->editDBName->text());
-#ifdef NO_LOGIN
+//#ifdef QT_DEBUG
+#ifdef NO_LOGIN_
     connections[i]->setUserName(SQL_USER);
     connections[i]->setPassword(SQL_PSWD);
     connections[i]->setHostName(SQL_HOST);
     connections[i]->setPort(SQL_PORT);
     connections[i]->setDatabaseName(SQL_DB);
+#else
+    connections[i]->setUserName(ui->editLogin->text());
+    connections[i]->setPassword(hash.result().toHex());
+    connections[i]->setHostName(ui->editIPaddr->text());
+    connections[i]->setPort(ui->editPort->text().toUInt());
+    connections[i]->setDatabaseName(ui->editDBName->text());
 #endif
+//#endif
+
 //		connections[i]->setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=5;MYSQL_OPT_READ_TIMEOUT=1");
     }
 

@@ -4,8 +4,11 @@
 #include "loginwindow.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
 #include "chooseofficewindow.h"
+//#define AUTO_CHOOSE_OFFICE
 #ifdef QT_DEBUG
-    #define AUTO_CHOOSE_OFFICE
+#ifdef AUTO_CHOOSE_OFFICE
+#define AUTO_CHOOSE_OFFICE_
+#endif
 #endif
 
 windowsDispatcher::windowsDispatcher(QObject *parent) :
@@ -19,10 +22,8 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject::connect(windowLogin,SIGNAL(btnCancelClick()),this,SIGNAL(quit()));
 
     windowLogin->show();
-#ifdef QT_DEBUG
-#ifdef NO_LOGIN     // NO_LOGIN объявляется в loginwindow.h
+#ifdef NO_LOGIN_     // NO_LOGIN объявляется в loginwindow.h
     windowLogin->debugLogin();
-#endif
 #endif
 
 }
@@ -75,17 +76,15 @@ void windowsDispatcher::connectOK()
 
 void windowsDispatcher::createChooseOfficeWindow()
 {
-#ifndef QT_DEBUG
-    chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
-    QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));
-    windowChooseOffice->show();
-#else
-#ifdef AUTO_CHOOSE_OFFICE
+#ifdef AUTO_CHOOSE_OFFICE_
 #define AUTO_OFFICE_ID 0
     userData->insert("current_office", officesModel->record(AUTO_OFFICE_ID).value("id").toInt());
     userData->insert("current_office_name", officesModel->record(AUTO_OFFICE_ID).value("name").toString());
     createMainWindow();
-#endif
+#else
+    chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
+    QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));
+    windowChooseOffice->show();
 #endif
 }
 

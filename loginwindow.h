@@ -14,6 +14,11 @@
 #include <QStandardPaths>
 #include "windowsdispatcher.h"
 #define NO_LOGIN
+#ifdef QT_DEBUG
+#ifdef NO_LOGIN
+#define NO_LOGIN_
+#endif
+#endif
 #define ASC_SETTINGS_PATH   "VLab/ASC.exe_Url_1ttwwpflaim4gbzvmtfpiarttwuebugu"    // путь к файлу настроек АЦС для пути к приложению "C:\Program Files (x86)\ASCApp\ASC.exe"
 
 namespace Ui {
@@ -31,10 +36,8 @@ signals:
 public:
     explicit LoginWindow(QObject *parent = nullptr);
 	~LoginWindow();
-#ifdef QT_DEBUG
-#ifdef NO_LOGIN
+#ifdef NO_LOGIN_
     void debugLogin();
-#endif
 #endif
 
 private:
