@@ -124,31 +124,31 @@ bool tabPrintDialog::initReportDataSources()
     if (report_type == "new_rep")
     {   // TODO: реализовать дэмо-данные, как для sticker1
         QSqlQueryModel *repairModel = new QSqlQueryModel();
-        repairModel->setQuery(QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` WHERE workshop.`id` = %1;").arg(report_vars.value("repair_id").toString()), QSqlDatabase::database("connMain"));
+        repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString());
         report->dataManager()->addModel("repair", repairModel, true);
         client_id = repairModel->record(0).value("client").toInt();
 
         QSqlQueryModel *customerModel = new QSqlQueryModel();
-        customerModel->setQuery(QString("SELECT t1.*, GROUP_CONCAT(t2.phone ORDER BY t2.`type` DESC SEPARATOR ',') AS 'phone', IF(t1.`type` = 1, t1.`ur_name`, CONCAT(t1.`surname`, ' ', t1.`name`, ' ', t1.`patronymic`)) AS 'FioOrUrName' FROM clients as t1 LEFT JOIN tel AS t2 ON t1.id = t2.customer WHERE t1.`id` = %1 GROUP BY t1.`id`;").arg(repairModel->record(0).value("client").toInt()), QSqlDatabase::database("connMain"));
+        customerModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt());
         report->dataManager()->addModel("customer", customerModel, true);
 
-        QSqlQueryModel *userModel = new QSqlQueryModel();
-        userModel->setQuery(QString("SELECT CONCAT(IF(users.`surname` IS NULL OR users.`surname` = '', '', CONCAT(users.`surname`, ' ')), IF(users.`name` IS NULL OR users.`name` = '', '', CONCAT(LEFT(users.`name`, 1), '. ')), IF(users.`patronymic` IS NULL OR users.`patronymic` = '', '', CONCAT(LEFT(users.`patronymic`, 1), '.'))) AS 'fio', users.* FROM users WHERE `id` = %1;").arg(userData->value("id").toInt()), QSqlDatabase::database("connMain"));
-        report->dataManager()->addModel("user", userModel, true);
-
-        QSqlQueryModel *companyModel = new QSqlQueryModel();
-        companyModel->setQuery(QString("SELECT * FROM companies WHERE `id` = %1;").arg(1), QSqlDatabase::database("connMain")); // TODO: несколько организаций
-        report->dataManager()->addModel("company", companyModel, true);
-
-        QSqlQueryModel *officeModel = new QSqlQueryModel();
-        officeModel->setQuery(QString("SELECT * FROM offices WHERE `id` = %1;").arg(userData->value("current_office").toString()), QSqlDatabase::database("connMain"));
-        report->dataManager()->addModel("office", officeModel, true);
-
-        QSqlQueryModel *configModel = new QSqlQueryModel();
-        configModel->setQuery(QString("SELECT * FROM config WHERE `id` = %1;").arg(1), QSqlDatabase::database("connMain")); // TODO: несколько организаций
+        // из всех параметров для отёта пригодится только валюта
+        // TODO: изменить банковское обозначение валюты на локализованное сокращение или символ
+        QStandardItemModel *configModel = new QStandardItemModel();
+        QStringList headers = {"currency"};
+        configModel->setHorizontalHeaderLabels(headers);
+        configModel->appendRow(new QStandardItem(comSettings->value("currency").toString()));
         report->dataManager()->addModel("config", configModel, true);
 
-//        itemsModel = new QSqlQueryModel();
+        QSqlQueryModel *fieldsModel = new QSqlQueryModel();
+        fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(report_vars.value("repair_id").toString());
+        report->dataManager()->addModel("additionalFields", fieldsModel, true);
+
+        report->dataManager()->addModel("user", userDataModel, true);
+        report->dataManager()->addModel("company", companiesModel, true);
+        report->dataManager()->addModel("office", officesModel, true);
+
+//        QSqlQueryModel *itemsModel = new QSqlQueryModel();
 //        itemsModel->setQuery("", QSqlDatabase::database("connMain"));
 //        report->dataManager()->addModel("", itemsModel, true);
 

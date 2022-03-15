@@ -15,7 +15,6 @@ public:
     windowsDispatcher(QObject* parent = nullptr);
     virtual ~windowsDispatcher();
     QString test = "QString test";
-    QSqlQuery *queryUserData;
     QSqlQuery* queryPermissions;
 
 public slots:

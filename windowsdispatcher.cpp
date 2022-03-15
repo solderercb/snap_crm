@@ -35,22 +35,19 @@ windowsDispatcher::~windowsDispatcher()
 
 void windowsDispatcher::connectOK()
 {
-    queryUserData   = new QSqlQuery(QSqlDatabase::database("connMain"));
-    queryPermissions= new QSqlQuery(QSqlDatabase::database("connMain"));
+    userDataModel->setQuery(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()), QSqlDatabase::database("connMain")); // использую QSqlQueryModel потому, что она ещу будет использоваться (например, в отчетах)
 
-    queryUserData->exec(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()));    // данные пользователя, которые потребуются ему в работе (кроме личных данных: телефон, фото, дата рождения, паспорт и т. п.)
-    queryUserData->first();
+    queryPermissions= new QSqlQuery(QSqlDatabase::database("connMain"));
 
     // Переписываем результаты запроса в специальный массив
     // это необходимо, т. к. данные пользователя могут быть дополнены (например, кодом текущего офиса, если у пользователя есть право выбора офиса при входе)
     // Кроме того, есть параметры, хранящиеся в AppData и эти настройки превалируют над настройками, сохранёнными в БД (например, ширины столбцов таблиц, которые могут иметь разные значения в случае если пользователь работает на разных ПК).
-    // TODO: чтение найла настроек в AppData
-    for (int i = 0; i < queryUserData->record().count(); i++)
+    for (int i = 0; i < userDataModel->record(0).count(); i++)
     {
-        userData->insert(queryUserData->record().fieldName(i), queryUserData->value(i));
+        userData->insert(userDataModel->record(0).fieldName(i), userDataModel->record(0).value(i));
     }
 
-    queryPermissions->exec(QUERY_SEL_PERMISSIONS(queryUserData->value("roles").toString()));
+    queryPermissions->exec(QUERY_SEL_PERMISSIONS(userData->value("roles").toString()));
     while (queryPermissions->next())
     {
         permissions->insert(queryPermissions->value(0).toString(), 1);    // разрешённые пользователю действия хранятся в объекте QMap, не перечисленные действия не разрешены

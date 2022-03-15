@@ -2,6 +2,7 @@
 #define GLOBAL_H
 
 extern QMap<QString, QVariant> *userData;
+extern QSqlQueryModel *userDataModel;
 extern QMap<QString, QVariant> *userLocalData;
 extern QMap<QString, bool> *permissions;
 extern QMap<QString, QVariant> *comSettings;
