@@ -28,23 +28,6 @@ tabClients::tabClients(bool type, MainWindow *parent) :
         ui->buttonClientNew->hide();
     }
 
-    clientsTypesList = new QStandardItemModel(this);
-    clientTypeSelector[0] << new QStandardItem("Все клиенты") << new QStandardItem("0") << new QStandardItem("t1.`state` = 1");
-    clientsTypesList->appendRow( clientTypeSelector[0] );
-    clientTypeSelector[1] << new QStandardItem("Организации") << new QStandardItem("1") << new QStandardItem("t1.`type` = 1 AND t1.`state` = 1");
-    clientsTypesList->appendRow( clientTypeSelector[1] );
-    clientTypeSelector[2] << new QStandardItem("Посредники") << new QStandardItem("2") << new QStandardItem("t1.`is_agent` = 1 AND t1.`state` = 1");
-    clientsTypesList->appendRow( clientTypeSelector[2] );
-    clientTypeSelector[3] << new QStandardItem("Поставщики") << new QStandardItem("3") << new QStandardItem("t1.`is_dealer` = 1 AND t1.`state` = 1");
-    clientsTypesList->appendRow( clientTypeSelector[3] );
-    clientTypeSelector[4] << new QStandardItem("Постоянные клиенты") << new QStandardItem("4") << new QStandardItem("t1.`is_regular` = 1 AND t1.`state` = 1");
-    clientsTypesList->appendRow( clientTypeSelector[4] );
-    clientTypeSelector[5] << new QStandardItem("Проблемные клиенты") << new QStandardItem("5") << new QStandardItem("t1.`is_bad` = 1 AND t1.`state` = 1");
-    clientsTypesList->appendRow( clientTypeSelector[5] );
-    clientTypeSelector[6] << new QStandardItem("Реализаторы") << new QStandardItem("6") << new QStandardItem("t1.`is_realizator` = 1 AND t1.`state` = 1");
-    clientsTypesList->appendRow( clientTypeSelector[6] );
-    clientTypeSelector[7] << new QStandardItem("Архивные") << new QStandardItem("7") << new QStandardItem("t1.`state` = 0");
-    clientsTypesList->appendRow( clientTypeSelector[7] );
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
     if (userData->value("prefer_regular").toBool())
@@ -52,9 +35,8 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     else
         ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
 
-    clientAdTypesList = new QSqlQueryModel(this);
-    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
+    ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->comboBoxClientAdType->setModelColumn(0);
 
     query_static = QUERY_SEL_CLIENTS_STATIC; // default query
@@ -105,13 +87,16 @@ void tabClients::updateTableWidget()
     if (query_where_static.length() > 0)    // если предустановлен дефолтный фильтр
         query_where << query_where_static;
     query_where << clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text();  // добавляем условие для выбранной категории клиентов
-    if (ui->comboBoxClientAdType->currentIndex() > 0 )
-//        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data().toString();
+    // TODO: создать свой ComboBox с кнопкой 🗙
+    if (ui->comboBoxClientAdType->currentIndex() >= 0 )
+    {
+        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString();
         query_where << QString("`visit_source` = %1").arg(clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString());
+    }
     if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
         query_where << QString("(LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1') OR t1.`id` = '%1' OR t2.`phone` REGEXP '%1' OR t2.`phone_clean` REGEXP '%1')").arg(ui->lineEditSearch->text());
 
-    query << query_static << (query_where.count()>0?"WHERE " + query_where.join(" AND "):"") << "GROUP BY" << query_group.join(", ") << "ORDER BY" << query_order.join(", ");
+    query << query_static << (query_where.count()>0?("WHERE " + query_where.join(" AND ")):"") << "GROUP BY" << query_group.join(", ") << "ORDER BY" << query_order.join(", ");
 //    qDebug() << query.join(' ');
     clientsTable->setQuery(query.join(' '), QSqlDatabase::database("connMain"));
     ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));

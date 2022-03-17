@@ -51,6 +51,11 @@ protected:
     QWidget * createWidget(QWidget *parent);
 private slots:
     void slotHidden();
+    void clearComboBoxOffice();
+    void clearComboBoxStatus();
+    void clearComboBoxEmployee();
+    void clearComboBoxClients();
+    void clearComboBoxX();
 };
 
 #endif // POPUPM_H

@@ -40,17 +40,12 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     query_order_static = "t1.`id` DESC";   // default ORDER part of query
     query_order << query_order_static;
 
-    QSqlQueryModel *statusesModel = new QSqlQueryModel();
-    statusesModel->setQuery("SELECT 1;", QSqlDatabase::database("connMain"));
-    QSqlQueryModel *employeesModel = new QSqlQueryModel();
-    employeesModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
-
     QSqlQueryModel *clientsModel = new QSqlQueryModel();
     clientsModel->setQuery("SELECT 1;", QSqlDatabase::database("connMain"));
     widgetAction->setComboBoxOfficeModel(officesModel);
     widgetAction->setComboBoxStatusModel(statusesModel);
-    widgetAction->setComboBoxEmployeeModel(employeesModel);
-    widgetAction->setComboBoxClientModel(clientsModel);
+    widgetAction->setComboBoxEmployeeModel(usersModel);
+    widgetAction->setComboBoxClientModel(clientsTypesList);
 //    widgetAction->setComboBoxXModel(repairModel);
     widgetAction->setFilter(filterSettings);
 

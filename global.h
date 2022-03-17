@@ -15,6 +15,10 @@ extern QSqlQueryModel *engineersModel;
 extern QSqlQueryModel *itemBoxesModel;
 extern QSqlQueryModel *repairBoxesModel;
 extern QSqlQueryModel *paymentSystemsModel;
+extern QStandardItemModel* clientsTypesList;
+extern QSqlQueryModel* clientAdTypesList;
+extern QStandardItemModel *statusesModel;
+
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;
 

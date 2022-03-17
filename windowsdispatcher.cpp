@@ -4,7 +4,7 @@
 #include "loginwindow.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
 #include "chooseofficewindow.h"
-//#define AUTO_CHOOSE_OFFICE
+#define AUTO_CHOOSE_OFFICE
 #ifdef QT_DEBUG
 #ifdef AUTO_CHOOSE_OFFICE
 #define AUTO_CHOOSE_OFFICE_

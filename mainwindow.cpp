@@ -136,7 +136,6 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     pushButton01->setText("pushButton01");
     ui->gridLayout_4->addWidget(pushButton01, 4, 4, 1, 1);
 
-
     // ТУТА нужно быть аккуратным! Если в конструкторе tabRepairs создаётся связь со слотом объекта MainWindow, то получим цикл.
     // лучше создавать вкладки по-умолчанию в main.cpp
 //    createTabRepairs(0);
@@ -412,8 +411,80 @@ void MainWindow::initGlobalModels()
 //    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
     paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
+    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
+
+    QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы", "Архивные"};
+    QVector<QString> clientTypesQueryFilterList = {"t1.`state` = 1", "t1.`type` = 1 AND t1.`state` = 1", "t1.`is_agent` = 1 AND t1.`state` = 1", "t1.`is_dealer` = 1 AND t1.`state` = 1", "t1.`is_regular` = 1 AND t1.`state` = 1", "t1.`is_bad` = 1 AND t1.`state` = 1", "t1.`is_realizator` = 1 AND t1.`state` = 1", "t1.`state` = 0"};
+    clientsTypesList = new QStandardItemModel();
+    for (int i=0; i<clientTypesList.size(); i++)
+    {
+        clientTypeSelector = new QList<QStandardItem*>();
+        *clientTypeSelector << new QStandardItem(clientTypesList.at(i)) << new QStandardItem(QString::number(i)) << new QStandardItem(clientTypesQueryFilterList.at(i));
+        clientsTypesList->appendRow(*clientTypeSelector);
+    }
+
+    QJsonDocument jsonDoc(QJsonDocument::fromJson(comSettings->value("statuses").toByteArray()));
+    if (jsonDoc.isArray())
+    {
+        QJsonArray jsonArray(jsonDoc.array());
+        readStatuses(*statusesModel, jsonArray);
+    }
+    else
+    {
+        QList<QStandardItem*> *el = new QList<QStandardItem*>({new QStandardItem("Model init failed")});
+        statusesModel->appendRow(*el);
+    }
 
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
+}
+
+bool MainWindow::readStatuses(QStandardItemModel &model, QJsonArray &jsonArray)
+{
+    QList<QStandardItem*> *list;
+
+    if (!jsonArray.empty())
+    {
+        QJsonArray::iterator i = jsonArray.begin();
+        do
+        {
+            QJsonObject jsonObj = i->toObject();
+            list = new QList<QStandardItem*>;
+            *list << new QStandardItem(jsonObj["Name"].toString())\
+                  << new QStandardItem(QString::number(jsonObj["Id"].toInt()))\
+                  << new QStandardItem(jsonObj["Color"].toString())\
+                  << new QStandardItem(jsonObj["Terms"].toString())\
+                  << new QStandardItem(jsonArrayJoin(jsonObj["Contains"],"|"))\
+                  << new QStandardItem(jsonArrayJoin(jsonObj["Actions"],"|"))\
+                  << new QStandardItem(jsonArrayJoin(jsonObj["Roles"],"|"));
+            model.appendRow(*list);
+            i++;
+        }
+        while ( i != jsonArray.end());
+    }
+    return 1;
+}
+
+QString MainWindow::jsonArrayJoin(QJsonValue value, const QString)
+{
+    if(value.isArray())
+    {
+        QString out = "";
+        QVariantList array = value.toArray().toVariantList();
+        if (!array.empty())
+        {
+            QVariantList::iterator i = array.begin();
+            do
+            {
+                if (out != "")
+                    out += "|";
+                out += i->toString();
+                i++;
+            }
+            while ( i != array.end());
+        }
+        return out;
+    }
+    return "not an array";
 }
 
 // При смене склада обновляем таблицу
@@ -594,12 +665,13 @@ void MainWindow::closeTab(int index)
 void MainWindow::test_scheduler_handler()  // обработик таймера открытия вкладки
 {
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
-//    createTabClients(0);
+    createTabClients(0);
+//    createTabRepairs();
     if (test_scheduler_counter < 375)
     {
 //        createTabRepairNew();
 //        QMap<QString, QVariant> report_vars;
-//        report_vars.insert("repair_id", 24944);
+//        report_vars.insert("repair_id", 24996);
 //        report_vars.insert("type", "new_rep");
 //        createTabPrint(report_vars);
     }

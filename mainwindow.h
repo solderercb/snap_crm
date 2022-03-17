@@ -25,6 +25,10 @@
 #include <QTimer>
 #include <QCompleter>
 #include <QFontMetrics>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
 #include "windowsdispatcher.h"
 
 namespace Ui {
@@ -65,7 +69,8 @@ private:
     explicit MainWindow(windowsDispatcher *parent = nullptr);
     Ui::MainWindow *ui;
     static MainWindow* p_instance;
-	void readGoods(const QModelIndex &index, const QString &warehouse_code);
+    QList<QStandardItem*> *clientTypeSelector;
+    void readGoods(const QModelIndex &index, const QString &warehouse_code);
 	void readConsignments(const QModelIndex &index, const QString &warehouse_code);
 	void get_warehouses_list();
 	QStandardItemModel *comboboxSourceModel;
@@ -77,6 +82,8 @@ private:
 	QStandardItemModel *tableConsignmentsModel; // Модель таблицы, отображающей партии товара
 	QStringList tableConsignmentsHeaders;
     void initGlobalModels();    // общие модели данных: организации, офисы, склады, сотрудники (все, менеджеры, инженеры) и др.
+    bool readStatuses(QStandardItemModel &, QJsonArray &);
+    QString jsonArrayJoin(QJsonValue, const QString);
 
 public slots:
     void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.

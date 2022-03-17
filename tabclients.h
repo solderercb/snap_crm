@@ -46,9 +46,6 @@ private:
     QStringList query_where;
     QStringList query_group;
     QStringList query_order;
-    QStandardItemModel* clientsTypesList;
-    QList<QStandardItem*> clientTypeSelector[8];
-    QSqlQueryModel* clientAdTypesList;
 
 private slots:
     void clientTypeChanged(QModelIndex);

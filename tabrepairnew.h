@@ -69,7 +69,6 @@ private:
     QSqlQueryModel* clientModel;
     QSqlQueryModel* queryDevice;
     QSqlQueryModel* clientPhonesModel;
-    QSqlQueryModel* clientAdTypesList;
     QStandardItemModel* clientPhoneTypesList;
     QList<QStandardItem*> clientPhoneTypesSelector[2];
     QStandardItemModel* prepayReasonsModel;

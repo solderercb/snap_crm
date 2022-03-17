@@ -75,6 +75,11 @@ QWidget * repairTableFilterMenu::createWidget(QWidget *parent)
     }
 
     connect(widget, SIGNAL(hidden()), this, SLOT(slotHidden()));
+    QObject::connect(widget->ui->toolButton, SIGNAL(clicked()), this, SLOT(clearComboBoxOffice()));
+    QObject::connect(widget->ui->toolButton_2, SIGNAL(clicked()), this, SLOT(clearComboBoxStatus()));
+    QObject::connect(widget->ui->toolButton_3, SIGNAL(clicked()), this, SLOT(clearComboBoxEmployee()));
+    QObject::connect(widget->ui->toolButton_4, SIGNAL(clicked()), this, SLOT(clearComboBoxClients()));
+    QObject::connect(widget->ui->toolButton_5, SIGNAL(clicked()), this, SLOT(clearComboBoxX()));
     return widget;
 
 }
@@ -95,4 +100,29 @@ void repairTableFilterMenu::slotHidden()
         }
         emit hidden();
     }
+}
+
+void repairTableFilterMenu::clearComboBoxOffice()
+{
+    widget->ui->comboBoxOffice->setCurrentIndex(-1);
+}
+
+void repairTableFilterMenu::clearComboBoxStatus()
+{
+    widget->ui->comboBoxStatus->setCurrentIndex(-1);
+}
+
+void repairTableFilterMenu::clearComboBoxEmployee()
+{
+    widget->ui->comboBoxEmployee->setCurrentIndex(-1);
+}
+
+void repairTableFilterMenu::clearComboBoxClients()
+{
+    widget->ui->comboBoxClients->setCurrentIndex(-1);
+}
+
+void repairTableFilterMenu::clearComboBoxX()
+{
+    widget->ui->comboBoxX->setCurrentIndex(-1);
 }

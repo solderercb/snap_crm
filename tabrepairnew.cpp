@@ -130,8 +130,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     comboBoxExteriorModel = new QSqlQueryModel();
     ui->comboBoxExterior->setModel(comboBoxExteriorModel);
 
-    clientAdTypesList = new QSqlQueryModel(this);
-    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setModelColumn(0);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
@@ -179,7 +177,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
 
-    test_scheduler->start(200);
+//    test_scheduler->start(200);
 #endif
 
     query->exec(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
@@ -204,7 +202,6 @@ tabRepairNew::~tabRepairNew()
     delete comboBoxExteriorModel;
     delete clientsMatchTable;
     delete devicesMatchTable;
-    delete clientAdTypesList;
     for(int i=clientPhoneTypesList->rowCount()-1;i>=0;i--)   // типы телефонов; фиг знает, может быть и достаточно удалить clientPhoneTypesList
         for (int j=clientPhoneTypesSelector[i].size()-1; j>=0; j--)     // каждый QStandartItem
             delete clientPhoneTypesSelector[i].value(j);

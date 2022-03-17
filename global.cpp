@@ -13,4 +13,9 @@ QSqlQueryModel *engineersModel = new QSqlQueryModel;
 QSqlQueryModel *itemBoxesModel = new QSqlQueryModel;
 QSqlQueryModel *repairBoxesModel = new QSqlQueryModel;
 QSqlQueryModel *paymentSystemsModel = new QSqlQueryModel;
+QStandardItemModel* clientsTypesList = new QStandardItemModel;
+QSqlQueryModel* clientAdTypesList = new QSqlQueryModel;
+QStandardItemModel *statusesModel = new QStandardItemModel();
+
+
 

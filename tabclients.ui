@@ -147,7 +147,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,1,0" columnstretch="0,0,0,1,0" columnminimumwidth="0,250,0,0,0">
+      <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,1,0" columnstretch="0,0,0,1" columnminimumwidth="0,250,0,0">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
@@ -225,6 +225,9 @@
          <layout class="QGridLayout" name="gridLayout_7">
           <item row="0" column="0">
            <widget class="QComboBox" name="comboBoxClientAdType">
+            <property name="insertPolicy">
+             <enum>QComboBox::NoInsert</enum>
+            </property>
             <property name="placeholderText">
              <string>Источник обращения</string>
             </property>

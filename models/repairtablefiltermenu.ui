@@ -14,13 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
-    <widget class="QComboBox" name="comboBoxEmployee">
-     <property name="placeholderText">
-      <string>все сотрудники</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
     <widget class="QCheckBox" name="checkBoxOnlyMyOrders">
      <property name="text">
@@ -28,17 +21,17 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QComboBox" name="comboBoxOffice">
-     <property name="placeholderText">
-      <string>офис</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0">
     <widget class="QComboBox" name="comboBoxStatus">
      <property name="placeholderText">
       <string>все статусы</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QComboBox" name="comboBoxEmployee">
+     <property name="placeholderText">
+      <string>все сотрудники</string>
      </property>
     </widget>
    </item>
@@ -59,8 +52,105 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QComboBox" name="comboBoxOffice">
+     <property name="placeholderText">
+      <string>офис</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QToolButton" name="toolButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string notr="true">🗙</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextOnly</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QToolButton" name="toolButton_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string notr="true">🗙</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextOnly</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QToolButton" name="toolButton_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string notr="true">🗙</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextOnly</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QToolButton" name="toolButton_4">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string notr="true">🗙</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextOnly</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QToolButton" name="toolButton_5">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string notr="true">🗙</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextOnly</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
+ <slots>
+  <slot>clearComboBoxOffice()</slot>
+  <slot>clearComboBoxStatus()</slot>
+  <slot>clearComboBoxEmployee()</slot>
+  <slot>clearComboBoxClients()</slot>
+  <slot>clearComboBoxX()</slot>
+ </slots>
 </ui>

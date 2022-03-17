@@ -123,6 +123,9 @@ bool tabPrintDialog::initReportDataSources()
 
     if (report_type == "new_rep")
     {   // TODO: реализовать дэмо-данные, как для sticker1
+        // TODO: подумать над вариантом модели данных ремонта в виде списка полей со столбцами "название поля", "значение";
+        // в этом случае шаблон отчета будет построен полностью на dataBand, а строки dataBand'а могут автоматичеки увеличиваться по высоте и,
+        // в случае большого кол-ва данных, не придётся уменьшать размерт шрифта
         QSqlQueryModel *repairModel = new QSqlQueryModel();
         repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString());
         report->dataManager()->addModel("repair", repairModel, true);
