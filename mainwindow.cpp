@@ -680,8 +680,9 @@ void MainWindow::closeTab(int index)
 void MainWindow::test_scheduler_handler()  // обработик таймера открытия вкладки
 {
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
-    createTabClients(0);
+//    createTabClients(0);
 //    createTabRepairs();
+    createTabRepair(25023);
     if (test_scheduler_counter < 375)
     {
 //        createTabRepairNew();
