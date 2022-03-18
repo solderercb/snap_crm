@@ -53,6 +53,16 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
 
     this->resize(1440,800);
 
+    QString toolButtonStyle = "QToolButton {\
+                                   border: 0px;\
+                                   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
+                                                                     stop: 0 #f6f7fa, stop: 1 #dadbde);\
+                               }\
+                               \
+                               QToolButton::menu-button {\
+                                   width: 32px;\
+                               }";
+    ui->toolBar->setStyleSheet("QToolBar::separator {width: 10px; border: none;}");
     /* Кнопка Ремонты и меню */
     QMenu *workshop_menu = new QMenu();
     QAction *workshop_new = new QAction("Принять", this);
@@ -70,8 +80,10 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     workshop_button->setMenu(workshop_menu);
     workshop_button->setPopupMode(QToolButton::MenuButtonPopup);
     workshop_button->setText("Ремонты");
-    workshop_button->setFixedSize(96,48);
+    workshop_button->setFixedSize(128,48);
+    workshop_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(workshop_button);
+    ui->toolBar->addSeparator();
     QObject::connect(workshop_button, SIGNAL(clicked()), this, SLOT(createTabRepairs()));
 
     /* Кнопка Товары и меню */
@@ -98,8 +110,10 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     goods_button->setMenu(goods_menu);
     goods_button->setPopupMode(QToolButton::MenuButtonPopup);
     goods_button->setText("Товары");
-    goods_button->setFixedSize(96,48);
+    goods_button->setFixedSize(128,48);
+    goods_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(goods_button);
+    ui->toolBar->addSeparator();
 
     /* Кнопка Клиенты и меню */
     QMenu *clients_menu = new QMenu();
@@ -115,7 +129,8 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     clients_button->setMenu(clients_menu);
     clients_button->setPopupMode(QToolButton::MenuButtonPopup);
     clients_button->setText("Клиенты");
-    clients_button->setFixedSize(96,48);
+    clients_button->setFixedSize(128,48);
+    clients_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(clients_button);
     QObject::connect(clients_button, SIGNAL(clicked()), this, SLOT(createTabClients()));
 
