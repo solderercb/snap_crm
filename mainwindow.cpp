@@ -39,7 +39,6 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     QMainWindow(nullptr),
 	ui(new Ui::MainWindow)
 {
-    qDebug() << "MainWindow::MainWindow(): this =" << this;
     QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QTextCodec::setCodecForLocale(codec);
 
@@ -420,6 +419,11 @@ void MainWindow::initGlobalModels()
         }
 
     warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
+    for(int i = 0; i < allUsersModel->rowCount(); i++)
+    {
+        allUsersMap->insert(allUsersModel->record(i).value("id").toInt(), allUsersModel->record(i).value("username").toString());
+    }
     usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
     managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database("connMain"));
     engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
@@ -448,6 +452,15 @@ void MainWindow::initGlobalModels()
     {
         QList<QStandardItem*> *el = new QList<QStandardItem*>({new QStandardItem("Model init failed")});
         statusesModel->appendRow(*el);
+    }
+
+    QVector<QString> notifyStatusesList = {"---", "Клиент оповещён", "Клиент не отвечает", "Клиент не доступен", "Не оповещён прочее"};
+    notifyStatusesModel = new QStandardItemModel();
+    for (int i=0; i<notifyStatusesList.size(); i++)
+    {
+        notifyStatusSelector = new QList<QStandardItem*>();
+        *notifyStatusSelector << new QStandardItem(notifyStatusesList.at(i)) << new QStandardItem(QString::number(i));
+        notifyStatusesModel->appendRow(*notifyStatusSelector);
     }
 
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
@@ -596,8 +609,9 @@ void MainWindow::createTabRepairs(int type)
 
 void MainWindow::createTabRepair(int repair_id)
 {
-    tabRepair *subwindow = tabRepair::getInstance(this);
-    ui->tabWidget->addTab(subwindow, "Ремонт " + QString::number(repair_id));
+    tabRepair *subwindow = tabRepair::getInstance(repair_id, this);
+    if(ui->tabWidget->indexOf(subwindow) == -1)
+        ui->tabWidget->addTab(subwindow, "Ремонт " + QString::number(repair_id));
     ui->tabWidget->setCurrentWidget(subwindow);
 }
 
@@ -682,12 +696,21 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 //    createTabClients(0);
 //    createTabRepairs();
-    createTabRepair(25023);
+//    QSqlQuery rand_rep_id = QSqlQuery(QSqlDatabase::database("connMain"));
+//    rand_rep_id.exec("SELECT ROUND(RAND()*25000, 0) INTO @id;");
+//    rand_rep_id.exec("SELECT `id` FROM `workshop` WHERE `id` >= @id AND `hidden` = 0 LIMIT 1;");
+//    qDebug() << rand_rep_id.lastError().databaseText();
+//    if (rand_rep_id.next())
+//    {
+//        qDebug() << rand_rep_id.value(0);
+//        createTabRepair(rand_rep_id.value(0).toInt());
+//    }
+    createTabRepair(19932);
     if (test_scheduler_counter < 375)
     {
 //        createTabRepairNew();
 //        QMap<QString, QVariant> report_vars;
-//        report_vars.insert("repair_id", 24996);
+//        report_vars.insert("repair_id", 25022);
 //        report_vars.insert("type", "new_rep");
 //        createTabPrint(report_vars);
     }

@@ -7,6 +7,8 @@ QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
 QSqlQueryModel *companiesModel = new QSqlQueryModel;
 QSqlQueryModel *officesModel = new QSqlQueryModel;
 QSqlQueryModel *warehousesModel = new QSqlQueryModel;
+QSqlQueryModel *allUsersModel = new QSqlQueryModel;
+QMap<int, QString> *allUsersMap = new QMap<int, QString>;
 QSqlQueryModel *usersModel = new QSqlQueryModel;
 QSqlQueryModel *managersModel = new QSqlQueryModel;
 QSqlQueryModel *engineersModel = new QSqlQueryModel;
@@ -16,6 +18,7 @@ QSqlQueryModel *paymentSystemsModel = new QSqlQueryModel;
 QStandardItemModel* clientsTypesList = new QStandardItemModel;
 QSqlQueryModel* clientAdTypesList = new QSqlQueryModel;
 QStandardItemModel *statusesModel = new QStandardItemModel();
+QStandardItemModel *notifyStatusesModel = new QStandardItemModel();
 
 
 

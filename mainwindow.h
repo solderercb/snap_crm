@@ -29,6 +29,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QRandomGenerator>
 #include "windowsdispatcher.h"
 
 namespace Ui {
@@ -70,6 +71,7 @@ private:
     Ui::MainWindow *ui;
     static MainWindow* p_instance;
     QList<QStandardItem*> *clientTypeSelector;
+    QList<QStandardItem*> *notifyStatusSelector;
     void readGoods(const QModelIndex &index, const QString &warehouse_code);
 	void readConsignments(const QModelIndex &index, const QString &warehouse_code);
 	void get_warehouses_list();

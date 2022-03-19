@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1024</width>
-    <height>768</height>
+    <height>778</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,17 +15,17 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0" rowminimumheight="0,15">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item row="0" column="0">
-      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,1">
+      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,1,8" columnminimumwidth="0,150,0">
        <property name="sizeConstraint">
         <enum>QLayout::SetMaximumSize</enum>
        </property>
        <item row="7" column="1">
-        <widget class="QLineEdit" name="lineEdit_8">
+        <widget class="QLineEdit" name="lineEditManager">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -35,7 +35,7 @@
         </widget>
        </item>
        <item row="8" column="1">
-        <widget class="QLineEdit" name="lineEdit_10">
+        <widget class="QLineEdit" name="lineEditEngineer">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -45,7 +45,7 @@
         </widget>
        </item>
        <item row="9" column="1">
-        <widget class="QLineEdit" name="lineEdit_9">
+        <widget class="QLineEdit" name="lineEditPreagreedAmount">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -55,21 +55,21 @@
         </widget>
        </item>
        <item row="16" column="0" colspan="2">
-        <widget class="QPushButton" name="pushButton_4">
+        <widget class="QPushButton" name="pushButtonCreatePrepayOrder">
          <property name="text">
           <string>Предоплата</string>
          </property>
         </widget>
        </item>
        <item row="13" column="0" colspan="2">
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="pushButtonCreateTask">
          <property name="text">
           <string>Новое задание</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLineEdit" name="lineEdit_2">
+        <widget class="QLineEdit" name="lineEditSN">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -79,7 +79,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="labelDevice">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -92,7 +92,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="lineEditRepairId">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -102,7 +102,7 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QLineEdit" name="lineEdit_6">
+        <widget class="QLineEdit" name="lineEditOutDate">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -112,7 +112,7 @@
         </widget>
        </item>
        <item row="6" column="0">
-        <widget class="QLabel" name="label_7">
+        <widget class="QLabel" name="labelOffice">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -125,7 +125,7 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="lineEdit_4">
+        <widget class="QLineEdit" name="lineEditClient">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -135,7 +135,7 @@
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="label_6">
+        <widget class="QLabel" name="labelOutDate">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -148,7 +148,7 @@
         </widget>
        </item>
        <item row="8" column="0">
-        <widget class="QLabel" name="label_10">
+        <widget class="QLabel" name="labelEngineer">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -161,7 +161,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="labelSN">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -174,7 +174,7 @@
         </widget>
        </item>
        <item row="7" column="0">
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="labelManager">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -187,7 +187,7 @@
         </widget>
        </item>
        <item row="10" column="1">
-        <widget class="QLineEdit" name="lineEdit_12">
+        <widget class="QLineEdit" name="lineEditBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -200,7 +200,7 @@
         </widget>
        </item>
        <item row="10" column="0">
-        <widget class="QLineEdit" name="lineEdit_11">
+        <widget class="QLineEdit" name="lineEditColor">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -213,7 +213,7 @@
         </widget>
        </item>
        <item row="9" column="0">
-        <widget class="QLabel" name="label_9">
+        <widget class="QLabel" name="labelPreagreedAmount">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -226,7 +226,7 @@
         </widget>
        </item>
        <item row="15" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox_6">
+        <widget class="QGroupBox" name="groupBoxChangeNotifyStatus">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -238,7 +238,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_15">
           <item row="0" column="0">
-           <widget class="QComboBox" name="comboBox_2">
+           <widget class="QComboBox" name="comboBoxNotifyStatus">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -251,14 +251,14 @@
         </widget>
        </item>
        <item row="12" column="0" colspan="2">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="pushButtonSetOutMessage">
          <property name="text">
           <string>Сообщение при выдаче</string>
          </property>
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="labelInDate">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -271,7 +271,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="labelClient">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -284,7 +284,7 @@
         </widget>
        </item>
        <item row="11" column="0" colspan="2">
-        <widget class="QLineEdit" name="lineEdit_13">
+        <widget class="QLineEdit" name="lineEditWarrantyLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -297,7 +297,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_3">
+        <widget class="QLineEdit" name="lineEditDevice">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -307,7 +307,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="labelRepairId">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -320,7 +320,7 @@
         </widget>
        </item>
        <item row="6" column="1">
-        <widget class="QLineEdit" name="lineEdit_7">
+        <widget class="QLineEdit" name="lineEditOffice">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -330,7 +330,7 @@
         </widget>
        </item>
        <item row="14" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox_5">
+        <widget class="QGroupBox" name="groupBoxChangeStatus">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -342,7 +342,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
           <item row="0" column="0">
-           <widget class="QComboBox" name="comboBox">
+           <widget class="QComboBox" name="comboBoxStatus">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -355,7 +355,7 @@
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLineEdit" name="lineEdit_5">
+        <widget class="QLineEdit" name="lineEditInDate">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -367,7 +367,7 @@
        <item row="0" column="2" rowspan="18">
         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,0,0">
          <item>
-          <widget class="QGroupBox" name="groupBox">
+          <widget class="QGroupBox" name="groupBoxDeviceSummary">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -397,12 +397,12 @@
              <number>5</number>
             </property>
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_6">
+             <layout class="QGridLayout" name="gridLayoutDeviceSummary">
               <property name="spacing">
                <number>3</number>
               </property>
               <item row="1" column="0">
-               <widget class="QLabel" name="label_12">
+               <widget class="QLabel" name="labelIncomingSet">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -415,7 +415,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_11">
+               <widget class="QLabel" name="labelProblem">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -428,7 +428,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_14">
+               <widget class="QLineEdit" name="lineEditProblem">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -438,7 +438,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_13">
+               <widget class="QLabel" name="labelExterior">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -451,7 +451,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_15">
+               <widget class="QLineEdit" name="lineEditIncomingSet">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -461,7 +461,7 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_16">
+               <widget class="QLineEdit" name="lineEditExterior">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -476,7 +476,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_2">
+          <widget class="QGroupBox" name="groupBoxDiagResult">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -506,12 +506,12 @@
              <number>5</number>
             </property>
             <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_9">
+             <layout class="QGridLayout" name="gridLayoutDiagResult">
               <property name="spacing">
                <number>3</number>
               </property>
               <item row="1" column="1">
-               <widget class="QPushButton" name="pushButton_5">
+               <widget class="QPushButton" name="pushButtonSaveAgreedAmount">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -524,7 +524,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLineEdit" name="lineEdit_17">
+               <widget class="QLineEdit" name="lineEditAgreedAmount">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -534,7 +534,7 @@
                </widget>
               </item>
               <item row="0" column="0" colspan="3">
-               <widget class="QTextEdit" name="textEdit"/>
+               <widget class="QTextEdit" name="textEditDiagResult"/>
               </item>
              </layout>
             </item>
@@ -542,7 +542,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_3">
+          <widget class="QGroupBox" name="groupBoxWorksAndSpareParts">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -572,7 +572,7 @@
              <number>5</number>
             </property>
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_11">
+             <layout class="QGridLayout" name="gridLayoutWorksAndSpareParts">
               <property name="spacing">
                <number>3</number>
               </property>
@@ -590,7 +590,7 @@
                </spacer>
               </item>
               <item row="0" column="1">
-               <widget class="QPushButton" name="pushButton_7">
+               <widget class="QPushButton" name="pushButtonAddWorkFromPriceList">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -603,7 +603,7 @@
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QLineEdit" name="lineEdit_18">
+               <widget class="QLineEdit" name="lineEditQuickAddSparePartByUID">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -613,7 +613,7 @@
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QPushButton" name="pushButton_8">
+               <widget class="QPushButton" name="pushButtonRequestSparePart">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -626,7 +626,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QPushButton" name="pushButton_6">
+               <widget class="QPushButton" name="pushButtonAddWork">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -639,7 +639,7 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="5">
-               <widget class="QTableView" name="tableView"/>
+               <widget class="QTableView" name="tableViewWorksAndSpareParts"/>
               </item>
              </layout>
             </item>
@@ -660,7 +660,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="groupBoxComments">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -690,7 +690,7 @@
              <number>5</number>
             </property>
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_13">
+             <layout class="QGridLayout" name="gridLayoutComments">
               <property name="sizeConstraint">
                <enum>QLayout::SetMinimumSize</enum>
               </property>
@@ -698,7 +698,7 @@
                <number>3</number>
               </property>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_19">
+               <widget class="QLineEdit" name="lineEditNewComment">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -708,7 +708,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_14">
+               <widget class="QLabel" name="labelNewComment">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -721,7 +721,7 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QListView" name="listView">
+               <widget class="commentsTable" name="tableViewComments">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -757,7 +757,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>50</height>
+         <height>60</height>
         </size>
        </property>
        <property name="contextMenuPolicy">
@@ -780,47 +780,110 @@
         <item row="1" column="0">
          <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,0,1,0" rowminimumheight="0" columnminimumwidth="0,0,0,0,0">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SetMinimumSize</enum>
           </property>
           <item row="0" column="0">
            <layout class="QGridLayout" name="LeftGridLayout_2" columnstretch="0">
             <property name="sizeConstraint">
-             <enum>QLayout::SetFixedSize</enum>
+             <enum>QLayout::SetDefaultConstraint</enum>
             </property>
            </layout>
           </item>
           <item row="0" column="2">
            <layout class="QGridLayout" name="CentralGridLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
             <item row="0" column="3">
-             <widget class="QPushButton" name="buttonShowParamsPopupMenu">
+             <widget class="QPushButton" name="buttonMedia">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
               <property name="text">
                <string>Медиа</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QPushButton" name="buttonRefreshTable">
+             <widget class="QPushButton" name="buttonClientCard">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
               <property name="text">
                <string>Клиент</string>
               </property>
              </widget>
             </item>
             <item row="0" column="0">
-             <widget class="QPushButton" name="buttonRepairNew">
+             <widget class="QPushButton" name="buttonCall">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
               <property name="text">
                <string>Позвонить</string>
               </property>
              </widget>
             </item>
             <item row="0" column="2">
-             <widget class="QPushButton" name="buttonPrint">
+             <widget class="QPushButton" name="buttonHistory">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
               <property name="text">
                <string>История</string>
               </property>
              </widget>
             </item>
             <item row="0" column="4">
-             <widget class="QPushButton" name="pushButton">
+             <widget class="QPushButton" name="buttonAdm">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
               <property name="text">
                <string>Администрирование</string>
               </property>
@@ -863,7 +926,7 @@
           <item row="0" column="4">
            <layout class="QGridLayout" name="RightGridLayout_2">
             <property name="sizeConstraint">
-             <enum>QLayout::SetFixedSize</enum>
+             <enum>QLayout::SetDefaultConstraint</enum>
             </property>
            </layout>
           </item>
@@ -876,9 +939,16 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>commentsTable</class>
+   <extends>QTableView</extends>
+   <header>tabrepair.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
-  <tabstop>buttonShowParamsPopupMenu</tabstop>
-  <tabstop>buttonRefreshTable</tabstop>
+  <tabstop>buttonMedia</tabstop>
+  <tabstop>buttonClientCard</tabstop>
  </tabstops>
  <resources/>
  <connections/>

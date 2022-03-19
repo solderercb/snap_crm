@@ -9,6 +9,8 @@ extern QMap<QString, QVariant> *comSettings;
 extern QSqlQueryModel *companiesModel;
 extern QSqlQueryModel *officesModel;
 extern QSqlQueryModel *warehousesModel;
+extern QSqlQueryModel *allUsersModel;
+extern QMap<int, QString> *allUsersMap;
 extern QSqlQueryModel *usersModel;
 extern QSqlQueryModel *managersModel;
 extern QSqlQueryModel *engineersModel;
@@ -18,6 +20,7 @@ extern QSqlQueryModel *paymentSystemsModel;
 extern QStandardItemModel* clientsTypesList;
 extern QSqlQueryModel* clientAdTypesList;
 extern QStandardItemModel *statusesModel;
+extern QStandardItemModel *notifyStatusesModel;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

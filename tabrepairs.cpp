@@ -11,7 +11,6 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairs)
 {
-    qDebug() << "tabRepairs::tabRepairs(): parent =" << parent;
     ui->setupUi(this);
 
     filterSettings = new QMap<QString, int>;
@@ -91,7 +90,7 @@ void tabRepairs::updateTableWidget()
 //        query_where << QString("(LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1') OR t1.`id` = '%1' OR t2.`phone` REGEXP '%1' OR t2.`phone_clean` REGEXP '%1')").arg(ui->lineEditSearch->text());
 
     query << query_static << (query_where.count()>0?"WHERE " + query_where.join(" AND "):"") << (query_group.count()>0?"GROUP BY " + query_group.join(", "):"") << (query_group.count()>0?"ORDER BY " + query_order.join(", "):"");
-    qDebug() << query.join(' ');
+//    qDebug() << query.join(' ');
 //    clientsTable->setQuery(query.join(' '), QSqlDatabase::database("connMain"));
 //    ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));
 

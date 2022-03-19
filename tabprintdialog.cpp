@@ -127,12 +127,12 @@ bool tabPrintDialog::initReportDataSources()
         // в этом случае шаблон отчета будет построен полностью на dataBand, а строки dataBand'а могут автоматичеки увеличиваться по высоте и,
         // в случае большого кол-ва данных, не придётся уменьшать размерт шрифта
         QSqlQueryModel *repairModel = new QSqlQueryModel();
-        repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString());
+        repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString()));
         report->dataManager()->addModel("repair", repairModel, true);
         client_id = repairModel->record(0).value("client").toInt();
 
         QSqlQueryModel *customerModel = new QSqlQueryModel();
-        customerModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt());
+        customerModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt()));
         report->dataManager()->addModel("customer", customerModel, true);
 
         // из всех параметров для отёта пригодится только валюта
@@ -144,7 +144,7 @@ bool tabPrintDialog::initReportDataSources()
         report->dataManager()->addModel("config", configModel, true);
 
         QSqlQueryModel *fieldsModel = new QSqlQueryModel();
-        fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(report_vars.value("repair_id").toString());
+        fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(report_vars.value("repair_id").toString()));
         report->dataManager()->addModel("additionalFields", fieldsModel, true);
 
         report->dataManager()->addModel("user", userDataModel, true);
