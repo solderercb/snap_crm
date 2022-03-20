@@ -10,7 +10,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui(new Ui::tabRepair),
     repair_id(rep_id)
 {
-    qDebug() << "tabRepair constructor";
     ui->setupUi(this);
     getRepairData();
     connect(ui->comboBoxStatus, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxIndexChanged(int)));
@@ -28,6 +27,10 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     }
     else
         ui->lineEditOutDate->setText(repairModel->record(0).value("out_date").toDateTime().toLocalTime().toString());
+    if (repairModel->record(0).value("state").toInt() != 6 && repairModel->record(0).value("state").toInt() != 7)
+    {
+        ui->pushButtonGetout->setHidden(true);   // TODO: нужен более гибкий способ скрытия кнопки "Выдать", если статус не "Готово к выдаче" или "Готово к выдаче без ремонта" (id!=6, id!=7)
+    }
 
     ui->lineEditOffice->setText(getDisplayRoleById(repairModel->record(0).value("office").toInt(), officesModel, getFieldIdByName("id", officesModel)));
     ui->lineEditManager->setText(getDisplayRoleById(repairModel->record(0).value("manager").toInt(), allUsersModel, getFieldIdByName("id", allUsersModel)));
@@ -40,9 +43,12 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     else
         ui->lineEditPreagreedAmount->setText(repairModel->record(0).value("pre_agreed_amount").toString() + comSettings->value("currency").toString());        // TODO: изменить банковское обозначение валюты на локализованное сокращение или символ
 
-    ui->lineEditBox->setText(getDisplayRoleById(repairModel->record(0).value("box").toInt(), repairBoxesModel, getFieldIdByName("id", repairBoxesModel)));
+    ui->comboBoxPlace->setModel(repairBoxesModel);
+    ui->comboBoxPlace->setCurrentIndex(-1);
+    ui->comboBoxPlace->setCurrentText(getDisplayRoleById(repairModel->record(0).value("box").toInt(), repairBoxesModel, getFieldIdByName("id", repairBoxesModel)));
     ui->lineEditColor->setText(repairModel->record(0).value("color").toString());
     ui->lineEditWarrantyLabel->setText(repairModel->record(0).value("warranty_label").toString());
+    ui->listWidgetExtraInfo->setHidden(true);
 
     // TODO: добавить игнор колёсика мышки для комбобоксов статусов.
     ui->comboBoxStatus->setModel(statusesProxyModel);
@@ -56,17 +62,20 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->lineEditIncomingSet->setText(repairModel->record(0).value("complect").toString());
     ui->lineEditExterior->setText(repairModel->record(0).value("look").toString());
     ui->textEditDiagResult->setText(repairModel->record(0).value("diagnostic_result").toString());
-    ui->lineEditAgreedAmount->setText(repairModel->record(0).value("repair_cost").toString());
+    ui->lineEditAgreedAmount->setText(QString::number(repairModel->record(0).value("repair_cost").toFloat(), 'f', 2));
     ui->tableViewComments->setModel(commentsModel);
     ui->tableViewComments->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->tableViewComments->verticalHeader()->hide();
     ui->tableViewComments->horizontalHeader()->hide();
 
+    ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
+    ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
+
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    works_table = new QSqlTableModel();
-    ui->tableViewWorksAndSpareParts->setModel(works_table);
-    updateTableWidget();
+//    works_table = new QSqlTableModel();
+//    ui->tableViewWorksAndSpareParts->setModel(works_table);
+//    updateTableWidget();
 }
 
 tabRepair::~tabRepair()
@@ -97,7 +106,11 @@ void tabRepair::getRepairData()
     statusesProxyModel->setSourceModel(statusesModel);
 
     commentsModel = new commentsDataModel();
-    commentsModel->setQuery(QUERY_SEL_REPAIR_DATA(repair_id));
+    commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
+
+    worksAndPartsModel = new worksAndSparePartsDataModel;
+    connect(worksAndPartsModel, SIGNAL(modelReset()), this, SLOT(updateTotalSumms()));  // TODO: уточнить генерируется ли сигнал при изменении существующих данных
+    worksAndPartsModel->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(repair_id));
 }
 
 int tabRepair::getFieldIdByName(const QString &field, QSqlQueryModel *model)
@@ -127,6 +140,59 @@ QString tabRepair::getDisplayRoleById(int id, QAbstractItemModel *model, int col
 void tabRepair::eventResize(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+}
+
+void tabRepair::addItemToListViewExtraInfo(QString, QString)
+{
+    if(ui->listWidgetExtraInfo->isHidden())
+        ui->listWidgetExtraInfo->setHidden(false);
+}
+
+void tabRepair::updateTotalSumms()
+{
+    works_sum = 0;
+    parts_sum = 0;
+    total_sum = 0;
+    for(int i=0;i<worksAndPartsModel->rowCount();i++)
+    {
+        if(worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::item_rsrv_id).toInt())
+            parts_sum += worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::summ).toFloat();
+        else
+            works_sum += worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::summ).toFloat();
+
+        total_sum +=  worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::summ).toFloat();
+    }
+    ui->lineEditWorksAmount->setText(QString::number(works_sum, 'f', 2));
+    ui->lineEditSparePartsAmount->setText(QString::number(parts_sum, 'f', 2));
+    ui->lineEditTotalAmount->setText(QString::number(total_sum, 'f', 2));
+}
+
+void tabRepair::createGetOutDialog()
+{
+    overlay = new QWidget(this);
+    overlay->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
+    overlay->resize(size());
+    overlay->setVisible(true);
+
+    modalWidget = new getOutDialog(this, Qt::SplashScreen);
+    connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
+
+    modalWidget ->setWindowModality(Qt::WindowModal);
+    modalWidget ->show();
+}
+
+void tabRepair::closeGetOutDialog()
+{
+    if(modalWidget != nullptr)
+    {
+        modalWidget->deleteLater();
+        modalWidget = nullptr;
+    }
+    if (overlay != nullptr)
+    {
+        overlay->deleteLater();
+        overlay = nullptr;
+    }
 }
 
 void tabRepair::updateTableWidget()
@@ -226,11 +292,75 @@ QVariant commentsDataModel::data(const QModelIndex &index, int role) const
             QDateTime date = QSqlQueryModel::data(index, role).toDateTime();
 //            date = QSqlQueryModel::data(index, role).toDateTime();
             date.setTimeZone(QTimeZone::utc());
-//            qDebug() << date.toLocalTime().toString("dd.MM.yyyy hh:mm:dd");
-            return date.toLocalTime().toString("dd.MM.yyyy hh:mm:dd");
+//            qDebug() << date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+            return date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
         }
         if (index.column() == 1)    // имя пользователя
             return allUsersMap->value(QSqlQueryModel::data(index, role).toInt());
+    }
+    return QSqlQueryModel::data(index, role);   // или если просто возвращать данные наследуемого объекта, то тоже всё ОК
+}
+
+// =====================================
+worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) :
+    QTableView(parent)
+{
+}
+
+worksAndSparePartsTable::~worksAndSparePartsTable()
+{
+}
+
+void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
+{
+    QTableView::resizeEvent(event);
+    int i;
+    int colWidths[] = {30,0,30,50,50,60,60,100};
+    int colNameWidth = 0;
+
+    horizontalHeader()->hideSection(10); // прячем служебные столбцы
+    horizontalHeader()->hideSection(9);
+    horizontalHeader()->hideSection(8);
+
+    for (i = 0; i < 8; i++)
+    {
+        colNameWidth += colWidths[i];
+        setColumnWidth(i, colWidths[i]);
+    }
+    colNameWidth = geometry().width() - verticalScrollBar()->width() - colNameWidth;
+    if (verticalScrollBar()->isVisible())
+        setColumnWidth(1, colNameWidth - verticalScrollBar()->width());
+    else
+        setColumnWidth(1, colNameWidth);
+    resizeRowsToContents();
+}
+
+worksAndSparePartsDataModel::worksAndSparePartsDataModel(QWidget *parent) :
+    QSqlQueryModel(parent)
+{
+
+}
+
+worksAndSparePartsDataModel::~worksAndSparePartsDataModel()
+{
+
+}
+
+QVariant worksAndSparePartsDataModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return false;
+
+    // FIXME: Implement me!
+    if (role == Qt::DisplayRole)
+    {
+        switch (index.column()) {
+            case actions: return QSqlQueryModel::data(index, role);
+            case price: return QString::number(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
+            case summ: return QString::number(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
+            case user: return allUsersMap->value(QSqlQueryModel::data(index, role).toInt());
+            case warranty: return warrantyTermsMap->value(QSqlQueryModel::data(index, role).toInt());
+        }
     }
     return QSqlQueryModel::data(index, role);   // или если просто возвращать данные наследуемого объекта, то тоже всё ОК
 }

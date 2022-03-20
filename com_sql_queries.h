@@ -127,7 +127,10 @@
                                                    ON t1.`client` = t5.`id`")   // Здесь не должно быть точки с запятой!
 
 #define QUERY_SEL_REPAIR_DATA(id)           QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` WHERE workshop.`id` = %1;").arg((id))
-#define QUERY_SEL_REPAIR_DATA(id)           QString("SELECT `created`, `user`, `text` FROM `comments` WHERE `remont` = %1 ORDER BY `id` DESC;").arg((id)), QSqlDatabase::database("connMain")
+#define QUERY_SEL_REPAIR_COMMENTS(id)       QString("SELECT `created`, `user`, `text` FROM `comments` WHERE `remont` = %1 ORDER BY `id` DESC;").arg((id)), QSqlDatabase::database("connMain")
+#define QUERY_SEL_REPAIR_WORKS_AND_PARTS(id) QString("SELECT 'X  +' AS '*', t1.`name`,t1.`count`,ROUND(t1.`price`, 2) AS 'price', t1.`count`*ROUND(t1.`price`, 2) AS 'summ',t1.`warranty`,t1.`user`,'' AS 'item_sn',t1.`id`, t1.`id` AS 'work_id', '' AS 'item_rsrv_id' FROM `works` AS t1 WHERE `repair` = %1\
+                                                        UNION ALL\
+                                                        SELECT '   X', t2.`name`,t2.`count`,ROUND(t2.`price`, 2),t2.`count`*ROUND(t2.`price`, 2),t2.`warranty`,t2.`to_user`, t2.`sn`,t2.`id`,t2.`work_id`, t2.`id` FROM `store_int_reserve` AS t2 WHERE t2.work_id IN (SELECT `id` FROM `works` WHERE `repair` = %1) ORDER BY `work_id` ASC, `item_rsrv_id` ASC;").arg((id)), QSqlDatabase::database("connMain")
 
 /**************** SELECT queries for data models for reports ******************/
 #define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` WHERE workshop.`id` = %1;").arg(R), QSqlDatabase::database("connMain")

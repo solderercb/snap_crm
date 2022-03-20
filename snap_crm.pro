@@ -34,6 +34,7 @@ SOURCES += main.cpp\
     SSetComboBox/ssetcombobox.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
+    getOutDialog.cpp \
     global.cpp \
     mainwindow.cpp \
     loginwindow.cpp \
@@ -49,6 +50,7 @@ SOURCES += main.cpp\
     windowsdispatcher.cpp
 
 HEADERS  += \
+    getOutDialog.h \
     global.h \
     models/repairtablefiltermenu.h \
     stable.h \
@@ -72,6 +74,7 @@ HEADERS  += \
 FORMS    += mainwindow.ui \
     bottoolbarwidget.ui \
     chooseofficewindow.ui \
+    getOutDialog.ui \
     loginwindow.ui \
     models/repairtablefiltermenu.ui \
     tabclients.ui \

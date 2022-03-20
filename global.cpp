@@ -19,6 +19,8 @@ QStandardItemModel* clientsTypesList = new QStandardItemModel;
 QSqlQueryModel* clientAdTypesList = new QSqlQueryModel;
 QStandardItemModel *statusesModel = new QStandardItemModel();
 QStandardItemModel *notifyStatusesModel = new QStandardItemModel();
-
+QStandardItemModel *warrantyTermsModel = new QStandardItemModel();
+QMap<int, QString> *warrantyTermsMap = new QMap<int, QString>;
+QWidget *modalWidget = nullptr;
 
 

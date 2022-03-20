@@ -463,6 +463,19 @@ void MainWindow::initGlobalModels()
         notifyStatusesModel->appendRow(*notifyStatusSelector);
     }
 
+    // TODO: В АСЦ в списке сроков гарантии также присутствуют "Согласно гарантии производителя", "Согласно ЗоЗПП" и "Согласно ФГТ", но, похоже, их выбор не реализован
+    QVector<QString> warrantyTermsList = {"нет", "7 дней", "14 дней", "1 мес", "2 мес", "3 мес", "4 мес", "6 мес", "1 год", "2 года", "3 года"};
+    int warrantyTerms[] = {0, 7, 14, 31, 62, 93, 124, 186, 365, 730, 1095};
+    // Модель для комбобоксов при редактировании, а QMap для отображения
+    warrantyTermsModel = new QStandardItemModel();
+    for (int i=0; i<warrantyTermsList.size(); i++)
+    {
+        warrantyTermSelector = new QList<QStandardItem*>();
+        *warrantyTermSelector << new QStandardItem(warrantyTermsList.at(i)) << new QStandardItem(warrantyTerms[i]);
+        warrantyTermsModel->appendRow(*warrantyTermSelector);
+        warrantyTermsMap->insert(warrantyTerms[i], warrantyTermsList.at(i));
+    }
+
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
 }
 
@@ -705,7 +718,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-    createTabRepair(19932);
+    createTabRepair(24888);
     if (test_scheduler_counter < 375)
     {
 //        createTabRepairNew();

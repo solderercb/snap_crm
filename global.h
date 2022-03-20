@@ -21,6 +21,9 @@ extern QStandardItemModel* clientsTypesList;
 extern QSqlQueryModel* clientAdTypesList;
 extern QStandardItemModel *statusesModel;
 extern QStandardItemModel *notifyStatusesModel;
+extern QStandardItemModel *warrantyTermsModel;
+extern QMap<int, QString> *warrantyTermsMap;
+extern QWidget *modalWidget;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

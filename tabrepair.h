@@ -15,6 +15,7 @@
 #include <QTimeZone>
 #include <QDateTime>
 #include "tabcommon.h"
+#include "getOutDialog.h"
 
 namespace Ui {
 class tabRepair;
@@ -42,6 +43,29 @@ private:
     QVariant data(const QModelIndex &index, int role) const;
 };
 
+class worksAndSparePartsTable : public QTableView
+{
+    Q_OBJECT
+
+public:
+    explicit worksAndSparePartsTable(QWidget *parent = nullptr);
+    ~worksAndSparePartsTable();
+    void resizeEvent(QResizeEvent*);
+private:
+};
+
+class worksAndSparePartsDataModel : public QSqlQueryModel
+{
+    Q_OBJECT
+
+public:
+    enum {actions, name, qty, price, summ, warranty, user, sn, id, work_id, item_rsrv_id};
+    explicit worksAndSparePartsDataModel(QWidget *parent = nullptr);
+    ~worksAndSparePartsDataModel();
+private:
+    QVariant data(const QModelIndex &index, int role) const;
+};
+
 class tabRepair : public tabCommon
 {
     Q_OBJECT
@@ -63,21 +87,29 @@ private:
     QSqlQueryModel *fieldsModel;
     QSortFilterProxyModel *statusesProxyModel;
     commentsDataModel *commentsModel;
+    worksAndSparePartsDataModel *worksAndPartsModel;
     bool statusUpdateFlag;
+    float works_sum, parts_sum, total_sum;
     void getRepairData();
     int getFieldIdByName(const QString &, QSqlQueryModel *);
     QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
     void eventResize(QResizeEvent *);
+    void addItemToListViewExtraInfo(QString, QString);
 
     void updateTableWidget();
 //    QTableView* tableView;
     QSqlQueryModel* works_table;
+//    getOutDialog *modalWidget;
+    QWidget *overlay;
 
 private slots:
     void worksTreeDoubleClicked(QModelIndex);
     void comboBoxIndexChanged(int);
 //    void lineEditSearchTextChanged(QString);
 //    void lineEditSearchReturnPressed();
+    void updateTotalSumms();
+    void createGetOutDialog();
+    void closeGetOutDialog();
 
 };
 
