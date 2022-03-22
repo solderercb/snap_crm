@@ -41,6 +41,7 @@ SOURCES += main.cpp\
     models/repairtablefiltermenu.cpp \
     mylineedit.cpp \
     repairstablemodel.cpp \
+    shortlivednotification.cpp \
     tabclients.cpp \
     tabcommon.cpp \
     tabprintdialog.cpp \
@@ -53,6 +54,7 @@ HEADERS  += \
     getOutDialog.h \
     global.h \
     models/repairtablefiltermenu.h \
+    shortlivednotification.h \
     stable.h \
     mainwindow.h \
     SSetComboBox/ssetcombobox.h \

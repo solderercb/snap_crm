@@ -2,6 +2,7 @@
 #define GETOUTDIALOG_H
 
 #include <QWidget>
+#include "shortlivednotification.h"
 
 namespace Ui {
 class getOutDialog;
