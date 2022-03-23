@@ -211,11 +211,32 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
     test_scheduler->start(200);
 #endif
+    }
+
+// https://stackoverflow.com/a/17482796
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+//    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "APP_NAME",
+//                                                                tr("Are you sure?\n"),
+//                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+//                                                                QMessageBox::Yes);
+//    if (resBtn != QMessageBox::Yes) {
+//        event->ignore();
+//    } else {
+//        event->accept();
+//    }
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nDBErr = 1;
+    query->exec(QUERY_BEGIN);
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Logout")));
+    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    delete query;
 }
 
 MainWindow::~MainWindow()
 {
-	delete tableConsignmentsModel;
+    delete tableConsignmentsModel;
 	delete tableGoodsModel;
 	delete tree_model;
 	delete comboboxSourceModel;
@@ -226,7 +247,8 @@ MainWindow::~MainWindow()
     delete managersModel;
     delete engineersModel;
     delete repairBoxesModel;
-    QSqlDatabase::database("connMain").close();
+    for (int i = 0; i<connections.size(); i++)  // открываем вспомогательные соединения
+        connections[i]->close();
 }
 
 MainWindow* MainWindow::getInstance(windowsDispatcher *parent)   // singleton: MainWindow только один объект

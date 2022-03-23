@@ -30,6 +30,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QRandomGenerator>
+#include <QCloseEvent>
 #include "windowsdispatcher.h"
 
 namespace Ui {
@@ -70,6 +71,7 @@ private:
     explicit MainWindow(windowsDispatcher *parent = nullptr);
     Ui::MainWindow *ui;
     static MainWindow* p_instance;
+    void closeEvent(QCloseEvent*);
     QList<QStandardItem*> *clientTypeSelector;
     QList<QStandardItem*> *notifyStatusSelector;
     QList<QStandardItem*> *warrantyTermSelector;

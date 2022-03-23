@@ -20,6 +20,8 @@ public:
 
 private:
     Ui::getOutDialog *ui;
+    bool summsNotEq = 0;
+
 private slots:
     void getOut();
     void cancel();

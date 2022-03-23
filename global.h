@@ -1,6 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+extern QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 extern QMap<QString, QVariant> *userData;
 extern QSqlQueryModel *userDataModel;
 extern QMap<QString, QVariant> *userLocalData;
@@ -23,7 +24,7 @@ extern QStandardItemModel *statusesModel;
 extern QStandardItemModel *notifyStatusesModel;
 extern QStandardItemModel *warrantyTermsModel;
 extern QMap<int, QString> *warrantyTermsMap;
-extern QWidget *modalWidget;
+extern QString commonComboBoxStyleSheet;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

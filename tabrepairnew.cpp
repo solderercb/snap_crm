@@ -54,6 +54,12 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui(new Ui::tabRepairNew)
 {
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nDBErr = 1;
+    query->exec(QUERY_BEGIN);
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
+    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    delete query;
 
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
@@ -177,15 +183,19 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
 
-//    test_scheduler->start(200);
+    test_scheduler->start(200);
 #endif
-
-    query->exec(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
-    query->exec(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toInt()));
 }
 
 tabRepairNew::~tabRepairNew()
 {
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nDBErr = 1;
+    query->exec(QUERY_BEGIN);
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    delete query;
+
     delete ui;
     delete comboboxDeviceMakersModel;
     delete comboboxDeviceModelsModel;
@@ -356,7 +366,7 @@ void tabRepairNew::changeDeviceType()
             QComboBox *additionalFieldComboBox = new QComboBox(this);
             additionalFieldWidget = additionalFieldComboBox;
             QStandardItemModel* additionalFieldComboBoxModel = new QStandardItemModel();
-            // TODO: нужно проверить удаляется ли модель при удалении вджета
+            // TODO: нужно проверить удаляется ли модель при удалении виджета
             QStringList additionalFieldComboBoxItems = additionalFieldsList->value(1).toString().split('\n');
             QStandardItem *newRow;
             QFontMetrics *fm = new QFontMetrics(this->font());
@@ -1106,17 +1116,9 @@ int tabRepairNew::createRepair()
         }
     }
 
-    if (nDBErr == 0)   // в случае ошибки выполнения запроса нужно всё откатить
+    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    if (nDBErr)   // если все запросы выполнены без ошибок, очистить всё, кроме данных клиента
     {
-        qDebug() << QString("Ошибка выполнения запроса\r\n%1").arg(query->lastError().text());
-        msgBox.setText(QString("Ошибка выполнения запроса\r\n%1").arg(query->lastError().text()));
-        query->exec(QUERY_ROLLBACK);
-        msgBox.exec();
-    }
-    else
-    {
-        query->exec(QUERY_COMMIT);
-        // очистить всё, кроме данных клиента
         ui->comboBoxProblem->clearEditText();
         ui->comboBoxIncomingSet->clearEditText();
         ui->comboBoxExterior->clearEditText();

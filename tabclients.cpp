@@ -11,6 +11,14 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabClients)
 {
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nDBErr = 1;
+    query->exec(QUERY_BEGIN);
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Клиенты")));
+    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    delete query;
+
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
     _type = type;
@@ -59,6 +67,13 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
 tabClients::~tabClients()
 {
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nDBErr = 1;
+    query->exec(QUERY_BEGIN);
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    delete query;
+
     p_instance[this->_type] = nullptr;   // Обязательно блять!
     clientsTable->clear();
     delete ui;

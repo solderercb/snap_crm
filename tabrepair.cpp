@@ -10,11 +10,16 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui(new Ui::tabRepair),
     repair_id(rep_id)
 {
+    setLock(1);
     ui->setupUi(this);
+    ui->comboBoxStatus->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxNotifyStatus->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxPlace->setStyleSheet(commonComboBoxStyleSheet);
     getRepairData();
     connect(ui->comboBoxStatus, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxIndexChanged(int)));
+    connect(ui->toolButtonSaveStatus, SIGNAL(clicked()), this, SLOT(saveStatus()));
 
-//    this->setWindowTitle("Ремонт " + QString::number(repair_id));
+
     ui->lineEditRepairId->setText(QString::number(repair_id));
     ui->lineEditDevice->setText(repairModel->record(0).value("Title").toString());
     ui->lineEditSN->setText(repairModel->record(0).value("serial_number").toString());
@@ -50,8 +55,14 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->lineEditWarrantyLabel->setText(repairModel->record(0).value("warranty_label").toString());
     ui->listWidgetExtraInfo->setHidden(true);
 
-    // TODO: добавить игнор колёсика мышки для комбобоксов статусов.
+    save_state_on_close = userDataModel->record(0).value("save_state_on_close").toBool();
+    if(save_state_on_close)
+    {
+        ui->toolButtonSaveStatus->setHidden(true);
+        ui->comboBoxStatus->disableWheelEvent(true);  // если включено автосохранение статуса ремонта, то нужно игнорировать колёсико мышки
+    }
     ui->comboBoxStatus->setModel(statusesProxyModel);
+
     ui->comboBoxNotifyStatus->setModel(notifyStatusesModel);
     statusesProxyModel->setFilterKeyColumn(1);
     statusesProxyModel->setFilterRegularExpression("");
@@ -80,6 +91,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
 tabRepair::~tabRepair()
 {
+    setLock(0);
     delete ui;
     p_instance.remove(repair_id);   // Обязательно блять!
 }
@@ -92,6 +104,8 @@ void tabRepair::getRepairData()
     clientModel = new QSqlQueryModel();
     clientModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt()));
 
+    if (repairModel->record(0).value("user_lock").toInt());
+        // TODO: Добавлять символ 🔒 в название вкладки
     // из всех параметров для отёта пригодится только валюта
     // TODO: изменить банковское обозначение валюты на локализованное сокращение или символ
     QStandardItemModel *configModel = new QStandardItemModel();
@@ -148,6 +162,19 @@ void tabRepair::addItemToListViewExtraInfo(QString, QString)
         ui->listWidgetExtraInfo->setHidden(false);
 }
 
+void tabRepair::setLock(bool lock)
+{
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nDBErr = 1;
+    query->exec(QUERY_BEGIN);
+    QUERY_EXEC(query, nDBErr)(QUERY_LOCK_REPAIR(repair_id,lock?(userData->value("id").toString()):("NULL")));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    if(lock)
+        QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Ремонт %1").arg(repair_id)));
+    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    delete query;
+}
+
 void tabRepair::updateTotalSumms()
 {
     works_sum = 0;
@@ -175,7 +202,7 @@ void tabRepair::createGetOutDialog()
     overlay->setVisible(true);
 
     modalWidget = new getOutDialog(this, Qt::SplashScreen);
-    connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
+    QObject::connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
 
     modalWidget ->setWindowModality(Qt::WindowModal);
     modalWidget ->show();
@@ -209,7 +236,12 @@ void tabRepair::worksTreeDoubleClicked(QModelIndex item)
     //    emit this->worksTreeDoubleClicked(ui->tableWidget->item(item->row(), item->column())->text().toInt());
 }
 
-void tabRepair::comboBoxIndexChanged(int index)
+void tabRepair::saveStatus()
+{
+    saveStatus(ui->comboBoxStatus->currentIndex());
+}
+
+void tabRepair::saveStatus(int index)
 {
     if (index >= 0)
     {
@@ -222,6 +254,14 @@ void tabRepair::comboBoxIndexChanged(int index)
             ui->comboBoxStatus->setPlaceholderText(activeStatus);
             statusUpdateFlag = 0;
         }
+    }
+}
+
+void tabRepair::comboBoxIndexChanged(int index)
+{
+    if(save_state_on_close)
+    {
+        saveStatus(index);
     }
 }
 

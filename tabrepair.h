@@ -70,6 +70,8 @@ class tabRepair : public tabCommon
 {
     Q_OBJECT
 
+    friend class getOutDialog;
+
 signals:
     void worksTreeDoubleClicked(int);
 
@@ -95,15 +97,19 @@ private:
     QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
     void eventResize(QResizeEvent *);
     void addItemToListViewExtraInfo(QString, QString);
+    void setLock(bool);
 
     void updateTableWidget();
 //    QTableView* tableView;
     QSqlQueryModel* works_table;
-//    getOutDialog *modalWidget;
+    getOutDialog *modalWidget;
     QWidget *overlay;
+    bool save_state_on_close = 0;
 
 private slots:
     void worksTreeDoubleClicked(QModelIndex);
+    void saveStatus();
+    void saveStatus(int);
     void comboBoxIndexChanged(int);
 //    void lineEditSearchTextChanged(QString);
 //    void lineEditSearchReturnPressed();

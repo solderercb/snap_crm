@@ -38,6 +38,7 @@ SOURCES += main.cpp\
     global.cpp \
     mainwindow.cpp \
     loginwindow.cpp \
+    mcombobox.cpp \
     models/repairtablefiltermenu.cpp \
     mylineedit.cpp \
     repairstablemodel.cpp \
@@ -53,6 +54,7 @@ SOURCES += main.cpp\
 HEADERS  += \
     getOutDialog.h \
     global.h \
+    mcombobox.h \
     models/repairtablefiltermenu.h \
     shortlivednotification.h \
     stable.h \

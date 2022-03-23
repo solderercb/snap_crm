@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QFile>
 #include <QStandardPaths>
+#include <QMessageBox>
 #include "windowsdispatcher.h"
 #define NO_LOGIN
 #ifdef QT_DEBUG

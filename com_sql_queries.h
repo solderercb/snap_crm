@@ -126,14 +126,15 @@
                                                 LEFT JOIN `clients` AS t5\
                                                    ON t1.`client` = t5.`id`")   // Здесь не должно быть точки с запятой!
 
-#define QUERY_SEL_REPAIR_DATA(id)           QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` WHERE workshop.`id` = %1;").arg((id))
+#define QUERY_SEL_REPAIR_DATA(id)           QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg((id))
 #define QUERY_SEL_REPAIR_COMMENTS(id)       QString("SELECT `created`, `user`, `text` FROM `comments` WHERE `remont` = %1 ORDER BY `id` DESC;").arg((id)), QSqlDatabase::database("connMain")
 #define QUERY_SEL_REPAIR_WORKS_AND_PARTS(id) QString("SELECT 'X  +' AS '*', t1.`name`,t1.`count`,ROUND(t1.`price`, 2) AS 'price', t1.`count`*ROUND(t1.`price`, 2) AS 'summ',t1.`warranty`,t1.`user`,'' AS 'item_sn',t1.`id`, t1.`id` AS 'work_id', '' AS 'item_rsrv_id' FROM `works` AS t1 WHERE `repair` = %1\
                                                         UNION ALL\
                                                         SELECT '   X', t2.`name`,t2.`count`,ROUND(t2.`price`, 2),t2.`count`*ROUND(t2.`price`, 2),t2.`warranty`,t2.`to_user`, t2.`sn`,t2.`id`,t2.`work_id`, t2.`id` FROM `store_int_reserve` AS t2 WHERE t2.work_id IN (SELECT `id` FROM `works` WHERE `repair` = %1) ORDER BY `work_id` ASC, `item_rsrv_id` ASC;").arg((id)), QSqlDatabase::database("connMain")
+#define QUERY_LOCK_REPAIR(R,U)              QString("UPDATE `workshop` SET `user_lock`=%1, `lock_datetime`=UTC_TIMESTAMP() WHERE `id` = %2;").arg((U)).arg((R))
 
 /**************** SELECT queries for data models for reports ******************/
-#define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` WHERE workshop.`id` = %1;").arg(R), QSqlDatabase::database("connMain")
+#define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg(R), QSqlDatabase::database("connMain")
 #define QUERY_SEL_CLIENT_RPRT(C)            QString("SELECT t1.*, GROUP_CONCAT(t2.phone ORDER BY t2.`type` DESC SEPARATOR ',') AS 'phone', IF(t1.`type` = 1, t1.`ur_name`, CONCAT(t1.`surname`, ' ', t1.`name`, ' ', t1.`patronymic`)) AS 'FioOrUrName' FROM clients as t1 LEFT JOIN tel AS t2 ON t1.id = t2.customer WHERE t1.`id` = %1 GROUP BY t1.`id`;").arg(C), QSqlDatabase::database("connMain")
 #define QUERY_SEL_REP_FIELDS_RPRT(R)        QString("(SELECT 'Предоплата' AS 'name', CONCAT(ROUND(`prepaid_summ`, 0), '$D{config.currency}') AS 'value', `prepaid_type` AS 'comment' FROM workshop WHERE `id` = %1 AND `is_prepaid` = 1)\
                                                       UNION ALL\
@@ -170,6 +171,19 @@
 #define QUERY_BEGIN                         QString("BEGIN;")
 #define QUERY_COMMIT                        QString("COMMIT;")
 #define QUERY_ROLLBACK                      QString("ROLLBACK;")
+#define QUERY_COMMIT_ROLLBACK(obj,flag)     if (flag == 0)   /* в случае ошибки выполнения запроса нужно всё откатить */\
+                                            {\
+                                                qDebug() << QString("Ошибка выполнения запроса\r\n%1").arg(obj->lastError().text());\
+                                                QMessageBox msgBox;\
+                                                msgBox.setText(QString("Ошибка выполнения запроса\r\n%1").arg(obj->lastError().text()));\
+                                                obj->exec(QUERY_ROLLBACK);\
+                                                msgBox.exec();\
+                                            }\
+                                            else\
+                                            {\
+                                                obj->exec(QUERY_COMMIT);\
+                                            }
+
 #define QUERY_INS_DEVICE_MODEL              QString("INSERT INTO `device_models` (`name`, `position`, `maker`, `device`) VALUES ('%1', %2, %3, %4);")
 #define QUERY_INS_CLIENT                    QString("INSERT INTO `clients` (`creator`, `name`, `surname`, `patronymic`, `agent_phone_mask`, `agent2_phone_mask`, `address`, `post_index`, `passport_num`, `passport_date`, `passport_organ`, `state`, `type`, `birthday`, `memorial`, `notes`, `is_regular`, `is_dealer`, `balance_enable`, `prefer_cashless`, `take_long`, `ignore_calls`, `is_bad`, `is_realizator`, `is_agent`, `visit_source`, `photo_id`, `INN`, `KPP`, `OGRN`, `web_password`, `ur_name`, `email`, `icq`, `skype`, `viber`, `telegram`, `site`, `whatsapp`, `agent_name`, `agent_surname`, `agent_patronymic`, `agent_phone`, `agent_phone_clean`, `agent2_name`, `agent2_surname`, `agent2_patronymic`, `agent2_phone`, `agent2_phone_clean`, `created`, `balance`, `price_col`, `repairs`, `purchases`, `token`) VALUES\
                                                                             (%1, '%2', '%3', '%4', 1, 1, '%5', NULL, NULL, NULL, NULL, 1, %6, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, %7, NULL, NULL, NULL, NULL, '%8', '', '%9', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, UTC_TIMESTAMP(), 0, 0, 1, 0, NULL);")
@@ -179,6 +193,7 @@
                                                 '%1','%2',%3,%4,%5,'%6'\
                                                 );").arg(P).arg(p).arg(M).arg(C).arg(T).arg(t)
 #define QUERY_INS_USER_ACTIVITY(action)     QString("INSERT INTO `users_activity` (`user_id`, `datetime_`, `address`, `notes`, `app_version`, `machine_name`) VALUES (%1, UTC_TIMESTAMP(), SUBSTRING_INDEX(USER(), '@', -1), '%2', '%3', '%4');").arg(userData->value("id").toInt()).arg((action)).arg(APP_VER).arg("TODO:hostname")
+#define QUERY_UPD_LAST_USER_LOGIN(id)       QString("UPDATE `users` SET `last_login`=UTC_TIMESTAMP() WHERE `id` = %1;").arg((id))
 #define QUERY_UPD_LAST_USER_ACTIVITY(id)    QString("UPDATE `users` SET `last_activity`=UTC_TIMESTAMP() WHERE `id` = %1;").arg((id))
 #define QUERY_INS_WORKSHOP                  QString("INSERT INTO `workshop` (\
                                                 `Hidden`, `Title`, `client`, `type`, `maker`, `model`, `serial_number`, `company`, `office`, `start_office`, `manager`, `current_manager`, `master`, `diagnostic_result`, `in_date`, `out_date`, `state`, `new_state`, `user_lock`, `lock_datetime`, `express_repair`, `quick_repair`, `is_warranty`, `is_repeat`, `payment_system`, `is_card_payment`, `can_format`, `print_check`, `box`, `warranty_label`, `ext_notes`, `is_prepaid`, `prepaid_type`, `prepaid_summ`, `prepaid_order`, `is_pre_agreed`, `is_debt`, `pre_agreed_amount`, `repair_cost`, `real_repair_cost`, `parts_cost`, `fault`, `complect`, `look`, `thirs_party_sc`, `last_save`, `last_status_changed`, `warranty_days`, `barcode`, `reject_reason`, `informed_status`, `image_ids`, `color`, `order_moving`, `early`, `ext_early`, `issued_msg`, `sms_inform`, `invoice`, `cartridge`, `vendor_id`, `termsControl`\

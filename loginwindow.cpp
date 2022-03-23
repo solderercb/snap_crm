@@ -3,6 +3,7 @@
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
 #include "sqlcreds.h"
+#include "com_sql_queries.h"
 
 LoginWindow::LoginWindow(QObject *parent) :
 //	QWidget(parent),
@@ -231,7 +232,6 @@ void LoginWindow::btnLoginHandler()
 {
     QTextCodec *codec = QTextCodec::codecForName("UTF8");
     QTextCodec::setCodecForLocale(codec);
-    QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 
     connMain = QSqlDatabase::addDatabase("QMYSQL", "connMain");       // это соединение для получения данных (ремонты, клиенты и т. д.)
     connections.append(&connMain);
@@ -289,6 +289,14 @@ void LoginWindow::btnLoginHandler()
                 connections[i]->open();
             emit this->DBConnectOK();
 
+            QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+            bool nDBErr = 1;
+            query->exec(QUERY_BEGIN);
+            QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_LOGIN(userData->value("id").toString()));
+            QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+            QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Выполнен вход в систему")));
+            QUERY_COMMIT_ROLLBACK(query, nDBErr);
+            delete query;
             userLocalData->insert("dbHost", ui->editIPaddr->text());
             userLocalData->insert("dbPort", ui->editPort->text());
             userLocalData->insert("dbName", ui->editDBName->text());

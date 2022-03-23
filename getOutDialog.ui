@@ -62,6 +62,9 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QComboBox" name="comboBoxRejectReason"/>
+     </item>
     </layout>
    </item>
    <item row="1" column="1">
@@ -83,7 +86,11 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEditPrepay"/>
+      <widget class="QLineEdit" name="lineEditPrepay">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="labelAgreedAmount">
@@ -93,7 +100,11 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEditAgreedAmount"/>
+      <widget class="QLineEdit" name="lineEditAgreedAmount">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="labelAlreadyPayed">
@@ -103,7 +114,11 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEditAlreadyPayed"/>
+      <widget class="QLineEdit" name="lineEditAlreadyPayed">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="labelTotalAmount">
@@ -113,7 +128,11 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="lineEditTotalAmount"/>
+      <widget class="QLineEdit" name="lineEditTotalAmount">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="labelCurrentPaymentAmount">
@@ -123,7 +142,11 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLineEdit" name="lineEditCurrentPaymentAmount"/>
+      <widget class="QLineEdit" name="lineEditCurrentPaymentAmount">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="5" column="0">
       <widget class="QLabel" name="labelPaymentAccount">
@@ -156,7 +179,7 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QPushButton" name="pushButtonCancel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -169,7 +192,7 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QPushButton" name="pushButtonGetout">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -179,6 +202,13 @@
        </property>
        <property name="text">
         <string>Выдать</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0" colspan="2">
+      <widget class="QCheckBox" name="checkBoxConfirmGetOut">
+       <property name="text">
+        <string>Подтвердить выдачу</string>
        </property>
       </widget>
      </item>

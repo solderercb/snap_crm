@@ -1,4 +1,5 @@
 #include "global.h"
+QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 QMap<QString, QVariant> *userData = new QMap<QString, QVariant>;
 QSqlQueryModel *userDataModel = new QSqlQueryModel();
 QMap<QString, QVariant> *userLocalData = new QMap<QString, QVariant>;
@@ -21,6 +22,12 @@ QStandardItemModel *statusesModel = new QStandardItemModel();
 QStandardItemModel *notifyStatusesModel = new QStandardItemModel();
 QStandardItemModel *warrantyTermsModel = new QStandardItemModel();
 QMap<int, QString> *warrantyTermsMap = new QMap<int, QString>;
-QWidget *modalWidget = nullptr;
+QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
+        QComboBox::drop-down {  border: 0px;}\
+        QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
+        QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
+        QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
+
+//QWidget *modalWidget = nullptr;
 
 
