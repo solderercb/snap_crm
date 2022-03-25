@@ -13,6 +13,7 @@
 #include <QFile>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include "shortlivednotification.h"
 #include "windowsdispatcher.h"
 #define NO_LOGIN
 #ifdef QT_DEBUG

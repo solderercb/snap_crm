@@ -183,7 +183,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
 
-    test_scheduler->start(200);
+//    test_scheduler->start(200);
 #endif
 }
 
@@ -1049,11 +1049,11 @@ int tabRepairNew::createRepair()
         QUERY_EXEC(query,nDBErr)(QUERY_INS_CASH(
                                    12,
                                    ui->lineEditPrepaySumm->text(),
-                                   "TODO: сумма прописью",
+                                   amountToWords(prepaySumm).replace('\'',"\\\'"),
                                    client,
                                    user,
                                    office,
-                                   QString("Предоплата за ремонт №%1 в размере %2%3").arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString()),
+                                   QString("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)),
                                    repair,
                                    paymentSystemsModel->record(ui->comboBoxPrepayAccount->currentIndex()).value("system_id").toInt()
                                    )
@@ -1062,11 +1062,11 @@ int tabRepairNew::createRepair()
         QUERY_EXEC(query,nDBErr)(QUERY_VRFY_CASH(
                                    12,
                                    ui->lineEditPrepaySumm->text(),
-                                   "TODO: сумма прописью",
+                                   amountToWords(prepaySumm).replace('\'',"\\\'"),
                                    client,
                                    user,
                                    office,
-                                   QString("Предоплата за ремонт №%1 в размере %2%3").arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString()),
+                                   QString("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)),
                                    repair,
                                    paymentSystemsModel->record(ui->comboBoxPrepayAccount->currentIndex()).value("system_id").toInt()
                                    )
@@ -1085,7 +1085,7 @@ int tabRepairNew::createRepair()
 
         // TODO: Признак предмета расчета
         // В журнале делаю запись о предоплате, думаю это будет удобно; ASC CRM такую запись вроде бы не делает :-(
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL",QString("Внесена предоплата за ремонт №%2 в размере %3%4 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(prepaySumm).arg(comSettings->value("currency").toString())));
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL",QString("Внесена предоплата за ремонт №%2 в размере %3 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(sysLocale.toCurrencyString(prepaySumm))));
     }
 
     for(int i=0; i< additionalFieldsWidgets.size(); i++)   // запись значений доп. полей

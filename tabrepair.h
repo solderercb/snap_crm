@@ -14,6 +14,7 @@
 #include <QScrollBar>
 #include <QTimeZone>
 #include <QDateTime>
+#include <QLocale>
 #include "tabcommon.h"
 #include "getOutDialog.h"
 
@@ -29,6 +30,7 @@ public:
     explicit commentsTable(QWidget *parent = nullptr);
     ~commentsTable();
     void resizeEvent(QResizeEvent*);
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
 private:
 };
 
@@ -39,6 +41,7 @@ class commentsDataModel : public QSqlQueryModel
 public:
     explicit commentsDataModel(QWidget *parent = nullptr);
     ~commentsDataModel();
+    void update();
 private:
     QVariant data(const QModelIndex &index, int role) const;
 };
@@ -51,6 +54,7 @@ public:
     explicit worksAndSparePartsTable(QWidget *parent = nullptr);
     ~worksAndSparePartsTable();
     void resizeEvent(QResizeEvent*);
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
 private:
 };
 
@@ -62,6 +66,7 @@ public:
     enum {actions, name, qty, price, summ, warranty, user, sn, id, work_id, item_rsrv_id};
     explicit worksAndSparePartsDataModel(QWidget *parent = nullptr);
     ~worksAndSparePartsDataModel();
+    void update();
 private:
     QVariant data(const QModelIndex &index, int role) const;
 };
@@ -92,27 +97,25 @@ private:
     worksAndSparePartsDataModel *worksAndPartsModel;
     bool statusUpdateFlag;
     float works_sum, parts_sum, total_sum;
-    void getRepairData();
     int getFieldIdByName(const QString &, QSqlQueryModel *);
     QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
     void eventResize(QResizeEvent *);
     void addItemToListViewExtraInfo(QString, QString);
     void setLock(bool);
+    QString box_name;
 
-    void updateTableWidget();
-//    QTableView* tableView;
-    QSqlQueryModel* works_table;
     getOutDialog *modalWidget;
     QWidget *overlay;
     bool save_state_on_close = 0;
+    bool worksAndPartsEditEnabled = 0;
 
 private slots:
+    void updateRepairData();
+    void updateWidgets();
     void worksTreeDoubleClicked(QModelIndex);
     void saveStatus();
     void saveStatus(int);
     void comboBoxIndexChanged(int);
-//    void lineEditSearchTextChanged(QString);
-//    void lineEditSearchReturnPressed();
     void updateTotalSumms();
     void createGetOutDialog();
     void closeGetOutDialog();

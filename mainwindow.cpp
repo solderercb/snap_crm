@@ -456,7 +456,6 @@ void MainWindow::initGlobalModels()
 
     QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы", "Архивные"};
     QVector<QString> clientTypesQueryFilterList = {"t1.`state` = 1", "t1.`type` = 1 AND t1.`state` = 1", "t1.`is_agent` = 1 AND t1.`state` = 1", "t1.`is_dealer` = 1 AND t1.`state` = 1", "t1.`is_regular` = 1 AND t1.`state` = 1", "t1.`is_bad` = 1 AND t1.`state` = 1", "t1.`is_realizator` = 1 AND t1.`state` = 1", "t1.`state` = 0"};
-    clientsTypesList = new QStandardItemModel();
     for (int i=0; i<clientTypesList.size(); i++)
     {
         clientTypeSelector = new QList<QStandardItem*>();
@@ -477,7 +476,6 @@ void MainWindow::initGlobalModels()
     }
 
     QVector<QString> notifyStatusesList = {"---", "Клиент оповещён", "Клиент не отвечает", "Клиент не доступен", "Не оповещён прочее"};
-    notifyStatusesModel = new QStandardItemModel();
     for (int i=0; i<notifyStatusesList.size(); i++)
     {
         notifyStatusSelector = new QList<QStandardItem*>();
@@ -489,13 +487,21 @@ void MainWindow::initGlobalModels()
     QVector<QString> warrantyTermsList = {"нет", "7 дней", "14 дней", "1 мес", "2 мес", "3 мес", "4 мес", "6 мес", "1 год", "2 года", "3 года"};
     int warrantyTerms[] = {0, 7, 14, 31, 62, 93, 124, 186, 365, 730, 1095};
     // Модель для комбобоксов при редактировании, а QMap для отображения
-    warrantyTermsModel = new QStandardItemModel();
     for (int i=0; i<warrantyTermsList.size(); i++)
     {
         warrantyTermSelector = new QList<QStandardItem*>();
         *warrantyTermSelector << new QStandardItem(warrantyTermsList.at(i)) << new QStandardItem(warrantyTerms[i]);
         warrantyTermsModel->appendRow(*warrantyTermSelector);
         warrantyTermsMap->insert(warrantyTerms[i], warrantyTermsList.at(i));
+    }
+
+    QVector<QString> rejectReasonList = {"отказ от ремонта", "ремонт не возможен", "ремонт не возможен из-за отсутствия запчастей", "ремонт не рентабелен", "неисправносте не проявилась", "другие причины"};
+    QList<QStandardItem*> *rejectReasonSelector;
+    for (int i=0; i<rejectReasonList.size(); i++)
+    {
+        rejectReasonSelector = new QList<QStandardItem*>();
+        *rejectReasonSelector << new QStandardItem(rejectReasonList.at(i)) << new QStandardItem(QString::number(i));
+        rejectReasonModel->appendRow(*rejectReasonSelector);
     }
 
     query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
@@ -730,7 +736,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 {
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 //    createTabClients(0);
-//    createTabRepairs();
+    createTabRepairs();
 //    QSqlQuery rand_rep_id = QSqlQuery(QSqlDatabase::database("connMain"));
 //    rand_rep_id.exec("SELECT ROUND(RAND()*25000, 0) INTO @id;");
 //    rand_rep_id.exec("SELECT `id` FROM `workshop` WHERE `id` >= @id AND `hidden` = 0 LIMIT 1;");
@@ -740,7 +746,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-    createTabRepair(24888);
+    createTabRepair(24313);
     if (test_scheduler_counter < 375)
     {
 //        createTabRepairNew();

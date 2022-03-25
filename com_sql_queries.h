@@ -131,7 +131,11 @@
 #define QUERY_SEL_REPAIR_WORKS_AND_PARTS(id) QString("SELECT 'X  +' AS '*', t1.`name`,t1.`count`,ROUND(t1.`price`, 2) AS 'price', t1.`count`*ROUND(t1.`price`, 2) AS 'summ',t1.`warranty`,t1.`user`,'' AS 'item_sn',t1.`id`, t1.`id` AS 'work_id', '' AS 'item_rsrv_id' FROM `works` AS t1 WHERE `repair` = %1\
                                                         UNION ALL\
                                                         SELECT '   X', t2.`name`,t2.`count`,ROUND(t2.`price`, 2),t2.`count`*ROUND(t2.`price`, 2),t2.`warranty`,t2.`to_user`, t2.`sn`,t2.`id`,t2.`work_id`, t2.`id` FROM `store_int_reserve` AS t2 WHERE t2.work_id IN (SELECT `id` FROM `works` WHERE `repair` = %1) ORDER BY `work_id` ASC, `item_rsrv_id` ASC;").arg((id)), QSqlDatabase::database("connMain")
-#define QUERY_LOCK_REPAIR(R,U)              QString("UPDATE `workshop` SET `user_lock`=%1, `lock_datetime`=UTC_TIMESTAMP() WHERE `id` = %2;").arg((U)).arg((R))
+
+#define QUERY_SEL_REPAIR_PREPAYS(R)         QString("SELECT IFNULL(SUM(`summa`), 0) AS 'summa' FROM `cash_orders` WHERE `repair` = %1;").arg((R))
+#define QUERY_SEL_REPAIR_WORKS(R)           QString("SELECT SUM(`price` * `count`) AS 'summa' FROM `works` WHERE `repair` = %1 GROUP BY `repair`;").arg((R))
+#define QUERY_SEL_REPAIR_PARTS(R)           QString("SELECT SUM(`price` * `count`) AS `summa` FROM `store_int_reserve` WHERE `state` IN (2, 3) AND `repair_id` = %1;").arg((R))
+#define QUERY_SEL_IS_BALANCE_EN(C)          QString("SELECT SUM(`summ`) AS 'summa' FROM `balance` WHERE `client` = %1;").arg((C))
 
 /**************** SELECT queries for data models for reports ******************/
 #define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg(R), QSqlDatabase::database("connMain")
@@ -173,7 +177,7 @@
 #define QUERY_ROLLBACK                      QString("ROLLBACK;")
 #define QUERY_COMMIT_ROLLBACK(obj,flag)     if (flag == 0)   /* в случае ошибки выполнения запроса нужно всё откатить */\
                                             {\
-                                                qDebug() << QString("Ошибка выполнения запроса\r\n%1").arg(obj->lastError().text());\
+                                                qDebug() << QString("Ошибка выполнения запроса: %1").arg(obj->lastError().text());\
                                                 QMessageBox msgBox;\
                                                 msgBox.setText(QString("Ошибка выполнения запроса\r\n%1").arg(obj->lastError().text()));\
                                                 obj->exec(QUERY_ROLLBACK);\
@@ -207,11 +211,11 @@
                                                 );")
 
 // запись в журнал действий: Устройство принято в ремонт, Деталь добавлена в ремонт, Деталь продана в ремонте; UOCRI = user,office,client,repair,item, т. е. связанные ключи других таблиц
-#define QUERY_INS_LOG(G,T,U,O,C,R,I,D,B,t)  QString("INSERT INTO `logs` (\
-                                                `group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`\
-                                                ) VALUES (\
-                                                %1, %2, 0, %3, UTC_TIMESTAMP(), NULL, NULL, %4, %5, %6, %7, %8, NULL, %9, '%10'\
-                                                );").arg(G)\
+#define QUERY_INS_LOG(G,T,U,O,C,R,I,D,B,t)  QString("INSERT INTO `logs` ("\
+                                                "`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`"\
+                                                ") VALUES (\n"\
+                                                "%1, %2, 0, %3, UTC_TIMESTAMP(), NULL, NULL, %4, %5, %6, %7, %8, NULL, %9, '%10'"\
+                                                ");").arg(G)\
                                                 .arg(T)\
                                                 .arg(U)\
                                                 .arg(O)\
@@ -221,11 +225,11 @@
                                                 .arg(D)\
                                                 .arg(B)\
                                                 .arg(t)
-#define QUERY_INS_CASH(T,S,s,C,U,O,t,R,A)   QString("INSERT INTO `cash_orders` (\
-                                                `created`, `type`, `summa`, `summa_str`, `invoice`, `client`, `to_user`, `user`, `company`, `office`, `notes`, `repair`, `document`, `img`, `payment_system`, `card_fee`, `is_backdate`, `card_info`, `customer_email`, `fdn`, `payment_item_sign`\
-                                                ) VALUES (\
-                                                UTC_TIMESTAMP(), %1, %2, '%3', NULL, %4, NULL, %5, 1, %6, '%7', %8, NULL, NULL, %9, 0, 0, NULL, '', NULL, NULL\
-                                                );").arg(T)\
+#define QUERY_INS_CASH(T,S,s,C,U,O,t,R,A)   QString("INSERT INTO `cash_orders` ("\
+                                                "`created`, `type`, `summa`, `summa_str`, `invoice`, `client`, `to_user`, `user`, `company`, `office`, `notes`, `repair`, `document`, `img`, `payment_system`, `card_fee`, `is_backdate`, `card_info`, `customer_email`, `fdn`, `payment_item_sign`"\
+                                                ") VALUES (\n"\
+                                                "UTC_TIMESTAMP(), %1, %2, '%3', NULL, %4, NULL, %5, 1, %6, '%7', %8, NULL, NULL, %9, 0, 0, NULL, '', NULL, NULL"\
+                                                ");").arg(T)\
                                                 .arg(S)\
                                                 .arg(s)\
                                                 .arg(C)\
@@ -234,7 +238,7 @@
                                                 .arg(t)\
                                                 .arg(R)\
                                                 .arg(A)
-#define QUERY_VRFY_CASH(T,S,s,C,U,O,t,R,A)  QString("SELECT IF(`type` = %1 AND `summa` = %2 /*AND `summa_str` = %3*/ AND `client` = %4 AND `user` = %5 AND `office` = %6 /*AND `notes` = %7*/ AND `repair` = %8 AND `payment_system` = %9, 21930, 0)\
+#define QUERY_VRFY_CASH(T,S,s,C,U,O,t,R,A)  QString("SELECT IF(`type` = %1 AND `summa` = %2 /*AND `summa_str` = '%3'*/ AND `client` = %4 AND `user` = %5 AND `office` = %6 /*AND `notes` = '%7'*/ AND `repair` = %8 AND `payment_system` = %9, 21930, 0)\
                                                     FROM `cash_orders`\
                                                     WHERE `id` = LAST_INSERT_ID();").arg(T)\
                                                 .arg(S)\
@@ -246,9 +250,39 @@
                                                 .arg(R)\
                                                 .arg(A)
 
-#define QUERY_INS_FIELDS(T, R, I, t)  QString("INSERT INTO `field_values` (`field_id`, `repair_id`, `item_id`, `value`) VALUES (%1, %2, %3, '%4');").arg(T)\
+#define QUERY_INS_FIELDS(T, R, I, t)        QString("INSERT INTO `field_values` (`field_id`, `repair_id`, `item_id`, `value`) VALUES (%1, %2, %3, '%4');").arg(T)\
                                                 .arg(R)\
                                                 .arg(I)\
                                                 .arg(t)
+
+#define QUERY_LOCK_REPAIR(R,U)              QString("UPDATE `workshop` SET `user_lock`=%1, `lock_datetime`=UTC_TIMESTAMP() WHERE `id` = %2;").arg((U)).arg((R))
+
+#define QUERY_UPD_REPAIR_STATE(R, S)        QString("UPDATE `workshop` SET `out_date`=UTC_TIMESTAMP(), `state`=%1, `lock_datetime`=UTC_TIMESTAMP(), `box`=NULL, `last_status_changed`=UTC_TIMESTAMP() WHERE `id` = %2;").arg(S)\
+                                                .arg(R)
+
+#define QUERY_SET_REJ_REASON(R, t)          QString("UPDATE `workshop` SET `reject_reason` = '%2' WHERE `id` = %1;").arg((R)).arg((t))
+
+#define QUERY_INS_WRKSHP_ISSUED(R, U)       QString("INSERT INTO `workshop_issued`(`repair_id`, `employee_id`, `created_at`) VALUES (%1, %2, UTC_TIMESTAMP());").arg((R))\
+                                                .arg((U))
+
+#define QUERY_INS_REPAIR_STATUS_LOG(R,S,U,Mngr,Mstr)  QString("INSERT INTO `repair_status_logs`(`created_at`, `repair_id`, `status_id`, `user_id`, `manager_id`, `master_id`) VALUES (UTC_TIMESTAMP(), %1, %2, %3, %4, %5);").arg((R)).arg((S)).arg((U)).arg((Mngr)).arg((Mstr))
+
+#define QUERY_INS_BALANCE_LOG(C,S,D,t,O,U)  QString("INSERT INTO `balance` (`client`, `summ`, `direction`, `reason`, `created`, `office`, `uid`, `dealer_payment`) VALUES (%1, %2, %3, '%4', UTC_TIMESTAMP(), %5, %6, NULL);").arg((C)).arg((S)).arg((D)).arg((t)).arg((O)).arg((U))
+
+#define QUERY_UPDATE_BALANCE(C,S)           QString("UPDATE `clients` SET `balance`=`balance`+(%2) WHERE  `id`=%1;").arg((C)).arg((S))
+
+#define QUERY_VRFY_BALANCE(C)               QString("SELECT IF(t1.`balance` = SUM(t2.`summ`), 21930, 0) FROM `clients` AS t1 LEFT JOIN `balance` AS t2 ON t1.id = t2.`client` WHERE t1.`balance_enable` = 1 AND t1.`id` = %1;").arg((C))
+
+#define QUERY_UPDATE_STORE_INT_RSRV(S,R)    QString("UPDATE `store_int_reserve` SET `state`=%1 WHERE `repair_id` = %2;").arg((S)).arg((R))
+
+#define QUERY_SEL_PRE_UPD_STORE_ITEMS(R)    QString("SELECT t1.`count`-t2.`count` AS 'count', t1.`reserved`-t2.`count` AS 'reserved', t1.`sold`+t2.`count` AS 'sold' FROM `store_items` AS t1 LEFT JOIN store_int_reserve AS t2 ON t2.item_id = t1.`id` WHERE t2.`repair_id` = %1;").arg((R))
+
+#define QUERY_UPD_STORE_ITEMS(R)            QString("UPDATE `store_items` AS t1 LEFT JOIN store_int_reserve AS t2 ON t2.item_id = t1.`id` SET t1.`count`=t1.`count`-t2.`count`, t1.`reserved`=t1.`reserved`-t2.`count`, t1.`sold`=t1.`sold`+t2.`count` WHERE t2.`repair_id` = %1;").arg((R))
+
+#define QUERY_SEL_PST_UPD_STORE_ITEMS(R)    QString("SELECT t1.`count`, t1.`reserved`, t1.`sold` FROM `store_items` AS t1 LEFT JOIN store_int_reserve AS t2 ON t2.item_id = t1.`id` WHERE t2.`repair_id` = %1;").arg((R))
+
+#define QUERY_INS_LOG_PARTS_IN_REPAIR(U,O,C,R) QString("INSERT INTO `logs`(`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`) SELECT \n"\
+                                                    "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, %3, `repair_id`, `item_id`, NULL, NULL, NULL, CONCAT('Товар установленный в ремонт №', `repair_id`, 'продан. Ремонт выдан') FROM `store_int_reserve` WHERE `repair_id` = %4;").arg((U)).arg((O)).arg((C)).arg((R))
+
 
 #endif // COM_SQL_QUERIES_H

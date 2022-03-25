@@ -16,6 +16,7 @@
 #endif
 #include "mainwindow.h"
 #include "tabcommon.h"
+#include "amountToWords.h"
 
 namespace Ui {
     class tabRepairNew;
@@ -85,21 +86,6 @@ private:
 #endif
 
     groupBoxEventFilter *groupBoxEventFilterObj;
-    QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
-            QComboBox::drop-down {  border: 0px;}\
-            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
-            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
-            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
-    QString commonLineEditStyleSheet = "";
-    QString commonDateEditStyleSheet = "";
-
-    QString commonComboBoxStyleSheetRed = "QComboBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}\
-            QComboBox::drop-down {  border: 0px;}\
-            QComboBox::down-arrow{  image: url(down-arrow.png);  width: 16px;  height: 20px;}\
-            QComboBox::hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
-            QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
-    QString commonLineEditStyleSheetRed = "QLineEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
-    QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 
 private slots:
     void changeClientType();

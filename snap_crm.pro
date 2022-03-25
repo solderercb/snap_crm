@@ -32,6 +32,7 @@ PRECOMPILED_HEADER = stable.h
 
 SOURCES += main.cpp\
     SSetComboBox/ssetcombobox.cpp \
+    amountToWords.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
     getOutDialog.cpp \
@@ -43,6 +44,8 @@ SOURCES += main.cpp\
     mylineedit.cpp \
     repairstablemodel.cpp \
     shortlivednotification.cpp \
+    ssqlquerymodel.cpp \
+    sstandarditemmodel.cpp \
     tabclients.cpp \
     tabcommon.cpp \
     tabprintdialog.cpp \
@@ -52,11 +55,14 @@ SOURCES += main.cpp\
     windowsdispatcher.cpp
 
 HEADERS  += \
+    amountToWords.h \
     getOutDialog.h \
     global.h \
     mcombobox.h \
     models/repairtablefiltermenu.h \
     shortlivednotification.h \
+    ssqlquerymodel.h \
+    sstandarditemmodel.h \
     stable.h \
     mainwindow.h \
     SSetComboBox/ssetcombobox.h \

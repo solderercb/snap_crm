@@ -36,6 +36,9 @@ LoginWindow::LoginWindow(QObject *parent) :
         ui->editPassword->setFocus();
     }
 
+//  shortlivedNotification::setSize(385, 90);
+    shortlivedNotification::setAppearance(this, shortlivedNotification::bottomRight);
+
     QObject::connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
     QObject::connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
 
@@ -289,14 +292,6 @@ void LoginWindow::btnLoginHandler()
                 connections[i]->open();
             emit this->DBConnectOK();
 
-            QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-            bool nDBErr = 1;
-            query->exec(QUERY_BEGIN);
-            QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_LOGIN(userData->value("id").toString()));
-            QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
-            QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Выполнен вход в систему")));
-            QUERY_COMMIT_ROLLBACK(query, nDBErr);
-            delete query;
             userLocalData->insert("dbHost", ui->editIPaddr->text());
             userLocalData->insert("dbPort", ui->editPort->text());
             userLocalData->insert("dbName", ui->editDBName->text());

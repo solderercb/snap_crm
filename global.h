@@ -1,6 +1,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include "sstandarditemmodel.h"
+#include "ssqlquerymodel.h"
+
+extern QLocale sysLocale;
 extern QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 extern QMap<QString, QVariant> *userData;
 extern QSqlQueryModel *userDataModel;
@@ -25,6 +29,14 @@ extern QStandardItemModel *notifyStatusesModel;
 extern QStandardItemModel *warrantyTermsModel;
 extern QMap<int, QString> *warrantyTermsMap;
 extern QString commonComboBoxStyleSheet;
+extern QString commonComboBoxStyleSheetRed;
+extern QString commonLineEditStyleSheet;
+extern QString commonLineEditStyleSheetRed;
+extern QString commonTextEditStyleSheet;
+extern QString commonTextEditStyleSheetRed;
+extern QString commonDateEditStyleSheet;
+extern QString commonDateEditStyleSheetRed;
+extern SStandardItemModel *rejectReasonModel;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;
