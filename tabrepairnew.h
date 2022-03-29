@@ -44,6 +44,7 @@ private slots:
     void clearClientCreds();
     void lineEditPrevRepairButtonsHandler(int);
     void setPrevRepair(int);
+    void fillClientCreds(int);
     void buttonSelectExistingClientHandler();
 
 };

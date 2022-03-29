@@ -178,6 +178,11 @@ void tabRepairNew::setPrevRepair(int repairNum)
     ui->lineEditPrevRepair->setText(QString::number(repairNum));
 }
 
+void tabRepairNew::fillClientCreds(int)
+{
+
+}
+
 void tabRepairNew::buttonSelectExistingClientHandler()
 {
     emit createTabSelectExistingClient(1);

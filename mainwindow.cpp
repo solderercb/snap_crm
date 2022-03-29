@@ -5,6 +5,7 @@
 #include "ui_tabrepairnew.h"
 #include "tabrepairs.h"
 #include "tabrepair.h"
+#include "tabclients.h"
 #include "mylineedit.h"
 
 #define NO_LOGIN
@@ -72,6 +73,24 @@ MainWindow::MainWindow(QWidget *parent) :
     goods_button->setText("Товары");
     goods_button->setFixedSize(96,48);
     ui->toolBar->addWidget(goods_button);
+
+    /* Кнопка Клиенты и меню */
+    QMenu *clients_menu = new QMenu();
+    QAction *client_new = new QAction("Новый клиент", this);
+    clients_menu->addAction(client_new);
+    QAction *clients_calls = new QAction("Вызовы", this);
+    clients_menu->addAction(clients_calls);
+    QAction *clients_sms = new QAction("SMS", this);
+    clients_menu->addAction(clients_sms);
+//    QAction *clients_editor = new QAction("Групповой редактор клиентов", this);
+//    clients_menu->addAction(clients_editor);
+    QToolButton* clients_button = new QToolButton();
+    clients_button->setMenu(clients_menu);
+    clients_button->setPopupMode(QToolButton::MenuButtonPopup);
+    clients_button->setText("Клиенты");
+    clients_button->setFixedSize(96,48);
+    ui->toolBar->addWidget(clients_button);
+    QObject::connect(clients_button, SIGNAL(clicked()), this, SLOT(createTabClients()));
 
     QPushButton* pushButton05 = new QPushButton();
     pushButton05->setText("pushButton05");
@@ -398,7 +417,7 @@ void MainWindow::createTabRepairs(int type)
     else
     {
         // Сигнал экземпляра вкладки выбора предыдущего ремонта подключаем к слоту вкладки нового ремонта для вставки номера в соотв. поле
-        // и к слоту MainWindow, в котором происходит преключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
+        // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabRepairNew::getInstance(), SLOT(setPrevRepair(int)));
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(reactivateTabRepairNew(int)));
     }
@@ -420,6 +439,7 @@ void MainWindow::createTabRepairNew()
         ui->tabWidget->addTab(subwindow, "Приём в ремонт");
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int)), this, SLOT(createTabRepairs(int)));
+    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int)), this, SLOT(createTabClients(int)));
 }
 
 void MainWindow::reactivateTabRepairNew(int)
@@ -429,6 +449,25 @@ void MainWindow::reactivateTabRepairNew(int)
 
 void MainWindow::createTabClients(int type)
 {
+    const QString tabLabels[] = {"Клиенты", "Выбрать клиента"};
+    tabClients *subwindow = tabClients::getInstance(type);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, tabLabels[type]);
+
+    if (type == 0)
+    {
+        //
+        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabClient(int)));
+    }
+    else
+    {
+        // Сигнал экземпляра вкладки выбора клиента подключаем к слоту вкладки нового ремонта для заполнения соотв. полей
+        // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
+        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabRepairNew::getInstance(), SLOT(fillClientCreds(int)));
+        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(reactivateTabRepairNew(int)));
+    }
+
+    ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Ремонты/Выбрать ремонт
 
 }
 

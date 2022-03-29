@@ -33,6 +33,7 @@ SOURCES += main.cpp\
     my_widget.cpp \
     mylineedit.cpp \
     repairstablemodel.cpp \
+    tabclients.cpp \
     tabrepair.cpp \
     tabrepairnew.cpp \
     tabrepairs.cpp
@@ -44,6 +45,7 @@ HEADERS  += mainwindow.h \
     my_widget.h \
     mylineedit.h \
     repairstablemodel.h \
+    tabclients.h \
     tabrepair.h \
     tabrepairnew.h \
     tabrepairs.h
@@ -51,6 +53,7 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     bottoolbarwidget.ui \
     loginwindow.ui \
+    tabclients.ui \
     tabrepair.ui \
     tabrepairnew.ui \
     tabrepairs.ui

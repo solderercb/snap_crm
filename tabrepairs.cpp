@@ -112,8 +112,9 @@ void tabRepairs::tableSectionResized(int logicalIndex, int oldSize, int newSize)
     qDebug() << "Slot tableSectionResized(int, int, int)";
 }
 
-void tabRepairs::tableSortingChanged(int, Qt::SortOrder)
+void tabRepairs::tableSortingChanged(int column, Qt::SortOrder order)
 {
     qDebug() << "Slot tableSortingChanged(int, Qt::SortOrder)";
+    repairs_table->sort(column, order);
 }
 
