@@ -199,10 +199,14 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
 
 	QObject::connect(ui->btnLogin,SIGNAL(clicked(bool)),this,SLOT(btnClick()));
 
+
+    for(int i = ui->tabWidget->count() - 1; i >= 0; i--)
+        closeTab(i);
+
+#ifdef QT_DEBUG
     get_warehouses_list();
     btnClick();
 
-#ifdef QT_DEBUG
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
     test_scheduler2 = new QTimer();

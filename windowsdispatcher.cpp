@@ -98,7 +98,7 @@ void windowsDispatcher::createMainWindow()
 {
     MainWindow *windowMain = MainWindow::getInstance(this); // указатель должен объявляться именно здесь, по другому компилятор ругается
     windowMain->show();
-//    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
+    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
 //    windowMain->createTabRepairNew(); // по-умолчанию создаём вкладку Ремонты
 }
 

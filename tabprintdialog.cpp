@@ -39,6 +39,7 @@ tabPrintDialog::~tabPrintDialog()
 {
     delete ui;
     delete report;
+    delete printer;
 }
 
 bool tabPrintDialog::tabCloseRequest()
@@ -136,20 +137,21 @@ bool tabPrintDialog::initReportDataSources()
         report->dataManager()->addModel("customer", customerModel, true);
 
         // из всех параметров для отёта пригодится только валюта
-        // TODO: изменить банковское обозначение валюты на локализованное сокращение или символ
+        // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
         QStandardItemModel *configModel = new QStandardItemModel();
         QStringList headers = {"currency"};
         configModel->setHorizontalHeaderLabels(headers);
-        configModel->appendRow(new QStandardItem(comSettings->value("currency").toString()));
+//        qDebug() << "sysLocale.currencySymbol: " << sysLocale.currencySymbol(QLocale::CurrencySymbol);  // QLocale::CurrencyDisplayName почему-то возвращает "рубль": язык интерф. Win 10 Русский (Россия), ден. ед. в настройках ОС - "грн.", Qt v6.2.1
+        configModel->appendRow(new QStandardItem(sysLocale.currencySymbol(QLocale::CurrencySymbol)));
         report->dataManager()->addModel("config", configModel, true);
 
         QSqlQueryModel *fieldsModel = new QSqlQueryModel();
         fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(report_vars.value("repair_id").toString()));
         report->dataManager()->addModel("additionalFields", fieldsModel, true);
 
-        report->dataManager()->addModel("user", userDataModel, true);
-        report->dataManager()->addModel("company", companiesModel, true);
-        report->dataManager()->addModel("office", officesModel, true);
+        report->dataManager()->addModel("user", userDataModel, false);
+        report->dataManager()->addModel("company", companiesModel, false);
+        report->dataManager()->addModel("office", officesModel, false);
 
 //        QSqlQueryModel *itemsModel = new QSqlQueryModel();
 //        itemsModel->setQuery("", QSqlDatabase::database("connMain"));
@@ -220,12 +222,16 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
         }
         else
             qDebug() << "unacceptable input";
+
+        delete validator;
     }
 
     printer->setCopyCount(ui->spinBoxCopies->value());
     report->printReport(printer);   // TODO: разобраться, что возвращает данная функция
     if (report_type == "new_rep")
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL","Печать квитанции к ремонту №"+report_vars.value("repair_id").toString()));
+
+    delete query;
 }
 
 
