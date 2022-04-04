@@ -139,7 +139,29 @@
 
 /**************** SELECT queries for data models for reports ******************/
 #define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg(R), QSqlDatabase::database("connMain")
-#define QUERY_SEL_CLIENT_RPRT(C)            QString("SELECT t1.*, GROUP_CONCAT(t2.phone ORDER BY t2.`type` DESC SEPARATOR ',') AS 'phone', IF(t1.`type` = 1, t1.`ur_name`, CONCAT(t1.`surname`, ' ', t1.`name`, ' ', t1.`patronymic`)) AS 'FioOrUrName' FROM clients as t1 LEFT JOIN tel AS t2 ON t1.id = t2.customer WHERE t1.`id` = %1 GROUP BY t1.`id`;").arg(C), QSqlDatabase::database("connMain")
+#define QUERY_SEL_CLIENT_RPRT(C)            QString(\
+                                                "SELECT\r\n"\
+                                                "  t1.*,\r\n"\
+                                                "  GROUP_CONCAT(t2.phone ORDER BY t2.`type` DESC SEPARATOR ',') AS 'phone',\r\n"\
+                                                "  IF( t1.`type` = 1, t1.`ur_name`,\r\n"\
+                                                "    CONCAT(\r\n"\
+                                                "      IF(t1.`surname` IS NULL OR t1.`surname` = '',\r\n"\
+                                                "        '',\r\n"\
+                                                "        CONCAT(t1.`surname`,' ')\r\n"\
+                                                "      ),\r\n"\
+                                                "      t1.`name`,\r\n"\
+                                                "      IF(t1.`patronymic` IS NULL OR t1.`patronymic` = '',\r\n"\
+                                                "        '',\r\n"\
+                                                "        CONCAT(' ', t1.`patronymic`)\r\n"\
+                                                "      )\r\n"\
+                                                "    )\r\n"\
+                                                "  ) AS 'FioOrUrName'\r\n"\
+                                                "FROM clients AS t1\r\n"\
+                                                "LEFT JOIN tel AS t2\r\n"\
+                                                "  ON t1.id = t2.customer\r\n"\
+                                                "WHERE t1.`id` = %1\r\n"\
+                                                "GROUP BY t1.`id`;").arg(C), QSqlDatabase::database("connMain")
+
 #define QUERY_SEL_REP_FIELDS_RPRT(R)        QString("(SELECT 'Предоплата' AS 'name', CONCAT(ROUND(`prepaid_summ`, 0), '$D{config.currency}') AS 'value', `prepaid_type` AS 'comment' FROM workshop WHERE `id` = %1 AND `is_prepaid` = 1)\
                                                       UNION ALL\
                                                       (SELECT 'Ориентировочная стоимость ремонта', CONCAT(ROUND(`pre_agreed_amount`, 0), '$D{config.currency}'), '' FROM workshop WHERE `id` = %1 AND `is_pre_agreed` = 1)\

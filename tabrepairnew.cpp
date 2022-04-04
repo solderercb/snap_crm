@@ -756,28 +756,21 @@ void tabRepairNew::setDefaultStyleSheets()
 
 }
 
-int tabRepairNew::createRepair()
+bool tabRepairNew::checkInput()
 {
     int error = 0;
-    int deviceTypeIndex, deviceMakerIndex, deviceModelIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
-    int deviceModel, user, office, company, repair, engineer, payment_system, prepaySumm, box;
-    bool isPrepay, isEstPrice, isWarranty, isRepeat, nDBErr = 1, nIntegrityErr = 1;
-    QString prevRepair = "NULL", prevRepairFromOldDB = "NULL", phone1, phone1c, phone2, phone2c;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
-    setDefaultStyleSheets();
-
-    if ( (deviceTypeIndex = ui->comboBoxDevice->currentIndex()) < 0 )        // если не выбран тип уст-ва
+    if ( ui->comboBoxDevice->currentIndex() < 0 )        // если не выбран тип уст-ва
     {
         ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 1;
     }
-    if ( (deviceMakerIndex = ui->comboBoxDeviceMaker->currentIndex()) < 0 )        // если не выбран производителя
+    if ( ui->comboBoxDeviceMaker->currentIndex() < 0 )        // если не выбран производителя
     {
         ui->comboBoxDeviceMaker->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 2;
     }
-    if ( (deviceModelIndex = ui->comboBoxDeviceModel->currentIndex()) < 0 && ui->comboBoxDeviceModel->currentText() == "" )        // если не выбрана или не написана модель
+    if ( ui->comboBoxDeviceModel->currentIndex() < 0 && ui->comboBoxDeviceModel->currentText() == "" )        // если не выбрана или не написана модель
     {
         ui->comboBoxDeviceModel->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 3;
@@ -787,12 +780,12 @@ int tabRepairNew::createRepair()
         ui->lineEditSN->setStyleSheet(commonLineEditStyleSheetRed);
         error = 4;
     }
-    if (ui->lineEditClientLastName->text() == "")       // если не указана фамилия (или название организации)
+    if (ui->lineEditClientLastName->text() == "" && ui->checkBoxClientType->checkState() == 0)       // если не указана фамилия (только для физ. лиц)
     {
         ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheetRed);
         error = 5;
     }
-    if (ui->lineEditClientFirstName->text() == "" && ui->checkBoxClientType->checkState() == 0)     // если не указано имя (только для физ. лиц)
+    if (ui->lineEditClientFirstName->text() == "")     // если не указано имя (или название организации)
     {
         ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
         error = 6;
@@ -882,44 +875,71 @@ int tabRepairNew::createRepair()
             }
         }
     }
-    if ( (isEstPrice = ui->checkBoxIsEstPrice->isChecked()) )   // если установлен флаг "Клиент ознакомлен с возможной стоимостью"
+    if ( ui->checkBoxIsEstPrice->isChecked() )   // если установлен флаг "Клиент ознакомлен с возможной стоимостью"
         if (ui->lineEditEstPrice->text() == "" || ui->lineEditEstPrice->text().toInt() == 0)   // соответствует ли норме введённая сумма
         {
             ui->lineEditEstPrice->setStyleSheet(commonLineEditStyleSheetRed);
             error = 17;
         }
-    if ( (isPrepay = ui->checkBoxIsPrepay->isChecked()) )       // если установлен флаг "Клиент вносит предоплату"
+    if ( ui->checkBoxIsPrepay->isChecked() )       // если установлен флаг "Клиент вносит предоплату"
     {
         if (ui->comboBoxPrepayReason->currentIndex() < 0)       // обязательно должно быть указано основание
             ui->comboBoxPrepayReason->setStyleSheet(commonComboBoxStyleSheetRed);
         if (ui->comboBoxPrepayAccount->currentIndex() < 0)      // опязательно должен быть выбран счёт
             ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheetRed);
-        if ( (prepaySumm = ui->lineEditPrepaySumm->text().toInt()) == 0 )   // соответствует ли норме введённая сумма
+        if ( ui->lineEditPrepaySumm->text().toInt() == 0 )   // соответствует ли норме введённая сумма
         {
             ui->lineEditPrepaySumm->setStyleSheet(commonLineEditStyleSheetRed);
             error = 18;
         }
     }
-    if ( (isRepeat = ui->checkBoxWasEarlier->isChecked()) ) // если установлен флаг "Ранее было в ремонте", то обязательно должен быть указан номер ремонта; однако, это не касается гарантийного ремонта
-        if ( (prevRepair = ui->lineEditPrevRepair->text() ) == "" )
+    if ( ui->checkBoxWasEarlier->isChecked() ) // если установлен флаг "Ранее было в ремонте", то обязательно должен быть указан номер ремонта; однако, это не касается гарантийного ремонта
+        if ( ui->lineEditPrevRepair->text() == "" )
         {
-            if ( (prevRepairFromOldDB = ui->lineEditPrevRepairFromOldDB->text()) == "" )  // также допускается не выбирать предыдущий ремонт, если указан номер ремонта в старой системе CRM
+            if ( ui->lineEditPrevRepairFromOldDB->text() == "" )  // также допускается не выбирать предыдущий ремонт, если указан номер ремонта в старой системе CRM
             {
                 ui->lineEditPrevRepair->setStyleSheet(commonLineEditStyleSheetRed);
                 error = 19;
-            }
-            else
-            {
-                prevRepair = "NULL";
-                prevRepairFromOldDB = "\'" + prevRepairFromOldDB + "\'";
             }
         }
 
     if (error)
     {
         qDebug() << "Ошибка создания карты ремонта: не все обязательные поля заполнены (error " << error << ")";
-        return error;
+        return false;
     }
+
+    return true;
+}
+
+bool tabRepairNew::createRepair()
+{
+    if(!checkInput())
+        return true; // return 0 — OK, return 1 - ошибка
+
+    int error = 0;
+    int deviceTypeIndex, deviceMakerIndex, deviceModelIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
+    int deviceModel, user, office, company, repair, engineer, payment_system, prepaySumm, box;
+    bool isPrepay, isEstPrice, isWarranty, isRepeat, nDBErr = 1, nIntegrityErr = 1;
+    QString prevRepair = "NULL", prevRepairFromOldDB = "NULL", phone1, phone1c, phone2, phone2c;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
+    setDefaultStyleSheets();
+    deviceTypeIndex = ui->comboBoxDevice->currentIndex();
+    deviceMakerIndex = ui->comboBoxDeviceMaker->currentIndex();
+    deviceModelIndex = ui->comboBoxDeviceModel->currentIndex();
+    isEstPrice = ui->checkBoxIsEstPrice->isChecked();
+    isPrepay = ui->checkBoxIsPrepay->isChecked();
+    prepaySumm = ui->lineEditPrepaySumm->text().toInt();
+    isRepeat = ui->checkBoxWasEarlier->isChecked();
+    prevRepair = ui->lineEditPrevRepair->text();
+    prevRepairFromOldDB = ui->lineEditPrevRepairFromOldDB->text();
+    if ( prevRepair == "" )
+        prevRepair = "NULL";
+    if( prevRepairFromOldDB == "" )
+        prevRepairFromOldDB = "NULL";
+    else
+        prevRepairFromOldDB = "\'" + prevRepairFromOldDB + "\'";
 
     user = userData->value("id").toInt();
     office = officesModel->record(ui->comboBoxOffice->currentIndex()).value("id").toInt();
@@ -1155,7 +1175,7 @@ int tabRepairNew::createRepair()
     }
 
     delete query;
-    return !nDBErr;
+    return !nDBErr; // return 0 — OK, return 1 - ошибка
 }
 
 void tabRepairNew::createRepairClose()

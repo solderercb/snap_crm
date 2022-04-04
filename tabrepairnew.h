@@ -79,6 +79,7 @@ private:
     QVector<QWidget*> additionalFieldsWidgets;
     int client = 0;
     void phoneTypeChanged(int, int);
+    bool checkInput();
     QMessageBox msgBox;
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
@@ -106,7 +107,7 @@ private slots:
     void deviceMatchTableDoubleClicked(QModelIndex);
     void clientMatchTableDoubleClicked(QModelIndex);
     void lineEditSNClearHandler(int);
-    int createRepair();
+    bool createRepair();
     void createRepairClose();
 #ifdef QT_DEBUG
     void test_scheduler_handler();
