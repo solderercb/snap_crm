@@ -183,7 +183,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
 
-//    test_scheduler->start(200);
+    test_scheduler->start(200);
 #endif
 }
 
@@ -450,7 +450,7 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
 {
     setDefaultStyleSheets();
     client = 0;
-    ui->pushButtonCreateTabClient->hide();
+    ui->pushButtonCreateTabClient->setEnabled(false);
     ui->lineEditClientLastName->clear();
     ui->lineEditClientFirstName->clear();
     ui->lineEditClientPatronymic->clear();
@@ -502,7 +502,7 @@ void tabRepairNew::fillClientCreds(int id)
     changeClientType();
 
     client = id;
-    ui->pushButtonCreateTabClient->show();
+    ui->pushButtonCreateTabClient->setEnabled(true);
     ui->lineEditClientFirstName->setText(clientModel->record(0).value("name").toString());
     ui->lineEditClientLastName->setText(clientModel->record(0).value("surname").toString());
     ui->lineEditClientPatronymic->setText(clientModel->record(0).value("patronymic").toString());

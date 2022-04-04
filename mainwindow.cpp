@@ -215,7 +215,7 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
     test_scheduler->start(200);
 #endif
-    }
+}
 
 // https://stackoverflow.com/a/17482796
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -417,7 +417,8 @@ void MainWindow::initGlobalModels()
     // Переписываем результаты запроса в специальный массив
     // это необходимо, т. к. данные общих настроек могут быть дополнены.
     // Кроме того, есть параметры, хранящиеся в AppData и эти настройки превалируют над настройками, сохранёнными в БД.
-    // TODO: чтение найла настроек в AppData
+    // TODO: чтение файла настроек в AppData
+    // TODO: чтение файлов настроек пользователя из каталога приложения (например, program files): RepairsGrid-user.xml, SaleGrid-user.xml и многие другие
     for (int i = 0; i < queryCommonSettings->record().count(); i++)
     {
         comSettings->insert(queryCommonSettings->record().fieldName(i), queryCommonSettings->value(i));
@@ -740,7 +741,6 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 {
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 //    createTabClients(0);
-    createTabRepairs();
 //    QSqlQuery rand_rep_id = QSqlQuery(QSqlDatabase::database("connMain"));
 //    rand_rep_id.exec("SELECT ROUND(RAND()*25000, 0) INTO @id;");
 //    rand_rep_id.exec("SELECT `id` FROM `workshop` WHERE `id` >= @id AND `hidden` = 0 LIMIT 1;");

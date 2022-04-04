@@ -68,7 +68,6 @@ tabRepair::~tabRepair()
 
 void tabRepair::updateRepairData()
 {
-    qDebug() << "tabRepair::updateRepairData()";
     repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(repair_id));
     clientModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt()));
     fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(repair_id));

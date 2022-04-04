@@ -90,7 +90,7 @@ tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleto
 
 void tabRepairs::updateTableWidget()
 {
-    qDebug() << "tabRepairs::updateTableWidget()";
+//    qDebug() << "tabRepairs::updateTableWidget()";
     query.clear();
 
     /* Собираем условия для запроса */
@@ -163,7 +163,7 @@ void tabRepairs::tableSectionMoved(int logicalIndex, int oldVisualIndex, int new
 /* В слоте будем сохранять настроенную пользователем ширину столбца */
 void tabRepairs::tableSectionResized(int logicalIndex, int oldSize, int newSize)
 {
-    qDebug() << "Slot tableSectionResized(int, int, int)";
+//    qDebug() << "Slot tableSectionResized(int, int, int)";
 }
 
 void tabRepairs::tableSortingChanged(int column, Qt::SortOrder order)
