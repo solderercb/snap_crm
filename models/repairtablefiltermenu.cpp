@@ -20,7 +20,7 @@ bool popupm::event(QEvent *e)
 //        qDebug() << "popupm::event(QEvent *e); " << e->type();
         emit hidden();
     }
-    QFrame::event(e);
+    return QFrame::event(e);
 }
 
 repairTableFilterMenu::repairTableFilterMenu(QWidget * parent) : QWidgetAction(parent),
