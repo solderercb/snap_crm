@@ -195,7 +195,7 @@ void getOutDialog::getOut()
         else    // если выдача с оплатой
         {
             QUERY_EXEC(query,nDBErr)(QUERY_INS_CASH(
-                                       12,
+                                       15,
                                        currentPaymentAmount,
                                        amountToWords(currentPaymentAmount).replace('\'',"\\\'"),
                                        client,
@@ -203,12 +203,13 @@ void getOutDialog::getOut()
                                        office,
                                        QString("Поступление денег в размере %2 в счёт выполненого ремонта №%1").arg(repair_id).arg(sysLocale.toCurrencyString(currentPaymentAmount)),
                                        repair_id,
+                                       "NULL",
                                        paymentSystemsModel->record(ui->comboBoxPaymentAccount->currentIndex()).value("system_id").toInt()
                                        )
                         );
             // финансы — очень важная вещь, поэтому нужно верифицировать записанные данные
             QUERY_EXEC(query,nDBErr)(QUERY_VRFY_CASH(
-                                       12,
+                                       15,
                                        currentPaymentAmount,
                                        amountToWords(currentPaymentAmount).replace('\'',"\\\'"),
                                        client,
@@ -216,6 +217,7 @@ void getOutDialog::getOut()
                                        office,
                                        QString("Поступление денег в размере %2 в счёт выполненого ремонта №%1").arg(repair_id).arg(sysLocale.toCurrencyString(currentPaymentAmount)),
                                        repair_id,
+                                       "\'NULL\'",
                                        paymentSystemsModel->record(ui->comboBoxPaymentAccount->currentIndex()).value("system_id").toInt()
                                        )
                         );

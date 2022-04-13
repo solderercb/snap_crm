@@ -2,6 +2,7 @@
 #define SSTANDARDITEMMODEL_H
 
 #include <QObject>
+#include <QStandardItemModel>
 
 class SStandardItemModel : public QStandardItemModel
 {

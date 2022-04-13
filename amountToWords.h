@@ -2,5 +2,7 @@
 #ifndef AMOUNTTOWORDS_H
 #define AMOUNTTOWORDS_H
 
+#include <QString>
+
 QString amountToWords(double);
 #endif // AMOUNTTOWORDS_H

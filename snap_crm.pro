@@ -35,13 +35,17 @@ SOURCES += main.cpp\
     amountToWords.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
+    clients4test.cpp \
     getOutDialog.cpp \
     global.cpp \
     mainwindow.cpp \
     loginwindow.cpp \
     mcombobox.cpp \
     models/repairtablefiltermenu.cpp \
+    models/saletable/saletableitemdelegates.cpp \
+    models/saletable/saletablemodel.cpp \
     mylineedit.cpp \
+    querylog.cpp \
     repairstablemodel.cpp \
     shortlivednotification.cpp \
     ssqlquerymodel.cpp \
@@ -52,14 +56,19 @@ SOURCES += main.cpp\
     tabrepair.cpp \
     tabrepairnew.cpp \
     tabrepairs.cpp \
+    tabsale.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
     amountToWords.h \
+    clients4test.h \
     getOutDialog.h \
     global.h \
     mcombobox.h \
     models/repairtablefiltermenu.h \
+    models/saletable/saletableitemdelegates.h \
+    models/saletable/saletablemodel.h \
+    querylog.h \
     shortlivednotification.h \
     ssqlquerymodel.h \
     sstandarditemmodel.h \
@@ -79,6 +88,7 @@ HEADERS  += \
     tabrepair.h \
     tabrepairnew.h \
     tabrepairs.h \
+    tabsale.h \
     windowsdispatcher.h
 
 FORMS    += mainwindow.ui \
@@ -91,7 +101,8 @@ FORMS    += mainwindow.ui \
     tabprintdialog.ui \
     tabrepair.ui \
     tabrepairnew.ui \
-    tabrepairs.ui
+    tabrepairs.ui \
+    tabsale.ui
 
 LIB_DIR = $$PWD/lib6
 INCLUDEPATH += $$LIB_DIR/include

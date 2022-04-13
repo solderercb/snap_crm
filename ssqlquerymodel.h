@@ -2,6 +2,7 @@
 #define SSQLQUERYMODEL_H
 
 #include <QSqlQueryModel>
+#include <QSqlRecord>
 #include <QSqlField>
 #include "sstandarditemmodel.h"
 

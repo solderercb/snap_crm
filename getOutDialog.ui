@@ -48,6 +48,9 @@
      </property>
      <item>
       <widget class="QCheckBox" name="checkBoxDiagDocPrint">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::RightToLeft</enum>
        </property>
@@ -58,6 +61,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBoxWorksDocPrint">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::RightToLeft</enum>
        </property>
@@ -68,6 +74,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBoxWarrantyDocPrint">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::RightToLeft</enum>
        </property>
@@ -78,6 +87,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonLooseDocPrint">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Бланк утери квитанции</string>
        </property>

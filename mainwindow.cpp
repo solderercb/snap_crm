@@ -7,6 +7,7 @@
 #include "tabrepairnew.h"
 #include "tabrepairs.h"
 #include "tabrepair.h"
+#include "tabsale.h"
 #include "tabclients.h"
 #include "tabprintdialog.h"
 #include "mylineedit.h"
@@ -91,6 +92,7 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     goods_menu->addAction(goods_arrival);
     QAction *goods_sale = new QAction("Продажа", this);
     goods_menu->addAction(goods_sale);
+    QObject::connect(goods_sale,SIGNAL(triggered()),this,SLOT(createTabSale()));
     QAction *store_docs = new QAction("Документы", this);
     goods_menu->addAction(store_docs);
     QAction *purchase_manager = new QAction("Менеджер закупок", this);
@@ -444,6 +446,16 @@ void MainWindow::initGlobalModels()
             qDebug() << "МАСКА ТЕЛЕФОНА 2!!!";
             break;
         }
+    comSettings->insert("phone_mask1", comSettings->value("phone_mask1").toString().replace('0', '9')); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
+    comSettings->insert("phone_mask2", comSettings->value("phone_mask2").toString().replace('0', '9'));
+
+    QList<QStandardItem*> *clientPhoneTypesSelector;
+    clientPhoneTypesSelector = new QList<QStandardItem*>();
+    *clientPhoneTypesSelector << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem(comSettings->value("phone_mask1").toString()); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
+    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
+    clientPhoneTypesSelector = new QList<QStandardItem*>();;
+    *clientPhoneTypesSelector << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
+    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
 
     warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
@@ -456,7 +468,7 @@ void MainWindow::initGlobalModels()
     engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
 //    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
-    paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
+    paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain")); // TODO: нужна прокси-модель для отображения платёжных систем в соответствии с правами пользователя
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
 
     QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы", "Архивные"};
@@ -495,7 +507,7 @@ void MainWindow::initGlobalModels()
     for (int i=0; i<warrantyTermsList.size(); i++)
     {
         warrantyTermSelector = new QList<QStandardItem*>();
-        *warrantyTermSelector << new QStandardItem(warrantyTermsList.at(i)) << new QStandardItem(warrantyTerms[i]);
+        *warrantyTermSelector << new QStandardItem(warrantyTermsList.at(i)) << new QStandardItem(QString::number(warrantyTerms[i]));
         warrantyTermsModel->appendRow(*warrantyTermSelector);
         warrantyTermsMap->insert(warrantyTerms[i], warrantyTermsList.at(i));
     }
@@ -509,7 +521,30 @@ void MainWindow::initGlobalModels()
         rejectReasonModel->appendRow(*rejectReasonSelector);
     }
 
-    query = QString("SELECT '' AS 'name', '' AS 'id', '' AS 'company_list' UNION ALL (SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`);");
+    QVector<QString> priceColNamesList = {"Цена для сервиса", "Цена розница", "Цена опт", "Цена опт2", "Цена опт3"};
+    QVector<QString> priceColIdsList = {"1", "2", "3", "4", "5"};
+    QVector<QString> priceColDBFieldsList = {"price", "price2", "price3", "price4", "price5"};
+    QList<QStandardItem*> *priceColSelector;
+    for (int i=0; i<priceColNamesList.size(); i++)
+    {
+        priceColSelector = new QList<QStandardItem*>();
+        *priceColSelector << new QStandardItem(priceColNamesList.at(i)) << new QStandardItem(priceColIdsList.at(i)) << new QStandardItem(priceColDBFieldsList.at(i));
+        priceColModel->appendRow(*priceColSelector);
+    }
+
+    QVector<QString> itemUnitsList = {"шт", "г", "м", "см", "л"};
+    QVector<QString> itemUnitsIdsList = {"1", "2", "3", "4", "5"};
+    QList<QStandardItem*> *itemUnitsSelector;
+    for (int i=0; i<itemUnitsList.size(); i++)
+    {
+        itemUnitsSelector = new QList<QStandardItem*>();
+        *itemUnitsSelector << new QStandardItem(itemUnitsList.at(i)) << new QStandardItem(itemUnitsIdsList.at(i));
+        itemUnitsModel->appendRow(*itemUnitsSelector);
+    }
+
+#ifdef QT_DEBUG
+    initClients4Test();
+#endif
 }
 
 bool MainWindow::readStatuses(QStandardItemModel &model, QJsonArray &jsonArray)
@@ -690,6 +725,18 @@ void MainWindow::reactivateTabRepairNew(int)
     ui->tabWidget->setCurrentWidget(tabRepairNew::getInstance());
 }
 
+void MainWindow::createTabSale(int doc_id)
+{
+    tabSale *subwindow = tabSale::getInstance(doc_id, this);
+    if(ui->tabWidget->indexOf(subwindow) == -1)
+        if(doc_id)
+            ui->tabWidget->addTab(subwindow, "Расходная накладная " + QString::number(doc_id));
+        else
+            ui->tabWidget->addTab(subwindow, "Продажа");
+    ui->tabWidget->setCurrentWidget(subwindow);
+    // TODO: QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
+}
+
 void MainWindow::createTabClients(int type)
 {
     const QString tabLabels[] = {"Клиенты", "Выбрать клиента"};
@@ -750,15 +797,17 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-    createTabRepair(24313);
-    if (test_scheduler_counter < 375)
-    {
+//    createTabRepair(24313);
+//    createTabSale(16316);
+    createTabSale(0);
+//    if (test_scheduler_counter < 375)
+//    {
 //        createTabRepairNew();
 //        QMap<QString, QVariant> report_vars;
-//        report_vars.insert("repair_id", 25022);
+//        report_vars.insert("repair_id", 25037);
 //        report_vars.insert("type", "new_rep");
 //        createTabPrint(report_vars);
-    }
+//    }
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 
 }

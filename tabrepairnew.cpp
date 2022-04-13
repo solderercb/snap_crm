@@ -3,9 +3,6 @@
 #include "tabrepairnew.h"
 #include "ui_tabrepairnew.h"
 #include "com_sql_queries.h"
-#ifdef QT_DEBUG
-#include "clients4test.h"
-#endif
 
 tabRepairNew* tabRepairNew::p_instance = nullptr;
 
@@ -174,8 +171,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     msgBox.setIcon(QMessageBox::Critical);
 
 #ifdef QT_DEBUG
-    initClients4Test();
-
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
     test_scheduler2 = new QTimer();
@@ -220,9 +215,6 @@ tabRepairNew::~tabRepairNew()
     #ifdef QT_DEBUG
         delete test_scheduler;
         delete test_scheduler2;
-        for(int i=clients4Test->size()-1;i>=0;i--)
-            delete clients4Test->value(i);
-        delete clients4Test;
     #endif
     p_instance = nullptr;   // Обязательно блять!
 }
@@ -949,29 +941,10 @@ bool tabRepairNew::createRepair()
     box = (ui->comboBoxPresetBox->currentIndex() < 0)?0:repairBoxesModel->record(ui->comboBoxPresetBox->currentIndex()).value("id").toInt();
     isWarranty = ui->checkBoxIsWarranty->isChecked();
 
-    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
-
-    // пользователь мог выбрать модель из списка, а затем отредаткировать её, поэтому пробуем найти модель в списке
-    deviceModelIndex = comboboxDeviceModelsModel->rowCount();
-    while (--deviceModelIndex >= 0 && comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText());
-    // если не выбрана модель из списка, создаём новую. Или если была выбрана модель из списка, а затем текст был отредактирован, тоже записываем в таблицу новую модель.
-    if ( deviceModelIndex < 0 ||  (comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText()) )
-    {
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_DEVICE_MODEL
-                    .arg(ui->comboBoxDeviceModel->currentText())
-                    .arg("NULL")
-                    .arg(comboboxDeviceMakersModel->record(deviceMakerIndex).value("id").toInt())
-                    .arg(comboboxDevicesModel->record(deviceTypeIndex).value("id").toInt()));
-        QUERY_LAST_INS_ID(query,nDBErr,deviceModel);
-        qDebug() << "Новая модель уст-ва: LAST_INSERT_ID() = " << deviceModel;
-    }
-    else
-    {
-        deviceModel = comboboxDeviceModelsModel->record(deviceModelIndex).value("id").toInt();
-//        qDebug() << "model already exists";
-    }
     if (client == 0)
     {
+
+        QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
         QUERY_EXEC(query,nDBErr)(QUERY_INS_CLIENT
                     .arg(user)
                     .arg(ui->lineEditClientFirstName->text())
@@ -1013,6 +986,29 @@ bool tabRepairNew::createRepair()
         }
 
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",2,user,office,client,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт"));
+        QUERY_COMMIT_ROLLBACK(query,nDBErr);
+    }
+
+    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
+
+    // пользователь мог выбрать модель из списка, а затем отредаткировать её, поэтому пробуем найти модель в списке
+    deviceModelIndex = comboboxDeviceModelsModel->rowCount();
+    while (--deviceModelIndex >= 0 && comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText());
+    // если не выбрана модель из списка, создаём новую. Или если была выбрана модель из списка, а затем текст был отредактирован, тоже записываем в таблицу новую модель.
+    if ( deviceModelIndex < 0 ||  (comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText()) )
+    {
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_DEVICE_MODEL
+                    .arg(ui->comboBoxDeviceModel->currentText())
+                    .arg("NULL")
+                    .arg(comboboxDeviceMakersModel->record(deviceMakerIndex).value("id").toInt())
+                    .arg(comboboxDevicesModel->record(deviceTypeIndex).value("id").toInt()));
+        QUERY_LAST_INS_ID(query,nDBErr,deviceModel);
+        qDebug() << "Новая модель уст-ва: LAST_INSERT_ID() = " << deviceModel;
+    }
+    else
+    {
+        deviceModel = comboboxDeviceModelsModel->record(deviceModelIndex).value("id").toInt();
+//        qDebug() << "model already exists";
     }
 
 //    qDebug() << (QUERY_INS_WORKSHOP
@@ -1053,6 +1049,8 @@ bool tabRepairNew::createRepair()
 //    qDebug() << "Новый ремонт: LAST_INSERT_ID() = " << repair;
 //    qDebug() << QUERY_INS_LOG("NULL",3,user,office,client,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair));
     QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,client,repair,"NULL","NULL","NULL","Устройство принято в ремонт №"+QString::number(repair)));
+    QUERY_EXEC(query,nDBErr)(QUERY_UPD_CLIENT_REPAIRS(client));
+
     if (ui->lineEditInsideComment->text() != "" )
     {
         QUERY_EXEC(query,nDBErr)(QUERY_INS_REPAIR_COMMENT
@@ -1075,6 +1073,7 @@ bool tabRepairNew::createRepair()
                                    office,
                                    QString("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)),
                                    repair,
+                                   "NULL",
                                    paymentSystemsModel->record(ui->comboBoxPrepayAccount->currentIndex()).value("system_id").toInt()
                                    )
                     );
@@ -1088,6 +1087,7 @@ bool tabRepairNew::createRepair()
                                    office,
                                    QString("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)),
                                    repair,
+                                   "NULL",
                                    paymentSystemsModel->record(ui->comboBoxPrepayAccount->currentIndex()).value("system_id").toInt()
                                    )
                     );

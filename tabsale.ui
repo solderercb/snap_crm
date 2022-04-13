@@ -1,0 +1,1302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>tabSale</class>
+ <widget class="QWidget" name="tabSale">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1176</width>
+    <height>948</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
+     </property>
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,4" columnminimumwidth="300,0">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMaximumSize</enum>
+       </property>
+       <item row="0" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+         <item>
+          <widget class="sparePartsTable" name="tableView">
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustToContents</enum>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxClientCoincidence">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>500</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Совпадение клиента</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QTableView" name="tableViewClientMatch">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="tabKeyNavigation">
+               <bool>false</bool>
+              </property>
+              <property name="showDropIndicator" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <attribute name="horizontalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="lineEditTakeIn">
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLineEdit" name="lineEditTotal">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLineEdit" name="lineEditCharge">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="4">
+            <widget class="QLineEdit" name="lineEditAddByUID"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelTotal">
+             <property name="text">
+              <string>Итого</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="labelTakeIn">
+             <property name="text">
+              <string>Внесено</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="labelCharge">
+             <property name="text">
+              <string>Сдача</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Добавить по UID</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="0">
+        <layout class="QFormLayout" name="formLayout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <property name="labelAlignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="formAlignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelDocNum">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Номер документа</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEditDocNum">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="labelDate">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Дата</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="lineEditDate">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="labelPaymentAccount">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Оплата</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="labelPriceCol">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Колонка</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="comboBoxPriceCol">
+           <property name="insertPolicy">
+            <enum>QComboBox::NoInsert</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="labelCompany">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Организация</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="comboBoxCompany">
+           <property name="insertPolicy">
+            <enum>QComboBox::NoInsert</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QSpinBox" name="spinBoxReserve"/>
+         </item>
+         <item row="7" column="0" colspan="2">
+          <widget class="QCheckBox" name="checkBoxAnonymous">
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string>Анонимный клиент</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0" colspan="2">
+          <widget class="QGroupBox" name="groupBoxClient">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Клиент</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
+              <item>
+               <widget class="QPushButton" name="pushButtonClientFromDB">
+                <property name="text">
+                 <string>Выбрать</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonClientCredsClearAll">
+                <property name="text">
+                 <string>Очистить</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonCreateTabClient">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Открыть</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="8" column="1">
+             <widget class="MComboBox" name="comboBoxClientPhoneType">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="insertPolicy">
+               <enum>QComboBox::NoInsert</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0" colspan="2">
+             <widget class="QLineEdit" name="lineEditClientPatronymic"/>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QLabel" name="labelClientPatronymic">
+              <property name="text">
+               <string>Отчество</string>
+              </property>
+             </widget>
+            </item>
+            <item row="11" column="0" colspan="2">
+             <widget class="QComboBox" name="comboBoxClientAdType"/>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QLabel" name="labelClientFirstName">
+              <property name="text">
+               <string>Имя</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QLabel" name="labelClientLastName">
+              <property name="text">
+               <string>Фамилия</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QLineEdit" name="lineEditClientPhone"/>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QLineEdit" name="lineEditClientLastName"/>
+            </item>
+            <item row="7" column="0" colspan="2">
+             <widget class="QLabel" name="labelClientPhone">
+              <property name="text">
+               <string>Телефон</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0" colspan="2">
+             <widget class="QLineEdit" name="lineEditClientFirstName"/>
+            </item>
+            <item row="9" column="0" colspan="2">
+             <widget class="QLabel" name="labelClientAdType">
+              <property name="text">
+               <string>Источник обращения</string>
+              </property>
+             </widget>
+            </item>
+            <item row="12" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayoutBalance">
+              <item>
+               <widget class="QLabel" name="labelBalance">
+                <property name="text">
+                 <string>Баланс</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditBalance">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxSaleInCredit">
+                <property name="layoutDirection">
+                 <enum>Qt::RightToLeft</enum>
+                </property>
+                <property name="text">
+                 <string>С баланса</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="2">
+          <widget class="QGroupBox" name="groupBoxAdm">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Администрирование</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetMinimumSize</enum>
+            </property>
+            <item row="4" column="0" colspan="2">
+             <widget class="QPushButton" name="pushButtonRevert">
+              <property name="text">
+               <string>Распровести расходную накладную</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="2">
+             <widget class="QTextEdit" name="textEditRevertReason">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="placeholderText">
+               <string>Основание возврата</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QPushButton" name="pushButtonPrintCkeck">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Распечатать кассовый чек</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QLabel" name="labelMoneyBackAccount">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Возврат средств</string>
+                </property>
+                <property name="margin">
+                 <number>3</number>
+                </property>
+                <property name="indent">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBoxMoneyBackAccount">
+                <property name="insertPolicy">
+                 <enum>QComboBox::NoInsert</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="10" column="0" colspan="2">
+          <widget class="QLabel" name="labelComment">
+           <property name="text">
+            <string>Примечание</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0" colspan="2">
+          <widget class="QLineEdit" name="lineEditComment"/>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="labelTrack">
+           <property name="text">
+            <string>ТТН</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <widget class="QLineEdit" name="lineEditTrack"/>
+         </item>
+         <item row="13" column="0" colspan="2">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="6" column="1">
+          <widget class="QProgressBar" name="progressBarReserve">
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+           <property name="invertedAppearance">
+            <bool>true</bool>
+           </property>
+           <property name="format">
+            <string>%v</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="labelReserve">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Резерв</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="labelReserveProgress">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>До снятия резерва, дней</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="margin">
+            <number>4</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="comboBoxPaymentAccount">
+           <property name="insertPolicy">
+            <enum>QComboBox::NoInsert</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QWidget" name="botToolbar" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,0" rowminimumheight="0,0">
+        <property name="verticalSpacing">
+         <number>15</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::HLine</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,0,1,0" rowminimumheight="0" columnminimumwidth="0,0,0,0,0">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMinimumSize</enum>
+          </property>
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="LeftGridLayout_2" columnstretch="0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="0" column="2">
+           <layout class="QGridLayout" name="CentralGridLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="buttonLog">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>История</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="buttonParams">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Параметры</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="7">
+             <widget class="QPushButton" name="buttonSale">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Продать</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QPushButton" name="buttonAdd">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Добавить</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="buttonReserve">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Резерв</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5">
+             <widget class="QPushButton" name="buttonReserveCancel">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Снять резерв</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="6">
+             <widget class="QPushButton" name="buttonSaleMore">
+              <property name="text">
+               <string>Продать ещё</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="buttonPrint">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Печать</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_1">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>70</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>70</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="4">
+           <layout class="QGridLayout" name="RightGridLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">mcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>sparePartsTable</class>
+   <extends>QTableView</extends>
+   <header>tabsale.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>buttonSale</tabstop>
+  <tabstop>buttonAdd</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>lineEditClientLastName</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>tabSale</receiver>
+   <slot>findMatchingClient(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditClientPhone</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>tabSale</receiver>
+   <slot>findMatchingClient(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>445</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonClientFromDB</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>buttonSelectExistingClientHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>77</x>
+     <y>264</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxAnonymous</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tabSale</receiver>
+   <slot>hideGroupBoxClient(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>309</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableViewClientMatch</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>tabSale</receiver>
+   <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1088</x>
+     <y>653</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1169</x>
+     <y>624</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditAddByUID</sender>
+   <signal>returnPressed()</signal>
+   <receiver>tabSale</receiver>
+   <slot>addItemByUID()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1078</x>
+     <y>851</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1171</x>
+     <y>849</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonReserve</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>reserveButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>624</x>
+     <y>922</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>628</x>
+     <y>943</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonAdd</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>addItemButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>542</x>
+     <y>914</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>543</x>
+     <y>943</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonParams</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>paramsButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>459</x>
+     <y>909</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>463</x>
+     <y>944</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditTakeIn</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>tabSale</receiver>
+   <slot>updateChargeAmount(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>571</x>
+     <y>849</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>362</x>
+     <y>941</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditTotal</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>tabSale</receiver>
+   <slot>updateChargeAmount(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>385</x>
+     <y>851</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>190</x>
+     <y>944</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxClientPhoneType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabSale</receiver>
+   <slot>phoneTypeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>445</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>395</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonClientCredsClearAll</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>tabSale</receiver>
+   <slot>clearClientCreds(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>204</x>
+     <y>264</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>153</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonSaleMore</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>saleMoreButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>791</x>
+     <y>911</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>717</x>
+     <y>944</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonSale</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>saleButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>875</x>
+     <y>911</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>838</x>
+     <y>944</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditTrack</sender>
+   <signal>returnPressed()</signal>
+   <receiver>tabSale</receiver>
+   <slot>setTrackNum()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>752</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>746</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonCreateTabClient</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>buttonCreateTabClientHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>250</x>
+     <y>256</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonReserveCancel</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>reserveCancelButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>729</x>
+     <y>913</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>730</x>
+     <y>954</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonLog</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>logButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>914</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>401</x>
+     <y>969</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonPrint</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>printButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>296</x>
+     <y>912</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>295</x>
+     <y>962</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonRevert</sender>
+   <signal>clicked()</signal>
+   <receiver>tabSale</receiver>
+   <slot>unSaleButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>637</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableView</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>tabSale</receiver>
+   <slot>tableRowDoubleClick(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1067</x>
+     <y>146</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1177</x>
+     <y>146</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>findMatchingClient(QString)</slot>
+  <slot>buttonSelectExistingClientHandler()</slot>
+  <slot>hideGroupBoxClient(bool)</slot>
+  <slot>selectPriceCol(int)</slot>
+  <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
+  <slot>addItemByUID()</slot>
+  <slot>saleButtonClicked()</slot>
+  <slot>reserveButtonClicked()</slot>
+  <slot>addItemButtonClicked()</slot>
+  <slot>paramsButtonClicked()</slot>
+  <slot>updateChargeAmount(QString)</slot>
+  <slot>phoneTypeChanged(int)</slot>
+  <slot>clearClientCreds(bool)</slot>
+  <slot>saleMoreButtonClicked()</slot>
+  <slot>setTrackNum()</slot>
+  <slot>buttonCreateTabClientHandler()</slot>
+  <slot>reserveCancelButtonClicked()</slot>
+  <slot>logButtonClicked()</slot>
+  <slot>printButtonClicked()</slot>
+  <slot>unSaleButtonClicked()</slot>
+  <slot>tableRowDoubleClick(QModelIndex)</slot>
+ </slots>
+</ui>

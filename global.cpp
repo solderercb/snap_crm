@@ -1,4 +1,5 @@
 #include "global.h"
+
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 QMap<QString, QVariant> *userData = new QMap<QString, QVariant>;
@@ -6,7 +7,8 @@ QSqlQueryModel *userDataModel = new QSqlQueryModel();
 QMap<QString, QVariant> *userLocalData = new QMap<QString, QVariant>;
 QMap<QString, bool> *permissions = new QMap<QString, bool>;
 QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
-QSqlQueryModel *companiesModel = new QSqlQueryModel;
+SStandardItemModel *clientPhoneTypesModel = new SStandardItemModel();
+SSqlQueryModel *companiesModel = new SSqlQueryModel;
 QSqlQueryModel *officesModel = new QSqlQueryModel;
 QSqlQueryModel *warehousesModel = new QSqlQueryModel;
 QSqlQueryModel *allUsersModel = new QSqlQueryModel;
@@ -14,14 +16,14 @@ QMap<int, QString> *allUsersMap = new QMap<int, QString>;
 QSqlQueryModel *usersModel = new QSqlQueryModel;
 QSqlQueryModel *managersModel = new QSqlQueryModel;
 QSqlQueryModel *engineersModel = new QSqlQueryModel;
-QSqlQueryModel *itemBoxesModel = new QSqlQueryModel;
-QSqlQueryModel *repairBoxesModel = new QSqlQueryModel;
-QSqlQueryModel *paymentSystemsModel = new QSqlQueryModel;
+SSqlQueryModel *itemBoxesModel = new SSqlQueryModel;
+SSqlQueryModel *repairBoxesModel = new SSqlQueryModel;
+SSqlQueryModel *paymentSystemsModel = new SSqlQueryModel;
 QStandardItemModel* clientsTypesList = new QStandardItemModel;
-QSqlQueryModel* clientAdTypesList = new QSqlQueryModel;
+SSqlQueryModel* clientAdTypesList = new SSqlQueryModel;
 QStandardItemModel *statusesModel = new QStandardItemModel();
 QStandardItemModel *notifyStatusesModel = new QStandardItemModel();
-QStandardItemModel *warrantyTermsModel = new QStandardItemModel();
+SStandardItemModel *warrantyTermsModel = new SStandardItemModel();
 QMap<int, QString> *warrantyTermsMap = new QMap<int, QString>;
 QString commonComboBoxStyleSheet = "QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
         QComboBox::drop-down {  border: 0px;}\
@@ -40,7 +42,8 @@ QString commonTextEditStyleSheetRed = "QTextEdit {  border: 1px solid red;  padd
 QString commonDateEditStyleSheet = "";
 QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 SStandardItemModel *rejectReasonModel = new SStandardItemModel;
+SStandardItemModel *priceColModel = new SStandardItemModel;
+SStandardItemModel *itemUnitsModel = new SStandardItemModel;
 
 //QWidget *modalWidget = nullptr;
-
 

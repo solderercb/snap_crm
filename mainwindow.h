@@ -32,6 +32,8 @@
 #include <QRandomGenerator>
 #include <QCloseEvent>
 #include "windowsdispatcher.h"
+#include "shortlivednotification.h"
+#include "amountToWords.h"
 
 namespace Ui {
 class MainWindow;
@@ -104,6 +106,7 @@ private slots:
 
     void createTabRepair(int);
     void reactivateTabRepairNew(int);
+    void createTabSale(int doc_id = 0);
     void createTabClients(int type = 0);
     void createTabClient(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
