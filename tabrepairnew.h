@@ -70,8 +70,6 @@ private:
     QSqlQueryModel* clientModel;
     QSqlQueryModel* queryDevice;
     QSqlQueryModel* clientPhonesModel;
-    QStandardItemModel* clientPhoneTypesList;
-    QList<QStandardItem*> clientPhoneTypesSelector[2];
     QStandardItemModel* prepayReasonsModel;
     QList<QStandardItem*> *prepayReason;
     QSqlQueryModel* clientsMatchTable;

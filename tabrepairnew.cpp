@@ -137,16 +137,11 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxClientAdType->setModelColumn(0);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
 
-    clientPhoneTypesList = new QStandardItemModel(this);
-    clientPhoneTypesSelector[0] << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem(comSettings->value("phone_mask1").toString()); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
-    clientPhoneTypesList->appendRow( clientPhoneTypesSelector[0] );
-    clientPhoneTypesSelector[1] << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
-    clientPhoneTypesList->appendRow( clientPhoneTypesSelector[1] );
-    ui->comboBoxClientPhone1Type->setModel(clientPhoneTypesList);
+    ui->comboBoxClientPhone1Type->setModel(clientPhoneTypesModel);
 //    ui->comboBoxClientPhone1Type->setItemData(0, QSize(0,0), Qt::SizeHintRole); // так можно спрятать элемент в выпадающем списке, но клавиатурой его всё равно можно выбрать
     ui->comboBoxClientPhone1Type->setModelColumn(0);
     ui->comboBoxClientPhone1Type->setCurrentIndex(0);    // устанавливаем первый элемент выпадающего списка
-    ui->comboBoxClientPhone2Type->setModel(clientPhoneTypesList);
+    ui->comboBoxClientPhone2Type->setModel(clientPhoneTypesModel);
     ui->comboBoxClientPhone2Type->setModelColumn(0);
     ui->comboBoxClientPhone2Type->setCurrentIndex(0);    // устанавливаем первый элемент выпадающего списка
 
@@ -207,10 +202,6 @@ tabRepairNew::~tabRepairNew()
     delete comboBoxExteriorModel;
     delete clientsMatchTable;
     delete devicesMatchTable;
-    for(int i=clientPhoneTypesList->rowCount()-1;i>=0;i--)   // типы телефонов; фиг знает, может быть и достаточно удалить clientPhoneTypesList
-        for (int j=clientPhoneTypesSelector[i].size()-1; j>=0; j--)     // каждый QStandartItem
-            delete clientPhoneTypesSelector[i].value(j);
-    delete clientPhoneTypesList;
     delete groupBoxEventFilterObj;
     #ifdef QT_DEBUG
         delete test_scheduler;
@@ -442,17 +433,28 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
 {
     setDefaultStyleSheets();
     client = 0;
+    ui->lineEditClientLastName->setReadOnly(false);  // разрешение редактирования
+    ui->lineEditClientFirstName->setReadOnly(false);
+    ui->lineEditClientPatronymic->setReadOnly(false);
+    ui->lineEditClientPhone1->setReadOnly(false);
+    ui->comboBoxClientPhone1Type->setEnabled(true);
+    ui->lineEditClientPhone2->setReadOnly(false);
+    ui->comboBoxClientPhone2Type->setEnabled(true);
+    ui->comboBoxClientAdType->setEnabled(true);
+    ui->lineEditClientAddress->setReadOnly(false);
+    ui->lineEditClientEmail->setReadOnly(false);
+
     ui->pushButtonCreateTabClient->setEnabled(false);
     ui->lineEditClientLastName->clear();
     ui->lineEditClientFirstName->clear();
     ui->lineEditClientPatronymic->clear();
     ui->lineEditClientPhone1->clear();
-    ui->comboBoxClientPhone1Type->setCurrentIndex(clientPhoneTypesList->index(0, 0).row());     // устанавливаем первый элемент выпадающего списка
+    ui->comboBoxClientPhone1Type->setCurrentIndex(0);     // устанавливаем первый элемент выпадающего списка
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->lineEditClientAddress->clear();
     ui->lineEditClientEmail->clear();
     ui->lineEditClientPhone2->clear();
-    ui->comboBoxClientPhone2Type->setCurrentIndex(clientPhoneTypesList->index(0, 0).row());     // устанавливаем первый элемент выпадающего списка
+    ui->comboBoxClientPhone2Type->setCurrentIndex(0);     // устанавливаем первый элемент выпадающего списка
     if (hideCoincidence)
         ui->groupBoxClientCoincidence->hide();
 }
@@ -494,6 +496,17 @@ void tabRepairNew::fillClientCreds(int id)
     changeClientType();
 
     client = id;
+    ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
+    ui->lineEditClientFirstName->setReadOnly(true);
+    ui->lineEditClientPatronymic->setReadOnly(true);
+    ui->lineEditClientPhone1->setReadOnly(true);
+    ui->comboBoxClientPhone1Type->setEnabled(false);
+    ui->lineEditClientPhone2->setReadOnly(true);
+    ui->comboBoxClientPhone2Type->setEnabled(false);
+    ui->comboBoxClientAdType->setEnabled(false);
+    ui->lineEditClientAddress->setReadOnly(true);
+    ui->lineEditClientEmail->setReadOnly(true);
+
     ui->pushButtonCreateTabClient->setEnabled(true);
     ui->lineEditClientFirstName->setText(clientModel->record(0).value("name").toString());
     ui->lineEditClientLastName->setText(clientModel->record(0).value("surname").toString());
@@ -508,12 +521,12 @@ void tabRepairNew::fillClientCreds(int id)
     // заполняем типы телефонов. Пока так, потом придумаю что-то более элегантное
     if(clientPhonesModel->rowCount() > 1)   // если результат содержит более одной строки, то в поле доп. номера записываем данные из второй строки результатов
     {
-        ui->comboBoxClientPhone2Type->setCurrentIndex(clientPhoneTypesList->index((clientPhonesModel->index(1, 1).data().toInt() - 1), 0).row());    // сначала устанавливаем тип в комбобоксе, чтобы применилась маска к полю
+        ui->comboBoxClientPhone2Type->setCurrentText(clientPhoneTypesModel->getDisplayRole(clientPhonesModel->index(1, 1).data().toInt(), 1));    // сначала устанавливаем тип в комбобоксе, чтобы применилась маска к полю
         ui->lineEditClientPhone2->setText(clientPhonesModel->index(1, 0).data().toString());    // теперь устанавливаем номер телефона
     }
     if(clientPhonesModel->rowCount() > 0)
     {
-        ui->comboBoxClientPhone1Type->setCurrentIndex(clientPhoneTypesList->index((clientPhonesModel->index(0, 1).data().toInt() - 1), 0).row());    //
+        ui->comboBoxClientPhone1Type->setCurrentText(clientPhoneTypesModel->getDisplayRole(clientPhonesModel->index(0, 1).data().toInt(), 1));    //
         ui->lineEditClientPhone1->setText(clientPhonesModel->index(0, 0).data().toString());
     }
 
@@ -581,7 +594,7 @@ void tabRepairNew::buttonSelectExistingClientHandler()
 void tabRepairNew::findMatchingClient(QString text)
 {
     QString lineEditClientPhone1DisplayText = ui->lineEditClientPhone1->displayText();  // отображаемый текст
-    QString currentPhone1InputMask = clientPhoneTypesList->index(ui->comboBoxClientPhone1Type->currentIndex(), 2).data().toString().replace(QRegularExpression("[09]"), "_");   // в маске телефона меняем 0 и 9 на подчеркивание; 0 и 9 — это специальные маскировочные символы (см. справку QLineEdit, inputMask)
+    QString currentPhone1InputMask = clientPhoneTypesModel->index(ui->comboBoxClientPhone1Type->currentIndex(), 2).data().toString().replace(QRegularExpression("[09]"), "_");   // в маске телефона меняем 0 и 9 на подчеркивание; 0 и 9 — это специальные маскировочные символы (см. справку QLineEdit, inputMask)
     QString enteredByUserDigits;    // строка символов, которые ввёл пользователь (т. е. текст отображаемый в lineEdit над которым выполнена операция т. н. XOR с заданной маской
     QStringList query_where;    // список условий для запроса к БД
     QString query;  // весь запрос к БД
@@ -712,6 +725,8 @@ void tabRepairNew::setDefaultStyleSheets()
     ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheet);
     ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheet);
     ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxClientPhone1Type->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxClientPhone2Type->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheet);
     ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheet);
     ui->lineEditClientPhone1->setStyleSheet(commonLineEditStyleSheet);
@@ -970,7 +985,7 @@ bool tabRepairNew::createRepair()
                     phone1c.append(phone1.at(i));
             }
 //            qDebug() << "phone1c: " << phone1c;
-            QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone1,phone1c,clientPhoneTypesList->index(ui->comboBoxClientPhone1Type->currentIndex(), 1).data().toInt(),client,1,""));
+            QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone1,phone1c,clientPhoneTypesModel->index(ui->comboBoxClientPhone1Type->currentIndex(), 1).data().toInt(),client,1,""));
         }
         if (ui->lineEditClientPhone2->hasAcceptableInput())
         {
@@ -982,7 +997,7 @@ bool tabRepairNew::createRepair()
                     phone2c.append(phone2.at(i));
             }
 //            qDebug() << "phone2c: " << phone2c;
-            QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone2,phone2c,clientPhoneTypesList->index(ui->comboBoxClientPhone2Type->currentIndex(), 1).data().toInt(),client,0,""));
+            QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone2,phone2c,clientPhoneTypesModel->index(ui->comboBoxClientPhone2Type->currentIndex(), 1).data().toInt(),client,0,""));
         }
 
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",2,user,office,client,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт"));
@@ -1194,8 +1209,8 @@ void tabRepairNew::phoneTypeChanged(int type, int index)
     switch (type)
     {
         // т. к. полей для телефона всего два, то нет смысла городить какую-то универсальную конструкцию.
-        case 1: ui->lineEditClientPhone1->setInputMask(""); ui->lineEditClientPhone1->setInputMask(clientPhoneTypesList->index(index, 2).data().toString() + ";_"); break;  // Here ";_" for filling blank characters with underscore
-        case 2: ui->lineEditClientPhone2->setInputMask(""); ui->lineEditClientPhone2->setInputMask(clientPhoneTypesList->index(index, 2).data().toString() + ";_"); break;
+        case 1: ui->lineEditClientPhone1->setInputMask(""); ui->lineEditClientPhone1->setInputMask(clientPhoneTypesModel->index(index, 2).data().toString() + ";_"); break;  // Here ";_" for filling blank characters with underscore
+        case 2: ui->lineEditClientPhone2->setInputMask(""); ui->lineEditClientPhone2->setInputMask(clientPhoneTypesModel->index(index, 2).data().toString() + ";_"); break;
     }
 }
 
