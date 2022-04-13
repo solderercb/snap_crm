@@ -74,6 +74,9 @@
             </item>
             <item row="0" column="1">
              <widget class="QPushButton" name="buttonRefreshTable">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Обновить</string>
               </property>
@@ -81,6 +84,9 @@
             </item>
             <item row="0" column="2">
              <widget class="QPushButton" name="buttonPrint">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Печать</string>
               </property>

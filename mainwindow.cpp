@@ -70,10 +70,13 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     QObject::connect(workshop_new,SIGNAL(triggered()),this,SLOT(createTabRepairNew()));
     QAction *workshop_refill = new QAction("Заправка", this);
     workshop_menu->addAction(workshop_refill);
+    workshop_refill->setEnabled(false);
     QAction *workshop_price = new QAction("Прайс-лист", this);
     workshop_menu->addAction(workshop_price);
+    workshop_price->setEnabled(false);
     QAction *workshop_editor = new QAction("Групповой редактор ремонтов", this);
     workshop_menu->addAction(workshop_editor);
+    workshop_editor->setEnabled(false);
     QToolButton* workshop_button = new QToolButton();
 //    QAction *workshop = new QAction("Ремонты", this);
 //    workshop_button->addAction(workshop);
@@ -90,23 +93,31 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     QMenu *goods_menu = new QMenu();
     QAction *goods_arrival = new QAction("Приход", this);
     goods_menu->addAction(goods_arrival);
+    goods_arrival->setEnabled(false);
     QAction *goods_sale = new QAction("Продажа", this);
     goods_menu->addAction(goods_sale);
     QObject::connect(goods_sale,SIGNAL(triggered()),this,SLOT(createTabSale()));
     QAction *store_docs = new QAction("Документы", this);
     goods_menu->addAction(store_docs);
+    store_docs->setEnabled(false);
     QAction *purchase_manager = new QAction("Менеджер закупок", this);
     goods_menu->addAction(purchase_manager);
+    purchase_manager->setEnabled(false);
     QAction *store_manager = new QAction("Управление складом", this);
     goods_menu->addAction(store_manager);
+    store_manager->setEnabled(false);
     QAction *goods_editor = new QAction("Групповой редактор товаров", this);
     goods_menu->addAction(goods_editor);
+    goods_editor->setEnabled(false);
     QAction *goods_uploader = new QAction("Выгрузка товаров", this);
     goods_menu->addAction(goods_uploader);
+    goods_uploader->setEnabled(false);
     QAction *device_buyout = new QAction("Выкуп техники", this);
     goods_menu->addAction(device_buyout);
+    device_buyout->setEnabled(false);
     QAction *stocktaking = new QAction("Переучет", this);
     goods_menu->addAction(stocktaking);
+    stocktaking->setEnabled(false);
     QToolButton* goods_button = new QToolButton();
     goods_button->setMenu(goods_menu);
     goods_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -120,10 +131,13 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     QMenu *clients_menu = new QMenu();
     QAction *client_new = new QAction("Новый клиент", this);
     clients_menu->addAction(client_new);
+    client_new->setEnabled(false);
     QAction *clients_calls = new QAction("Вызовы", this);
     clients_menu->addAction(clients_calls);
+    clients_calls->setEnabled(false);
     QAction *clients_sms = new QAction("SMS", this);
     clients_menu->addAction(clients_sms);
+    clients_sms->setEnabled(false);
 //    QAction *clients_editor = new QAction("Групповой редактор клиентов", this);
 //    clients_menu->addAction(clients_editor);
     QToolButton* clients_button = new QToolButton();
@@ -755,7 +769,7 @@ void MainWindow::createTabClients(int type)
         // Сигнал экземпляра вкладки выбора клиента подключаем к слоту вкладки нового ремонта для заполнения соотв. полей
         // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabRepairNew::getInstance(), SLOT(fillClientCreds(int)));
-        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(reactivateTabRepairNew(int)));
+        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(reactivateTabClientNew(int)));
     }
 
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Ремонты/Выбрать ремонт

@@ -59,9 +59,6 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int, int, int)), this, SLOT(tableSectionResized(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(tableSortingChanged(int, Qt::SortOrder)));
 
-    // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabClients, то получим цикл.
-    connect(ui->buttonClientNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
-
     updateTableWidget();
 }
 
