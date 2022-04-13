@@ -61,6 +61,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int, int, int)), this, SLOT(tableSectionMoved(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int, int, int)), this, SLOT(tableSectionResized(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(tableSortingChanged(int, Qt::SortOrder)));
+    connect(ui->buttonRepairNew, &QPushButton::clicked, this, &tabRepairs::buttonRepairNewClicked);
 
     // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.
     connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));

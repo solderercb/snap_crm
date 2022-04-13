@@ -26,6 +26,7 @@ class tabRepairs : public tabCommon
 
 signals:
     void doubleClicked(int);
+    void buttonRepairNewClicked();
 
 public:
     explicit tabRepairs(bool type = 0, MainWindow *parent = nullptr);

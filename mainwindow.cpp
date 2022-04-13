@@ -683,6 +683,7 @@ void MainWindow::createTabRepairs(int type)
         // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabRepairNew::getInstance(), SLOT(fillDeviceCreds(int)));
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(reactivateTabRepairNew(int)));
+        QObject::connect(subwindow,SIGNAL(buttonRepairNewClicked()), this, SLOT(createTabRepairNew()));
     }
 
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Ремонты/Выбрать ремонт
