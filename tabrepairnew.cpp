@@ -8,44 +8,6 @@ tabRepairNew* tabRepairNew::p_instance = nullptr;
 
 enum addlField {LineEdit = 1, ComboBox, DateEdit, dummy};
 
-groupBoxEventFilter::groupBoxEventFilter(QObject *parent) :
-    QObject(parent)
-{
-}
-
-bool groupBoxEventFilter::eventFilter(QObject *watched, QEvent *event)
-{
-//    qDebug() << watched->objectName() << ": viewEventFilter: " << event;
-
-    // когда указатель находится на заголовке (по всей ширине groupBox'а), устанавливаем курсор в виде руки с указательным пальцем
-    // TODO: проверить сколько эта метода жрёт ресурсов
-    QGroupBox *groupBox = static_cast<QGroupBox*>(watched);
-    if (event->type() == QEvent::HoverMove)
-    {
-        QPoint point = static_cast<QHoverEvent*>(event)->position().toPoint();
-        if (point.x() > 0 && point.x() < groupBox->width() && point.y() >0 && point.y() < 20)
-            groupBox->setCursor(Qt::PointingHandCursor);
-        else
-            groupBox->unsetCursor();
-    }
-
-    // Нажатие левой кнопкой мыши на заголовке groupBox'а скрывает/показывает таблицу (при скрытии groupBox сжимается по вертикали)
-    if (event->type() == QEvent::MouseButtonPress)
-    {
-        QMouseEvent *mouseButtonPress = static_cast<QMouseEvent*>(event);
-
-        if (mouseButtonPress->button() == Qt::LeftButton)
-        {
-            if (mouseButtonPress->position().toPoint().x() > 0 && mouseButtonPress->position().toPoint().x() < groupBox->width() && mouseButtonPress->position().toPoint().y() >0 && mouseButtonPress->position().toPoint().y() < 20)
-            {
-                QTableView *table = groupBox->findChild<QTableView*>();
-                table->setVisible(!table->isVisible());
-            }
-        }
-    }
-    return false;
-}
-
 tabRepairNew::tabRepairNew(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairNew)
@@ -66,9 +28,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     main_window_test_scheduler2 = parent->test_scheduler2;
 #endif
 
-    groupBoxEventFilterObj = new groupBoxEventFilter(this);
-    ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilterObj);
-    ui->groupBoxDeviceCoincidence->installEventFilter(groupBoxEventFilterObj);
+    groupBoxEventFilter = new SGroupBoxEventFilter(this);
+    ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilter);
+    ui->groupBoxDeviceCoincidence->installEventFilter(groupBoxEventFilter);
     ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
     ui->groupBoxClientCoincidence->hide();  // по умолчанию группу "Совпадение клиента" не показываем
     ui->labelPrevRepairFromOldDB->hide();   // по умолчанию поля "Предыдущий ремонт" не показываем
@@ -202,7 +164,7 @@ tabRepairNew::~tabRepairNew()
     delete comboBoxExteriorModel;
     delete clientsMatchTable;
     delete devicesMatchTable;
-    delete groupBoxEventFilterObj;
+    delete groupBoxEventFilter;
     #ifdef QT_DEBUG
         delete test_scheduler;
         delete test_scheduler2;

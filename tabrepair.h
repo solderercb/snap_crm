@@ -17,6 +17,7 @@
 #include <QLocale>
 #include "tabcommon.h"
 #include "getOutDialog.h"
+#include "widgets/sgroupboxeventfilter.h"
 
 namespace Ui {
 class tabRepair;
@@ -108,6 +109,7 @@ private:
     QWidget *overlay;
     bool save_state_on_close = 0;
     bool worksAndPartsEditEnabled = 0;
+    SGroupBoxEventFilter *groupBoxEventFilter;
 
 private slots:
     void updateRepairData();

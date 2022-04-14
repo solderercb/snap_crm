@@ -5,44 +5,6 @@
 
 QMap<int, tabSale*> tabSale::p_instance;
 
-groupBoxEventFilter3::groupBoxEventFilter3(QObject *parent) :
-    QObject(parent)
-{
-}
-
-bool groupBoxEventFilter3::eventFilter(QObject *watched, QEvent *event)  // TODO: вынести в отдельные файлы
-{
-//    qDebug() << watched->objectName() << ": viewEventFilter: " << event;
-
-    // когда указатель находится на заголовке (по всей ширине groupBox'а), устанавливаем курсор в виде руки с указательным пальцем
-    // TODO: проверить сколько эта метода жрёт ресурсов
-    QGroupBox *groupBox = static_cast<QGroupBox*>(watched);
-    if (event->type() == QEvent::HoverMove)
-    {
-        QPoint point = static_cast<QHoverEvent*>(event)->position().toPoint();
-        if (point.x() > 0 && point.x() < groupBox->width() && point.y() >0 && point.y() < 20)
-            groupBox->setCursor(Qt::PointingHandCursor);
-        else
-            groupBox->unsetCursor();
-    }
-
-    // Нажатие левой кнопкой мыши на заголовке groupBox'а скрывает/показывает таблицу (при скрытии groupBox сжимается по вертикали)
-    if (event->type() == QEvent::MouseButtonPress)
-    {
-        QMouseEvent *mouseButtonPress = static_cast<QMouseEvent*>(event);
-
-        if (mouseButtonPress->button() == Qt::LeftButton)
-        {
-            if (mouseButtonPress->position().toPoint().x() > 0 && mouseButtonPress->position().toPoint().x() < groupBox->width() && mouseButtonPress->position().toPoint().y() >0 && mouseButtonPress->position().toPoint().y() < 20)
-            {
-                QTableView *table = groupBox->findChild<QTableView*>();
-                table->setVisible(!table->isVisible());
-            }
-        }
-    }
-    return false;
-}
-
 tabSale::tabSale(int doc, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabSale),
@@ -57,8 +19,8 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
 
-    groupBoxEventFilterObj = new groupBoxEventFilter3(this);
-    ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilterObj);
+    groupBoxEventFilter = new SGroupBoxEventFilter(this);
+    ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilter);
     ui->comboBoxPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxMoneyBackAccount->setModel(paymentSystemsModel);
     ui->comboBoxPriceCol->setModel(priceColModel);
@@ -123,7 +85,7 @@ tabSale::~tabSale()
 {
     delete ui;
     p_instance.remove(doc_id);   // Обязательно блять!
-    delete groupBoxEventFilterObj;
+    delete groupBoxEventFilter;
 }
 
 void tabSale::setDefaultStyleSheets()

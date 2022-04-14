@@ -45,6 +45,13 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
     ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 
+    // сворачивание групп элементов (ну как в АСЦ чтобы). Отключено, т. к. требует доработки класса SGroupBoxEventFilter
+//    groupBoxEventFilter = new SGroupBoxEventFilter(this);
+//    ui->groupBoxDeviceSummary->installEventFilter(groupBoxEventFilter);
+//    ui->groupBoxDiagResult->installEventFilter(groupBoxEventFilter);
+//    ui->groupBoxWorksAndSpareParts->installEventFilter(groupBoxEventFilter);
+//    ui->groupBoxComments->installEventFilter(groupBoxEventFilter);
+
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(updateWidgets()));

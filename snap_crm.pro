@@ -57,6 +57,7 @@ SOURCES += main.cpp\
     tabrepairnew.cpp \
     tabrepairs.cpp \
     tabsale.cpp \
+    widgets/sgroupboxeventfilter.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
@@ -89,6 +90,7 @@ HEADERS  += \
     tabrepairnew.h \
     tabrepairs.h \
     tabsale.h \
+    widgets/sgroupboxeventfilter.h \
     windowsdispatcher.h
 
 FORMS    += mainwindow.ui \

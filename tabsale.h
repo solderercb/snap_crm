@@ -23,6 +23,7 @@
 #include "ssqlquerymodel.h"
 #include "models/saletable/saletablemodel.h"
 #include "models/saletable/saletableitemdelegates.h"
+#include "widgets/sgroupboxeventfilter.h"
 #ifdef QT_DEBUG
 #include <QTimer>
 #include <QFile>
@@ -32,18 +33,6 @@
 namespace Ui {
 class tabSale;
 }
-
-class groupBoxEventFilter3 : public QObject
-{
-    Q_OBJECT
-signals:
-
-public:
-    groupBoxEventFilter3(QObject*);
-private:
-protected:
-    bool eventFilter(QObject*, QEvent*) override;
-};
 
 class sparePartsTable : public QTableView
 {
@@ -83,7 +72,7 @@ private:
     float total_sum, takein_sum, charge_sum;
     void eventResize(QResizeEvent *);
     QSqlQueryModel* clientsMatchTable;
-    groupBoxEventFilter3 *groupBoxEventFilterObj;
+    SGroupBoxEventFilter *groupBoxEventFilter;
     QSqlQueryModel* clientPhonesModel;
     int client = 0;
     int price_col = 2;

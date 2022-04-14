@@ -17,22 +17,11 @@
 #include "mainwindow.h"
 #include "tabcommon.h"
 #include "amountToWords.h"
+#include "widgets/sgroupboxeventfilter.h"
 
 namespace Ui {
     class tabRepairNew;
 }
-
-class groupBoxEventFilter : public QObject
-{
-    Q_OBJECT
-signals:
-
-public:
-    groupBoxEventFilter(QObject*);
-private:
-protected:
-    bool eventFilter(QObject*, QEvent*) override;
-};
 
 class tabRepairNew : public tabCommon
 {
@@ -79,12 +68,11 @@ private:
     void phoneTypeChanged(int, int);
     bool checkInput();
     QMessageBox msgBox;
+    SGroupBoxEventFilter *groupBoxEventFilter;
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
 #endif
-
-    groupBoxEventFilter *groupBoxEventFilterObj;
 
 private slots:
     void changeClientType();
