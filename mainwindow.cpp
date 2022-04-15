@@ -416,7 +416,7 @@ void MainWindow::get_warehouses_list()
 		comboboxDestModel->appendRow(newRow2);	// Добавляем строку в модель comboBox (склад-приёмник)
 	}
 
-	ui->comboBoxDestWarehouse->setCurrentIndex(1); // По умолчанию складом-приёмником является второй элемент в списке
+//	ui->comboBoxDestWarehouse->setCurrentIndex(1); // По умолчанию складом-приёмником является второй элемент в списке
 
     delete warehouse_list;
 }

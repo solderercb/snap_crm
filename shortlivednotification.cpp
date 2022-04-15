@@ -8,8 +8,8 @@ QPoint shortlivedNotification::appearance = {0,0};
 int shortlivedNotification::appearanceStep = DEFAULT_HEIGHT + 5;
 QFont shortlivedNotification::captionFont = QFont("Calibri", 12, QFont::Bold);
 QFont shortlivedNotification::messageFont = QFont("Calibri", 11);
-QColor shortlivedNotification::captionColor = QColor("#FFFFFF");    // Цвета по умолчанию, белый
-QColor shortlivedNotification::messageColor = QColor("#F5F5F5");    // светло-серый
+QColor shortlivedNotification::captionColor = QColor(255,255,255);    // Цвета по умолчанию, белый
+QColor shortlivedNotification::messageColor = QColor(245,245,245);    // светло-серый
 int shortlivedNotification::maxDisplayedNotifications = MAX_POPUPS;
 
 // captionColor_ и messageColor_ имеют приоритет над static captionColor и static messageColor;

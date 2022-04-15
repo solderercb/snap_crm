@@ -583,7 +583,8 @@ void tabSale::addItemByUID(int uid)
 {
     if(tableModel->getModelState() == 0)
     {
-        if(!isItemAlreadyInList(uid))
+        int row = isItemAlreadyInList(uid);
+        if( row == -1)
         {
             newItemModel->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->index(ui->comboBoxPriceCol->currentIndex(), 2).data().toString()), QSqlDatabase::database("connMain"));
             for(int i = 0; i < newItemModel->rowCount(); i++)
@@ -591,13 +592,18 @@ void tabSale::addItemByUID(int uid)
                 if(newItemModel->record(i).value("avail").toInt())
                     tableModel->appendRecord(newItemModel->record(i));
                 else
+                {
                     qDebug() << QString("Товар UID %1 не доступен").arg(newItemModel->record(i).value("UID").toString());
+                    shortlivedNotification *newPopup = new shortlivedNotification(this, "Товар отсутствует", "\"" + newItemModel->record(i).value("name").toString() + "\" (UID " + newItemModel->record(i).value("UID").toString() + ") не доступен для продажи", QColor(255,199,173), QColor(255,164,119));
+                    newPopup->setVisible(true);
+                }
             }
         }
         else
         {
-            qDebug() << "товар уже добавлен";
-            // TODO: сообщение, что товар уже добавлен
+            qDebug() << QString("товар UID %1 уже добавлен").arg(tableModel->value(row, "UID").toString());
+            shortlivedNotification *newPopup = new shortlivedNotification(this, "Повтор", "\"" + tableModel->value(row, "name").toString()+"\" (UID " + tableModel->value(row, "UID").toString() + ") уже добавлен", QColor(255,255,255), QColor(245,245,245));
+            newPopup->setVisible(true);
         }
     }
 }
@@ -802,14 +808,14 @@ void tabSale::clearAll()
     clientModel->clear();
 }
 
-bool tabSale::isItemAlreadyInList(int id)
+int tabSale::isItemAlreadyInList(int id)
 {
     for(int i = 0; i < tableModel->rowCount(); i++)
     {
         if(tableModel->value(i, "item_id").toInt() == id)
-            return true;
+            return i;
     }
-    return false;
+    return -1;
 }
 
 bool tabSale::sale()

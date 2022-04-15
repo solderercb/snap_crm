@@ -86,7 +86,7 @@ private:
     QString genUserWebPass() const;
     bool sale();
     void clearAll();
-    bool isItemAlreadyInList(int);
+    int isItemAlreadyInList(int);
     void addItemByUID(int);
 
 #ifdef QT_DEBUG
