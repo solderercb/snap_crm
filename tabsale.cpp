@@ -530,7 +530,7 @@ void tabSale::fillClientCreds(int id)
 
 void tabSale::buttonSelectExistingClientHandler()
 {
-
+    emit createTabSelectExistingClient(1, this);
 }
 
 void tabSale::buttonCreateTabClientHandler()

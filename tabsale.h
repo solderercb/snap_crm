@@ -52,6 +52,7 @@ class tabSale : public tabCommon
     Q_OBJECT
 
 signals:
+    void createTabSelectExistingClient(int, QWidget*);
     void createTabClient(int);
     void createTabSparePart(int);
     void generatePrintout(QMap<QString, QVariant> report_vars);

@@ -91,7 +91,7 @@ void tabClients::lineEditSearchSetFocus()
 
 void tabClients::updateTableWidget()
 {
-    qDebug() << "updateTableWidget()";
+//    qDebug() << "updateTableWidget()";
     query.clear();
 
     /* Собираем условия для запроса */
@@ -102,7 +102,7 @@ void tabClients::updateTableWidget()
     // TODO: создать свой ComboBox с кнопкой 🗙
     if (ui->comboBoxClientAdType->currentIndex() >= 0 )
     {
-        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString();
+//        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString();
         query_where << QString("`visit_source` = %1").arg(clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString());
     }
     if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
@@ -122,7 +122,7 @@ void tabClients::clientTypeChanged(QModelIndex index)
 
 void tabClients::clientAdvertisingChanged(int index)
 {
-    qDebug() << "SLOT clientAdvertisingChanged(int index), index = " << ui->comboBoxClientAdType->currentIndex();
+//    qDebug() << "SLOT clientAdvertisingChanged(int index), index = " << ui->comboBoxClientAdType->currentIndex();
     updateTableWidget();
 }
 
@@ -130,7 +130,10 @@ void tabClients::tableItemDoubleClick(QModelIndex item)
 {
     emit doubleClicked(clientsTable->index(item.row(), 0).data().toInt());
     if (_type == 1)
+    {
+        emit activateCaller(callerPtr);
         deleteLater();
+    }
 }
 
 void tabClients::lineEditSearchTextChanged(QString search_str)

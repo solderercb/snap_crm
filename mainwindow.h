@@ -103,11 +103,11 @@ private slots:
 	void on_comboBoxSourceWarehouse_currentIndexChanged(int index);
 	void on_tableGoods_activated(const QModelIndex &index);
 	void on_tableGoods_clicked(const QModelIndex &index);
-
+    void reactivateCallerTab(QWidget *);
     void createTabRepair(int);
     void reactivateTabRepairNew(int);
     void createTabSale(int doc_id = 0);
-    void createTabClients(int type = 0);
+    void createTabClients(int type = 0, QWidget *caller = nullptr);
     void createTabClient(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
     void closeTab(int index);

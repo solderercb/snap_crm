@@ -29,7 +29,7 @@ class tabRepairNew : public tabCommon
 
 signals:
     void createTabSelectPrevRepair(int);
-    void createTabSelectExistingClient(int);
+    void createTabSelectExistingClient(int, QWidget *);
     void createTabClient(int);
     void generatePrintout(QMap<QString, QVariant>);
 

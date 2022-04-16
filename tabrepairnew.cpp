@@ -550,7 +550,7 @@ void tabRepairNew::fillDeviceCreds(int id)
 
 void tabRepairNew::buttonSelectExistingClientHandler()
 {
-    emit createTabSelectExistingClient(1);
+    emit createTabSelectExistingClient(1, this);
 }
 
 void tabRepairNew::findMatchingClient(QString text)

@@ -640,7 +640,12 @@ void MainWindow::on_tableGoods_activated(const QModelIndex &index)
 
 void MainWindow::on_tableGoods_clicked(const QModelIndex &index)
 {
-	readConsignments(index, ui->comboBoxSourceWarehouse->currentData(Qt::UserRole+1).toString());
+    readConsignments(index, ui->comboBoxSourceWarehouse->currentData(Qt::UserRole+1).toString());
+}
+
+void MainWindow::reactivateCallerTab(QWidget *caller)
+{
+    ui->tabWidget->setCurrentWidget(caller); // Переключаемся на вкладку caller
 }
 
 void MainWindow::readConsignments(const QModelIndex &index, const QString &warehouse_code)
@@ -718,7 +723,7 @@ void MainWindow::createTabRepairNew()
         ui->tabWidget->addTab(subwindow, "Приём в ремонт");
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int)), this, SLOT(createTabRepairs(int)));
-    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int)), this, SLOT(createTabClients(int)));
+    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int, QWidget*)), this, SLOT(createTabClients(int, QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString, QVariant>)), this, SLOT(createTabPrint(QMap<QString, QVariant>)));
 }
@@ -749,15 +754,27 @@ void MainWindow::createTabSale(int doc_id)
         else
             ui->tabWidget->addTab(subwindow, "Продажа");
     ui->tabWidget->setCurrentWidget(subwindow);
+    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int, QWidget *)), this, SLOT(createTabClients(int, QWidget *)));
+    QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString, QVariant>)), this, SLOT(createTabPrint(QMap<QString, QVariant>)));
     // TODO: QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
 }
 
-void MainWindow::createTabClients(int type)
+/*  Создание вкладки Клиенты (type = 0) или Выбрать клиента (type = 1)
+ *  caller - указатель на вызывающую вкладку-виджет, необходимый для правильной передачи id выбранного клиента
+ *  (данный слот может быть вызван с вкладок Приём в ремонт и Продать, а в будущем и других)
+*/
+void MainWindow::createTabClients(int type, QWidget *caller)
 {
     const QString tabLabels[] = {"Клиенты", "Выбрать клиента"};
     tabClients *subwindow = tabClients::getInstance(type, this);
-    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
-        ui->tabWidget->addTab(subwindow, tabLabels[type]);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет
+    {
+        if(caller)  // если передан параметр, то вставляем её сразу после вызывающей
+            ui->tabWidget->insertTab(ui->tabWidget->indexOf(caller) + 1, subwindow, tabLabels[type]);
+        else    // иначе добавляем в конец
+            ui->tabWidget->addTab(subwindow, tabLabels[type]);
+    }
 
     if (type == 0)
     {
@@ -766,13 +783,20 @@ void MainWindow::createTabClients(int type)
     }
     else
     {
-        // Сигнал экземпляра вкладки выбора клиента подключаем к слоту вкладки нового ремонта для заполнения соотв. полей
-        // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
-        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabRepairNew::getInstance(), SLOT(fillClientCreds(int)));
-        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(reactivateTabClientNew(int)));
+        // Сигнал вкладки выбора клиента подключаем к слоту вызывающей вкладки для заполнения соотв. полей
+        // и к слоту MainWindow, в котором происходит переключение на вызывающую вкладку после выбора клиента
+        // TODO: нужно придумать более элегантный способ подключения сигнала doubleClicked(int) к слоту вызывающей вкладки
+        if ( QString(caller->metaObject()->className()).compare("tabRepairNew", Qt::CaseSensitive) == 0 )
+            QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabRepairNew::getInstance(), SLOT(fillClientCreds(int)));
+        else if ( QString(caller->metaObject()->className()).compare("tabSale", Qt::CaseSensitive) == 0 )
+            QObject::connect(subwindow,SIGNAL(doubleClicked(int)), tabSale::getInstance(0), SLOT(fillClientCreds(int)));
+
+        // Чтобы после выбора клиента произошло автоматическое переключение на вызывающую вкладку, требуются доп. "телодвижения"
+        subwindow->setCallerPtr(caller);
+        QObject::connect(subwindow,SIGNAL(activateCaller(QWidget *)), this, SLOT(reactivateCallerTab(QWidget *)));
     }
 
-    ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Ремонты/Выбрать ремонт
+    ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Выбрать клиента
     subwindow->lineEditSearchSetFocus();
 
 }

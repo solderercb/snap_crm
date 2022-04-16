@@ -23,12 +23,14 @@ class tabClients : public tabCommon
 
 signals:
     void doubleClicked(int);
+    void activateCaller(QWidget *);
 
 public:
     explicit tabClients(bool type = 0, MainWindow *parent = nullptr);
     static tabClients* getInstance(bool type, MainWindow *parent = nullptr);
     void lineEditSearchSetFocus();
     ~tabClients();
+    void setCallerPtr(QWidget *ptr){callerPtr = ptr;};
 
 private:
     Ui::tabClients *ui;
@@ -46,6 +48,7 @@ private:
     QStringList query_where;
     QStringList query_group;
     QStringList query_order;
+    QWidget *callerPtr = nullptr;
 
 private slots:
     void clientTypeChanged(QModelIndex);
