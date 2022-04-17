@@ -51,9 +51,19 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
     tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)
     ui->tabWidget->tabBar()->installEventFilter(tabBarEventFilterObj);
 
-    this->resize(1440,800);
+    this->move(0, 0);   // размер и положение окна по умолчанию
+    this->resize(1440, 960);
+    if(userLocalData->value("WorkspaceState").toString() == "Maximized")
+    {
+        setWindowState(Qt::WindowMaximized);
+    }
+    else
+    {
+        this->move(userLocalData->value("WorkspaceLeft").toInt(), userLocalData->value("WorkspaceTop").toInt());
+        this->resize(userLocalData->value("WorkspaceWidth").toInt(), userLocalData->value("WorkspaceHeight").toInt());
+    }
 
-    QString toolButtonStyle = "QToolButton {\
+    QString toolButtonStyle = "QToolButton{\
                                    border: 0px;\
                                    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
                                                                      stop: 0 #f6f7fa, stop: 1 #dadbde);\
@@ -836,9 +846,9 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-//    createTabRepair(24313);
+    createTabRepair(24972);
 //    createTabSale(16316);
-    createTabSale(0);
+//    createTabSale(0);
 //    if (test_scheduler_counter < 375)
 //    {
 //        createTabRepairNew();

@@ -77,7 +77,7 @@ void tabRepair::updateRepairData()
 {
     repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(repair_id));
     clientModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt()));
-    fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(repair_id));
+    fieldsModel->setQuery(QUERY_SEL_REPAIR_ADD_FIELDS(repair_id));
     worksAndPartsModel->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(repair_id));
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
 }
@@ -122,6 +122,17 @@ void tabRepair::updateWidgets()
         ui->pushButtonGetout->setHidden(false);
     }
 
+    if( repairModel->record(0).value("ext_early").toString() != "" )
+    {
+        ui->labelExtPrevRepair->show();
+        ui->lineEditExtPrevRepair->show();
+        ui->lineEditExtPrevRepair->setText(repairModel->record(0).value("ext_early").toString());
+    }
+    else
+    {
+        ui->labelExtPrevRepair->hide();
+        ui->lineEditExtPrevRepair->hide();
+    }
     ui->lineEditOffice->setText(getDisplayRoleById(repairModel->record(0).value("office").toInt(), officesModel, getFieldIdByName("id", officesModel)));
     ui->lineEditManager->setText(getDisplayRoleById(repairModel->record(0).value("manager").toInt(), allUsersModel, getFieldIdByName("id", allUsersModel)));
     ui->lineEditEngineer->setText(getDisplayRoleById(repairModel->record(0).value("master").toInt(), allUsersModel, getFieldIdByName("id", allUsersModel)));
@@ -138,29 +149,40 @@ void tabRepair::updateWidgets()
     box_name = ui->comboBoxPlace->currentText();
     ui->lineEditColor->setText(repairModel->record(0).value("color").toString());
     ui->lineEditWarrantyLabel->setText(repairModel->record(0).value("warranty_label").toString());
-    ui->lineEditPrevRepair->setText(repairModel->record(0).value("early").toString());
-
+    if(repairModel->record(0).value("early").toInt())
+        ui->lineEditPrevRepair->setText(repairModel->record(0).value("early").toString());
     ui->listWidgetExtraInfo->setHidden(true);
-//    if(repairModel->record(0).value("express_repair").toBool())
-//        ui->listWidgetExtraInfo->addItem("");
-//    if(repairModel->record(0).value("is_warranty").toBool())
-//        ui->listWidgetExtraInfo->addItem("is_repeat");
+    ui->listWidgetExtraInfo->clear();
+    if(clientModel->record(0).value("is_regular").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("постоянный клиент"));
+    if(repairModel->record(0).value("thirs_party_sc").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("было в другом СЦ"));
+    if(repairModel->record(0).value("can_format").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("данные не важны"));
+    if(repairModel->record(0).value("express_repair").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("срочный"));
+    if(clientModel->record(0).value("is_agent").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("посредник"));
+//    if(clientModel->record(0).value("is_bad").toBool())
+//        ui->listWidgetExtraInfo->addItem(tr("проблемный"));
 //    if(repairModel->record(0).value("").toBool())
 //        ui->listWidgetExtraInfo->addItem("");
 //    if(repairModel->record(0).value("is_card_payment").toBool())
 //        ui->listWidgetExtraInfo->addItem("");
-//    if(repairModel->record(0).value("can_format").toBool())
+    if(repairModel->record(0).value("is_repeat").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("повтор"));
+    if(repairModel->record(0).value("is_warranty").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("гарантия"));
+//    if(repairModel->record(0).value("is_pre_agreed").toBool())    // предварительная стоимость в отдельном lineEdit
+//        ui->listWidgetExtraInfo->addItem(QString(tr("предварительная стоимость: %1")).arg(sysLocale.toCurrencyString(repairModel->record(0).value("pre_agreed_amount").toFloat())));
+    if(repairModel->record(0).value("print_check").toBool())
+        ui->listWidgetExtraInfo->addItem(tr("чек при выдаче"));
+    if(repairModel->record(0).value("is_prepaid").toBool())
+        ui->listWidgetExtraInfo->addItem(QString(tr("предоплата: %1")).arg(sysLocale.toCurrencyString(repairModel->record(0).value("prepaid_summ").toFloat())));
+//    if(repairModel->record(0).value("is_debt").toBool())  // похоже не используется в АЦС
 //        ui->listWidgetExtraInfo->addItem("");
-//    if(repairModel->record(0).value("print_check").toBool())
-//        ui->listWidgetExtraInfo->addItem("");
-//    if(repairModel->record(0).value("is_prepaid").toBool())
-//        ui->listWidgetExtraInfo->addItem(QString("предоплата: ").arg(sysLocale.toCurrencyString(repairModel->record(0).value("prepaid_summ").toFloat())));
-////    if(repairModel->record(0).value("is_debt").toBool())  // похоже не используется в АЦС
-////        ui->listWidgetExtraInfo->addItem("");
-//    if(repairModel->record(0).value("thirs_party_sc").toBool())
-//        ui->listWidgetExtraInfo->addItem("");
-//    if(repairModel->record(0).value("ext_early").toBool())
-//        ui->listWidgetExtraInfo->addItem("");
+    if(ui->listWidgetExtraInfo->count())
+        ui->listWidgetExtraInfo->setHidden(false);
 
     if(repairModel->record(0).value("payment_system").toInt() != 1) // TODO: нужен более гибкий способ определения безналичного рассчета
     {
@@ -196,6 +218,21 @@ void tabRepair::updateWidgets()
     ui->lineEditProblem->setText(repairModel->record(0).value("fault").toString());
     ui->lineEditIncomingSet->setText(repairModel->record(0).value("complect").toString());
     ui->lineEditExterior->setText(repairModel->record(0).value("look").toString());
+
+    for(int i = ui->gridLayoutDeviceSummary->rowCount() - 1; i > 2; i-- )
+    {
+        ui->gridLayoutDeviceSummary->itemAtPosition(i, 1)->widget()->deleteLater();
+        ui->gridLayoutDeviceSummary->itemAtPosition(i, 0)->widget()->deleteLater();
+    }
+    for(int i = 0; i < fieldsModel->rowCount(); i ++)
+    {
+        QLabel *label = new QLabel(fieldsModel->record(i).value("name").toString());
+        QLineEdit *lineEdit = new QLineEdit();
+        lineEdit->setText(fieldsModel->record(i).value("value").toString());
+        lineEdit->setReadOnly(true);
+        ui->gridLayoutDeviceSummary->addWidget(label, i + 3, 0 );
+        ui->gridLayoutDeviceSummary->addWidget(lineEdit, i + 3, 1);
+    }
     ui->textEditDiagResult->setText(repairModel->record(0).value("diagnostic_result").toString());
     ui->lineEditAgreedAmount->setText(sysLocale.toString(repairModel->record(0).value("repair_cost").toFloat(), 'f', 2));
 
