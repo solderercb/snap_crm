@@ -1013,7 +1013,7 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_8">
             <item row="0" column="0">
-             <widget class="MComboBox" name="comboBoxStatus">
+             <widget class="SComboBox" name="comboBoxStatus">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -1446,9 +1446,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MComboBox</class>
+   <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">mcombobox.h</header>
+   <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
    <class>commentsTable</class>

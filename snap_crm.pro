@@ -40,7 +40,6 @@ SOURCES += main.cpp\
     global.cpp \
     mainwindow.cpp \
     loginwindow.cpp \
-    mcombobox.cpp \
     models/repairtablefiltermenu.cpp \
     models/saletable/saletableitemdelegates.cpp \
     models/saletable/saletablemodel.cpp \
@@ -56,6 +55,7 @@ SOURCES += main.cpp\
     tabrepairnew.cpp \
     tabrepairs.cpp \
     tabsale.cpp \
+    widgets/scombobox.cpp \
     widgets/sgroupboxeventfilter.cpp \
     widgets/slineedit.cpp \
     windowsdispatcher.cpp
@@ -65,7 +65,6 @@ HEADERS  += \
     clients4test.h \
     getOutDialog.h \
     global.h \
-    mcombobox.h \
     models/repairtablefiltermenu.h \
     models/saletable/saletableitemdelegates.h \
     models/saletable/saletablemodel.h \
@@ -89,6 +88,7 @@ HEADERS  += \
     tabrepairnew.h \
     tabrepairs.h \
     tabsale.h \
+    widgets/scombobox.h \
     widgets/sgroupboxeventfilter.h \
     widgets/slineedit.h \
     windowsdispatcher.h
