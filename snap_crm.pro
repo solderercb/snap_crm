@@ -44,7 +44,6 @@ SOURCES += main.cpp\
     models/repairtablefiltermenu.cpp \
     models/saletable/saletableitemdelegates.cpp \
     models/saletable/saletablemodel.cpp \
-    mylineedit.cpp \
     querylog.cpp \
     repairstablemodel.cpp \
     shortlivednotification.cpp \
@@ -58,6 +57,7 @@ SOURCES += main.cpp\
     tabrepairs.cpp \
     tabsale.cpp \
     widgets/sgroupboxeventfilter.cpp \
+    widgets/slineedit.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
@@ -81,7 +81,6 @@ HEADERS  += \
     chooseofficewindow.h \
     com_sql_queries.h \
     loginwindow.h \
-    mylineedit.h \
     repairstablemodel.h \
     tabclients.h \
     tabcommon.h \
@@ -91,6 +90,7 @@ HEADERS  += \
     tabrepairs.h \
     tabsale.h \
     widgets/sgroupboxeventfilter.h \
+    widgets/slineedit.h \
     windowsdispatcher.h
 
 FORMS    += mainwindow.ui \

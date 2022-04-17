@@ -1,15 +1,15 @@
-#include "mylineedit.h"
+#include "slineedit.h"
 
-myLineEdit::myLineEdit(QWidget *parent)
+SLineEdit::SLineEdit(QWidget *parent)
     : QLineEdit(parent)
 {
     frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
 }
 
-void myLineEdit::setButtons(QString buttons)
+void SLineEdit::setButtons(QString buttons)
 {
     QStringList buttonsList;
-    QStringList allowedButtonsList = { "Clear", "DownArrow", "Edit", "Search" };
+    QStringList allowedButtonsList = { "Clear", "DownArrow", "Edit", "Search", "Print", "Apply" };
     if (buttons != nullptr)
     {
         signalMapper = new QSignalMapper(this);
@@ -39,28 +39,32 @@ void myLineEdit::setButtons(QString buttons)
             if (buttonsList.value(i) == "Clear")
             {
                 // ✖ или 🗙 или ⌫
-//                lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
                 lineEditButtons[i]->setText("🗙");
             }
             else if (buttonsList.value(i) == "DownArrow")
             {
                 // ▼
-//                lineEditButtons[i]->setIcon(style()->standardIcon(QStyle::SP_TitleBarUnshadeButton));
                 lineEditButtons[i]->setText("▼");
             }
             else if (buttonsList.value(i) == "Edit")
             {
                 // 🖉
-//                QPixmap pixmap("pencil.png");
-//                lineEditButtons[i]->setIcon(QIcon(pixmap));
                 lineEditButtons[i]->setText("🖉");
             }
             else if (buttonsList.value(i) == "Search")
             {
                 // 🔍
-//                QPixmap pixmap("magnifier.png");
-//                lineEditButtons[i]->setIcon(QIcon(pixmap));
                 lineEditButtons[i]->setText("🔍");
+            }
+            else if (buttonsList.value(i) == "Print")
+            {
+                // 🖶 печать (стикеров)
+                lineEditButtons[i]->setText("🖶");
+            }
+            else if (buttonsList.value(i) == "Apply")
+            {
+                // 🗸 применить
+                lineEditButtons[i]->setText("🗸");
             }
 
         }
@@ -69,12 +73,12 @@ void myLineEdit::setButtons(QString buttons)
 
 }
 
-QString myLineEdit::buttons()
+QString SLineEdit::buttons()
 {
 
 }
 
-void myLineEdit::tmp_set_buttons_style_sheet(const QString &styleSheet)
+void SLineEdit::tmp_set_buttons_style_sheet(const QString &styleSheet)
 {
     int i = 0;
 
@@ -87,7 +91,7 @@ void myLineEdit::tmp_set_buttons_style_sheet(const QString &styleSheet)
     }
 }
 
-void myLineEdit::resize(const QSize &size)
+void SLineEdit::resize(const QSize &size)
 {
     sz.setHeight(size.height());
     sz.setWidth(sizeHint().width());
@@ -95,12 +99,12 @@ void myLineEdit::resize(const QSize &size)
     QLineEdit::resize( size );
 }
 
-void myLineEdit::resize(int w, int h)
+void SLineEdit::resize(int w, int h)
 {
     resize(QSize(w, h));
 }
 
-void myLineEdit::resizeEvent(QResizeEvent *)
+void SLineEdit::resizeEvent(QResizeEvent *)
 {
     int i = 0;
     buttonSize.setHeight(this->height());
@@ -118,7 +122,7 @@ void myLineEdit::resizeEvent(QResizeEvent *)
 
 }
 
-void myLineEdit::updateCloseButton(const QString& text)
+void SLineEdit::updateCloseButton(const QString& text)
 {
 //    if (lineEditButton[0])
 //    {
@@ -129,12 +133,12 @@ void myLineEdit::updateCloseButton(const QString& text)
 //    }
 }
 
-void myLineEdit::slotButtonClicked(int buttonId)
+void SLineEdit::slotButtonClicked(int buttonId)
 {
     emit this->buttonClicked(buttonId);
 }
 
 
-myLineEdit::~myLineEdit()
+SLineEdit::~SLineEdit()
 {
 }

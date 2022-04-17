@@ -10,7 +10,7 @@
 #include "tabsale.h"
 #include "tabclients.h"
 #include "tabprintdialog.h"
-#include "mylineedit.h"
+#include "widgets/slineedit.h"
 #include "com_sql_queries.h"
 
 tabBarEventFilter::tabBarEventFilter(QObject *parent) :

@@ -1,5 +1,5 @@
-#ifndef MYLINEEDIT_H
-#define MYLINEEDIT_H
+#ifndef SLINEEDIT_H
+#define SLINEEDIT_H
 
 #include <QLineEdit>
 #include <QStringList>
@@ -8,19 +8,19 @@
 #include <QVector>
 #include <QSignalMapper>
 
-class myLineEdit : public QLineEdit
+class SLineEdit : public QLineEdit
 {
     Q_OBJECT
     Q_PROPERTY(QString buttons READ buttons WRITE setButtons)
 
 public:
-    myLineEdit(QWidget *parent = nullptr);
+    SLineEdit(QWidget *parent = nullptr);
     void setButtons(QString buttons);
     void resize(const QSize &);
     void resize(int, int);
     QString buttons();
     void tmp_set_buttons_style_sheet(const QString&);
-    ~myLineEdit();
+    ~SLineEdit();
 
 signals:
     void buttonClicked(int buttonId = 0);
@@ -44,4 +44,4 @@ private:
 };
 
 
-#endif // MYLINEEDIT_H
+#endif // SLINEEDIT_H

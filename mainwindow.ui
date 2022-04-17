@@ -254,7 +254,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="myLineEdit" name="testStyleSheetLineEdit">
+           <widget class="SLineEdit" name="testStyleSheetLineEdit">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -350,9 +350,9 @@
  <layoutdefault spacing="1" margin="0"/>
  <customwidgets>
   <customwidget>
-   <class>myLineEdit</class>
+   <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>mylineedit.h</header>
+   <header>widgets/slineedit.h</header>
    <slots>
     <signal>buttonClicked(int)</signal>
    </slots>

@@ -169,7 +169,7 @@
           </widget>
          </item>
          <item row="8" column="0" colspan="3">
-          <widget class="myLineEdit" name="lineEditPrevRepair">
+          <widget class="SLineEdit" name="lineEditPrevRepair">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -484,7 +484,7 @@
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="myLineEdit" name="lineEditSN">
+               <widget class="SLineEdit" name="lineEditSN">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -1049,9 +1049,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>myLineEdit</class>
+   <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>mylineedit.h</header>
+   <header>widgets/slineedit.h</header>
    <slots>
     <signal>buttonClicked(int)</signal>
    </slots>
