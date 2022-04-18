@@ -423,9 +423,9 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
 
 void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
 {
-    if (button == 0)
+    if (button == SLineEdit::Search)
         emit createTabSelectPrevRepair(1);
-    else if (button ==1)
+    else if (button == SLineEdit::DownArrow)
     {
         if (!ui->lineEditPrevRepairFromOldDB->isVisible())
         {
