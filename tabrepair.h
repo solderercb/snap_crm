@@ -80,6 +80,8 @@ class tabRepair : public tabCommon
 
 signals:
     void worksTreeDoubleClicked(int);
+    void createTabPrevRepair(int);
+    void generatePrintout(QMap<QString,QVariant>);
 
 public:
     explicit tabRepair(int rep_id, MainWindow *parent = nullptr);
@@ -121,7 +123,15 @@ private slots:
     void updateTotalSumms();
     void createGetOutDialog();
     void closeGetOutDialog();
-
+    void openPrevRepair();
+    void printStickers(int);
+    void changeOffice(int);
+    void changeManager(int);
+    void changeEngineer(int);
+    void openInvoice(int);
+    void quickAddSparePartByUID(int);
+    void editIncomingSet(int);
+    void setAgreedAmount(int);
 };
 
 #endif // TABREPAIR_H

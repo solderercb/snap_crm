@@ -12,6 +12,47 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 {
     setLock(1);
     ui->setupUi(this);
+    if(permissions->contains("3"))  // Печатать ценники и стикеры
+    {
+        ui->lineEditRepairId->setButtons("Print");
+        connect(ui->lineEditRepairId, &SLineEdit::buttonClicked, this, &tabRepair::printStickers);
+    }
+    if(permissions->contains("72"))  // Изменять офис ремонта
+    {
+        ui->lineEditOffice->setButtons("Edit");
+        connect(ui->lineEditOffice, &SLineEdit::buttonClicked, this, &tabRepair::changeOffice);
+    }
+    if(permissions->contains("76"))  // Назначать ответственного менеджера
+    {
+        ui->lineEditManager->setButtons("Edit");
+        connect(ui->lineEditManager, &SLineEdit::buttonClicked, this, &tabRepair::changeManager);
+    }
+    if(permissions->contains("60"))  // Назначать ответственного инженера
+    {
+        ui->lineEditEngineer->setButtons("Edit");
+        connect(ui->lineEditEngineer, &SLineEdit::buttonClicked, this, &tabRepair::changeEngineer);
+    }
+    if(permissions->contains("65"))  // Работать с безналичными счетами
+    {
+        ui->lineEditInvoice->setButtons("Open");
+        connect(ui->lineEditInvoice, &SLineEdit::buttonClicked, this, &tabRepair::openInvoice);
+    }
+//    if(permissions->contains("X"))  // TODO: разрешение Редактировать комплектность
+    {
+        ui->lineEditIncomingSet->setButtons("Edit");
+        connect(ui->lineEditIncomingSet, &SLineEdit::buttonClicked, this, &tabRepair::editIncomingSet);
+    }
+    if(permissions->contains("69"))  // Устанавливать детали со склада
+    {
+        ui->lineEditQuickAddSparePartByUID->setButtons("Apply");
+        connect(ui->lineEditQuickAddSparePartByUID, &SLineEdit::buttonClicked, this, &tabRepair::quickAddSparePartByUID);
+    }
+    if(permissions->contains("29"))  // Статус: Согласовано с клиентом; TODO: подумать над этим разрешением; посмотреть как в АСЦ; достаточно ли использовать его или нужно создать своё
+    {
+        ui->lineEditAgreedAmount->setButtons("Apply");
+        connect(ui->lineEditAgreedAmount, &SLineEdit::buttonClicked, this, &tabRepair::setAgreedAmount);
+    }
+
     ui->comboBoxStatus->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxNotifyStatus->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPlace->setStyleSheet(commonComboBoxStyleSheet);
@@ -184,23 +225,40 @@ void tabRepair::updateWidgets()
     if(ui->listWidgetExtraInfo->count())
         ui->listWidgetExtraInfo->setHidden(false);
 
-    if(repairModel->record(0).value("payment_system").toInt() != 1) // TODO: нужен более гибкий способ определения безналичного рассчета
+    if( repairModel->record(0).value("payment_system").toInt() == 1 && permissions->contains("65") )    // указана Безналичная оплата и есть разрешение Работать с безналичными счетами
+    { // TODO: нужен более гибкий способ определения безналичного рассчета
+
+        ui->groupBoxCashless->setHidden(false);
+        if(repairModel->record(0).value("invoice").toInt()) // если уже выставлен счет
     {
+            ui->lineEditInvoiceAmount->setText("TODO:");
+            ui->lineEditInvoice->setText(QString("id=%1; TODO:").arg(repairModel->record(0).value("invoice").toString()));
+            ui->labelInvoice->setHidden(false);
+            ui->lineEditInvoice->setHidden(false);
+            ui->lineEditInvoicePaymentDate->setText("TODO:");
+            ui->labelInvoicePaymentDate->setHidden(false);
+            ui->lineEditInvoicePaymentDate->setHidden(false);
         ui->pushButtonCreateInvoice->setHidden(true);
-        ui->groupBoxCashless->setHidden(true);
+            ui->labelInvoiceAmount->setHidden(false);
+            ui->lineEditInvoiceAmount->setHidden(false);
     }
     else
     {
-        if(repairModel->record(0).value("invoice").toInt())
-        {
-            ui->pushButtonCreateInvoice->setHidden(true);
-            ui->lineEditInvoice->setText(QString("id=%1; TODO:").arg(repairModel->record(0).value("invoice").toString()));
-            ui->lineEditInvoicePaymentDate->setText("TODO:");
-            ui->lineEditInvoiceAmount->setText("TODO:");
+            ui->labelInvoice->setHidden(true);
+            ui->lineEditInvoice->setHidden(true);
+            ui->labelInvoicePaymentDate->setHidden(true);
+            ui->lineEditInvoicePaymentDate->setHidden(true);
+            ui->labelInvoiceAmount->setHidden(true);
+            ui->lineEditInvoiceAmount->setHidden(true);
+            ui->pushButtonCreateInvoice->setHidden(false);
+        }
+        ui->pushButtonCreatePrepayOrder->setHidden(true);
         }
         else
+    {
+        ui->pushButtonCreatePrepayOrder->setHidden(false);
+        ui->pushButtonCreateInvoice->setHidden(true);
             ui->groupBoxCashless->setHidden(true);
-        ui->pushButtonCreatePrepayOrder->setHidden(true);
     }
 
     save_state_on_close = userDataModel->record(0).value("save_state_on_close").toBool();
@@ -334,6 +392,54 @@ void tabRepair::closeGetOutDialog()
         overlay->deleteLater();
         overlay = nullptr;
     }
+}
+
+void tabRepair::openPrevRepair()
+{
+    emit createTabPrevRepair(ui->lineEditPrevRepair->text().toInt());
+}
+
+void tabRepair::printStickers(int)
+{
+    QMap<QString, QVariant> report_vars;
+    report_vars.insert("type", "rep_label");
+    report_vars.insert("repair_id", repair_id);
+    emit generatePrintout(report_vars);
+}
+
+void tabRepair::changeOffice(int)
+{
+
+}
+
+void tabRepair::changeManager(int)
+{
+
+}
+
+void tabRepair::changeEngineer(int)
+{
+
+}
+
+void tabRepair::openInvoice(int)
+{
+
+}
+
+void tabRepair::quickAddSparePartByUID(int)
+{
+
+}
+
+void tabRepair::editIncomingSet(int)
+{
+
+}
+
+void tabRepair::setAgreedAmount(int)
+{
+
 }
 
 void tabRepair::worksTreeDoubleClicked(QModelIndex item)

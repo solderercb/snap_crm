@@ -117,7 +117,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEditIncomingSet">
+               <widget class="SLineEdit" name="lineEditIncomingSet">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -205,7 +205,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLineEdit" name="lineEditAgreedAmount">
+               <widget class="SLineEdit" name="lineEditAgreedAmount">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -329,7 +329,10 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEditQuickAddSparePartByUID">
+                 <widget class="SLineEdit" name="lineEditQuickAddSparePartByUID">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -625,7 +628,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditRepairId">
+          <widget class="SLineEdit" name="lineEditRepairId">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -799,7 +802,7 @@
           </widget>
          </item>
          <item row="7" column="1">
-          <widget class="QLineEdit" name="lineEditOffice">
+          <widget class="SLineEdit" name="lineEditOffice">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -828,7 +831,7 @@
           </widget>
          </item>
          <item row="8" column="1">
-          <widget class="QLineEdit" name="lineEditManager">
+          <widget class="SLineEdit" name="lineEditManager">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -857,7 +860,7 @@
           </widget>
          </item>
          <item row="9" column="1">
-          <widget class="QLineEdit" name="lineEditEngineer">
+          <widget class="SLineEdit" name="lineEditEngineer">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -972,7 +975,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEditPrevRepair">
+            <widget class="SLineEdit" name="lineEditPrevRepair">
              <property name="readOnly">
               <bool>true</bool>
              </property>
@@ -1091,81 +1094,6 @@
            </property>
           </widget>
          </item>
-         <item row="19" column="0" colspan="2">
-          <widget class="QPushButton" name="pushButtonCreateInvoice">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Выставить счёт</string>
-           </property>
-          </widget>
-         </item>
-         <item row="20" column="0" colspan="2">
-          <widget class="QGroupBox" name="groupBoxCashless">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title">
-            <string>Безналичный расчёт</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_16">
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="lineEditInvoicePaymentDate"/>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLineEdit" name="lineEditInvoiceAmount"/>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="lineEditInvoice"/>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Номер счёта</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Дата оплаты</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Сумма</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="21" column="1">
-          <spacer name="verticalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="22" column="0">
-          <widget class="QPushButton" name="pushButtonManualUpdateRepairData">
-           <property name="text">
-            <string>Обновить данные</string>
-           </property>
-          </widget>
-         </item>
          <item row="12" column="0" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
            <item>
@@ -1228,6 +1156,81 @@
            </property>
            <property name="text">
             <string>Предыдущий ремонт</string>
+           </property>
+          </widget>
+         </item>
+         <item row="19" column="0" colspan="2">
+          <widget class="QGroupBox" name="groupBoxCashless">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Безналичный расчёт</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_16">
+            <item row="1" column="0">
+             <widget class="QLabel" name="labelInvoice">
+              <property name="text">
+               <string>Номер счёта</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="labelInvoiceAmount">
+              <property name="text">
+               <string>Сумма</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelInvoicePaymentDate">
+              <property name="text">
+               <string>Дата оплаты</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="SLineEdit" name="lineEditInvoice"/>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="lineEditInvoicePaymentDate"/>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="lineEditInvoiceAmount"/>
+            </item>
+            <item row="0" column="0" colspan="2">
+             <widget class="QPushButton" name="pushButtonCreateInvoice">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Выставить счёт</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="20" column="1">
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="21" column="0">
+          <widget class="QPushButton" name="pushButtonManualUpdateRepairData">
+           <property name="text">
+            <string>Обновить данные</string>
            </property>
           </widget>
          </item>
@@ -1446,11 +1449,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>commentsTable</class>
    <extends>QTableView</extends>
    <header>tabrepair.h</header>
@@ -1459,6 +1457,20 @@
    <class>worksAndSparePartsTable</class>
    <extends>QTableView</extends>
    <header>tabrepair.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">widgets/slineedit.h</header>
+   <slots>
+    <signal>buttonClicked(int)</signal>
+    <signal>mouseDoubleClick()</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1483,8 +1495,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lineEditPrevRepair</sender>
+   <signal>mouseDoubleClick()</signal>
+   <receiver>tabRepair</receiver>
+   <slot>openPrevRepair()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>213</x>
+     <y>410</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>410</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createGetOutDialog()</slot>
+  <slot>openPrevRepair()</slot>
  </slots>
 </ui>

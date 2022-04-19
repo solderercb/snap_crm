@@ -87,6 +87,11 @@ void SLineEdit::resizeEvent(QResizeEvent *)
     setTextMargins(0,0, (this->height() + frameWidth)*buttonsCount, 0) ; // лучше задавать отступ справа так, а не с пом. setStyleSheet, т. к. в вышестоящей функции может потребоваться изменить внешний вид
 }
 
+void SLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    emit mouseDoubleClick();
+}
+
 void SLineEdit::updateCloseButton(const QString& text)
 {
 //    if (lineEditButton[0])

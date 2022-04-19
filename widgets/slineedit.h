@@ -16,6 +16,7 @@ class SLineEdit : public QLineEdit
 
 signals:
     void buttonClicked(int buttonId = 0);
+    void mouseDoubleClick();
 
 public:
     enum Buttons {Clear, DownArrow, Edit, Search, Print, Apply, Open};
@@ -43,7 +44,8 @@ private:
     QSize buttonSize;
 
 protected:
-    void resizeEvent(QResizeEvent *);
+    void resizeEvent(QResizeEvent *) override;
+    void mouseDoubleClickEvent(QMouseEvent *e) override;
 
 private slots:
     void updateCloseButton(const QString &text);

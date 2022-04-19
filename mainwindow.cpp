@@ -724,6 +724,8 @@ void MainWindow::createTabRepair(int repair_id)
     if(ui->tabWidget->indexOf(subwindow) == -1)
         ui->tabWidget->addTab(subwindow, "Ремонт " + QString::number(repair_id));
     ui->tabWidget->setCurrentWidget(subwindow);
+    QObject::connect(subwindow,SIGNAL(createTabPrevRepair(int)), this, SLOT(createTabRepair(int)));
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 }
 
 void MainWindow::createTabRepairNew()
@@ -733,9 +735,9 @@ void MainWindow::createTabRepairNew()
         ui->tabWidget->addTab(subwindow, "Приём в ремонт");
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int)), this, SLOT(createTabRepairs(int)));
-    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int, QWidget*)), this, SLOT(createTabClients(int, QWidget*)));
+    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
-    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString, QVariant>)), this, SLOT(createTabPrint(QMap<QString, QVariant>)));
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 }
 
 void MainWindow::createTabPrint(QMap<QString, QVariant> report_vars)
