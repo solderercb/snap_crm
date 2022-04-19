@@ -745,11 +745,12 @@ void MainWindow::createTabPrint(QMap<QString, QVariant> report_vars)
     report_vars.detach();
     qDebug() << "MainWindow::createTabPrint()";
     qDebug() << report_vars;
-    tabPrintDialog *printDialog;
+    tabPrintDialog *subwindow;
 
-    printDialog = new tabPrintDialog(this, report_vars);
-    ui->tabWidget->addTab(printDialog, "Print");
-    ui->tabWidget->setCurrentWidget(printDialog);
+    subwindow = new tabPrintDialog(this, report_vars);
+    ui->tabWidget->addTab(subwindow, "Print");
+    ui->tabWidget->setCurrentWidget(subwindow);
+    subwindow->setDefaultWidgetFocus();
 }
 
 void MainWindow::reactivateTabRepairNew(int)
@@ -857,6 +858,10 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("repair_id", 25037);
 //        report_vars.insert("type", "new_rep");
+//        createTabPrint(report_vars);
+//        QMap<QString, QVariant> report_vars;
+//        report_vars.insert("type", "rep_label");
+//        report_vars.insert("repair_id", 24972);
 //        createTabPrint(report_vars);
 //    }
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки

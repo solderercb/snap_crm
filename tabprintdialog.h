@@ -38,6 +38,7 @@ public:
     bool initReportDataSources();
     bool loadTmpReportTemplate(QString);
     QMap<QString, QVariant> report_vars;
+    void setDefaultWidgetFocus();
 
 private:
     Ui::tabPrintDialog *ui;
@@ -49,6 +50,7 @@ private:
     QFile CurrentFile;
     LimeReport::PreviewReportWidget *previewWindow;
     QPrinter *printer;
+    QStandardItemModel* initDemoModel(QStringList &, QList<QVariant> &);
 
 private slots:
     void some_func();

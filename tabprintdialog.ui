@@ -129,6 +129,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>spinBoxCopies</tabstop>
+  <tabstop>pushButtonPrint</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>comboBoxPrinters</tabstop>
+  <tabstop>lineEditPagesToPrint</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -74,18 +74,43 @@ bool tabPrintDialog::loadTmpReportTemplate(QString filename)
     return 1;
 }
 
+void tabPrintDialog::setDefaultWidgetFocus()
+{
+    if (report_type == "rep_label") // при печати стикеров логично установить фокус в поле Кол-во
+    {
+        ui->spinBoxCopies->setFocus();
+        ui->spinBoxCopies->selectAll();
+    }
+    else    // во всех остальных случаях фокус сразу на кнопке Печать
+        ui->pushButtonPrint->setFocus();
+}
+
+QStandardItemModel* tabPrintDialog::initDemoModel(QStringList &demoHeaders, QList<QVariant> &demoValues)
+{
+    QStandardItemModel *model = new QStandardItemModel();
+
+    model->setHorizontalHeaderLabels(demoHeaders);
+    foreach(QString item, demoHeaders)
+    {
+        QStandardItem *it = new QStandardItem(demoValues.at(demoHeaders.indexOf(item)).toString());
+        model->setItem(0, demoHeaders.indexOf(item), it);
+    }
+
+    return model;
+}
+
 bool tabPrintDialog::selectTemplateFile()
 {
     if (report_type == "new_rep")
         CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/priemka.lrxml");
     else if (report_type == "sticker1")
         CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/24x14.lrxml");
+    else if (report_type == "rep_label")
+        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/rep_label.lrxml");
 //    else if (report_type == "")
-//            loadTemplateFromFile(QApplication::applicationDirPath() + "/demo_reports/priemka.lrxml");
+//        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/priemka.lrxml");
 //    else if (report_type == "")
-//            loadTemplateFromFile(QApplication::applicationDirPath() + "/demo_reports/priemka.lrxml");
-//    else if (report_type == "")
-//            loadTemplateFromFile(QApplication::applicationDirPath() + "/demo_reports/priemka.lrxml");
+//        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/priemka.lrxml");
     else
         return 0;
 
@@ -158,6 +183,52 @@ bool tabPrintDialog::initReportDataSources()
 //        report->dataManager()->addModel("", itemsModel, true);
 
     }
+    else if (report_type == "rep_label")
+    {
+        if (report_vars.contains("repair_id"))
+        {
+            QSqlQueryModel *repairModel = new QSqlQueryModel();
+            repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString()));
+            report->dataManager()->addModel("repair", repairModel, true);
+            client_id = repairModel->record(0).value("client").toInt();
+
+            QSqlQueryModel *customerModel = new QSqlQueryModel();
+            customerModel->setQuery(QUERY_SEL_CLIENT_RPRT(client_id));
+            report->dataManager()->addModel("customer", customerModel, true);
+
+            report->dataManager()->addModel("user", userDataModel, false);
+            report->dataManager()->addModel("company", companiesModel, false);
+            report->dataManager()->addModel("office", officesModel, false);
+        }
+        else
+        {   // Дэмо значения для стикера (если не задано значение repair_id)
+            QStringList demoHeaders = {"id", "Title", "client", "serial_number", "company", "office", "start_office", "manager", "master", "in_date", "express_repair", "is_warranty", "is_repeat", "box", "box_name", "barcode", "early", "ext_early"};
+            QList<QVariant> demoValues = {12345, "Моноблок (All-in-One PC) Apple iMac12,1  Mid 2011  A1311 (EMC 2428)", 6325, "C02POIWERUJD", 1, 1, 1, 33, 33, "2022-01-25 10:26:32", 0, 0, 0, "NULL", "NULL", "012000123452", "NULL", "NULL"};
+            report->dataManager()->addModel("repair", initDemoModel(demoHeaders, demoValues), true);
+            client_id = 6325;
+            demoHeaders = {"id", "name", "surname", "patronymic", "type", "is_regular", "is_dealer"};
+            demoValues = {6325, "Андрей", "Андреев", "Андреевич", 0, 0, 0};
+            report->dataManager()->addModel("customer", initDemoModel(demoHeaders, demoValues), true);
+            demoHeaders = {"id", "username", "name", "surname", "patronymic", "phone", "phone2", "email"};
+            demoValues = {32, "manager", "Менеджер", "", "", "", "", ""};
+            report->dataManager()->addModel("user", initDemoModel(demoHeaders, demoValues), true);
+            demoHeaders = {"id", "type", "name", "inn", "kpp", "ogrn", "ur_address", "site", "email", "logo"};
+            demoValues = {1, 1, "ЧП Рога и копыта", "1234567890", "1234", "5678", "туманность Андромеды, 1", "rik.com", "pr@rik.com", "NULL"};
+            report->dataManager()->addModel("company", initDemoModel(demoHeaders, demoValues), true);
+            demoHeaders = {"id", "name", "address", "phone", "phone2", "logo"};
+            demoValues = {1, "Главный", "туманность Андромеды, 1", "123 456-78-90", "", "NULL"};
+            report->dataManager()->addModel("office", initDemoModel(demoHeaders, demoValues), true);
+        }
+
+        if (report_vars.contains("copies"))
+        {
+            ui->spinBoxCopies->setValue(report_vars.value("copies").toInt());
+        }
+        else
+        {
+            ui->spinBoxCopies->setValue(comSettings->value("rep_stickers_copy").toInt());
+        }
+    }
     else if (report_type == "sticker1")
     {
         if (report_vars.contains("ids_list"))
@@ -168,19 +239,9 @@ bool tabPrintDialog::initReportDataSources()
         }
         else
         {   // Дэмо значения для стикера (если не задано значение ids_list)
-            QStandardItemModel *itemsModel = new QStandardItemModel();
-            // назвиния полей:
             QStringList demoHeaders = {"UID", "id", "Hidden", "articul", "dealer", "is_realization", "dealer_lock", "name", "state", "category", "store", "created", "updated", "count", "reserved", "units", "box", "box_name", "price_option", "custom_price_option", "currency_rate", "in_price", "in_price_base", "price", "price_base", "price2", "price2_base", "price3", "price3_base", "price4", "price4_base", "price5", "price5_base", "document", "part_request", "shop_title", "shop_description", "SN", "PN", "description", "shop_enable", "int_barcode", "ext_barcode", "in_count", "in_summ", "notes", "img1", "img2", "img3", "img4", "img5", "minimum_in_stock", "sold", "return_percent", "warranty", "warranty_dealer", "not_for_sale", "st_state", "st_notes", "ge_highlight", "last_stocktaking_date"};
-            // значения полей:
             QList<QVariant> demoValues = {"016466-003790", 16466, 0, 3790, 1, 0, 0, "Гнездо micro USB, 2.0, на плату, Арт. 3790", 1, 82, 1, "2018-06-28 09:23:06", "NULL", 1, 0, 0, "NULL", "NULL", 1, 2, 26.19, 10.7629, 9.95, 22, 19.9, 22, 19.9, 22, 19.9, 22, 19.9, 22, 19.9, 2535, "NULL", "", "", "", "Бахчев: тип 45", "Прежняя ПН: 2535\r\n", "NULL", "011000164662", "NULL", 2, 20, "Похож на Бахчев P/N тип 47\r\nарт. 3392 (без \"юбки\").\r\nПохож на Бахчев P/N тип 54 (без \"юбки\").\r\nПохож на Бахчев P/N тип 106\r\nарт. 4922 (без \"юбки\").\r\nПохож на Бахчев P/N тип 124 (без \"юбки\").\r\nВозможна замена на:", "NULL", "NULL", "NULL", "NULL", "NULL", 0, 1, 0, 0, 0, 0, 0, "NULL", 0, "NULL"};
-            itemsModel->setHorizontalHeaderLabels(demoHeaders);
-            QVariant tmp = 123;
-            foreach(QString item, demoHeaders)
-            {
-                QStandardItem *it = new QStandardItem(demoValues.at(demoHeaders.indexOf(item)).toString());
-                itemsModel->setItem(0, demoHeaders.indexOf(item), it);
-            }
-            report->dataManager()->addModel("items", itemsModel, true);
+            report->dataManager()->addModel("items", initDemoModel(demoHeaders, demoValues), true);
         }
     }
 //    else if (report_type == "")
@@ -229,7 +290,13 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
     printer->setCopyCount(ui->spinBoxCopies->value());
     report->printReport(printer);   // TODO: разобраться, что возвращает данная функция
     if (report_type == "new_rep")
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL","Печать квитанции к ремонту №"+report_vars.value("repair_id").toString()));
+    {
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать квитанции к ремонту №%1").arg(report_vars.value("repair_id").toInt())));
+    }
+    else if (report_type == "rep_label")
+    {
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать стикеров к ремонту №%1 в кол-ве %2шт.").arg(report_vars.value("repair_id").toInt()).arg(ui->spinBoxCopies->value())));
+    }
 
     delete query;
 }

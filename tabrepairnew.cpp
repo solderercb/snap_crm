@@ -1064,7 +1064,7 @@ bool tabRepairNew::createRepair()
                                    office,
                                    QString("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)),
                                    repair,
-                                   "NULL",
+                                   "\'NULL\'",
                                    paymentSystemsModel->record(ui->comboBoxPrepayAccount->currentIndex()).value("system_id").toInt()
                                    )
                     );
@@ -1116,6 +1116,25 @@ bool tabRepairNew::createRepair()
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     if (nDBErr)   // если все запросы выполнены без ошибок, очистить всё, кроме данных клиента
     {
+        // печать квитанции
+        if(comSettings->value("print_new_repair_report").toBool())
+        {
+            QMap<QString, QVariant> report_vars;
+            report_vars.insert("type", "new_rep");
+            report_vars.insert("repair_id", repair);
+            emit generatePrintout(report_vars);
+        }
+
+        // печать стикеров
+        if(comSettings->value("print_rep_stickers").toBool())
+        {
+            QMap<QString, QVariant> report_vars;
+            report_vars.insert("type", "rep_label");
+            report_vars.insert("repair_id", repair);
+            report_vars.insert("copies", ui->spinBoxStickersCount->value());
+            emit generatePrintout(report_vars);
+        }
+
         ui->comboBoxProblem->clearEditText();
         ui->comboBoxIncomingSet->clearEditText();
         ui->comboBoxExterior->clearEditText();
@@ -1144,11 +1163,6 @@ bool tabRepairNew::createRepair()
         ui->comboBoxDevice->setCurrentIndex(-1);
         ui->comboBoxDeviceMaker->setCurrentIndex(-1);
         ui->comboBoxDeviceModel->setCurrentIndex(-1);
-
-        QMap<QString, QVariant> report_vars;
-        report_vars.insert("type", "new_rep");
-        report_vars.insert("repair_id", repair);
-        emit generatePrintout(report_vars);
     }
 
     delete query;
