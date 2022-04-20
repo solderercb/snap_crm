@@ -452,10 +452,7 @@ void MainWindow::initGlobalModels()
     queryCommonSettings->exec(QUERY_SEL_COMMON_SETTINGS2);  // вторая "порция" общих настроек ( в ASC CRM настроки из табил. config начиная с v3.7.18.969 schemaversion 258 постепенно "переезжают" в табл. settings; нова ятаблица имеет приоритет
     while(queryCommonSettings->next())
     {
-        if (comSettings->contains(queryCommonSettings->value(0).toString()))
-            comSettings->value(queryCommonSettings->value(0).toString()) = queryCommonSettings->value(1);
-        else
-            comSettings->insert(queryCommonSettings->value(0).toString(), queryCommonSettings->value(1));
+        comSettings->insert(queryCommonSettings->value(0).toString(), queryCommonSettings->value(1));
     }
 
     for (int i=0; i < comSettings->value("phone_mask1").toString().size(); i++)     // В ASC CRM (а точнее в DevExpress) маски ввода в lineEdit работают не так, как в Qt
@@ -743,14 +740,13 @@ void MainWindow::createTabRepairNew()
 void MainWindow::createTabPrint(QMap<QString, QVariant> report_vars)
 {
     report_vars.detach();
-    qDebug() << "MainWindow::createTabPrint()";
-    qDebug() << report_vars;
+//    qDebug() << "MainWindow::createTabPrint()";
+//    qDebug() << report_vars;
     tabPrintDialog *subwindow;
 
     subwindow = new tabPrintDialog(this, report_vars);
     ui->tabWidget->addTab(subwindow, "Print");
     ui->tabWidget->setCurrentWidget(subwindow);
-    subwindow->setDefaultWidgetFocus();
 }
 
 void MainWindow::reactivateTabRepairNew(int)
@@ -849,20 +845,20 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-    createTabRepair(24972);
+//    createTabRepair(24972);
 //    createTabSale(16316);
 //    createTabSale(0);
 //    if (test_scheduler_counter < 375)
 //    {
 //        createTabRepairNew();
-//        QMap<QString, QVariant> report_vars;
-//        report_vars.insert("repair_id", 25037);
-//        report_vars.insert("type", "new_rep");
-//        createTabPrint(report_vars);
-//        QMap<QString, QVariant> report_vars;
-//        report_vars.insert("type", "rep_label");
-//        report_vars.insert("repair_id", 24972);
-//        createTabPrint(report_vars);
+        QMap<QString, QVariant> report_vars;
+        report_vars.insert("repair_id", 24972);
+        report_vars.insert("type", "new_rep");
+        createTabPrint(report_vars);
+        QMap<QString, QVariant> report_vars2;
+        report_vars2.insert("type", "rep_label");
+        report_vars2.insert("repair_id", 24972);
+        createTabPrint(report_vars2);
 //    }
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 

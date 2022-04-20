@@ -25,14 +25,45 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
         msgBox.exec();
     }
 
-    ui->comboBoxPrinters->addItems(QPrinterInfo::availablePrinterNames());
-    if (userData->contains("DocsPrinter"))
+    QStringList printersList = QPrinterInfo::availablePrinterNames();
+    ui->comboBoxPrinters->addItems(printersList);
+
+    int pos = 0;
+    int rdpKeywordPos = -1;
+    QRegularExpression rdpKeywordRegExp(tr("\\(перенаправлено \\d\\)"));  // Microsoft RDP перенаправленным принтерам добавляет "(перенаправлено N)"; от сессии к сессии номер может меняться и чтобы не приходилось как в АСЦ изменять принтеры по умолчанию в настройках ...
+    QRegularExpression re("sticker1|sticker2|sticker3|rep_label");  // принтер этикеток
+    QRegularExpressionValidator v(re);
+    if(v.validate(report_type, pos) == QValidator::Acceptable)
     {
-        qDebug() << "DocsPrinter: " << userLocalData->value("DocsPrinter").toString();
-        ui->comboBoxPrinters->setCurrentText(userLocalData->value("DocsPrinter").toString());
+        if(userLocalData->contains("StickersPrinter"))
+        {
+            rdpKeywordPos = userLocalData->value("StickersPrinter").toString().indexOf(rdpKeywordRegExp);    // вернёт -1 если не найдёт
+            if(rdpKeywordPos >= 0)  // если будет найден паттерн rdpKeywordRegExp, то и поиск индекса принтера будет происходить по рег. выражению
+                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(QRegularExpression(userLocalData->value("StickersPrinter").toString().left(rdpKeywordPos)+
+                                                                            rdpKeywordRegExp.pattern())) );
+            else                    // иначе по простой строке (чтобы в случае содержащихся в названии принтера спец. символов рег. выражений корректно определялся индекс)
+                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(userLocalData->value("StickersPrinter").toString()));
+        }
+    }
+    pos = 0;
+    re.setPattern("sticker1|sticker2|sticker3|rep_label|slip");  // принтер документов (слип-чек не знаю на каком принтере должен печататься, поэтому тоже исключен)
+    v.setRegularExpression(re);
+    if(v.validate(report_type, pos) == QValidator::Invalid)
+    {
+        if (userLocalData->contains("DocsPrinter"))
+        {
+            rdpKeywordPos = userLocalData->value("DocsPrinter").toString().indexOf(rdpKeywordRegExp);
+            if(rdpKeywordPos >= 0)
+                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(QRegularExpression(userLocalData->value("DocsPrinter").toString().left(rdpKeywordPos)+
+                                                                            rdpKeywordRegExp.pattern())) );
+            else
+                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(userLocalData->value("DocsPrinter").toString()));
+        }
     }
     ui->gridLayoutTab->setColumnStretch(1, 1);
     ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
+    ui->pushButtonPrint->setStyleSheet("QPushButton:hover {border: 1px solid #0078D7; background: solid #E5F1FB;}\n"
+                                       "QPushButton:focus {border: 2px solid #0078D7;}");   // чтобы было видно, что кнопка в фокусе
 }
 
 tabPrintDialog::~tabPrintDialog()
@@ -44,7 +75,7 @@ tabPrintDialog::~tabPrintDialog()
 
 bool tabPrintDialog::tabCloseRequest()
 {
-    qDebug() << "(reimplemented) tabCloseRequest()";
+//    qDebug() << "(reimplemented) tabCloseRequest()";
     return 1;
 }
 
@@ -97,6 +128,16 @@ QStandardItemModel* tabPrintDialog::initDemoModel(QStringList &demoHeaders, QLis
     }
 
     return model;
+}
+
+bool tabPrintDialog::event(QEvent *ev)
+{
+    bool ret = tabCommon::event(ev);
+    if(ev->type() == QEvent::ShowToParent)  // при переключении на вкладку нужно установить фокус на виджет (например, при печати документа, нажатием Пробел можно быстро запустить печать и не делать лишних телодвижений мышью)
+    {
+        setDefaultWidgetFocus();
+    }
+    return ret;
 }
 
 bool tabPrintDialog::selectTemplateFile()

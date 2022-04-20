@@ -51,6 +51,7 @@ private:
     LimeReport::PreviewReportWidget *previewWindow;
     QPrinter *printer;
     QStandardItemModel* initDemoModel(QStringList &, QList<QVariant> &);
+    bool event(QEvent*);
 
 private slots:
     void some_func();
