@@ -58,7 +58,6 @@ private slots:
     void tableSectionMoved(int, int, int);
     void tableSectionResized(int, int, int);
     void tableSortingChanged(int, Qt::SortOrder);
-
 };
 
 #endif // TABREPAIRS_H

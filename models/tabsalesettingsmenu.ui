@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>popupm</class>
- <widget class="QWidget" name="popupm">
+ <class>tabSalePopupForm</class>
+ <widget class="QWidget" name="tabSalePopupForm">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,6 +30,9 @@
    </item>
    <item row="2" column="0">
     <widget class="QCheckBox" name="checkBoxShowItemDescr">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>наименование + описание</string>
      </property>

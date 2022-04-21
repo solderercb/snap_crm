@@ -847,18 +847,18 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    }
 //    createTabRepair(24972);
 //    createTabSale(16316);
-//    createTabSale(0);
+    createTabSale(0);
 //    if (test_scheduler_counter < 375)
 //    {
 //        createTabRepairNew();
-        QMap<QString, QVariant> report_vars;
-        report_vars.insert("repair_id", 24972);
-        report_vars.insert("type", "new_rep");
-        createTabPrint(report_vars);
-        QMap<QString, QVariant> report_vars2;
-        report_vars2.insert("type", "rep_label");
-        report_vars2.insert("repair_id", 24972);
-        createTabPrint(report_vars2);
+//        QMap<QString, QVariant> report_vars;
+//        report_vars.insert("repair_id", 24972);
+//        report_vars.insert("type", "new_rep");
+//        createTabPrint(report_vars);
+//        QMap<QString, QVariant> report_vars2;
+//        report_vars2.insert("type", "rep_label");
+//        report_vars2.insert("repair_id", 24972);
+//        createTabPrint(report_vars2);
 //    }
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 

@@ -19,6 +19,14 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
 
+    params = new int;
+    *params = 0;
+    *params |= comSettings->value("qs_print_rn").toBool()?tabSaleSettingsMenu::PrintDoc:0;
+    *params |= comSettings->value("qs_print_pko").toBool()?tabSaleSettingsMenu::PrintCheck:0;
+    widgetAction = new tabSaleSettingsMenu(this);
+    ui->buttonParams->addAction(widgetAction);
+    widgetAction->setParamsModel(params);
+
     groupBoxEventFilter = new SGroupBoxEventFilter(this);
     ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilter);
     ui->comboBoxPaymentAccount->setModel(paymentSystemsModel);
@@ -86,6 +94,20 @@ tabSale::~tabSale()
     delete ui;
     p_instance.remove(doc_id);   // Обязательно блять!
     delete groupBoxEventFilter;
+    delete params;
+    delete widgetAction;
+    delete clientsMatchTable;
+    delete tableModel;
+    delete newItemModel;
+    delete itemDelagates;
+    delete clientModel;
+#ifdef QT_DEBUG
+    delete test_scheduler;
+    delete test_scheduler2;
+    delete testPushButton;
+    delete testLineEdit;
+    delete testPanel;
+#endif
 }
 
 void tabSale::setDefaultStyleSheets()
@@ -520,6 +542,7 @@ void tabSale::fillClientCreds(int id)
     if(clientModel->record(0).value("balance_enable").toBool())
     {
         setBalanceWidgetsVisible(true);
+        ui->checkBoxSaleInCredit->setEnabled(true);
         ui->lineEditBalance->setText(sysLocale.toString(clientModel->record(0).value("balance").toFloat(), 'f', 2));
     }
     else
@@ -824,8 +847,8 @@ bool tabSale::sale()
         return true; // return 0 — OK, return 1 - ошибка
 
     bool nDBErr = 1, nIntegrityErr = 1, balance = 0, isAnonBuyer = 0;
-    int user, office, cash_order_id, paymentAccount = 0, reserveDays = 5, priceCol = 2;
-    float amount, currency = 29.2549 /* TODO: запрос валюты, даже если программа не перезапускалась несколько дней */;
+    int user, office, cash_order_id = 0, paymentAccount = 0, reserveDays = 5, priceCol = 2, initial_doc_id;
+    float amount, currency = 0.00 /* TODO: запрос валюты, даже если программа не перезапускалась несколько дней */;
     QString phone1, phone1c, client_;
     QStringList store_sales_cancel_records;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
@@ -902,6 +925,7 @@ bool tabSale::sale()
         QUERY_EXEC(query,nDBErr)(QUERY_INS_DOCS( reserve?6:2, 0, 0, paymentAccount, 1, "NULL", user, amount,\
                                                 QString("\'%1\'").arg(ui->lineEditComment->text()), 1, client_,\
                                                 currency, "\'Empty\'", priceCol, reserveDays ));
+        initial_doc_id = doc_id;
         QUERY_LAST_INS_ID(query,nDBErr,doc_id);
     }
 
@@ -1107,12 +1131,25 @@ bool tabSale::sale()
     delete query;
     if(nDBErr)
     {
-        QMap<QString, QVariant> report_vars;
-        report_vars.insert("type", "rn");
-        report_vars.insert("doc_id", doc_id);
-        emit generatePrintout(report_vars);
+        p_instance.remove(initial_doc_id);   // Если всё ОК, то нужно заменить указатель
+        p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
 
-        // TODO: печать чека
+        if(*params & tabSaleSettingsMenu::PrintDoc)     // печать РН
+        {
+            QMap<QString, QVariant> report_vars;
+            report_vars.insert("type", "rn");
+            report_vars.insert("doc_id", doc_id);
+            emit generatePrintout(report_vars);
+        }
+        if(*params & tabSaleSettingsMenu::PrintCheck && cash_order_id)   // печать ПКО
+        {
+            QMap<QString, QVariant> report_vars;
+            report_vars.insert("type", "pko");
+            report_vars.insert("order_id", cash_order_id);
+            emit generatePrintout(report_vars);
+        }
+
+        // TODO: печать чека с пом. РРО
         return false;
     }
     else
@@ -1459,3 +1496,4 @@ void tabSale::test_updateWidgetsWithDocNum()
     updateWidgets();
 }
 #endif
+

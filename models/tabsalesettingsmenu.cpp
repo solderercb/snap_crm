@@ -1,26 +1,26 @@
 #include "tabsalesettingsmenu.h"
 #include "ui_tabsalesettingsmenu.h"
 
-popupm::popupm(QWidget *parent) :
+tabSalePopupForm::tabSalePopupForm(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::popupm)
+    ui(new Ui::tabSalePopupForm)
 {
     ui->setupUi(this);
 }
 
-popupm::~popupm()
+tabSalePopupForm::~tabSalePopupForm()
 {
     delete ui;
 }
 
-bool popupm::event(QEvent *e)
+bool tabSalePopupForm::event(QEvent *e)
 {
     if (e->type() == QEvent::Hide)
     {
-//        qDebug() << "popupm::event(QEvent *e); " << e->type();
+//        qDebug() << "tabSalePopupForm::event(QEvent *e); " << e->type();
         emit hidden();
     }
-    QFrame::event(e);
+    return QFrame::event(e);
 }
 
 tabSaleSettingsMenu::tabSaleSettingsMenu(QWidget * parent) : QWidgetAction(parent),
@@ -30,19 +30,14 @@ tabSaleSettingsMenu::tabSaleSettingsMenu(QWidget * parent) : QWidgetAction(paren
 
 QWidget * tabSaleSettingsMenu::createWidget(QWidget *parent)
 {
-    widget = new popupm(parent);
+    widget = new tabSalePopupForm(parent);
     hideEventFilter = 1;   // при закрытии всплывающего меню почему-то генерируется два события Hide
     // после создания виджета устанавливаем модели данных для комбобоксов
-    if (filterSettingsBuf)
+    if (settings)
     {
-        if (filterSettingsBuf->contains("printCheck"))
-            widget->ui->checkBoxPrintCheck->setChecked(filterSettingsBuf->value("printCheck"));
-
-        if (filterSettingsBuf->contains("printDoc"))
-            widget->ui->checkBoxPrintDoc->setChecked(filterSettingsBuf->value("printDoc"));
-
-        if (filterSettingsBuf->contains("showItemDescr"))
-            widget->ui->checkBoxShowItemDescr->setChecked(filterSettingsBuf->value("showItemDescr"));
+        widget->ui->checkBoxPrintCheck->setChecked(*settings & Params::PrintCheck);
+        widget->ui->checkBoxPrintDoc->setChecked(*settings & Params::PrintDoc);
+        widget->ui->checkBoxShowItemDescr->setChecked(*settings & Params::ShowDescr);
     }
 
     connect(widget, SIGNAL(hidden()), this, SLOT(slotHidden()));
@@ -55,11 +50,12 @@ void tabSaleSettingsMenu::slotHidden()
     if (hideEventFilter)
     {
         hideEventFilter = 0;
-        if (filterSettingsBuf)
+        if (settings)
         {
-            filterSettingsBuf->insert("printCheck", widget->ui->checkBoxPrintCheck->isChecked());
-            filterSettingsBuf->insert("printDoc", widget->ui->checkBoxPrintDoc->isChecked());
-            filterSettingsBuf->insert("showItemDescr", widget->ui->checkBoxShowItemDescr->isChecked());
+            *settings &= ~(Params::PrintCheck | Params::PrintDoc | Params::ShowDescr);
+            *settings |= widget->ui->checkBoxPrintCheck->isChecked()?Params::PrintCheck:0;
+            *settings |= widget->ui->checkBoxPrintDoc->isChecked()?Params::PrintDoc:0;
+            *settings |= widget->ui->checkBoxShowItemDescr->isChecked()?Params::ShowDescr:0;
         }
         emit hidden();
     }

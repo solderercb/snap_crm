@@ -694,6 +694,50 @@
             <property name="sizeConstraint">
              <enum>QLayout::SetDefaultConstraint</enum>
             </property>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="buttonReserve">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Резерв</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="buttonPrint">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Печать</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="1">
              <widget class="QPushButton" name="buttonLog">
               <property name="enabled">
@@ -716,10 +760,10 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="buttonParams">
+            <item row="0" column="5">
+             <widget class="QPushButton" name="buttonReserveCancel">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -734,7 +778,14 @@
                </size>
               </property>
               <property name="text">
-               <string>Параметры</string>
+               <string>Снять резерв</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="6">
+             <widget class="QPushButton" name="buttonSaleMore">
+              <property name="text">
+               <string>Продать ещё</string>
               </property>
              </widget>
             </item>
@@ -782,76 +833,22 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="4">
-             <widget class="QPushButton" name="buttonReserve">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+            <item row="0" column="2">
+             <widget class="QToolButton" name="buttonParams">
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>75</width>
                 <height>23</height>
                </size>
               </property>
               <property name="text">
-               <string>Резерв</string>
+               <string>Параметры</string>
               </property>
-             </widget>
-            </item>
-            <item row="0" column="5">
-             <widget class="QPushButton" name="buttonReserveCancel">
-              <property name="enabled">
-               <bool>true</bool>
+              <property name="popupMode">
+               <enum>QToolButton::InstantPopup</enum>
               </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>23</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Снять резерв</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="6">
-             <widget class="QPushButton" name="buttonSaleMore">
-              <property name="text">
-               <string>Продать ещё</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QPushButton" name="buttonPrint">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>23</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Печать</string>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextOnly</enum>
               </property>
              </widget>
             </item>
@@ -1047,22 +1044,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>buttonParams</sender>
-   <signal>clicked()</signal>
-   <receiver>tabSale</receiver>
-   <slot>paramsButtonClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>459</x>
-     <y>909</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>463</x>
-     <y>944</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>lineEditTakeIn</sender>
    <signal>textChanged(QString)</signal>
    <receiver>tabSale</receiver>
@@ -1165,8 +1146,8 @@
    <slot>setTrackNum()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>191</x>
-     <y>752</y>
+     <x>309</x>
+     <y>784</y>
     </hint>
     <hint type="destinationlabel">
      <x>7</x>
@@ -1245,8 +1226,8 @@
    <slot>unSaleButtonClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>96</x>
-     <y>635</y>
+     <x>118</x>
+     <y>674</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>

@@ -1,5 +1,5 @@
-#ifndef POPUPM_H
-#define POPUPM_H
+#ifndef TABSALEPOPUPFORM_H
+#define TABSALEPOPUPFORM_H
 
 #include <QWidget>
 #include <QFrame>
@@ -7,18 +7,18 @@
 #include <QStandardItemModel>
 
 namespace Ui {
-    class popupm;
+    class tabSalePopupForm;
 }
 
-class popupm : public QFrame
+class tabSalePopupForm : public QFrame
 {
     Q_OBJECT
 signals:
     void hidden();
 public:
-    explicit popupm(QWidget *parent = nullptr);
-    ~popupm();
-    Ui::popupm *ui; // в данном случае ui должен быть public
+    explicit tabSalePopupForm(QWidget *parent = nullptr);
+    ~tabSalePopupForm();
+    Ui::tabSalePopupForm *ui; // в данном случае ui должен быть public
 
 private:
     bool event(QEvent *);
@@ -31,16 +31,18 @@ signals:
     void hidden();
 public:
     explicit tabSaleSettingsMenu(QWidget * parent);
-    popupm *widget;
-    void setFilter(QMap<QString, int> *filter){filterSettingsBuf = filter;};
+    tabSalePopupForm *widget;
+    enum Params {PrintCheck = 1 << 0, PrintDoc = 1 << 1, ShowDescr = 1 << 2};
+    void setParamsModel(int *params){settings = params;};
+    Q_ENUM(Params);
 private:
     QWidget *w;
     bool hideEventFilter;
-    QMap<QString, int> *filterSettingsBuf = nullptr;
+    int *settings = nullptr;
 protected:
     QWidget * createWidget(QWidget *parent);
 private slots:
     void slotHidden();
 };
 
-#endif // POPUPM_H
+#endif // TABSALEPOPUPFORM_H

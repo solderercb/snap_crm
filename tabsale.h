@@ -24,6 +24,7 @@
 #include "models/saletable/saletablemodel.h"
 #include "models/saletable/saletableitemdelegates.h"
 #include "widgets/sgroupboxeventfilter.h"
+#include "models/tabsalesettingsmenu.h"
 #ifdef QT_DEBUG
 #include <QTimer>
 #include <QFile>
@@ -89,6 +90,8 @@ private:
     void clearAll();
     int isItemAlreadyInList(int);
     void addItemByUID(int);
+    tabSaleSettingsMenu *widgetAction;
+    int *params;
 
 #ifdef QT_DEBUG
     void randomFill();
@@ -132,7 +135,6 @@ private slots:
     void test_scheduler2_handler();
     void test_updateWidgetsWithDocNum();
 #endif
-
 };
 
 #endif // TABREPAIR_H
