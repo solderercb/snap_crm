@@ -2,7 +2,7 @@
 #define TABPRINTDIALOG_H
 
 #include <QWidget>
-#include <LimeReport>
+#include <LimeReport/include/LimeReport>
 #include <QStringList>
 #include <QStringListModel>
 #include <QStandardItemModel>

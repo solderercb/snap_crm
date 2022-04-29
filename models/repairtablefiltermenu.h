@@ -37,7 +37,7 @@ public:
     void setComboBoxEmployeeModel(QAbstractItemModel *model){employeeModelBuf = model;};
     void setComboBoxClientModel(QAbstractItemModel *model){clientModelBuf = model;};
     void setComboBoxXModel(QAbstractItemModel *model){xModelBuf = model;};
-    void setFilter(QMap<QString, int> *filter){filterSettingsBuf = filter;};
+    void setFilterSettings(QMap<QString, int> *filter){filterSettingsBuf = filter;};
 private:
     QWidget *w;
     bool hideEventFilter;

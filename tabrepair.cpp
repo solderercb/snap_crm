@@ -86,7 +86,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
     ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 
-    // сворачивание групп элементов (ну как в АСЦ чтобы). Отключено, т. к. требует доработки класса SGroupBoxEventFilter
+    // сворачивание групп элементов (ну как в АСЦ чтобы). TODO: Отключено, т. к. требует доработки класса SGroupBoxEventFilter
 //    groupBoxEventFilter = new SGroupBoxEventFilter(this);
 //    ui->groupBoxDeviceSummary->installEventFilter(groupBoxEventFilter);
 //    ui->groupBoxDiagResult->installEventFilter(groupBoxEventFilter);
@@ -192,6 +192,7 @@ void tabRepair::updateWidgets()
     ui->lineEditWarrantyLabel->setText(repairModel->record(0).value("warranty_label").toString());
     if(repairModel->record(0).value("early").toInt())
         ui->lineEditPrevRepair->setText(repairModel->record(0).value("early").toString());
+
     ui->listWidgetExtraInfo->setHidden(true);
     ui->listWidgetExtraInfo->clear();
     if(clientModel->record(0).value("is_regular").toBool())
@@ -230,7 +231,7 @@ void tabRepair::updateWidgets()
 
         ui->groupBoxCashless->setHidden(false);
         if(repairModel->record(0).value("invoice").toInt()) // если уже выставлен счет
-    {
+        {
             ui->lineEditInvoiceAmount->setText("TODO:");
             ui->lineEditInvoice->setText(QString("id=%1; TODO:").arg(repairModel->record(0).value("invoice").toString()));
             ui->labelInvoice->setHidden(false);
@@ -238,12 +239,12 @@ void tabRepair::updateWidgets()
             ui->lineEditInvoicePaymentDate->setText("TODO:");
             ui->labelInvoicePaymentDate->setHidden(false);
             ui->lineEditInvoicePaymentDate->setHidden(false);
-        ui->pushButtonCreateInvoice->setHidden(true);
+            ui->pushButtonCreateInvoice->setHidden(true);
             ui->labelInvoiceAmount->setHidden(false);
             ui->lineEditInvoiceAmount->setHidden(false);
-    }
-    else
-    {
+        }
+        else
+        {
             ui->labelInvoice->setHidden(true);
             ui->lineEditInvoice->setHidden(true);
             ui->labelInvoicePaymentDate->setHidden(true);
@@ -253,12 +254,12 @@ void tabRepair::updateWidgets()
             ui->pushButtonCreateInvoice->setHidden(false);
         }
         ui->pushButtonCreatePrepayOrder->setHidden(true);
-        }
-        else
+    }
+    else
     {
         ui->pushButtonCreatePrepayOrder->setHidden(false);
         ui->pushButtonCreateInvoice->setHidden(true);
-            ui->groupBoxCashless->setHidden(true);
+        ui->groupBoxCashless->setHidden(true);
     }
 
     save_state_on_close = userDataModel->record(0).value("save_state_on_close").toBool();

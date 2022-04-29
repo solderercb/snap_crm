@@ -350,6 +350,7 @@ void tabPrintDialog::on_comboBoxPrinters_currentTextChanged(const QString &arg1)
     printer->setPageSize(pi.defaultPageSize()); // дефолтный размер страницы выбранного принтера, без этой установки размер страницы может остаться от предыдущего принтера и отчет отрисуется неправильно
     printer->setDuplex(pi.defaultDuplexMode());
     printer->setColorMode(pi.defaultColorMode());
+    printer->setPageMargins(QMarginsF(0,0,0,0));
 }
 
 

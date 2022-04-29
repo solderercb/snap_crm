@@ -54,13 +54,12 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     widgetAction->setComboBoxEmployeeModel(usersModel);
     widgetAction->setComboBoxClientModel(clientsTypesList);
 //    widgetAction->setComboBoxXModel(repairModel);
-    widgetAction->setFilter(filterSettings);
-
+    widgetAction->setFilterSettings(filterSettings);
 
     connect(widgetAction, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
-    connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int, int, int)), this, SLOT(tableSectionMoved(int, int, int)));
-    connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int, int, int)), this, SLOT(tableSectionResized(int, int, int)));
-    connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(tableSortingChanged(int, Qt::SortOrder)));
+    connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int,int,int)), this, SLOT(tableSectionMoved(int,int,int)));
+    connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int,int,int)), this, SLOT(tableSectionResized(int,int,int)));
+    connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(tableSortingChanged(int,Qt::SortOrder)));
     connect(ui->buttonRepairNew, &QPushButton::clicked, this, &tabRepairs::buttonRepairNewClicked);
 
     // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.

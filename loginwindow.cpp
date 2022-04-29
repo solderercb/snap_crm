@@ -181,9 +181,6 @@ bool LoginWindow::saveSettings()
     QDomElement tag1 = settingsDOM->createElement("userSettings");
     root.appendChild(tag1);
 
-    QDomElement tag2 = settingsDOM->createElement("ASC.Properties.Settings");
-    tag1.appendChild(tag2);
-
     QMap<QString, QVariant>::const_iterator setting = userLocalData->constBegin();
     while (setting != userLocalData->constEnd())
     {
@@ -191,7 +188,7 @@ bool LoginWindow::saveSettings()
         domElement = new QDomElement;
         *domElement = settingsDOM->createElement("setting");
         domElement->setAttribute("name", setting.key());
-        tag2.appendChild(*domElement);
+        tag1.appendChild(*domElement);
 
         value = new QDomNode();
         *value = settingsDOM->createElement("value");
