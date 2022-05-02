@@ -2,10 +2,11 @@
 #define TABPRINTDIALOG_H
 
 #include <QWidget>
-#include <LimeReport/include/LimeReport>
+#include <LimeReport>
 #include <QStringList>
 #include <QStringListModel>
 #include <QStandardItemModel>
+#include <QPrinter>
 #include <QPrinterInfo>
 #include <QPageSetupDialog>
 #include <QByteArray>
@@ -18,6 +19,7 @@
 #include "tabcommon.h"
 #include "mainwindow.h"
 #include <Windows.h>
+#include <QMessageBox>
 
 namespace Ui {
 class tabPrintDialog;

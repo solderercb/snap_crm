@@ -146,7 +146,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>назазвание БД</string>
+        <string>название БД</string>
        </property>
       </widget>
      </item>

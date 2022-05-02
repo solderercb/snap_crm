@@ -30,37 +30,18 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
 
 windowsDispatcher::~windowsDispatcher()
 {
-    delete queryPermissions;
 }
 
 void windowsDispatcher::connectOK()
 {
-    userDataModel->setQuery(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()), QSqlDatabase::database("connMain")); // использую QSqlQueryModel потому, что она ещу будет использоваться (например, в отчетах)
-
-    queryPermissions= new QSqlQuery(QSqlDatabase::database("connMain"));
-
-    // Переписываем результаты запроса в специальный массив
-    // это необходимо, т. к. данные пользователя могут быть дополнены (например, кодом текущего офиса, если у пользователя есть право выбора офиса при входе)
-    // Кроме того, есть параметры, хранящиеся в AppData и эти настройки превалируют над настройками, сохранёнными в БД (например, ширины столбцов таблиц, которые могут иметь разные значения в случае если пользователь работает на разных ПК).
-    for (int i = 0; i < userDataModel->record(0).count(); i++)
-    {
-        userData->insert(userDataModel->record(0).fieldName(i), userDataModel->record(0).value(i));
-    }
-
-    queryPermissions->exec(QUERY_SEL_PERMISSIONS(userData->value("roles").toString()));
-    while (queryPermissions->next())
-    {
-        permissions->insert(queryPermissions->value(0).toString(), 1);    // разрешённые пользователю действия хранятся в объекте QMap, не перечисленные действия не разрешены
-    }
-
-    // Список компаний.
-    companiesModel->setQuery(QUERY_SEL_COMPANIES, QSqlDatabase::database("connMain"));
-    officesModel->setQuery(QUERY_SEL_OFFICES(1), QSqlDatabase::database("connMain"));
+    initUserData();
+    initPermissions();
+    initCompanies();
+    initOffices();
 
     // TODO: добавить разрешение выбора компании при входе
     if (permissions->contains("59"))  // Менять офис при входе
     {
-
         createChooseOfficeWindow();
     }
     else

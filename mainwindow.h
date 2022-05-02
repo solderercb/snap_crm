@@ -63,7 +63,6 @@ signals:
 public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();	// Деструктор
-    QSqlQuery *queryCommonSettings;
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2;
     uint test_scheduler_counter = 0;
@@ -74,9 +73,6 @@ private:
     Ui::MainWindow *ui;
     static MainWindow* p_instance;
     void closeEvent(QCloseEvent*);
-    QList<QStandardItem*> *clientTypeSelector;
-    QList<QStandardItem*> *notifyStatusSelector;
-    QList<QStandardItem*> *warrantyTermSelector;
     void readGoods(const QModelIndex &index, const QString &warehouse_code);
 	void readConsignments(const QModelIndex &index, const QString &warehouse_code);
 	void get_warehouses_list();
@@ -88,9 +84,6 @@ private:
 	QStringList tableGoodsHeaders;
 	QStandardItemModel *tableConsignmentsModel; // Модель таблицы, отображающей партии товара
 	QStringList tableConsignmentsHeaders;
-    void initGlobalModels();    // общие модели данных: организации, офисы, склады, сотрудники (все, менеджеры, инженеры) и др.
-    bool readStatuses(QStandardItemModel &, QJsonArray &);
-    QString jsonArrayJoin(QJsonValue, const QString);
 
 public slots:
     void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.

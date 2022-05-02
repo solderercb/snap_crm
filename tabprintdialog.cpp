@@ -247,16 +247,16 @@ bool tabPrintDialog::initReportDataSources()
             QList<QVariant> demoValues = {12345, "Моноблок (All-in-One PC) Apple iMac12,1  Mid 2011  A1311 (EMC 2428)", 6325, "C02POIWERUJD", 1, 1, 1, 33, 33, "2022-01-25 10:26:32", 0, 0, 0, "NULL", "NULL", "012000123452", "NULL", "NULL"};
             report->dataManager()->addModel("repair", initDemoModel(demoHeaders, demoValues), true);
             client_id = 6325;
-            demoHeaders = {"id", "name", "surname", "patronymic", "type", "is_regular", "is_dealer"};
+            demoHeaders = QStringList{"id", "name", "surname", "patronymic", "type", "is_regular", "is_dealer"};
             demoValues = {6325, "Андрей", "Андреев", "Андреевич", 0, 0, 0};
             report->dataManager()->addModel("customer", initDemoModel(demoHeaders, demoValues), true);
-            demoHeaders = {"id", "username", "name", "surname", "patronymic", "phone", "phone2", "email"};
+            demoHeaders = QStringList{"id", "username", "name", "surname", "patronymic", "phone", "phone2", "email"};
             demoValues = {32, "manager", "Менеджер", "", "", "", "", ""};
             report->dataManager()->addModel("user", initDemoModel(demoHeaders, demoValues), true);
-            demoHeaders = {"id", "type", "name", "inn", "kpp", "ogrn", "ur_address", "site", "email", "logo"};
+            demoHeaders = QStringList{"id", "type", "name", "inn", "kpp", "ogrn", "ur_address", "site", "email", "logo"};
             demoValues = {1, 1, "ЧП Рога и копыта", "1234567890", "1234", "5678", "туманность Андромеды, 1", "rik.com", "pr@rik.com", "NULL"};
             report->dataManager()->addModel("company", initDemoModel(demoHeaders, demoValues), true);
-            demoHeaders = {"id", "name", "address", "phone", "phone2", "logo"};
+            demoHeaders = QStringList{"id", "name", "address", "phone", "phone2", "logo"};
             demoValues = {1, "Главный", "туманность Андромеды, 1", "123 456-78-90", "", "NULL"};
             report->dataManager()->addModel("office", initDemoModel(demoHeaders, demoValues), true);
         }
@@ -291,10 +291,21 @@ bool tabPrintDialog::initReportDataSources()
     else
         return 0;
 
-    previewWindow =  report->createPreviewWidget();
+    report->prepareReportPages();
+    previewWindow =  report->createPreviewWidget(1);
 
     // Вкладка предпросмотра  на подобие MS Office: слева в столбик параметры печати, а справа непосредсвтенно превью
     ui->gridLayoutTab->addWidget(previewWindow, 0, 1);
+
+    ui->gridLayoutTab->setColumnStretch(1, 1);
+    ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
+
+    qDebug() << "============================================";
+    qDebug() << "pageProperties:";
+    LimeReport::IPreparedPages::PageProps pageProperties = report->preparedPages()->pageProperties(0);
+    qDebug() << "page->pageSize():" << pageProperties.pageSize;
+    qDebug() << "page->geometry():" << pageProperties.geometry;
+    qDebug() << "left:" << pageProperties.leftMargin << "; top:" << pageProperties.topMargin << "; right:" << pageProperties.rightMargin << "; bottom:" << pageProperties.bottomMargin;
 
     return 1;
 }
@@ -329,7 +340,7 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
     }
 
     printer->setCopyCount(ui->spinBoxCopies->value());
-    report->printReport(printer);   // TODO: разобраться, что возвращает данная функция
+    previewWindow->print(printer);
     if (report_type == "new_rep")
     {
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать квитанции к ремонту №%1").arg(report_vars.value("repair_id").toInt())));
@@ -350,7 +361,19 @@ void tabPrintDialog::on_comboBoxPrinters_currentTextChanged(const QString &arg1)
     printer->setPageSize(pi.defaultPageSize()); // дефолтный размер страницы выбранного принтера, без этой установки размер страницы может остаться от предыдущего принтера и отчет отрисуется неправильно
     printer->setDuplex(pi.defaultDuplexMode());
     printer->setColorMode(pi.defaultColorMode());
-    printer->setPageMargins(QMarginsF(0,0,0,0));
+//    printer->setPageMargins(QMarginsF(0,0,0,0));
+
+    qDebug() << "============================================";
+    qDebug() << "on_comboBoxPrinters_currentTextChanged(), printerName():" << printer->printerName();
+    qDebug() << "pageLayout():" << printer->pageLayout();
+    qDebug() << "outputFormat() :" << printer->outputFormat();
+    qDebug() << "pageRect(QPrinter::Millimeter):" << printer->pageRect(QPrinter::Millimeter);
+    qDebug() << "paperRect(QPrinter::Millimeter):" << printer->paperRect(QPrinter::Millimeter);
+    qDebug() << "resolution():" << printer->resolution();
+    qDebug() << "supportedPageSizes():" << pi.supportedPageSizes();
+    if(pi.supportsCustomPageSizes()) (qDebug() << "supportsCustomPageSizes");
+//    bool supportsCustomPageSizes()
+//    QList<QPageSize> supportedPageSizes()
 }
 
 

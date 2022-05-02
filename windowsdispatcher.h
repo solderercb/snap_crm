@@ -14,8 +14,6 @@ signals:
 public:
     windowsDispatcher(QObject* parent = nullptr);
     virtual ~windowsDispatcher();
-    QString test = "QString test";
-    QSqlQuery* queryPermissions;
 
 public slots:
     void connectOK();

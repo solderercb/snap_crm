@@ -1,7 +1,14 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QLocale>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
 #include "sstandarditemmodel.h"
 #include "ssqlquerymodel.h"
 #ifdef QT_DEBUG
@@ -47,5 +54,13 @@ extern SStandardItemModel *itemUnitsModel;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;
+
+bool readStatuses(QStandardItemModel &, QJsonArray &);
+QString jsonArrayJoin(QJsonValue, const QString);
+void initUserData();
+void initPermissions();
+void initCompanies();
+void initOffices();
+void initGlobalModels();    // общие модели данных: организации, офисы, склады, сотрудники (все, менеджеры, инженеры) и др.
 
 #endif // GLOBAL_H
