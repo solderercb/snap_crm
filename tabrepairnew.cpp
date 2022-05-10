@@ -450,6 +450,12 @@ void tabRepairNew::fillClientCreds(int id)
     clientModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
+    if(clientModel->record(0).value("notes").toString() != "")
+    {
+        msgBox.setText(clientModel->record(0).value("notes").toString());
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+    }
 
     if (clientModel->record(0).value("type").toBool())
         ui->checkBoxClientType->setChecked(true);
@@ -481,6 +487,7 @@ void tabRepairNew::fillClientCreds(int id)
     clientPhonesModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     // заполняем типы телефонов. Пока так, потом придумаю что-то более элегантное
+    // TODO: придумать механизм сокрытия части номера, если у пользователя недостаточно прав
     if(clientPhonesModel->rowCount() > 1)   // если результат содержит более одной строки, то в поле доп. номера записываем данные из второй строки результатов
     {
         ui->comboBoxClientPhone2Type->setCurrentText(clientPhoneTypesModel->getDisplayRole(clientPhonesModel->index(1, 1).data().toInt(), 1));    // сначала устанавливаем тип в комбобоксе, чтобы применилась маска к полю

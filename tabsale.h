@@ -92,6 +92,7 @@ private:
     void addItemByUID(int);
     tabSaleSettingsMenu *widgetAction;
     int *params;
+    QMessageBox msgBox;
 
 #ifdef QT_DEBUG
     void randomFill();

@@ -514,6 +514,12 @@ void tabSale::fillClientCreds(int id)
     clientModel->setQuery(QUERY_SEL_CLIENT(id), QSqlDatabase::database("connMain"));
 
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
+    if(clientModel->record(0).value("notes").toString() != "")
+    {
+        msgBox.setText(clientModel->record(0).value("notes").toString());
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+    }
 
     client = id;
     ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
