@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Report>
   <object Type="Object" ClassName="LimeReport::ReportEnginePrivate">
     <objectName Type="QString"></objectName>
@@ -6,19 +6,19 @@
       <item Type="Object" ClassName="LimeReport::PageDesignIntf">
         <objectName Type="QString">page1</objectName>
         <itemIndexMethod Type="enumAndFlags" Value="0"/>
-        <sceneRect x="-50" y="-50" width="3070" Type="QRect" height="2205"/>
+        <sceneRect Type="QRect" height="2205" width="3070" y="-50" x="-50"/>
         <bspTreeDepth Type="int" Value="5"/>
-        <font italic="0" Type="QFont" pointSize="9" underline="0" family="Segoe UI" weight="400"/>
+        <font Type="QFont" weight="400" family="Segoe UI" italic="0" underline="0" pointSize="9"/>
         <stickyFocus Type="bool" Value="0"/>
         <minimumRenderSize Type="qreal" Value="0"/>
         <focusOnTouch Type="bool" Value="1"/>
         <pageItem Type="Object" ClassName="PageItem">
           <objectName Type="QString">Reportpage1</objectName>
-          <geometry x="0" y="0" width="2970" Type="QRect" height="2100"/>
+          <geometry Type="QRect" height="2100" width="2970" y="0" x="0"/>
           <children Type="Collection">
             <item Type="Object" ClassName="ShapeItem">
               <objectName Type="QString">ShapeItem1</objectName>
-              <geometry x="1460" y="50" width="50" Type="QRect" height="2000"/>
+              <geometry Type="QRect" height="2000" width="50" y="50" x="1460"/>
               <children Type="Collection"/>
               <zOrder Type="qreal" Value="0"/>
               <borders Type="enumAndFlags" Value="0"/>
@@ -41,11 +41,11 @@
             </item>
             <item Type="Object" ClassName="PageHeader">
               <objectName Type="QString">PageHeader1</objectName>
-              <geometry x="200" y="50" width="2720" Type="QRect" height="970"/>
+              <geometry Type="QRect" height="970" width="2720" y="50" x="200"/>
               <children Type="Collection">
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem16</objectName>
-                  <geometry x="0" y="730" width="380" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="380" y="730" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -62,7 +62,7 @@
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -90,7 +90,7 @@
                 </item>
                 <item Type="Object" ClassName="ShapeItem">
                   <objectName Type="QString">ShapeItem23</objectName>
-                  <geometry x="0" y="0" width="1230" Type="QRect" height="310"/>
+                  <geometry Type="QRect" height="310" width="1230" y="0" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="-0.1"/>
                   <borders Type="enumAndFlags" Value="15"/>
@@ -113,7 +113,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem9</objectName>
-                  <geometry x="0" y="490" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="490" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -130,7 +130,7 @@
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -158,7 +158,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem12</objectName>
-                  <geometry x="380" y="550" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="550" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -175,7 +175,7 @@
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -203,7 +203,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem4</objectName>
-                  <geometry x="380" y="310" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="310" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="11"/>
@@ -220,7 +220,7 @@
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -248,7 +248,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem3</objectName>
-                  <geometry x="0" y="310" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="310" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="11"/>
@@ -265,7 +265,7 @@
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -293,7 +293,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem14</objectName>
-                  <geometry x="380" y="610" width="850" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="850" y="610" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -310,7 +310,7 @@
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -338,7 +338,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem7</objectName>
-                  <geometry x="380" y="490" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="490" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -355,7 +355,7 @@
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -383,7 +383,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem33</objectName>
-                  <geometry x="710" y="0" width="520" Type="QRect" height="100"/>
+                  <geometry Type="QRect" height="100" width="520" y="0" x="710"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -401,7 +401,7 @@
                   <alignment Type="enumAndFlags" Value="34"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -429,7 +429,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem11</objectName>
-                  <geometry x="0" y="550" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="550" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -446,7 +446,7 @@
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -474,7 +474,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem13</objectName>
-                  <geometry x="0" y="610" width="380" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="380" y="610" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -491,7 +491,7 @@
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -519,7 +519,7 @@
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem34</objectName>
-                  <geometry x="510" y="0" width="200" Type="QRect" height="140"/>
+                  <geometry Type="QRect" height="140" width="200" y="0" x="510"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -538,7 +538,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="132"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="700"/>
+                  <font Type="QFont" weight="700" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -566,7 +566,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem17</objectName>
-                  <geometry x="380" y="850" width="850" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="850" y="850" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -583,7 +583,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -611,7 +611,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem32</objectName>
-                  <geometry x="920" y="270" width="310" Type="QRect" height="40"/>
+                  <geometry Type="QRect" height="40" width="310" y="270" x="920"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -628,7 +628,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="36"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="8" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="8"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -656,7 +656,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="BarcodeItem">
                   <objectName Type="QString">BarcodeItem31</objectName>
-                  <geometry x="1000" y="110" width="160" Type="QRect" height="160"/>
+                  <geometry Type="QRect" height="160" width="160" y="110" x="1000"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -687,7 +687,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem18</objectName>
-                  <geometry x="0" y="850" width="380" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="380" y="850" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -704,7 +704,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -732,7 +732,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem5</objectName>
-                  <geometry x="0" y="370" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="370" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -749,7 +749,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -777,10 +777,10 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="ImageItem">
                   <objectName Type="QString">ImageItem31</objectName>
-                  <geometry x="0" y="0" width="500" Type="QRect" height="125"/>
+                  <geometry Type="QRect" height="125" width="500" y="2" x="2"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0.1"/>
-                  <borders Type="enumAndFlags" Value="5"/>
+                  <borders Type="enumAndFlags" Value="0"/>
                   <parentName Type="QString">PageHeader1</parentName>
                   <borderLineSize Type="int" Value="1"/>
                   <isVisible Type="bool" Value="1"/>
@@ -805,7 +805,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem31</objectName>
-                  <geometry x="0" y="140" width="900" Type="QRect" height="170"/>
+                  <geometry Type="QRect" height="170" width="900" y="140" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -825,7 +825,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="8" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="8"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -853,7 +853,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem15</objectName>
-                  <geometry x="380" y="730" width="850" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="850" y="730" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -870,7 +870,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -898,7 +898,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem10</objectName>
-                  <geometry x="380" y="430" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="430" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -915,7 +915,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -943,7 +943,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem6</objectName>
-                  <geometry x="380" y="370" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="370" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -960,7 +960,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -988,7 +988,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem8</objectName>
-                  <geometry x="0" y="430" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="430" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1005,7 +1005,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1033,7 +1033,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem64</objectName>
-                  <geometry x="1870" y="850" width="850" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="850" y="850" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -1050,7 +1050,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1078,7 +1078,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem65</objectName>
-                  <geometry x="1870" y="550" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="550" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -1095,7 +1095,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1123,7 +1123,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem66</objectName>
-                  <geometry x="1870" y="610" width="850" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="850" y="610" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -1140,7 +1140,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1168,7 +1168,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem67</objectName>
-                  <geometry x="2410" y="270" width="310" Type="QRect" height="40"/>
+                  <geometry Type="QRect" height="40" width="310" y="270" x="2410"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -1185,7 +1185,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="36"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="8" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="8"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1213,7 +1213,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem68</objectName>
-                  <geometry x="1870" y="490" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="490" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -1230,7 +1230,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1258,7 +1258,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem69</objectName>
-                  <geometry x="1490" y="730" width="380" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="380" y="730" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1275,7 +1275,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1303,7 +1303,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="ShapeItem">
                   <objectName Type="QString">ShapeItem69</objectName>
-                  <geometry x="1490" y="0" width="1230" Type="QRect" height="310"/>
+                  <geometry Type="QRect" height="310" width="1230" y="0" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="-0.1"/>
                   <borders Type="enumAndFlags" Value="15"/>
@@ -1326,7 +1326,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem70</objectName>
-                  <geometry x="1870" y="310" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="310" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="11"/>
@@ -1343,7 +1343,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1371,7 +1371,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem71</objectName>
-                  <geometry x="1490" y="430" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="430" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1388,7 +1388,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1416,7 +1416,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem72</objectName>
-                  <geometry x="1490" y="140" width="900" Type="QRect" height="170"/>
+                  <geometry Type="QRect" height="170" width="900" y="140" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -1436,7 +1436,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="8" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="8"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1464,7 +1464,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem73</objectName>
-                  <geometry x="2000" y="0" width="200" Type="QRect" height="140"/>
+                  <geometry Type="QRect" height="140" width="200" y="0" x="2000"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -1483,7 +1483,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="132"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="700"/>
+                  <font Type="QFont" weight="700" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1511,7 +1511,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem74</objectName>
-                  <geometry x="1490" y="610" width="380" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="380" y="610" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1528,7 +1528,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1556,10 +1556,10 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="ImageItem">
                   <objectName Type="QString">ImageItem74</objectName>
-                  <geometry x="1490" y="0" width="500" Type="QRect" height="125"/>
+                  <geometry Type="QRect" height="125" width="500" y="2" x="1492"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0.1"/>
-                  <borders Type="enumAndFlags" Value="5"/>
+                  <borders Type="enumAndFlags" Value="0"/>
                   <parentName Type="QString">PageHeader1</parentName>
                   <borderLineSize Type="int" Value="1"/>
                   <isVisible Type="bool" Value="1"/>
@@ -1584,7 +1584,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem75</objectName>
-                  <geometry x="2200" y="0" width="520" Type="QRect" height="100"/>
+                  <geometry Type="QRect" height="100" width="520" y="0" x="2200"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -1602,7 +1602,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="34"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="0"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1630,7 +1630,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem76</objectName>
-                  <geometry x="1490" y="550" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="550" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1647,7 +1647,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1675,7 +1675,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem77</objectName>
-                  <geometry x="1870" y="370" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="370" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -1692,7 +1692,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1720,7 +1720,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem78</objectName>
-                  <geometry x="1870" y="430" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="430" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -1737,7 +1737,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1765,7 +1765,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem79</objectName>
-                  <geometry x="1490" y="370" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="370" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1782,7 +1782,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1810,7 +1810,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="BarcodeItem">
                   <objectName Type="QString">BarcodeItem79</objectName>
-                  <geometry x="2490" y="110" width="160" Type="QRect" height="160"/>
+                  <geometry Type="QRect" height="160" width="160" y="110" x="2490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -1841,7 +1841,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem80</objectName>
-                  <geometry x="1490" y="490" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="490" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1858,7 +1858,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1886,7 +1886,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem81</objectName>
-                  <geometry x="1490" y="850" width="380" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="380" y="850" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -1903,7 +1903,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1931,7 +1931,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem82</objectName>
-                  <geometry x="1870" y="730" width="850" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="850" y="730" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -1948,7 +1948,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -1976,7 +1976,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem83</objectName>
-                  <geometry x="1490" y="310" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="310" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="11"/>
@@ -1993,7 +1993,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2043,11 +2043,11 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
             </item>
             <item Type="Object" ClassName="Data">
               <objectName Type="QString">DataBand2</objectName>
-              <geometry x="200" y="1020" width="2720" Type="QRect" height="60"/>
+              <geometry Type="QRect" height="60" width="2720" y="1020" x="200"/>
               <children Type="Collection">
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem21</objectName>
-                  <geometry x="0" y="0" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="0" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -2064,7 +2064,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="9" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="9"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2092,7 +2092,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem22</objectName>
-                  <geometry x="380" y="0" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="0" x="380"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -2109,7 +2109,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="9" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="9"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2137,7 +2137,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem23</objectName>
-                  <geometry x="1490" y="0" width="380" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="380" y="0" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="10"/>
@@ -2154,7 +2154,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="9" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="9"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2182,7 +2182,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem24</objectName>
-                  <geometry x="1870" y="0" width="850" Type="QRect" height="60"/>
+                  <geometry Type="QRect" height="60" width="850" y="0" x="1870"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="6"/>
@@ -2199,7 +2199,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="129"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="9" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="9"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2258,11 +2258,11 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
             </item>
             <item Type="Object" ClassName="PageFooter">
               <objectName Type="QString">PageFooter2</objectName>
-              <geometry x="200" y="1220" width="2720" Type="QRect" height="630"/>
+              <geometry Type="QRect" height="630" width="2720" y="1220" x="200"/>
               <children Type="Collection">
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem30</objectName>
-                  <geometry x="0" y="380" width="970" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="970" y="380" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="14"/>
@@ -2279,7 +2279,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="130"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2307,7 +2307,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem28</objectName>
-                  <geometry x="0" y="260" width="970" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="970" y="260" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="14"/>
@@ -2324,7 +2324,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="130"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2352,7 +2352,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem26</objectName>
-                  <geometry x="970" y="140" width="260" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="260" y="140" x="970"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="15"/>
@@ -2369,7 +2369,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2397,7 +2397,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem29</objectName>
-                  <geometry x="970" y="380" width="260" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="260" y="380" x="970"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="14"/>
@@ -2414,7 +2414,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2442,7 +2442,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem25</objectName>
-                  <geometry x="0" y="140" width="970" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="970" y="140" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="15"/>
@@ -2459,7 +2459,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="130"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2487,7 +2487,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem27</objectName>
-                  <geometry x="970" y="260" width="260" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="260" y="260" x="970"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="14"/>
@@ -2504,7 +2504,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2532,7 +2532,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem86</objectName>
-                  <geometry x="1490" y="380" width="970" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="970" y="380" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="14"/>
@@ -2549,7 +2549,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="130"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2577,7 +2577,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem87</objectName>
-                  <geometry x="1490" y="260" width="970" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="970" y="260" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="15"/>
@@ -2594,7 +2594,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="130"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2622,7 +2622,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem88</objectName>
-                  <geometry x="2460" y="260" width="260" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="260" y="260" x="2460"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="15"/>
@@ -2639,7 +2639,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2667,7 +2667,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem89</objectName>
-                  <geometry x="2460" y="380" width="260" Type="QRect" height="120"/>
+                  <geometry Type="QRect" height="120" width="260" y="380" x="2460"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="14"/>
@@ -2684,7 +2684,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2712,7 +2712,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem90</objectName>
-                  <geometry x="2270" y="330" width="300" Type="QRect" height="300"/>
+                  <geometry Type="QRect" height="300" width="300" y="330" x="2270"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -2729,7 +2729,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="132"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Arial" weight="400"/>
+                  <font Type="QFont" weight="400" family="Arial" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2757,7 +2757,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="ShapeItem">
                   <objectName Type="QString">ShapeItem91</objectName>
-                  <geometry x="2270" y="330" width="300" Type="QRect" height="300"/>
+                  <geometry Type="QRect" height="300" width="300" y="330" x="2270"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -2780,7 +2780,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem91</objectName>
-                  <geometry x="1490" y="0" width="1230" Type="QRect" height="50"/>
+                  <geometry Type="QRect" height="50" width="1230" y="0" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="3"/>
@@ -2797,7 +2797,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="132"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="700"/>
+                  <font Type="QFont" weight="700" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2825,7 +2825,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem92</objectName>
-                  <geometry x="1490" y="50" width="1230" Type="QRect" height="210"/>
+                  <geometry Type="QRect" height="210" width="1230" y="50" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="2"/>
@@ -2843,7 +2843,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="0"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2894,7 +2894,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
             </item>
             <item Type="Object" ClassName="ShapeItem">
               <objectName Type="QString">ShapeItem2</objectName>
-              <geometry x="1410" y="50" width="40" Type="QRect" height="1850"/>
+              <geometry Type="QRect" height="1850" width="40" y="50" x="1410"/>
               <children Type="Collection"/>
               <zOrder Type="qreal" Value="0"/>
               <borders Type="enumAndFlags" Value="0"/>
@@ -2917,7 +2917,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
             </item>
             <item Type="Object" ClassName="ShapeItem">
               <objectName Type="QString">ShapeItem3</objectName>
-              <geometry x="180" y="50" width="40" Type="QRect" height="1850"/>
+              <geometry Type="QRect" height="1850" width="40" y="50" x="180"/>
               <children Type="Collection"/>
               <zOrder Type="qreal" Value="0"/>
               <borders Type="enumAndFlags" Value="0"/>
@@ -2940,11 +2940,11 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
             </item>
             <item Type="Object" ClassName="DataFooter">
               <objectName Type="QString">DataFooterBand3</objectName>
-              <geometry x="200" y="1080" width="2720" Type="QRect" height="140"/>
+              <geometry Type="QRect" height="140" width="2720" y="1080" x="200"/>
               <children Type="Collection">
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem19</objectName>
-                  <geometry x="0" y="0" width="1230" Type="QRect" height="140"/>
+                  <geometry Type="QRect" height="140" width="1230" y="0" x="0"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -2961,7 +2961,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -2989,7 +2989,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                 </item>
                 <item Type="Object" ClassName="TextItem">
                   <objectName Type="QString">TextItem20</objectName>
-                  <geometry x="1490" y="0" width="1230" Type="QRect" height="140"/>
+                  <geometry Type="QRect" height="140" width="1230" y="0" x="1490"/>
                   <children Type="Collection"/>
                   <zOrder Type="qreal" Value="0"/>
                   <borders Type="enumAndFlags" Value="0"/>
@@ -3006,7 +3006,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
                   <alignment Type="enumAndFlags" Value="33"/>
                   <autoWidth Type="enumAndFlags" Value="0"/>
                   <autoHeight Type="bool" Value="1"/>
-                  <font italic="0" Type="QFont" pointSize="10" underline="0" family="Cambria" weight="400"/>
+                  <font Type="QFont" weight="400" family="Cambria" italic="0" underline="0" pointSize="10"/>
                   <backgroundOpacity Type="int" Value="100"/>
                   <backgroundMode Type="enumAndFlags" Value="0"/>
                   <backgroundColor Type="QColor" Value="#ffffff"/>
@@ -3058,7 +3058,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
             </item>
             <item Type="Object" ClassName="ShapeItem">
               <objectName Type="QString">ShapeItem89</objectName>
-              <geometry x="2900" y="50" width="40" Type="QRect" height="1850"/>
+              <geometry Type="QRect" height="1850" width="40" y="50" x="2900"/>
               <children Type="Collection"/>
               <zOrder Type="qreal" Value="0"/>
               <borders Type="enumAndFlags" Value="0"/>
@@ -3081,7 +3081,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
             </item>
             <item Type="Object" ClassName="ShapeItem">
               <objectName Type="QString">ShapeItem90</objectName>
-              <geometry x="1670" y="50" width="40" Type="QRect" height="1850"/>
+              <geometry Type="QRect" height="1850" width="40" y="50" x="1670"/>
               <children Type="Collection"/>
               <zOrder Type="qreal" Value="0"/>
               <borders Type="enumAndFlags" Value="0"/>
@@ -3106,7 +3106,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
           <zOrder Type="qreal" Value="0"/>
           <borders Type="enumAndFlags" Value="0"/>
           <parentName Type="QString"></parentName>
-          <borderLineSize Type="int" Value="1"/>
+          <borderLineSize Type="int" Value="3"/>
           <isVisible Type="bool" Value="1"/>
           <borderColor Type="QColor" Value="#000000"/>
           <geometryLocked Type="bool" Value="0"/>
@@ -3116,7 +3116,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
           <leftMargin Type="int" Value="20"/>
           <pageOrientation Type="enumAndFlags" Value="1"/>
           <pageSize Type="enumAndFlags" Value="7"/>
-          <gridStep Type="int" Value="10"/>
+          <gridStep Type="int" Value="1"/>
           <fullPage Type="bool" Value="0"/>
           <oldPrintMode Type="bool" Value="0"/>
           <resetPageNumber Type="bool" Value="0"/>
@@ -3128,7 +3128,7 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
           <printable Type="bool" Value="1"/>
           <printerName Type="QString"></printerName>
           <units Type="enumAndFlags" Value="0"/>
-          <printBehavior Type="enumAndFlags" Value="1"/>
+          <printBehavior Type="enumAndFlags" Value="0"/>
           <dropPrinterMargins Type="bool" Value="0"/>
           <notPrintIfEmpty Type="bool" Value="0"/>
           <mixWithPriorPage Type="bool" Value="0"/>
@@ -3153,3 +3153,4 @@ $S{if($D{repair.is_repeat} == 1) { "Повтор"} else {""}}</content>
     <translation Type="Translation"/>
   </object>
 </Report>
+

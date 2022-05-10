@@ -116,11 +116,12 @@ PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
 
 CONFIG(release, debug|release) {
     BUILD_TYPE = release
-    LIBS += -L$$LIB_DIR -llimereport -lKernel32
+    LIBS += -L$$LIB_DIR -llimereport
 }else{
     BUILD_TYPE = debug
-    LIBS += -L$$LIB_DIR -llimereportd -lKernel32
+    LIBS += -L$$LIB_DIR -llimereportd
 }
+LIBS += -lwinspool -lKernel32
 
 BIN_DIR ~= s,/,\\,g
 LIB_DIR ~= s,/,\\,g

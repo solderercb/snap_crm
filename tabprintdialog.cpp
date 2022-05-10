@@ -60,6 +60,8 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
                 ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(userLocalData->value("DocsPrinter").toString()));
         }
     }
+    connect(ui->comboBoxPrinters, &QComboBox::currentTextChanged, this, &tabPrintDialog::setPrinter);   // подключение сигнал-слот именно здесь, чтобы избежать лишних вызовов слота при установке принтеров, сохранённых в настройках
+    initPrinter(false);
     ui->gridLayoutTab->setColumnStretch(1, 1);
     ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
     ui->pushButtonPrint->setStyleSheet("QPushButton:hover {border: 1px solid #0078D7; background: solid #E5F1FB;}\n"
@@ -293,6 +295,7 @@ bool tabPrintDialog::initReportDataSources()
 
     report->prepareReportPages();
     previewWindow =  report->createPreviewWidget(1);
+    
 
     // Вкладка предпросмотра  на подобие MS Office: слева в столбик параметры печати, а справа непосредсвтенно превью
     ui->gridLayoutTab->addWidget(previewWindow, 0, 1);
@@ -300,8 +303,8 @@ bool tabPrintDialog::initReportDataSources()
     ui->gridLayoutTab->setColumnStretch(1, 1);
     ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
 
-    qDebug() << "============================================";
-    qDebug() << "pageProperties:";
+    qDebug() << "";
+    qDebug() << "========== report page properties ==========";
     LimeReport::IPreparedPages::PageProps pageProperties = report->preparedPages()->pageProperties(0);
     qDebug() << "page->pageSize():" << pageProperties.pageSize;
     qDebug() << "page->geometry():" << pageProperties.geometry;
@@ -353,34 +356,206 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
     delete query;
 }
 
-
-void tabPrintDialog::on_comboBoxPrinters_currentTextChanged(const QString &arg1)
+void tabPrintDialog::setPrinter(const QString &)
 {
-    QPrinterInfo pi = QPrinterInfo::printerInfo(arg1);
-    printer->setPrinterName(arg1);
-    printer->setPageSize(pi.defaultPageSize()); // дефолтный размер страницы выбранного принтера, без этой установки размер страницы может остаться от предыдущего принтера и отчет отрисуется неправильно
-    printer->setDuplex(pi.defaultDuplexMode());
-    printer->setColorMode(pi.defaultColorMode());
-//    printer->setPageMargins(QMarginsF(0,0,0,0));
-
-    qDebug() << "============================================";
-    qDebug() << "on_comboBoxPrinters_currentTextChanged(), printerName():" << printer->printerName();
-    qDebug() << "pageLayout():" << printer->pageLayout();
-    qDebug() << "outputFormat() :" << printer->outputFormat();
-    qDebug() << "pageRect(QPrinter::Millimeter):" << printer->pageRect(QPrinter::Millimeter);
-    qDebug() << "paperRect(QPrinter::Millimeter):" << printer->paperRect(QPrinter::Millimeter);
-    qDebug() << "resolution():" << printer->resolution();
-    qDebug() << "supportedPageSizes():" << pi.supportedPageSizes();
-    if(pi.supportsCustomPageSizes()) (qDebug() << "supportsCustomPageSizes");
-//    bool supportsCustomPageSizes()
-//    QList<QPageSize> supportedPageSizes()
+    // очистка проприетарных данных драйвера принтера перед инициализацией
+    if(driverExtraData)
+        memset(driverExtraData, 0xFF, driverExtraDataSize);
+    driverExtraData = nullptr;
+    initPrinter(false);
 }
 
+/* https://stackoverflow.com/questions/40043507/qt-5-8-windows-printer-api-invalid-handle-error */
+void tabPrintDialog::initPrinter(bool showSettings)
+{
+    QString printerName;
+    QPrinterInfo pi;
+    bool pageSetResult;
+
+    printerName = ui->comboBoxPrinters->currentText();
+    pi = QPrinterInfo::printerInfo(printerName);
+    if(pi.isNull())
+        return;
+
+    printer->setPrinterName(printerName);
+
+#ifdef Q_OS_WINDOWS
+    printerName = printerName+"\0";
+    LPWSTR pname = reinterpret_cast<wchar_t *>(printerName.data());
+    HANDLE hPrinter = NULL;
+    LPDEVMODE pDevMode;
+    DWORD dwNeeded = 0, dwRet;
+    if(!OpenPrinter(pname, &hPrinter, NULL))
+    {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Не удалось вызвать драйвер принтера"));
+        msgBox.exec();
+    }
+    /* Step 1:
+    * Allocate a buffer of the correct size.
+    */
+    dwNeeded = DocumentProperties((HWND)effectiveWinId(),
+        hPrinter, /* Handle to our printer. */
+        pname, /* Name of the printer. */
+        NULL, /* Asking for size, so */
+        NULL, /* these are not used. */
+        0); /* Zero returns buffer size. */
+
+    pDevMode = (LPDEVMODE)malloc(dwNeeded);
+
+    /* Step 2:
+    * Get the default DevMode for the printer and
+    * modify it for your needs.
+    */
+    dwRet = DocumentProperties( (HWND)effectiveWinId(),
+                                hPrinter,
+                                pname,
+                                pDevMode, /* The address of the buffer to fill. */
+                                NULL, /* Not using the input buffer. */
+                                DM_OUT_BUFFER); /* Have the output buffer filled. */
+    if (dwRet != IDOK)
+    {
+        /* If failure, cleanup and return failure. */
+        free(pDevMode);
+        ClosePrinter(hPrinter);
+        return;
+    }
+
+    // вызов окна расширенной настройки параметров печати; это диалоговое окно, оно блокирует работу всей ОС (в т. ч. такое же поведение при вызове этого диалога, например, в Word)
+    // если пользователь нажмёт "Отмена", то функция вернёт 0
+    if(showSettings)
+    {
+        pDevMode->dmPaperWidth = printer->pageRect(QPrinter::Millimeter).width() * 10;
+        pDevMode->dmPaperLength = printer->pageRect(QPrinter::Millimeter).height() * 10;
+        pDevMode->dmOrientation = (printer->pageLayout().orientation() == QPageLayout::Portrait)?DMORIENT_PORTRAIT:DMORIENT_LANDSCAPE;
+        if(printer->pageLayout().pageSize().id() != QPageSize::Custom)    // попытка установить размер листа по id
+        {
+            pDevMode->dmPaperSize = PageSizeMap.value(printer->pageLayout().pageSize().id());
+        }
+        else
+        {
+            pDevMode->dmPaperSize = DMPAPER_USER;
+        }
+        pDevMode->dmPrintQuality = printer->resolution();
+        memcpy(((unsigned char *)(pDevMode) + pDevMode->dmSize), driverExtraData, driverExtraDataSize); // восстановление данных из буфера
+
+        // размер страницы принтера по умолчанию. Например, для Rongta RP400 размер по умолчанию 600 900 (или наоборот), а id страницы - 9 (т. е. A4).
+        qDebug() << "[before] LxW =" << pDevMode->dmPaperLength << pDevMode->dmPaperWidth << "; id=" << pDevMode->dmPaperSize;
+        AdvancedDocumentProperties( (HWND)effectiveWinId(),
+                                        hPrinter,
+                                        pname,
+                                        pDevMode,
+                                        pDevMode);
+    }
+    else
+    {
+        pDevMode->dmOrientation = (report->preparedPages()->pageProperties().orientation == QPageLayout::Portrait)?DMORIENT_PORTRAIT:DMORIENT_LANDSCAPE;   // ориентация по умолчанию в соответствии с параметрами страницы отчета
+    }
+
+    if(pDevMode->dmPaperSize < DMPAPER_USER)    // попытка установить размер листа по id
+        pageSetResult = printer->setPageSize(QPageSize((QPageSize::PageSizeId)PageSizeMap.key(pDevMode->dmPaperSize)));
+    if(pDevMode->dmPaperSize == DMPAPER_USER || !pageSetResult) // если размер изначально пользовательский или не удалось установить по id
+        printer->setPageSize( \
+                              QPageSize(
+                                    ((pDevMode->dmOrientation==DMORIENT_PORTRAIT)?\
+                                        QSizeF(
+                                            (pDevMode->dmPaperWidth / 10),
+                                            (pDevMode->dmPaperLength / 10)):\
+                                        QSizeF(
+                                            (pDevMode->dmPaperLength / 10),
+                                            (pDevMode->dmPaperWidth / 10))),
+                                    QPageSize::Millimeter,
+                                    QString(),
+                                    QPageSize::ExactMatch)); // изменённый размер страницы
+    printer->setPageOrientation((pDevMode->dmOrientation==DMORIENT_PORTRAIT)?QPageLayout::Portrait:QPageLayout::Landscape);       // ориентация в соответствии с параметрами драйвера
+    printer->setResolution(pDevMode->dmPrintQuality);
+    driverExtraDataSize = (int)pDevMode->dmDriverExtra;
+
+    // инициализация буфера проприетарных данных драйвера
+    if(driverExtraData == nullptr)
+        driverExtraData = (unsigned char*)malloc(driverExtraDataSize);
+    memcpy(driverExtraData, ((unsigned char *)(pDevMode) + pDevMode->dmSize), driverExtraDataSize);
+
+    if( report->preparedPages()->pageProperties(0).widthMM > printer->paperRect(QPrinter::Millimeter).width() ||
+        report->preparedPages()->pageProperties(0).heightMM > printer->paperRect(QPrinter::Millimeter).height() )
+    {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Размер страницы отчета больше размера страницы принтера"));
+        msgBox.exec();
+    }
+
+    free(pDevMode);
+    if(!ClosePrinter(hPrinter))
+    {
+        qDebug() << "ClosePrinter failed";
+        return;
+    }
+    CloseHandle(hPrinter);
+#else
+    printer->setPageSize(pi.defaultPageSize());   // defaultPageSize() по сути создаёт новый объект QPageSize, не привязанный ни к какому принтеру. В Win API вообще не замечено элементов, обозначающих  отступы страницы
+    printer->setDuplex(pi.defaultDuplexMode());   // TODO: dmDuplex
+    printer->setColorMode(pi.defaultColorMode()); // TODO: dmColor
+#endif
+
+    if(1)   // TODO: если dropPrinterMargins == 1; фактически это нужно только для отображения корректной отладочной информации, т. к. установка отступов при установленно флаге выполняется в LimeReport
+    {
+        printer->setFullPage(true); // без этой настройки установить отступы равными 0 у некоторых принтеров нельзя (Send to OneNote 2013 и Bullzip PDF...)
+        if( !printer->setPageMargins(QMarginsF(0,0,0,0)) )
+        {
+            qDebug() << "printer->setPageMargins failed.";
+        }
+    }
+
+    qDebug() << "";
+    if(showSettings)
+        qDebug() << "=========== Changed printer params ==========";
+    else
+        qDebug() << "=========== Selected printer params ==========";
+//    qDebug() << "supportedPageSizes" << pi.supportedPageSizes();
+    fillDebugData();
+}
 
 void tabPrintDialog::on_labelPrinterSettings_linkActivated(const QString &link)
 {
-    QPageSetupDialog dialog(printer);
-    dialog.open(this, SLOT(pageSetupAccepted()));
+    initPrinter(true);
+}
+
+void tabPrintDialog::fillDebugData()
+{
+    // Вывод отладочной инфы в TextEdit
+    ui->textEdit->clear();
+    ui->textEdit->append(QString("==== report params ===="));
+//    ui->textEdit->append(QString("dropPrinterMargins = %1 | fullPage = %2").arg(report->preparedPages()->pageProperties().dropPrinterMargins).arg(report->preparedPages()->pageProperties().fullPage));
+//    ui->textEdit->append(QString("oldPrintMode = %1 | endlessHeight = %2").arg(report->preparedPages()->pageProperties().oldPrintMode).arg(report->preparedPages()->pageProperties().endlessHeight));
+    ui->textEdit->append(QString("pageSize = %1x%2 | orientation %3")\
+                         .arg(report->preparedPages()->pageProperties().widthMM)\
+                         .arg(report->preparedPages()->pageProperties().heightMM)\
+                         .arg(report->preparedPages()->pageProperties().orientation));
+    ui->textEdit->append(QString(" setPageSizeToPrinter = %1 | printBehavior = %2")\
+                         .arg(report->preparedPages()->pageProperties().isSetPageSizeToPrinter)\
+                         .arg("N/A"/*report->preparedPages()->pageProperties().printBehavior*/));
+    ui->textEdit->append(QString("==== printer params ===="));
+    ui->textEdit->append(QString("paperSize: QRectF(%1, %2, %3x%4 | orientation %5")\
+                         .arg(printer->paperRect(QPrinter::Millimeter).left())\
+                         .arg(printer->paperRect(QPrinter::Millimeter).top())\
+                         .arg(printer->paperRect(QPrinter::Millimeter).width())\
+                         .arg(printer->paperRect(QPrinter::Millimeter).height())\
+                         .arg((QPageLayout::Orientation)printer->pageLayout().orientation()));
+    ui->textEdit->append(QString("pageSize: QRectF(%1, %2, %3x%4)")\
+                         .arg(printer->pageRect(QPrinter::Millimeter).left())\
+                         .arg(printer->pageRect(QPrinter::Millimeter).top())\
+                         .arg(printer->pageRect(QPrinter::Millimeter).width())\
+                         .arg(printer->pageRect(QPrinter::Millimeter).height())\
+                         );
+
+    qDebug() << "printerName():                     " << printer->printerName();
+    qDebug() << "pageLayout():                      " << printer->pageLayout();
+    qDebug() << "outputFormat() :                   " << printer->outputFormat();
+    qDebug() << "pageRect(QPrinter::Millimeter):    " << printer->pageRect(QPrinter::Millimeter);
+    qDebug() << "paperRect(QPrinter::Millimeter):   " << printer->paperRect(QPrinter::Millimeter);
+    qDebug() << "resolution():                      " << printer->resolution();
+//    qDebug() << "supportedPageSizes():              " << pi.supportedPageSizes();
+//    if(pi.supportsCustomPageSizes()) (qDebug() << "supportsCustomPageSizes");
 }
 
 void tabPrintDialog::pageSetupAccepted()

@@ -1,7 +1,7 @@
 #ifndef TABREPORTDESIGNER_H
 #define TABREPORTDESIGNER_H
 
-#include <../include/LimeReport>
+#include <LimeReport>
 #include <QAbstractItemModel>
 #include <QStandardItemModel>
 #include <QSqlQueryModel>
