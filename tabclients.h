@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QSqlQueryModel>
 #include <QSortFilterProxyModel>
+#include <QTimer>
 #include "mainwindow.h"
 #include "tabcommon.h"
 
@@ -36,7 +37,6 @@ private:
     Ui::tabClients *ui;
     static tabClients* p_instance[2];
     bool _type;
-    void updateTableWidget();
     QTableView* tableView;
     QSqlQueryModel* clientsTable;
     QSortFilterProxyModel* proxyModel;
@@ -49,8 +49,10 @@ private:
     QStringList query_group;
     QStringList query_order;
     QWidget *callerPtr = nullptr;
+    QTimer *tableUpdateDelay;
 
 private slots:
+    void updateTableWidget();
     void clientTypeChanged(QModelIndex);
     void clientAdvertisingChanged(int);
     void tableItemDoubleClick(QModelIndex);

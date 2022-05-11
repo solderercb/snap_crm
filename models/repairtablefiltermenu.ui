@@ -27,7 +27,7 @@
    <item row="2" column="0">
     <widget class="QComboBox" name="comboBoxStatus">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="placeholderText">
       <string>все статусы</string>
@@ -37,7 +37,7 @@
    <item row="3" column="0">
     <widget class="QComboBox" name="comboBoxEmployee">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="placeholderText">
       <string>все сотрудники</string>
@@ -47,7 +47,7 @@
    <item row="4" column="0">
     <widget class="QComboBox" name="comboBoxClients">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="placeholderText">
       <string>все клиенты</string>
@@ -67,7 +67,7 @@
    <item row="1" column="0">
     <widget class="QComboBox" name="comboBoxOffice">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="placeholderText">
       <string>офис</string>
@@ -77,7 +77,7 @@
    <item row="1" column="1">
     <widget class="QToolButton" name="toolButton">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
@@ -96,7 +96,7 @@
    <item row="2" column="1">
     <widget class="QToolButton" name="toolButton_2">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
@@ -115,7 +115,7 @@
    <item row="3" column="1">
     <widget class="QToolButton" name="toolButton_3">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
@@ -134,7 +134,7 @@
    <item row="4" column="1">
     <widget class="QToolButton" name="toolButton_4">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">

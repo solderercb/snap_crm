@@ -100,7 +100,8 @@
                                                 "   `manager`,\n"\
                                                 "   `master`,\n"\
                                                 "   `in_date`,\n"\
-                                                "   t1.`state`,\n"\
+                                                "   `out_date`,\n"\
+                                                "   t1.`state` AS 'status',\n"\
                                                 "   t1.`state`,\n"\
                                                 "   `new_state`,\n"\
                                                 "   `user_lock`,\n"\
@@ -119,7 +120,8 @@
                                                 "   `issued_msg`,\n"\
                                                 "   `vendor_id`,\n"\
                                                 "   `termsControl`,\n"\
-                                                "   `Hidden`\n"\
+                                                "   `Hidden`,\n"\
+                                                "   `company`\n"\
                                                 "FROM `workshop` AS t1\n"\
                                                 "LEFT JOIN `devices` AS t2\n"\
                                                 "   ON t1.`type` = t2.`id`\n"\

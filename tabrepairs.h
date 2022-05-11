@@ -12,6 +12,7 @@
 #include <QRegularExpressionValidator>
 #include <QFrame>
 #include <QWidgetAction>
+#include <QTimer>
 #include "tabcommon.h"
 #include "repairstablemodel.h"
 #include "models/repairtablefiltermenu.h"
@@ -38,7 +39,6 @@ private:
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
     bool _type;
-    void updateTableWidget();
     QTableView* tableView;
     QSqlQueryModel* repairs_table;
     QString query_static;
@@ -49,9 +49,10 @@ private:
     QStringList query_where;
     QStringList query_group;
     QStringList query_order;
+    QTimer *tableUpdateDelay;
 
 private slots:
-    void filterMenuClosed();
+    void updateTableWidget();
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();

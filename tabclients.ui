@@ -78,7 +78,7 @@
             <item row="0" column="1">
              <widget class="QPushButton" name="buttonRefreshTable">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Обновить</string>
@@ -245,7 +245,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -257,6 +257,13 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxShowArchived">
+            <property name="text">
+             <string>Показывать архивных</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -418,6 +425,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>checkBoxShowArchived</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>tabClients</receiver>
+   <slot>clientAdvertisingChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>46</x>
+     <y>414</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>451</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonRefreshTable</sender>
+   <signal>clicked()</signal>
+   <receiver>tabClients</receiver>
+   <slot>updateTableWidget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>356</x>
+     <y>732</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>705</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -436,5 +475,6 @@
   <slot>clientTypeChanged(QModelIndex)</slot>
   <slot>clientAdvertisingChanged(int)</slot>
   <slot>togglePropertiesPanel()</slot>
+  <slot>updateTableWidget()</slot>
  </slots>
 </ui>

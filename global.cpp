@@ -162,8 +162,8 @@ void initGlobalModels()
     paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain")); // TODO: нужна прокси-модель для отображения платёжных систем в соответствии с правами пользователя
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
 
-    QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы", "Архивные"};
-    QVector<QString> clientTypesQueryFilterList = {"t1.`state` = 1", "t1.`type` = 1 AND t1.`state` = 1", "t1.`is_agent` = 1 AND t1.`state` = 1", "t1.`is_dealer` = 1 AND t1.`state` = 1", "t1.`is_regular` = 1 AND t1.`state` = 1", "t1.`is_bad` = 1 AND t1.`state` = 1", "t1.`is_realizator` = 1 AND t1.`state` = 1", "t1.`state` = 0"};
+    QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы"};
+    QVector<QString> clientTypesQueryFilterList = {"`type` = '%'", "`type` = 1", "`is_agent` = 1", "`is_dealer` = 1", "`is_regular` = 1", "`is_bad` = 1", "`is_realizator` = 1"};
     for (int i=0; i<clientTypesList.size(); i++)
     {
         QList<QStandardItem*> *clientTypeSelector = new QList<QStandardItem*>();

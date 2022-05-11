@@ -47,17 +47,13 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->comboBoxClientAdType->setModelColumn(0);
 
-    query_static = QUERY_SEL_CLIENTS_STATIC; // default query
-//    query_where_static = "";    // default WHERE part of query
-//    query_where << query_where_static;
-    query_group_static = "t1.`id`";    // default GROUP part of query
-    query_group << query_group_static;
-    query_order_static = "t1.`id` ASC, t2.`id` ASC";   // default ORDER part of query
-    query_order << query_order_static;
-
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int, int, int)), this, SLOT(tableSectionMoved(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int, int, int)), this, SLOT(tableSectionResized(int, int, int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(tableSortingChanged(int, Qt::SortOrder)));
+
+    tableUpdateDelay = new QTimer();
+    QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(updateTableWidget()));
+    tableUpdateDelay->setSingleShot(true);
 
     updateTableWidget();
 }
@@ -94,21 +90,28 @@ void tabClients::updateTableWidget()
 //    qDebug() << "updateTableWidget()";
     query.clear();
 
-    /* Собираем условия для запроса */
     query_where.clear();
-    if (query_where_static.length() > 0)    // если предустановлен дефолтный фильтр
-        query_where << query_where_static;
-    query_where << clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text();  // добавляем условие для выбранной категории клиентов
+
+    /* Собираем условия для запроса */
+    //    query_where << "";    // default WHERE part of query
+    query_group << "t1.`id`";    // default GROUP part of query
+    query_order << "t1.`id` ASC, t2.`id` ASC";   // default ORDER part of query
+
+    if(!ui->checkBoxShowArchived->isChecked())
+        query_where << "t1.`state` = 1";    // TODO: нужно уйти от жестко заданного имени/алиаса таблицы
+    query_where << "t1." + clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text();  // добавляем условие для выбранной категории клиентов
     // TODO: создать свой ComboBox с кнопкой 🗙
     if (ui->comboBoxClientAdType->currentIndex() >= 0 )
     {
-//        qDebug() << "clientsAdTypesList->index(ui->comboBoxAdvertising->currentIndex(), 1).data() = " << clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString();
         query_where << QString("`visit_source` = %1").arg(clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString());
     }
     if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
         query_where << QString("(LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1') OR t1.`id` = '%1' OR t2.`phone` REGEXP '%1' OR t2.`phone_clean` REGEXP '%1')").arg(ui->lineEditSearch->text());
 
-    query << query_static << (query_where.count()>0?("WHERE " + query_where.join(" AND ")):"") << "GROUP BY" << query_group.join(", ") << "ORDER BY" << query_order.join(", ");
+    query << QUERY_SEL_CLIENTS_STATIC
+          << (query_where.count()>0?("WHERE " + query_where.join(" AND ")):"")
+          << "GROUP BY" << query_group.join(", ")
+          << "ORDER BY" << query_order.join(", ");
 //    qDebug() << query.join(' ');
     clientsTable->setQuery(query.join(' '), QSqlDatabase::database("connMain"));
     ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));
@@ -137,9 +140,10 @@ void tabClients::tableItemDoubleClick(QModelIndex item)
 }
 
 void tabClients::lineEditSearchTextChanged(QString search_str)
-{
+{   // задержка поиска; запрос к базе будет выполняться после каждого введённого символа и при быстром наборе текста прога тормозит
 //    qDebug() << "SLOT tabClients::lineEditSearchTextChanged(QString search_str), search_str = " << search_str;
-    updateTableWidget();
+    tableUpdateDelay->stop();
+    tableUpdateDelay->start(350);
 }
 
 void tabClients::lineEditSearchReturnPressed()
