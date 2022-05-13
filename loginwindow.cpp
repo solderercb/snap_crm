@@ -10,6 +10,10 @@ LoginWindow::LoginWindow(QObject *parent) :
 	ui(new Ui::LoginWindow)
 {
 	ui->setupUi(this);
+
+    if (settingsDOM == nullptr)
+        settingsDOM = new QDomDocument("settingsDOM");
+
     if (genAscSettingsFilePath())
         readSettings(settingsAscFile);  // сначала пробуем прочитать настройки ASC
     if (genSettingsFilePath())
@@ -117,9 +121,6 @@ bool LoginWindow::genAscSettingsFilePath()
 
 bool LoginWindow::readSettings(QFile &file)
 {
-    if (settingsDOM == nullptr)
-        settingsDOM = new QDomDocument("settingsDOM");
-
     if (!file.open(QIODevice::ReadOnly))
     {
 //        qDebug() << "Can't open settings file";
@@ -266,6 +267,7 @@ void LoginWindow::btnLoginHandler()
     connections[i]->setPort(ui->editPort->text().toUInt());
     connections[i]->setDatabaseName(ui->editDBName->text());
 #endif
+    connections[i]->setConnectOptions("MYSQL_OPT_RECONNECT=1;");
 //#endif
 
 //		connections[i]->setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=5;MYSQL_OPT_READ_TIMEOUT=1");
