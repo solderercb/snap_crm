@@ -125,7 +125,6 @@ void tabRepairs::updateTableWidget()
     query_group << "`id`";    // default GROUP part of query
     query_order << "`id` DESC";   // default ORDER part of query
 
-    qDebug() << (query_where.count()>0?"WHERE " + query_where.join(" AND "):"");
     query << QUERY_SEL_WORKSHOP_STATIC\
           << (query_where.count()>0?"\nWHERE " + query_where.join(" AND "):"")\
           << (query_group.count()>0?"\nGROUP BY " + query_group.join(", "):"")\

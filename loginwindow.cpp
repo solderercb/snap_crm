@@ -10,6 +10,11 @@ LoginWindow::LoginWindow(QObject *parent) :
 	ui(new Ui::LoginWindow)
 {
 	ui->setupUi(this);
+    logo = new QGraphicsPixmapItem(QPixmap("logo.png"));
+    logoScene = new QGraphicsScene();
+    logoScene->addItem(logo);
+    ui->graphicsLogo->setScene(logoScene);
+    ui->labelAppVer->setText(QString(APP_VER));
 
     if (settingsDOM == nullptr)
         settingsDOM = new QDomDocument("settingsDOM");
@@ -39,10 +44,17 @@ LoginWindow::LoginWindow(QObject *parent) :
         ui->editLogin->setText(userLocalData->value("lastLogin").toString());
         ui->editPassword->setFocus();
     }
+    if (userLocalData->contains("SSLConnection"))
+    {
+        ui->checkBoxSSL->setChecked(userLocalData->value("SSLConnection").toBool());
+    }
 
 //  shortlivedNotification::setSize(385, 90);
     shortlivedNotification::setAppearance(this, shortlivedNotification::bottomRight);
+    statusBarDelay = new QTimer();
+    statusBarDelay->setSingleShot(true);
 
+    QObject::connect(statusBarDelay, SIGNAL(timeout()), this, SLOT(clearStatusLabel()));
     QObject::connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
     QObject::connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
 
@@ -50,6 +62,7 @@ LoginWindow::LoginWindow(QObject *parent) :
 
 LoginWindow::~LoginWindow()
 {
+    delete logo;
     delete ui;
 }
 
@@ -233,7 +246,9 @@ void LoginWindow::btnLoginHandler()
 {
     QTextCodec *codec = QTextCodec::codecForName("UTF8");
     QTextCodec::setCodecForLocale(codec);
+    QStringList connOptions;
 
+    connections.clear();
     connMain = QSqlDatabase::addDatabase("QMYSQL", "connMain");       // это соединение для получения данных (ремонты, клиенты и т. д.)
     connections.append(&connMain);
     connNtfy = QSqlDatabase::addDatabase("QMYSQL", "connNtfy");
@@ -251,9 +266,22 @@ void LoginWindow::btnLoginHandler()
     hash.addData(ui->editPassword->text().toUtf8(), ui->editPassword->text().length());
 //    qDebug() << hash.result().toHex();
 
+    connOptions << ("MYSQL_OPT_RECONNECT=1");
+    if(ui->checkBoxSSL->isChecked())
+    {
+        if(userLocalData->contains("SSLKey") && userLocalData->value("SSLKey").toString() != "")
+            connOptions << QString("SSL_KEY=%1").arg(userLocalData->value("SSLKey").toString());
+        if(userLocalData->contains("SSLCert") && userLocalData->value("SSLCert").toString() != "")
+            connOptions << QString("SSL_CERT=%1").arg(userLocalData->value("SSLCert").toString());
+        if(userLocalData->contains("SSLCA") && userLocalData->value("SSLCA").toString() != "")
+            connOptions << QString("SSL_CA=%1").arg(userLocalData->value("SSLCA").toString());
+        if(userLocalData->contains("SSLCAPath") && userLocalData->value("SSLCAPath").toString() != "")
+            connOptions << QString("SSL_CAPATH=%1").arg(userLocalData->value("SSLCAPath").toString());
+        if(userLocalData->contains("SSLCipher") && userLocalData->value("SSLCipher").toString() != "")
+            connOptions << QString("SSL_CIPHER=%1").arg(userLocalData->value("SSLCipher").toString());
+    }
     for (int i=0; i<connections.size(); i++)
     {
-//#ifdef QT_DEBUG
 #ifdef NO_LOGIN_
     connections[i]->setUserName(SQL_USER);
     connections[i]->setPassword(SQL_PSWD);
@@ -267,17 +295,16 @@ void LoginWindow::btnLoginHandler()
     connections[i]->setPort(ui->editPort->text().toUInt());
     connections[i]->setDatabaseName(ui->editDBName->text());
 #endif
-    connections[i]->setConnectOptions("MYSQL_OPT_RECONNECT=1;");
-//#endif
-
+    connections[i]->setConnectOptions(connOptions.join(";")+";");
 //		connections[i]->setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=5;MYSQL_OPT_READ_TIMEOUT=1");
     }
 
     if (!connMain.open())
     {
-        qDebug() << "DB connect failed: " << connMain.lastError().driverText();
-        ui->labelStatus->setText(connMain.lastError().driverText());
+        qDebug() << "DB connect failed: " << connMain.lastError().text();
+        ui->labelStatus->setText(connMain.lastError().text());
         ui->labelStatus->setStyleSheet("color: red; font: bold;");
+        statusBarDelay->start(2500);
     }
     else
     {
@@ -295,7 +322,9 @@ void LoginWindow::btnLoginHandler()
             userLocalData->insert("dbPort", ui->editPort->text());
             userLocalData->insert("dbName", ui->editDBName->text());
             userLocalData->insert("lastLogin", ui->editLogin->text());
-            saveSettings();
+            userLocalData->insert("SSLConnection", ui->checkBoxSSL->isChecked());
+            if(ui->checkBoxSaveOnSuccess->isChecked())
+                saveSettings();
 
             this->hide();
             this->deleteLater();
@@ -310,5 +339,39 @@ void LoginWindow::btnLoginHandler()
 
 void LoginWindow::btnCancelHandler()
 {
-	emit this->btnCancelClick();
+    emit this->btnCancelClick();
 }
+
+void LoginWindow::clearStatusLabel()
+{
+    ui->labelStatus->clear();
+}
+
+void LoginWindow::createSSLOptionsDialog()
+{
+    overlay = new QWidget(this);
+    overlay->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
+    overlay->resize(size());
+    overlay->setVisible(true);
+
+    modalWidget = new SSLOptionsDialog(this, Qt::SplashScreen);
+    QObject::connect(modalWidget, SIGNAL(close()), this, SLOT(closeSSLOptionsDialog()));
+
+    modalWidget ->setWindowModality(Qt::WindowModal);
+    modalWidget ->show();
+}
+
+void LoginWindow::closeSSLOptionsDialog()
+{
+    if(modalWidget != nullptr)
+    {
+        modalWidget->deleteLater();
+        modalWidget = nullptr;
+    }
+    if (overlay != nullptr)
+    {
+        overlay->deleteLater();
+        overlay = nullptr;
+    }
+}
+

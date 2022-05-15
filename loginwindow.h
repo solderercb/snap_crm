@@ -13,8 +13,10 @@
 #include <QFile>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QGraphicsPixmapItem>
 #include "shortlivednotification.h"
 #include "windowsdispatcher.h"
+#include "models/ssloptionsdialog.h"
 #define NO_LOGIN
 #ifdef QT_DEBUG
 #ifdef NO_LOGIN
@@ -44,6 +46,8 @@ public:
 
 private:
 	Ui::LoginWindow *ui;
+    QGraphicsPixmapItem *logo;
+    QGraphicsScene *logoScene;
     QSqlDatabase connMain;
     QSqlDatabase connNtfy;
     QSqlDatabase connThird;
@@ -61,12 +65,17 @@ private:
     QDir settingsPath;
     QDir settingsAscPath;
     QFile prevAppVerSettingsFile;
-
+    QTimer *statusBarDelay;
+    SSLOptionsDialog *modalWidget;
+    QWidget *overlay;
 
 private slots:
     void editPassword_onReturnPressed();
     void btnLoginHandler();
     void btnCancelHandler();
+    void clearStatusLabel();
+    void createSSLOptionsDialog();
+    void closeSSLOptionsDialog();
 };
 
 #endif // LOGINWINDOW_H

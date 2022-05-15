@@ -43,6 +43,7 @@ SOURCES += main.cpp\
     models/repairtablefiltermenu.cpp \
     models/saletable/saletableitemdelegates.cpp \
     models/saletable/saletablemodel.cpp \
+    models/ssloptionsdialog.cpp \
     models/tabsalesettingsmenu.cpp \
     querylog.cpp \
     repairstablemodel.cpp \
@@ -69,6 +70,7 @@ HEADERS  += \
     models/repairtablefiltermenu.h \
     models/saletable/saletableitemdelegates.h \
     models/saletable/saletablemodel.h \
+    models/ssloptionsdialog.h \
     models/tabsalesettingsmenu.h \
     querylog.h \
     shortlivednotification.h \
@@ -101,6 +103,7 @@ FORMS    += mainwindow.ui \
     getOutDialog.ui \
     loginwindow.ui \
     models/repairtablefiltermenu.ui \
+    models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
     tabclients.ui \
     tabprintdialog.ui \
