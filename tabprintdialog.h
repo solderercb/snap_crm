@@ -44,7 +44,7 @@ public:
     QMap<QString, QVariant> report_vars;
     void setDefaultWidgetFocus();
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
     QMap<int, int> PageSizeMap = {
         {QPageSize::Letter, DMPAPER_LETTER}, {QPageSize::LetterSmall, DMPAPER_LETTERSMALL},
         {QPageSize::Tabloid, DMPAPER_TABLOID}, {QPageSize::Ledger, DMPAPER_LEDGER}, {QPageSize::Legal, DMPAPER_LEGAL},
@@ -76,14 +76,13 @@ public:
         {QPageSize::EnvelopePrc5, DMPAPER_PENV_5}, {QPageSize::EnvelopePrc6, DMPAPER_PENV_6},
         {QPageSize::EnvelopePrc7, DMPAPER_PENV_7}, {QPageSize::EnvelopePrc8, DMPAPER_PENV_8},
         {QPageSize::EnvelopePrc9, DMPAPER_PENV_9}, {QPageSize::EnvelopePrc10, DMPAPER_PENV_10}, {QPageSize::Custom, DMPAPER_USER} };
-#elif (QT_VERSION < QT_VERSION_CHECK(5, 15, 1))
+#else
     QMap<int, int> PageSizeMap = {
         {QPrinter::Letter, DMPAPER_LETTER}, {QPrinter::Tabloid, DMPAPER_TABLOID}, {QPrinter::Ledger, DMPAPER_LEDGER},
         {QPrinter::Legal, DMPAPER_LEGAL}, {QPrinter::Executive, DMPAPER_EXECUTIVE}, {QPrinter::A4, DMPAPER_A4},
         {QPrinter::A5, DMPAPER_A5}, {QPrinter::B4, DMPAPER_B4}, {QPrinter::B5, DMPAPER_B5}, {QPrinter::Folio, DMPAPER_FOLIO},
         {QPrinter::B6, DMPAPER_B5_TRANSVERSE}, {QPrinter::A6, DMPAPER_A6} };
 #endif
-
 private:
     Ui::tabPrintDialog *ui;
     QString report_type;

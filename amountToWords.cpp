@@ -164,8 +164,7 @@ QString amountToWords( double n )
 		if ((hi == 0) && (nPor >= 1))
 			break;
 	}
-	QString up = s[0];
-    up = up.toUpper();
-	s.replace(0,1,up);
+
+    s.replace(0,1,s[0].toUpper());
 	return s;
 }

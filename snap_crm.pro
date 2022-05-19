@@ -1,16 +1,16 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-04-23T01:19:21
+# Project created by QtCreator
 #
 #-------------------------------------------------
 
 QT	+= core gui
 QT      += widgets
 QT	+= sql
-QT      += core5compat
 QT      += printsupport
 QT      += xml
 QT      += qml
+greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
 TARGET = snap
 TEMPLATE = app
@@ -112,16 +112,32 @@ FORMS    += mainwindow.ui \
     tabrepairs.ui \
     tabsale.ui
 
-LIB_DIR = $$PWD/lib6
+CONFIG(release, debug|release) {
+    BUILD_TYPE = release
+}else{
+    BUILD_TYPE = debug
+}
+
+MOC_DIR        = $${OUT_PWD}/$${BUILD_TYPE}/moc
+OBJECTS_DIR    = $${OUT_PWD}/$${BUILD_TYPE}/obj
+UI_DIR         = $${OUT_PWD}/ui
+UI_HEADERS_DIR = $${OUT_PWD}/ui
+UI_SOURCES_DIR = $${OUT_PWD}/ui
+RCC_DIR        = $${OUT_PWD}/$${BUILD_TYPE}/rcc
+
+equals(QT_MAJOR_VERSION, 6){
+    LIB_DIR = $$PWD/lib6
+}
+else {
+    LIB_DIR = $$PWD/lib5
+}
 INCLUDEPATH += $$LIB_DIR/include
 DEPENDPATH += $$LIB_DIR/include
 PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
 
 CONFIG(release, debug|release) {
-    BUILD_TYPE = release
     LIBS += -L$$LIB_DIR -llimereport
 }else{
-    BUILD_TYPE = debug
     LIBS += -L$$LIB_DIR -llimereportd
 }
 LIBS += -lwinspool -lKernel32
@@ -129,5 +145,7 @@ LIBS += -lwinspool -lKernel32
 BIN_DIR ~= s,/,\\,g
 LIB_DIR ~= s,/,\\,g
 QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
-QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
-CONFIG(release, debug|release): QMAKE_POST_LINK += $$QMAKE_COPY \"$${PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)
+#QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
+equals(QT_MAJOR_VERSION, 6){
+    CONFIG(release, debug|release): QMAKE_POST_LINK += $$QMAKE_COPY \"$${PWD}\\$${OUT_PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)
+}

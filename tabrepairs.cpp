@@ -14,7 +14,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Ремонты")));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
@@ -67,7 +67,7 @@ tabRepairs::~tabRepairs()
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
 
@@ -119,7 +119,7 @@ void tabRepairs::updateTableWidget()
     {
         query_where << "t5." + clientsTypesList->item(filterSettings->value("client"), 2)->text();
     }
-    if ( !userData->value("display_out").toBool() && query_where.count() == 0 )    // дефолтный фильтр, если не настроен пользователем
+    if ( !userDbData->value("display_out").toBool() && query_where.count() == 0 )    // дефолтный фильтр, если не настроен пользователем
         query_where << "`out_date` IS NULL AND `company` = 1";
 
     query_group << "`id`";    // default GROUP part of query

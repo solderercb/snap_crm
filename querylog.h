@@ -5,6 +5,8 @@
 #include <QSqlRecord>
 #include <QByteArray>
 #include <QFile>
+#include <QVariant>
+#include <QDebug>
 
 class queryLog
 {

@@ -262,7 +262,7 @@ void tabRepair::updateWidgets()
         ui->groupBoxCashless->setHidden(true);
     }
 
-    save_state_on_close = userDataModel->record(0).value("save_state_on_close").toBool();
+    save_state_on_close = userDbDataModel->record(0).value("save_state_on_close").toBool();
     ui->comboBoxStatus->setCurrentText(getDisplayRoleById(repairModel->record(0).value("state").toInt(), statusesModel, 1));
     if(save_state_on_close)
             {
@@ -339,8 +339,8 @@ void tabRepair::setLock(bool lock)
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_LOCK_REPAIR(repair_id,lock?(userData->value("id").toString()):("NULL")));
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_LOCK_REPAIR(repair_id,lock?(userDbData->value("id").toString()):("NULL")));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     if(lock)
         QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Ремонт %1").arg(repair_id)));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
@@ -463,6 +463,7 @@ void tabRepair::saveStatus(int index)
             statusUpdateFlag = 1; // защита от зацикливания: при обновлении фильтра прокси модели происходит установка текущего индекса равным 0 и генерируется сигнал currentIndexChanged()
             statusesProxyModel->setFilterRegularExpression(QString("\\b(") + statusesProxyModel->index(index, 4).data().toString() + QString(")\\b"));
             ui->comboBoxStatus->setCurrentIndex(-1);
+            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
             ui->comboBoxStatus->setPlaceholderText(activeStatus);
             statusUpdateFlag = 0;
         }
@@ -520,7 +521,11 @@ void commentsTable::resizeEvent(QResizeEvent *event)
     resizeRowsToContents();
 }
 
+#if QT_VERSION >= 0x060000
 void commentsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+#else
+void commentsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+#endif
 {
     qDebug() << "commentsTable::dataChanged()"; // TODO: разообраться, почему этот слот не вызывается при обновлении модели.
     QTableView::dataChanged(topLeft,bottomRight,roles);
@@ -592,7 +597,11 @@ void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
     resizeRowsToContents();
 }
 
+#if QT_VERSION >= 0x060000
 void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+#else
+void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+#endif
 {
     QTableView::dataChanged(topLeft,bottomRight,roles);
     resizeRowsToContents();

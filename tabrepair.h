@@ -31,7 +31,11 @@ public:
     explicit commentsTable(QWidget *parent = nullptr);
     ~commentsTable();
     void resizeEvent(QResizeEvent*);
+#if QT_VERSION >= 0x060000
     void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
+#else
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
+#endif
 private:
 };
 
@@ -55,7 +59,11 @@ public:
     explicit worksAndSparePartsTable(QWidget *parent = nullptr);
     ~worksAndSparePartsTable();
     void resizeEvent(QResizeEvent*);
+#if QT_VERSION >= 0x060000
     void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
+#else
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
+#endif
 private:
 };
 

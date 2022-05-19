@@ -41,7 +41,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->spinBoxReserve->setMinimum(1);
 
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
 
     if(doc_id)
     {
@@ -73,7 +73,8 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     testPushButton = new QPushButton(testPanel);
     testPushButton->setGeometry(5,35, 90, 25);
     testPushButton->setText("updateWidgets()");
-    connect(testPushButton, &QPushButton::clicked, this, &tabSale::test_updateWidgetsWithDocNum);
+//    connect(testPushButton, &QPushButton::clicked, this, &tabSale::test_updateWidgetsWithDocNum);
+    connect(testPushButton, SIGNAL(clicked()), this, SLOT(test_updateWidgetsWithDocNum()));
     testPanel->show();
 
     test_scheduler = new QTimer();
@@ -648,8 +649,8 @@ bool tabSale::unSale()  // распроведение
     int user, office, cash_order_id, paymentAccount = 0;
     float amount;
 
-    user = userData->value("id").toInt();
-    office = userData->value("current_office").toInt();
+    user = userDbData->value("id").toInt();
+    office = userDbData->value("current_office").toInt();
 
     if( paymentSystemsModel->index(ui->comboBoxMoneyBackAccount->currentIndex(), 1).data().toInt() == -2 && (!clientModel->record(0).value("balance_enable").toBool() || ui->checkBoxAnonymous->isChecked()) )
     {
@@ -715,7 +716,7 @@ bool tabSale::unSale()  // распроведение
     QUERY_EXEC(query_pre,nDBErr)(QUERY_SEL_PRE_UPD_STORE_ITEMS6(doc_id, store_sales_cancel_records.join(',')));
     QUERY_EXEC(query,nDBErr)(QUERY_UPD_STORE_ITEMS_UNSALE(doc_id, store_sales_cancel_records.join(',')));
     QUERY_EXEC(query,nDBErr)(QUERY_UPD_STORE_SALES_UNSALE(doc_id, store_sales_cancel_records.join(',')));
-    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG_PARTS_IN_DOC_RET(userData->value("id").toInt(),userData->value("current_office").toInt(),doc_id,QString("'Возврат товара, основание: %1'").arg(ui->textEditRevertReason->toPlainText()), store_sales_cancel_records.join(',')));
+    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG_PARTS_IN_DOC_RET(userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),doc_id,QString("'Возврат товара, основание: %1'").arg(ui->textEditRevertReason->toPlainText()), store_sales_cancel_records.join(',')));
     QUERY_EXEC(query,nDBErr)(QUERY_SEL_PST_UPD_STORE_ITEMS6(doc_id, store_sales_cancel_records.join(',')));
 
     while(query->next() && query_pre->next() && nIntegrityErr)
@@ -866,8 +867,8 @@ bool tabSale::sale()
     log->truncateLog();
 #endif
 
-    user = userData->value("id").toInt();
-    office = userData->value("current_office").toInt();
+    user = userDbData->value("id").toInt();
+    office = userDbData->value("current_office").toInt();
     amount = tableModel->totalAmount();
     reserveDays = ui->spinBoxReserve->value();
     priceCol = priceColModel->index(ui->comboBoxPriceCol->currentIndex(), 1).data().toInt();
@@ -1244,7 +1245,7 @@ void tabSale::setTrackNum()     // слот вызываемый по нажат
 
     QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
     QUERY_EXEC(query,nDBErr)(QUERY_UPD_SALE_DOC_SET_TRACK(doc_id, ui->lineEditTrack->text()));
-    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_,"NULL","NULL",doc_id,"NULL",QString("РН №%1 присвоен номер ТТН: %2").arg(doc_id).arg(ui->lineEditTrack->text())));   // TODO: экранировать спец символы, мало ли что введёт пользователь
+    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),client_,"NULL","NULL",doc_id,"NULL",QString("РН №%1 присвоен номер ТТН: %2").arg(doc_id).arg(ui->lineEditTrack->text())));   // TODO: экранировать спец символы, мало ли что введёт пользователь
     QUERY_COMMIT_ROLLBACK(query,nDBErr);
     if(!nDBErr);
         //TODO: сообщение об ошибке
@@ -1288,8 +1289,8 @@ void tabSale::reserveCancelButtonClicked()
     QUERY_EXEC(query,nDBErr)(QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(doc_id, store_sales_records.join(',')));
     QUERY_EXEC(query,nDBErr)(QUERY_UPD_STORE_SALES_RESERVE_CANCELLATION(doc_id, store_sales_records.join(',')));
     QUERY_EXEC(query,nDBErr)(QUERY_SEL_PST_UPD_STORE_ITEMS5(doc_id));
-    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG_PARTS_IN_DOC_RSRV(userData->value("id").toInt(),userData->value("current_office").toInt(),doc_id,"'Снятие резерва'", 1));
-    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",6,userData->value("id").toInt(),userData->value("current_office").toInt(),client_,"NULL","NULL",doc_id,"NULL",QString("Резерв товара по РН№%1 снят").arg(doc_id)));
+    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG_PARTS_IN_DOC_RSRV(userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),doc_id,"'Снятие резерва'", 1));
+    QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",6,userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),client_,"NULL","NULL",doc_id,"NULL",QString("Резерв товара по РН№%1 снят").arg(doc_id)));
 
     while(query->next() && query_pre->next() && nIntegrityErr)
     {
@@ -1387,7 +1388,11 @@ void sparePartsTable::resizeEvent(QResizeEvent *event)
     resizeRowsToContents();
 }
 
+#if QT_VERSION >= 0x060000
 void sparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+#else
+void sparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+#endif
 {
     QTableView::dataChanged(topLeft,bottomRight,roles);
     resizeRowsToContents();

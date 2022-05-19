@@ -28,7 +28,11 @@ bool tabBarEventFilter::eventFilter(QObject *watched, QEvent *event)
         if (mouseButtonPress->button() == Qt::MiddleButton)
         {
 //            qDebug() << watched->objectName() << ": viewEventFilter: " << event << "; tab = " << tabBar->tabAt(mouseButtonPress->position().toPoint());
-            emit tabBar->tabCloseRequested(tabBar->tabAt(mouseButtonPress->position().toPoint()));
+#if QT_VERSION >= 0x060000
+                emit tabBar->tabCloseRequested(tabBar->tabAt(mouseButtonPress->position().toPoint()));
+#else
+                emit tabBar->tabCloseRequested(tabBar->tabAt(mouseButtonPress->localPos().toPoint()));
+#endif
         }
     }
     return false;
@@ -45,7 +49,7 @@ MainWindow::MainWindow(windowsDispatcher *parent) :
 
     ui->setupUi(this);
 
-    setWindowTitle("SNAP CRM ["+userData->value("current_office_name").toString()+"] ["+QSqlDatabase::database("connMain").userName()+"]");
+    setWindowTitle("SNAP CRM ["+userDbData->value("current_office_name").toString()+"] ["+QSqlDatabase::database("connMain").userName()+"]");
     initGlobalModels();
 
     tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)
@@ -258,7 +262,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Logout")));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;

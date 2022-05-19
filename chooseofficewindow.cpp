@@ -16,6 +16,7 @@ chooseOfficeWindow::chooseOfficeWindow(windowsDispatcher *parent) :
 //    ui->companiesComboBox->setModelColumn(0);
 //    ui->companiesComboBox->setCurrentIndex(-1);
     ui->officesComboBox->setModel(officesModel);
+    // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->officesComboBox->setPlaceholderText("<выберите офис>");
     ui->officesComboBox->setStyleSheet("QComboBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
                                        QComboBox::drop-down {  border: 0px;}\
@@ -34,12 +35,12 @@ chooseOfficeWindow::~chooseOfficeWindow()
 void chooseOfficeWindow::accept()
 {
 //    int comboBoxCompanyIndex = ui->companiesComboBox->currentIndex();
-//    userData->insert("current_company", windowsDispatcherObj->companiesModel->index(comboBoxCompanyIndex, 1).data().toInt());
+//    userDbData->insert("current_company", windowsDispatcherObj->companiesModel->index(comboBoxCompanyIndex, 1).data().toInt());
     int comboBoxOfficeIndex = ui->officesComboBox->currentIndex();
     if (comboBoxOfficeIndex >= 0)
     {
-        userData->insert("current_office", officesModel->record(comboBoxOfficeIndex).value("id").toInt());
-        userData->insert("current_office_name", officesModel->record(comboBoxOfficeIndex).value("name").toString());
+        userDbData->insert("current_office", officesModel->record(comboBoxOfficeIndex).value("id").toInt());
+        userDbData->insert("current_office_name", officesModel->record(comboBoxOfficeIndex).value("name").toString());
         emit officeChoosed();
         this->deleteLater();
     }

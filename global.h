@@ -17,8 +17,8 @@
 
 extern QLocale sysLocale;
 extern QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
-extern QMap<QString, QVariant> *userData;
-extern QSqlQueryModel *userDataModel;
+extern QMap<QString, QVariant> *userDbData;
+extern QSqlQueryModel *userDbDataModel;
 extern QMap<QString, QVariant> *userLocalData;
 extern QMap<QString, bool> *permissions;
 extern QMap<QString, QVariant> *comSettings;
@@ -57,7 +57,7 @@ extern SStandardItemModel *itemUnitsModel;
 
 bool readStatuses(QStandardItemModel &, QJsonArray &);
 QString jsonArrayJoin(QJsonValue, const QString);
-void initUserData();
+void initUserDbData();
 void initPermissions();
 void initCompanies();
 void initOffices();

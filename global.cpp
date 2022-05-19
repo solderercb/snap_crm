@@ -3,8 +3,8 @@
 
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
-QMap<QString, QVariant> *userData = new QMap<QString, QVariant>;
-QSqlQueryModel *userDataModel = new QSqlQueryModel();
+QMap<QString, QVariant> *userDbData = new QMap<QString, QVariant>;
+QSqlQueryModel *userDbDataModel = new QSqlQueryModel();
 QMap<QString, QVariant> *userLocalData = new QMap<QString, QVariant>;
 QMap<QString, bool> *permissions = new QMap<QString, bool>;
 QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
@@ -148,7 +148,7 @@ void initGlobalModels()
     *clientPhoneTypesSelector << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
     clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
 
-    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
     for(int i = 0; i < allUsersModel->rowCount(); i++)
     {
@@ -157,7 +157,7 @@ void initGlobalModels()
     usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
     managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database("connMain"));
     engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
-    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
     paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain")); // TODO: нужна прокси-модель для отображения платёжных систем в соответствии с правами пользователя
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
@@ -238,16 +238,16 @@ void initGlobalModels()
 #endif
 }
 
-void initUserData()
+void initUserDbData()
 {
-    userDataModel->setQuery(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()), QSqlDatabase::database("connMain"));
+    userDbDataModel->setQuery(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()), QSqlDatabase::database("connMain"));
 
     // Переписываем результаты запроса в специальный массив
     // это необходимо, т. к. данные пользователя могут быть дополнены (например, кодом текущего офиса, если у пользователя есть право выбора офиса при входе)
     // Кроме того, есть параметры, хранящиеся в AppData и эти настройки превалируют над настройками, сохранёнными в БД (например, ширины столбцов таблиц, которые могут иметь разные значения в случае если пользователь работает на разных ПК).
-    for (int i = 0; i < userDataModel->record(0).count(); i++)
+    for (int i = 0; i < userDbDataModel->record(0).count(); i++)
     {
-        userData->insert(userDataModel->record(0).fieldName(i), userDataModel->record(0).value(i));
+        userDbData->insert(userDbDataModel->record(0).fieldName(i), userDbDataModel->record(0).value(i));
     }
 }
 
@@ -255,7 +255,7 @@ void initPermissions()
 {
     QSqlQuery *queryPermissions = new QSqlQuery(QSqlDatabase::database("connMain"));
 
-    queryPermissions->exec(QUERY_SEL_PERMISSIONS(userData->value("roles").toString()));
+    queryPermissions->exec(QUERY_SEL_PERMISSIONS(userDbData->value("roles").toString()));
     while (queryPermissions->next())
     {
         permissions->insert(queryPermissions->value(0).toString(), 1);    // разрешённые пользователю действия хранятся в объекте QMap, не перечисленные действия не разрешены

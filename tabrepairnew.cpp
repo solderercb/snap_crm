@@ -15,7 +15,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
@@ -41,6 +41,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxDoc->hide();
 
     ui->pushButtonCreateTabClient->hide();  // кнопка открытия карточки клиента будет отображаться, только когда выбран клиент из базы
+    // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->comboBoxProblem->lineEdit()->setPlaceholderText("неисправность");
     ui->comboBoxIncomingSet->lineEdit()->setPlaceholderText("комплектность");
     ui->comboBoxExterior->lineEdit()->setPlaceholderText("внешний вид");
@@ -68,7 +69,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxOffice->setModel(officesModel);
     int i = 0;
-    while (userData->value("current_office").toInt() != officesModel->record(i++).value("id").toInt());
+    while (userDbData->value("current_office").toInt() != officesModel->record(i++).value("id").toInt());
 
     ui->comboBoxOffice->setCurrentIndex(i-1);
     ui->comboBoxPresetEngineer->setModel(engineersModel);
@@ -144,7 +145,7 @@ tabRepairNew::~tabRepairNew()
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
 
@@ -214,6 +215,7 @@ void tabRepairNew::changeClientType()
     if(ui->checkBoxClientType->checkState())
     {
         ui->groupBoxClient->setTitle("Клиент (юридическое лицо)");
+        // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
         ui->lineEditClientFirstName->setPlaceholderText("Название организации");
         ui->lineEditClientLastName->hide();    // скрываем поле "Фамилия"
         ui->lineEditClientPatronymic->hide();    // скрываем поле "Отчество"
@@ -225,6 +227,7 @@ void tabRepairNew::changeClientType()
         ui->gridLayoutClient->addWidget(ui->lineEditClientLastName, 1, 0, 1, 2);
         ui->gridLayoutClient->addWidget(ui->lineEditClientFirstName, 1, 2, 1, 2); // заменяем поле "Фамилия" самим собой, но сжимаем его по ширине до двух столбцов
         ui->gridLayoutClient->addWidget(ui->lineEditClientPatronymic, 1, 4, 1, 2);
+        // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
         ui->lineEditClientFirstName->setPlaceholderText("Фамилия");
         ui->lineEditClientLastName->show();    // показываем поле "Имя"
         ui->lineEditClientPatronymic->show();    // показываем поле "Отчество"
@@ -305,6 +308,7 @@ void tabRepairNew::changeDeviceType()
         {
             QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
             additionalFieldWidget = additionalFieldLineEdit;
+            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
             additionalFieldLineEdit->setPlaceholderText(additionalFieldsList->value(0).toString());
         } else if (additionalFieldType == addlField::ComboBox)
         {
@@ -340,6 +344,7 @@ void tabRepairNew::changeDeviceType()
             additionalFieldComboBox->view()->setMinimumWidth(dropDownListWidth);
             additionalFieldComboBox->setCurrentIndex(-1);
             additionalFieldComboBox->setEditable(true);
+            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
             additionalFieldComboBox->lineEdit()->setPlaceholderText(additionalFieldsList->value(0).toString());
         } else if (additionalFieldType == addlField::DateEdit)
         {
@@ -351,6 +356,7 @@ void tabRepairNew::changeDeviceType()
             // TODO: В АСЦ не реализовано, поэтому используем заглушку из лайнэдита
             QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
             additionalFieldWidget = additionalFieldLineEdit;
+            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
             additionalFieldLineEdit->setPlaceholderText(additionalFieldsList->value(0).toString());
             additionalFieldLineEdit->setEnabled(false);
         }
@@ -917,7 +923,7 @@ bool tabRepairNew::createRepair()
     else
         prevRepairFromOldDB = "\'" + prevRepairFromOldDB + "\'";
 
-    user = userData->value("id").toInt();
+    user = userDbData->value("id").toInt();
     office = officesModel->record(ui->comboBoxOffice->currentIndex()).value("id").toInt();
     company = companiesModel->record(ui->comboBoxCompany->currentIndex()).value("id").toInt();
     engineer = (ui->comboBoxPresetEngineer->currentIndex() < 0)?0:engineersModel->record(ui->comboBoxPresetEngineer->currentIndex()).value("id").toInt();
@@ -1221,12 +1227,12 @@ void tabRepairNew::randomFill()
         else
         {
 //            qDebug() << "генерирую случайное число в качестве модели уст-ва, i = " << i;
-            ui->comboBoxDeviceModel->setCurrentText(QString::number(QRandomGenerator::global()->bounded(140737488355328)));
+            ui->comboBoxDeviceModel->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
         }
     }
     else if (test_scheduler_counter == 3)   // серийный номер
     {
-        ui->lineEditSN->setText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+        ui->lineEditSN->setText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
     }
     else if (test_scheduler_counter == 4)   // клиент
     {
@@ -1278,7 +1284,7 @@ void tabRepairNew::randomFill()
         i = comboboxProblemModel->rowCount();
         ui->comboBoxProblem->setCurrentText(comboboxProblemModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
         if (ui->comboBoxProblem->currentText() == "")
-            ui->comboBoxProblem->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+            ui->comboBoxProblem->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
         QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
         QCoreApplication::postEvent(ui->comboBoxProblem->lineEdit(), newEvent);
         QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
@@ -1290,7 +1296,7 @@ void tabRepairNew::randomFill()
         i = comboBoxIncomingSetModel->rowCount();
         ui->comboBoxIncomingSet->setCurrentText(comboBoxIncomingSetModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
         if (ui->comboBoxIncomingSet->currentText() == "")
-            ui->comboBoxIncomingSet->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+            ui->comboBoxIncomingSet->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
         QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
         QCoreApplication::postEvent(ui->comboBoxIncomingSet->lineEdit(), newEvent);
         QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
@@ -1302,7 +1308,7 @@ void tabRepairNew::randomFill()
         i = comboBoxIncomingSetModel->rowCount();
         ui->comboBoxExterior->setCurrentText(comboBoxExteriorModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
         if (ui->comboBoxExterior->currentText() == "")
-            ui->comboBoxExterior->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+            ui->comboBoxExterior->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
         QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
         QCoreApplication::postEvent(ui->comboBoxExterior->lineEdit(), newEvent);
         QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
@@ -1322,7 +1328,7 @@ void tabRepairNew::randomFill()
                 }
                 else if ( QString(additionalFieldsWidgets[j]->metaObject()->className()).compare("QLineEdit", Qt::CaseSensitive) == 0 )
                 {
-                    (static_cast<QLineEdit*>(additionalFieldsWidgets[j]))->setText(QString::number(QRandomGenerator::global()->bounded(2147483648)));
+                    (static_cast<QLineEdit*>(additionalFieldsWidgets[j]))->setText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
                 }
             }
         }

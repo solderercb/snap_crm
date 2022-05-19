@@ -18,6 +18,7 @@
 #include <QLocale>
 #include <QRandomGenerator>
 #include <QPushButton>
+#include <QMessageBox>
 #include "tabcommon.h"
 #include "sstandarditemmodel.h"
 #include "ssqlquerymodel.h"
@@ -43,7 +44,11 @@ public:
     explicit sparePartsTable(QWidget *parent = nullptr);
     ~sparePartsTable();
     void resizeEvent(QResizeEvent*);
+#if QT_VERSION >= 0x060000
     void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
+#else
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
+#endif
 private:
 
 };

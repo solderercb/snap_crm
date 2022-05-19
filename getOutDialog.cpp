@@ -134,8 +134,8 @@ void getOutDialog::getOut()
 
     repair_id = parentTab->repair_id;
     client = parentTab->repairModel->record(0).value("client").toInt();
-    user = userData->value("id").toInt();
-    office = userData->value("current_office").toInt();
+    user = userDbData->value("id").toInt();
+    office = userDbData->value("current_office").toInt();
     currentPaymentAmount = sysLocale.toFloat(ui->lineEditCurrentPaymentAmount->text());
     if( ui->checkBoxPaymentCheckout->isVisible() && !ui->checkBoxPaymentCheckout->isChecked())
     {

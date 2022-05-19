@@ -34,7 +34,7 @@ windowsDispatcher::~windowsDispatcher()
 
 void windowsDispatcher::connectOK()
 {
-    initUserData();
+    initUserDbData();
     initPermissions();
     initCompanies();
     initOffices();
@@ -46,16 +46,16 @@ void windowsDispatcher::connectOK()
     }
     else
     {
-        userData->insert("current_office", officesModel->record(userData->value("office").toInt()-1).value("id").toInt());
-        userData->insert("current_office_name", officesModel->record(userData->value("office").toInt()-1).value("name").toString());
+        userDbData->insert("current_office", officesModel->record(userDbData->value("office").toInt()-1).value("id").toInt());
+        userDbData->insert("current_office_name", officesModel->record(userDbData->value("office").toInt()-1).value("name").toString());
         createMainWindow();
     }
 
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_LOGIN(userData->value("id").toString()));
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_LOGIN(userDbData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
 //            QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Выполнен вход в систему")));   // Пока отключено, потому что АСЦ не позволяет два логина
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
@@ -65,8 +65,8 @@ void windowsDispatcher::createChooseOfficeWindow()
 {
 #ifdef AUTO_CHOOSE_OFFICE_
 #define AUTO_OFFICE_ID 0
-    userData->insert("current_office", officesModel->record(AUTO_OFFICE_ID).value("id").toInt());
-    userData->insert("current_office_name", officesModel->record(AUTO_OFFICE_ID).value("name").toString());
+    userDbData->insert("current_office", officesModel->record(AUTO_OFFICE_ID).value("id").toInt());
+    userDbData->insert("current_office_name", officesModel->record(AUTO_OFFICE_ID).value("name").toString());
     createMainWindow();
 #else
     chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);

@@ -217,7 +217,7 @@ bool tabPrintDialog::initReportDataSources()
         fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(report_vars.value("repair_id").toString()));
         report->dataManager()->addModel("additionalFields", fieldsModel, true);
 
-        report->dataManager()->addModel("user", userDataModel, false);
+        report->dataManager()->addModel("user", userDbDataModel, false);
         report->dataManager()->addModel("company", companiesModel, false);
         report->dataManager()->addModel("office", officesModel, false);
 
@@ -239,7 +239,7 @@ bool tabPrintDialog::initReportDataSources()
             customerModel->setQuery(QUERY_SEL_CLIENT_RPRT(client_id));
             report->dataManager()->addModel("customer", customerModel, true);
 
-            report->dataManager()->addModel("user", userDataModel, false);
+            report->dataManager()->addModel("user", userDbDataModel, false);
             report->dataManager()->addModel("company", companiesModel, false);
             report->dataManager()->addModel("office", officesModel, false);
         }
@@ -346,11 +346,11 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
     previewWindow->print(printer);
     if (report_type == "new_rep")
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать квитанции к ремонту №%1").arg(report_vars.value("repair_id").toInt())));
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать квитанции к ремонту №%1").arg(report_vars.value("repair_id").toInt())));
     }
     else if (report_type == "rep_label")
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userData->value("id").toInt(),userData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать стикеров к ремонту №%1 в кол-ве %2шт.").arg(report_vars.value("repair_id").toInt()).arg(ui->spinBoxCopies->value())));
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),client_id,report_vars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать стикеров к ремонту №%1 в кол-ве %2шт.").arg(report_vars.value("repair_id").toInt()).arg(ui->spinBoxCopies->value())));
     }
 
     delete query;

@@ -14,7 +14,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Клиенты")));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
@@ -38,7 +38,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
-    if (userData->value("prefer_regular").toBool())
+    if (userDbData->value("prefer_regular").toBool())
         ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(4, 0));
     else
         ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
@@ -63,7 +63,7 @@ tabClients::~tabClients()
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userData->value("id").toString()));
+    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
 
