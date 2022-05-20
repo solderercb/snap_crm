@@ -112,6 +112,8 @@ FORMS    += mainwindow.ui \
     tabrepairs.ui \
     tabsale.ui
 
+RESOURCES += styles.qrc
+
 CONFIG(release, debug|release) {
     BUILD_TYPE = release
 }else{
