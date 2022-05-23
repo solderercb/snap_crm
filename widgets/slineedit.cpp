@@ -34,7 +34,8 @@ void SLineEdit::setButtons(QString buttons)
             signalMapper->setMapping(lineEditButtons[i], buttonIndex);
             QObject::connect(lineEditButtons[i], SIGNAL(clicked()), signalMapper, SLOT(map()));
 
-            lineEditButtons[i]->setText( buttonIconList[buttonIndex] );
+//            setText( buttonIconList[buttonIndex] );
+            lineEditButtons[i]->setIcon(QIcon(":/icons/light/" + buttonIconList[buttonIndex]));
         }
     }
 }

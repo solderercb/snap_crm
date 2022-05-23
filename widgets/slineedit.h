@@ -31,8 +31,9 @@ public:
 
 private:
     QStringList allowedButtonsList = { "Clear", "DownArrow", "Edit", "Search", "Print", "Apply", "Open" };
-    QList<QString> buttonIconList = { "🗙", "▼", "🖉", "🔍", "🖶", "🗸", "🗁" };
+//    QList<QString> buttonIconList = { "🗙", "▼", "🖉", "🔍", "🖶", "🗸", "🗁" };
     // другие варианты unicode иконок кнопок: ✖ или 🗙 или ⌫, ▼, 🖉, 🔍, 🖶 или 🖨, 🗸, 🗁 или 📂
+    QList<QString> buttonIconList = { "1F5D9_32.png", "25BC_32.png", "1F589_32.png", "1F50D_32.png", "1F5A8_32.png", "1F5F8_32.png", "1F4C2_32.png" };
 
     QStringList *buttonsList;
     int buttonsCount = 0;

@@ -30,12 +30,12 @@ QMap<int, QString> *warrantyTermsMap = new QMap<int, QString>;
 // фактическая высота ComboBox'а будет на 4 пикселя больше; высоту нужно задать в styleSheet, т. к. Qt5 и Qt6 без этого параметра рисуют виджеты чуть-чуть разной высоты
 QString commonComboBoxStyleSheet = "QComboBox {  height: 18px; border: 1px solid gray;  padding: 1px 18px 1px 3px;}\
         QComboBox::drop-down {  border: 0px;}\
-        QComboBox::down-arrow{  image: url(:/stylelight/qss_icons/down-arrow.png);  width: 16px;  height: 20px;}\
+        QComboBox::down-arrow{  image: url(:/icons/light/down-arrow.png);  width: 16px;  height: 20px;}\
         QComboBox:!editable:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
         QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
 QString commonComboBoxStyleSheetRed = "QComboBox {  height: 18px; border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}\
         QComboBox::drop-down {  border: 0px;}\
-        QComboBox::down-arrow{  image: url(:/stylelight/qss_icons/down-arrow.png);  width: 16px;  height: 20px;}\
+        QComboBox::down-arrow{  image: url(:/icons/light/down-arrow.png);  width: 16px;  height: 20px;}\
         QComboBox:!editable:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
         QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
 

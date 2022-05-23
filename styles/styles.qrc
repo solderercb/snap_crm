@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>light/1F4C2_32.png</file>
+    <file>light/1F4E6_32.png</file>
+    <file>light/1F5A8_32.png</file>
+    <file>light/1F5B6_32.png</file>
+    <file>light/1F5C1_32.png</file>
+    <file>light/1F5D1_32.png</file>
+    <file>light/1F5D9_32.png</file>
+    <file>light/1F5F8_32.png</file>
+    <file>light/1F6D2_32.png</file>
+    <file>light/1F6E0_32.png</file>
+    <file>light/1F50D_32.png</file>
+    <file>light/1F589_32.png</file>
+    <file>light/25BC_32.png</file>
+    <file>light/232B_32.png</file>
+    <file>light/2716_32.png</file>
+    <file>light/1F464_32.png</file>
+    <file>light/down-arrow.png</file>
+  </qresource>
+</RCC>

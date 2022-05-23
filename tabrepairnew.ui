@@ -832,7 +832,11 @@
                  <enum>Qt::LeftToRight</enum>
                 </property>
                 <property name="text">
-                 <string>🗙</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="styles/styles.qrc">
+                  <normaloff>:/icons/light/1F5D9_32.png</normaloff>:/icons/light/1F5D9_32.png</iconset>
                 </property>
                </widget>
               </item>
@@ -842,7 +846,11 @@
                  <string>открыть карточку клиента</string>
                 </property>
                 <property name="text">
-                 <string>👤</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="styles/styles.qrc">
+                  <normaloff>:/icons/light/1F464_32.png</normaloff>:/icons/light/1F464_32.png</iconset>
                 </property>
                </widget>
               </item>
@@ -1116,7 +1124,9 @@
   <tabstop>CentnerButton1_2</tabstop>
   <tabstop>pushButtonCashReceipt</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="styles/styles.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>checkBoxClientType</sender>
