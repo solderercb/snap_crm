@@ -71,9 +71,10 @@ private:
     QTimer *statusBarDelay;
     SSLOptionsDialog *modalWidget;
     QWidget *overlay;
+    bool checkAppVer();
     int checkSchema();
     QStringList usersOnline();
-    bool updateSchema(int);
+    bool updateDB(int);
     void closeConnections();
 
 private slots:

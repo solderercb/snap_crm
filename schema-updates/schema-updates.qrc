@@ -1,4 +1,5 @@
 <RCC>
     <qresource prefix="schema-updates/">
+        <file>script000001.sql</file>
     </qresource>
 </RCC>
