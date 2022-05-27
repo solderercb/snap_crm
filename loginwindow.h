@@ -14,6 +14,8 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QGraphicsPixmapItem>
+#include <QResource>
+#include <QIODevice>
 #include "shortlivednotification.h"
 #include "windowsdispatcher.h"
 #include "models/ssloptionsdialog.h"
@@ -65,9 +67,14 @@ private:
     QDir settingsPath;
     QDir settingsAscPath;
     QFile prevAppVerSettingsFile;
+    void statusBarMsg(const QString&, int delay = 2500);
     QTimer *statusBarDelay;
     SSLOptionsDialog *modalWidget;
     QWidget *overlay;
+    int checkSchema();
+    QStringList usersOnline();
+    bool updateSchema(int);
+    void closeConnections();
 
 private slots:
     void editPassword_onReturnPressed();

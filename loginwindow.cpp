@@ -229,6 +229,120 @@ bool LoginWindow::saveSettings()
     return 1;
 }
 
+void LoginWindow::statusBarMsg(const QString &text, int delay)
+{
+    ui->labelStatus->setText(text);
+    ui->labelStatus->setStyleSheet("color: red; font: bold;");
+    if(delay)
+        statusBarDelay->start(delay);
+}
+
+/*  Проверка соответствия версии приложения версии структуры БД
+ *  Возвращает номер скрипта, с которого нужно начать обновление
+ */
+int LoginWindow::checkSchema()
+{
+    QString fileName;
+    QSqlQuery queryCheckSchema = QSqlQuery(QSqlDatabase::database("connMain"));
+    int i = 1;
+
+    queryCheckSchema.exec(QUERY_SEL_ASC_SCHEMA_VER);
+    queryCheckSchema.first();
+    if(queryCheckSchema.value(0).toString() != "ASC.Scripts.Script000307.sql")  // версия БД АСЦ должна соответствовать версии приложения 3.7.31.1123
+        throw 3;    // Попытка подключения к старой версии БД ...
+    queryCheckSchema.clear();
+
+    // подсчет кол-ва патчей в файле ресурсов
+    while(QFile::exists(fileName = ":/schema-updates/script" + QString::number(i++).rightJustified(6, '0') + ".sql"));
+    i -= 1;
+
+    // определение кол-ва применённых патчей
+    queryCheckSchema.exec(QUERY_SEL_SCHEMA_VER);
+    if(queryCheckSchema.size() > i)
+        throw 5;    // сообщение об устаревшей версии программы/запуск обновления ПО
+    else if (queryCheckSchema.size() < i)
+        return queryCheckSchema.size() + 1; // возвращаем кол-во уже применённых патчей
+
+    return 0;
+}
+
+/*  Проверка активных подключений к базе
+ *  Этот метод нужен "на всякий случай"; базу нужно обновлять в нерабочее время.
+ *  Возвращает список имён пользователей или пустой список.
+ */
+QStringList LoginWindow::usersOnline()
+{
+    QSqlQuery queryCheckUsersOnline = QSqlQuery(QSqlDatabase::database("connMain"));
+
+    // запрос активных соединений
+    queryCheckUsersOnline.exec(QUERY_SEL_ACTIVE_USERS(QSqlDatabase::database("connMain").databaseName(), QSqlDatabase::database("connMain").userName()));
+//    queryCheckUsersOnline.first();
+    if(queryCheckUsersOnline.size())
+        return queryCheckUsersOnline.value(0).toString().split(',');
+
+    // пользователи, значение  `users`.`last_activity` которых вписывается в период timeout до текущего момента (ХЗ зачем, потом придумаю)
+//    queryCheckUsersOnline.exec(QUERY_SEL_GLOB_WAIT_TIMEOUT);
+//    queryCheckUsersOnline.first();
+//    timeout = queryCheckUsersOnline.value(0).toInt();
+//    queryCheckUsersOnline.exec(QString(QUERY_SEL_ACTIVE_USERS2(timeout));
+//    if(queryCheckUsersOnline.size())
+//        return queryCheckUsersOnline.value(0).toString().split(',');
+
+    return QStringList();
+}
+
+/*  Обновление структуры БД
+ *  параметр — номер скрипта, с которого нужно начать
+ */
+bool LoginWindow::updateSchema(int startFrom)
+{
+    QString fileName;
+    QFile file;
+    QByteArray fileContent;
+    int i = startFrom;
+    QSqlQuery queryUpdate = QSqlQuery(QSqlDatabase::database("connThird"));
+
+
+    queryUpdate.exec(QUERY_BEGIN);
+    // TODO: переключение БД в режим обслуживания (на всякий случай, чтобы пользователи не смогли подключиться во время обновления)
+    try {
+        while(QFile::exists(fileName = ":/schema-updates/script" + QString::number(i).rightJustified(6, '0') + ".sql"))
+        {
+            qDebug() << "fileName = " << fileName;
+            file.setFileName(fileName);
+            file.open(QIODevice::ReadOnly);
+            fileContent = file.readAll();
+            file.close();
+            // TODO: предусмотреть наличие директивы DELIMITER в скриптах
+            qDebug() << "queries:" << fileContent;
+            if(!queryUpdate.exec(QString::fromLocal8Bit(fileContent)))
+                throw 1;
+            if(!queryUpdate.exec(QUERY_INS_SCHEMAVERSIONS("SNAP.schema-updates.script" + QString::number(i).rightJustified(6, '0') + ".sql")))
+                throw 1;
+            i++;
+        }
+        queryUpdate.exec(QUERY_COMMIT);
+    }  catch (int)
+    {
+        queryUpdate.exec(QUERY_ROLLBACK);
+        return 1;
+    }
+    // TODO: переключение БД в обычный режим
+    // TODO: отправка служебного уведомления, что база обновлена (например, для случаев, когда компьютер находился в спящем режиме)
+
+    return 0;
+}
+
+void LoginWindow::closeConnections()
+{
+    for (int i = 0; i<connections.size(); i++)  // закрываем все соединения
+    {
+        connections[i]->close();
+        while(connections[i]->isOpen());
+        QSqlDatabase::removeDatabase(connections[i]->connectionName());
+    }
+}
+
 void LoginWindow::editPassword_onReturnPressed()
 {
     if(ui->editPassword->text() != "")
@@ -247,6 +361,7 @@ void LoginWindow::btnLoginHandler()
     QTextCodec *codec = QTextCodec::codecForName("UTF8");
     QTextCodec::setCodecForLocale(codec);
     QStringList connOptions;
+    QResource res;
 
     connections.clear();
     connMain = QSqlDatabase::addDatabase("QMYSQL", "connMain");       // это соединение для получения данных (ремонты, клиенты и т. д.)
@@ -296,43 +411,86 @@ void LoginWindow::btnLoginHandler()
     connections[i]->setDatabaseName(ui->editDBName->text());
 #endif
     connections[i]->setConnectOptions(connOptions.join(";")+";");
-//		connections[i]->setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=5;MYSQL_OPT_READ_TIMEOUT=1");
     }
 
     if (!connMain.open())
     {
         qDebug() << "DB connect failed: " << connMain.lastError().text();
-        ui->labelStatus->setText(connMain.lastError().text());
-        ui->labelStatus->setStyleSheet("color: red; font: bold;");
-        statusBarDelay->start(2500);
+        statusBarMsg(connMain.lastError().text());
     }
     else
     {
         qDebug("DB successfully opened.");
         QSqlQuery queryCheckUser = QSqlQuery(QSqlDatabase::database("connMain"));   // проверка состояния учетной записи пользователя (база программы, а не mysql)
-        queryCheckUser.exec(QString("SELECT `id` FROM `users` WHERE `username` = '%1' AND `state` = 1 AND `is_bot` = 0 LIMIT 1;").arg(QSqlDatabase::database("connMain").userName()));
+        queryCheckUser.exec(QUERY_SEL_USER_STATE(QSqlDatabase::database("connMain").userName()));
         queryCheckUser.first();
-        if (queryCheckUser.isValid())
+        try
         {
-            for (int i = 1; i<connections.size(); i++)  // открываем вспомогательные соединения
-                connections[i]->open();
-            emit this->DBConnectOK();
+            if (queryCheckUser.isValid())
+            {
+                for (int i = 1; i<connections.size(); i++)  // открываем вспомогательные соединения
+                    connections[i]->open();
 
-            userLocalData->insert("dbHost", ui->editIPaddr->text());
-            userLocalData->insert("dbPort", ui->editPort->text());
-            userLocalData->insert("dbName", ui->editDBName->text());
-            userLocalData->insert("lastLogin", ui->editLogin->text());
-            userLocalData->insert("SSLConnection", ui->checkBoxSSL->isChecked());
-            if(ui->checkBoxSaveOnSuccess->isChecked())
-                saveSettings();
+                userLocalData->insert("dbHost", ui->editIPaddr->text());
+                userLocalData->insert("dbPort", ui->editPort->text());
+                userLocalData->insert("dbName", ui->editDBName->text());
+                userLocalData->insert("lastLogin", ui->editLogin->text());
+                userLocalData->insert("SSLConnection", ui->checkBoxSSL->isChecked());
+                if(ui->checkBoxSaveOnSuccess->isChecked())
+                    saveSettings();
 
-            this->hide();
-            this->deleteLater();
+                // TODO: SplashScreen с сообщениями об этапах инициализации
+                if(!res.registerResource(QApplication::applicationDirPath() + "/schema-updates.rcc"))
+                {
+                    throw 3;    // Попытка подключения к старой версии БД ...
+                }
+
+                int lastPatch = checkSchema();
+                if( lastPatch )
+                {
+                    if (QSqlDatabase::database("connMain").userName() == "admin")  // только админ может обновлять БД
+                    {
+                        if(usersOnline().isEmpty())
+                        {
+                            if(updateSchema(lastPatch))
+                            {
+                                // TODO: запись в журнал приложения причины ошибки обновления
+                                throw 1;
+                            }
+                        }
+                        else
+                        {
+                            qDebug() << "usersOnline(): " << usersOnline();
+                            // TODO: отправка служебного сообщения и инициация закрытия приложения у пользователей
+                            throw 2;
+                        }
+                    }
+                    else
+                    {
+                        throw 3;
+                    }
+                }
+                res.unregisterResource(QApplication::applicationDirPath() + "/schema-updates.rcc");
+
+                emit this->DBConnectOK();
+                this->hide();
+                this->deleteLater();
+            }
+            else
+            {
+                throw 4;
+            }
         }
-        else
+        catch (int err)
         {
-            ui->labelStatus->setText("Учетная запись отключена");
-            ui->labelStatus->setStyleSheet("color: red; font: bold;");
+            switch (err) {
+                case 1: statusBarMsg(tr("Не удалось обновить базу данных.")); break;
+                case 2: statusBarMsg(tr("Не удалось обновить базу данных. Есть пользователи онлайн.")); break;
+                case 3: statusBarMsg(tr("Попытка подключения к старой версии БД. Обратитесь к администратору.")); break;
+                case 4: statusBarMsg(tr("Учетная запись отключена"), 0); break;
+                case 5: statusBarMsg(tr("Требуется обновление программы"), 0);/* TODO: обновление ПО (до нужной версии) */ break;
+            }
+            closeConnections();
         }
     }
 }

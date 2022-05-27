@@ -22,6 +22,7 @@ RC_FILE = resources.rc
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += LIMEREPORT_IMPORTS
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -146,6 +147,8 @@ LIBS += -lwinspool -lKernel32
 
 BIN_DIR ~= s,/,\\,g
 LIB_DIR ~= s,/,\\,g
+QMAKE_PRE_LINK  += chcp 1250 >nul 2>&1 $$escape_expand(\\n\\t)
+QMAKE_PRE_LINK  += rcc -binary $${PWD}\\schema-updates\\schema-updates.qrc -o $${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc $$escape_expand(\\n\\t)
 QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
 #QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
 equals(QT_MAJOR_VERSION, 6){
