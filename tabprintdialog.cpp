@@ -142,37 +142,87 @@ bool tabPrintDialog::event(QEvent *ev)
     return ret;
 }
 
-bool tabPrintDialog::selectTemplateFile()
-{
-    if (report_type == "new_rep")
-        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/priemka.lrxml");
-    else if (report_type == "sticker1")
-        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/24x14.lrxml");
-    else if (report_type == "rep_label")
-        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/rep_label.lrxml");
-//    else if (report_type == "")
-//        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/priemka.lrxml");
-//    else if (report_type == "")
-//        CurrentFile.setFileName(QApplication::applicationDirPath() + "/reports/priemka.lrxml");
-    else
-        return 0;
-
-    return 1;
-}
-
+/* Загрузка ранее кэшированного файла отчета
+ * Возвращает 1 в случае успеха
+ */
 bool tabPrintDialog::loadTemplateFromFile()
 {
-    if (!selectTemplateFile())
-        return 0;
-    if(!report->loadFromFile(CurrentFile.fileName()))
+//    qDebug() << "tabPrintDialog::loadTemplateFromFile()";
+    QString fileName;
+    QFile file;
+    QByteArray fileContent;
+    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
+
+    if(!QFile::exists(fileName = QApplication::applicationDirPath() + "/reports/" + report_type + ".lrxml"))
     {
-        return 0;
+        if(!loadTemplateFromDB())
+            return 0;
+    }
+    else    // если файл отчета кэширован ранее, нужно сравнить контрольные суммы
+    {
+        query.exec(QUERY_SEL_DOC_TEMPL_CHECKSUM(report_type));
+        query.first();
+        if(query.isValid())
+        {
+            file.setFileName(fileName);
+            file.open(QIODevice::ReadOnly);
+            fileContent = file.readAll();
+            file.close();
+            QCryptographicHash hash(QCryptographicHash::Sha1);
+            hash.addData(fileContent);
+//            qDebug() << "file hash (Sha1): " << hash.result().toHex() << "; DB hash (Sha1): " << query.value(0).toString();
+            if(hash.result().toHex().toUpper() != query.value(0).toString())
+            {
+                if(!loadTemplateFromDB())
+                    return 0;
+            }
+            else
+            {
+                if(!report->loadFromFile(fileName))
+                {
+                    return 0;
+                }
+            }
+        }
     }
     return 1;
 }
 
+/* Загрузка бланка отчета из БД и кэширование
+ * Возвращает 1 в случае успеха
+ */
 bool tabPrintDialog::loadTemplateFromDB()
 {
+//    qDebug() << "tabPrintDialog::loadTemplateFromDB()";
+    QString filePath = QApplication::applicationDirPath() + "/reports/";
+    QString fileName = filePath + report_type + ".lrxml";
+    QDir path;
+    QFile file;
+    QByteArray fileContent;
+    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
+
+    query.exec(QUERY_SEL_DOC_TEMPL_DATA(report_type));
+    query.first();
+    if(query.isValid())
+    {
+        fileContent = query.value(0).toByteArray();
+        path.setPath(filePath);
+        if (!path.exists())
+            path.mkpath(filePath);
+        file.setFileName(fileName);
+        if (!file.open(QIODevice::ReadWrite))
+        {
+            qDebug() << "Не удалось сохранить файл бланка отчета на диск";
+            return 0;
+        }
+        file.resize(fileContent.size());
+        file.write(fileContent);
+        file.close();
+        if(!report->loadFromFile(fileName))
+        {
+            return 0;
+        }
+    }
 
     return 1;
 }
@@ -303,12 +353,14 @@ bool tabPrintDialog::initReportDataSources()
     ui->gridLayoutTab->setColumnStretch(1, 1);
     ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
 
+#ifdef PRINT_DEBUG_PAGE_INFO
     qDebug() << "";
     qDebug() << "========== report page properties ==========";
     LimeReport::IPreparedPages::PageProps pageProperties = report->preparedPages()->pageProperties(0);
     qDebug() << "page->pageSize():" << pageProperties.pageSize;
     qDebug() << "page->geometry():" << pageProperties.geometry;
     qDebug() << "left:" << pageProperties.leftMargin << "; top:" << pageProperties.topMargin << "; right:" << pageProperties.rightMargin << "; bottom:" << pageProperties.bottomMargin;
+#endif
 
     return 1;
 }
@@ -506,12 +558,14 @@ void tabPrintDialog::initPrinter(bool showSettings)
         }
     }
 
+#ifdef PRINT_DEBUG_PAGE_INFO
     qDebug() << "";
     if(showSettings)
         qDebug() << "=========== Changed printer params ==========";
     else
         qDebug() << "=========== Selected printer params ==========";
 //    qDebug() << "supportedPageSizes" << pi.supportedPageSizes();
+#endif
     fillDebugData();
 }
 
@@ -548,6 +602,7 @@ void tabPrintDialog::fillDebugData()
                          .arg(printer->pageRect(QPrinter::Millimeter).height())\
                          );
 
+#ifdef PRINT_DEBUG_PAGE_INFO
     qDebug() << "printerName():                     " << printer->printerName();
     qDebug() << "pageLayout():                      " << printer->pageLayout();
     qDebug() << "outputFormat() :                   " << printer->outputFormat();
@@ -556,6 +611,7 @@ void tabPrintDialog::fillDebugData()
     qDebug() << "resolution():                      " << printer->resolution();
 //    qDebug() << "supportedPageSizes():              " << pi.supportedPageSizes();
 //    if(pi.supportsCustomPageSizes()) (qDebug() << "supportsCustomPageSizes");
+#endif
 }
 
 void tabPrintDialog::pageSetupAccepted()

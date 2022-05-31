@@ -151,6 +151,9 @@ QMAKE_PRE_LINK  += chcp 1250 >nul 2>&1 $$escape_expand(\\n\\t)
 QMAKE_PRE_LINK  += rcc -binary $${PWD}\\schema-updates\\schema-updates.qrc -o $${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc $$escape_expand(\\n\\t)
 QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
 #QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
-equals(QT_MAJOR_VERSION, 6){
-    CONFIG(release, debug|release): QMAKE_POST_LINK += $$QMAKE_COPY \"$${PWD}\\$${OUT_PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)
+equals(QT_MAJOR_VERSION, 5){
+    CONFIG(release, debug|release) {
+        QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc\" \"$${PROGRAM_FILES_DIR}\\\" $$escape_expand(\\n\\t)
+    }
 }

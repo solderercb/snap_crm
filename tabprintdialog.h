@@ -10,6 +10,7 @@
 #include <QPrinterInfo>
 #include <QPageSetupDialog>
 #include <QByteArray>
+#include <QDir>
 #include <QFile>
 #include <QMap>
 #include <QString>
@@ -21,6 +22,8 @@
 #include <Windows.h>
 #include <QMessageBox>
 #include <QMetaEnum>
+#include <QCryptographicHash>
+//#define PRINT_DEBUG_PAGE_INFO
 
 namespace Ui {
 class tabPrintDialog;
@@ -36,7 +39,6 @@ public:
     ~tabPrintDialog();
     virtual bool tabCloseRequest();
     bool loadReportTemplate(QByteArray*);
-    bool selectTemplateFile();
     bool loadTemplateFromFile();
     bool loadTemplateFromDB();
     bool initReportDataSources();
