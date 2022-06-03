@@ -243,6 +243,13 @@ void getOutDialog::getOut()
 
     QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair_id,"NULL","NULL","NULL",QString("Заказаз-наряд №%1 выдан клиенту.").arg(repair_id)));
 
+    // Зачисления за товары на реализации
+    QUERY_EXEC(query,nDBErr)(QUERY_INS_BALANCE_LOG2(office, user, repair_id));
+    QUERY_EXEC(query,nDBErr)(QUERY_UPDATE_BALANCE2(repair_id));
+    QUERY_EXEC(query,nDBErr)(QUERY_VRFY_BALANCE2(repair_id));
+    while(query->next() && nDBErr)  // верификация баланса (-ов, если в ремонте товары разных поставщиков)
+         nDBErr = (query->value(0).toInt() == 21930)?1:0;
+
     QUERY_EXEC(query,nDBErr)(QUERY_UPDATE_STORE_INT_RSRV(3,repair_id));
 
     QUERY_EXEC(query2,nDBErr)(QUERY_SEL_PRE_UPD_STORE_ITEMS(repair_id));    // кол-ва товара, которое должно получиться после обновления

@@ -391,11 +391,164 @@
 
 #define QUERY_INS_REPAIR_STATUS_LOG(R,S,U,Mngr,Mstr)  QString("INSERT INTO `repair_status_logs`(`created_at`, `repair_id`, `status_id`, `user_id`, `manager_id`, `master_id`) VALUES (UTC_TIMESTAMP(), %1, %2, %3, %4, %5);").arg((R)).arg((S)).arg((U)).arg((Mngr)).arg((Mstr))
 
-#define QUERY_INS_BALANCE_LOG(C,S,D,t,O,U)  QString("INSERT INTO `balance` (`client`, `summ`, `direction`, `reason`, `created`, `office`, `uid`, `dealer_payment`) VALUES (%1, %2, %3, '%4', UTC_TIMESTAMP(), %5, %6, NULL);").arg((C)).arg((S)).arg((D)).arg((t)).arg((O)).arg((U))
+#define QUERY_INS_BALANCE_LOG(C,S,D,t,O,U)  QString(\
+                                                "INSERT INTO\n"\
+                                                "  `balance` (\n"\
+                                                "    `client`,\n"\
+                                                "    `summ`,\n"\
+                                                "    `direction`,\n"\
+                                                "    `reason`,\n"\
+                                                "    `created`,\n"\
+                                                "    `office`,\n"\
+                                                "    `uid`,\n"\
+                                                "    `dealer_payment`\n"\
+                                                "  )\n"\
+                                                "VALUES (\n"\
+                                                "    %1,\n"\
+                                                "    %2,\n"\
+                                                "    %3,\n"\
+                                                "    '%4',\n"\
+                                                "    UTC_TIMESTAMP(),\n"\
+                                                "    %5,\n"\
+                                                "    %6,\n"\
+                                                "    NULL\n"\
+                                                ");")\
+                                                .arg((C))\
+                                                .arg((S))\
+                                                .arg((D))\
+                                                .arg((t))\
+                                                .arg((O))\
+                                                .arg((U))
 
-#define QUERY_UPDATE_BALANCE(C,S)           QString("UPDATE `clients` SET `balance`=`balance`+(%2) WHERE  `id`=%1;").arg((C)).arg((S))
+#define QUERY_UPDATE_BALANCE(C,S)           QString(\
+                                                "UPDATE\n"\
+                                                "  `clients`\n"\
+                                                "SET\n"\
+                                                "  `balance` = `balance` + (%2)\n"\
+                                                "WHERE\n"\
+                                                "  `id`=%1;")\
+                                                .arg((C))\
+                                                .arg((S))
 
-#define QUERY_VRFY_BALANCE(C)               QString("SELECT IF(t1.`balance` = SUM(t2.`summ`), 21930, 0) FROM `clients` AS t1 LEFT JOIN `balance` AS t2 ON t1.id = t2.`client` WHERE t1.`balance_enable` = 1 AND t1.`id` = %1;").arg((C))
+#define QUERY_VRFY_BALANCE(C)               QString(\
+                                                "SELECT\n"\
+                                                "  IF(t1.`balance` = SUM(t2.`summ`), 21930, 0)\n"\
+                                                "FROM\n"\
+                                                "  `clients` AS t1\n"\
+                                                "LEFT JOIN\n"\
+                                                "  `balance` AS t2\n"\
+                                                "ON\n"\
+                                                "  t1.id = t2.`client`\n"\
+                                                "WHERE\n"\
+                                                "  t1.`balance_enable` = 1\n"\
+                                                "  AND t1.`id` = %1;")\
+                                                .arg((C))
+
+// Зачисления за товары на реализации, использованные в ремонте: запись в журнал балансов
+#define QUERY_INS_BALANCE_LOG2(O,U,R) QString(\
+                                                "INSERT INTO\n"\
+                                                "  `balance` (\n"\
+                                                "    `client`,\n"\
+                                                "    `summ`,\n"\
+                                                "    `direction`,\n"\
+                                                "    `reason`,\n"\
+                                                "    `created`,\n"\
+                                                "    `office`,\n"\
+                                                "    `uid`,\n"\
+                                                "    `dealer_payment`\n"\
+                                                "  )\n"\
+                                                "  SELECT\n"\
+                                                "    `parts`.dealer,\n"\
+                                                "    `parts`.`summ`,\n"\
+                                                "    IF(`parts`.`summ` >= 0, 1, 0),\n"\
+                                                "    CONCAT('Зачисление средств на баланса клиента №', `parts`.dealer, ' на сумму ', `parts`.`summ`, ' за проданные товары, находившиеся на реализации'),\n"\
+                                                "    UTC_TIMESTAMP(),\n"\
+                                                "    %1,\n"\
+                                                "    %2,\n"\
+                                                "    NULL\n"\
+                                                "  FROM (\n"\
+                                                "    SELECT \n"\
+                                                "      t2.`dealer`,\n"\
+                                                "      ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
+                                                "    FROM\n"\
+                                                "      `store_items` AS t2\n"\
+                                                "    LEFT JOIN\n"\
+                                                "      `store_int_reserve` AS t3\n"\
+                                                "    ON\n"\
+                                                "      t2.id = t3.item_id\n"\
+                                                "    WHERE\n"\
+                                                "      t3.repair_id = %3\n"\
+                                                "      AND t2.is_realization = 1\n"\
+                                                "      AND t3.state = 2\n"\
+                                                "    GROUP BY\n"\
+                                                "      t3.repair_id,\n"\
+                                                "      t2.dealer\n"\
+                                                "  ) AS `parts`;")\
+                                                .arg((O))\
+                                                .arg((U))\
+                                                .arg((R))
+
+// Зачисления за товары на реализации, использованные в ремонте: обновление балансов клиентов
+#define QUERY_UPDATE_BALANCE2(R)            QString(\
+                                                "UPDATE\n"\
+                                                "  `clients` AS t1\n"\
+                                                "CROSS JOIN (\n"\
+                                                "  SELECT\n"\
+                                                "    t2.`dealer`,\n"\
+                                                "    ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
+                                                "  FROM\n"\
+                                                "    `store_items` AS t2\n"\
+                                                "  LEFT JOIN\n"\
+                                                "    `store_int_reserve` AS t3\n"\
+                                                "  ON\n"\
+                                                "    t2.id = t3.item_id\n"\
+                                                "  WHERE\n"\
+                                                "    t3.repair_id = %1\n"\
+                                                "    AND t2.is_realization = 1\n"\
+                                                "    AND t3.state = 2\n"\
+                                                "  GROUP BY\n"\
+                                                "    t3.repair_id,\n"\
+                                                "    t2.dealer\n"\
+                                                "  ) AS `parts`\n"\
+                                                "ON\n"\
+                                                "  t1.id = `parts`.dealer\n"\
+                                                "SET\n"\
+                                                "  t1.balance = t1.balance + `parts`.`summ`\n"\
+                                                "WHERE\n"\
+                                                "  t1.balance_enable = 1;")\
+                                                .arg((R))
+
+// Зачисления за товары на реализации, использованные в ремонте: верификация балансов
+#define QUERY_VRFY_BALANCE2(R)              QString(\
+                                                "SELECT\n"\
+                                                "  IF(t1.`balance` = SUM(t2.`summ`), 21930, 0)\n"\
+                                                "FROM\n"\
+                                                "  `clients` AS t1\n"\
+                                                "LEFT JOIN\n"\
+                                                "  `balance` AS t2\n"\
+                                                "ON\n"\
+                                                "  t1.id = t2.`client`\n"\
+                                                "WHERE\n"\
+                                                "  t1.`id` IN (\n"\
+                                                "    SELECT \n"\
+                                                "      t2.`dealer`\n"\
+                                                "    FROM\n"\
+                                                "      `store_items` AS t2\n"\
+                                                "    LEFT JOIN\n"\
+                                                "      `store_int_reserve` AS t3\n"\
+                                                "    ON\n"\
+                                                "      t2.id = t3.item_id\n"\
+                                                "    WHERE\n"\
+                                                "      t3.repair_id = %1\n"\
+                                                "      AND t2.is_realization = 1\n"\
+                                                "      AND t3.state = 2\n"\
+                                                "    GROUP BY\n"\
+                                                "      t3.repair_id,\n"\
+                                                "      t2.dealer\n"\
+                                                "  )\n"\
+                                                "GROUP BY\n"\
+                                                "  t1.`id`;")\
+                                                .arg((R))
 
 #define QUERY_UPDATE_STORE_INT_RSRV(S,R)    QString("UPDATE `store_int_reserve` SET `state`=%1 WHERE `repair_id` = %2;").arg((S)).arg((R))
 
@@ -698,7 +851,7 @@
                                                         .arg((items_list))
 
 #define QUERY_INS_LOG_PARTS_IN_REPAIR(U,O,C,R) QString("INSERT INTO `logs`(`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`) SELECT \n"\
-                                                    "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, %3, `repair_id`, `item_id`, NULL, NULL, NULL, CONCAT('Товар установленный в ремонт №', `repair_id`, 'продан. Ремонт выдан') FROM `store_int_reserve` WHERE `repair_id` = %4;").arg((U)).arg((O)).arg((C)).arg((R))
+                                                    "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, %3, `repair_id`, `item_id`, NULL, NULL, NULL, CONCAT('Товар установленный в ремонт №', `repair_id`, ' продан. Ремонт выдан') FROM `store_int_reserve` WHERE `repair_id` = %4;").arg((U)).arg((O)).arg((C)).arg((R))
 
 #define QUERY_SEL_PART_FOR_SALE(uid, price_field_name)   QString(\
                                                         "SELECT\n"\
