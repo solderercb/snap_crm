@@ -550,6 +550,112 @@
                                                 "  t1.`id`;")\
                                                 .arg((R))
 
+// Зачисления за товары на реализации (обычная продажа): запись в журнал балансов
+#define QUERY_INS_BALANCE_LOG3(O,U,D) QString(\
+                                                "INSERT INTO\n"\
+                                                "  `balance` (\n"\
+                                                "    `client`,\n"\
+                                                "    `summ`,\n"\
+                                                "    `direction`,\n"\
+                                                "    `reason`,\n"\
+                                                "    `created`,\n"\
+                                                "    `office`,\n"\
+                                                "    `uid`,\n"\
+                                                "    `dealer_payment`\n"\
+                                                "  )\n"\
+                                                "  SELECT\n"\
+                                                "    `parts`.dealer,\n"\
+                                                "    `parts`.`summ`,\n"\
+                                                "    IF(`parts`.`summ` >= 0, 1, 0),\n"\
+                                                "    CONCAT('Зачисление средств на баланса клиента №', `parts`.dealer, ' на сумму ', `parts`.`summ`, ' за проданные товары, находившиеся на реализации'),\n"\
+                                                "    UTC_TIMESTAMP(),\n"\
+                                                "    %1,\n"\
+                                                "    %2,\n"\
+                                                "    NULL\n"\
+                                                "  FROM (\n"\
+                                                "    SELECT\n"\
+                                                "      t2.`dealer`,\n"\
+                                                "      ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
+                                                "    FROM\n"\
+                                                "      `store_items` AS t2\n"\
+                                                "    LEFT JOIN\n"\
+                                                "      `store_sales` AS t3\n"\
+                                                "    ON\n"\
+                                                "      t2.id = t3.item_id\n"\
+                                                "    WHERE\n"\
+                                                "      t3.document_id = %3\n"\
+                                                "      AND t2.is_realization = 1\n"\
+                                                "      AND t3.is_cancellation = 0\n"\
+                                                "    GROUP BY\n"\
+                                                "      t3.document_id,\n"\
+                                                "      t2.dealer\n"\
+                                                "  ) AS `parts`;")\
+                                                .arg((O))\
+                                                .arg((U))\
+                                                .arg((D))
+
+// Зачисления за товары на реализации (обычная продажа): обновление балансов клиентов
+#define QUERY_UPDATE_BALANCE3(D)            QString(\
+                                                "UPDATE\n"\
+                                                "  `clients` AS t1\n"\
+                                                "CROSS JOIN (\n"\
+                                                "  SELECT\n"\
+                                                "    t2.`dealer`,\n"\
+                                                "    ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
+                                                "  FROM\n"\
+                                                "    `store_items` AS t2\n"\
+                                                "  LEFT JOIN\n"\
+                                                "    `store_sales` AS t3\n"\
+                                                "  ON\n"\
+                                                "    t2.id = t3.item_id\n"\
+                                                "  WHERE\n"\
+                                                "    t3.document_id = %1\n"\
+                                                "    AND t2.is_realization = 1\n"\
+                                                "    AND t3.is_cancellation = 0\n"\
+                                                "  GROUP BY\n"\
+                                                "    t3.document_id,\n"\
+                                                "    t2.dealer\n"\
+                                                "  ) AS `parts`\n"\
+                                                "ON\n"\
+                                                "  t1.id = `parts`.dealer\n"\
+                                                "SET\n"\
+                                                "  t1.balance = t1.balance + `parts`.`summ`\n"\
+                                                "WHERE\n"\
+                                                "  t1.balance_enable = 1;")\
+                                                .arg((D))
+
+// Зачисления за товары на реализации (обычная продажа): верификация балансов
+#define QUERY_VRFY_BALANCE3(D)              QString(\
+                                                "SELECT\n"\
+                                                "  IF(t1.`balance` = SUM(t2.`summ`), 21930, 0)\n"\
+                                                "FROM\n"\
+                                                "  `clients` AS t1\n"\
+                                                "LEFT JOIN\n"\
+                                                "  `balance` AS t2\n"\
+                                                "ON\n"\
+                                                "  t1.id = t2.`client`\n"\
+                                                "WHERE\n"\
+                                                "  t1.`id` IN (\n"\
+                                                "    SELECT\n"\
+                                                "      t2.`dealer`\n"\
+                                                "    FROM\n"\
+                                                "      `store_items` AS t2\n"\
+                                                "    LEFT JOIN\n"\
+                                                "      `store_sales` AS t3\n"\
+                                                "    ON\n"\
+                                                "      t2.id = t3.item_id\n"\
+                                                "    WHERE\n"\
+                                                "      t3.document_id = %1\n"\
+                                                "      AND t2.is_realization = 1\n"\
+                                                "      AND t3.is_cancellation = 0\n"\
+                                                "    GROUP BY\n"\
+                                                "      t3.document_id,\n"\
+                                                "      t2.dealer\n"\
+                                                "  )\n"\
+                                                "GROUP BY\n"\
+                                                "  t1.`id`;")\
+                                                .arg((D))
+
 #define QUERY_UPDATE_STORE_INT_RSRV(S,R)    QString("UPDATE `store_int_reserve` SET `state`=%1 WHERE `repair_id` = %2;").arg((S)).arg((R))
 
 // выдача ремонта:

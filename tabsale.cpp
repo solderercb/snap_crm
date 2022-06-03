@@ -948,7 +948,7 @@ bool tabSale::sale()
                 store_sales_cancel_records.append(QString::number(i.value())); // преобразование в QStringList
                 i++;
             }
-            QUERY_EXEC(query,nDBErr)(QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(doc_id, store_sales_cancel_records.join(','))); // TODO: нужно проверить порядок этих запросов
+            QUERY_EXEC(query,nDBErr)(QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(doc_id, store_sales_cancel_records.join(',')));
             QUERY_EXEC(query,nDBErr)(QUERY_UPD_STORE_SALES_RESERVE_CANCELLATION(doc_id, store_sales_cancel_records.join(',')));
         }
     }
@@ -1036,6 +1036,15 @@ bool tabSale::sale()
         // а может и не нужно; в АСЦ удалялась, но за годы пользования я так и не понял зачем это сделано
     }
     delete query_pre;
+
+    if(reserve != 1)    // Зачисления за товары на реализации
+    {
+        QUERY_EXEC(query,nDBErr)(QUERY_INS_BALANCE_LOG3(office,user,doc_id));
+        QUERY_EXEC(query,nDBErr)(QUERY_UPDATE_BALANCE3(doc_id));
+        QUERY_EXEC(query,nDBErr)(QUERY_VRFY_BALANCE3(doc_id));
+        while(query->next() && nDBErr)  // верификация баланса (-ов, если в ремонте товары разных поставщиков)
+             nDBErr = (query->value(0).toInt() == 21930)?1:0;
+    }
 
     // в АСЦ с кол-вом покупок то ли глюк, то ли странная задумка: в таблице клиентов отображается кол-во РН, а в самой карте клиента кол-во записей в таблице store_sales
     // TODO: разобраться с этим
@@ -1440,13 +1449,13 @@ void tabSale::randomFill()
     else if (test_scheduler_counter == 2)   // товары
     {
         QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-        i = QRandomGenerator::global()->bounded(10); // кол-во товаров от 1 до 10
+        i = QRandomGenerator::global()->bounded(3); // кол-во товаров от 1 до 3
         if(i < 3)
             i += 3;
 
         for(int j = 0; j < i; j++)
         {
-            query->exec(QString("SELECT `id` FROM (SELECT ROUND(@i * RAND(), 0) AS 'rand') AS `rand` LEFT JOIN (SELECT @i := @i + 1 AS 'num', t1.`id` FROM store_items AS t1 CROSS JOIN (SELECT @i := 0) AS dummy WHERE t1.`count` - t1.`reserved` > 0) AS t1 ON t1.`num` = `rand`.`rand`;"));
+            query->exec(QString("SELECT `id` FROM (SELECT ROUND(@i * RAND(), 0) AS 'rand') AS `rand` LEFT JOIN (SELECT @i := @i + 1 AS 'num', t1.`id` FROM store_items AS t1 CROSS JOIN (SELECT @i := 0) AS dummy WHERE t1.`count` - t1.`reserved` > 0 AND t1.`is_realization` = 1) AS t1 ON t1.`num` = `rand`.`rand`;"));
             if(j<2)
                 continue;   // после обновления сервера на mysql 5.6.51 (win) пришлось чуть-чуть изменить запрос для случайного товара; также в только что открытой сессии результаты первых двух запросов будут состоять из NULL, поэтому пропускаем их
 
