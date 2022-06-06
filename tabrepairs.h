@@ -14,7 +14,7 @@
 #include <QWidgetAction>
 #include <QTimer>
 #include "tabcommon.h"
-#include "repairstablemodel.h"
+#include "models/repairstablemodel.h"
 #include "models/repairtablefiltermenu.h"
 
 namespace Ui {

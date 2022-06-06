@@ -31,26 +31,23 @@ DEFINES += LIMEREPORT_IMPORTS
 
 PRECOMPILED_HEADER = stable.h
 
-SOURCES += main.cpp\
-    SSetComboBox/ssetcombobox.cpp \
+SOURCES += \
+    main.cpp\
     amountToWords.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
     clients4test.cpp \
-    getOutDialog.cpp \
     global.cpp \
-    mainwindow.cpp \
     loginwindow.cpp \
+    mainwindow.cpp \
+    models/repairstablemodel.cpp \
     models/repairtablefiltermenu.cpp \
-    models/saletable/saletableitemdelegates.cpp \
-    models/saletable/saletablemodel.cpp \
+    models/saletablemodel.cpp \
     models/ssloptionsdialog.cpp \
+    models/ssqlquerymodel.cpp \
+    models/sstandarditemmodel.cpp \
     models/tabsalesettingsmenu.cpp \
     querylog.cpp \
-    repairstablemodel.cpp \
-    shortlivednotification.cpp \
-    ssqlquerymodel.cpp \
-    sstandarditemmodel.cpp \
     tabclients.cpp \
     tabcommon.cpp \
     tabprintdialog.cpp \
@@ -58,34 +55,34 @@ SOURCES += main.cpp\
     tabrepairnew.cpp \
     tabrepairs.cpp \
     tabsale.cpp \
+    widgets/getoutdialog.cpp \
+    widgets/saletableitemdelegates.cpp \
     widgets/scombobox.cpp \
     widgets/sgroupboxeventfilter.cpp \
+    widgets/shortlivednotification.cpp \
     widgets/slineedit.cpp \
+    widgets/ssetcombobox.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
     amountToWords.h \
-    clients4test.h \
-    getOutDialog.h \
-    global.h \
-    models/repairtablefiltermenu.h \
-    models/saletable/saletableitemdelegates.h \
-    models/saletable/saletablemodel.h \
-    models/ssloptionsdialog.h \
-    models/tabsalesettingsmenu.h \
-    querylog.h \
-    shortlivednotification.h \
-    ssqlquerymodel.h \
-    sstandarditemmodel.h \
-    stable.h \
-    mainwindow.h \
-    SSetComboBox/ssetcombobox.h \
     appver.h \
     bottoolbarwidget.h \
     chooseofficewindow.h \
+    clients4test.h \
     com_sql_queries.h \
+    global.h \
     loginwindow.h \
-    repairstablemodel.h \
+    mainwindow.h \
+    models/repairstablemodel.h \
+    models/repairtablefiltermenu.h \
+    models/saletablemodel.h \
+    models/ssloptionsdialog.h \
+    models/ssqlquerymodel.h \
+    models/sstandarditemmodel.h \
+    models/tabsalesettingsmenu.h \
+    querylog.h \
+    stable.h \
     tabclients.h \
     tabcommon.h \
     tabprintdialog.h \
@@ -93,16 +90,20 @@ HEADERS  += \
     tabrepairnew.h \
     tabrepairs.h \
     tabsale.h \
+    widgets/getoutdialog.h \
+    widgets/saletableitemdelegates.h \
     widgets/scombobox.h \
     widgets/sgroupboxeventfilter.h \
+    widgets/shortlivednotification.h \
     widgets/slineedit.h \
+    widgets/ssetcombobox.h \
     windowsdispatcher.h
 
-FORMS    += mainwindow.ui \
+FORMS += \
     bottoolbarwidget.ui \
     chooseofficewindow.ui \
-    getOutDialog.ui \
     loginwindow.ui \
+    mainwindow.ui \
     models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
@@ -111,9 +112,12 @@ FORMS    += mainwindow.ui \
     tabrepair.ui \
     tabrepairnew.ui \
     tabrepairs.ui \
-    tabsale.ui
+    tabsale.ui \
+    widgets/getoutdialog.ui
 
 RESOURCES += styles/styles.qrc
+
+QMAKE_MKLINK = mklink /H
 
 CONFIG(release, debug|release) {
     BUILD_TYPE = release
@@ -156,4 +160,101 @@ equals(QT_MAJOR_VERSION, 5){
         QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)
         QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc\" \"$${PROGRAM_FILES_DIR}\\\" $$escape_expand(\\n\\t)
     }
+}
+
+# Qt Creator v5/v6 при сохранении разрушает жёсткую связь файлов. Для того, чтобы в отдельном субрепозитории (субпроекте,
+# предназначенном для разработки отдельного класса и позволяющем чуть-чуть сэкономить на времени компиляции) при изменении
+# исходного кода в основном проекте также появились изменения, после линковки пересоздаём жесткую ссылку. У этого метода,
+# есть, конечно, недостатки; например, если файл был изменён в соновном проекте, сохранён, а компиляция не производилась, то
+# в случае внесения изменений в файл в субрепозитории и запуска компиляции, изменения в файле в основном репозитории могут
+# быть утрачены.
+
+SHARED_FILE_SRC_PATH = $${PWD}\\widgets
+SHARED_FILE_TRG_PATH = $${PWD}\\standalone-dev\\SSetComboBox
+SHARED_FILES = ssetcombobox.cpp
+SHARED_FILES += ssetcombobox.h
+for(FILE,SHARED_FILES){
+    QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
+    QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)
+}
+
+SHARED_FILE_SRC_PATH = $${PWD}
+SHARED_FILE_TRG_PATH = $${PWD}\\standalone-dev\\saletable
+SHARED_FILES = amountToWords.cpp
+SHARED_FILES += amountToWords.h
+SHARED_FILES += clients4test.cpp
+SHARED_FILES += clients4test.h
+SHARED_FILES += com_sql_queries.h
+SHARED_FILES += global.cpp
+SHARED_FILES += global.h
+SHARED_FILES += querylog.cpp
+SHARED_FILES += querylog.h
+SHARED_FILES += tabcommon.cpp
+SHARED_FILES += tabcommon.h
+SHARED_FILES += tabsale.cpp
+SHARED_FILES += tabsale.h
+SHARED_FILES += tabsale.ui
+for(FILE,SHARED_FILES){
+    QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
+    QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)
+}
+
+SHARED_FILE_SRC_PATH = $${PWD}\\widgets
+SHARED_FILE_TRG_PATH = $${PWD}\\standalone-dev\\saletable\\widgets
+SHARED_FILES = saletableitemdelegates.cpp
+SHARED_FILES += saletableitemdelegates.h
+SHARED_FILES += shortlivednotification.cpp
+SHARED_FILES += shortlivednotification.h
+SHARED_FILES += tabsalesettingsmenu.cpp
+SHARED_FILES += tabsalesettingsmenu.h
+SHARED_FILES += tabsalesettingsmenu.ui
+SHARED_FILES += sgroupboxeventfilter.cpp
+SHARED_FILES += sgroupboxeventfilter.h
+for(FILE,SHARED_FILES){
+    QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
+    QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)
+}
+
+SHARED_FILE_SRC_PATH = $${PWD}\\models
+SHARED_FILE_TRG_PATH = $${PWD}\\standalone-dev\\saletable\\models
+SHARED_FILES = saletablemodel.cpp
+SHARED_FILES += saletablemodel.h
+SHARED_FILES += ssqlquerymodel.cpp
+SHARED_FILES += ssqlquerymodel.h
+SHARED_FILES += sstandarditemmodel.cpp
+SHARED_FILES += sstandarditemmodel.h
+for(FILE,SHARED_FILES){
+    QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
+    QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)
+}
+
+SHARED_FILE_SRC_PATH = $${PWD}
+SHARED_FILE_TRG_PATH = $${PWD}\\LimeReport\\demo_snap
+SHARED_FILES = clients4test.cpp
+SHARED_FILES += clients4test.h
+SHARED_FILES += com_sql_queries.h
+SHARED_FILES += global.cpp
+SHARED_FILES += global.h
+SHARED_FILES += tabcommon.cpp
+SHARED_FILES += tabcommon.h
+SHARED_FILES += tabprintdialog.cpp
+SHARED_FILES += tabprintdialog.h
+SHARED_FILES += tabprintdialog.ui
+SHARED_FILES += tabreportdesigner.cpp
+SHARED_FILES += tabreportdesigner.h
+SHARED_FILES += tabreportdesigner.ui
+for(FILE,SHARED_FILES){
+    QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
+    QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)
+}
+
+SHARED_FILE_SRC_PATH = $${PWD}\\models
+SHARED_FILE_TRG_PATH = $${PWD}\\LimeReport\\demo_snap\\models
+SHARED_FILES = ssqlquerymodel.cpp
+SHARED_FILES += ssqlquerymodel.h
+SHARED_FILES += sstandarditemmodel.cpp
+SHARED_FILES += sstandarditemmodel.h
+for(FILE,SHARED_FILES){
+    QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
+    QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)
 }

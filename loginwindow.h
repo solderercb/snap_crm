@@ -16,7 +16,7 @@
 #include <QGraphicsPixmapItem>
 #include <QResource>
 #include <QIODevice>
-#include "shortlivednotification.h"
+#include "widgets/shortlivednotification.h"
 #include "windowsdispatcher.h"
 #include "models/ssloptionsdialog.h"
 #define NO_LOGIN

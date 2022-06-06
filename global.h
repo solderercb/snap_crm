@@ -9,8 +9,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
-#include "sstandarditemmodel.h"
-#include "ssqlquerymodel.h"
+#include "models/sstandarditemmodel.h"
+#include "models/ssqlquerymodel.h"
 #ifdef QT_DEBUG
 #include "clients4test.h"
 #endif

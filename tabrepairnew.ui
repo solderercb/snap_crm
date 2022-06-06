@@ -1067,7 +1067,7 @@
   <customwidget>
    <class>SSetComboBox</class>
    <extends>QComboBox</extends>
-   <header>SSetComboBox\ssetcombobox.h</header>
+   <header>widgets/ssetcombobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

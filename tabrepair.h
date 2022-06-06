@@ -16,7 +16,7 @@
 #include <QDateTime>
 #include <QLocale>
 #include "tabcommon.h"
-#include "getOutDialog.h"
+#include "widgets/getoutdialog.h"
 #include "widgets/sgroupboxeventfilter.h"
 
 namespace Ui {

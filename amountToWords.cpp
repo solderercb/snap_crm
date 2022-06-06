@@ -18,7 +18,7 @@ QString amountToWords( double n )
 			"сім ",
 			"вісім ",
 			"дев'ять "
-		},
+        },
 		{
 			"",
 			"одна ",

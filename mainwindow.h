@@ -32,7 +32,7 @@
 #include <QRandomGenerator>
 #include <QCloseEvent>
 #include "windowsdispatcher.h"
-#include "shortlivednotification.h"
+#include "widgets/shortlivednotification.h"
 #include "amountToWords.h"
 
 namespace Ui {
