@@ -47,6 +47,14 @@ SOURCES += \
     models/ssqlquerymodel.cpp \
     models/sstandarditemmodel.cpp \
     models/tabsalesettingsmenu.cpp \
+    models/scashregistermodel.cpp \
+    models/sclientmodel.cpp \
+    models/scomrecord.cpp \
+    models/sdatabaserecord.cpp \
+    models/sdocumentmodel.cpp \
+    models/slogrecordmodel.cpp \
+    models/sphonemodel.cpp \
+    models/ssaleitemmodel.cpp \
     querylog.cpp \
     tabclients.cpp \
     tabcommon.cpp \
@@ -81,6 +89,14 @@ HEADERS  += \
     models/ssqlquerymodel.h \
     models/sstandarditemmodel.h \
     models/tabsalesettingsmenu.h \
+    models/scashregistermodel.h \
+    models/sclientmodel.h \
+    models/scomrecord.h \
+    models/sdatabaserecord.h \
+    models/sdocumentmodel.h \
+    models/slogrecordmodel.h \
+    models/sphonemodel.h \
+    models/ssaleitemmodel.h \
     querylog.h \
     stable.h \
     tabclients.h \
@@ -223,6 +239,23 @@ SHARED_FILES += ssqlquerymodel.cpp
 SHARED_FILES += ssqlquerymodel.h
 SHARED_FILES += sstandarditemmodel.cpp
 SHARED_FILES += sstandarditemmodel.h
+SHARED_FILES += scashregistermodel.cpp
+SHARED_FILES += scashregistermodel.h
+SHARED_FILES += sclientmodel.cpp
+SHARED_FILES += sclientmodel.h
+SHARED_FILES += scomrecord.cpp
+SHARED_FILES += scomrecord.h
+SHARED_FILES += scomrecordmodel.h
+SHARED_FILES += sdatabaserecord.cpp
+SHARED_FILES += sdatabaserecord.h
+SHARED_FILES += sdocumentmodel.cpp
+SHARED_FILES += sdocumentmodel.h
+SHARED_FILES += slogrecordmodel.cpp
+SHARED_FILES += slogrecordmodel.h
+SHARED_FILES += sphonemodel.cpp
+SHARED_FILES += sphonemodel.h
+SHARED_FILES += ssaleitemmodel.cpp
+SHARED_FILES += ssaleitemmodel.h
 for(FILE,SHARED_FILES){
     QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
     QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)

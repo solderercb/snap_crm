@@ -15,16 +15,15 @@ SaleTableItemDelegates::~SaleTableItemDelegates()
 
 QWidget *SaleTableItemDelegates::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-//    qDebug() << "SaleTableItemDelegates::createEditor() | parent: " << parent;
-    if( index.column() == tableModel->fields->value("count") )
+    if( index.column() == SaleTableModel::ColCount )
     {
         // Create the spinbox and populate it
         QSpinBox *sb = new QSpinBox(parent);
         sb->setMinimum(1);
-        sb->setMaximum(tableModel->index(index.row(), tableModel->fields->value("avail")).data().toInt());
+        sb->setMaximum(tableModel->index(index.row(), SaleTableModel::ColAvail).data().toInt());
         return sb;
     }
-    else if( index.column() == tableModel->fields->value("price") )
+    else if( index.column() == SaleTableModel::ColPrice )
     {
         // Create the spinbox and populate it
         QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
@@ -33,7 +32,7 @@ QWidget *SaleTableItemDelegates::createEditor(QWidget *parent, const QStyleOptio
         sb->setMaximum(9999999999.99);
         return sb;
     }
-    else if( index.column() == tableModel->fields->value("warranty") )
+    else if( index.column() == SaleTableModel::ColWarranty )
     {
     // Create the combobox and populate it
         QComboBox *cb = new QComboBox(parent);
@@ -54,22 +53,20 @@ QWidget *SaleTableItemDelegates::createEditor(QWidget *parent, const QStyleOptio
 
 void SaleTableItemDelegates::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-//    qDebug() << "SaleTableItemDelegates::setEditorData()";
-    if( index.column() == tableModel->fields->value("count") )
+    if( index.column() == SaleTableModel::ColCount )
     {
         QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
         Q_ASSERT(sb);
         sb->setValue(index.data().toInt());
     }
-    else if( index.column() == tableModel->fields->value("price") )
+    else if( index.column() == SaleTableModel::ColPrice )
     {
         QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
         Q_ASSERT(sb);
         sb->setValue(sysLocale.toFloat(index.data().toString()));
     }
-    else if( index.column() == tableModel->fields->value("warranty") )
+    else if( index.column() == SaleTableModel::ColWarranty )
     {
-    // Create the combobox and populate it
         QComboBox *cb = qobject_cast<QComboBox *>(editor);
         Q_ASSERT(cb);
         cb->setCurrentText(index.data().toString());
@@ -93,20 +90,19 @@ void SaleTableItemDelegates::setEditorData(QWidget *editor, const QModelIndex &i
 
 void SaleTableItemDelegates::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-//    qDebug() << "SaleTableItemDelegates::setModelData()";
-    if( index.column() == tableModel->fields->value("count") )
+    if( index.column() == SaleTableModel::ColCount )
     {
         QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
         Q_ASSERT(sb);
         model->setData(index, sb->value(), Qt::EditRole);
     }
-    else if( index.column() == tableModel->fields->value("price") )
+    else if( index.column() == SaleTableModel::ColPrice )
     {
         QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
         Q_ASSERT(sb);
         model->setData(index, sb->value(), Qt::EditRole);
     }
-    else if( index.column() == tableModel->fields->value("warranty") )
+    else if( index.column() == SaleTableModel::ColWarranty )
     {
         QComboBox *cb = qobject_cast<QComboBox *>(editor);
         Q_ASSERT(cb);
@@ -122,15 +118,14 @@ void SaleTableItemDelegates::setModelData(QWidget *editor, QAbstractItemModel *m
 //            model->setData(index, lineEdit->text(), Qt::EditRole);
         QStyledItemDelegate::setModelData(editor, model, index);
     }
-//    qDebug() << "new value:" << index.data().toString();
+    model->setData(index, 1, SaleTableModel::Changed);
 }
 
 void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-//    qDebug() << "SaleTableItemDelegates::paint()";
-    if(index.column() == tableModel->fields->value("id") )
+    if(index.column() == SaleTableModel::ColId )
     {
-        if(tableModel->getModelState() < 3)
+        if(tableModel->modelState() != SaleTableModel::Cancelled)
         {
             if(!index.data(Qt::UserRole).toBool()) // В UserRole хранится значение is_cancellation (чтобы лишний раз не лезть в другие индексы объекта модели)
             {
@@ -151,7 +146,7 @@ void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem
                 QApplication::style()->drawControl( QStyle::CE_PushButton, &button, painter);
             }
         }
-        // Если   getModelState() == 3, то ничего не отображаем
+        // Если   modelState() == 3, то ничего не отображаем
     }
     else
         QStyledItemDelegate::paint(painter, option, index);
@@ -159,13 +154,12 @@ void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem
 
 bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
-//    qDebug() << "SaleTableItemDelegates::editorEvent() | event: " << event;
     if( event->type() == QEvent::MouseButtonRelease )
     {
         QMouseEvent * e = (QMouseEvent *)event;
-        if( index.column() == tableModel->fields->value("id") )
+        if( index.column() == SaleTableModel::ColId )
         {
-            if(tableModel->getModelState() < 3)
+            if(tableModel->modelState() != SaleTableModel::Cancelled)
             {
                 if(!index.data(Qt::UserRole).toBool()) // В UserRole хранится значение is_cancellation (чтобы лишний раз не лезть в другие индексы объекта модели)
                 {
@@ -188,7 +182,7 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
                     if( clickX > x && clickX < x + w )
                         if( clickY > y && clickY < y + h )
                         {
-                            if(tableModel->getModelState() == 0)   // в режиме создания новой РН удаляем строки
+                            if(tableModel->modelState() == SaleTableModel::New)   // в режиме создания новой РН удаляем строки
                                 model->removeRows(index.row(), 1);
                             else    // в режимах просмотра резерва или проведённой накладной, помечаем строки на возврат/отмену резерва
                                 tableModel->removeRowHandler(index.row(), index.data().toInt());
@@ -196,7 +190,7 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
                     }
                 }
             }
-            // Если   getModelState() == 3, то никакой реакции
+            // Если   modelState() == 3, то никакой реакции
         }
         else
         {
@@ -223,14 +217,11 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
 
 bool SaleTableItemDelegates::event(QEvent *event)
 {
-//    qDebug() << "SaleTableItemDelegates::event() | event: " << event;
     return QStyledItemDelegate::event(event);
 }
 
 bool SaleTableItemDelegates::eventFilter(QObject *obj, QEvent *event)
 {
-//    qDebug() << "SaleTableItemDelegates::eventFilter() | object: " << obj << "; event: " << event;
-
     // если виджет-редактор — lineEdit, и он уже содержит данные, задаваемые в setEditorData(), то текст будет
     // выделен; чтобы по одинарному клику активировалось редактирование, а курсор устанавливался в
     // место, где нажал пользователь, вызываем метод установки курсора по координатам

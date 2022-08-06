@@ -569,7 +569,7 @@
           </widget>
          </item>
          <item row="12" column="1">
-          <widget class="QLineEdit" name="lineEditTrack"/>
+          <widget class="SLineEdit" name="lineEditTrack"/>
          </item>
          <item row="13" column="0" colspan="2">
           <spacer name="verticalSpacer">
@@ -908,10 +908,54 @@
    <extends>QTableView</extends>
    <header>tabsale.h</header>
   </customwidget>
+  <customwidget>
+   <class>SLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets/slineedit.h</header>
+   <slots>
+    <signal>buttonClicked(int)</signal>
+   </slots>
+  </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>lineEditAddByUID</tabstop>
+  <tabstop>checkBoxAnonymous</tabstop>
+  <tabstop>pushButtonClientFromDB</tabstop>
+  <tabstop>lineEditClientLastName</tabstop>
+  <tabstop>lineEditClientFirstName</tabstop>
+  <tabstop>lineEditClientPatronymic</tabstop>
+  <tabstop>comboBoxClientPhoneType</tabstop>
+  <tabstop>lineEditClientPhone</tabstop>
+  <tabstop>comboBoxClientAdType</tabstop>
+  <tabstop>lineEditComment</tabstop>
+  <tabstop>lineEditTakeIn</tabstop>
   <tabstop>buttonSale</tabstop>
+  <tabstop>buttonSaleMore</tabstop>
+  <tabstop>buttonReserve</tabstop>
+  <tabstop>pushButtonClientCredsClearAll</tabstop>
+  <tabstop>comboBoxPaymentAccount</tabstop>
+  <tabstop>comboBoxPriceCol</tabstop>
+  <tabstop>comboBoxCompany</tabstop>
+  <tabstop>spinBoxReserve</tabstop>
+  <tabstop>lineEditDocNum</tabstop>
+  <tabstop>lineEditDate</tabstop>
+  <tabstop>pushButtonCreateTabClient</tabstop>
+  <tabstop>lineEditBalance</tabstop>
+  <tabstop>checkBoxSaleInCredit</tabstop>
+  <tabstop>textEditRevertReason</tabstop>
+  <tabstop>comboBoxMoneyBackAccount</tabstop>
+  <tabstop>pushButtonRevert</tabstop>
+  <tabstop>pushButtonPrintCkeck</tabstop>
+  <tabstop>lineEditTrack</tabstop>
+  <tabstop>tableView</tabstop>
+  <tabstop>tableViewClientMatch</tabstop>
+  <tabstop>lineEditTotal</tabstop>
+  <tabstop>lineEditCharge</tabstop>
+  <tabstop>buttonPrint</tabstop>
+  <tabstop>buttonLog</tabstop>
+  <tabstop>buttonParams</tabstop>
   <tabstop>buttonAdd</tabstop>
+  <tabstop>buttonReserveCancel</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -1251,6 +1295,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>comboBoxPaymentAccount</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabSale</receiver>
+   <slot>paymentSystemChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxMoneyBackAccount</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabSale</receiver>
+   <slot>paymentSystemChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>195</x>
+     <y>637</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>600</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditTrack</sender>
+   <signal>buttonClicked(int)</signal>
+   <receiver>tabSale</receiver>
+   <slot>setTrackNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>774</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>778</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>findMatchingClient(QString)</slot>
@@ -1274,5 +1366,7 @@
   <slot>printButtonClicked()</slot>
   <slot>unSaleButtonClicked()</slot>
   <slot>tableRowDoubleClick(QModelIndex)</slot>
+  <slot>paymentSystemChanged(int)</slot>
+  <slot>setTrackNum(int)</slot>
  </slots>
 </ui>

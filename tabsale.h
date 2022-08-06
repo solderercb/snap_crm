@@ -20,9 +20,14 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include "tabcommon.h"
+#include "models/sdocumentmodel.h"
 #include "models/sstandarditemmodel.h"
 #include "models/ssqlquerymodel.h"
 #include "models/saletablemodel.h"
+#include "models/slogrecordmodel.h"
+#include "models/scashregistermodel.h"
+#include "models/sclientmodel.h"
+#include "models/sphonemodel.h"
 #include "widgets/saletableitemdelegates.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "widgets/tabsalesettingsmenu.h"
@@ -65,6 +70,7 @@ signals:
     void generatePrintout(QMap<QString, QVariant> report_vars);
 
 public:
+    enum DocState {Sale = 0, Reserve = 1, SaleReserved = 2};
     explicit tabSale(int, MainWindow *parent = nullptr);
     static tabSale* getInstance(int, MainWindow *parent = nullptr);
     ~tabSale();
@@ -74,9 +80,9 @@ private:
     void setDefaultStyleSheets();
     void setBalanceWidgetsVisible(bool);
     static QMap<int, tabSale*> p_instance;
-    int doc_id;
-    QSqlQueryModel *docModel;
-    SSqlQueryModel *clientModel;
+    int doc_id = 0;
+    SDocumentModel *docModel;
+    SClientModel *clientModel;
     float total_sum, takein_sum, charge_sum;
     void eventResize(QResizeEvent *);
     QSqlQueryModel* clientsMatchTable;
@@ -84,14 +90,14 @@ private:
     QSqlQueryModel* clientPhonesModel;
     int client = 0;
     int price_col = 2;
-    void updateDocData();
     void updateWidgets();
     bool checkInput();
     SaleTableModel *tableModel;
     QSqlQueryModel *newItemModel;
     SaleTableItemDelegates *itemDelagates;
     int reserve = 0;
-    QString genUserWebPass() const;
+    bool createClient();
+    bool createNewDoc();
     bool sale();
     void clearAll();
     int isItemAlreadyInList(int);
@@ -99,14 +105,19 @@ private:
     tabSaleSettingsMenu *widgetAction;
     int *params;
     QMessageBox msgBox;
+    SCashRegisterModel *cashRegister;
+    int m_docState = 0;
+    void print();
 
 #ifdef QT_DEBUG
     void randomFill();
+    void createTestPanel();
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
     QWidget *testPanel;
     QLineEdit *testLineEdit;
     QPushButton *testPushButton;
+    QPushButton *testBtnAddRandomItem;
 #endif
 
 public slots:
@@ -133,14 +144,17 @@ private slots:
     void updateChargeAmount(QString);
     void phoneTypeChanged(int);
     void setTrackNum();
+    void setTrackNum(int);
     void reserveCancelButtonClicked();
     void printButtonClicked();
     void logButtonClicked();
     void unSaleButtonClicked();
+    void paymentSystemChanged(int);
 #ifdef QT_DEBUG
     void test_scheduler_handler();
     void test_scheduler2_handler();
     void test_updateWidgetsWithDocNum();
+    void test_addRandomItem();
 #endif
 };
 

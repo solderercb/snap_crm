@@ -23,7 +23,13 @@ int SStandardItemModel::getFieldIdByName(const QString &field)
                 return i;
             }
         }
+#ifdef  QT_DEBUG
+        Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("field [\"name\"] not defined").toLocal8Bit());
+#endif
     }
+#ifdef  QT_DEBUG
+    Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("object is empty").toLocal8Bit());
+#endif
     return -1;
 }
 
@@ -36,24 +42,58 @@ int SStandardItemModel::getFieldIdByName(const QString &field)
  * Чтобы в ComboBox'е выбрать значение, соответствующее текущей записи в таблице records,
  * в функцию нужно передать id равный значению type_id и column равный 1.
  */
-QString SStandardItemModel::getDisplayRole(int id, int column)
+QString SStandardItemModel::getDisplayRole(int id, int searchColumn)
 {
-    for(int i=0; i<QStandardItemModel::rowCount(); i++)
+    int row = rowByDatabaseID(id, searchColumn);
+    if(m_displayRoleColumn == -1)
     {
-        if(QStandardItemModel::index(i, column).data().toInt() == id)
-        {
-            return QStandardItemModel::index(i, 0).data().toString();
-        }
+        m_displayRoleColumn = getFieldIdByName("name");
     }
-    return NULL;
+
+    if(row == -1)
+        return NULL;
+
+    return QStandardItemModel::index(row, m_displayRoleColumn).data().toString();
 }
 
-QString SStandardItemModel::getDisplayRole(int id, QString field)
+QString SStandardItemModel::getDisplayRole(int id, QString searchField)
 {
-    int fieldId = getFieldIdByName(field);
-    if(fieldId >= 0)
-        return getDisplayRole(id, fieldId);
-    else
-        return "unknown";
+    int searchColumn = getFieldIdByName(searchField);
+
+    return getDisplayRole(id, searchColumn);
+}
+
+int SStandardItemModel::rowByDatabaseID(int id, int searchColumn)
+{
+    if(this->rowCount() == 0)
+        return -1;
+
+    for(int i=0; i<QStandardItemModel::rowCount(); i++)
+    {
+        if(QStandardItemModel::index(i, searchColumn).data().toInt() == id)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int SStandardItemModel::rowByDatabaseID(int id, QString searchField)
+{
+    int searchColumn = getFieldIdByName(searchField);
+
+    return rowByDatabaseID(id, searchColumn);
+}
+
+int SStandardItemModel::databaseIDByRow(int row, int column)
+{
+    return index(row, column).data().toInt();
+}
+
+int SStandardItemModel::databaseIDByRow(int row, QString field)
+{
+    int column = getFieldIdByName(field);
+    return index(row, column).data().toInt();
 }
 

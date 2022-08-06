@@ -25,7 +25,13 @@ int SSqlQueryModel::getFieldIdByName(const QString &field)
                 return i;
             }
         }
+#ifdef  QT_DEBUG
+        Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("field [\"name\"] not defined").toLocal8Bit());
+#endif
     }
+#ifdef  QT_DEBUG
+    Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("object is empty").toLocal8Bit());
+#endif
     return -1;
 }
 
@@ -38,24 +44,58 @@ int SSqlQueryModel::getFieldIdByName(const QString &field)
  * Чтобы в ComboBox'е выбрать значение, соответствующее текущей записи в таблице records,
  * в функцию нужно передать id равный значению type_id и column равный 1.
  */
-QString SSqlQueryModel::getDisplayRole(int id, int column)
+QString SSqlQueryModel::getDisplayRole(int id, int searchColumn)
 {
-    for(int i=0; i<QSqlQueryModel::rowCount(); i++)
+    int row = rowByDatabaseID(id, searchColumn);
+    if(m_displayRoleColumn == -1)
     {
-        if(QSqlQueryModel::index(i, column).data().toInt() == id)
-        {
-            return QSqlQueryModel::index(i, 0).data().toString();
-        }
+        m_displayRoleColumn = getFieldIdByName("name");
     }
-    return NULL;
+
+    if(row == -1)
+        return NULL;
+
+    return QSqlQueryModel::index(row, m_displayRoleColumn).data().toString();
 }
 
-QString SSqlQueryModel::getDisplayRole(int id, QString field)
+QString SSqlQueryModel::getDisplayRole(int id, QString searchField)
 {
-    int fieldId = getFieldIdByName(field);
-    if(fieldId >= 0)
-        return getDisplayRole(id, fieldId);
-    else
-        return "unknown";
+    int searchColumn = getFieldIdByName(searchField);
+
+    return getDisplayRole(id, searchColumn);
+}
+
+int SSqlQueryModel::rowByDatabaseID(int id, int searchColumn)
+{
+    if(this->rowCount() == 0)
+        return -1;
+
+    for(int i=0; i<QSqlQueryModel::rowCount(); i++)
+    {
+        if(QSqlQueryModel::index(i, searchColumn).data().toInt() == id)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int SSqlQueryModel::rowByDatabaseID(int id, QString searchField)
+{
+    int searchColumn = getFieldIdByName(searchField);
+
+    return rowByDatabaseID(id, searchColumn);
+}
+
+int SSqlQueryModel::databaseIDByRow(int row, int column)
+{
+    return index(row, column).data().toInt();
+}
+
+int SSqlQueryModel::databaseIDByRow(int row, QString field)
+{
+    int column = getFieldIdByName(field);
+    return index(row, column).data().toInt();
 }
 

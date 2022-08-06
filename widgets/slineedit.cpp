@@ -91,6 +91,7 @@ void SLineEdit::resizeEvent(QResizeEvent *)
 void SLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
 {
     emit mouseDoubleClick();
+    QLineEdit::mouseDoubleClickEvent(e);
 }
 
 void SLineEdit::updateCloseButton(const QString& text)

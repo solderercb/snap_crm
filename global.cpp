@@ -150,20 +150,31 @@ void initGlobalModels()
     clientPhoneTypesSelector = new QList<QStandardItem*>();;
     *clientPhoneTypesSelector << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
     clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
+    clientPhoneTypesModel->setObjectName("clientPhoneTypesModel");
+    clientPhoneTypesModel->setHorizontalHeaderLabels({"name", "id", "mask"});
 
     warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    warehousesModel->setObjectName("warehousesModel");
     allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
+    allUsersModel->setObjectName("allUsersModel");
     for(int i = 0; i < allUsersModel->rowCount(); i++)
     {
         allUsersMap->insert(allUsersModel->record(i).value("id").toInt(), allUsersModel->record(i).value("username").toString());
     }
     usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
+    usersModel->setObjectName("usersModel");
     managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database("connMain"));
+    managersModel->setObjectName("managersModel");
     engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
+    engineersModel->setObjectName("engineersModel");
     itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    itemBoxesModel->setObjectName("itemBoxesModel");
     repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
+    repairBoxesModel->setObjectName("repairBoxesModel");
     paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain")); // TODO: нужна прокси-модель для отображения платёжных систем в соответствии с правами пользователя
+    paymentSystemsModel->setObjectName("paymentSystemsModel");
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
+    clientAdTypesList->setObjectName("clientAdTypesList");
 
     QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы"};
     QVector<QString> clientTypesQueryFilterList = {"`type` = '%'", "`type` = 1", "`is_agent` = 1", "`is_dealer` = 1", "`is_regular` = 1", "`is_bad` = 1", "`is_realizator` = 1"};
@@ -205,6 +216,8 @@ void initGlobalModels()
         warrantyTermsModel->appendRow(*warrantyTermSelector);
         warrantyTermsMap->insert(warrantyTerms[i], warrantyTermsList.at(i));
     }
+    warrantyTermsModel->setObjectName("warrantyTermsModel");
+    warrantyTermsModel->setHorizontalHeaderLabels({"name","days"});
 
     QVector<QString> rejectReasonList = {"отказ от ремонта", "ремонт не возможен", "ремонт не возможен из-за отсутствия запчастей", "ремонт не рентабелен", "неисправносте не проявилась", "другие причины"};
     QList<QStandardItem*> *rejectReasonSelector;
@@ -214,6 +227,8 @@ void initGlobalModels()
         *rejectReasonSelector << new QStandardItem(rejectReasonList.at(i)) << new QStandardItem(QString::number(i));
         rejectReasonModel->appendRow(*rejectReasonSelector);
     }
+    rejectReasonModel->setObjectName("rejectReasonModel");
+    rejectReasonModel->setHorizontalHeaderLabels({"name","id"});
 
     QVector<QString> priceColNamesList = {"Цена для сервиса", "Цена розница", "Цена опт", "Цена опт2", "Цена опт3"};
     QVector<QString> priceColIdsList = {"1", "2", "3", "4", "5"};
@@ -225,6 +240,8 @@ void initGlobalModels()
         *priceColSelector << new QStandardItem(priceColNamesList.at(i)) << new QStandardItem(priceColIdsList.at(i)) << new QStandardItem(priceColDBFieldsList.at(i));
         priceColModel->appendRow(*priceColSelector);
     }
+    priceColModel->setObjectName("priceColModel");
+    priceColModel->setHorizontalHeaderLabels({"name", "id", "dbColumn"});
 
     QVector<QString> itemUnitsList = {"шт", "г", "м", "см", "л"};
     QVector<QString> itemUnitsIdsList = {"1", "2", "3", "4", "5"};
@@ -235,6 +252,8 @@ void initGlobalModels()
         *itemUnitsSelector << new QStandardItem(itemUnitsList.at(i)) << new QStandardItem(itemUnitsIdsList.at(i));
         itemUnitsModel->appendRow(*itemUnitsSelector);
     }
+    itemUnitsModel->setObjectName("itemUnitsModel");
+    itemUnitsModel->setHorizontalHeaderLabels({"name", "id"});
 
 #ifdef QT_DEBUG
     initClients4Test();
@@ -244,6 +263,7 @@ void initGlobalModels()
 void initUserDbData()
 {
     userDbDataModel->setQuery(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()), QSqlDatabase::database("connMain"));
+    userDbDataModel->setObjectName("userDbDataModel");
 
     // Переписываем результаты запроса в специальный массив
     // это необходимо, т. к. данные пользователя могут быть дополнены (например, кодом текущего офиса, если у пользователя есть право выбора офиса при входе)
@@ -270,9 +290,11 @@ void initPermissions()
 void initCompanies()    // Список компаний.
 {
     companiesModel->setQuery(QUERY_SEL_COMPANIES, QSqlDatabase::database("connMain"));
+    companiesModel->setObjectName("companiesModel");
 }
 
 void initOffices()      // Список офисов
 {
     officesModel->setQuery(QUERY_SEL_OFFICES(1), QSqlDatabase::database("connMain"));
+    officesModel->setObjectName("officesModel");
 }

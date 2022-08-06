@@ -28,7 +28,7 @@ class shortlivedNotification : public QWidget
     Q_OBJECT
 public:
     enum {topLeft, topRight, bottomLeft, bottomRight};
-    explicit shortlivedNotification(QWidget *parent, QString, QString, QColor captionColor_ = captionColor, QColor messageColor_ = messageColor, int millisecondsTimeout = 3000);
+    explicit shortlivedNotification(QObject *parent, QString, QString, QColor captionColor_ = captionColor, QColor messageColor_ = messageColor, int millisecondsTimeout = 3000);
     // TODO: сделать перегруженный контруктор для более гибкого использования класса.
     ~shortlivedNotification();
     void repaintPopups();

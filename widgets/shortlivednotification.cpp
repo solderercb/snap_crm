@@ -14,7 +14,7 @@ int shortlivedNotification::maxDisplayedNotifications = MAX_POPUPS;
 
 // captionColor_ и messageColor_ имеют приоритет над static captionColor и static messageColor;
 // вторая пара цветов может быть настроена с помощью setCaptionColor(QColor) и setMessageColor(QColor) соответственно, и все следующие уведомления по умолчанию будут иметь эти цвета
-shortlivedNotification::shortlivedNotification(QWidget *parent, QString caption, QString message, QColor captionColor_, QColor messageColor_, int millisecondsTimeout):
+shortlivedNotification::shortlivedNotification(QObject *parent, QString caption, QString message, QColor captionColor_, QColor messageColor_, int millisecondsTimeout):
     QWidget()
 {
     const QString labelCaptionStyle =   "border: 0px;\
@@ -82,6 +82,7 @@ shortlivedNotification::shortlivedNotification(QWidget *parent, QString caption,
     connect(labelMessage, SIGNAL(clicked()), this, SLOT(close()));
 
     autoDisappearTimer->start(millisecondsTimeout);
+    setVisible(true);
 }
 
 shortlivedNotification::~shortlivedNotification()

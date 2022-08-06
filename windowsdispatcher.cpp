@@ -1,4 +1,4 @@
-﻿#include "global.h"
+#include "global.h"
 #include "appver.h"
 #include "windowsdispatcher.h"
 #include "loginwindow.h"
@@ -50,6 +50,7 @@ void windowsDispatcher::connectOK()
         userDbData->insert("current_office_name", officesModel->record(userDbData->value("office").toInt()-1).value("name").toString());
         createMainWindow();
     }
+    userDbData->insert("company", 1);   // TODO: несколько компаний
 
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nDBErr = 1;

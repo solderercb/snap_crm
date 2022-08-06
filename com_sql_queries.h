@@ -224,8 +224,74 @@
 #define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t2.`name`, t1.`value`, '' AS 'comment' FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R)), QSqlDatabase::database("connMain")
 #define QUERY_SEL_IS_BALANCE_EN(C)          QString("SELECT SUM(`summ`) AS 'summa' FROM `balance` WHERE `client` = %1;").arg((C))
 #define QUERY_SEL_DOC(id)                   QString("SELECT  `id`,  `type`,  `state`,  `is_realization`,  `payment_system`,  `company`,  `store`,  `user`,  `total`,  `notes`,  `created`,  `updated_at`,  `office`,  `dealer`,  `currency_rate`,  `reason`,  `order_id`,  `price_option`,  `return_percent`,  `reserve_days`, DiffDays(UTC_TIMESTAMP(), `created`) AS 'diff_days', `master_id`,  `repair_id`,  `works_included`,  `invoice`,  `track`,  `d_store`,  `d_pay` FROM `docs` WHERE `id` = %1;").arg((id))
-#define QUERY_SEL_ITEMS_IN_DOC(id)          QString("SELECT t1.`id`, CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID', t2.`name`, t1.`count`, t2.`count` - t2.`reserved` AS 'avail', t1.`price`, t1.`count`*t1.`price` AS 'summ', t2.`box`, t1.`sn`, t1.`warranty`, t2.`is_realization`, t2.`return_percent`, t1.`is_cancellation`, t1.`cancellation_reason`, t2.`id` AS 'item_id', t2.`in_price`, t2.`dealer` FROM store_sales AS t1 LEFT JOIN store_items AS t2 ON t1.`item_id`=t2.id WHERE (`document_id` = %1);").arg((id))
-#define QUERY_SEL_ITEMS_IN_DOC_RSRV(id)     QString("SELECT t1.`id`, CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID', t2.`name`, t1.`count`, t2.`count` - t2.`reserved` + t1.`count` AS 'avail', t1.`price`, t1.`count`*t1.`price` AS 'summ', t2.`box`, t1.`sn`, t1.`warranty`, t2.`is_realization`, t2.`return_percent`, t1.`is_cancellation`, t1.`cancellation_reason`, t2.`id` AS 'item_id', t2.`in_price`, t2.`dealer` FROM store_sales AS t1 LEFT JOIN store_items AS t2 ON t1.`item_id`=t2.id WHERE (`document_id` = %1);").arg((id))
+#define QUERY_SEL_ITEMS_IN_DOC(id)          QString("SELECT t1.`id`, CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID', t2.`name`, t1.`count`, t2.`count` - t2.`reserved` AS 'avail', t1.`price`, t1.`count`*t1.`price` AS 'summ', t2.`box`, t1.`sn`, t1.`warranty`, t2.`is_realization`, t2.`return_percent`, t1.`is_cancellation`, t1.`cancellation_reason`, t2.`id` AS 'item_id', t2.`in_price`, t1.`document_id`, t2.`dealer`, t1.`customer_id` FROM store_sales AS t1 LEFT JOIN store_items AS t2 ON t1.`item_id`=t2.id WHERE (`document_id` = %1);").arg((id))
+#define QUERY_SEL_ITEMS_IN_DOC_RSRV(id)     QString("SELECT t1.`id`, CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID', t2.`name`, t1.`count`, t2.`count` - t2.`reserved` + t1.`count` AS 'avail', t1.`price`, t1.`count`*t1.`price` AS 'summ', t2.`box`, t1.`sn`, t1.`warranty`, t2.`is_realization`, t2.`return_percent`, t1.`is_cancellation`, t1.`cancellation_reason`, t2.`id` AS 'item_id', t2.`in_price`, t1.`document_id`, t2.`dealer`, t1.`customer_id` FROM store_sales AS t1 LEFT JOIN store_items AS t2 ON t1.`item_id`=t2.id WHERE (`document_id` = %1);").arg((id))
+#define QUERY_SEL_PART_FOR_SALE(uid, price_field_name)   QString(\
+                                                        "SELECT\n"\
+                                                        "  0 AS 'id',\n"\
+                                                        "  CONCAT(LPAD(t1.articul, 6, '0'), '-', LPAD(t1.id, 6, '0')) AS 'UID',\n"\
+                                                        "  t1.`name`,\n"\
+                                                        "  1 AS 'count',\n"\
+                                                        "  t1.`count` - t1.`reserved` AS 'avail',\n"\
+                                                        "  t1.%2 AS 'price',\n"\
+                                                        "  t1.%2 AS 'summ',\n"\
+                                                        "  t1.`box`,\n"\
+                                                        "  t1.`SN` AS 'sn',\n"\
+                                                        "  t1.`warranty`,\n"\
+                                                        "  t1.`is_realization`,\n"\
+                                                        "  t1.`return_percent`,\n"\
+                                                        "  0 AS 'is_cancellation',\n"\
+                                                        "  NULL AS 'cancellation_reason',\n"\
+                                                        "  t1.`id` AS 'item_id',\n"\
+                                                        "  t1.`in_price`,\n"\
+                                                        "  0 AS 'document_id',\n"\
+                                                        "  t1.`dealer`,\n"\
+                                                        "  0 AS 'customer_id'\n"\
+                                                        "FROM\n"\
+                                                        "  store_items AS t1\n"\
+                                                        "WHERE\n"\
+                                                        "  `id` IN (%1);").arg(uid).arg((price_field_name))
+
+#define QUERY_SEL_ITEM_ACTUAL_QTY(item_id)   QString(\
+                                                        "SELECT\n"\
+                                                        "  `count`,\n"\
+                                                        "  `sold`,\n"\
+                                                        "  `reserved`\n"\
+                                                        "FROM\n"\
+                                                        "  `store_items`\n"\
+                                                        "WHERE\n"\
+                                                        "  `id` = %1;")\
+                                                        .arg((item_id))
+
+#define QUERY_SEL_STORE_SALES_QTY(id)       QString("SELECT `count` FROM store_sales WHERE `id` = %1;").arg((id))
+#define QUERY_SEL_CASH_ORDER(id)            QString(\
+                                                        "SELECT\n"\
+                                                        "  `id`,\n"\
+                                                        "  `created`,\n"\
+                                                        "  `type`,\n"\
+                                                        "  `summa`,\n"\
+                                                        "  `summa_str`,\n"\
+                                                        "  `invoice`,\n"\
+                                                        "  `client`,\n"\
+                                                        "  `to_user`,\n"\
+                                                        "  `user`,\n"\
+                                                        "  `company`,\n"\
+                                                        "  `office`,\n"\
+                                                        "  `notes`,\n"\
+                                                        "  `repair`,\n"\
+                                                        "  `document`,\n"\
+                                                        "  `img`,\n"\
+                                                        "  `payment_system`,\n"\
+                                                        "  `card_fee`,\n"\
+                                                        "  `is_backdate`,\n"\
+                                                        "  `card_info`,\n"\
+                                                        "  `customer_email`,\n"\
+                                                        "  `fdn`,\n"\
+                                                        "  `payment_item_sign`\n"\
+                                                        "FROM\n"\
+                                                        "  `cash_orders`\n"\
+                                                        "WHERE\n"\
+                                                        "  `id` = %1;").arg((id))
 
 /**************** SELECT queries for data models for reports ******************/
 #define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg(R), QSqlDatabase::database("connMain")
@@ -358,7 +424,7 @@
                                                 .arg(D)\
                                                 .arg(A)
 #define QUERY_VRFY_CASH(T,S,s,C,U,O,t,R,D,A)  QString(\
-                                                "SELECT IF(`type` = %1 AND `summa` = %2 /*AND `summa_str` = '%3'*/ AND IFNULL(`client`,'NULL') = %4 AND `user` = %5 AND `office` = %6 /*AND `notes` = '%7'*/ AND IFNULL(`repair`,'NULL') = %8 AND IFNULL(`document`,'NULL') = %9 AND `payment_system` = %10, 21930, 0)\n"\
+                                                "SELECT IF(`type` = %1 AND `summa` = %2 /*AND `summa_str` = '%3'*/ AND IFNULL(`client`,'NULL') = %4 AND `user` = %5 AND `office` = %6 /*AND `notes` = '%7'*/ AND IFNULL(`repair`,'NULL') = IFNULL(%8,'NULL') AND IFNULL(`document`,'NULL') = IFNULL(%9,'NULL') AND `payment_system` = %10, 21930, 0)\n"\
                                                 "FROM `cash_orders`\n"\
                                                 "WHERE `id` = LAST_INSERT_ID();")\
                                                 .arg(T)\
@@ -700,387 +766,73 @@
 // для интерактивного обновления цен уже добавленных в список товаров используется prepaired statement
 #define QUERY_SEL_STORE_ITEMS_ITEM_PRICE(column)    QString("SELECT %1 FROM store_items WHERE `id` = :id;").arg(column)
 
-// резерв:
-#define QUERY_SEL_PRE_UPD_STORE_ITEMS2(qty, id)  QString(\
-                                                        "SELECT\n"\
-                                                        "  t1.`count`,\n"\
-                                                        "  t1.`count` AS 'count_',\n"\
-                                                        "  t1.`sold`,\n"\
-                                                        "  t1.`sold` AS 'sold_',\n"\
-                                                        "  t1.`reserved`,\n"\
-                                                        "  t1.`reserved` + %1 AS 'reserved_'\n"\
-                                                        "FROM\n"\
-                                                        "  `store_items` AS t1\n"\
+#define QUERY_UPD_STORE_ITEMS_RESERVE(qty, id)     QString(\
+                                                        "UPDATE\n"\
+                                                        "  `store_items`\n"\
+                                                        "SET\n"\
+                                                        "  `reserved`=`reserved` + %1,\n"\
+                                                        "  `updated`=UTC_TIMESTAMP()\n"\
                                                         "WHERE\n"\
-                                                        "  t1.`id` = %2;")\
+                                                        "  `id` = %2;")\
                                                         .arg((qty))\
                                                         .arg((id))
 
-#define QUERY_UPD_STORE_ITEMS2(qty, id)     QString(\
+#define QUERY_UPD_STORE_ITEMS_SALE(qty, id)     QString(\
                                                         "UPDATE\n"\
-                                                        "  `store_items` AS t1\n"\
+                                                        "  `store_items`\n"\
                                                         "SET\n"\
-                                                        "  t1.`reserved`=t1.`reserved` + %1,\n"\
-                                                        "  t1.`updated`=UTC_TIMESTAMP()\n"\
+                                                        "  `count`=`count` - %1,\n"\
+                                                        "  `sold`=`sold` + %1,\n"\
+                                                        "  `updated`=UTC_TIMESTAMP()\n"\
                                                         "WHERE\n"\
-                                                        "  t1.`id` = %2;")\
+                                                        "  `id` = %2;")\
                                                         .arg((qty))\
                                                         .arg((id))
 
-#define QUERY_SEL_PST_UPD_STORE_ITEMS2(doc, item)  QString("#Верификация чисел в столбцах store_sales.count, store_items.count, store_items.sold и store_items.reserved после записи (одним запросом)\n"\
-                                                        "SELECT\n"\
-                                                        "  t2.`count`,\n"\
-                                                        "  t2.`count` AS 'count_',\n"\
-                                                        "  t2.`sold`,\n"\
-                                                        "  t2.`sold` AS 'sold_',\n"\
-                                                        "  t2.`reserved` - t1.`count` AS 'reserved',\n"\
-                                                        "  t2.`reserved` AS 'reserved_'\n"\
-                                                        "FROM `store_sales` AS t1\n"\
-                                                        "LEFT JOIN `store_items` AS t2\n"\
-                                                        "  ON t1.`item_id` = t2.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`document_id` = %1\n"\
-                                                        "  AND t1.`item_id` = %2;")\
-                                                        .arg((doc))\
-                                                        .arg((item))
-// продажа (простая):
-#define QUERY_SEL_PRE_UPD_STORE_ITEMS3(qty, id)  QString(\
-                                                        "SELECT\n"\
-                                                        "  t1.`count`,\n"\
-                                                        "  t1.`count` - %1 AS 'count_',\n"\
-                                                        "  t1.`sold`,\n"\
-                                                        "  t1.`sold` + %1 AS 'sold_',\n"\
-                                                        "  t1.`reserved`,\n"\
-                                                        "  t1.`reserved` AS 'reserved_'\n"\
-                                                        "FROM\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`id` = %2;")\
-                                                        .arg((qty)).arg((id))
-
-#define QUERY_UPD_STORE_ITEMS3(qty, id)     QString(\
+#define QUERY_UPD_STORE_ITEMS_SALE_RESERVED(item, new_qty, old_qty)     QString(\
                                                         "UPDATE\n"\
-                                                        "  `store_items` AS t1\n"\
+                                                        "  `store_items`\n"\
                                                         "SET\n"\
-                                                        "  t1.`count`=t1.`count` - %1,\n"\
-                                                        "  t1.`sold`=t1.`sold` + %1,\n"\
-                                                        "  t1.`updated`=UTC_TIMESTAMP()\n"\
+                                                        "  `count` = `count` - %2,\n"\
+                                                        "  `sold` = `sold` + %2,\n"\
+                                                        "  `reserved` = `reserved` - %3,\n"\
+                                                        "  `updated` = UTC_TIMESTAMP()\n"\
                                                         "WHERE\n"\
-                                                        "  t1.`id` = %2;")\
-                                                        .arg((qty)).arg((id))
-
-#define QUERY_SEL_PST_UPD_STORE_ITEMS3(doc, item)  QString(\
-                                                        "SELECT\n"\
-                                                        "  t2.`count` + t1.`count` AS 'count',\n"\
-                                                        "  t2.`count` AS 'count_',\n"\
-                                                        "  t2.`sold` - t1.`count` AS 'sold',\n"\
-                                                        "  t2.`sold` AS 'sold_',\n"\
-                                                        "  t2.`reserved`,"\
-                                                        "  t2.`reserved` AS 'reserved_'\n"\
-                                                        "FROM\n"\
-                                                        "  `store_sales` AS t1\n"\
-                                                        "LEFT JOIN `store_items` AS t2\n"\
-                                                        "  ON t1.`item_id` = t2.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`document_id` = %1\n"\
-                                                        "  AND t1.`item_id` = %2;")\
-                                                        .arg((doc)).arg((item))
-
-// продажа (ранее зарезервированные товары):
-#define QUERY_SEL_PRE_UPD_STORE_ITEMS4(qty, id)  QString(\
-                                                        "SELECT\n"\
-                                                        "  t1.`count`,\n"\
-                                                        "  t1.`count` - %2 AS 'count_',\n"\
-                                                        "  t1.`sold`,\n"\
-                                                        "  t1.`sold` + %2 AS 'sold_',\n"\
-                                                        "  t1.`reserved` - t2.`count` AS 'reserved_',\n"\
-                                                        "  t1.`reserved` - t2.`count` + %2 AS 'reserved'\n"\
-                                                        "FROM\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN `store_sales` AS t2\n"\
-                                                        "  ON t2.`item_id` = t1.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t2.`id` = %1\n"\
-                                                        "  AND t2.`is_cancellation` = 0;")\
-                                                        .arg((id)).arg((qty))
-
-#define QUERY_UPD_STORE_ITEMS4(new_qty, id)     QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN `store_sales` AS t2\n"\
-                                                        "  ON t2.`item_id` = t1.`id`\n"\
-                                                        "SET\n"\
-                                                        "  t1.`reserved` = t1.`reserved` - t2.`count` + %1,\n"\
-                                                        "  t1.`updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  t2.`id` = %2\n"\
-                                                        "  AND t2.`is_cancellation` = 0;\n")\
+                                                        "  `id` = %1;\n")\
+                                                        .arg((item))\
                                                         .arg((new_qty))\
-                                                        .arg((id))
+                                                        .arg((old_qty))
 
-#define QUERY_UPD_STORE_ITEMS4_1(new_qty, id)     QString(\
+#define QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(item, qty)  QString(\
                                                         "UPDATE\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN `store_sales` AS t2\n"\
-                                                        "  ON t2.`item_id` = t1.`id`\n"\
+                                                        "  `store_items`\n"\
                                                         "SET\n"\
-                                                        "  t1.`count`=t1.`count` - %1,\n"\
-                                                        "  t1.`sold`=t1.`sold` + %1,\n"\
-                                                        "  t1.`reserved` = t1.`reserved` - t2.`count`,\n"\
-                                                        "  t1.`updated`=UTC_TIMESTAMP()\n"\
+                                                        "  `reserved` = `reserved` - %2,\n"\
+                                                        "  `updated`=UTC_TIMESTAMP()\n"\
                                                         "WHERE\n"\
-                                                        "  t2.`id` = %2\n"\
-                                                        "  AND t2.`is_cancellation` = 0;\n")\
-                                                        .arg((new_qty))\
-                                                        .arg((id))
+                                                        "  `id` = %1;\n")\
+                                                        .arg((item))\
+                                                        .arg((qty))
 
-#define QUERY_SEL_PST_UPD_STORE_ITEMS4(id)  QString(\
-                                                        "SELECT\n"\
-                                                        "  t2.`count` + t1.`count` AS 'count',\n"\
-                                                        "  t2.`count` AS 'count_',\n"\
-                                                        "  t2.`sold` - t1.`count` AS 'sold',\n"\
-                                                        "  t2.`sold` AS 'sold_',\n"\
-                                                        "  t2.`reserved` AS 'reserved_',\n"\
-                                                        "  t2.`reserved` + t1.`count` AS 'reserved'\n"\
-                                                        "FROM\n"\
-                                                        "  `store_sales` AS t1\n"\
-                                                        "LEFT JOIN `store_items` AS t2\n"\
-                                                        "  ON t1.`item_id` = t2.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`id` = %1\n"\
-                                                        "  AND t1.`is_cancellation` = 0;")\
-                                                        .arg((id))
-
-// отмена резерва (в т. ч. частичная, перед проведением накладной)
-#define QUERY_UPD_STORE_SALES_RESERVE_CANCELLATION(doc, items_list)  QString(\
+#define QUERY_UPD_STORE_ITEMS_UNSALE(item, qty)  QString(\
                                                         "UPDATE\n"\
-                                                        "  `store_sales`\n"\
+                                                        "  `store_items`\n"\
                                                         "SET\n"\
-                                                        "  `count` = 0,\n"\
-                                                        "  `is_cancellation` = 1,\n"\
-                                                        "  `cancellation_reason` = 'снятие резерва'\n"\
+                                                        "  `count` = `count` + %2,\n"\
+                                                        "  `sold` = `sold` - %2,\n"\
+                                                        "  `updated`=UTC_TIMESTAMP()\n"\
                                                         "WHERE\n"\
-                                                        "  `document_id` = %1\n"\
-                                                        "  AND `id` IN (%2);\n")\
-                                                        .arg((doc))\
-                                                        .arg((items_list))
+                                                        "  `id` = %1;\n")\
+                                                        .arg((item))\
+                                                        .arg((qty))
 
-#define QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(doc, items_list)  QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN `store_sales` AS t2\n"\
-                                                        "  ON t2.`item_id` = t1.`id`\n"\
-                                                        "SET\n"\
-                                                        "  t1.`reserved` = t1.`reserved` - t2.`count`,\n"\
-                                                        "  t1.`updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  t2.`document_id` = %1\n"\
-                                                        "  #AND t2.`is_cancellation` = 1\n"\
-                                                        "  AND t2.`id` IN (%2);\n")\
-                                                        .arg((doc))\
-                                                        .arg((items_list))
-
-#define QUERY_SEL_PRE_UPD_STORE_ITEMS5(doc)  QString(\
-                                                        "SELECT\n"\
-                                                        "  t2.`reserved` - t1.`count` AS 'reserved'\n"\
-                                                        "FROM `store_sales` AS t1\n"\
-                                                        "LEFT JOIN `store_items` AS t2\n"\
-                                                        "  ON t1.`item_id` = t2.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`document_id` = %1;")\
-                                                        .arg((doc))
-
-#define QUERY_SEL_PST_UPD_STORE_ITEMS5(doc)  QString("#Верификация чисел в столбцах store_sales.count, store_items.count, store_items.sold и store_items.reserved после записи (одним запросом)\n"\
-                                                        "SELECT\n"\
-                                                        "  t2.`reserved`\n"\
-                                                        "FROM `store_sales` AS t1\n"\
-                                                        "LEFT JOIN `store_items` AS t2\n"\
-                                                        "  ON t1.`item_id` = t2.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`document_id` = %1;")\
-                                                        .arg((doc))
-
-// Возврат товара
-#define QUERY_UPD_STORE_ITEMS_UNSALE(doc, items_list)  QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN `store_sales` AS t2\n"\
-                                                        "  ON t2.`item_id` = t1.`id`\n"\
-                                                        "SET\n"\
-                                                        "  t1.`count` = t1.`count` + t2.`count`,\n"\
-                                                        "  t1.`sold` = t1.`sold` - t2.`count`,\n"\
-                                                        "  t1.`updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  t2.`document_id` = %1\n"\
-                                                        "  #AND t2.`is_cancellation` = 1\n"\
-                                                        "  AND t2.`id` IN (%2);\n")\
-                                                        .arg((doc))\
-                                                        .arg((items_list))
-
-#define QUERY_UPD_STORE_SALES_UNSALE(doc, items_list)  QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_sales`\n"\
-                                                        "SET\n"\
-                                                        "  `count` = 0,\n"\
-                                                        "  `is_cancellation` = 1,\n"\
-                                                        "  `cancellation_reason` = 'Возврат товара'\n"\
-                                                        "WHERE\n"\
-                                                        "  `document_id` = %1\n"\
-                                                        "  AND `id` IN (%2);\n")\
-                                                        .arg((doc))\
-                                                        .arg((items_list))
-
-#define QUERY_SEL_PRE_UPD_STORE_ITEMS6(doc, items_list)  QString(\
-                                                        "SELECT\n"\
-                                                        "  t2.`count` + t1.`count` AS 'count',\n"\
-                                                        "  t2.`sold` - t1.`count` AS 'sold'\n"\
-                                                        "FROM `store_sales` AS t1\n"\
-                                                        "LEFT JOIN `store_items` AS t2\n"\
-                                                        "  ON t1.`item_id` = t2.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`document_id` = %1\n"\
-                                                        "  AND t1.`id` IN (%2);")\
-                                                        .arg((doc))\
-                                                        .arg((items_list))
-
-#define QUERY_SEL_PST_UPD_STORE_ITEMS6(doc, items_list)  QString("#Верификация чисел в столбцах store_sales.count, store_items.count, store_items.sold и store_items.reserved после записи (одним запросом)\n"\
-                                                        "SELECT\n"\
-                                                        "  t2.`count`,\n"\
-                                                        "  t2.`sold`\n"\
-                                                        "FROM `store_sales` AS t1\n"\
-                                                        "LEFT JOIN `store_items` AS t2\n"\
-                                                        "  ON t1.`item_id` = t2.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t1.`document_id` = %1\n"\
-                                                        "  AND t1.`id` IN (%2);")\
-                                                        .arg((doc))\
-                                                        .arg((items_list))
 
 #define QUERY_INS_LOG_PARTS_IN_REPAIR(U,O,C,R) QString("INSERT INTO `logs`(`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`) SELECT \n"\
                                                     "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, %3, `repair_id`, `item_id`, NULL, NULL, NULL, CONCAT('Товар установленный в ремонт №', `repair_id`, ' продан. Ремонт выдан') FROM `store_int_reserve` WHERE `repair_id` = %4;").arg((U)).arg((O)).arg((C)).arg((R))
 
-#define QUERY_SEL_PART_FOR_SALE(uid, price_field_name)   QString(\
-                                                        "SELECT\n"\
-                                                        "  0 AS 'id',\n"\
-                                                        "  CONCAT(LPAD(t1.articul, 6, '0'), '-', LPAD(t1.id, 6, '0')) AS 'UID',\n"\
-                                                        "  t1.`name`,\n"\
-                                                        "  1 AS 'count',\n"\
-                                                        "  t1.`count` - t1.`reserved` AS 'avail',\n"\
-                                                        "  t1.%2 AS 'price',\n"\
-                                                        "  t1.%2 AS 'summ',\n"\
-                                                        "  t1.`box`,\n"\
-                                                        "  t1.`SN` AS 'sn',\n"\
-                                                        "  t1.`warranty`,\n"\
-                                                        "  t1.`is_realization`,\n"\
-                                                        "  t1.`return_percent`,\n"\
-                                                        "  0 AS 'is_cancellation',\n"\
-                                                        "  NULL AS 'cancellation_reason',\n"\
-                                                        "  t1.`id` AS 'item_id',\n"\
-                                                        "  t1.`in_price`,\n"\
-                                                        "  t1.`dealer`\n"\
-                                                        "FROM\n"\
-                                                        "  store_items AS t1\n"\
-                                                        "WHERE\n"\
-                                                        "  `id` IN (%1);").arg(uid).arg((price_field_name))
-
-#define QUERY_INS_LOG_PARTS_IN_DOC(U,O,D,t)   QString("INSERT INTO `logs`(`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`) SELECT \n"\
-                                                    "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, NULL, NULL, `item_id`, %3, NULL, NULL, %4 FROM `store_sales` WHERE `document_id` = %3;").arg((U)).arg((O)).arg((D)).arg((t))
-
-#define QUERY_INS_LOG_PARTS_IN_DOC_RSRV(U,O,D,t,ic)   QString("INSERT INTO `logs`(`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`) SELECT \n"\
-                                                    "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, NULL, NULL, `item_id`, %3, NULL, NULL, %4 FROM `store_sales` WHERE `document_id` = %3 AND `is_cancellation` = %5;").arg((U)).arg((O)).arg((D)).arg((t)).arg((ic))
-
-#define QUERY_INS_LOG_PARTS_IN_DOC_RET(U,O,D,t,items_list)   QString("INSERT INTO `logs`(`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`) SELECT \n"\
-                                                    "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, NULL, NULL, `item_id`, %3, NULL, NULL, %4 FROM `store_sales` WHERE `document_id` = %3 AND `id` IN (%5);").arg((U)).arg((O)).arg((D)).arg((t)).arg((items_list))
-
-#define QUERY_UPD_CLIENT_PURCHASES(id, num)      QString("UPDATE `clients` SET `purchases`=`purchases`+%2 WHERE `id` = %1;").arg((id)).arg((num))
+#define QUERY_UPD_CLIENT_PURCHASES(id, num)      QString("UPDATE `clients` SET `purchases`=`purchases`+(%2) WHERE `id` = %1;").arg((id)).arg((num))
 #define QUERY_UPD_CLIENT_REPAIRS(id)      QString("UPDATE `clients` SET `repairs`=`repairs`+1 WHERE `id` = %1;").arg((id))
 
-#define QUERY_UPD_SALE_DOC_TYPE_N_STATE(id, new_type, new_state)  QString("UPDATE `docs` SET `type` = %2, `state`=%3 WHERE `id` = %1;").arg((id)).arg((new_type)).arg((new_state))
-
-#define QUERY_UPD_SALE_DOC_STATE_N_SUMM(doc, new_state, new_summ)  QString("UPDATE `docs` SET `state`=%2, `total`=%3 WHERE `id` = %1;").arg((doc)).arg((new_state)).arg((new_summ))
-
-#define QUERY_UPD_SALE_DOC_TYPE_STATE_SUMM(id, new_type, new_state, new_summ)  QString("UPDATE `docs` SET `type` = %2, `state`=%3, `total`=%4 WHERE `id` = %1;").arg((id)).arg((new_type)).arg((new_state)).arg((new_summ))
-
-#define QUERY_UPD_SALE_DOC(doc,\
-                   type, state, acc, summ, notes,\
-                    upd, reason, track)  QString(\
-                                                        "UPDATE\n"\
-                                                        "  `docs`\n"\
-                                                        "SET\n"\
-                                                        "  `type` = %2,\n"\
-                                                        "  `state` = %3,\n"\
-                                                        "  `payment_system` = %4,\n"\
-                                                        "  `total` = %5,\n"\
-                                                        "  `notes` = %6,\n"\
-                                                        "  `updated_at` = %7,\n"\
-                                                        "  `reason` = %8,\n"\
-                                                        "  `track` = %9\n"\
-                                                        "WHERE\n"\
-                                                        "  `id` = %1;")\
-                                                        .arg((doc))\
-                                                        .arg((type))\
-                                                        .arg((state))\
-                                                        .arg((acc))\
-                                                        .arg((summ))\
-                                                        .arg((notes))\
-                                                        .arg((upd))\
-                                                        .arg((reason))\
-                                                        .arg((track))
-
-#define QUERY_INS_DOCS(type, state, real,\
-    acc, comp, store, U, sum, t, O, C,\
-    cur, t2, p_opt, rsrv)       QString("INSERT INTO `docs`(`type`, `state`, `is_realization`, `payment_system`, `company`, `store`, `user`, `total`, `notes`, `office`, `dealer`, `currency_rate`, `reason`, `price_option`, `reserve_days`, `created`, `updated_at`, `order_id`, `return_percent`, `master_id`, `repair_id`, `works_included`, `invoice`, `track`, `d_store`, `d_pay`) VALUES (\n"\
-                                                    "%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15, UTC_TIMESTAMP(), NULL, NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, 0);")\
-                                                    .arg((type))\
-                                                    .arg((state))\
-                                                    .arg((real))\
-                                                    .arg((acc))\
-                                                    .arg((comp))\
-                                                    .arg((store))\
-                                                    .arg((U))\
-                                                    .arg((sum))\
-                                                    .arg((t))\
-                                                    .arg((O))\
-                                                    .arg((C))\
-                                                    .arg((cur))\
-                                                    .arg((t2))\
-                                                    .arg((p_opt))\
-                                                    .arg((rsrv))
-
-#define QUERY_INS_STORE_SALES(dealer, item, doc,\
-    buyer, qty, in_price, price, warranty, is_realiz,\
-    ret_percent, user, sn)      QString("INSERT INTO `store_sales`(`dealer`, `item_id`, `document_id`, `customer_id`, `count`, `in_price`, `price`, `warranty`, `realizator_payed`, `is_realization`, `dealer_payment`, `return_percent`, `user`, `is_cancellation`, `cancellation_reason`, `sn`, `d_category`) VALUES (\n"\
-                                    "%1, %2, %3, %4, %5, %6, %7, %8, 0, %9, NULL, %10, %11, 0, NULL, '%12', NULL);")\
-                                                    .arg((dealer))\
-                                                    .arg((item))\
-                                                    .arg((doc))\
-                                                    .arg((buyer))\
-                                                    .arg((qty))\
-                                                    .arg((in_price))\
-                                                    .arg((price))\
-                                                    .arg((warranty))\
-                                                    .arg((is_realiz))\
-                                                    .arg((ret_percent))\
-                                                    .arg((user))\
-                                                    .arg((sn))
-
-#define QUERY_UPD_STORE_SALES(id, buyer, qty,\
-    price, warranty, user, is_cancel,\
-    cancel_reason, sn)          QString("UPDATE `store_sales` SET `customer_id` = %2, `count` = %3, `price` = %4, `warranty` = %5,"\
-                                    "`user` = %6, `is_cancellation` = %7, `cancellation_reason` = %8, `sn` = '%9' WHERE `id` = %1;")\
-                                                    .arg((id))\
-                                                    .arg((buyer))\
-                                                    .arg((qty))\
-                                                    .arg((price))\
-                                                    .arg((warranty))\
-                                                    .arg((user))\
-                                                    .arg((is_cancel))\
-                                                    .arg((cancel_reason))\
-                                                    .arg((sn))
-
-#define QUERY_UPD_SALE_DOC_SET_TRACK(id, track)    QString("UPDATE `docs` SET `track` = '%2' WHERE `id` = %1;")\
-                                                    .arg((id))\
-                                                    .arg((track))
 #define QUERY_INS_SCHEMAVERSIONS(scriptName)       QString("INSERT INTO `schemaversions` (ScriptName, Applied) VALUES ('%1',UTC_TIMESTAMP());").arg(scriptName)
 #define QUERY_UPD_APP_VER(appVer)                  QString("UPDATE `config` SET `version_snap`='%1' WHERE `id`=1;").arg(appVer)
 
