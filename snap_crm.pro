@@ -65,6 +65,7 @@ SOURCES += \
     tabsale.cpp \
     widgets/getoutdialog.cpp \
     widgets/saletableitemdelegates.cpp \
+    widgets/sclientmatch.cpp \
     widgets/scombobox.cpp \
     widgets/sgroupboxeventfilter.cpp \
     widgets/shortlivednotification.cpp \
@@ -108,6 +109,7 @@ HEADERS  += \
     tabsale.h \
     widgets/getoutdialog.h \
     widgets/saletableitemdelegates.h \
+    widgets/sclientmatch.h \
     widgets/scombobox.h \
     widgets/sgroupboxeventfilter.h \
     widgets/shortlivednotification.h \
@@ -129,7 +131,8 @@ FORMS += \
     tabrepairnew.ui \
     tabrepairs.ui \
     tabsale.ui \
-    widgets/getoutdialog.ui
+    widgets/getoutdialog.ui \
+    widgets/sclientmatch.ui
 
 RESOURCES += styles/styles.qrc
 
@@ -226,6 +229,9 @@ SHARED_FILES += tabsalesettingsmenu.h
 SHARED_FILES += tabsalesettingsmenu.ui
 SHARED_FILES += sgroupboxeventfilter.cpp
 SHARED_FILES += sgroupboxeventfilter.h
+SHARED_FILES += sclientmatch.cpp
+SHARED_FILES += sclientmatch.h
+SHARED_FILES += sclientmatch.ui
 for(FILE,SHARED_FILES){
     QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
     QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)

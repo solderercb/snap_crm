@@ -29,7 +29,6 @@
 #include "models/sclientmodel.h"
 #include "models/sphonemodel.h"
 #include "widgets/saletableitemdelegates.h"
-#include "widgets/sgroupboxeventfilter.h"
 #include "widgets/tabsalesettingsmenu.h"
 #include "widgets/shortlivednotification.h"
 #ifdef QT_DEBUG
@@ -85,8 +84,6 @@ private:
     SClientModel *clientModel;
     float total_sum, takein_sum, charge_sum;
     void eventResize(QResizeEvent *);
-    QSqlQueryModel* clientsMatchTable;
-    SGroupBoxEventFilter *groupBoxEventFilter;
     QSqlQueryModel* clientPhonesModel;
     int client = 0;
     int price_col = 2;
@@ -127,13 +124,13 @@ private slots:
     void fillClientCreds(int);
     void comboBoxIndexChanged(int);
     void updateTotalSumms(float);
-    void findMatchingClient(QString);
+    void findClientByLastname(QString);
+    void findClientByPhone(QString);
     void buttonSelectExistingClientHandler();
     void buttonCreateTabClientHandler();
     void tableRowDoubleClick(QModelIndex);
     void hideGroupBoxClient(bool);
     void selectPriceCol(int);
-    void clientMatchTableDoubleClicked(QModelIndex);
     void addItemByUID();
     bool unSale();
     void saleButtonClicked();

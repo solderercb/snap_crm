@@ -11,7 +11,6 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     doc_id(doc)
 {
     ui->setupUi(this);
-    clientsMatchTable = new QSqlQueryModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
     docModel = new SDocumentModel();
     tableModel = new SaleTableModel(this);
     newItemModel = new QSqlQueryModel(this);
@@ -29,8 +28,6 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->buttonParams->addAction(widgetAction);
     widgetAction->setParamsModel(params);
 
-    groupBoxEventFilter = new SGroupBoxEventFilter(this);
-    ui->groupBoxClientCoincidence->installEventFilter(groupBoxEventFilter);
     ui->comboBoxPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxMoneyBackAccount->setModel(paymentSystemsModel);
     ui->comboBoxPriceCol->setModel(priceColModel);
@@ -42,6 +39,8 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->spinBoxReserve->setMinimum(1);
     ui->lineEditTrack->setButtons("Apply");
+    ui->widgetClientMatch->hide();
+    connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
 
     query->exec(QUERY_BEGIN);
     QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
@@ -81,10 +80,8 @@ tabSale::~tabSale()
 {
     delete ui;
     p_instance.remove(doc_id);   // Обязательно блять!
-    delete groupBoxEventFilter;
     delete params;
     delete widgetAction;
-    delete clientsMatchTable;
     delete tableModel;
     delete newItemModel;
     delete itemDelagates;
@@ -159,7 +156,6 @@ void tabSale::updateWidgets()
         ui->spinBoxReserve->setValue(docModel->reserveDays());
         ui->spinBoxReserve->setReadOnly(true);
         ui->lineEditTrack->setText(docModel->trackingNumber());
-        ui->groupBoxClientCoincidence->hide();
         ui->buttonLog->show();
         ui->buttonReserve->hide();   // не допускается повтоное нажатие "Резерв"
         if(client)
@@ -274,7 +270,6 @@ void tabSale::updateWidgets()
         ui->labelTrack->setText("");
         ui->textEditRevertReason->setText("");
         ui->lineEditTrack->hide();
-        ui->groupBoxClientCoincidence->hide();
         ui->labelReserve->show();
         ui->spinBoxReserve->show();
         ui->labelReserveProgress->hide();
@@ -306,6 +301,7 @@ void tabSale::updateWidgets()
         test_scheduler->start(200);
 #endif
     }
+    ui->widgetClientMatch->hide();
 }
 
 bool tabSale::checkInput()
@@ -338,7 +334,7 @@ bool tabSale::checkInput()
             ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
             error = 4;
         }
-        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool())   // если не указан телефон и он обязятелен
+        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool() && clientModel->isClear())   // если не указан телефон и он обязятелен
         {
             ui->lineEditClientPhone->setStyleSheet(commonLineEditStyleSheetRed);
             error = 5;
@@ -467,49 +463,14 @@ void tabSale::updateTotalSumms(float amount)
         ui->lineEditCharge->setText(sysLocale.toString(0.00, 'f', 2));
 }
 
-void tabSale::findMatchingClient(QString)
+void tabSale::findClientByLastname(QString text)
 {
-    QString lineEditClientPhoneDisplayText = ui->lineEditClientPhone->displayText();  // отображаемый текст
-    QString currentPhoneInputMask = clientPhoneTypesModel->index(ui->comboBoxClientPhoneType->currentIndex(), 2).data().toString().replace(QRegularExpression("[09]"), "_");   // в маске телефона меняем 0 и 9 на подчеркивание; 0 и 9 — это специальные маскировочные символы (см. справку QLineEdit, inputMask)
-    QString enteredByUserDigits;    // строка символов, которые ввёл пользователь (т. е. текст отображаемый в lineEdit над которым выполнена операция т. н. XOR с заданной маской
-    QStringList query_where;    // список условий для запроса к БД
-    QString query;  // весь запрос к БД
-    int i;
+    ui->widgetClientMatch->findByLastname(text);
+}
 
-    for (i = 0; i < currentPhoneInputMask.length(); i++ )  // определяем какие символы ввёл пользователь
-    {
-        if(currentPhoneInputMask.at(i) != lineEditClientPhoneDisplayText.at(i))
-            enteredByUserDigits.append(lineEditClientPhoneDisplayText.at(i));
-    }
-    if(ui->lineEditClientLastName->text().length() >= 3 || enteredByUserDigits.length() >= 3 )  // если пользователь ввёл более двух символов в одно из полей
-    {
-        query_where.clear();
-        if (ui->lineEditClientLastName->text().length() >= 3 )
-            query_where << QString("LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1')").arg(ui->lineEditClientLastName->text());   // условие поиска по фамилии, имени и отчеству
-        if (enteredByUserDigits.length() >= 3 )
-            query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(lineEditClientPhoneDisplayText, enteredByUserDigits);   // условие поиска по телефонному номеру
-
-        ui->tableViewClientMatch->setModel(clientsMatchTable);  // указываем модель таблицы
-        query = QUERY_SEL_CLIENT_MATCH.arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
-        clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
-
-        // изменяем размер столбцов под соедржимое.
-        // TODO: нужно бы создать свой класс с наследованием QTableView, реализовать в нём пропорциональное изменение ширин столбцов
-        // при изменении размера окна и тултип для длинного текста (несколько телефонов в одной ячейке). Этот класс использовать везде
-        ui->tableViewClientMatch->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        if (clientsMatchTable->rowCount() > 0)
-        {
-            ui->groupBoxClientCoincidence->show();  // только если возвращены результаты, показываем таблицу совпадения клиента
-            ui->tableViewClientMatch->show();       // может случиться ситуация, когда таблица будет скрыта, поэтому принудительно отображаем её
-        }
-        else
-            ui->groupBoxClientCoincidence->hide();  // иначе прячем таблицу
-    }
-    else
-    {
-        clientsMatchTable->clear(); // если кол-во введённых пользователем символов меньше трёх, то удаляем результаты предыдущего запроса и прячем таблицу.
-        ui->groupBoxClientCoincidence->hide();
-    }
+void tabSale::findClientByPhone(QString)
+{
+    ui->widgetClientMatch->findByPhone(ui->lineEditClientPhone->displayText());
 }
 
 void tabSale::clearClientCreds(bool hideCoincidence)
@@ -538,7 +499,7 @@ void tabSale::clearClientCreds(bool hideCoincidence)
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->checkBoxSaleInCredit->setChecked(false);
     if (hideCoincidence)
-        ui->groupBoxClientCoincidence->hide();
+        ui->widgetClientMatch->hide();
 }
 
 void tabSale::fillClientCreds(int id)
@@ -624,12 +585,6 @@ void tabSale::selectPriceCol(int comboBoxIndex)
     query->prepare(QUERY_SEL_STORE_ITEMS_ITEM_PRICE(priceColModel->index(comboBoxIndex, 2).data().toString()));
     tableModel->setPriceColumn(query);
     delete query;
-}
-
-void tabSale::clientMatchTableDoubleClicked(QModelIndex index)
-{
-    fillClientCreds(clientsMatchTable->index(index.row(), 0).data().toInt());
-    ui->tableViewClientMatch->hide();   // прячем таблицу, а не весь groupBox (вдруг пользователь промахнётся)
 }
 
 void tabSale::addItemByUID()
@@ -926,6 +881,7 @@ bool tabSale::sale()
         p_instance.remove(initial_doc_id);   // Если всё ОК, то нужно заменить указатель
         p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
 
+        emit updateLabel(this, tr("Расходная накладная %1").arg(doc_id));
         print();
         return false;
     }
@@ -1003,6 +959,7 @@ void tabSale::phoneTypeChanged(int index)
 {
     ui->lineEditClientPhone->setInputMask("");
     ui->lineEditClientPhone->setInputMask(clientPhoneTypesModel->index(index, 2).data().toString() + ";_");  // Here ";_" for filling blank characters with underscore
+    ui->widgetClientMatch->setPhoneMask(index);
 }
 
 void tabSale::setTrackNum()     // слот вызываемый по нажатию Return

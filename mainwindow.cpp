@@ -584,6 +584,7 @@ void MainWindow::createTabSale(int doc_id)
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int, QWidget *)), this, SLOT(createTabClients(int, QWidget *)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString, QVariant>)), this, SLOT(createTabPrint(QMap<QString, QVariant>)));
+    QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*, QString)), this, SLOT(updateTabLabel(QWidget*, const QString&)));
     // TODO: QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
 }
 
@@ -647,6 +648,11 @@ void MainWindow::closeTab(int index)
         }
     }
     delete w;
+}
+
+void MainWindow::updateTabLabel(QWidget *w, const QString &label)
+{
+    ui->tabWidget->setTabText(ui->tabWidget->indexOf(w), label);
 }
 
 #ifdef QT_DEBUG

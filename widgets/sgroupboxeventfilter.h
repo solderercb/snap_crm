@@ -14,6 +14,9 @@
 class SGroupBoxEventFilter : public QObject
 {
     Q_OBJECT
+signals:
+    void toggleElementsVisibility();
+
 public:
     explicit SGroupBoxEventFilter(QObject *);
 

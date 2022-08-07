@@ -9,6 +9,10 @@ class tabCommon : public QWidget
 {
     Q_OBJECT
 
+signals:
+    void updateLabel(QWidget*, QString);
+    void updateIcon(QWidget*, QIcon);
+
 public:
     explicit tabCommon(MainWindow *p = nullptr);
     ~tabCommon();
