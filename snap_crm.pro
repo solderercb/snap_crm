@@ -54,8 +54,10 @@ SOURCES += \
     models/sdocumentmodel.cpp \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
+    models/sphonesmodel.cpp \
     models/ssaleitemmodel.cpp \
     querylog.cpp \
+    tabcashoperation.cpp \
     tabclients.cpp \
     tabcommon.cpp \
     tabprintdialog.cpp \
@@ -70,6 +72,8 @@ SOURCES += \
     widgets/sgroupboxeventfilter.cpp \
     widgets/shortlivednotification.cpp \
     widgets/slineedit.cpp \
+    widgets/sphone.cpp \
+    widgets/sphones.cpp \
     widgets/ssetcombobox.cpp \
     windowsdispatcher.cpp
 
@@ -97,9 +101,11 @@ HEADERS  += \
     models/sdocumentmodel.h \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
+    models/sphonesmodel.h \
     models/ssaleitemmodel.h \
     querylog.h \
     stable.h \
+    tabcashoperation.h \
     tabclients.h \
     tabcommon.h \
     tabprintdialog.h \
@@ -114,6 +120,8 @@ HEADERS  += \
     widgets/sgroupboxeventfilter.h \
     widgets/shortlivednotification.h \
     widgets/slineedit.h \
+    widgets/sphone.h \
+    widgets/sphones.h \
     widgets/ssetcombobox.h \
     windowsdispatcher.h
 
@@ -125,6 +133,7 @@ FORMS += \
     models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
+    tabcashoperation.ui \
     tabclients.ui \
     tabprintdialog.ui \
     tabrepair.ui \
@@ -132,7 +141,9 @@ FORMS += \
     tabrepairs.ui \
     tabsale.ui \
     widgets/getoutdialog.ui \
-    widgets/sclientmatch.ui
+    widgets/sclientmatch.ui \
+    widgets/sphone.ui \
+    widgets/sphones.ui
 
 RESOURCES += styles/styles.qrc
 
@@ -229,6 +240,12 @@ SHARED_FILES += tabsalesettingsmenu.h
 SHARED_FILES += tabsalesettingsmenu.ui
 SHARED_FILES += sgroupboxeventfilter.cpp
 SHARED_FILES += sgroupboxeventfilter.h
+SHARED_FILES += sphones.cpp
+SHARED_FILES += sphones.h
+SHARED_FILES += sphones.ui
+SHARED_FILES += sphone.cpp
+SHARED_FILES += sphone.h
+SHARED_FILES += sphone.ui
 SHARED_FILES += sclientmatch.cpp
 SHARED_FILES += sclientmatch.h
 SHARED_FILES += sclientmatch.ui
@@ -258,6 +275,8 @@ SHARED_FILES += sdocumentmodel.cpp
 SHARED_FILES += sdocumentmodel.h
 SHARED_FILES += slogrecordmodel.cpp
 SHARED_FILES += slogrecordmodel.h
+SHARED_FILES += sphonesmodel.cpp
+SHARED_FILES += sphonesmodel.h
 SHARED_FILES += sphonemodel.cpp
 SHARED_FILES += sphonemodel.h
 SHARED_FILES += ssaleitemmodel.cpp

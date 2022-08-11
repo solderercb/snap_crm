@@ -120,11 +120,10 @@ private:
 public slots:
 
 private slots:
-    void clearClientCreds(bool);
+    void clearClientCreds(bool hideCoincidence = true);
     void fillClientCreds(int);
     void comboBoxIndexChanged(int);
     void updateTotalSumms(float);
-    void findClientByLastname(QString);
     void findClientByPhone(QString);
     void buttonSelectExistingClientHandler();
     void buttonCreateTabClientHandler();

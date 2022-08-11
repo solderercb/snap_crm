@@ -8,7 +8,8 @@ QSqlQueryModel *userDbDataModel = new QSqlQueryModel();
 QMap<QString, QVariant> *userLocalData = new QMap<QString, QVariant>;
 QMap<QString, bool> *permissions = new QMap<QString, bool>;
 QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
-SStandardItemModel *clientPhoneTypesModel = new SStandardItemModel();
+//SStandardItemModel *clientPhoneTypesModel = new SStandardItemModel();
+SSqlQueryModel *clientPhoneTypesModel = new SSqlQueryModel();
 SSqlQueryModel *companiesModel = new SSqlQueryModel;
 QSqlQueryModel *officesModel = new QSqlQueryModel;
 QSqlQueryModel *warehousesModel = new QSqlQueryModel;
@@ -143,15 +144,17 @@ void initGlobalModels()
     comSettings->insert("phone_mask1", comSettings->value("phone_mask1").toString().replace('0', '9')); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
     comSettings->insert("phone_mask2", comSettings->value("phone_mask2").toString().replace('0', '9'));
 
-    QList<QStandardItem*> *clientPhoneTypesSelector;
-    clientPhoneTypesSelector = new QList<QStandardItem*>();
-    *clientPhoneTypesSelector << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem(comSettings->value("phone_mask1").toString()); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
-    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
-    clientPhoneTypesSelector = new QList<QStandardItem*>();;
-    *clientPhoneTypesSelector << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
-    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
+
+//    QList<QStandardItem*> *clientPhoneTypesSelector;
+//    clientPhoneTypesSelector = new QList<QStandardItem*>();
+//    *clientPhoneTypesSelector << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem(comSettings->value("phone_mask1").toString()); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
+//    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
+//    clientPhoneTypesSelector = new QList<QStandardItem*>();;
+//    *clientPhoneTypesSelector << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
+//    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
+    clientPhoneTypesModel->setQuery(QUERY_SEL_PHONE_TYPES, QSqlDatabase::database("connMain"));
     clientPhoneTypesModel->setObjectName("clientPhoneTypesModel");
-    clientPhoneTypesModel->setHorizontalHeaderLabels({"name", "id", "mask"});
+//    clientPhoneTypesModel->setHorizontalHeaderLabels({"name", "id", "mask"});
 
     warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     warehousesModel->setObjectName("warehousesModel");

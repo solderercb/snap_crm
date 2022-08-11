@@ -6,6 +6,7 @@ SClientMatch::SClientMatch(QWidget *parent) :
     ui(new Ui::SClientMatch)
 {
     ui->setupUi(this);
+    this->hide();
 
     groupBoxEventFilter = new SGroupBoxEventFilter(this);
     ui->groupBoxClientMatch->installEventFilter(groupBoxEventFilter);

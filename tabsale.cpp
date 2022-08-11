@@ -35,6 +35,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->comboBoxClientPhoneType->setModel(clientPhoneTypesModel);
     ui->comboBoxClientPhoneType->setModelColumn(0);
     ui->comboBoxClientPhoneType->setCurrentIndex(0);
+    ui->widgetClientMatch->setPhoneMask(0);
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->spinBoxReserve->setMinimum(1);
@@ -65,6 +66,9 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 //    connect(ui->buttonSale, SIGNAL(clicked()), this, SLOT(saleButtonClicked()));    // подключены в дизайнере
     connect(ui->comboBoxPriceCol, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPriceCol(int)));    // нужно подключать здесь, иначе возникает глюк с доступом к QMap<> fields
     connect(tableModel, SIGNAL(amountChanged(float)), this, SLOT(updateTotalSumms(float)));
+    connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
+    connect(ui->comboBoxClientPhoneType,SIGNAL(currentIndexChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
+    connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(findClientByPhone(QString)));
 
 
 #ifdef QT_DEBUG
@@ -461,11 +465,6 @@ void tabSale::updateTotalSumms(float amount)
         ui->lineEditCharge->setText(sysLocale.toString(takeInSumm - amount, 'f', 2));
     else
         ui->lineEditCharge->setText(sysLocale.toString(0.00, 'f', 2));
-}
-
-void tabSale::findClientByLastname(QString text)
-{
-    ui->widgetClientMatch->findByLastname(text);
 }
 
 void tabSale::findClientByPhone(QString)
@@ -959,7 +958,6 @@ void tabSale::phoneTypeChanged(int index)
 {
     ui->lineEditClientPhone->setInputMask("");
     ui->lineEditClientPhone->setInputMask(clientPhoneTypesModel->index(index, 2).data().toString() + ";_");  // Here ";_" for filling blank characters with underscore
-    ui->widgetClientMatch->setPhoneMask(index);
 }
 
 void tabSale::setTrackNum()     // слот вызываемый по нажатию Return

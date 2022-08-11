@@ -5,6 +5,8 @@ SPhoneModel::SPhoneModel(QObject *parent) : SComRecord(parent)
     i_obligatoryFields << "mask" << "customer";
 
     i_logRecord->setType(SLogRecordModel::Client);
+
+    m_mask = clientPhoneTypesModel->record(0).value("id").toInt();  // тип телефона по умолчанию
 }
 
 SPhoneModel::SPhoneModel(const QSqlRecord &record, QObject *parent) : SPhoneModel(parent)
@@ -77,6 +79,7 @@ int SPhoneModel::mask()
 
 void SPhoneModel::setMask(const int index)
 {
+    m_mask = index;
     i_valuesMap.insert("mask", clientPhoneTypesModel->databaseIDByRow(index));
 }
 
@@ -88,11 +91,11 @@ int SPhoneModel::maskIndex()
     return clientPhoneTypesModel->rowByDatabaseID(mask(), "id");
 }
 
-void SPhoneModel::setType(const int type)
+int SPhoneModel::type()
 {
-    i_valuesMap.insert("type", type);
-    // Запись в журнал при изменении типа будет осуществляться в классе SPhonesModel
+    return m_type;
 }
+
 
 void SPhoneModel::setNote(const QString &note)
 {
@@ -116,6 +119,13 @@ void SPhoneModel::setMessengers(const int opt)
     // TODO: подумать над необходимостью записи в журнал
 }
 
+bool SPhoneModel::isEmpty()
+{
+    if(m_id)
+        return false;
+    return true;
+}
+
 QString SPhoneModel::cleanPhone(const QString &phone)
 {
     QString cleanPhone;
@@ -128,3 +138,36 @@ QString SPhoneModel::cleanPhone(const QString &phone)
 
     return cleanPhone;
 }
+
+void SPhoneModel::setType(const int type)
+{
+    m_type = type;
+    i_valuesMap.insert("type", type);
+
+    if(type == Primary)
+    {
+        emit markedPrimary(this);
+        i_logRecord->setText(tr("Номер %1 задан основным").arg(m_phone));
+    }
+    else
+        emit typeChanged(m_type);
+}
+
+/*  Установка основным номером через вызов метода (т. е. программно)
+ *  Можно установить номер не основным, передав false
+ */
+void SPhoneModel::setPrimary(int primary)
+{
+    setType(primary);
+    if(primary == Primary)
+        emit typeChanged(primary);   // при программной установке основным тоже нужно изменить состояние checkBox'а
+
+}
+
+/*  SLOT: Установка основным номером через UI (т. е. включение checkBox'а мышкой)
+ */
+void SPhoneModel::setPrimaryUi()
+{
+    setType(SPhoneModel::Primary);
+}
+

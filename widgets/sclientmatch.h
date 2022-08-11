@@ -20,7 +20,6 @@ signals:
 public:
     explicit SClientMatch(QWidget *parent = nullptr);
     ~SClientMatch();
-    void setPhoneMask(const int index);
 
 private:
     Ui::SClientMatch *ui;
@@ -32,6 +31,7 @@ private:
     void findClient();
 
 public slots:
+    void setPhoneMask(const int index);
     void findByLastname(const QString&);
     void findByPhone(const QString&);
 

@@ -858,9 +858,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>sparePartsTable</class>
-   <extends>QTableView</extends>
-   <header>tabsale.h</header>
+   <class>SClientMatch</class>
+   <extends>QWidget</extends>
+   <header>widgets/sclientmatch.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
@@ -871,10 +872,9 @@
    </slots>
   </customwidget>
   <customwidget>
-   <class>SClientMatch</class>
-   <extends>QWidget</extends>
-   <header>widgets/sclientmatch.h</header>
-   <container>1</container>
+   <class>sparePartsTable</class>
+   <extends>QTableView</extends>
+   <header>tabsale.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -918,38 +918,6 @@
  </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>lineEditClientLastName</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>tabSale</receiver>
-   <slot>findClientByLastname(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>90</x>
-     <y>310</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>6</x>
-     <y>224</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditClientPhone</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>tabSale</receiver>
-   <slot>findClientByPhone(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>76</x>
-     <y>445</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>6</x>
-     <y>359</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>pushButtonClientFromDB</sender>
    <signal>clicked()</signal>
@@ -1080,9 +1048,9 @@
   </connection>
   <connection>
    <sender>pushButtonClientCredsClearAll</sender>
-   <signal>clicked(bool)</signal>
+   <signal>clicked()</signal>
    <receiver>tabSale</receiver>
-   <slot>clearClientCreds(bool)</slot>
+   <slot>clearClientCreds()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>204</x>
@@ -1288,7 +1256,6 @@
   </connection>
  </connections>
  <slots>
-  <slot>findClientByLastname(QString)</slot>
   <slot>buttonSelectExistingClientHandler()</slot>
   <slot>hideGroupBoxClient(bool)</slot>
   <slot>selectPriceCol(int)</slot>
@@ -1300,7 +1267,7 @@
   <slot>paramsButtonClicked()</slot>
   <slot>updateChargeAmount(QString)</slot>
   <slot>phoneTypeChanged(int)</slot>
-  <slot>clearClientCreds(bool)</slot>
+  <slot>clearClientCreds()</slot>
   <slot>saleMoreButtonClicked()</slot>
   <slot>setTrackNum()</slot>
   <slot>buttonCreateTabClientHandler()</slot>
@@ -1311,6 +1278,5 @@
   <slot>tableRowDoubleClick(QModelIndex)</slot>
   <slot>paymentSystemChanged(int)</slot>
   <slot>setTrackNum(int)</slot>
-  <slot>findClientByPhone(QString)</slot>
  </slots>
 </ui>

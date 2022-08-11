@@ -17,7 +17,9 @@
 #include "mainwindow.h"
 #include "tabcommon.h"
 #include "amountToWords.h"
+#include "models/sclientmodel.h"
 #include "widgets/sgroupboxeventfilter.h"
+#include "widgets/sphones.h"
 
 namespace Ui {
     class tabRepairNew;
@@ -46,6 +48,7 @@ private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
     MainWindow *parent;
+    SClientModel *clientModel2;
     void setDefaultStyleSheets();
     void getDevices();
     QString genUserWebPass() const;
@@ -65,7 +68,6 @@ private:
     QSqlQueryModel* devicesMatchTable;
     QVector<QWidget*> additionalFieldsWidgets;
     int client = 0;
-    void phoneTypeChanged(int, int);
     bool checkInput();
     QMessageBox msgBox;
     SGroupBoxEventFilter *groupBoxEventFilter;
@@ -86,10 +88,7 @@ private slots:
     void fillDeviceCreds(int);
     void buttonSelectExistingClientHandler();
     void buttonCreateTabClientHandler();
-    void findMatchingClient(QString);
     void findMatchingDevice(QString);
-    void phone1TypeChanged(int);
-    void phone2TypeChanged(int);
     void deviceMatchTableDoubleClicked(QModelIndex);
     void clientMatchTableDoubleClicked(QModelIndex);
     void lineEditSNClearHandler(int);

@@ -245,88 +245,6 @@
        </item>
        <item row="0" column="4">
         <layout class="QGridLayout" name="gridLayout_8" rowstretch="0,0,0,0,0,0,0">
-         <item row="3" column="0">
-          <widget class="QGroupBox" name="groupBoxClientCoincidence">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>500</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>Совпадение клиента</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <property name="leftMargin">
-             <number>5</number>
-            </property>
-            <property name="topMargin">
-             <number>5</number>
-            </property>
-            <property name="rightMargin">
-             <number>5</number>
-            </property>
-            <property name="bottomMargin">
-             <number>5</number>
-            </property>
-            <property name="spacing">
-             <number>5</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QTableView" name="tableViewClientMatch">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="horizontalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOff</enum>
-              </property>
-              <property name="editTriggers">
-               <set>QAbstractItemView::NoEditTriggers</set>
-              </property>
-              <property name="tabKeyNavigation">
-               <bool>false</bool>
-              </property>
-              <property name="showDropIndicator" stdset="0">
-               <bool>false</bool>
-              </property>
-              <property name="dragDropOverwriteMode">
-               <bool>false</bool>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-              <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="horizontalHeaderHighlightSections">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="verticalHeaderHighlightSections">
-               <bool>false</bool>
-              </attribute>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
          <item row="4" column="0">
           <widget class="QGroupBox" name="groupBoxDeviceDescription">
            <property name="title">
@@ -692,11 +610,27 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_13">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayoutClient" columnstretch="1,1,1,1,1,1,1,1,0">
+             <layout class="QGridLayout" name="gridLayoutClient" columnstretch="0,0,0">
               <property name="sizeConstraint">
-               <enum>QLayout::SetMaximumSize</enum>
+               <enum>QLayout::SetFixedSize</enum>
               </property>
-              <item row="3" column="2" colspan="2">
+              <item row="1" column="0">
+               <widget class="QLineEdit" name="lineEditClientLastName">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>Фамилия</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
                <widget class="QLineEdit" name="lineEditClientAddress">
                 <property name="text">
                  <string/>
@@ -706,48 +640,14 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="6" colspan="2">
-               <widget class="QLineEdit" name="lineEditClientPhone2">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>Доплонительный номер тел.</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="4" colspan="2">
-               <widget class="QLineEdit" name="lineEditClientPatronymic">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>Отчество</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="2">
-               <widget class="QLineEdit" name="lineEditClientLastName">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>Фамилия</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" colspan="2">
-               <widget class="QLineEdit" name="lineEditClientFirstName">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>Имя</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0" colspan="2">
+              <item row="3" column="0">
                <widget class="QComboBox" name="comboBoxClientAdType">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -759,40 +659,141 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="pushButtonClientFromDB">
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEditClientFirstName">
                 <property name="text">
-                 <string>Клиент из списка</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="6" colspan="2">
-               <widget class="QLineEdit" name="lineEditClientPhone1">
-                <property name="inputMask">
-                 <string>(+38) 999 999-99-99;_</string>
-                </property>
-                <property name="text">
-                 <string>(+38)  --</string>
+                 <string/>
                 </property>
                 <property name="placeholderText">
-                 <string>Номер телефона</string>
+                 <string>Имя</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBoxClientType">
-                <property name="layoutDirection">
-                 <enum>Qt::RightToLeft</enum>
+              <item row="0" column="0" colspan="3">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetMinimumSize</enum>
                 </property>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxClientType">
+                  <property name="maximumSize">
+                   <size>
+                    <width>120</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
+                  </property>
+                  <property name="text">
+                   <string>Организация</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonClientFromDB">
+                  <property name="maximumSize">
+                   <size>
+                    <width>120</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Клиент из списка</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonClientCredsClearAll">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>23</width>
+                    <height>23</height>
+                   </size>
+                  </property>
+                  <property name="baseSize">
+                   <size>
+                    <width>3</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>очистить</string>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="styles/styles.qrc">
+                    <normaloff>:/icons/light/1F5D9_32.png</normaloff>:/icons/light/1F5D9_32.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonCreateTabClient">
+                  <property name="toolTip">
+                   <string>открыть карточку клиента</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="styles/styles.qrc">
+                    <normaloff>:/icons/light/1F464_32.png</normaloff>:/icons/light/1F464_32.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="2">
+               <widget class="QLineEdit" name="lineEditClientPatronymic">
                 <property name="text">
-                 <string>Организация</string>
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>Отчество</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="8">
-               <widget class="QComboBox" name="comboBoxClientPhone1Type"/>
-              </item>
-              <item row="3" column="4" colspan="2">
+              <item row="3" column="2">
                <widget class="QLineEdit" name="lineEditClientEmail">
                 <property name="text">
                  <string/>
@@ -802,56 +803,21 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="8">
-               <widget class="QComboBox" name="comboBoxClientPhone2Type"/>
-              </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="pushButtonClientCredsClearAll">
+              <item row="2" column="0" colspan="3">
+               <widget class="SPhones" name="phones" native="true">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>23</width>
-                  <height>23</height>
-                 </size>
-                </property>
-                <property name="baseSize">
-                 <size>
-                  <width>3</width>
+                  <width>0</width>
                   <height>0</height>
                  </size>
                 </property>
-                <property name="toolTip">
-                 <string>очистить</string>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="styles/styles.qrc">
-                  <normaloff>:/icons/light/1F5D9_32.png</normaloff>:/icons/light/1F5D9_32.png</iconset>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3">
-               <widget class="QPushButton" name="pushButtonCreateTabClient">
-                <property name="toolTip">
-                 <string>открыть карточку клиента</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="styles/styles.qrc">
-                  <normaloff>:/icons/light/1F464_32.png</normaloff>:/icons/light/1F464_32.png</iconset>
-                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_6"/>
                </widget>
               </item>
              </layout>
@@ -941,6 +907,33 @@
               </attribute>
              </widget>
             </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="SClientMatch" name="widgetClientMatch" native="true">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>500</height>
+            </size>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <property name="spacing">
+             <number>5</number>
+            </property>
            </layout>
           </widget>
          </item>
@@ -1057,6 +1050,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>SClientMatch</class>
+   <extends>QWidget</extends>
+   <header>widgets/sclientmatch.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets/slineedit.h</header>
@@ -1069,23 +1068,18 @@
    <extends>QComboBox</extends>
    <header>widgets/ssetcombobox.h</header>
   </customwidget>
+  <customwidget>
+   <class>SPhones</class>
+   <extends>QWidget</extends>
+   <header>widgets/sphones.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>comboBoxDevice</tabstop>
   <tabstop>comboBoxDeviceMaker</tabstop>
   <tabstop>comboBoxDeviceModel</tabstop>
   <tabstop>lineEditSN</tabstop>
-  <tabstop>pushButtonClientFromDB</tabstop>
-  <tabstop>lineEditClientLastName</tabstop>
-  <tabstop>lineEditClientFirstName</tabstop>
-  <tabstop>lineEditClientPatronymic</tabstop>
-  <tabstop>lineEditClientPhone1</tabstop>
-  <tabstop>comboBoxClientPhone1Type</tabstop>
-  <tabstop>comboBoxClientAdType</tabstop>
-  <tabstop>lineEditClientAddress</tabstop>
-  <tabstop>lineEditClientEmail</tabstop>
-  <tabstop>lineEditClientPhone2</tabstop>
-  <tabstop>comboBoxClientPhone2Type</tabstop>
   <tabstop>comboBoxProblem</tabstop>
   <tabstop>comboBoxIncomingSet</tabstop>
   <tabstop>comboBoxExterior</tabstop>
@@ -1117,10 +1111,6 @@
   <tabstop>checkBoxIsCashReceiptDocNeeded</tabstop>
   <tabstop>spinBoxStickersCount</tabstop>
   <tabstop>tableViewDeviceMatch</tabstop>
-  <tabstop>checkBoxClientType</tabstop>
-  <tabstop>pushButtonClientCredsClearAll</tabstop>
-  <tabstop>pushButtonCreateTabClient</tabstop>
-  <tabstop>tableViewClientMatch</tabstop>
   <tabstop>CentnerButton1_2</tabstop>
   <tabstop>pushButtonCashReceipt</tabstop>
  </tabstops>
@@ -1135,8 +1125,8 @@
    <slot>changeClientType()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>332</x>
-     <y>264</y>
+     <x>344</x>
+     <y>335</y>
     </hint>
     <hint type="destinationlabel">
      <x>63</x>
@@ -1183,8 +1173,8 @@
    <slot>buttonSelectExistingClientHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>428</x>
-     <y>263</y>
+     <x>492</x>
+     <y>343</y>
     </hint>
     <hint type="destinationlabel">
      <x>615</x>
@@ -1199,44 +1189,12 @@
    <slot>clearClientCreds()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>475</x>
-     <y>263</y>
+     <x>526</x>
+     <y>344</y>
     </hint>
     <hint type="destinationlabel">
      <x>800</x>
      <y>6</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditClientLastName</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>findMatchingClient(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>355</x>
-     <y>292</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>413</x>
-     <y>5</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditClientPhone1</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>findMatchingClient(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>833</x>
-     <y>296</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>671</x>
-     <y>-6</y>
     </hint>
    </hints>
   </connection>
@@ -1247,12 +1205,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>494</x>
-     <y>627</y>
+     <x>506</x>
+     <y>583</y>
     </hint>
     <hint type="destinationlabel">
      <x>795</x>
-     <y>633</y>
+     <y>585</y>
     </hint>
    </hints>
   </connection>
@@ -1301,54 +1259,6 @@
     <hint type="destinationlabel">
      <x>5</x>
      <y>161</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableViewClientMatch</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>889</x>
-     <y>449</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1019</x>
-     <y>264</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxClientPhone1Type</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>phone1TypeChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>970</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1022</x>
-     <y>152</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxClientPhone2Type</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>phone2TypeChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>960</x>
-     <y>316</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1020</x>
-     <y>180</y>
     </hint>
    </hints>
   </connection>
@@ -1439,8 +1349,8 @@
    <slot>enablePrepayWidgets(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>650</y>
+     <x>506</x>
+     <y>611</y>
     </hint>
     <hint type="destinationlabel">
      <x>1021</x>
@@ -1455,8 +1365,8 @@
    <slot>buttonCreateTabClientHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>574</x>
-     <y>266</y>
+     <x>560</x>
+     <y>344</y>
     </hint>
     <hint type="destinationlabel">
      <x>1020</x>
@@ -1471,8 +1381,8 @@
    <slot>createRepairClose()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>980</x>
-     <y>652</y>
+     <x>1000</x>
+     <y>614</y>
     </hint>
     <hint type="destinationlabel">
      <x>1019</x>
@@ -1488,7 +1398,6 @@
   <slot>changeDeviceMaker()</slot>
   <slot>buttonSelectExistingClientHandler()</slot>
   <slot>clearClientCreds()</slot>
-  <slot>findMatchingClient(QString)</slot>
   <slot>showLineEditPrevRepair()</slot>
   <slot>lineEditPrevRepairButtonsHandler(int)</slot>
   <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>

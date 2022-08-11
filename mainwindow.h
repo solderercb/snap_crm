@@ -73,6 +73,7 @@ private:
     Ui::MainWindow *ui;
     static MainWindow* p_instance;
     void closeEvent(QCloseEvent*);
+    void createMenu();
     void readGoods(const QModelIndex &index, const QString &warehouse_code);
 	void readConsignments(const QModelIndex &index, const QString &warehouse_code);
 	void get_warehouses_list();
@@ -84,18 +85,15 @@ private:
 	QStringList tableGoodsHeaders;
 	QStandardItemModel *tableConsignmentsModel; // Модель таблицы, отображающей партии товара
 	QStringList tableConsignmentsHeaders;
+#ifdef QT_DEBUG
+    void createTestTab();
+#endif
 
 public slots:
     void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
     void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
 
 private slots:
-	void btnClick();
-	void on_treeView_clicked(const QModelIndex &index);
-	void on_treeView_activated(const QModelIndex &index);
-	void on_comboBoxSourceWarehouse_currentIndexChanged(int index);
-	void on_tableGoods_activated(const QModelIndex &index);
-	void on_tableGoods_clicked(const QModelIndex &index);
     void reactivateCallerTab(QWidget *);
     void createTabRepair(int);
     void reactivateTabRepairNew(int);
@@ -103,9 +101,18 @@ private slots:
     void createTabClients(int type = 0, QWidget *caller = nullptr);
     void createTabClient(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
+    void createTabCashOperations();
+    void createTabNewPKO();
+    void createTabNewRKO();
     void closeTab(int index);
     void updateTabLabel(QWidget*, const QString&);
 #ifdef QT_DEBUG
+    void btnClick();
+    void on_treeView_clicked(const QModelIndex &index);
+    void on_treeView_activated(const QModelIndex &index);
+    void on_comboBoxSourceWarehouse_currentIndexChanged(int index);
+    void on_tableGoods_activated(const QModelIndex &index);
+    void on_tableGoods_clicked(const QModelIndex &index);
     void test_scheduler_handler();
     void test_scheduler2_handler();
 #endif

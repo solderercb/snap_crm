@@ -9,31 +9,7 @@
 #include "scomrecord.h"
 #include "scashregistermodel.h"
 #include "slogrecordmodel.h"
-#include "sphonemodel.h"
-
-class SPhonesModel : public QObject
-{
-    Q_OBJECT
-public:
-    explicit SPhonesModel(int client = 0, QObject *parent = nullptr);
-    ~SPhonesModel();
-    SPhoneModel* primary();
-    void setPrimary(SPhoneModel*);
-    QList<SPhoneModel*> phonesList();
-    bool load(int);
-    void add(SPhoneModel*);
-    void remove(int id);
-    bool isEmpty();
-    void setClient(const int id);
-    bool commit();
-    void clear();
-
-private:
-    QSqlQuery *query;
-    SLogRecordModel *logRecord;
-    QList<SPhoneModel*> m_phonesList;
-    SPhoneModel* phoneItemHandler(const QSqlRecord &phone = QSqlRecord());
-};
+#include "sphonesmodel.h"
 
 class SBalanceLogRecordModel : public SComRecord
 {
