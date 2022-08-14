@@ -38,12 +38,11 @@ private:
     QList<SPhoneModel*> m_phoneModelsList;
     SPhone *m_primaryForm;
     void addForm(SPhoneModel*);
-    void removeForm();
-    void updateFormsButtons();
 
 private slots:
     void addPhone();
     void delPhone(SPhone*);
+    void updateFormsButtons();
 };
 
 #endif // SPHONES_H

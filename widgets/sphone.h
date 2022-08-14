@@ -27,6 +27,7 @@ signals:
     void markedPrimary();
     void addPhone();
     void delPhone(SPhone*);
+    void sigEditPhone();
     void maskChanged(int);
     void inputUpdated(QString);
 

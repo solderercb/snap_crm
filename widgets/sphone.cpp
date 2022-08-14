@@ -25,7 +25,6 @@ SPhone::SPhone(QWidget *parent) :
     connect(ui->checkBoxViber,SIGNAL(clicked(bool)), this,SLOT(checkBoxViberClicked(bool)));
     connect(ui->checkBoxTelegram,SIGNAL(clicked(bool)), this,SLOT(checkBoxTelegramClicked(bool)));
     connect(ui->checkBoxWhatsapp,SIGNAL(clicked(bool)), this,SLOT(checkBoxWhatsappClicked(bool)));
-    ui->pushButtonEditPhone->hide();
 }
 
 SPhone::SPhone(SPhoneModel *model, QWidget *parent) :
@@ -140,7 +139,7 @@ void SPhone::setButtonVisible(Buttons button, bool state)
 void SPhone::updateButtons()
 {
     ui->pushButtonAddPhone->setVisible(!m_isReadOnly);
-    ui->pushButtonDelPhone->setVisible(!m_isPrimary);
+    ui->pushButtonDelPhone->setVisible(!m_isPrimary & !m_isReadOnly);
     ui->pushButtonEditPhone->setVisible(m_isReadOnly);
 }
 
@@ -191,6 +190,7 @@ void SPhone::editPhone()
 {
     setReadOnly(!m_isReadOnly);
     updateButtons();
+    emit sigEditPhone();
 }
 
 void SPhone::numberFieldEdited(QString)

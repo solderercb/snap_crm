@@ -45,23 +45,21 @@ void SPhones::addForm(SPhoneModel *model)
     SPhone *phoneForm = new SPhone(model, this);
     connect(phoneForm,SIGNAL(addPhone()),this,SLOT(addPhone()));
     connect(phoneForm,SIGNAL(delPhone(SPhone*)),this,SLOT(delPhone(SPhone*)));
+    connect(phoneForm,SIGNAL(sigEditPhone()),this,SLOT(updateFormsButtons()));
     connect(phoneForm,SIGNAL(markedPrimary()),model,SLOT(setPrimaryUi()));
 
     m_isPrimary = model->type();
     if(m_isPrimary)
         m_primaryForm = phoneForm;  // форма с основным телефоном только одна; задача определения типа лежит на методах класса SPhonesModel
 
-    if(!m_phoneFormsList.isEmpty())
-        m_phoneFormsList.last()->setButtonVisible(SPhone::Add, true);
     m_phoneFormsList.append(phoneForm);
     ui->gridLayout_2->addWidget(phoneForm);
 }
 
-void SPhones::removeForm()
-{
-
-}
-
+/*  Скрытие и отображение кнопок на всех формах:
+ *  кнопка Add должна быть только на последней (нижней) форме;
+ *  кнопка Del не должна отображаться на форме основного телефона;
+ */
 void SPhones::updateFormsButtons()
 {
     QList<SPhone*>::const_iterator i = m_phoneFormsList.constBegin();

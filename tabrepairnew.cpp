@@ -1111,7 +1111,7 @@ void tabRepairNew::randomFill()
     if (1)   // клиент
     {
 //        return;
-        fillClientCreds(143);
+        fillClientCreds(257);
         return;
         if(1)
 //        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
