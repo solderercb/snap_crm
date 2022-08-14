@@ -1107,37 +1107,12 @@ void tabRepairNew::buttonCreateTabClientHandler()
 void tabRepairNew::randomFill()
 {
     int i;
-    if (test_scheduler_counter == 0)
+//    if (test_scheduler_counter == 0)   // клиент
+    if (1)   // клиент
     {
-        i = comboboxDevicesModel->rowCount();
-        ui->comboBoxDevice->setCurrentIndex(QRandomGenerator::global()->bounded(i));
-    }
-    else if (test_scheduler_counter == 1)
-    {
-        i = comboboxDeviceMakersModel->rowCount();
-        ui->comboBoxDeviceMaker->setCurrentIndex(QRandomGenerator::global()->bounded(i));
-    }
-    else if (test_scheduler_counter == 2)   // модель
-    {
-        i = comboboxDeviceModelsModel->rowCount();
-        if (QRandomGenerator::global()->bounded(100) > 50 && i)  // 50/50 или выбираем из уже имеющихся моделей или случайное число (проверка i нужна, т. к. список может быть вообще пуст)
-        {
-            ui->comboBoxDeviceModel->setCurrentIndex(QRandomGenerator::global()->bounded(i));
-        }
-        else
-        {
-//            qDebug() << "генерирую случайное число в качестве модели уст-ва, i = " << i;
-            ui->comboBoxDeviceModel->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
-        }
-    }
-    else if (test_scheduler_counter == 3)   // серийный номер
-    {
-        ui->lineEditSN->setText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
-    }
-    else if (test_scheduler_counter == 4)   // клиент
-    {
+//        return;
+        fillClientCreds(143);
         return;
-        fillClientCreds(712);
         if(1)
 //        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {
@@ -1180,6 +1155,33 @@ void tabRepairNew::randomFill()
             ui->comboBoxClientAdType->setCurrentIndex(i);
 
         }
+    }
+    else if (test_scheduler_counter == 1)
+    {
+        i = comboboxDevicesModel->rowCount();
+        ui->comboBoxDevice->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+    }
+    else if (test_scheduler_counter == 2)
+    {
+        i = comboboxDeviceMakersModel->rowCount();
+        ui->comboBoxDeviceMaker->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+    }
+    else if (test_scheduler_counter == 3)   // модель
+    {
+        i = comboboxDeviceModelsModel->rowCount();
+        if (QRandomGenerator::global()->bounded(100) > 50 && i)  // 50/50 или выбираем из уже имеющихся моделей или случайное число (проверка i нужна, т. к. список может быть вообще пуст)
+        {
+            ui->comboBoxDeviceModel->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+        }
+        else
+        {
+//            qDebug() << "генерирую случайное число в качестве модели уст-ва, i = " << i;
+            ui->comboBoxDeviceModel->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
+        }
+    }
+    else if (test_scheduler_counter == 4)   // серийный номер
+    {
+        ui->lineEditSN->setText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
     }
     else if (test_scheduler_counter == 5)   // неисправность
     {

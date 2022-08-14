@@ -15,6 +15,6 @@ INSERT INTO `tel_types` (`name`, `mask`, `order`) VALUES ('мобильный (R
 
 ALTER TABLE `tel`
 	CHANGE COLUMN `mask` `mask` INT(11) UNSIGNED NOT NULL AFTER `phone_clean`,
-	ADD COLUMN `viber` BIT NOT NULL DEFAULT b'0' AFTER `note`,
-	ADD COLUMN `telegram` BIT NOT NULL DEFAULT b'0' AFTER `viber`,
-	ADD COLUMN `whatsapp` BIT NOT NULL DEFAULT b'0' AFTER `telegram`;
+	ADD COLUMN `viber` TINYINT(1) NOT NULL DEFAULT '0' AFTER `note`,
+	ADD COLUMN `telegram` TINYINT(1) NOT NULL DEFAULT '0' AFTER `viber`,
+	ADD COLUMN `whatsapp` TINYINT(1) NOT NULL DEFAULT '0' AFTER `telegram`;

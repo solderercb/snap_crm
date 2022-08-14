@@ -13,7 +13,7 @@ class SPhoneModel : public SComRecord
     Q_OBJECT
 signals:
     void markedPrimary(SPhoneModel*);
-    void typeChanged(int type);
+    void modelUpdated();
 
 public:
     enum Types {Additional = 0, Primary = 1};
@@ -32,7 +32,7 @@ public:
     QString note();
     void setNote(const QString&);
     int messengers();
-    void setMessengers(const int opt);
+    void setMessengers(const int opt, bool state = 1);
     bool isEmpty();
     void setPrimary(int primary = Primary);
 private:
@@ -43,7 +43,7 @@ private:
     QString m_note;
     int m_type = Additional;
     int m_mask;
-    int m_messengers;
+    int m_messengers = 0;
     const QSqlRecord* m_record = nullptr;
     QString cleanPhone(const QString &);
     void setType(const int type);

@@ -16,7 +16,7 @@ public:
     QList<SPhoneModel*> phonesList();
     bool load(int);
     void add(SPhoneModel*);
-    void remove(int id);
+    void remove(SPhoneModel *phone);
     bool isEmpty();
     void setClient(const int id);
     bool commit();

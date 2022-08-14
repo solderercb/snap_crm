@@ -38,7 +38,7 @@ bool SPhoneModel::commit()
     {
         insert("tel");
     }
-    i_logRecord->commit();
+    commitLogs();
 
     return i_nDBErr;
 }
@@ -68,7 +68,7 @@ void SPhoneModel::setPhone(const QString &phone)
     }
     else
     {
-        i_logRecord->setText("Добавлен номер " + phone);
+        appendLogText("Добавлен номер " + phone);
     }
 }
 
@@ -96,6 +96,11 @@ int SPhoneModel::type()
     return m_type;
 }
 
+QString SPhoneModel::note()
+{
+    return m_note;
+}
+
 
 void SPhoneModel::setNote(const QString &note)
 {
@@ -108,14 +113,14 @@ int SPhoneModel::messengers()
     return m_messengers;
 }
 
-void SPhoneModel::setMessengers(const int opt)
+void SPhoneModel::setMessengers(const int opt, bool state)
 {
-    if(opt&Messengers::Viber)
-        i_valuesMap.insert("viber", 1);
-    if(opt&Messengers::Telegram)
-        i_valuesMap.insert("telegram", 1);
-    if(opt&Messengers::Whatsapp)
-        i_valuesMap.insert("whatsapp", 1);
+    if( opt&Messengers::Viber )
+        i_valuesMap.insert("viber", state );
+    if( opt&Messengers::Telegram)
+        i_valuesMap.insert("telegram", state );
+    if( opt&Messengers::Whatsapp )
+        i_valuesMap.insert("whatsapp", state );
     // TODO: подумать над необходимостью записи в журнал
 }
 
@@ -147,10 +152,9 @@ void SPhoneModel::setType(const int type)
     if(type == Primary)
     {
         emit markedPrimary(this);
-        i_logRecord->setText(tr("Номер %1 задан основным").arg(m_phone));
     }
     else
-        emit typeChanged(m_type);
+        emit modelUpdated();
 }
 
 /*  Установка основным номером через вызов метода (т. е. программно)
@@ -160,7 +164,7 @@ void SPhoneModel::setPrimary(int primary)
 {
     setType(primary);
     if(primary == Primary)
-        emit typeChanged(primary);   // при программной установке основным тоже нужно изменить состояние checkBox'а
+        emit modelUpdated();   // при программной установке основным тоже нужно изменить состояние checkBox'а
 
 }
 

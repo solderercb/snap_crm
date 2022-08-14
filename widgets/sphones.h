@@ -39,9 +39,11 @@ private:
     SPhone *m_primaryForm;
     void addForm(SPhoneModel*);
     void removeForm();
+    void updateFormsButtons();
 
 private slots:
     void addPhone();
+    void delPhone(SPhone*);
 };
 
 #endif // SPHONES_H

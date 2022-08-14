@@ -268,7 +268,6 @@ SHARED_FILES += sclientmodel.cpp
 SHARED_FILES += sclientmodel.h
 SHARED_FILES += scomrecord.cpp
 SHARED_FILES += scomrecord.h
-SHARED_FILES += scomrecordmodel.h
 SHARED_FILES += sdatabaserecord.cpp
 SHARED_FILES += sdatabaserecord.h
 SHARED_FILES += sdocumentmodel.cpp

@@ -53,6 +53,13 @@ void SPhonesModel::add(SPhoneModel *phone)
 
 }
 
+void SPhonesModel::remove(SPhoneModel *phone)
+{
+    int modelIndex = m_phonesList.indexOf(phone);
+    m_phonesList.removeAt(modelIndex);
+    delete phone;
+}
+
 bool SPhonesModel::isEmpty()
 {
     return m_phonesList.isEmpty();
@@ -99,12 +106,13 @@ SPhoneModel *SPhonesModel::phoneItemHandler(const QSqlRecord &record)
 void SPhonesModel::switchPrimaryPhone(SPhoneModel *newPrimaryPhone)
 {
     SPhoneModel *item;
+    newPrimaryPhone->appendLogText(tr("Номер %1 задан основным").arg(newPrimaryPhone->phone()));
     foreach(item, m_phonesList)
     {
         if(item == newPrimaryPhone)
             continue;
 
-        item->setPrimary(SPhoneModel::Additional);
+        item->setPrimary(false);
     }
 
 }
