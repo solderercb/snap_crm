@@ -17,10 +17,12 @@ public:
     explicit SComRecord(QObject *parent = nullptr);
     ~SComRecord();
     void appendLogText(const QString&);
+    void appendLogText(const QString&, const QString &disambiguation);
+    void removeLogText(const QString &disambiguation);
 protected:
     bool commitLogs();
+    QMap<QString, QString> *i_logTexts;
     SLogRecordModel *i_logRecord;
-    QStringList *i_logTexts;
 
 };
 

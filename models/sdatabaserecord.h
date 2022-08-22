@@ -27,6 +27,7 @@ protected:
     QDateTime i_createdUtc;
     bool checkSystemTime();
     bool checkObligatoryFields();
+    bool checkTableName();
     QMap<QString, QVariant> i_valuesMap;   // key - field name
     QStringList i_obligatoryFields = {};   // поля не имеющие значения по умолчанию
     QSqlQuery *i_query;
@@ -34,9 +35,10 @@ protected:
     void fieldsInsFormatter();
     void fieldsUpdFormatter();
     QString fieldValueHandler(const QVariant&);
-    bool insert(const QString&);
-    bool update(const QString&, const int);
-    bool del(const QString&, const int);
+    bool insert(bool flush = true);
+    bool update();
+    bool del();
+    QString tableName;
 private:
 signals:
 

@@ -7,6 +7,9 @@
 #include "../models/ssqlquerymodel.h"
 #include "../models/sphonemodel.h"
 #include "global.h"
+#ifdef QT_DEBUG
+#include <QRandomGenerator>
+#endif
 
 namespace Ui {
 class SPhone;
@@ -25,11 +28,10 @@ class SPhone : public QWidget
 
 signals:
     void markedPrimary();
-    void addPhone();
+    void buttonAddClicked();
     void delPhone(SPhone*);
     void sigEditPhone();
-    void maskChanged(int);
-    void inputUpdated(QString);
+    void phoneEdited(QString);
 
 public:
     enum Buttons{Add = 0, Del = 1, Edit = 2};
@@ -41,30 +43,33 @@ public:
     void setReadOnly(bool stat = true);
     void clear();
     void fillPhone(const QSqlRecord&);
+#ifdef QT_DEBUG
+    void testFill(const int, const QString&);
+#endif
     QString phone();
     QString cleanedPhone();
     void setPrimary();
     bool isValid();
     void setButtonVisible(Buttons button, bool state = true);
     void updateButtons();
+    int maskIndex();
 
 private:
     Ui::SPhone *ui;
-    QString m_mask;
-    QString m_visibleMask;
     bool m_isPrimary = 0;
     bool m_isReadOnly = 0;
     QString m_clearPhone;    // строка символов, которые ввёл пользователь (т. е. текст отображаемый в lineEdit над которым выполнена операция т. н. XOR с заданной маской
     SPhoneModel *m_phoneModel;
     int m_messengers;
+    bool m_isValid = 1;
 
 private slots:
     void phoneMaskChanged(int);
     void checkBoxTypeToggled(bool);
     void modelUpdated();
-    void delPhone();
-    void editPhone();
-    void numberFieldEdited(QString);
+    void buttonDelClicked();
+    void buttonEditClicked();
+    void numberEdited(QString);
     void numberEditFinished();
     void notesEditFinished();
     void checkBoxViberClicked(bool);

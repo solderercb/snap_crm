@@ -3,9 +3,9 @@
 SPhonesModel::SPhonesModel(int client, QObject *parent) :
     QObject(parent)
 {
+    m_client = client;
     if(client)
         load(client);
-
 }
 
 SPhonesModel::~SPhonesModel()
@@ -32,6 +32,8 @@ QList<SPhoneModel *> SPhonesModel::phonesList()
 
 bool SPhonesModel::load(int client)
 {
+    m_client = client;
+
     clear();
     query = new QSqlQuery(QSqlDatabase::database("connMain"));
 
@@ -67,6 +69,7 @@ bool SPhonesModel::isEmpty()
 
 void SPhonesModel::setClient(const int id)
 {
+    m_client = id;
     SPhoneModel *item;
     foreach(item, m_phonesList)
     {
@@ -82,6 +85,11 @@ bool SPhonesModel::commit()
         if(!item->commit())
             return 0;
     }
+    if(logRecord != nullptr)
+    {
+        logRecord->commit();
+        logRecord->deleteLater();
+    }
     return 1;
 }
 
@@ -96,6 +104,16 @@ void SPhonesModel::clear()
     }
 }
 
+bool SPhonesModel::isUpdated()
+{
+    return m_updated;
+}
+
+void SPhonesModel::markUpdated()
+{
+    m_updated = true;
+}
+
 SPhoneModel *SPhonesModel::phoneItemHandler(const QSqlRecord &record)
 {
     SPhoneModel *item = new SPhoneModel(record, this);
@@ -106,7 +124,11 @@ SPhoneModel *SPhonesModel::phoneItemHandler(const QSqlRecord &record)
 void SPhonesModel::switchPrimaryPhone(SPhoneModel *newPrimaryPhone)
 {
     SPhoneModel *item;
-    newPrimaryPhone->appendLogText(tr("Номер %1 задан основным").arg(newPrimaryPhone->phone()));
+    if(logRecord == nullptr)
+        logRecord = new SLogRecordModel();  // запись в журнал о смене основного номера телефона
+    logRecord->setClient(m_client);
+    logRecord->setType(SLogRecordModel::Client);
+    logRecord->setText(tr("Номер %1 задан основным").arg(newPrimaryPhone->phone()));
     foreach(item, m_phonesList)
     {
         if(item == newPrimaryPhone)

@@ -48,6 +48,12 @@ bool SDatabaseRecord::checkObligatoryFields()
     return 0;
 }
 
+bool SDatabaseRecord::checkTableName()
+{
+    Q_ASSERT_X(!tableName.isEmpty(), this->metaObject()->className(), QString("Variable tableName (QString) not set").toLocal8Bit());
+    return 0;
+}
+
 QDateTime SDatabaseRecord::createdUtc()
 {
     return i_createdUtc;
@@ -114,37 +120,42 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
     return str_value;
 }
 
-bool SDatabaseRecord::insert(const QString &table)
+bool SDatabaseRecord::insert(bool flush)
 {
     QString q;
 
+    checkTableName();
     checkSystemTime();
     checkObligatoryFields();
     fieldsInsFormatter();
     q = QString("INSERT INTO `%1` (\n  %2\n) VALUES (\n  %3\n);")\
-                                         .arg(table)\
+                                         .arg(tableName)\
                                          .arg(fields.join(','))\
                                          .arg(field_values.join(','));
 //    qDebug().noquote() << q;
     QUERY_EXEC(i_query,i_nDBErr)(q);
     QUERY_LAST_INS_ID(i_query,i_nDBErr,i_id);
-    if(i_nDBErr)
+    if(i_nDBErr && flush)
         i_valuesMap.clear();
 
     return i_nDBErr;
 }
 
-bool SDatabaseRecord::update(const QString &table, const int id)
+bool SDatabaseRecord::update()
 {
+    if(i_valuesMap.isEmpty())
+        return 1;
+
     QString q;
 
+    checkTableName();
     checkSystemTime();
     fieldsUpdFormatter();
     q = QString("UPDATE\n  `%1`\nSET\n  %2\nWHERE `id` = %3;")\
-                                         .arg(table)\
+                                         .arg(tableName)\
                                          .arg(fields.join(",\n  "))\
-                                         .arg(id);
-//    qDebug().noquote() << q;
+                                         .arg(i_id);
+
     QUERY_EXEC(i_query,i_nDBErr)(q);
     if(i_nDBErr)
         i_valuesMap.clear();
@@ -152,13 +163,14 @@ bool SDatabaseRecord::update(const QString &table, const int id)
     return i_nDBErr;
 }
 
-bool SDatabaseRecord::del(const QString &table, const int id)
+bool SDatabaseRecord::del()
 {
     QString q;
 
+    checkTableName();
     q = QString("DELETE FROM `%1` WHERE `id` = %2;")\
-                                         .arg(table)\
-                                         .arg(id);
+                                         .arg(tableName)\
+                                         .arg(i_id);
     QUERY_EXEC(i_query,i_nDBErr)(q);
 //    qDebug().noquote() << q;
 

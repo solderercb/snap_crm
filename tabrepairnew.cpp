@@ -103,8 +103,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxClientAdType->setModelColumn(0);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
 
-    connect(ui->phones,SIGNAL(typeChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
-    connect(ui->phones,SIGNAL(inputUpdated(QString)),ui->widgetClientMatch,SLOT(findByPhone(QString)));
+    connect(ui->phones,SIGNAL(primaryPhoneEdited(QString)),this,SLOT(primaryPhoneEdited(QString)));
 
     QStringList prepayReasonsList = {tr("полная предоплата"), tr("за детали"), tr("за часть стоимости деталей"), tr("за часть стоимости работ"), tr("за диагностику")};
     prepayReasonsModel = new QStandardItemModel();
@@ -398,7 +397,6 @@ void tabRepairNew::changeDeviceMaker()
 void tabRepairNew::clearClientCreds(bool hideCoincidence)
 {
     setDefaultStyleSheets();
-    clientModel2->clear();
     client = 0;
     ui->checkBoxClientType->setEnabled(true);
     ui->lineEditClientLastName->setReadOnly(false);  // разрешение редактирования
@@ -415,7 +413,11 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->lineEditClientAddress->clear();
     ui->lineEditClientEmail->clear();
-    ui->phones->clear();
+
+    delete clientModel2;
+    clientModel2 = new SClientModel();
+    ui->phones->setModel(clientModel2->phones());
+
     if (hideCoincidence)
         ui->widgetClientMatch->hide();
 }
@@ -804,6 +806,32 @@ bool tabRepairNew::checkInput()
     return true;
 }
 
+bool tabRepairNew::createClient()
+{
+    bool nDBErr = 1;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
+    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
+    clientModel2->setFirstName(ui->lineEditClientFirstName->text());
+    clientModel2->setLastName(ui->lineEditClientLastName->text());
+    clientModel2->setPatronymicName(ui->lineEditClientPatronymic->text());
+    clientModel2->appendLogText(tr("Быстрое создание клиента из формы приёма в ремонт"));
+    clientModel2->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
+    clientModel2->setAddress(ui->lineEditClientAddress->text());
+    clientModel2->setType(ui->checkBoxClientType->isChecked());
+//    if (ui->lineEditClientPhone->hasAcceptableInput())
+//    {
+//        clientModel2->addPhone(ui->lineEditClientPhone->text(),
+//                              ui->comboBoxClientPhoneType->currentIndex());
+//    }
+    nDBErr = clientModel2->commit();
+
+    QUERY_COMMIT_ROLLBACK(query,nDBErr);
+
+    delete query;
+    return nDBErr;
+}
+
 bool tabRepairNew::createRepair()
 {
     if(!checkInput())
@@ -841,53 +869,17 @@ bool tabRepairNew::createRepair()
     box = (ui->comboBoxPresetBox->currentIndex() < 0)?0:repairBoxesModel->record(ui->comboBoxPresetBox->currentIndex()).value("id").toInt();
     isWarranty = ui->checkBoxIsWarranty->isChecked();
 
-    if (client == 0)
-    {
+#ifdef QT_DEBUG
+    queryLog *sqlLog = new queryLog(query);
+    sqlLog->setFile(QApplication::applicationDirPath() + "\\tabRepairNew.sql");
+    sqlLog->truncateLog();
+#endif
 
-        QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_CLIENT
-                    .arg(user)
-                    .arg(ui->lineEditClientFirstName->text())
-                    .arg(ui->lineEditClientLastName->text())
-                    .arg(ui->lineEditClientPatronymic->text())
-                    .arg(ui->lineEditClientAddress->text())
-                    .arg(ui->checkBoxClientType->isChecked())
-                    .arg(clientAdTypesList->record(ui->comboBoxClientAdType->currentIndex()).value("id").toInt())
-                    .arg(genUserWebPass())
-                    .arg(ui->lineEditClientAddress->text()));
-        QUERY_LAST_INS_ID(query,nDBErr,client);
-//        qDebug() << "Новый клиент: LAST_INSERT_ID() = " << client;
-//        qDebug() << QUERY_INS_LOG("NULL",2,user,office,client,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт");
-
-        // запись телефонных номеров в таблицу tel
-//        if (ui->lineEditClientPhone1->hasAcceptableInput())
-//        {
-//            phone1 = ui->lineEditClientPhone1->text();
-//            phone1c = "";
-//            for (int i = 0; i < phone1.length(); i++ )  // переписываем "чистый" номер
-//            {
-//                if(phone1.at(i).isDigit())
-//                    phone1c.append(phone1.at(i));
-//            }
-////            qDebug() << "phone1c: " << phone1c;
-//            QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone1,phone1c,clientPhoneTypesModel->index(ui->comboBoxClientPhone1Type->currentIndex(), 1).data().toInt(),client,1,""));
-//        }
-//        if (ui->lineEditClientPhone2->hasAcceptableInput())
-//        {
-//            phone2 = ui->lineEditClientPhone2->text();
-//            phone2c = "";
-//            for (int i = 0; i < phone2.length(); i++ )  // переписываем "чистый" номер
-//            {
-//                if(phone2.at(i).isDigit())
-//                    phone2c.append(phone2.at(i));
-//            }
-////            qDebug() << "phone2c: " << phone2c;
-//            QUERY_EXEC(query,nDBErr)(QUERY_INS_PHONE(phone2,phone2c,clientPhoneTypesModel->index(ui->comboBoxClientPhone2Type->currentIndex(), 1).data().toInt(),client,0,""));
-//        }
-
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",2,user,office,client,"NULL","NULL","NULL","NULL","Быстрое создание клиента из формы приёма в ремонт"));
-        QUERY_COMMIT_ROLLBACK(query,nDBErr);
-    }
+    if (clientModel2->isClear())
+        createClient();
+    client= clientModel2->id();
+    if(clientModel2->phones()->isUpdated())
+        clientModel2->phones()->commit();
 
     QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
 
@@ -1037,6 +1029,12 @@ bool tabRepairNew::createRepair()
     }
 
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
+#ifdef QT_DEBUG
+//    nDBErr = 1; // и это для отладки (чтобы проверить работу дальше)
+    sqlLog->saveLog();
+    delete sqlLog;
+#endif
+
     if (nDBErr)   // если все запросы выполнены без ошибок, очистить всё, кроме данных клиента
     {
         // печать квитанции
@@ -1098,6 +1096,11 @@ void tabRepairNew::createRepairClose()
         this->deleteLater();
 }
 
+void tabRepairNew::primaryPhoneEdited(QString number)
+{
+    ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
+}
+
 void tabRepairNew::buttonCreateTabClientHandler()
 {
     emit createTabClient(client);
@@ -1107,14 +1110,15 @@ void tabRepairNew::buttonCreateTabClientHandler()
 void tabRepairNew::randomFill()
 {
     int i;
-//    if (test_scheduler_counter == 0)   // клиент
-    if (1)   // клиент
+    if (test_scheduler_counter == 0)   // клиент
+//    if (1)
     {
-//        return;
-        fillClientCreds(257);
+//        fillClientCreds(257);
+        test_scheduler_counter++;
+        test_scheduler->start(400);    //  (пере-)запускаем таймер
         return;
-        if(1)
-//        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
+//        if(0)
+        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {
             fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
             if (ui->lineEditClientLastName->text() == "")
@@ -1130,25 +1134,22 @@ void tabRepairNew::randomFill()
             ui->lineEditClientPatronymic->setText(clients4Test->value(i)->at(2));
             if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или телефон мобильный или городской (это для проверки масок)
             {
-//                ui->comboBoxClientPhone1Type->setCurrentIndex(1);
-//                ui->lineEditClientPhone1->setText(clients4Test->value(i)->at(4));
+                ui->phones->primary()->testFill(2, clients4Test->value(i)->at(4));
             }
             else
             {
-//                ui->comboBoxClientPhone1Type->setCurrentIndex(0);
-//                ui->lineEditClientPhone1->setText(clients4Test->value(i)->at(3));
+                ui->phones->primary()->testFill(1, clients4Test->value(i)->at(3));
             }
             if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 заполняем доп. номер или нет и аналогично 50/50 тип доп. номера
             {
+                ui->phones->addPhone();
                 if (QRandomGenerator::global()->bounded(100) > 50)
                 {
-//                    ui->comboBoxClientPhone2Type->setCurrentIndex(1);
-//                    ui->lineEditClientPhone2->setText(clients4Test->value(i)->at(4));
+                    ui->phones->forms().last()->testFill(2, clients4Test->value(i)->at(4));
                 }
                 else
                 {
-//                    ui->comboBoxClientPhone2Type->setCurrentIndex(0);
-//                    ui->lineEditClientPhone2->setText(clients4Test->value(i)->at(3));
+                    ui->phones->forms().last()->testFill(0, clients4Test->value(i)->at(3));
                 }
             }
             i = QRandomGenerator::global()->bounded(clientAdTypesList->rowCount()); // если клиент новый, то случайно выбираем источник обращения

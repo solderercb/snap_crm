@@ -3,6 +3,7 @@
 SCashRegisterModel::SCashRegisterModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "created" << "type" << "summa" << "user" << "company" << "office" << "notes";
+    tableName = "cash_orders";
 }
 
 SCashRegisterModel::SCashRegisterModel(int systemId, QObject *parent) :
@@ -66,7 +67,7 @@ bool SCashRegisterModel::commit()
 {
     if(i_id)
     {
-        update("cash_orders", i_id);
+        update();
     }
     else
     {
@@ -81,7 +82,7 @@ bool SCashRegisterModel::commit()
 
         fieldsVerifyFormatter();    // вызов этого метода должен быть до вызова метода insert()
 
-        insert("cash_orders");
+        insert();
 
         // финансы — очень важная вещь, поэтому нужно верифицировать записанные данные
         q = "SELECT IF(\n  " + fields_verify.join(" AND\n  ") + "\n, 21930, 0)\n"\

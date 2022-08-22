@@ -3,7 +3,7 @@
 SComRecord::SComRecord(QObject *parent) : SDatabaseRecord(parent)
 {
     i_logRecord = new SLogRecordModel(this);
-    i_logTexts = new QStringList();
+    i_logTexts = new QMap<QString, QString>();
 }
 
 SComRecord::~SComRecord()
@@ -18,7 +18,17 @@ SComRecord::~SComRecord()
  */
 void SComRecord::appendLogText(const QString &text)
 {
-    i_logTexts->append(text);
+    i_logTexts->insert(QString::number(i_logTexts->size()), text);
+}
+
+void SComRecord::appendLogText(const QString &text, const QString &disambiguation)
+{
+    i_logTexts->insert(disambiguation, text);
+}
+
+void SComRecord::removeLogText(const QString &disambiguation)
+{
+    i_logTexts->remove(disambiguation);
 }
 
 bool SComRecord::commitLogs()

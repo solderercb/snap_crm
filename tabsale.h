@@ -124,7 +124,7 @@ private slots:
     void fillClientCreds(int);
     void comboBoxIndexChanged(int);
     void updateTotalSumms(float);
-    void findClientByPhone(QString);
+    void phoneNumberEdited(QString);
     void buttonSelectExistingClientHandler();
     void buttonCreateTabClientHandler();
     void tableRowDoubleClick(QModelIndex);

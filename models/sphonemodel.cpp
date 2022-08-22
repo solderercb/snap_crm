@@ -3,6 +3,7 @@
 SPhoneModel::SPhoneModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "mask" << "customer";
+    tableName = "tel";
 
     i_logRecord->setType(SLogRecordModel::Client);
 
@@ -11,7 +12,7 @@ SPhoneModel::SPhoneModel(QObject *parent) : SComRecord(parent)
 
 SPhoneModel::SPhoneModel(const QSqlRecord &record, QObject *parent) : SPhoneModel(parent)
 {
-    m_id = record.value("id").toInt();
+    i_id = record.value("id").toInt();
     m_client_id = record.value("customer").toInt();
     i_logRecord->setClient(m_client_id);
     m_phone = record.value("phone").toString();
@@ -22,6 +23,7 @@ SPhoneModel::SPhoneModel(const QSqlRecord &record, QObject *parent) : SPhoneMode
     m_messengers = (record.value("viber").toBool()?Messengers::Viber:0) | \
                    (record.value("telegram").toBool()?Messengers::Telegram:0) | \
                    (record.value("whatsapp").toBool()?Messengers::Whatsapp:0);
+    m_initialMessengers = m_messengers;
 }
 
 SPhoneModel::~SPhoneModel()
@@ -30,13 +32,13 @@ SPhoneModel::~SPhoneModel()
 
 bool SPhoneModel::commit()
 {
-    if(m_record)
+    if(i_id)
     {
-        // update();
+        update();
     }
     else
     {
-        insert("tel");
+        insert();
     }
     commitLogs();
 
@@ -45,7 +47,7 @@ bool SPhoneModel::commit()
 
 void SPhoneModel::setClient(const int id)
 {
-    if(m_record)
+    if(i_id)
         return;
 
     i_valuesMap.insert("customer", id);
@@ -62,14 +64,15 @@ void SPhoneModel::setPhone(const QString &phone)
 {
     i_valuesMap.insert("phone", phone);
     i_valuesMap.insert("phone_clean", cleanPhone(phone));
-    if(m_record)
+    if(i_id)
     {
-        // TODO: запись в журнал "телефон изменён с ххх на ууу"
+        appendLogText(tr("Номер изменён с %1 на %2").arg(m_phone, phone), "Phone_changed");
     }
     else
     {
-        appendLogText("Добавлен номер " + phone);
+        appendLogText(tr("Добавлен номер %1").arg(phone), "Phone_added");
     }
+    m_phone = phone;
 }
 
 int SPhoneModel::mask()
@@ -113,20 +116,41 @@ int SPhoneModel::messengers()
     return m_messengers;
 }
 
-void SPhoneModel::setMessengers(const int opt, bool state)
+/*  Изменение связи номера с учетной записью мессенджера
+ *  Допускается только одна опция за раз
+ *  Первый вызов метода для определённой опции всегда подразумевает изменение состояния этой опции;
+ *  при втором вызове нужно удалить элементы из массива значений и массива записей в журнал
+ */
+void SPhoneModel::setMessengers(const int option, bool state)
 {
-    if( opt&Messengers::Viber )
-        i_valuesMap.insert("viber", state );
-    if( opt&Messengers::Telegram)
-        i_valuesMap.insert("telegram", state );
-    if( opt&Messengers::Whatsapp )
-        i_valuesMap.insert("whatsapp", state );
-    // TODO: подумать над необходимостью записи в журнал
+    static int enumIndex = staticMetaObject.indexOfEnumerator("Messengers");
+    QMetaEnum enumerator = staticMetaObject.enumerator(enumIndex);
+    for (int i = 0; i<enumerator.keyCount(); ++i)
+    {
+        if(option == enumerator.value(i))
+        {
+            bool initialOptionState = ((m_initialMessengers&enumerator.value(i)) != 0);
+            if(initialOptionState != state)
+            {
+                i_valuesMap.insert(enumerator.key(i), state );
+                if(state)
+                    appendLogText(tr("Установлена связь номера %1 с уч. записью %2").arg(m_phone, enumerator.key(i)), enumerator.key(i));
+                else
+                    appendLogText(tr("Разорвана связь номера %1 с уч. записью %2").arg(m_phone, enumerator.key(i)), enumerator.key(i));
+            }
+            else
+            {
+                i_valuesMap.remove(enumerator.key(i));
+                removeLogText(enumerator.key(i));
+            }
+            break;
+        }
+    }
 }
 
 bool SPhoneModel::isEmpty()
 {
-    if(m_id)
+    if(i_id)
         return false;
     return true;
 }

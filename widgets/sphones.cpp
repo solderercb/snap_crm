@@ -43,10 +43,12 @@ void SPhones::setModel(SPhonesModel *model)
 void SPhones::addForm(SPhoneModel *model)
 {
     SPhone *phoneForm = new SPhone(model, this);
-    connect(phoneForm,SIGNAL(addPhone()),this,SLOT(addPhone()));
+    connect(phoneForm,SIGNAL(buttonAddClicked()),this,SLOT(addPhone()));
     connect(phoneForm,SIGNAL(delPhone(SPhone*)),this,SLOT(delPhone(SPhone*)));
     connect(phoneForm,SIGNAL(sigEditPhone()),this,SLOT(updateFormsButtons()));
+    connect(phoneForm,SIGNAL(sigEditPhone()),this,SLOT(markPhonesModelUpdated()));
     connect(phoneForm,SIGNAL(markedPrimary()),model,SLOT(setPrimaryUi()));
+    connect(phoneForm,SIGNAL(phoneEdited(QString)),this,SIGNAL(primaryPhoneEdited(QString)));
 
     m_isPrimary = model->type();
     if(m_isPrimary)
@@ -71,6 +73,16 @@ void SPhones::updateFormsButtons()
     (*i)->setButtonVisible(SPhone::Add, true);
 }
 
+void SPhones::markPhonesModelUpdated()
+{
+    m_phonesModel->markUpdated();
+}
+
+void SPhones::primaryPhoneEdited()
+{
+
+}
+
 void SPhones::clear()
 {
     deleteAllForms();
@@ -89,12 +101,24 @@ void SPhones::deleteAllForms()
 
 bool SPhones::isValid()
 {
-    return m_primaryForm->isValid();
+    bool ret = 1;
+    QList<SPhone*>::const_iterator i = m_phoneFormsList.constBegin();
+    while(i != m_phoneFormsList.constEnd())
+    {
+        ret &= (*i)->isValid();
+        i++;
+    }
+    return ret;
 }
 
 SPhone *SPhones::primary()
 {
     return m_primaryForm;
+}
+
+QList<SPhone *> SPhones::forms()
+{
+    return m_phoneFormsList;
 }
 
 /*  SLOT

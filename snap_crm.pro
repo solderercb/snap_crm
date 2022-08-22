@@ -181,9 +181,7 @@ LIBS += -lwinspool -lKernel32
 
 BIN_DIR ~= s,/,\\,g
 LIB_DIR ~= s,/,\\,g
-QMAKE_PRE_LINK  += chcp 1250 >nul 2>&1 $$escape_expand(\\n\\t)
 QMAKE_PRE_LINK  += rcc -binary $${PWD}\\schema-updates\\schema-updates.qrc -o $${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc $$escape_expand(\\n\\t)
-QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
 #QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
 equals(QT_MAJOR_VERSION, 5){
     CONFIG(release, debug|release) {

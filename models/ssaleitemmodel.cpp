@@ -2,6 +2,9 @@
 
 SSaleItemModel::SSaleItemModel(const QList<QStandardItem *> &record, QObject *parent) : SComRecord(parent)
 {
+    i_obligatoryFields << "dealer" << "item_id" << "document_id" << "user";
+    tableName = "store_sales";
+
     i_id = record.at(ColId)->data(Qt::DisplayRole).toInt();
     m_item_id = record.at(ColItemId)->data(Qt::DisplayRole).toInt();
     m_item_name = record.at(ColName)->data(Qt::DisplayRole).toString();
@@ -43,7 +46,6 @@ SSaleItemModel::SSaleItemModel(const QList<QStandardItem *> &record, QObject *pa
         i_logRecord->setDocumentId(m_doc_id);
     if(m_customer)
         i_logRecord->setClient(m_customer);
-    i_obligatoryFields << "dealer" << "item_id" << "document_id" << "user";
 }
 
 SSaleItemModel::~SSaleItemModel()
@@ -271,11 +273,11 @@ bool SSaleItemModel::commit()
     {
         if( (m_op_type == Sale) || (m_op_type == Reserve) )
         {
-            insert("store_sales");
+            insert();
         }
         else    // продажа ранее зарезервированного товара, возврат или отмена резерва
         {
-            update("store_sales", i_id);
+            update();
         }
 
         i_logRecord->commit();

@@ -20,6 +20,7 @@
 #include "models/sclientmodel.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "widgets/sphones.h"
+#include "querylog.h"
 
 namespace Ui {
     class tabRepairNew;
@@ -71,6 +72,7 @@ private:
     bool checkInput();
     QMessageBox msgBox;
     SGroupBoxEventFilter *groupBoxEventFilter;
+    bool createClient();
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
@@ -94,6 +96,7 @@ private slots:
     void lineEditSNClearHandler(int);
     bool createRepair();
     void createRepairClose();
+    void primaryPhoneEdited(QString);
 #ifdef QT_DEBUG
     void test_scheduler_handler();
     void test_scheduler2_handler();

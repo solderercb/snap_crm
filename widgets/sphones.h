@@ -16,8 +16,7 @@ class SPhones : public QWidget
     Q_OBJECT
 
 signals:
-    void inputUpdated(QString);
-    void typeChanged(int);
+    void primaryPhoneEdited(QString);
 
 public:
     explicit SPhones(QWidget *parent = nullptr);
@@ -29,6 +28,7 @@ public:
     void deleteAllForms();
     bool isValid();
     SPhone* primary();
+    QList<SPhone*> forms();
 
 private:
     Ui::SPhones *ui;
@@ -40,9 +40,12 @@ private:
     void addForm(SPhoneModel*);
 
 private slots:
-    void addPhone();
     void delPhone(SPhone*);
     void updateFormsButtons();
+    void markPhonesModelUpdated();
+    void primaryPhoneEdited();
+public slots:
+    void addPhone();
 };
 
 #endif // SPHONES_H

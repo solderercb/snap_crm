@@ -88,6 +88,12 @@ void SClientMatch::findByPhone(const QString &text)
     findClient();
 }
 
+void SClientMatch::findByPhone(const QString &text, const int mask)
+{
+    setPhoneMask(mask);
+    findByPhone(text);
+}
+
 void SClientMatch::clientMatchTableDoubleClicked(QModelIndex index)
 {
     emit clientSelected(clientsMatchTable->index(index.row(), 0).data().toInt());

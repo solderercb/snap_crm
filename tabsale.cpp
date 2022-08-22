@@ -68,7 +68,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     connect(tableModel, SIGNAL(amountChanged(float)), this, SLOT(updateTotalSumms(float)));
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
     connect(ui->comboBoxClientPhoneType,SIGNAL(currentIndexChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
-    connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(findClientByPhone(QString)));
+    connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(phoneNumberEdited(QString)));
 
 
 #ifdef QT_DEBUG
@@ -418,8 +418,8 @@ bool tabSale::createClient()
     clientModel->setFirstName(ui->lineEditClientFirstName->text());
     clientModel->setLastName(ui->lineEditClientLastName->text());
     clientModel->setPatronymicName(ui->lineEditClientPatronymic->text());
-    clientModel->appendLogText("Быстрое создание клиента из формы продажи");
-    clientModel->setAdType(clientAdTypesList->record(ui->comboBoxClientAdType->currentIndex()).value("id").toInt());
+    clientModel->appendLogText(tr("Быстрое создание клиента из формы продажи"));
+    clientModel->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
     if (ui->lineEditClientPhone->hasAcceptableInput())
     {
         clientModel->addPhone(ui->lineEditClientPhone->text(),
@@ -467,9 +467,9 @@ void tabSale::updateTotalSumms(float amount)
         ui->lineEditCharge->setText(sysLocale.toString(0.00, 'f', 2));
 }
 
-void tabSale::findClientByPhone(QString)
+void tabSale::phoneNumberEdited(QString)
 {
-    ui->widgetClientMatch->findByPhone(ui->lineEditClientPhone->displayText());
+    ui->widgetClientMatch->findByPhone(ui->lineEditClientPhone->displayText(), ui->comboBoxClientPhoneType->currentIndex());
 }
 
 void tabSale::clearClientCreds(bool hideCoincidence)
@@ -495,6 +495,7 @@ void tabSale::clearClientCreds(bool hideCoincidence)
     ui->lineEditBalance->clear();
     setBalanceWidgetsVisible(false);
     ui->comboBoxClientPhoneType->setCurrentIndex(clientPhoneTypesModel->index(0, 0).row());     // устанавливаем первый элемент выпадающего списка
+    ui->comboBoxClientAdType->setEnabled(true);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->checkBoxSaleInCredit->setChecked(false);
     if (hideCoincidence)

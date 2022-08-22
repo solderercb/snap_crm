@@ -34,6 +34,7 @@ public slots:
     void setPhoneMask(const int index);
     void findByLastname(const QString&);
     void findByPhone(const QString&);
+    void findByPhone(const QString&, const int);
 
 private slots:
     void clientMatchTableDoubleClicked(QModelIndex);

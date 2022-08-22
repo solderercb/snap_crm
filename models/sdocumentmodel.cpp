@@ -3,6 +3,7 @@
 SDocumentModel::SDocumentModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "company" << "user" << "total" << "created" << "office" << "img1" << "img2" << "img3";
+    tableName = "docs";
     i_logRecord->setType(SLogRecordModel::Doc);
 }
 
@@ -236,9 +237,9 @@ void SDocumentModel::setTrackingNumber(const QString &track)
     m_trackingNumber = track;
     i_valuesMap.insert("track", track);
     if(track.isEmpty())
-        i_logTexts->append(tr("Номер ТТН для РН №%1 удалён").arg(i_id));
+        appendLogText(tr("Номер ТТН для РН №%1 удалён").arg(i_id));
     else
-        i_logTexts->append(tr("РН №%1 присвоен номер ТТН: %2").arg(i_id).arg(track));
+        appendLogText(tr("РН №%1 присвоен номер ТТН: %2").arg(i_id).arg(track));
 }
 
 bool SDocumentModel::isValid()
@@ -253,7 +254,7 @@ bool SDocumentModel::commit()
 {
     if(i_id)
     {
-        update("docs", i_id);
+        update();
     }
     else
     {
@@ -268,7 +269,7 @@ bool SDocumentModel::commit()
         i_valuesMap.insert("user", userDbData->value("id"));
         i_valuesMap.insert("created", QDateTime::currentDateTime());
 
-        insert("docs");
+        insert();
     }
 
     i_logRecord->setDocumentId(i_id);

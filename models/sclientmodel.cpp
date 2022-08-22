@@ -4,6 +4,7 @@ SClientModel::SClientModel(int id, QObject *parent) :
     SComRecord(parent)
 {
     i_obligatoryFields << "name" << "notes";
+    tableName = "clients";
     m_phones = new SPhonesModel();
 
     i_logRecord->setType(SLogRecordModel::Client);
@@ -189,10 +190,9 @@ QString SClientModel::address()
     return m_address;
 }
 
-bool SClientModel::setAddress(QString &text)
+void SClientModel::setAddress(const QString &text)
 {
     i_valuesMap.insert("address", text);
-    return  1;
 }
 
 QString SClientModel::postIndex()
@@ -200,10 +200,9 @@ QString SClientModel::postIndex()
     return m_postIndex;
 }
 
-bool SClientModel::setPostIndex(QString &text)
+void SClientModel::setPostIndex(const QString &text)
 {
     i_valuesMap.insert("post_index", text);
-    return  1;
 }
 
 QString SClientModel::passportNum()
@@ -211,10 +210,9 @@ QString SClientModel::passportNum()
     return m_passportNum;
 }
 
-bool SClientModel::setPassportNum(QString &text)
+void SClientModel::setPassportNum(const QString &text)
 {
     i_valuesMap.insert("passport_num", text);
-    return  1;
 }
 
 QString SClientModel::passportIssuedDate()
@@ -222,10 +220,9 @@ QString SClientModel::passportIssuedDate()
     return m_passportIssuedDate;
 }
 
-bool SClientModel::setPassportIssuedDate(QString &text)
+void SClientModel::setPassportIssuedDate(const QString &text)
 {
     i_valuesMap.insert("passport_date", text);
-    return  1;
 }
 
 QString SClientModel::passportIssuedBy()
@@ -233,10 +230,9 @@ QString SClientModel::passportIssuedBy()
     return m_passportIssuedBy;
 }
 
-bool SClientModel::setPassportIssuedBy(QString &text)
+void SClientModel::setPassportIssuedBy(const QString &text)
 {
     i_valuesMap.insert("passport_organ", text);
-    return  1;
 }
 
 bool SClientModel::state()
@@ -249,15 +245,19 @@ bool SClientModel::type()
     return m_type;
 }
 
+void SClientModel::setType(const int type)
+{
+    i_valuesMap.insert("type", type);
+}
+
 QString SClientModel::birthday()
 {
     return m_birthday;
 }
 
-bool SClientModel::setBirthday(QString &text)
+void SClientModel::setBirthday(const QString &text)
 {
     i_valuesMap.insert("birthday", text);
-    return  1;
 }
 
 QString SClientModel::memorial()
@@ -539,20 +539,20 @@ QString SClientModel::genWebPass()
  */
 void SClientModel::appendLogText(const QString &text)
 {
-    i_logTexts->append(text);
+    SComRecord::appendLogText(text);
 }
 
 bool SClientModel::commit()
 {
     if(i_id)
     {
-        update("clients", i_id);
+        update();
     }
     else
     {
         i_valuesMap.insert("created", QDateTime::currentDateTime());
         i_valuesMap.insert("web_password", genWebPass());
-        insert("clients");
+        insert();
     }
 
     if(!i_nDBErr)
@@ -603,6 +603,7 @@ SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):
     SComRecord(parent)
 {
     i_obligatoryFields << "client" << "summ" << "direction" << "reason" << "created" << "office" << "uid";
+    tableName = "balance";
     i_valuesMap.insert("uid", userDbData->value("id"));
     i_valuesMap.insert("office", userDbData->value("current_office"));
     i_logRecord->setType(SLogRecordModel::Client);
@@ -651,7 +652,7 @@ bool SBalanceLogRecordModel::commit(const float amount)
     i_valuesMap.insert("summ", amount);
     i_valuesMap.insert("created", QDateTime::currentDateTime());
 
-    insert("balance");
+    insert();
 
     i_logRecord->commit();
     return i_nDBErr;

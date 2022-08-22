@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSqlRecord>
+#include <QMetaEnum>
 #include "global.h"
 #include "com_sql_queries.h"
 #include "scomrecord.h"
@@ -18,6 +19,7 @@ signals:
 public:
     enum Types {Additional = 0, Primary = 1};
     enum Messengers {Viber = 1, Telegram = 2, Whatsapp = 4};
+    Q_ENUM(Messengers);
     explicit SPhoneModel(QObject *parent = nullptr);
     explicit SPhoneModel(const QSqlRecord &record, QObject *parent = nullptr);
     ~SPhoneModel();
@@ -36,7 +38,6 @@ public:
     bool isEmpty();
     void setPrimary(int primary = Primary);
 private:
-    int m_id = 0;
     int m_client_id = 0;
     QString m_phone;
     QString m_phoneClean;
@@ -44,7 +45,7 @@ private:
     int m_type = Additional;
     int m_mask;
     int m_messengers = 0;
-    const QSqlRecord* m_record = nullptr;
+    int m_initialMessengers = 0;
     QString cleanPhone(const QString &);
     void setType(const int type);
 

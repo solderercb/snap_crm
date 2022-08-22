@@ -4,6 +4,7 @@ SLogRecordModel::SLogRecordModel(QObject *parent) :
     SDatabaseRecord(parent)
 {
     i_obligatoryFields << "user" << "created" << "values" << "values_after" << "office" << "notes";
+    tableName = "logs";
 }
 
 bool SLogRecordModel::commit()
@@ -14,7 +15,7 @@ bool SLogRecordModel::commit()
     i_valuesMap.insert("values_after", QVariant());
     i_valuesMap.insert("created", QDateTime::currentDateTime());
 
-    insert("logs");
+    insert(false);
 
     return i_nDBErr;
 }

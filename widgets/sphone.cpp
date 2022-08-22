@@ -16,10 +16,10 @@ SPhone::SPhone(QWidget *parent) :
 
     connect(ui->comboBoxPhoneMask,SIGNAL(currentIndexChanged(int)),this,SLOT(phoneMaskChanged(int)));
     connect(ui->checkBoxPrimary,SIGNAL(toggled(bool)), this,SLOT(checkBoxTypeToggled(bool)));
-    connect(ui->pushButtonAddPhone,SIGNAL(clicked()),this,SIGNAL(addPhone()));
-    connect(ui->pushButtonDelPhone,SIGNAL(clicked()),this,SLOT(delPhone()));
-    connect(ui->pushButtonEditPhone,SIGNAL(clicked()),this,SLOT(editPhone()));
-    connect(ui->lineEditPhone,SIGNAL(textEdited(QString)),this,SLOT(numberFieldEdited(QString)));
+    connect(ui->pushButtonAddPhone,SIGNAL(clicked()),this,SIGNAL(buttonAddClicked()));
+    connect(ui->pushButtonDelPhone,SIGNAL(clicked()),this,SLOT(buttonDelClicked()));
+    connect(ui->pushButtonEditPhone,SIGNAL(clicked()),this,SLOT(buttonEditClicked()));
+    connect(ui->lineEditPhone,SIGNAL(textEdited(QString)),this,SLOT(numberEdited(QString)));
     connect(ui->lineEditPhone,SIGNAL(editingFinished()),this,SLOT(numberEditFinished()));
     connect(ui->lineEditNotes,SIGNAL(editingFinished()),this,SLOT(notesEditFinished()));
     connect(ui->checkBoxViber,SIGNAL(clicked(bool)), this,SLOT(checkBoxViberClicked(bool)));
@@ -47,6 +47,9 @@ void SPhone::setModel(SPhoneModel *model)
 {
     connect(model,SIGNAL(modelUpdated()),this,SLOT(modelUpdated()));
 
+    if(!model->isEmpty())
+        setReadOnly();
+
     m_phoneModel = model;
     m_messengers = model->messengers();
     ui->comboBoxPhoneMask->setCurrentIndex(model->maskIndex());
@@ -60,10 +63,6 @@ void SPhone::setModel(SPhoneModel *model)
     if(m_isPrimary)
     {
         ui->checkBoxPrimary->setChecked(true);
-    }
-    if(!model->isEmpty())
-    {
-        setReadOnly();
     }
     updateButtons();
 }
@@ -99,6 +98,15 @@ void SPhone::fillPhone(const QSqlRecord &record)
     ui->lineEditPhone->setText(record.value(0).toString());    // теперь устанавливаем номер телефона
 }
 
+#ifdef QT_DEBUG
+void SPhone::testFill(const int mask, const QString &number)
+{
+    ui->comboBoxPhoneMask->setCurrentIndex(mask);
+    ui->lineEditPhone->setText(number);
+//    numberEditFinished();
+}
+#endif
+
 QString SPhone::phone()
 {
     return ui->lineEditPhone->displayText();
@@ -118,12 +126,13 @@ void SPhone::setPrimary()
 
 bool SPhone::isValid()
 {
-    if (!ui->lineEditPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool())   // если не указано отчество и оно обязятельно (только для физ. лиц)
+    if (!ui->lineEditPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool() && !m_isReadOnly)
     {
         ui->lineEditPhone->setStyleSheet(commonLineEditStyleSheetRed);
-        return 0;
+        m_isValid = 0;
+        return m_isValid;
     }
-    return 1;
+    return m_isValid;
 }
 
 void SPhone::setButtonVisible(Buttons button, bool state)
@@ -143,15 +152,24 @@ void SPhone::updateButtons()
     ui->pushButtonEditPhone->setVisible(m_isReadOnly);
 }
 
+int SPhone::maskIndex()
+{
+    return ui->comboBoxPhoneMask->currentIndex();
+}
+
 void SPhone::phoneMaskChanged(int index)
 {
-    m_mask = clientPhoneTypesModel->index(index, 2).data().toString();
+    QString mask = clientPhoneTypesModel->index(index, 2).data().toString();
+
+    if(m_isReadOnly)
+        ui->lineEditPhone->setReadOnly(false);  // маска не устанавливается в режиме RO, поэтому временно его выключаю
     ui->lineEditPhone->setInputMask("");
-    ui->lineEditPhone->setInputMask(m_mask + ";_");  // Here ";_" for filling blank characters with underscore
-//    m_visibleMask = m_mask.replace(QRegularExpression("[09]"), "_");   // в маске телефона меняем 0 и 9 на подчеркивание; 0 и 9 — это специальные маскировочные символы (см. справку QLineEdit, inputMask)
-    m_visibleMask = ui->lineEditPhone->displayText(); // второй вариант получения видимой маски
-    if(m_isPrimary)
-                emit maskChanged(index);
+    ui->lineEditPhone->setInputMask(mask + ";_");  // Here ";_" for filling blank characters with underscore
+    if(m_isReadOnly)
+        ui->lineEditPhone->setReadOnly(true);
+
+    if(!m_isReadOnly)
+        m_phoneModel->setMask(index);
 }
 
 void SPhone::checkBoxTypeToggled(bool checked)
@@ -179,30 +197,33 @@ void SPhone::modelUpdated()
     ui->checkBoxPrimary->blockSignals(false);
 }
 
-/*  SLOT
- */
-void SPhone::delPhone()
+void SPhone::buttonDelClicked()
 {
     emit delPhone(this);
 }
 
-void SPhone::editPhone()
+void SPhone::buttonEditClicked()
 {
     setReadOnly(!m_isReadOnly);
     updateButtons();
     emit sigEditPhone();
 }
 
-void SPhone::numberFieldEdited(QString)
+void SPhone::numberEdited(QString)
 {
-    ui->lineEditPhone->setStyleSheet(commonLineEditStyleSheet);   // если ранее lineEdit был подсвечен из-за ошибки ввода
+    if(!m_isValid)
+    {
+        ui->lineEditPhone->setStyleSheet(commonLineEditStyleSheet);   // если ранее lineEdit был подсвечен из-за ошибки ввода
+        m_isValid = 1;
+    }
     if(m_isPrimary)
-        emit inputUpdated(ui->lineEditPhone->displayText());
+        emit phoneEdited(ui->lineEditPhone->displayText());
 }
 
 void SPhone::numberEditFinished()
 {
-    m_phoneModel->setPhone(ui->lineEditPhone->text());
+    if(!m_isReadOnly)
+        m_phoneModel->setPhone(ui->lineEditPhone->text());
 }
 
 void SPhone::notesEditFinished()
