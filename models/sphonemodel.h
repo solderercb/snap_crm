@@ -37,6 +37,7 @@ public:
     void setMessengers(const int opt, bool state = 1);
     bool isEmpty();
     void setPrimary(int primary = Primary);
+    bool delDBRecord();
 private:
     int m_client_id = 0;
     QString m_phone;

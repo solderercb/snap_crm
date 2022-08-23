@@ -28,6 +28,7 @@ public:
 private:
     QSqlQuery *query;
     QList<SPhoneModel*> m_phonesList;
+    QList<SPhoneModel*> m_removeList;
     SPhoneModel* phoneItemHandler(const QSqlRecord &phone = QSqlRecord());
     SLogRecordModel *logRecord = nullptr;
     int m_client = 0;

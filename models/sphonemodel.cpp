@@ -192,6 +192,13 @@ void SPhoneModel::setPrimary(int primary)
 
 }
 
+bool SPhoneModel::delDBRecord()
+{
+    i_logRecord->setText(tr("Номер %1 удалён").arg(m_phone));
+    i_logRecord->commit();
+    return SComRecord::del();
+}
+
 /*  SLOT: Установка основным номером через UI (т. е. включение checkBox'а мышкой)
  */
 void SPhoneModel::setPrimaryUi()

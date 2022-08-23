@@ -19,7 +19,9 @@ SPhoneModel *SPhonesModel::primary()
     {
         SPhoneModel *dummyPhone = new SPhoneModel(this);
         dummyPhone->setPrimary();  // Первый всегда основной
+        dummyPhone->setClient(m_client);
         add(dummyPhone);
+        markUpdated();
     }
 
     return m_phonesList.first();
@@ -52,14 +54,14 @@ void SPhonesModel::add(SPhoneModel *phone)
     connect(phone,SIGNAL(markedPrimary(SPhoneModel*)),this,SLOT(switchPrimaryPhone(SPhoneModel*)));
 
     m_phonesList.append(phone);
-
+    phone->setClient(m_client);
 }
 
 void SPhonesModel::remove(SPhoneModel *phone)
 {
+    m_removeList.append(phone);
     int modelIndex = m_phonesList.indexOf(phone);
     m_phonesList.removeAt(modelIndex);
-    delete phone;
 }
 
 bool SPhonesModel::isEmpty()
@@ -85,11 +87,23 @@ bool SPhonesModel::commit()
         if(!item->commit())
             return 0;
     }
+
     if(logRecord != nullptr)
     {
-        logRecord->commit();
+        logRecord->commit();        // запись в журнал об изменении основного номера
         logRecord->deleteLater();
     }
+
+    while( !m_removeList.isEmpty() )
+    {
+        item = m_removeList.last();
+        if(!item->delDBRecord())
+            return 0;
+
+        m_removeList.removeLast();
+        item->deleteLater();
+    }
+
     return 1;
 }
 
