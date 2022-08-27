@@ -71,7 +71,25 @@
                                                 "  (LENGTH(REPLACE(t1.`look_list`, ',', ''))-LENGTH(t1.`look_list`) <= enumerator.`number`+1));\n")\
                                                 .arg((device))
 
-#define QUERY_SEL_DEVICE_ADD_FIELDS(device) QString("SELECT `name`, REPLACE(`def_values`,'\r','') AS 'def_values', `type`, `id`,  `required`,  `printable`  FROM `fields` WHERE `_f` = 0 AND FIND_IN_SET(%1,`devices`) AND `archive` = 0 ORDER BY `id`;").arg((device))
+#define QUERY_SEL_ADDITIONAL_FIELDS_TYPES(isRepair, id) QString(\
+                                                "SELECT\n"\
+                                                "  `name`,\n"\
+                                                "  REPLACE(`def_values`,'\r','') AS 'def_values',\n"\
+                                                "  `type`,\n"\
+                                                "  `id`,\n"\
+                                                "  `required`,\n"\
+                                                "  `printable`\n"\
+                                                "FROM\n"\
+                                                "  `fields`\n"\
+                                                "WHERE\n"\
+                                                "  `_f` = %1\n"\
+                                                "  AND FIND_IN_SET(%2,`%3`)\n"\
+                                                "  AND `archive` = 0\n"\
+                                                "ORDER BY\n"\
+                                                "  `id`;")\
+                                                .arg((isRepair?0:1))\
+                                                .arg((id))\
+                                                .arg((isRepair?"devices":"categories"))
 #define QUERY_SEL_DEVICE_MATCH(text)        QString(\
                                                 "SELECT\n"\
                                                 "  t1.`id`,\n"\
@@ -222,7 +240,9 @@
 #define QUERY_SEL_REPAIR_PREPAYS(R)         QString("SELECT IFNULL(SUM(`summa`), 0) AS 'summa' FROM `cash_orders` WHERE `repair` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_WORKS(R)           QString("SELECT SUM(`price` * `count`) AS 'summa' FROM `works` WHERE `repair` = %1 GROUP BY `repair`;").arg((R))
 #define QUERY_SEL_REPAIR_PARTS(R)           QString("SELECT SUM(`price` * `count`) AS `summa` FROM `store_int_reserve` WHERE `state` IN (2, 3) AND `repair_id` = %1;").arg((R))
-#define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t2.`name`, t1.`value`, '' AS 'comment' FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R)), QSqlDatabase::database("connMain")
+#define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t2.`name`, t1.`value`, '' AS 'comment' FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R))
+#define QUERY_SEL_ADD_FIELD(id)             QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment' FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`id` = %1;").arg((id))
+#define QUERY_SEL_ITEM_ADD_FIELDS(I)        QString("SELECT t2.`name`, t1.`value`, '' AS 'comment' FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`item_id` = %1 ORDER BY t1.`field_id` ASC;").arg((I))
 #define QUERY_SEL_IS_BALANCE_EN(C)          QString("SELECT SUM(`summ`) AS 'summa' FROM `balance` WHERE `client` = %1;").arg((C))
 #define QUERY_SEL_DOC(id)                   QString("SELECT  `id`,  `type`,  `state`,  `is_realization`,  `payment_system`,  `company`,  `store`,  `user`,  `total`,  `notes`,  `created`,  `updated_at`,  `office`,  `dealer`,  `currency_rate`,  `reason`,  `order_id`,  `price_option`,  `return_percent`,  `reserve_days`, DiffDays(UTC_TIMESTAMP(), `created`) AS 'diff_days', `master_id`,  `repair_id`,  `works_included`,  `invoice`,  `track`,  `d_store`,  `d_pay` FROM `docs` WHERE `id` = %1;").arg((id))
 #define QUERY_SEL_ITEMS_IN_DOC(id)          QString("SELECT t1.`id`, CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID', t2.`name`, t1.`count`, t2.`count` - t2.`reserved` AS 'avail', t1.`price`, t1.`count`*t1.`price` AS 'summ', t2.`box`, t1.`sn`, t1.`warranty`, t2.`is_realization`, t2.`return_percent`, t1.`is_cancellation`, t1.`cancellation_reason`, t2.`id` AS 'item_id', t2.`in_price`, t1.`document_id`, t2.`dealer`, t1.`customer_id` FROM store_sales AS t1 LEFT JOIN store_items AS t2 ON t1.`item_id`=t2.id WHERE (`document_id` = %1);").arg((id))

@@ -18,6 +18,9 @@
 #include "tabcommon.h"
 #include "amountToWords.h"
 #include "models/sclientmodel.h"
+#include "models/sfieldsmodel.h"
+#include "models/sdevmdlmodel.h"
+#include "models/srepairmodel.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "widgets/sphones.h"
 #include "querylog.h"
@@ -49,25 +52,25 @@ private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
     MainWindow *parent;
-    SClientModel *clientModel2;
+    SRepairModel * repairModel;
     void setDefaultStyleSheets();
     void getDevices();
-    QString genUserWebPass() const;
-//    QStandardItemModel* comboboxDevicesModel;
-    QSqlQueryModel* comboboxDevicesModel;
-    QSqlQueryModel* comboboxDeviceMakersModel;
-    QSqlQueryModel* comboboxDeviceModelsModel;
-    QSqlQueryModel* comboboxProblemModel;
-    QSqlQueryModel* comboBoxIncomingSetModel;
-    QSqlQueryModel* comboBoxExteriorModel;
+//    QStandardItemModel* deviceClassesModel;
+    SSqlQueryModel* deviceClassesModel;
+    SSqlQueryModel* deviceVendorsModel;
+    SSqlQueryModel* devicesModel;
+    QSqlQueryModel* classProblemsModel;
+    QSqlQueryModel* classIncomingSetsModel;
+    QSqlQueryModel* classExteriorsModel;
     QSqlQueryModel* clientModel;
-    QSqlQueryModel* queryDevice;
     QSqlQueryModel* clientPhonesModel;
+    SClientModel *clientModel2;
+    SFieldsModel *additionalFields;
+    QSqlQueryModel* queryDevice;
     QStandardItemModel* prepayReasonsModel;
     QList<QStandardItem*> *prepayReason;
     QSqlQueryModel* clientsMatchTable;
     QSqlQueryModel* devicesMatchTable;
-    QVector<QWidget*> additionalFieldsWidgets;
     int client = 0;
     bool checkInput();
     QMessageBox msgBox;
@@ -82,8 +85,8 @@ private slots:
     void changeClientType();
     void showLineEditPrevRepair();
     void enablePrepayWidgets(bool);
-    void changeDeviceType();
-    void changeDeviceMaker();
+    void changeDeviceClass(int);
+    void changeDeviceVendor(int);
     void clearClientCreds(bool hideCoincidence = true);
     void lineEditPrevRepairButtonsHandler(int);
     void fillClientCreds(int);

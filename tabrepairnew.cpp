@@ -12,7 +12,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairNew)
 {
+    additionalFields = new SFieldsModel(1);
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    repairModel = new SRepairModel(this);
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
     QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
@@ -83,19 +85,19 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxPresetBox->setCurrentIndex(-1);
     ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
 
-    comboboxDevicesModel = new QSqlQueryModel();
-    ui->comboBoxDevice->setModel(comboboxDevicesModel);
-    comboboxDeviceMakersModel = new QSqlQueryModel();
-    ui->comboBoxDeviceMaker->setModel(comboboxDeviceMakersModel);
-    comboboxDeviceModelsModel = new QSqlQueryModel();
-    ui->comboBoxDeviceModel->setModel(comboboxDeviceModelsModel);
-    comboboxProblemModel = new QSqlQueryModel();
-    ui->comboBoxProblem->setModel(comboboxProblemModel);
+    deviceClassesModel = new SSqlQueryModel();
+    ui->comboBoxDevice->setModel(deviceClassesModel);
+    deviceVendorsModel = new SSqlQueryModel();
+    ui->comboBoxDeviceMaker->setModel(deviceVendorsModel);
+    devicesModel = new SSqlQueryModel();
+    ui->comboBoxDeviceModel->setModel(devicesModel);
+    classProblemsModel = new QSqlQueryModel();
+    ui->comboBoxProblem->setModel(classProblemsModel);
     ui->comboBoxProblem->setCurrentIndex(-1);
-    comboBoxIncomingSetModel = new QSqlQueryModel();
-    ui->comboBoxIncomingSet->setModel(comboBoxIncomingSetModel);
-    comboBoxExteriorModel = new QSqlQueryModel();
-    ui->comboBoxExterior->setModel(comboBoxExteriorModel);
+    classIncomingSetsModel = new QSqlQueryModel();
+    ui->comboBoxIncomingSet->setModel(classIncomingSetsModel);
+    classExteriorsModel = new QSqlQueryModel();
+    ui->comboBoxExterior->setModel(classExteriorsModel);
 
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
 
@@ -120,7 +122,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     clientsMatchTable = new QSqlQueryModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
     devicesMatchTable = new QSqlQueryModel();       // таблица совпадения устройства (по серийному номеру)
 
-    comboboxDevicesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
+    deviceClassesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
     ui->comboBoxDevice->setCurrentIndex(-1);
     msgBox.setText(tr("Ошибка"));
     msgBox.setIcon(QMessageBox::Critical);
@@ -147,22 +149,16 @@ tabRepairNew::~tabRepairNew()
     delete query;
 
     delete ui;
-    delete comboboxDeviceMakersModel;
-    delete comboboxDeviceModelsModel;
-    delete comboboxDevicesModel;
-    for(int i=additionalFieldsWidgets.size()-1;i>=0;i--)   // удаляем доп. поля
-    {
-        if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QComboBox", Qt::CaseSensitive) == 0 )
-            delete static_cast<QComboBox*>(additionalFieldsWidgets[i])->model();    // удаляем модель данных, если объект QComboBox
-        delete additionalFieldsWidgets[i];
-        additionalFieldsWidgets.removeAt(i);
-    }
-    delete comboboxProblemModel;
-    delete comboBoxIncomingSetModel;
-    delete comboBoxExteriorModel;
+    delete deviceVendorsModel;
+    delete devicesModel;
+    delete deviceClassesModel;
+    delete classProblemsModel;
+    delete classIncomingSetsModel;
+    delete classExteriorsModel;
     delete clientsMatchTable;
     delete devicesMatchTable;
     delete groupBoxEventFilter;
+    delete additionalFields;
     #ifdef QT_DEBUG
         delete test_scheduler;
         delete test_scheduler2;
@@ -188,22 +184,6 @@ void tabRepairNew::getDevices()
 //    if (!DBConnectionOK)
 //        return;
 
-}
-
-// https://stackoverflow.com/a/18866593
-QString tabRepairNew::genUserWebPass() const
-{
-   const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-   const int randomStringLength = 6; // assuming you want random strings of 12 characters
-
-   QString randomString;
-   for(int i=0; i<randomStringLength; ++i)
-   {
-       int index = QRandomGenerator::global()->bounded(possibleCharacters.length());
-       QChar nextChar = possibleCharacters.at(index);
-       randomString.append(nextChar);
-   }
-   return randomString;
 }
 
 void tabRepairNew::changeClientType()
@@ -253,120 +233,41 @@ void tabRepairNew::enablePrepayWidgets(bool state)
     ui->pushButtonCashReceipt->setEnabled(state);
 }
 
-void tabRepairNew::changeDeviceType()
+void tabRepairNew::changeDeviceClass(int index)
 {
-
-    int comboBoxDeviceIndex = ui->comboBoxDevice->currentIndex();
+    qDebug().nospace() << "[tabRepairNew] changeDeviceClass() | In";
     int additionalFieldRow = 2, additionaFieldCol = 0;
-    int additionalFieldType = 0;
-    QSizePolicy *additionalFieldsSizePolicy = new QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    QWidget *additionalField;
+    int classId = 0;
     QString query;
 
-//    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(before)";
-    for(int i=additionalFieldsWidgets.size()-1;i>=0;i--)   // в случае ошибочного выбора категории уст-ва, нужно удалить ранее добавленные виджеты доп. полей
-    {
-//        qDebug() << "Removing widget; fieldId = " << additionalFieldsWidgets[i]->property("fieldId").toInt() << "; fieldType = " << additionalFieldsWidgets[i]->property("fieldType").toInt();
-        delete additionalFieldsWidgets[i];
-        additionalFieldsWidgets.removeAt(i);
-    }
-//    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(after)";
+    classId = deviceClassesModel->databaseIDByRow(index);
+    repairModel->setClassId(classId);
+    additionalFields->initWidgets(classId);
 
-    query = QUERY_SEL_DEVICE_MAKERS(comboboxDevicesModel->index(comboBoxDeviceIndex, 2).data().toString());
-    comboboxDeviceMakersModel->setQuery(query, QSqlDatabase::database("connMain"));
+    query = QUERY_SEL_DEVICE_MAKERS(classId);
+    deviceVendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxDeviceMaker->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка неисправностей
-    query = QUERY_SEL_DEVICE_FAULTS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
-    comboboxProblemModel->setQuery(query, QSqlDatabase::database("connMain"));
+    query = QUERY_SEL_DEVICE_FAULTS(classId);
+    classProblemsModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxProblem->setCurrentIndex(-1);
 
-
     // Заполнение модели выпадающего списка комплектности
-    query = QUERY_SEL_DEVICE_SET(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
-    comboBoxIncomingSetModel->setQuery(query, QSqlDatabase::database("connMain"));
+    query = QUERY_SEL_DEVICE_SET(classId);
+    classIncomingSetsModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxIncomingSet->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка внешнего вида
-    query = QUERY_SEL_DEVICE_EXTERIOR(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
-    comboBoxExteriorModel->setQuery(query, QSqlDatabase::database("connMain"));
+    query = QUERY_SEL_DEVICE_EXTERIOR(classId);
+    classExteriorsModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxExterior->setCurrentIndex(-1);
 
-    // создание доп. полей для выбранной категории уст-ва
-    QSqlQuery* additionalFieldsList = new QSqlQuery(QSqlDatabase::database("connMain"));
-
-    query = QUERY_SEL_DEVICE_ADD_FIELDS(comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt());
-    additionalFieldsList->exec(query);
-
-    while(additionalFieldsList->next())
+    qDebug().nospace() << "[tabRepairNew] changeDeviceClass() | Creating additional fields";
+    foreach(additionalField, additionalFields->widgetsList())
     {
-        additionalFieldType = additionalFieldsList->value(2).toInt();
-        QWidget *additionalFieldWidget;
-        if (additionalFieldType == addlField::LineEdit)
-        {
-            QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
-            additionalFieldWidget = additionalFieldLineEdit;
-            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-            additionalFieldLineEdit->setPlaceholderText(additionalFieldsList->value(0).toString());
-        } else if (additionalFieldType == addlField::ComboBox)
-        {
-            QComboBox *additionalFieldComboBox = new QComboBox(this);
-            additionalFieldWidget = additionalFieldComboBox;
-            QStandardItemModel* additionalFieldComboBoxModel = new QStandardItemModel();
-            // TODO: нужно проверить удаляется ли модель при удалении виджета
-            QStringList additionalFieldComboBoxItems = additionalFieldsList->value(1).toString().split('\n');
-            QStandardItem *newRow;
-            QFontMetrics *fm = new QFontMetrics(this->font());
-            int itemTextWidth, dropDownListWidth = 0;
-
-            additionalFieldComboBox->setModel(additionalFieldComboBoxModel);
-//            if (additionalFieldComboBoxItems.at(0) != "")   // Принудительно добавляем пустую строку
-//            {
-//                newRow = new QStandardItem();
-//                newRow->setText("");
-//                additionalFieldComboBoxModel->appendRow(newRow);
-//            }
-            for (int i=0; i<additionalFieldComboBoxItems.size(); i++)
-            {
-                newRow = new QStandardItem();
-                newRow->setText(additionalFieldComboBoxItems.at(i));
-                additionalFieldComboBoxModel->appendRow(newRow);
-
-                // определяем наибольшую длину текста в списке элементов
-                itemTextWidth = fm->size(Qt::TextSingleLine, additionalFieldComboBoxItems.at(i)).width() + 10;
-                if (itemTextWidth > dropDownListWidth)
-                    dropDownListWidth = itemTextWidth;
-            }
-            delete fm;  // больше не нужен
-            additionalFieldComboBox->setMinimumWidth(100);
-            additionalFieldComboBox->view()->setMinimumWidth(dropDownListWidth);
-            additionalFieldComboBox->setCurrentIndex(-1);
-            additionalFieldComboBox->setEditable(true);
-            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-            additionalFieldComboBox->lineEdit()->setPlaceholderText(additionalFieldsList->value(0).toString());
-        } else if (additionalFieldType == addlField::DateEdit)
-        {
-            QDateEdit *additionalFieldDateTimeEdit = new QDateEdit(QDate::currentDate());
-            additionalFieldWidget = additionalFieldDateTimeEdit;
-            additionalFieldDateTimeEdit->setCalendarPopup(true);
-        } else if (additionalFieldType == addlField::dummy)
-        {
-            // TODO: В АСЦ не реализовано, поэтому используем заглушку из лайнэдита
-            QLineEdit *additionalFieldLineEdit = new QLineEdit(this);
-            additionalFieldWidget = additionalFieldLineEdit;
-            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-            additionalFieldLineEdit->setPlaceholderText(additionalFieldsList->value(0).toString());
-            additionalFieldLineEdit->setEnabled(false);
-        }
-        else
-            additionalFieldWidget = new QWidget();  // на случай ошибок в БД
-
-        additionalFieldWidget->setSizePolicy(*additionalFieldsSizePolicy);
-        additionalFieldsWidgets.append(additionalFieldWidget);
-        ui->gridLayoutDeviceDescription->addWidget(additionalFieldWidget, additionalFieldRow, additionaFieldCol, 1, 1);
-        additionalFieldWidget->setProperty("fieldId", additionalFieldsList->value(3).toInt());
-        additionalFieldWidget->setProperty("fieldType", additionalFieldType);
-        additionalFieldWidget->setProperty("fieldRequired", additionalFieldsList->value(4).toBool());
-        additionalFieldWidget->setProperty("fieldPrintable", additionalFieldsList->value(5).toBool());
+        ui->gridLayoutDeviceDescription->addWidget(additionalField, additionalFieldRow, additionaFieldCol, 1, 1);
 
         if (++additionaFieldCol > 5)
         {
@@ -374,23 +275,19 @@ void tabRepairNew::changeDeviceType()
             additionaFieldCol = 0;
         }
     }
-
-//    qDebug() << "tabRepairNew::changeDeviceType: additionalFieldsWidgets.size() =" << additionalFieldsWidgets.size() << "(end of function)";
-//    delete additionalFieldsList;
-    delete additionalFieldsSizePolicy;
-
+    qDebug().nospace() << "[tabRepairNew] changeDeviceClass() | Out";
 }
 
-void tabRepairNew::changeDeviceMaker()
+void tabRepairNew::changeDeviceVendor(int VenId)
 {
     int comboBoxDeviceIndex = ui->comboBoxDevice->currentIndex();
     int comboBoxDeviceMakerIndex = ui->comboBoxDeviceMaker->currentIndex();
-    int deviceId = comboboxDevicesModel->index(comboBoxDeviceIndex, 1).data().toInt();
-    int deviceMakerId = comboboxDeviceMakersModel->index(comboBoxDeviceMakerIndex, 1).data().toInt();
+    int deviceId = deviceClassesModel->index(comboBoxDeviceIndex, 1).data().toInt();
+    int deviceMakerId = deviceVendorsModel->index(comboBoxDeviceMakerIndex, 1).data().toInt();
     QString query;
 
     query = QUERY_SEL_DEVICE_MODELS.arg(deviceId).arg(deviceMakerId);
-    comboboxDeviceModelsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    devicesModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxDeviceModel->setCurrentIndex(-1);
 }
 
@@ -507,24 +404,24 @@ void tabRepairNew::fillDeviceCreds(int id)
     fillClientCreds(client);
 //    if (ui->comboBoxDevice->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
     {
-        for (i = 0; i < comboboxDevicesModel->rowCount(); i++)  // перебираем все типы уст-в в поисках нужного id
+        for (i = 0; i < deviceClassesModel->rowCount(); i++)  // перебираем все типы уст-в в поисках нужного id
         {
-            if (comboboxDevicesModel->index(i, 1).data().toInt() == device)
+            if (deviceClassesModel->index(i, 1).data().toInt() == device)
                 break;
         }
         ui->comboBoxDevice->setCurrentIndex(i);
         // TODO: сделать запросы к БД асинхронными. Готовые классы https://github.com/micjabbour/MSqlQuery
         // на данный момент по локальной сети всё работает быстро, поэтому не буду заморачиваться
 
-        for (i = 0; i < comboboxDeviceMakersModel->rowCount(); i++)  // перебираем всех производителей уст-в в поисках нужного id
+        for (i = 0; i < deviceVendorsModel->rowCount(); i++)  // перебираем всех производителей уст-в в поисках нужного id
         {
-            if (comboboxDeviceMakersModel->index(i, 1).data().toInt() == deviceMaker)
+            if (deviceVendorsModel->index(i, 1).data().toInt() == deviceMaker)
                 break;
         }
         ui->comboBoxDeviceMaker->setCurrentIndex(i);
-        for (i = 0; i < comboboxDeviceModelsModel->rowCount(); i++)  // перебираем все модели уст-в в поисках нужной id
+        for (i = 0; i < devicesModel->rowCount(); i++)  // перебираем все модели уст-в в поисках нужной id
         {
-            if (comboboxDeviceModelsModel->index(i, 1).data().toInt() == deviceModel)
+            if (devicesModel->index(i, 1).data().toInt() == deviceModel)
                 break;
         }
         ui->comboBoxDeviceModel->setCurrentIndex(i);
@@ -634,7 +531,7 @@ void tabRepairNew::setDefaultStyleSheets()
     ui->lineEditPrepaySumm->setStyleSheet(commonLineEditStyleSheet);
     ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditPrevRepair->setStyleSheet(commonLineEditStyleSheet);
-
+/*
     for(int i=0; i< additionalFieldsWidgets.size(); i++)   // установка стилей доп. полей
     {
         if ( additionalFieldsWidgets[i]->property("fieldRequired").toBool() )
@@ -650,7 +547,7 @@ void tabRepairNew::setDefaultStyleSheets()
 //                    additionalFieldsWidgets[i]->setStyleSheet(commonDateEditStyleSheet);   // Дату не окрашиваем, даже если она обязательна, т. к. не продуман механизм проверки
         }
     }
-
+*/
 }
 
 bool tabRepairNew::checkInput()
@@ -729,6 +626,7 @@ bool tabRepairNew::checkInput()
         ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 15;
     }
+/*
     for(int i=0; i< additionalFieldsWidgets.size(); i++)   // установка стилей доп. полей
     {
         if ( additionalFieldsWidgets[i]->property("fieldRequired").toBool() )
@@ -769,6 +667,7 @@ bool tabRepairNew::checkInput()
             }
         }
     }
+*/
     if ( ui->checkBoxIsEstPrice->isChecked() )   // если установлен флаг "Клиент ознакомлен с возможной стоимостью"
         if (ui->lineEditEstPrice->text() == "" || ui->lineEditEstPrice->text().toInt() == 0)   // соответствует ли норме введённая сумма
         {
@@ -884,22 +783,21 @@ bool tabRepairNew::createRepair()
     QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
 
     // пользователь мог выбрать модель из списка, а затем отредаткировать её, поэтому пробуем найти модель в списке
-    deviceModelIndex = comboboxDeviceModelsModel->rowCount();
-    while (--deviceModelIndex >= 0 && comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText());
+    deviceModelIndex = devicesModel->rowCount();
+    while (--deviceModelIndex >= 0 && devicesModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText());
     // если не выбрана модель из списка, создаём новую. Или если была выбрана модель из списка, а затем текст был отредактирован, тоже записываем в таблицу новую модель.
-    if ( deviceModelIndex < 0 ||  (comboboxDeviceModelsModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText()) )
+    if ( deviceModelIndex < 0 ||  (devicesModel->record(deviceModelIndex).value("name").toString() != ui->comboBoxDeviceModel->currentText()) )
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_DEVICE_MODEL
-                    .arg(ui->comboBoxDeviceModel->currentText())
-                    .arg("NULL")
-                    .arg(comboboxDeviceMakersModel->record(deviceMakerIndex).value("id").toInt())
-                    .arg(comboboxDevicesModel->record(deviceTypeIndex).value("id").toInt()));
-        QUERY_LAST_INS_ID(query,nDBErr,deviceModel);
-        qDebug() << "Новая модель уст-ва: LAST_INSERT_ID() = " << deviceModel;
+        SDevMdlModel *devMdl = new SDevMdlModel(this);
+        devMdl->setName(ui->comboBoxDeviceModel->currentText());
+        devMdl->setDevice(deviceClassesModel->record(deviceTypeIndex).value("id").toInt());
+        devMdl->setMaker(deviceVendorsModel->record(deviceMakerIndex).value("id").toInt());
+        devMdl->commit();
+        qDebug() << "Новая модель уст-ва: LAST_INSERT_ID() = " << devMdl->id();
     }
     else
     {
-        deviceModel = comboboxDeviceModelsModel->record(deviceModelIndex).value("id").toInt();
+        deviceModel = devicesModel->record(deviceModelIndex).value("id").toInt();
 //        qDebug() << "model already exists";
     }
 
@@ -907,8 +805,8 @@ bool tabRepairNew::createRepair()
     QUERY_EXEC(query,nDBErr)(QUERY_INS_WORKSHOP
                 .arg(ui->comboBoxDevice->currentText() + " " + ui->comboBoxDeviceMaker->currentText() + " " + ui->comboBoxDeviceModel->currentText())
                 .arg(client)
-                .arg(comboboxDevicesModel->record(deviceTypeIndex).value("id").toInt())
-                .arg(comboboxDeviceMakersModel->record(deviceMakerIndex).value("id").toInt())
+                .arg(deviceClassesModel->record(deviceTypeIndex).value("id").toInt())
+                .arg(deviceVendorsModel->record(deviceMakerIndex).value("id").toInt())
                 .arg(deviceModel)
                 .arg(ui->lineEditSN->text())
                 .arg(company)
@@ -999,7 +897,7 @@ bool tabRepairNew::createRepair()
         // В журнале делаю запись о предоплате, думаю это будет удобно; ASC CRM такую запись вроде бы не делает :-(
         QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL",QString("Внесена предоплата за ремонт №%2 в размере %3 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(sysLocale.toCurrencyString(prepaySumm))));
     }
-
+/*
     for(int i=0; i< additionalFieldsWidgets.size(); i++)   // запись значений доп. полей
     {
         QString text = "";
@@ -1027,7 +925,7 @@ bool tabRepairNew::createRepair()
             QUERY_EXEC(query,nDBErr)(QUERY_INS_FIELDS(additionalFieldsWidgets[i]->property("fieldId").toInt(), repair, "NULL", text));
         }
     }
-
+*/
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
 #ifdef QT_DEBUG
 //    nDBErr = 1; // и это для отладки (чтобы проверить работу дальше)
@@ -1159,17 +1057,17 @@ void tabRepairNew::randomFill()
     }
     else if (test_scheduler_counter == 1)
     {
-        i = comboboxDevicesModel->rowCount();
+        i = deviceClassesModel->rowCount();
         ui->comboBoxDevice->setCurrentIndex(QRandomGenerator::global()->bounded(i));
     }
     else if (test_scheduler_counter == 2)
     {
-        i = comboboxDeviceMakersModel->rowCount();
+        i = deviceVendorsModel->rowCount();
         ui->comboBoxDeviceMaker->setCurrentIndex(QRandomGenerator::global()->bounded(i));
     }
     else if (test_scheduler_counter == 3)   // модель
     {
-        i = comboboxDeviceModelsModel->rowCount();
+        i = devicesModel->rowCount();
         if (QRandomGenerator::global()->bounded(100) > 50 && i)  // 50/50 или выбираем из уже имеющихся моделей или случайное число (проверка i нужна, т. к. список может быть вообще пуст)
         {
             ui->comboBoxDeviceModel->setCurrentIndex(QRandomGenerator::global()->bounded(i));
@@ -1187,8 +1085,8 @@ void tabRepairNew::randomFill()
     else if (test_scheduler_counter == 5)   // неисправность
     {
         ui->comboBoxProblem->setFocus();
-        i = comboboxProblemModel->rowCount();
-        ui->comboBoxProblem->setCurrentText(comboboxProblemModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
+        i = classProblemsModel->rowCount();
+        ui->comboBoxProblem->setCurrentText(classProblemsModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
         if (ui->comboBoxProblem->currentText() == "")
             ui->comboBoxProblem->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
         QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
@@ -1199,8 +1097,8 @@ void tabRepairNew::randomFill()
     else if (test_scheduler_counter == 6)   // космолектность
     {
         ui->comboBoxIncomingSet->setFocus();
-        i = comboBoxIncomingSetModel->rowCount();
-        ui->comboBoxIncomingSet->setCurrentText(comboBoxIncomingSetModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
+        i = classIncomingSetsModel->rowCount();
+        ui->comboBoxIncomingSet->setCurrentText(classIncomingSetsModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
         if (ui->comboBoxIncomingSet->currentText() == "")
             ui->comboBoxIncomingSet->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
         QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
@@ -1211,8 +1109,8 @@ void tabRepairNew::randomFill()
     else if (test_scheduler_counter == 7)   // внешний вид
     {
         ui->comboBoxExterior->setFocus();
-        i = comboBoxIncomingSetModel->rowCount();
-        ui->comboBoxExterior->setCurrentText(comboBoxExteriorModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
+        i = classIncomingSetsModel->rowCount();
+        ui->comboBoxExterior->setCurrentText(classExteriorsModel->record(QRandomGenerator::global()->bounded(i)).value("name").toString());
         if (ui->comboBoxExterior->currentText() == "")
             ui->comboBoxExterior->setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
         QKeyEvent* newEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier,"\t");
@@ -1222,6 +1120,7 @@ void tabRepairNew::randomFill()
     }
     else if (test_scheduler_counter == 8)
     {
+/*
         for(int j=0; j< additionalFieldsWidgets.size(); j++)   // автозаполнение обязательных доп. полей
         {
             if ( additionalFieldsWidgets[j]->property("fieldRequired").toBool() )
@@ -1238,6 +1137,7 @@ void tabRepairNew::randomFill()
                 }
             }
         }
+*/
     }
     else if (test_scheduler_counter == 9)   // инженер
     {

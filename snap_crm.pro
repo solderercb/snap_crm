@@ -43,6 +43,17 @@ SOURCES += \
     models/repairstablemodel.cpp \
     models/repairtablefiltermenu.cpp \
     models/saletablemodel.cpp \
+    models/scommentmodel.cpp \
+    models/scommentsmodel.cpp \
+    models/sdevicemakermodel.cpp \
+    models/sdevicemakersmodel.cpp \
+    models/sdevicemodel.cpp \
+    models/sdevicesmodel.cpp \
+    models/sdevmdlmodel.cpp \
+    models/sdevmdlsmodel.cpp \
+    models/sfieldsmodel.cpp \
+    models/sfieldvaluemodel.cpp \
+    models/srepairmodel.cpp \
     models/ssloptionsdialog.cpp \
     models/ssqlquerymodel.cpp \
     models/sstandarditemmodel.cpp \
@@ -90,6 +101,17 @@ HEADERS  += \
     models/repairstablemodel.h \
     models/repairtablefiltermenu.h \
     models/saletablemodel.h \
+    models/scommentmodel.h \
+    models/scommentsmodel.h \
+    models/sdevicemakermodel.h \
+    models/sdevicemakersmodel.h \
+    models/sdevicemodel.h \
+    models/sdevicesmodel.h \
+    models/sdevmdlmodel.h \
+    models/sdevmdlsmodel.h \
+    models/sfieldsmodel.h \
+    models/sfieldvaluemodel.h \
+    models/srepairmodel.h \
     models/ssloptionsdialog.h \
     models/ssqlquerymodel.h \
     models/sstandarditemmodel.h \

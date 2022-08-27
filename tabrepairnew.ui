@@ -1138,7 +1138,7 @@
    <sender>comboBoxDevice</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>changeDeviceType()</slot>
+   <slot>changeDeviceClass(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>387</x>
@@ -1154,7 +1154,7 @@
    <sender>comboBoxDeviceMaker</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>changeDeviceMaker()</slot>
+   <slot>changeDeviceVendor(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>566</x>
@@ -1394,8 +1394,8 @@
  <slots>
   <slot>changeClientType()</slot>
   <slot>enableLineEditPrevRepair()</slot>
-  <slot>changeDeviceType()</slot>
-  <slot>changeDeviceMaker()</slot>
+  <slot>changeDeviceClass(int)</slot>
+  <slot>changeDeviceVendor(int)</slot>
   <slot>buttonSelectExistingClientHandler()</slot>
   <slot>clearClientCreds()</slot>
   <slot>showLineEditPrevRepair()</slot>

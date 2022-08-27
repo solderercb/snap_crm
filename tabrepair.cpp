@@ -118,7 +118,7 @@ void tabRepair::updateRepairData()
 {
     repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(repair_id));
     clientModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt()));
-    fieldsModel->setQuery(QUERY_SEL_REPAIR_ADD_FIELDS(repair_id));
+    fieldsModel->setQuery(QUERY_SEL_REPAIR_ADD_FIELDS(repair_id), QSqlDatabase::database("connMain"));
     worksAndPartsModel->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(repair_id));
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
 }
