@@ -3,36 +3,8 @@
 
 #include <QObject>
 #include <QList>
+#include <QHash>
 #include "sfieldvaluemodel.h"
-
-/*  Специальный LineEdit для доп. полей
- *  Ретранслирует стандартный сигнал editingFinished с новым значением
- */
-class AFLineEdit : public QLineEdit
-{
-    Q_OBJECT
-signals:
-    void editingFinished(const QString&);
-public:
-    explicit AFLineEdit(QWidget *parent = nullptr);
-private slots:
-    void editingFinished();
-};
-
-/*  Специальный DateEdit для доп. полей
- *  Ретранслирует стандартный сигнал dateChanged с преобразованным в QString значением
- */
-class AFDateEdit : public QDateEdit
-{
-    Q_OBJECT
-signals:
-    void dateChanged(const QString&);
-public:
-    explicit AFDateEdit(QWidget *parent = nullptr);
-    explicit AFDateEdit(QDate, QWidget *parent = nullptr);
-private slots:
-    void dateChanged(const QDate&);
-};
 
 class SFieldsModel : public QObject
 {
@@ -52,7 +24,7 @@ public:
     QWidget *createDummyWidget(const QSqlRecord&, SFieldValueModel*);
     bool load(int);
     void add(SFieldValueModel*);
-    void remove(SFieldValueModel *phone);
+    void remove(SFieldValueModel *field);
     bool isEmpty();
     void setRepair(const int id);
     void setItem(const int id);
@@ -64,9 +36,7 @@ public:
     void resetIds();
 private:
     QSqlQuery *query;
-    QList<SFieldValueModel*> m_fieldsList;
     QList<SFieldValueModel*> m_removeList;
-    QList<QWidget*> m_widgetsList;
     SFieldValueModel* itemHandler(const QSqlRecord &phone = QSqlRecord());
     SLogRecordModel *logRecord = nullptr;
     int m_repair = 0;

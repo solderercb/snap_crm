@@ -11,20 +11,22 @@ SFieldsModel::~SFieldsModel()
 {
     qDebug().nospace() << "[SFieldsModel] ~SFieldsModel() | In";
     delete query;
-    deleteWidgets();
-    qDebug().nospace() << "[SFieldsModel] ~SFieldsModel() | all widgets deleted successfully";
-    deleteFields();
-    qDebug().nospace() << "[SFieldsModel] ~SFieldsModel() | Out";
+    clear();
+    qDebug().nospace() << "[SFieldsModel] ~SFieldsModel() | all widgets and fields deleted successfully";
 }
 
-void SFieldsModel::deleteWidgets()
+void SFieldsModel::clear()
 {
     qDebug().nospace() << "[SFieldsModel] deleteWidgets() | In";
     QWidget *w;
+    SFieldValueModel *f;
 
-    while( !m_widgetsList.isEmpty() )
+    QMap<QWidget*, SFieldValueModel*>::ConstIterator i;
+    while(!widgetFieldMap.isEmpty())
     {
-        w = m_widgetsList.last();
+        i = widgetFieldMap.constBegin();
+        w = i.key();
+        f = i.value();
         qDebug().nospace() << "[SFieldsModel] deleteWidgets() | Step x.0";
         if(w->property("fieldType") == WidgetType::ComboBox)
         {
@@ -36,33 +38,22 @@ void SFieldsModel::deleteWidgets()
                 delete widgetModel;
         }
         qDebug().nospace() << "[SFieldsModel] deleteWidgets() | Step x.1";
-        m_widgetsList.removeLast();
+        widgetFieldMap.remove(w);
         qDebug().nospace() << "[SFieldsModel] deleteWidgets() | Step x.2";
         delete w;
+        delete f;
     }
     qDebug().nospace() << "[SFieldsModel] deleteWidgets() | Out";
 }
 
-void SFieldsModel::deleteFields()
-{
-    SFieldValueModel *f;
-
-    while(!m_fieldsList.isEmpty())
-    {
-        f = m_fieldsList.last();
-        m_fieldsList.removeLast();
-        delete f;
-    }
-}
-
 QList<SFieldValueModel*> SFieldsModel::list()
 {
-    return m_fieldsList;
+    return widgetFieldMap.values();
 }
 
 QList<QWidget *> SFieldsModel::widgetsList()
 {
-    return m_widgetsList;
+    return widgetFieldMap.keys();
 }
 
 /*  Инициализация массива виджетов для нового товара или ремонта
@@ -76,7 +67,7 @@ bool SFieldsModel::initWidgets(const int id)
         return 0;
 
     qDebug().nospace() << "[SFieldsModel] initWidgets() | step 0";
-    if( !(m_widgetsList.isEmpty() && m_fieldsList.isEmpty()) )
+    if( !widgetFieldMap.isEmpty() )
     {
         clear();
     }
@@ -104,8 +95,6 @@ bool SFieldsModel::initWidgets(const int id)
         qDebug().nospace() << "[SFieldsModel] initWidgets() | step 3.x";
         widget->setSizePolicy(*sizePolicy);
         widgetFieldMap.insert(widget, field);
-        m_widgetsList.append(widget);
-        m_fieldsList.append(field);
         field->setFieldId(query->value(3).toInt());
         widget->setProperty("fieldId", query->value(3).toInt());
         widget->setProperty("fieldType", type);
@@ -120,7 +109,7 @@ bool SFieldsModel::initWidgets(const int id)
 
 QWidget *SFieldsModel::createLineEdit(const QSqlRecord &record, SFieldValueModel *field)
 {
-    QLineEdit *widget = new AFLineEdit();
+    QLineEdit *widget = new QLineEdit();
     widget->setPlaceholderText(record.value(0).toString());
     if(!record.value(1).toString().isEmpty())
     {
@@ -128,7 +117,6 @@ QWidget *SFieldsModel::createLineEdit(const QSqlRecord &record, SFieldValueModel
         widget->setText(record.value(1).toString());
         field->setValue(widget->text());
     }
-//    connect(widget,SIGNAL(editingFinished(const QString&)),field,SLOT(setValue(const QString&)));
     return widget;
 }
 
@@ -166,14 +154,13 @@ QWidget *SFieldsModel::createComboBox(const QSqlRecord &record, SFieldValueModel
     widget->setEditable(true);
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     widget->lineEdit()->setPlaceholderText(record.value(0).toString());
-//    connect(widget,SIGNAL(currentTextChanged(const QString&)),field,SLOT(setValue(const QString&)));
 
     return widget;
 }
 
 QWidget *SFieldsModel::createDateTime(const QSqlRecord &record, SFieldValueModel *field)
 {
-    QDateEdit *widget = new AFDateEdit();
+    QDateEdit *widget = new QDateEdit();
     if(record.value(1).toString().isEmpty())
     {
         widget->setDate(QDate::currentDate());
@@ -184,7 +171,6 @@ QWidget *SFieldsModel::createDateTime(const QSqlRecord &record, SFieldValueModel
     }
     field->setValue(widget->text());
     widget->setCalendarPopup(true);
-//    connect(widget,SIGNAL(dateChanged(const QString&)),field,SLOT(setValue(const QString&)));
 
     return widget;
 }
@@ -192,10 +178,9 @@ QWidget *SFieldsModel::createDateTime(const QSqlRecord &record, SFieldValueModel
 QWidget *SFieldsModel::createDummyWidget(const QSqlRecord &record, SFieldValueModel *field)
 {
     // TODO: В АСЦ не реализовано, поэтому используем LineEdit
-    QLineEdit *widget = new AFLineEdit();
+    QLineEdit *widget = new QLineEdit();
     widget->setPlaceholderText(record.value(0).toString());
     widget->setEnabled(false);
-//    connect(widget,SIGNAL(editingFinished(const QString&)),field,SLOT(setValue(const QString&)));
 
     return widget;
 }
@@ -221,38 +206,39 @@ bool SFieldsModel::load(int id)
 
 void SFieldsModel::add(SFieldValueModel *item)
 {
-    m_fieldsList.append(item);
+    QWidget *w = nullptr;
+    widgetFieldMap.insert(w, item);
 }
 
 void SFieldsModel::remove(SFieldValueModel *item)
 {
     m_removeList.append(item);
-    int modelIndex = m_fieldsList.indexOf(item);
-    m_fieldsList.removeAt(modelIndex);
+    QWidget *w = widgetFieldMap.key(item);
+    widgetFieldMap.remove(w);
 }
 
 bool SFieldsModel::isEmpty()
 {
-    return m_fieldsList.isEmpty();
+    return widgetFieldMap.isEmpty();
 }
 
 void SFieldsModel::setRepair(const int id)
 {
-    SFieldValueModel *item;
     m_repair = id;
-    foreach(item, m_fieldsList)
+    QMap<QWidget*, SFieldValueModel*>::ConstIterator i;
+    for (i = widgetFieldMap.constBegin(); i != widgetFieldMap.constEnd(); ++i)
     {
-        item->setRepairId(id);
+        i.value()->setRepairId(id);
     }
 }
 
 void SFieldsModel::setItem(const int id)
 {
-    SFieldValueModel *item;
     m_item = id;
-    foreach(item, m_fieldsList)
+    QMap<QWidget*, SFieldValueModel*>::ConstIterator i;
+    for (i = widgetFieldMap.constBegin(); i != widgetFieldMap.constEnd(); ++i)
     {
-        item->setItemId(id);
+        i.value()->setItemId(id);
     }
 }
 
@@ -273,8 +259,7 @@ bool SFieldsModel::commit()
             case WidgetType::DateEdit: item->setValue(static_cast<QDateEdit*>(widget)->date().toString("yyyy-MM-dd")); break;
             default: item->setValue(static_cast<QLineEdit*>(widget)->text());
         }
-//    foreach(item, m_fieldsList)
-//    {
+
         if(!item->value().isEmpty())
         {
             if(!item->commit())
@@ -295,21 +280,14 @@ bool SFieldsModel::commit()
     return 1;
 }
 
-void SFieldsModel::clear()
-{
-    qDebug().nospace() << "[SFieldsModel] clear() | step 0";
-    deleteWidgets();
-    qDebug().nospace() << "[SFieldsModel] clear() | step 1";
-    deleteFields();
-    qDebug().nospace() << "[SFieldsModel] clear() | step 2";
-}
-
 bool SFieldsModel::validate()
 {
     QWidget *w;
     bool ret = 1;
-    foreach(w, m_widgetsList)
+    QMap<QWidget*, SFieldValueModel*>::ConstIterator i;
+    for (i = widgetFieldMap.constBegin(); i != widgetFieldMap.constEnd(); ++i)
     {
+        w = i.key();
         if(w->property("fieldRequired").toBool())
         {
             switch (w->property("fieldType").toInt())
@@ -327,8 +305,10 @@ bool SFieldsModel::validate()
 void SFieldsModel::resetIds()
 {
     SFieldValueModel *item;
-    foreach(item, m_fieldsList)
+    QMap<QWidget*, SFieldValueModel*>::ConstIterator i;
+    for (i = widgetFieldMap.constBegin(); i != widgetFieldMap.constEnd(); ++i)
     {
+        item = i.value();
         if(!item->value().isEmpty())
             item->setId(0);
     }
@@ -342,30 +322,3 @@ SFieldValueModel *SFieldsModel::itemHandler(const QSqlRecord &record)
     return item;
 }
 
-AFLineEdit::AFLineEdit(QWidget *parent) : QLineEdit(parent)
-{
-    connect(this,SIGNAL(editingFinished()),this,SLOT(editingFinished()));
-}
-
-void AFLineEdit::editingFinished()
-{
-    qDebug().nospace() << "[AFLineEdit] editingFinished() | SLOT";
-    emit editingFinished(text());
-}
-
-AFDateEdit::AFDateEdit(QWidget *parent) :
-    QDateEdit(parent)
-{
-    connect(this,SIGNAL(dateChanged(QDate)),this,SLOT(dateChanged(QDate)));
-}
-
-AFDateEdit::AFDateEdit(QDate date, QWidget *parent) :
-    QDateEdit(date, parent)
-{
-    connect(this,SIGNAL(dateChanged(QDate)),this,SLOT(dateChanged(QDate)));
-}
-
-void AFDateEdit::dateChanged(const QDate &date)
-{
-    emit dateChanged(date.toString("dd.MM.yyyy"));
-}
