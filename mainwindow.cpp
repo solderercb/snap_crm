@@ -105,6 +105,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Logout")));
     QUERY_COMMIT_ROLLBACK(query, nDBErr);
     delete query;
+    appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Normal application exit");
+    appLog->appendRecord("\r\n\r\n\r\n");
 }
 
 void MainWindow::createMenu()

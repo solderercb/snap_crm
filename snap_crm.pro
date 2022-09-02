@@ -32,6 +32,7 @@ DEFINES += LIMEREPORT_IMPORTS
 PRECOMPILED_HEADER = stable.h
 
 SOURCES += \
+    applog.cpp \
     main.cpp\
     amountToWords.cpp \
     bottoolbarwidget.cpp \
@@ -90,6 +91,7 @@ SOURCES += \
 
 HEADERS  += \
     amountToWords.h \
+    applog.h \
     appver.h \
     bottoolbarwidget.h \
     chooseofficewindow.h \

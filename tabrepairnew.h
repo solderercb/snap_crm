@@ -52,7 +52,8 @@ private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
     MainWindow *parent;
-    SRepairModel * repairModel;
+    SRepairModel *repairModel;
+    SCashRegisterModel *cashRegister;
     void setDefaultStyleSheets();
     void getDevices();
 //    QStandardItemModel* deviceClassesModel;
@@ -100,6 +101,9 @@ private slots:
     bool createRepair();
     void createRepairClose();
     void primaryPhoneEdited(QString);
+    void preferredPaymentSystemChanged(int);
+    void prepayPaymentSystemChanged(int);
+    void extNotesEditingFinished();
 #ifdef QT_DEBUG
     void test_scheduler_handler();
     void test_scheduler2_handler();

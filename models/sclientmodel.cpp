@@ -465,6 +465,19 @@ int SClientModel::repairs()
     return m_repairs;
 }
 
+bool SClientModel::updateRepairs()
+{
+    if(i_id == 0)
+        return 1;
+
+    QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_CLIENT_REPAIRS(i_id));
+
+    if(!i_nDBErr)
+        throw 1;
+
+    return i_nDBErr;
+}
+
 int SClientModel::purchases()
 {
     return m_purchases;

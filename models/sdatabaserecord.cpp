@@ -30,11 +30,17 @@ bool SDatabaseRecord::checkSystemTime()
     date.setTimeZone(QTimeZone::utc());
     secDiff = date.secsTo(QDateTime::currentDateTimeUtc());
     if( secDiff > 30 || secDiff < -30 )
-        return 0;
+    {
+        i_nTimeErr = 0;
+        appLog->appendRecord(QString("[Warning] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss")));
+    }
 
-    return 1;
+    return i_nTimeErr;
 }
 
+/*  Проверка обязательных полей (полей, не имеющих значения по умолчанию или связанных с другой таблицей)
+ *  Возвращает 1 если всё хорошо.
+ */
 bool SDatabaseRecord::checkObligatoryFields()
 {
     if(i_obligatoryFields.isEmpty())
@@ -43,9 +49,16 @@ bool SDatabaseRecord::checkObligatoryFields()
     QStringList::const_iterator i;
     for (i = i_obligatoryFields.constBegin(); i != i_obligatoryFields.constEnd(); ++i)
     {
+        if(!i_valuesMap.contains(*i))
+        {
+            i_nSrcCodeErr = 0;
+            appLog->appendRecord(QString("[Error] ASSERT failure in %1: i_valuesMap[\"%2\"] not set").arg(this->metaObject()->className()).arg(*i));
+        }
+#ifdef QT_DEBUG
         Q_ASSERT_X(i_valuesMap.contains(*i), this->metaObject()->className(), QString("i_valuesMap[\"%1\"] not set").arg(*i).toLocal8Bit());
+#endif
     }
-    return 0;
+    return i_nSrcCodeErr;
 }
 
 bool SDatabaseRecord::checkTableName()
@@ -120,13 +133,23 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
     return str_value;
 }
 
-bool SDatabaseRecord::insert(bool flush)
+/*  Формирует и отправляет запрос INSERT
+ *  Передварительно производится проверка системного времени и обязательных полей
+ *  Возвращает 0 в случае какой-либо ошибки; тип ошибки можно определить прочитав переменные i_nTimeErr, i_nSrcCodeErr, i_nDBErr
+ */
+bool SDatabaseRecord::insert(bool flushValues)
 {
     QString q;
 
+#ifdef QT_DEBUG
     checkTableName();
-    checkSystemTime();
-    checkObligatoryFields();
+#endif
+    if(!checkSystemTime())
+        return 0;
+
+    if(!checkObligatoryFields())
+        return 0;
+
     fieldsInsFormatter();
     q = QString("INSERT INTO `%1` (\n  %2\n) VALUES (\n  %3\n);")\
                                          .arg(tableName)\
@@ -135,8 +158,7 @@ bool SDatabaseRecord::insert(bool flush)
 //    qDebug().noquote() << q;
     QUERY_EXEC(i_query,i_nDBErr)(q);
     QUERY_LAST_INS_ID(i_query,i_nDBErr,i_id);
-    if(i_nDBErr && flush)
-        i_valuesMap.clear();
+    dbErrFlagHandler(flushValues);
 
     return i_nDBErr;
 }
@@ -148,8 +170,12 @@ bool SDatabaseRecord::update()
 
     QString q;
 
+#ifdef QT_DEBUG
     checkTableName();
-    checkSystemTime();
+#endif
+    if(!checkSystemTime())
+        return 0;
+
     fieldsUpdFormatter();
     q = QString("UPDATE\n  `%1`\nSET\n  %2\nWHERE `id` = %3;")\
                                          .arg(tableName)\
@@ -157,8 +183,7 @@ bool SDatabaseRecord::update()
                                          .arg(i_id);
 
     QUERY_EXEC(i_query,i_nDBErr)(q);
-    if(i_nDBErr)
-        i_valuesMap.clear();
+    dbErrFlagHandler(true);
 
     return i_nDBErr;
 }
@@ -171,8 +196,18 @@ bool SDatabaseRecord::del()
     q = QString("DELETE FROM `%1` WHERE `id` = %2;")\
                                          .arg(tableName)\
                                          .arg(i_id);
+    //    qDebug().noquote() << q;
     QUERY_EXEC(i_query,i_nDBErr)(q);
-//    qDebug().noquote() << q;
+    dbErrFlagHandler(false);
 
     return i_nDBErr;
+}
+
+void SDatabaseRecord::dbErrFlagHandler(bool flushValues)
+{
+    if(!i_nDBErr)
+        appLog->appendRecord(QString("Query error in %1: \"%2\"").arg(this->metaObject()->className()).arg(i_query->lastError().text()));
+
+    if(i_nDBErr && flushValues)
+        i_valuesMap.clear();
 }

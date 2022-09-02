@@ -120,7 +120,7 @@
           </widget>
          </item>
          <item row="11" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBoxPresetBox">
+          <widget class="QComboBox" name="comboBoxPresetPlace">
            <property name="editable">
             <bool>false</bool>
            </property>
@@ -354,7 +354,7 @@
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridLayoutDevice">
               <item row="0" column="0">
-               <widget class="QComboBox" name="comboBoxDevice">
+               <widget class="QComboBox" name="comboBoxDeviceClass">
                 <property name="autoFillBackground">
                  <bool>false</bool>
                 </property>
@@ -376,7 +376,7 @@
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QComboBox" name="comboBoxDeviceModel">
+               <widget class="QComboBox" name="comboBoxDevice">
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -389,7 +389,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBoxDeviceMaker">
+               <widget class="QComboBox" name="comboBoxDeviceVendor">
                 <property name="editable">
                  <bool>false</bool>
                 </property>
@@ -1076,9 +1076,9 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>comboBoxDeviceClass</tabstop>
+  <tabstop>comboBoxDeviceVendor</tabstop>
   <tabstop>comboBoxDevice</tabstop>
-  <tabstop>comboBoxDeviceMaker</tabstop>
-  <tabstop>comboBoxDeviceModel</tabstop>
   <tabstop>lineEditSN</tabstop>
   <tabstop>comboBoxProblem</tabstop>
   <tabstop>comboBoxIncomingSet</tabstop>
@@ -1102,7 +1102,7 @@
   <tabstop>lineEditPrevRepair</tabstop>
   <tabstop>lineEditPrevRepairFromOldDB</tabstop>
   <tabstop>comboBoxPresetEngineer</tabstop>
-  <tabstop>comboBoxPresetBox</tabstop>
+  <tabstop>comboBoxPresetPlace</tabstop>
   <tabstop>comboBoxOffice</tabstop>
   <tabstop>comboBoxCompany</tabstop>
   <tabstop>comboBoxPresetPaymentAccount</tabstop>
@@ -1135,7 +1135,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBoxDevice</sender>
+   <sender>comboBoxDeviceClass</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>tabRepairNew</receiver>
    <slot>changeDeviceClass(int)</slot>
@@ -1151,7 +1151,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBoxDeviceMaker</sender>
+   <sender>comboBoxDeviceVendor</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>tabRepairNew</receiver>
    <slot>changeDeviceVendor(int)</slot>
@@ -1390,6 +1390,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>comboBoxPresetPaymentAccount</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>preferredPaymentSystemChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>315</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxPrepayAccount</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>prepayPaymentSystemChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>855</x>
+     <y>606</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1019</x>
+     <y>580</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditExtNotes</sender>
+   <signal>editingFinished()</signal>
+   <receiver>tabRepairNew</receiver>
+   <slot>extNotesEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>462</x>
+     <y>515</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1019</x>
+     <y>502</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -1412,5 +1460,8 @@
   <slot>deviceMatchTableDoubleClicked(QModelIndex)</slot>
   <slot>enablePrepayWidgets(bool)</slot>
   <slot>buttonCreateTabClientHandler()</slot>
+  <slot>preferredPaymentSystemChanged(int)</slot>
+  <slot>prepayPaymentSystemChanged(int)</slot>
+  <slot>extNotesEditingFinished()</slot>
  </slots>
 </ui>

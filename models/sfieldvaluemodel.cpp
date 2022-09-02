@@ -45,7 +45,7 @@ int SFieldValueModel::id()
 
 void SFieldValueModel::setId(const int id)
 {
-    i_valuesMap.insert("id", id);
+    i_id = id;
 }
 
 int SFieldValueModel::fieldId()
@@ -85,11 +85,13 @@ QString SFieldValueModel::value()
     return m_value;
 }
 
-void SFieldValueModel::setValue(const QString& value)
+void SFieldValueModel::setValue(const QString &value)
 {
+    qDebug().nospace() << "[SFieldValueModel] setValue() | value = " << value;
     if(i_id)
         appendLogText(tr("Значение поля %1 изменено с %2 на %2").arg(m_name,m_value,value));
 
+    m_value = value;
     i_valuesMap.insert("value", value);
 }
 

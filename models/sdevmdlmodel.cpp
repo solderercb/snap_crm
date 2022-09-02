@@ -23,12 +23,15 @@ bool SDevMdlModel::commit()
     }
     commitLogs();
 
+    if(!i_nDBErr)
+        throw 1;
+
     return i_nDBErr;
 }
 
 int SDevMdlModel::id()
 {
-    return m_id;
+    return i_id;
 }
 
 void SDevMdlModel::setId(const int id)

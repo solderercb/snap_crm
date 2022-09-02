@@ -138,6 +138,7 @@ public:
     int priceColumnIndex();
     int repairs();
     void setRepairs(int);
+    bool updateRepairs();
     int purchases();
     void setPurchases(int);
     bool updatePurchases(int);

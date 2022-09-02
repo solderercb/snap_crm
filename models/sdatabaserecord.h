@@ -23,12 +23,14 @@ public:
     QString created();
 protected:
     int i_id = 0;
-    bool i_nDBErr = 1;
+    bool i_nDBErr = 1;      // флаг обнаружения ошибки выполнения запроса к БД
+    bool i_nSrcCodeErr = 1; // флаг обнаружения ошибки на уровне исходного кода
+    bool i_nTimeErr = 1;    // флаг обнаружения большой разницы времени сервера и клиента
     QDateTime i_createdUtc;
     bool checkSystemTime();
     bool checkObligatoryFields();
     bool checkTableName();
-    QMap<QString, QVariant> i_valuesMap;   // key - field name
+    QMap<QString, QVariant> i_valuesMap;   // ключ — название столбца (поля) таблицы БД
     QStringList i_obligatoryFields = {};   // поля не имеющие значения по умолчанию
     QSqlQuery *i_query;
     QStringList fields, field_values;
@@ -38,6 +40,7 @@ protected:
     bool insert(bool flush = true);
     bool update();
     bool del();
+    void dbErrFlagHandler(bool);
     QString tableName;
 private:
 signals:

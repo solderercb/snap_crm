@@ -2,7 +2,7 @@
 
 SRepairModel::SRepairModel(QObject *parent) : SComRecord(parent)
 {
-    i_obligatoryFields << "client" << "type" << "maker" << "office" << "manager" << "diagnostic_result" << "in_date" << "fault" << "reject_reason";
+    i_obligatoryFields << "client" << "type" << "maker" << "office" << "manager" << "diagnostic_result" << "in_date" << "fault" << "reject_reason" << "company" << "start_office" << "current_manager" << "master";
     tableName = "workshop";
     clientModel = new SClientModel();
 }
@@ -17,9 +17,22 @@ SRepairModel::~SRepairModel()
 
 }
 
-void SRepairModel::load(const int)
+int SRepairModel::id()
 {
+    return i_id;
+}
 
+void SRepairModel::setId(const int id)
+{
+    i_id = id;
+}
+
+void SRepairModel::load(const int id)
+{
+    if(!id)
+        return;
+
+    i_id = id;
 }
 
 bool SRepairModel::isHidden()
@@ -99,7 +112,7 @@ int SRepairModel::companyIndex()
 
 void SRepairModel::setCompanyIndex(const int index)
 {
-    i_valuesMap.insert("company", index);
+    i_valuesMap.insert("company", companiesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::officeIndex()
@@ -109,7 +122,7 @@ int SRepairModel::officeIndex()
 
 void SRepairModel::setOfficeIndex(const int index)
 {
-    i_valuesMap.insert("office", index);
+    i_valuesMap.insert("office", officesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::startOfficeIndex()
@@ -119,7 +132,7 @@ int SRepairModel::startOfficeIndex()
 
 void SRepairModel::setStartOfficeIndex(const int index)
 {
-    i_valuesMap.insert("start_office", index);
+    i_valuesMap.insert("start_office", officesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::managerIndex()
@@ -127,9 +140,16 @@ int SRepairModel::managerIndex()
     return m_managerIndex;
 }
 
+void SRepairModel::setManager(const int id)
+{
+    i_valuesMap.insert("manager", id);
+}
+
 void SRepairModel::setManagerIndex(const int index)
 {
-    i_valuesMap.insert("manager", index);
+    if(index == -1)
+        return;
+    i_valuesMap.insert("manager", managersModel->databaseIDByRow(index));
 }
 
 int SRepairModel::currentManagerIndex()
@@ -137,9 +157,16 @@ int SRepairModel::currentManagerIndex()
     return m_currentManagerIndex;
 }
 
+void SRepairModel::setCurrentManager(const int id)
+{
+    i_valuesMap.insert("current_manager", id);
+}
+
 void SRepairModel::setCurrentManagerIndex(const int index)
 {
-    i_valuesMap.insert("current_manager", index);
+    if(index == -1)
+        return;
+    i_valuesMap.insert("current_manager", managersModel->databaseIDByRow(index));
 }
 
 int SRepairModel::masterIndex()
@@ -149,7 +176,10 @@ int SRepairModel::masterIndex()
 
 void SRepairModel::setMasterIndex(const int index)
 {
-    i_valuesMap.insert("master", index);
+    if(index == -1)
+        i_valuesMap.insert("master", QVariant());
+    else
+        i_valuesMap.insert("master", engineersModel->databaseIDByRow(index));
 }
 
 QString SRepairModel::diagnosticResult()
@@ -162,24 +192,24 @@ void SRepairModel::setDiagnosticResult(const QString str)
     i_valuesMap.insert("diagnostic_result", str);
 }
 
-QDate SRepairModel::inDate()
+QDateTime SRepairModel::inDate()
 {
     return m_inDate;
 }
 
-void SRepairModel::setInDate(const QDate date)
+void SRepairModel::setInDate(const QDateTime timestamp)
 {
-    i_valuesMap.insert("in_date", date);
+    i_valuesMap.insert("in_date", timestamp);
 }
 
-QDate SRepairModel::outDate()
+QDateTime SRepairModel::outDate()
 {
     return m_outDate;
 }
 
-void SRepairModel::setOutDate(const QDate date)
+void SRepairModel::setOutDate(const QDateTime timestamp)
 {
-    i_valuesMap.insert("out_date", date);
+    i_valuesMap.insert("out_date", timestamp);
 }
 
 int SRepairModel::stateIndex()
@@ -212,14 +242,14 @@ void SRepairModel::setUserLock(const int id)
     i_valuesMap.insert("user_lock", id);
 }
 
-QDate SRepairModel::lockDatetime()
+QDateTime SRepairModel::lockDatetime()
 {
     return m_lockDatetime;
 }
 
-void SRepairModel::setLockDatetime(const QDate date)
+void SRepairModel::setLockDatetime(const QDateTime timestamp)
 {
-    i_valuesMap.insert("lock_datetime", date);
+    i_valuesMap.insert("lock_datetime", timestamp);
 }
 
 bool SRepairModel::expressRepair()
@@ -267,9 +297,14 @@ int SRepairModel::paymentSystemIndex()
     return m_paymentSystemIndex;
 }
 
+void SRepairModel::setPaymentSystem(const int id)
+{
+    i_valuesMap.insert("payment_system", id);
+}
+
 void SRepairModel::setPaymentSystemIndex(const int index)
 {
-    i_valuesMap.insert("payment_system", index);
+    i_valuesMap.insert("payment_system", paymentSystemsModel->databaseIDByRow(index, "system_id"));
 }
 
 bool SRepairModel::isCardPayment()
@@ -309,7 +344,7 @@ int SRepairModel::boxIndex()
 
 void SRepairModel::setBoxIndex(const int index)
 {
-    i_valuesMap.insert("box", index);
+    i_valuesMap.insert("box", repairBoxesModel->databaseIDByRow(index));
 }
 
 QString SRepairModel::warrantyLabel()
@@ -472,24 +507,24 @@ void SRepairModel::setThirsPartySc(const bool state)
     i_valuesMap.insert("thirs_party_sc", state);
 }
 
-QDate SRepairModel::lastSave()
+QDateTime SRepairModel::lastSave()
 {
     return m_lastSave;
 }
 
-void SRepairModel::setLastSave(const QDate date)
+void SRepairModel::setLastSave(const QDateTime timestamp)
 {
-    i_valuesMap.insert("last_save", date);
+    i_valuesMap.insert("last_save", timestamp);
 }
 
-QDate SRepairModel::lastStatusChanged()
+QDateTime SRepairModel::lastStatusChanged()
 {
     return m_lastStatusChanged;
 }
 
-void SRepairModel::setLastStatusChanged(const QDate date)
+void SRepairModel::setLastStatusChanged(const QDateTime timestamp)
 {
-    i_valuesMap.insert("last_status_changed", date);
+    i_valuesMap.insert("last_status_changed", timestamp);
 }
 
 int SRepairModel::warrantyDays()
@@ -630,5 +665,34 @@ bool SRepairModel::termsControl()
 void SRepairModel::setTermsControl(const bool state)
 {
     i_valuesMap.insert("termsControl", state);
+}
+
+bool SRepairModel::commit()
+{
+    try
+    {
+        if(i_id)
+        {
+            if(!update())
+                throw 0;
+        }
+        else
+        {
+            setDiagnosticResult("");
+            setRejectReason("");
+            setInDate(QDateTime::currentDateTime());
+            if(!insert())
+                throw 0;
+            appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
+        }
+        commitLogs();
+    }
+    catch (bool)
+    {
+        if(!i_nDBErr)
+            throw 1;
+    }
+
+    return i_nDBErr;
 }
 

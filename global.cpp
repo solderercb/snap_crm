@@ -11,13 +11,13 @@ QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
 //SStandardItemModel *clientPhoneTypesModel = new SStandardItemModel();
 SSqlQueryModel *clientPhoneTypesModel = new SSqlQueryModel();
 SSqlQueryModel *companiesModel = new SSqlQueryModel;
-QSqlQueryModel *officesModel = new QSqlQueryModel;
+SSqlQueryModel *officesModel = new SSqlQueryModel;
 QSqlQueryModel *warehousesModel = new QSqlQueryModel;
-QSqlQueryModel *allUsersModel = new QSqlQueryModel;
+SSqlQueryModel *allUsersModel = new SSqlQueryModel;
 QMap<int, QString> *allUsersMap = new QMap<int, QString>;
-QSqlQueryModel *usersModel = new QSqlQueryModel;
-QSqlQueryModel *managersModel = new QSqlQueryModel;
-QSqlQueryModel *engineersModel = new QSqlQueryModel;
+SSqlQueryModel *usersModel = new SSqlQueryModel;
+SSqlQueryModel *managersModel = new SSqlQueryModel;
+SSqlQueryModel *engineersModel = new SSqlQueryModel;
 SSqlQueryModel *itemBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *repairBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *paymentSystemsModel = new SSqlQueryModel;
@@ -49,6 +49,7 @@ QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padd
 SStandardItemModel *rejectReasonModel = new SStandardItemModel;
 SStandardItemModel *priceColModel = new SStandardItemModel;
 SStandardItemModel *itemUnitsModel = new SStandardItemModel;
+SAppLog *appLog = new SAppLog();
 
 //QWidget *modalWidget = nullptr;
 

@@ -369,9 +369,9 @@
 
 // QSqlQuery::lastInsertId() почему-то не работает, поэтому так:
 #define QUERY_LAST_INS_ID(obj,flag,id)      /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Executing SELECT LAST_INSERT_ID() query...";*/ if ((flag)){\
-                                                (flag) = (obj)->exec("SELECT LAST_INSERT_ID();");\
-                                                if ((flag)){(obj)->first();\
-                                                    (id) = (obj)->value(0).toInt();}}
+                                                (obj)->exec("SELECT LAST_INSERT_ID();");\
+                                                (obj)->first();\
+                                                (id) = (obj)->value(0).toInt();}
 #define QUERY_BEGIN                         QString("BEGIN;")
 #define QUERY_COMMIT                        QString("COMMIT;")
 #define QUERY_ROLLBACK                      QString("ROLLBACK;")

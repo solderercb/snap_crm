@@ -9,6 +9,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include "applog.h"
 #include "models/sstandarditemmodel.h"
 #include "models/ssqlquerymodel.h"
 #ifdef QT_DEBUG
@@ -25,13 +26,13 @@ extern QMap<QString, QVariant> *comSettings;
 //extern SStandardItemModel *clientPhoneTypesModel;
 extern SSqlQueryModel *clientPhoneTypesModel;
 extern SSqlQueryModel *companiesModel;
-extern QSqlQueryModel *officesModel;
+extern SSqlQueryModel *officesModel;
 extern QSqlQueryModel *warehousesModel;
-extern QSqlQueryModel *allUsersModel;
+extern SSqlQueryModel *allUsersModel;
 extern QMap<int, QString> *allUsersMap;
-extern QSqlQueryModel *usersModel;
-extern QSqlQueryModel *managersModel;
-extern QSqlQueryModel *engineersModel;
+extern SSqlQueryModel *usersModel;
+extern SSqlQueryModel *managersModel;
+extern SSqlQueryModel *engineersModel;
 extern SSqlQueryModel *itemBoxesModel;
 extern SSqlQueryModel *repairBoxesModel;
 extern SSqlQueryModel *paymentSystemsModel;
@@ -52,6 +53,7 @@ extern QString commonDateEditStyleSheetRed;
 extern SStandardItemModel *rejectReasonModel;
 extern SStandardItemModel *priceColModel;
 extern SStandardItemModel *itemUnitsModel;
+extern SAppLog *appLog;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

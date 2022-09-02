@@ -22,7 +22,6 @@ public:
     int itemId();
     void setItemId(const int);
     QString value();
-    void setValue(const QString&);
     bool commit();
     bool delDBRecord();
     bool isValid();
@@ -34,6 +33,8 @@ private:
     int m_itemId;
     QString m_value;
     bool m_isValid = 0;
+public slots:
+    void setValue(const QString &);
 };
 
 #endif // SFIELDVALUEMODEL_H
