@@ -16,11 +16,11 @@ SSqlQueryModel::~SSqlQueryModel()
  */
 int SSqlQueryModel::getFieldIdByName(const QString &field)
 {
-    if(QSqlQueryModel::rowCount())
+    if(QSqlQueryModel::columnCount())
     {
         for (int i = 0; i<QSqlQueryModel::columnCount(); i++)
         {
-            if (QSqlQueryModel::record(0).field(i).name() == field)
+            if (QSqlQueryModel::headerData(i,Qt::Horizontal).toString() == field)
             {
                 return i;
             }
@@ -46,12 +46,9 @@ int SSqlQueryModel::getFieldIdByName(const QString &field)
  */
 QString SSqlQueryModel::getDisplayRole(int id, int searchColumn)
 {
-    int row = rowByDatabaseID(id, searchColumn);
-    if(m_displayRoleColumn == -1)
-    {
-        m_displayRoleColumn = getFieldIdByName("name");
-    }
 
+    int row = rowByDatabaseID(id, searchColumn);
+    initDisplayRoleColumn();
     if(row == -1)
         return NULL;
 
@@ -97,5 +94,26 @@ int SSqlQueryModel::databaseIDByRow(int row, QString field)
 {
     int column = getFieldIdByName(field);
     return index(row, column).data().toInt();
+}
+
+void SSqlQueryModel::setDisplayRoleColumn(const QString &field)
+{
+    m_displayRoleColumn = getFieldIdByName(field);
+}
+
+int SSqlQueryModel::findIndex(const QString &search)
+{
+    initDisplayRoleColumn();
+    int deviceModelIndex = rowCount();
+    while (--deviceModelIndex >= 0 && record(deviceModelIndex).value(m_displayRoleColumn).toString() != search);
+    return deviceModelIndex;
+}
+
+void SSqlQueryModel::initDisplayRoleColumn()
+{
+    if(m_displayRoleColumn == -1)
+    {
+        m_displayRoleColumn = getFieldIdByName("name");
+    }
 }
 

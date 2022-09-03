@@ -17,8 +17,11 @@ public:
     int rowByDatabaseID(int id, QString field = "id");
     int databaseIDByRow(int row, int colum);
     int databaseIDByRow(int row, QString field = "id");
+    void setDisplayRoleColumn(const QString&);
+    int findIndex(const QString&);
 private:
     int m_displayRoleColumn = -1;
+    void initDisplayRoleColumn();
 
 signals:
 

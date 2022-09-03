@@ -103,7 +103,6 @@ private slots:
     void primaryPhoneEdited(QString);
     void preferredPaymentSystemChanged(int);
     void prepayPaymentSystemChanged(int);
-    void extNotesEditingFinished();
 #ifdef QT_DEBUG
     void test_scheduler_handler();
     void test_scheduler2_handler();

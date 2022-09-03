@@ -239,7 +239,6 @@ void tabRepairNew::enablePrepayWidgets(bool state)
 
 void tabRepairNew::changeDeviceClass(int index)
 {
-    qDebug().nospace() << "[tabRepairNew] changeDeviceClass() | In";
     if(index == -1)
     {
         additionalFields->clear();
@@ -247,12 +246,11 @@ void tabRepairNew::changeDeviceClass(int index)
     }
 
     int additionalFieldRow = 2, additionaFieldCol = 0;
-    QWidget *additionalField;
+    SFieldValueModel *additionalField;
     int classId = 0;
     QString query;
     classId = deviceClassesModel->databaseIDByRow(index);
 
-    additionalFields->initWidgets(classId);
 
     query = QUERY_SEL_DEVICE_MAKERS(deviceClassesModel->index(index, 2).data().toString());
     deviceVendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
@@ -273,10 +271,10 @@ void tabRepairNew::changeDeviceClass(int index)
     classExteriorsModel->setQuery(query, QSqlDatabase::database("connMain"));
     ui->comboBoxExterior->setCurrentIndex(-1);
 
-    qDebug().nospace() << "[tabRepairNew] changeDeviceClass() | Creating additional fields";
-    foreach(additionalField, additionalFields->widgetsList())
+    additionalFields->init(classId);
+    foreach(additionalField, additionalFields->list())
     {
-        ui->gridLayoutDeviceDescription->addWidget(additionalField, additionalFieldRow, additionaFieldCol, 1, 1);
+        ui->gridLayoutDeviceDescription->addWidget(additionalField->widget(), additionalFieldRow, additionaFieldCol, 1, 1);
 
         if (++additionaFieldCol > 5)
         {
@@ -284,7 +282,6 @@ void tabRepairNew::changeDeviceClass(int index)
             additionaFieldCol = 0;
         }
     }
-    qDebug().nospace() << "[tabRepairNew] changeDeviceClass() | Out";
 }
 
 void tabRepairNew::changeDeviceVendor(int index)
@@ -563,6 +560,7 @@ void tabRepairNew::setDefaultStyleSheets()
 bool tabRepairNew::checkInput()
 {
     int error = 0;
+    setDefaultStyleSheets();
 
     if ( ui->comboBoxDeviceClass->currentIndex() < 0 )        // если не выбран тип уст-ва
     {
@@ -704,28 +702,16 @@ bool tabRepairNew::createRepair()
         return true; // return 0 — OK, return 1 - ошибка
 
     int deviceClassIndex, deviceVendorIndex, deviceIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
-    int device, user, office, company, repair, engineer, preferredPaymentAccIndex, prepaySumm;
+    int device, user, office, repair, preferredPaymentAccIndex, prepaySumm;
     bool nDBErr = 1;
-    QString prevRepair = "NULL", prevRepairFromOldDB = "NULL", phone1, phone1c, phone2, phone2c;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     setDefaultStyleSheets();
     deviceClassIndex = ui->comboBoxDeviceClass->currentIndex();
     deviceVendorIndex = ui->comboBoxDeviceVendor->currentIndex();
-    deviceIndex = ui->comboBoxDevice->currentIndex();
-    prevRepair = ui->lineEditPrevRepair->text();
-    prevRepairFromOldDB = ui->lineEditPrevRepairFromOldDB->text();
-    if ( prevRepair == "" )
-        prevRepair = "NULL";
-    if( prevRepairFromOldDB == "" )
-        prevRepairFromOldDB = "NULL";
-    else
-        prevRepairFromOldDB = "\'" + prevRepairFromOldDB + "\'";
 
     user = userDbData->value("id").toInt();
     office = officesModel->record(ui->comboBoxOffice->currentIndex()).value("id").toInt();
-    company = companiesModel->record(ui->comboBoxCompany->currentIndex()).value("id").toInt();
-    engineer = (ui->comboBoxPresetEngineer->currentIndex() < 0)?0:engineersModel->record(ui->comboBoxPresetEngineer->currentIndex()).value("id").toInt();
     preferredPaymentAccIndex = ui->comboBoxPresetPaymentAccount->currentIndex();
 
 #ifdef QT_DEBUG
@@ -745,10 +731,9 @@ bool tabRepairNew::createRepair()
         QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
 
         // пользователь мог выбрать модель из списка, а затем отредаткировать её, поэтому пробуем найти модель в списке
-        deviceIndex = devicesModel->rowCount();
-        while (--deviceIndex >= 0 && devicesModel->getDisplayRole((deviceIndex), "name") != ui->comboBoxDevice->currentText());
-        // если не выбрана модель из списка, создаём новую. Или если была выбрана модель из списка, а затем текст был отредактирован, тоже записываем в таблицу новую модель.
-        if ( deviceIndex < 0 ||  (devicesModel->getDisplayRole((deviceIndex), "name") != ui->comboBoxDevice->currentText()) )
+        deviceIndex = devicesModel->findIndex(ui->comboBoxDevice->currentText());
+        // если модель не найдена, создаём новую
+        if ( deviceIndex < 0 )
         {
             SDevMdlModel *devMdl = new SDevMdlModel(this);
             devMdl->setName(ui->comboBoxDevice->currentText());
@@ -756,12 +741,10 @@ bool tabRepairNew::createRepair()
             devMdl->setMaker(deviceVendorsModel->record(deviceVendorIndex).value("id").toInt());
             devMdl->commit();
             device = devMdl->id();
-            qDebug() << "Новая модель уст-ва: LAST_INSERT_ID() = " << device;
         }
         else
         {
             device = devicesModel->databaseIDByRow(deviceIndex);
-            qDebug() << "model already exists";
         }
 
         repairModel->setClassId(deviceClassesModel->databaseIDByRow(ui->comboBoxDeviceClass->currentIndex()));
@@ -779,6 +762,7 @@ bool tabRepairNew::createRepair()
         repairModel->setFault(ui->comboBoxProblem->currentText());
         repairModel->setComplect(ui->comboBoxIncomingSet->currentText());
         repairModel->setLook(ui->comboBoxExterior->currentText());
+        repairModel->setExtNotes(ui->lineEditExtNotes->text());
         if(ui->checkBoxIsHighPriority->isChecked())
             repairModel->setExpressRepair(1);
         if(ui->checkBoxIsQuick->isChecked())
@@ -814,13 +798,10 @@ bool tabRepairNew::createRepair()
             if(paymentSystemsModel->databaseIDByRow(preferredPaymentAccIndex, "system_id") == -1)
                 repairModel->setIsCardPayment(1);
         }
-//        repairModel->set;
-//        if()
 
         repairModel->commit();
         clientModel2->updateRepairs();
         repair = repairModel->id();
-        qDebug() << "Новый ремонт: LAST_INSERT_ID() = " << repair;
 
         // запись значений доп. полей
         additionalFields->setRepair(repair);
@@ -943,12 +924,6 @@ void tabRepairNew::prepayPaymentSystemChanged(int index)
 {
     int sysId = paymentSystemsModel->databaseIDByRow(index, "system_id");
     cashRegister->setSystemId(sysId);
-}
-
-void tabRepairNew::extNotesEditingFinished()
-{
-    qDebug().nospace() << "[tabRepairNew] extNotesEditingFinished()";
-    repairModel->setExtNotes(ui->lineEditExtNotes->text());
 }
 
 void tabRepairNew::buttonCreateTabClientHandler()

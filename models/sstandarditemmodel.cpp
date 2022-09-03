@@ -14,7 +14,7 @@ SStandardItemModel::~SStandardItemModel()
  */
 int SStandardItemModel::getFieldIdByName(const QString &field)
 {
-    if(QStandardItemModel::rowCount())
+    if(QStandardItemModel::columnCount())
     {
         for (int i = 0; i<QStandardItemModel::columnCount(); i++)
         {
@@ -45,11 +45,7 @@ int SStandardItemModel::getFieldIdByName(const QString &field)
 QString SStandardItemModel::getDisplayRole(int id, int searchColumn)
 {
     int row = rowByDatabaseID(id, searchColumn);
-    if(m_displayRoleColumn == -1)
-    {
-        m_displayRoleColumn = getFieldIdByName("name");
-    }
-
+    initDisplayRoleColumn();
     if(row == -1)
         return NULL;
 
@@ -95,5 +91,26 @@ int SStandardItemModel::databaseIDByRow(int row, QString field)
 {
     int column = getFieldIdByName(field);
     return index(row, column).data().toInt();
+}
+
+void SStandardItemModel::setDisplayRoleColumn(const QString &field)
+{
+    m_displayRoleColumn = getFieldIdByName(field);
+}
+
+int SStandardItemModel::findIndex(const QString &search)
+{
+    initDisplayRoleColumn();
+    int deviceModelIndex = rowCount();
+    while (--deviceModelIndex >= 0 && index(deviceModelIndex, m_displayRoleColumn).data().toString() != search);
+    return deviceModelIndex;
+}
+
+void SStandardItemModel::initDisplayRoleColumn()
+{
+    if(m_displayRoleColumn == -1)
+    {
+        m_displayRoleColumn = getFieldIdByName("name");
+    }
 }
 

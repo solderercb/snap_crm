@@ -1422,22 +1422,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>lineEditExtNotes</sender>
-   <signal>editingFinished()</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>extNotesEditingFinished()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>462</x>
-     <y>515</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1019</x>
-     <y>502</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -1449,9 +1433,6 @@
   <slot>showLineEditPrevRepair()</slot>
   <slot>lineEditPrevRepairButtonsHandler(int)</slot>
   <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>
-  <slot>phone1TypeChanged(int)</slot>
-  <slot>phone2TypeChanged(int)</slot>
-  <slot>phoneTypeChanged(int,int)</slot>
   <slot>lineEditSNClearHandler(int)</slot>
   <slot>findMatchingDevice(QString)</slot>
   <slot>fillDeviceCreds(QModelIndex)</slot>
@@ -1462,6 +1443,5 @@
   <slot>buttonCreateTabClientHandler()</slot>
   <slot>preferredPaymentSystemChanged(int)</slot>
   <slot>prepayPaymentSystemChanged(int)</slot>
-  <slot>extNotesEditingFinished()</slot>
  </slots>
 </ui>

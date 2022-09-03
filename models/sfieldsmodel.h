@@ -15,13 +15,7 @@ public:
     explicit SFieldsModel(Type type, QObject *parent = nullptr);
     ~SFieldsModel();
     QList<SFieldValueModel*> list();
-    QList<QWidget*> widgetsList();
-    QMap<QWidget*, SFieldValueModel*> widgetFieldMap;
-    bool initWidgets(const int);
-    QWidget *createLineEdit(const QSqlRecord&, SFieldValueModel*);
-    QWidget *createComboBox(const QSqlRecord&, SFieldValueModel*);
-    QWidget *createDateTime(const QSqlRecord&, SFieldValueModel*);
-    QWidget *createDummyWidget(const QSqlRecord&, SFieldValueModel*);
+    bool init(const int);
     bool load(int);
     void add(SFieldValueModel*);
     void remove(SFieldValueModel *field);
@@ -36,6 +30,7 @@ public:
     void resetIds();
 private:
     QSqlQuery *query;
+    QList<SFieldValueModel*> m_fieldsList;
     QList<SFieldValueModel*> m_removeList;
     SFieldValueModel* itemHandler(const QSqlRecord &phone = QSqlRecord());
     SLogRecordModel *logRecord = nullptr;
