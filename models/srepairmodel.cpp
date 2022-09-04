@@ -3,7 +3,7 @@
 SRepairModel::SRepairModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "client" << "type" << "maker" << "office" << "manager" << "diagnostic_result" << "in_date" << "fault" << "reject_reason" << "company" << "start_office" << "current_manager" << "master";
-    tableName = "workshop";
+    i_tableName = "workshop";
     clientModel = new SClientModel();
 }
 
@@ -669,30 +669,22 @@ void SRepairModel::setTermsControl(const bool state)
 
 bool SRepairModel::commit()
 {
-    try
+    if(i_id)
     {
-        if(i_id)
-        {
-            if(!update())
-                throw 0;
-        }
-        else
-        {
-            setDiagnosticResult("");
-            setRejectReason("");
-            setInDate(QDateTime::currentDateTime());
-            if(!insert())
-                throw 0;
-            appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
-        }
-        commitLogs();
-    }
-    catch (bool)
-    {
-        if(!i_nDBErr)
+        if(!update())
             throw 1;
     }
+    else
+    {
+        setDiagnosticResult("");
+        setRejectReason("");
+        setInDate(QDateTime::currentDateTime());
+        if(!insert())
+            throw 1;
+        appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
+    }
+    commitLogs();
 
-    return i_nDBErr;
+    return i_nErr;
 }
 

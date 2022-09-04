@@ -375,6 +375,11 @@
 #define QUERY_BEGIN                         QString("BEGIN;")
 #define QUERY_COMMIT                        QString("COMMIT;")
 #define QUERY_ROLLBACK                      QString("ROLLBACK;")
+#define QUERY_ROLLBACK_MSG(obj,text)        qDebug() << QString("Возникла ошибка: %1").arg((text));\
+                                            QMessageBox msgBox;\
+                                            msgBox.setText(QString("Возникла ошибка\r\n%1").arg((text)));\
+                                            obj->exec(QUERY_ROLLBACK);\
+                                            msgBox.exec();
 #define QUERY_COMMIT_ROLLBACK(obj,flag)     if (flag == 0)   /* в случае ошибки выполнения запроса нужно всё откатить */\
                                             {\
                                                 qDebug() << QString("Ошибка выполнения запроса: %1").arg(obj->lastError().text());\

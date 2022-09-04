@@ -21,6 +21,7 @@
 #include "models/sfieldsmodel.h"
 #include "models/sdevmdlmodel.h"
 #include "models/srepairmodel.h"
+#include "models/scommentmodel.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "widgets/sphones.h"
 #include "querylog.h"
@@ -54,6 +55,7 @@ private:
     MainWindow *parent;
     SRepairModel *repairModel;
     SCashRegisterModel *cashRegister;
+    SCommentModel *comment;
     void setDefaultStyleSheets();
     void getDevices();
 //    QStandardItemModel* deviceClassesModel;

@@ -4,7 +4,7 @@ SClientModel::SClientModel(int id, QObject *parent) :
     SComRecord(parent)
 {
     i_obligatoryFields << "name" << "notes";
-    tableName = "clients";
+    i_tableName = "clients";
     m_phones = new SPhonesModel();
 
     i_logRecord->setType(SLogRecordModel::Client);
@@ -421,12 +421,12 @@ bool SClientModel::updateBalance(const float amount, const QString &text)
         return 1;
 
     balanceLog->setText(text);
-    i_nDBErr = balanceLog->commit(amount);
+    i_nErr = balanceLog->commit(amount);
 
-    QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPDATE_BALANCE(i_id, amount));
-    QUERY_EXEC(i_query,i_nDBErr)(QUERY_VRFY_BALANCE(i_id));
+    QUERY_EXEC(i_query,i_nErr)(QUERY_UPDATE_BALANCE(i_id, amount));
+    QUERY_EXEC(i_query,i_nErr)(QUERY_VRFY_BALANCE(i_id));
 
-    if(!i_nDBErr)
+    if(!i_nErr)
         throw 1;
 
     QUERY_EXEC_VRFY(i_query,nIntegrityErr);
@@ -436,7 +436,7 @@ bool SClientModel::updateBalance(const float amount, const QString &text)
         throw 2;
     }
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SClientModel::updateBalance(const float amount, const QString &text, const int doc_id)
@@ -444,7 +444,7 @@ bool SClientModel::updateBalance(const float amount, const QString &text, const 
     balanceLog->setDocumentId(doc_id);
     updateBalance(amount, text);
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 int SClientModel::priceColumn()
@@ -470,12 +470,12 @@ bool SClientModel::updateRepairs()
     if(i_id == 0)
         return 1;
 
-    QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_CLIENT_REPAIRS(i_id));
+    QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_CLIENT_REPAIRS(i_id));
 
-    if(!i_nDBErr)
+    if(!i_nErr)
         throw 1;
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 int SClientModel::purchases()
@@ -490,12 +490,12 @@ bool SClientModel::updatePurchases(int items)
 
     // в АСЦ с кол-вом покупок то ли глюк, то ли странная задумка: в таблице клиентов отображается кол-во РН, а в самой карте клиента кол-во записей в таблице store_sales
     // TODO: разобраться с этим
-    QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_CLIENT_PURCHASES(i_id, items));
+    QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_CLIENT_PURCHASES(i_id, items));
 
-    if(!i_nDBErr)
+    if(!i_nErr)
         throw 1;
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 QString SClientModel::token()
@@ -568,20 +568,20 @@ bool SClientModel::commit()
         insert();
     }
 
-    if(!i_nDBErr)
+    if(!i_nErr)
         return 0;
 
     i_logRecord->setClient(i_id);
     commitLogs();
 
     m_phones->setClient(i_id);
-    i_nDBErr = m_phones->commit();
-    if(!i_nDBErr)
+    i_nErr = m_phones->commit();
+    if(!i_nErr)
         return 0;
 
     load(i_id);
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SClientModel::balanceEnough(const QString summ)
@@ -616,7 +616,7 @@ SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):
     SComRecord(parent)
 {
     i_obligatoryFields << "client" << "summ" << "direction" << "reason" << "created" << "office" << "uid";
-    tableName = "balance";
+    i_tableName = "balance";
     i_valuesMap.insert("uid", userDbData->value("id"));
     i_valuesMap.insert("office", userDbData->value("current_office"));
     i_logRecord->setType(SLogRecordModel::Client);
@@ -668,12 +668,12 @@ bool SBalanceLogRecordModel::commit(const float amount)
     insert();
 
     i_logRecord->commit();
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SBalanceLogRecordModel::commit(const float amount, const QString &text)
 {
     setText(text);
     commit(amount);
-    return i_nDBErr;
+    return i_nErr;
 }

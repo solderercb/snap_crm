@@ -21,28 +21,29 @@ public:
     int lastInsertId();
     QDateTime createdUtc();
     QString created();
+    bool isError();
+    QString lastError();
 protected:
     int i_id = 0;
-    bool i_nDBErr = 1;      // флаг обнаружения ошибки выполнения запроса к БД
-    bool i_nSrcCodeErr = 1; // флаг обнаружения ошибки на уровне исходного кода
-    bool i_nTimeErr = 1;    // флаг обнаружения большой разницы времени сервера и клиента
-    QDateTime i_createdUtc;
-    bool checkSystemTime();
-    bool checkObligatoryFields();
-    bool checkTableName();
-    QMap<QString, QVariant> i_valuesMap;   // ключ — название столбца (поля) таблицы БД
+    bool i_nErr = 1;
+    QString i_tableName;
     QStringList i_obligatoryFields = {};   // поля не имеющие значения по умолчанию
+    QDateTime i_createdUtc;
     QSqlQuery *i_query;
-    QStringList fields, field_values;
-    void fieldsInsFormatter();
-    void fieldsUpdFormatter();
+    QString i_lastError;
     QString fieldValueHandler(const QVariant&);
     bool insert(bool flush = true);
     bool update();
     bool del();
-    void dbErrFlagHandler(bool);
-    QString tableName;
+    QMap<QString, QVariant> i_valuesMap;   // ключ — название столбца (поля) таблицы БД
 private:
+    QStringList fields, field_values;
+    bool checkSystemTime();
+    bool checkObligatoryFields();
+    bool checkTableName();
+    void fieldsInsFormatter();
+    void fieldsUpdFormatter();
+    void dbErrFlagHandler(bool);
 signals:
 
 };

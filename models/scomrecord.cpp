@@ -37,10 +37,14 @@ bool SComRecord::commitLogs()
     foreach(logText, *i_logTexts)
     {
         i_logRecord->setText(logText);
-        i_nDBErr &= i_logRecord->commit();
-        if(!i_nDBErr)
+        i_nErr &= i_logRecord->commit();
+        if(!i_nErr)
+        {
+            i_lastError = i_logRecord->lastError();
             return 0;
+        }
     }
+
     i_logTexts->clear();
     return 1;
 }

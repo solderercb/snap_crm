@@ -3,7 +3,7 @@
 SPhoneModel::SPhoneModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "mask" << "customer";
-    tableName = "tel";
+    i_tableName = "tel";
 
     i_logRecord->setType(SLogRecordModel::Client);
 
@@ -42,7 +42,7 @@ bool SPhoneModel::commit()
     }
     commitLogs();
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 void SPhoneModel::setClient(const int id)

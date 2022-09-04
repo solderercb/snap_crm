@@ -3,7 +3,7 @@
 SCashRegisterModel::SCashRegisterModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "created" << "type" << "summa" << "user" << "company" << "office" << "notes";
-    tableName = "cash_orders";
+    i_tableName = "cash_orders";
 }
 
 SCashRegisterModel::SCashRegisterModel(int systemId, QObject *parent) :
@@ -88,7 +88,7 @@ bool SCashRegisterModel::commit()
         q = "SELECT IF(\n  " + fields_verify.join(" AND\n  ") + "\n, 21930, 0)\n"\
                                                                 "FROM `cash_orders`\n"\
                                                                 "WHERE `id` = " + QString::number(i_id) + ";";
-        QUERY_EXEC(query,i_nDBErr)(q);
+        QUERY_EXEC(query,i_nErr)(q);
         QUERY_EXEC_VRFY(query,nIntegrityErr);
 
         delete query;
@@ -97,13 +97,13 @@ bool SCashRegisterModel::commit()
             throw 2;
     }
 
-    if(!i_nDBErr)
+    if(!i_nErr)
         throw 1;
 
     i_logRecord->commit();
     // TODO: Признак предмета расчета
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SCashRegisterModel::commit(float amount)

@@ -3,7 +3,7 @@
 SDevMdlModel::SDevMdlModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "maker";
-    tableName = "device_models";
+    i_tableName = "device_models";
     i_logRecord->setGroup(1);
 //    i_logRecord->setType(1);
 }
@@ -23,10 +23,10 @@ bool SDevMdlModel::commit()
     }
     commitLogs();
 
-    if(!i_nDBErr)
+    if(!i_nErr)
         throw 1;
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 int SDevMdlModel::id()

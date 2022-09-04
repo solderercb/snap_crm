@@ -31,11 +31,12 @@ bool SDatabaseRecord::checkSystemTime()
     secDiff = date.secsTo(QDateTime::currentDateTimeUtc());
     if( secDiff > 30 || secDiff < -30 )
     {
-        i_nTimeErr = 0;
-        appLog->appendRecord(QString("[Warning] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss")));
+        i_nErr = 0;
+        i_lastError = QString("[Warning] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss"));
+        appLog->appendRecord(i_lastError);
     }
 
-    return i_nTimeErr;
+    return i_nErr;
 }
 
 /*  Проверка обязательных полей (полей, не имеющих значения по умолчанию или связанных с другой таблицей)
@@ -51,20 +52,28 @@ bool SDatabaseRecord::checkObligatoryFields()
     {
         if(!i_valuesMap.contains(*i))
         {
-            i_nSrcCodeErr = 0;
-            appLog->appendRecord(QString("[Error] ASSERT failure in %1: i_valuesMap[\"%2\"] not set").arg(this->metaObject()->className()).arg(*i));
+            i_nErr = 0;
+            i_lastError = QString("[Error] ASSERT failure in %1: i_valuesMap[\"%2\"] not set").arg(this->metaObject()->className()).arg(*i);
+            appLog->appendRecord(i_lastError);
         }
 #ifdef QT_DEBUG
         Q_ASSERT_X(i_valuesMap.contains(*i), this->metaObject()->className(), QString("i_valuesMap[\"%1\"] not set").arg(*i).toLocal8Bit());
 #endif
     }
-    return i_nSrcCodeErr;
+    return i_nErr;
 }
 
 bool SDatabaseRecord::checkTableName()
 {
-    Q_ASSERT_X(!tableName.isEmpty(), this->metaObject()->className(), QString("Variable tableName (QString) not set").toLocal8Bit());
-    return 0;
+    if(i_tableName.isEmpty())
+    {
+        i_nErr = 0;
+        i_lastError = QString("[Error] ASSERT failure in %1: variable i_tableName (QString) not set").arg(this->metaObject()->className());
+        appLog->appendRecord(i_lastError);
+        Q_ASSERT_X(0, this->metaObject()->className(), i_lastError.toLocal8Bit());
+        return 0;
+    }
+    return 1;
 }
 
 QDateTime SDatabaseRecord::createdUtc()
@@ -135,7 +144,7 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
 
 /*  Формирует и отправляет запрос INSERT
  *  Передварительно производится проверка системного времени и обязательных полей
- *  Возвращает 0 в случае какой-либо ошибки; тип ошибки можно определить прочитав переменные i_nTimeErr, i_nSrcCodeErr, i_nDBErr
+ *  Возвращает 0 в случае какой-либо ошибки
  */
 bool SDatabaseRecord::insert(bool flushValues)
 {
@@ -152,15 +161,15 @@ bool SDatabaseRecord::insert(bool flushValues)
 
     fieldsInsFormatter();
     q = QString("INSERT INTO `%1` (\n  %2\n) VALUES (\n  %3\n);")\
-                                         .arg(tableName)\
+                                         .arg(i_tableName)\
                                          .arg(fields.join(','))\
                                          .arg(field_values.join(','));
 //    qDebug().noquote() << q;
-    QUERY_EXEC(i_query,i_nDBErr)(q);
-    QUERY_LAST_INS_ID(i_query,i_nDBErr,i_id);
+    QUERY_EXEC(i_query,i_nErr)(q);
+    QUERY_LAST_INS_ID(i_query,i_nErr,i_id);
     dbErrFlagHandler(flushValues);
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SDatabaseRecord::update()
@@ -178,14 +187,14 @@ bool SDatabaseRecord::update()
 
     fieldsUpdFormatter();
     q = QString("UPDATE\n  `%1`\nSET\n  %2\nWHERE `id` = %3;")\
-                                         .arg(tableName)\
+                                         .arg(i_tableName)\
                                          .arg(fields.join(",\n  "))\
                                          .arg(i_id);
 
-    QUERY_EXEC(i_query,i_nDBErr)(q);
+    QUERY_EXEC(i_query,i_nErr)(q);
     dbErrFlagHandler(true);
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SDatabaseRecord::del()
@@ -194,20 +203,33 @@ bool SDatabaseRecord::del()
 
     checkTableName();
     q = QString("DELETE FROM `%1` WHERE `id` = %2;")\
-                                         .arg(tableName)\
+                                         .arg(i_tableName)\
                                          .arg(i_id);
     //    qDebug().noquote() << q;
-    QUERY_EXEC(i_query,i_nDBErr)(q);
+    QUERY_EXEC(i_query,i_nErr)(q);
     dbErrFlagHandler(false);
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 void SDatabaseRecord::dbErrFlagHandler(bool flushValues)
 {
-    if(!i_nDBErr)
-        appLog->appendRecord(QString("Query error in %1: \"%2\"").arg(this->metaObject()->className()).arg(i_query->lastError().text()));
+    if(!i_nErr)
+    {
+        i_lastError = QString("Query error in %1: \"%2\"").arg(this->metaObject()->className()).arg(i_query->lastError().text());
+        appLog->appendRecord(i_lastError);
+    }
 
-    if(i_nDBErr && flushValues)
+    if(i_nErr && flushValues)
         i_valuesMap.clear();
+}
+
+bool SDatabaseRecord::isError()
+{
+    return !i_nErr;
+}
+
+QString SDatabaseRecord::lastError()
+{
+    return i_lastError;
 }

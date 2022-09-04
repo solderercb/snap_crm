@@ -2,9 +2,10 @@
 #define SCOMMENTSMODEL_H
 
 #include <QObject>
+#include "sstandarditemmodel.h"
 #include "scommentmodel.h"
 
-class SCommentsModel : public QObject
+class SCommentsModel : public SStandardItemModel
 {
     Q_OBJECT
 public:

@@ -9,6 +9,7 @@
 class SFieldsModel : public QObject
 {
     Q_OBJECT
+signals:
 public:
     enum Type {Item = 0, Repair = 1};
     enum WidgetType {LineEdit = 1, ComboBox, DateEdit, dummy};
@@ -18,7 +19,6 @@ public:
     bool init(const int);
     bool load(int);
     void add(SFieldValueModel*);
-    void remove(SFieldValueModel *field);
     bool isEmpty();
     void setRepair(const int id);
     void setItem(const int id);
@@ -28,6 +28,8 @@ public:
     void markUpdated();
     bool validate();
     void resetIds();
+    bool isError();
+    QString lastError();
 private:
     QSqlQuery *query;
     QList<SFieldValueModel*> m_fieldsList;
@@ -37,11 +39,12 @@ private:
     int m_repair = 0;
     bool m_item = 0;
     bool m_isRepair = 0;
+    bool m_nErr = 1;
+    QString m_lastError;
     void deleteWidgets();
     void deleteFields();
-
-signals:
-
+public slots:
+    void remove(SFieldValueModel *field);
 };
 
 #endif // SFIELDSMODEL_H

@@ -4,7 +4,7 @@ SLogRecordModel::SLogRecordModel(QObject *parent) :
     SDatabaseRecord(parent)
 {
     i_obligatoryFields << "user" << "created" << "values" << "values_after" << "office" << "notes";
-    tableName = "logs";
+    i_tableName = "logs";
 }
 
 bool SLogRecordModel::commit()
@@ -17,7 +17,7 @@ bool SLogRecordModel::commit()
 
     insert(false);
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SLogRecordModel::commit(const QString &text)

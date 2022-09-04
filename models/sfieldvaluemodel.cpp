@@ -3,7 +3,7 @@
 SFieldValueModel::SFieldValueModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "field_id" << "value";
-    tableName = "field_values";
+    i_tableName = "field_values";
 }
 
 SFieldValueModel::SFieldValueModel(const int id, QObject *parent) : SFieldValueModel()
@@ -232,6 +232,11 @@ void SFieldValueModel::setItemId(const int item_id)
     i_logRecord->setItemId(item_id);
 }
 
+QString SFieldValueModel::name()
+{
+    return m_name;
+}
+
 QString SFieldValueModel::value()
 {
     return m_value;
@@ -242,7 +247,7 @@ void SFieldValueModel::setValue(const QString &value)
     if(i_id)
     {
         if(value.isEmpty())
-            delDBRecord();
+            emit emptied(this);
         else
             appendLogText(tr("Значение параметра %1 изменено с \"%2\" на \"%3\"").arg(m_name,m_value,value));
     }
@@ -268,11 +273,17 @@ bool SFieldValueModel::commit()
         return 1;
 
     if(i_id)
-        update();
+    {
+        if(!update())
+            return 0;
+    }
     else
-        insert();
+    {
+        if(!insert())
+            return 0;
+    }
     commitLogs();
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SFieldValueModel::delDBRecord()

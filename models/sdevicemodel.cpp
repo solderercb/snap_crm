@@ -3,7 +3,7 @@
 SDeviceModel::SDeviceModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "fault_list" << "look_list" << "complect_list" << "company_list";
-    tableName = "devices";
+    i_tableName = "devices";
 
 }
 

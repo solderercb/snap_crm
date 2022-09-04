@@ -3,7 +3,7 @@
 SDeviceMakerModel::SDeviceMakerModel(QObject *parent) : SComRecord(parent)
 {
 //    i_obligatoryFields << "name" << "notes";
-    tableName = "device_makers";
+    i_tableName = "device_makers";
 
 }
 

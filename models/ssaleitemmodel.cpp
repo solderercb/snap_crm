@@ -3,7 +3,7 @@
 SSaleItemModel::SSaleItemModel(const QList<QStandardItem *> &record, QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "dealer" << "item_id" << "document_id" << "user";
-    tableName = "store_sales";
+    i_tableName = "store_sales";
 
     i_id = record.at(ColId)->data(Qt::DisplayRole).toInt();
     m_item_id = record.at(ColItemId)->data(Qt::DisplayRole).toInt();
@@ -92,7 +92,7 @@ bool SSaleItemModel::sale()
 
     i_logRecord->setText(tr("Продажа товара в кол-ве %1ед.").arg(m_count));
     commit(Sale);
-    return i_nDBErr;
+    return i_nErr;
 }
 
 
@@ -100,7 +100,7 @@ bool SSaleItemModel::reserve()
 {
     i_logRecord->setText(tr("Резерв %1ед. товара").arg(m_count));
     commit(Reserve);
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SSaleItemModel::unsale()
@@ -110,7 +110,7 @@ bool SSaleItemModel::unsale()
         logText.append(tr(", причина: %1").arg(m_unsaleReason));
     i_logRecord->setText(logText);
     commit(Unsale);
-    return i_nDBErr;
+    return i_nErr;
 }
 
 void SSaleItemModel::setUnsaleReason(const QString &reason)
@@ -122,7 +122,7 @@ bool SSaleItemModel::free()
 {
     i_logRecord->setText(tr("Отмена резерва %1ед. товара").arg(m_old_count));
     commit(Free);
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SSaleItemModel::saleReserve()
@@ -136,7 +136,7 @@ bool SSaleItemModel::saleReserve()
         text = tr("Продажа ранее зарезервированного товара: %1ед.").arg(m_count);
     i_logRecord->setText(text);
     commit(SaleReserved);
-    return i_nDBErr;
+    return i_nErr;
 }
 
 /* Получение "свежих известий" о кол-ве товаров
@@ -147,8 +147,8 @@ QSqlRecord* SSaleItemModel::actualStoreQtys()
 
     QSqlRecord *record = new QSqlRecord();
 
-    QUERY_EXEC(i_query,i_nDBErr)(QUERY_SEL_ITEM_ACTUAL_QTY(m_item_id));
-    if((i_nDBErr && i_query->first()))
+    QUERY_EXEC(i_query,i_nErr)(QUERY_SEL_ITEM_ACTUAL_QTY(m_item_id));
+    if((i_nErr && i_query->first()))
         *record = i_query->record();
 
     return record;
@@ -226,7 +226,7 @@ int SSaleItemModel::count()
     if( i_id == 0 )
         return 0;
 
-    QUERY_EXEC(i_query,i_nDBErr)( QUERY_SEL_STORE_SALES_QTY(i_id));
+    QUERY_EXEC(i_query,i_nErr)( QUERY_SEL_STORE_SALES_QTY(i_id));
     i_query->first();
     return i_query->value(0).toInt();
 }
@@ -241,22 +241,22 @@ bool SSaleItemModel::dealerRoyalty()
         if(m_op_type == Unsale)
         {
             float dealerRoyalty = m_old_count*( m_inPrice + (m_price - m_inPrice)*m_returnPercent/100 );
-            i_nDBErr = dealer->updateBalance(-dealerRoyalty, tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_old_count).arg(m_item_id), m_doc_id);
+            i_nErr = dealer->updateBalance(-dealerRoyalty, tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_old_count).arg(m_item_id), m_doc_id);
         }
         else
         {
             float dealerRoyalty = m_count*( m_inPrice + (m_price - m_inPrice)*m_returnPercent/100 );
-            i_nDBErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_count).arg(m_item_id), m_doc_id);
+            i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_count).arg(m_item_id), m_doc_id);
         }
     }
     catch (int)
     {
-        i_nDBErr = 0;
+        i_nErr = 0;
         showNotification(tr("Ошибка целостности данных баланса, dealer = %1").arg(m_dealer));
     }
     delete dealer;
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SSaleItemModel::commit()
@@ -267,7 +267,7 @@ bool SSaleItemModel::commit()
     if(checkAvailabilityBefore(before))
     {
         shortlivedNotification *newPopup = new shortlivedNotification(parent(), tr("Товар отсутствует"), tr("\"%1\" (UID %2) больше не доступен для продажи").arg(m_item_name).arg(m_item_id), QColor(255,164,119), QColor(255,199,173));
-        i_nDBErr = 0;
+        i_nErr = 0;
     }
     else
     {
@@ -292,9 +292,9 @@ bool SSaleItemModel::commit()
         // TODO: если последняя единица товара, нужно удалить ячейку и сделать соотв. запись в журнал (но! нужно чтобы при вызове updateWidgets() в таблице место не обновлялось)
         // а может и не нужно; в АСЦ удалялась, но за годы пользования я так и не понял зачем это сделано
 
-        if(i_nDBErr && !verifyQty(before, after))
+        if(i_nErr && !verifyQty(before, after))
         {
-            i_nDBErr = 0;
+            i_nErr = 0;
             showNotification(tr("Ошибка целостности данных item_id = %1").arg(m_item_id));
         }
 
@@ -302,7 +302,7 @@ bool SSaleItemModel::commit()
     }
     delete before;
 
-    return i_nDBErr;
+    return i_nErr;
 }
 
 bool SSaleItemModel::commit(Operation op)
@@ -327,15 +327,15 @@ bool SSaleItemModel::updateStoreItemsTable()
 {
     switch (m_op_type)
     {
-        case Sale         : QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_STORE_ITEMS_SALE(m_count, m_item_id)); break;
-        case Reserve      : QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_STORE_ITEMS_RESERVE(m_count, m_item_id)); break;
-        case SaleReserved : QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_STORE_ITEMS_SALE_RESERVED(m_item_id, m_count, m_old_count)); break;
-        case Unsale       : QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_STORE_ITEMS_UNSALE(m_item_id, m_old_count)); break;
-        case Free         : QUERY_EXEC(i_query,i_nDBErr)(QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(m_item_id, m_old_count)); break;
+        case Sale         : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_SALE(m_count, m_item_id)); break;
+        case Reserve      : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_RESERVE(m_count, m_item_id)); break;
+        case SaleReserved : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_SALE_RESERVED(m_item_id, m_count, m_old_count)); break;
+        case Unsale       : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_UNSALE(m_item_id, m_old_count)); break;
+        case Free         : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(m_item_id, m_old_count)); break;
         case Nop:
         case SaleRepair: break;
         default: break;
     }
 
-    return i_nDBErr;
+    return i_nErr;
 }

@@ -3,6 +3,8 @@
 
 #include "scomrecord.h"
 #include <QObject>
+#include <QDateTime>
+#include <QString>
 
 class SCommentModel : public SComRecord
 {
@@ -15,17 +17,18 @@ public:
     QString text();
     void setText(const QString);
     QDate created();
-    void setCreated(const QDate);
+    void setCreated(const QDateTime);
     int user();
     void setUser(const int);
     int remont();
-    void setRemont(const int);
+    void setRepair(const int);
     int client();
     void setClient(const int);
     int taskId();
     void setTaskId(const int);
     int partRequest();
     void setPartRequest(const int);
+    bool commit();
 private:
     int m_id;
     QString m_text;

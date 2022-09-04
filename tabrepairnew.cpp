@@ -16,6 +16,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     repairModel = new SRepairModel(this);
     cashRegister = new SCashRegisterModel();
+    comment = new SCommentModel();
     bool nDBErr = 1;
     query->exec(QUERY_BEGIN);
     QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
@@ -163,6 +164,7 @@ tabRepairNew::~tabRepairNew()
     delete clientModel2;
     delete cashRegister;
     delete repairModel;
+    delete comment;
     #ifdef QT_DEBUG
         delete test_scheduler;
         delete test_scheduler2;
@@ -809,11 +811,9 @@ bool tabRepairNew::createRepair()
 
         if (ui->lineEditInsideComment->text() != "" )
         {
-            QUERY_EXEC(query,nDBErr)(QUERY_INS_REPAIR_COMMENT
-                    .arg(ui->lineEditInsideComment->text())
-                    .arg(user)
-                    .arg(repair));
-            QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,user,office,"NULL",repair,"NULL","NULL","NULL","Добавлен внутренний комментарий к ремонту №"+QString::number(repair)));
+            comment->setRepair(repair);
+            comment->setText(ui->lineEditInsideComment->text());
+            comment->commit();
         }
 
         if (ui->checkBoxIsPrepay->isChecked())
@@ -837,10 +837,20 @@ bool tabRepairNew::createRepair()
     }
     catch (int)
     {
+        QString err = "DEBUG ROLLBACK";
+
+        nDBErr = 0;
         repairModel->setId(0);
         additionalFields->resetIds();
-        nDBErr = 0;
-        QUERY_COMMIT_ROLLBACK(query, nDBErr);
+        if(repairModel->isError())
+            err = repairModel->lastError();
+        if(additionalFields->isError())
+            err = additionalFields->lastError();
+        if(comment->isError())
+            err = comment->lastError();
+        if(cashRegister->isError())
+            err = cashRegister->lastError();
+        QUERY_ROLLBACK_MSG(query, err);
     }
 //    nDBErr = 1; // и это для отладки (чтобы проверить работу дальше)
 

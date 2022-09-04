@@ -52,12 +52,11 @@ bool SFieldsModel::init(const int id)
     {
         field = new SFieldValueModel();
         field->createWidget(query->record());
-
-        m_fieldsList.append(field);
         field->setProperty("fieldType", query->value(2).toInt());
         field->setProperty("fieldId", query->value(3).toInt());
         field->setProperty("fieldRequired", query->value(4).toBool());
         field->setProperty("fieldPrintable", query->value(5).toBool());
+        add(field);
     }
     return 1;
 }
@@ -83,6 +82,7 @@ bool SFieldsModel::load(int id)
 
 void SFieldsModel::add(SFieldValueModel *item)
 {
+    connect(item, SIGNAL(emptied(SFieldValueModel*)), this, SLOT(remove(SFieldValueModel*)));
     m_fieldsList.append(item);
 }
 
@@ -125,14 +125,22 @@ bool SFieldsModel::commit()
     foreach(item, m_fieldsList)
     {
         if(!item->commit())
+        {
+            m_lastError = item->lastError();
+            m_nErr = 0;
             throw 1;
+        }
     }
 
     while( !m_removeList.isEmpty() )
     {
         item = m_removeList.last();
         if(!item->delDBRecord())
+        {
+            m_lastError = item->lastError();
+            m_nErr = 0;
             throw 1;
+        }
 
         m_removeList.removeLast();
         item->deleteLater();
@@ -160,6 +168,16 @@ void SFieldsModel::resetIds()
         if(!item->value().isEmpty())
             item->setId(0);
     }
+}
+
+bool SFieldsModel::isError()
+{
+    return !m_nErr;
+}
+
+QString SFieldsModel::lastError()
+{
+    return m_lastError;
 }
 
 SFieldValueModel *SFieldsModel::itemHandler(const QSqlRecord &record)

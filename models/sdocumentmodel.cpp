@@ -3,7 +3,7 @@
 SDocumentModel::SDocumentModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "company" << "user" << "total" << "created" << "office" << "img1" << "img2" << "img3";
-    tableName = "docs";
+    i_tableName = "docs";
     i_logRecord->setType(SLogRecordModel::Doc);
 }
 
@@ -275,8 +275,8 @@ bool SDocumentModel::commit()
     i_logRecord->setDocumentId(i_id);
     commitLogs();
 
-    if(!i_nDBErr)
+    if(!i_nErr)
         throw 1;
 
-    return i_nDBErr;
+    return i_nErr;
 }

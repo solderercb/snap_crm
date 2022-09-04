@@ -8,6 +8,8 @@
 class SFieldValueModel : public SComRecord
 {
     Q_OBJECT
+signals:
+    void emptied(SFieldValueModel*);
 public:
     enum WidgetType {LineEdit = 1, ComboBox, DateEdit, dummy};
     explicit SFieldValueModel(QObject *parent = nullptr);
@@ -28,6 +30,7 @@ public:
     void setRepairId(const int);
     int itemId();
     void setItemId(const int);
+    QString name();
     QString value();
     bool commit();
     bool delDBRecord();

@@ -1,6 +1,6 @@
 #include "scommentsmodel.h"
 
-SCommentsModel::SCommentsModel(QObject *parent) : QObject(parent)
+SCommentsModel::SCommentsModel(QObject *parent) : SStandardItemModel(parent)
 {
 
 }
