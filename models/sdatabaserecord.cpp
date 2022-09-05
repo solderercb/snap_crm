@@ -23,6 +23,7 @@ bool SDatabaseRecord::checkSystemTime()
     QSqlQuery serverTime(QSqlDatabase::database("connMain"));
     QDateTime date;
     int secDiff;
+    QString error;
 
     serverTime.exec("SELECT UTC_TIMESTAMP();");
     serverTime.first();
@@ -32,8 +33,8 @@ bool SDatabaseRecord::checkSystemTime()
     if( secDiff > 30 || secDiff < -30 )
     {
         i_nErr = 0;
-        i_lastError = QString("[Warning] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss"));
-        appLog->appendRecord(i_lastError);
+        error = QString("[Warning] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss"));
+        appLog->appendRecord(error);
     }
 
     return i_nErr;
@@ -44,6 +45,8 @@ bool SDatabaseRecord::checkSystemTime()
  */
 bool SDatabaseRecord::checkObligatoryFields()
 {
+    QString error;
+
     if(i_obligatoryFields.isEmpty())
         qDebug() << this->metaObject()->className() << QString("[WARNING]: Obligatory fields not defined!");
 
@@ -53,27 +56,32 @@ bool SDatabaseRecord::checkObligatoryFields()
         if(!i_valuesMap.contains(*i))
         {
             i_nErr = 0;
-            i_lastError = QString("[Error] ASSERT failure in %1: i_valuesMap[\"%2\"] not set").arg(this->metaObject()->className()).arg(*i);
-            appLog->appendRecord(i_lastError);
-        }
+            error = QString("[Error] ASSERT failure in %1: i_valuesMap[\"%2\"] not set").arg(this->metaObject()->className()).arg(*i);
+            appLog->appendRecord(error);
+            errorMsg(error);
 #ifdef QT_DEBUG
-        Q_ASSERT_X(i_valuesMap.contains(*i), this->metaObject()->className(), QString("i_valuesMap[\"%1\"] not set").arg(*i).toLocal8Bit());
+            Q_ASSERT_X(0, this->metaObject()->className(), QString("i_valuesMap[\"%1\"] not set").arg(*i).toLocal8Bit());
 #endif
+        }
     }
     return i_nErr;
 }
 
 bool SDatabaseRecord::checkTableName()
 {
+    QString error;
+
     if(i_tableName.isEmpty())
     {
         i_nErr = 0;
-        i_lastError = QString("[Error] ASSERT failure in %1: variable i_tableName (QString) not set").arg(this->metaObject()->className());
-        appLog->appendRecord(i_lastError);
-        Q_ASSERT_X(0, this->metaObject()->className(), i_lastError.toLocal8Bit());
-        return 0;
+        error = QString("[Error] ASSERT failure in %1: variable i_tableName (QString) not set").arg(this->metaObject()->className());
+        appLog->appendRecord(error);
+        errorMsg(error);
+#ifdef QT_DEBUG
+        Q_ASSERT_X(0, this->metaObject()->className(), error.toLocal8Bit());
+#endif
     }
-    return 1;
+    return i_nErr;
 }
 
 QDateTime SDatabaseRecord::createdUtc()
@@ -214,22 +222,23 @@ bool SDatabaseRecord::del()
 
 void SDatabaseRecord::dbErrFlagHandler(bool flushValues)
 {
+    QString error;
+
     if(!i_nErr)
     {
-        i_lastError = QString("Query error in %1: \"%2\"").arg(this->metaObject()->className()).arg(i_query->lastError().text());
-        appLog->appendRecord(i_lastError);
+        error = QString("Query error in %1: \"%2\"").arg(this->metaObject()->className()).arg(i_query->lastError().text());
+        appLog->appendRecord(error);
+        errorMsg(error);
     }
 
     if(i_nErr && flushValues)
         i_valuesMap.clear();
 }
 
-bool SDatabaseRecord::isError()
+void SDatabaseRecord::errorMsg(const QString &text)
 {
-    return !i_nErr;
+    QMessageBox msgBox;
+    msgBox.setText(text);
+    msgBox.exec();
 }
 
-QString SDatabaseRecord::lastError()
-{
-    return i_lastError;
-}

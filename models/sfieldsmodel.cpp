@@ -126,7 +126,6 @@ bool SFieldsModel::commit()
     {
         if(!item->commit())
         {
-            m_lastError = item->lastError();
             m_nErr = 0;
             throw 1;
         }
@@ -137,7 +136,6 @@ bool SFieldsModel::commit()
         item = m_removeList.last();
         if(!item->delDBRecord())
         {
-            m_lastError = item->lastError();
             m_nErr = 0;
             throw 1;
         }
@@ -168,16 +166,6 @@ void SFieldsModel::resetIds()
         if(!item->value().isEmpty())
             item->setId(0);
     }
-}
-
-bool SFieldsModel::isError()
-{
-    return !m_nErr;
-}
-
-QString SFieldsModel::lastError()
-{
-    return m_lastError;
 }
 
 SFieldValueModel *SFieldsModel::itemHandler(const QSqlRecord &record)

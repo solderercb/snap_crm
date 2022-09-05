@@ -40,7 +40,6 @@ bool SComRecord::commitLogs()
         i_nErr &= i_logRecord->commit();
         if(!i_nErr)
         {
-            i_lastError = i_logRecord->lastError();
             return 0;
         }
     }

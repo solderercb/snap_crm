@@ -28,8 +28,6 @@ public:
     void markUpdated();
     bool validate();
     void resetIds();
-    bool isError();
-    QString lastError();
 private:
     QSqlQuery *query;
     QList<SFieldValueModel*> m_fieldsList;
@@ -40,7 +38,6 @@ private:
     bool m_item = 0;
     bool m_isRepair = 0;
     bool m_nErr = 1;
-    QString m_lastError;
     void deleteWidgets();
     void deleteFields();
 public slots:

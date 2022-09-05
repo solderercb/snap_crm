@@ -741,7 +741,7 @@ bool tabRepairNew::createRepair()
             devMdl->setName(ui->comboBoxDevice->currentText());
             devMdl->setDevice(deviceClassesModel->record(deviceClassIndex).value("id").toInt());
             devMdl->setMaker(deviceVendorsModel->record(deviceVendorIndex).value("id").toInt());
-            devMdl->commit();
+            nDBErr = devMdl->commit();
             device = devMdl->id();
         }
         else
@@ -801,19 +801,19 @@ bool tabRepairNew::createRepair()
                 repairModel->setIsCardPayment(1);
         }
 
-        repairModel->commit();
-        clientModel2->updateRepairs();
+        nDBErr = repairModel->commit();
+        nDBErr = clientModel2->updateRepairs();
         repair = repairModel->id();
 
         // запись значений доп. полей
         additionalFields->setRepair(repair);
-        additionalFields->commit();
+        nDBErr = additionalFields->commit();
 
         if (ui->lineEditInsideComment->text() != "" )
         {
             comment->setRepair(repair);
             comment->setText(ui->lineEditInsideComment->text());
-            comment->commit();
+            nDBErr = comment->commit();
         }
 
         if (ui->checkBoxIsPrepay->isChecked())
@@ -824,33 +824,29 @@ bool tabRepairNew::createRepair()
             cashRegister->setRepairId(repair);
             cashRegister->setReason(tr("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)));
             cashRegister->setLogText(tr("Внесена предоплата за ремонт №%2 в размере %3 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)));
-            cashRegister->commit(prepaySumm);
+            nDBErr = cashRegister->commit(prepaySumm);
 
             // TODO: Признак предмета расчета
         }
 
 #ifdef QT_DEBUG
-        throw 1; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
 
         QUERY_COMMIT_ROLLBACK(query, nDBErr);
     }
-    catch (int)
+    catch (int type)
     {
-        QString err = "DEBUG ROLLBACK";
-
         nDBErr = 0;
         repairModel->setId(0);
         additionalFields->resetIds();
-        if(repairModel->isError())
-            err = repairModel->lastError();
-        if(additionalFields->isError())
-            err = additionalFields->lastError();
-        if(comment->isError())
-            err = comment->lastError();
-        if(cashRegister->isError())
-            err = cashRegister->lastError();
-        QUERY_ROLLBACK_MSG(query, err);
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query, nDBErr);
     }
 //    nDBErr = 1; // и это для отладки (чтобы проверить работу дальше)
 

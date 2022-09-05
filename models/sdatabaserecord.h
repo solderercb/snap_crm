@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QTimeZone>
+#include <QMessageBox>
 #include "global.h"
 #include "com_sql_queries.h"
 #include "models/ssqlquerymodel.h"
@@ -21,8 +22,6 @@ public:
     int lastInsertId();
     QDateTime createdUtc();
     QString created();
-    bool isError();
-    QString lastError();
 protected:
     int i_id = 0;
     bool i_nErr = 1;
@@ -30,7 +29,6 @@ protected:
     QStringList i_obligatoryFields = {};   // поля не имеющие значения по умолчанию
     QDateTime i_createdUtc;
     QSqlQuery *i_query;
-    QString i_lastError;
     QString fieldValueHandler(const QVariant&);
     bool insert(bool flush = true);
     bool update();
@@ -44,6 +42,7 @@ private:
     void fieldsInsFormatter();
     void fieldsUpdFormatter();
     void dbErrFlagHandler(bool);
+    void errorMsg(const QString&);
 signals:
 
 };

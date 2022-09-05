@@ -382,6 +382,14 @@
                                             msgBox.exec();
 #define QUERY_COMMIT_ROLLBACK(obj,flag)     if (flag == 0)   /* в случае ошибки выполнения запроса нужно всё откатить */\
                                             {\
+                                                obj->exec(QUERY_ROLLBACK);\
+                                            }\
+                                            else\
+                                            {\
+                                                obj->exec(QUERY_COMMIT);\
+                                            }
+#define QUERY_COMMIT_ROLLBACK_MSG(obj,flag) if (flag == 0)   /* в случае ошибки выполнения запроса нужно всё откатить */\
+                                            {\
                                                 qDebug() << QString("Ошибка выполнения запроса: %1").arg(obj->lastError().text());\
                                                 QMessageBox msgBox;\
                                                 msgBox.setText(QString("Ошибка выполнения запроса\r\n%1").arg(obj->lastError().text()));\
