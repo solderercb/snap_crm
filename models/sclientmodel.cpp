@@ -182,7 +182,7 @@ SPhonesModel* SClientModel::phones()
     return m_phones;
 }
 
-bool SClientModel::addPhone(const QString &number, int comboBoxMaskIndex, int messengers)
+void SClientModel::addPhone(const QString &number, int comboBoxMaskIndex, int messengers)
 {
     SPhoneModel *phone = new SPhoneModel();
     phone->setPhone(number);
@@ -191,7 +191,6 @@ bool SClientModel::addPhone(const QString &number, int comboBoxMaskIndex, int me
         phone->setPrimary();
     phone->setMessengers(messengers);
     m_phones->add(phone);
-
 }
 
 QString SClientModel::address()

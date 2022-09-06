@@ -42,7 +42,7 @@ bool SPhonesModel::load(int client)
     query->exec(QUERY_SEL_CLIENT_PHONES(client));
     while(query->next())
     {
-        phoneItemHandler(query->record());
+        sqlRecordHandler(query->record());
     }
 
     delete query;
@@ -140,7 +140,7 @@ void SPhonesModel::markUpdated(bool state)
     m_updated = state;
 }
 
-SPhoneModel *SPhonesModel::phoneItemHandler(const QSqlRecord &record)
+SPhoneModel *SPhonesModel::sqlRecordHandler(const QSqlRecord &record)
 {
     SPhoneModel *item = new SPhoneModel(record, this);
     add(item);

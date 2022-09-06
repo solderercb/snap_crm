@@ -31,7 +31,7 @@ private:
     QSqlQuery *query;
     QList<SPhoneModel*> m_phonesList;
     QList<SPhoneModel*> m_removeList;
-    SPhoneModel* phoneItemHandler(const QSqlRecord &phone = QSqlRecord());
+    SPhoneModel* sqlRecordHandler(const QSqlRecord &phone = QSqlRecord());
     SLogRecordModel *logRecord = nullptr;
     int m_client = 0;
     bool m_updated = false;

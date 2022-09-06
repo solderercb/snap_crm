@@ -16,7 +16,7 @@ public:
     void setId(const int);
     QString text();
     void setText(const QString);
-    QDate created();
+    QDateTime created();
     void setCreated(const QDateTime);
     int user();
     void setUser(const int);
@@ -32,7 +32,7 @@ public:
 private:
     int m_id;
     QString m_text;
-    QDate m_created;
+    QDateTime m_created;
     int m_user;
     int m_remont;
     int m_client;

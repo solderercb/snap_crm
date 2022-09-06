@@ -31,7 +31,7 @@ void SCommentModel::setText(QString text)
     i_valuesMap.insert("text", text);
 }
 
-QDate SCommentModel::created()
+QDateTime SCommentModel::created()
 {
     return m_created;
 }

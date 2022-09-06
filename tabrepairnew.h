@@ -65,9 +65,7 @@ private:
     QSqlQueryModel* classProblemsModel;
     QSqlQueryModel* classIncomingSetsModel;
     QSqlQueryModel* classExteriorsModel;
-    QSqlQueryModel* clientModel;
-    QSqlQueryModel* clientPhonesModel;
-    SClientModel *clientModel2;
+    SClientModel *clientModel;
     SFieldsModel *additionalFields;
     QSqlQueryModel* queryDevice;
     QStandardItemModel* prepayReasonsModel;

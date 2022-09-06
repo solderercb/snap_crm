@@ -4,7 +4,7 @@ SRepairModel::SRepairModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "client" << "type" << "maker" << "office" << "manager" << "diagnostic_result" << "in_date" << "fault" << "reject_reason" << "company" << "start_office" << "current_manager" << "master";
     i_tableName = "workshop";
-    clientModel = new SClientModel();
+    m_clientModel = new SClientModel();
 }
 
 SRepairModel::SRepairModel(const int repair, QObject *parent) : SRepairModel(parent)
@@ -14,7 +14,7 @@ SRepairModel::SRepairModel(const int repair, QObject *parent) : SRepairModel(par
 
 SRepairModel::~SRepairModel()
 {
-
+    delete m_clientModel;
 }
 
 int SRepairModel::id()
@@ -63,6 +63,11 @@ int SRepairModel::clientId()
 void SRepairModel::setClientId(const int id)
 {
     i_valuesMap.insert("client", id);
+}
+
+SClientModel *SRepairModel::clientModel()
+{
+    return m_clientModel;
 }
 
 int SRepairModel::classId()

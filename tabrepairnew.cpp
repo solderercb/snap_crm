@@ -33,8 +33,8 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     main_window_test_scheduler2 = parent->test_scheduler2;
 #endif
 
-    clientModel2 = new SClientModel();
-    ui->phones->setModel(clientModel2->phones());
+    clientModel = new SClientModel();
+    ui->phones->setModel(clientModel->phones());
     groupBoxEventFilter = new SGroupBoxEventFilter(this);
     ui->groupBoxDeviceCoincidence->installEventFilter(groupBoxEventFilter);
     ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
@@ -161,7 +161,7 @@ tabRepairNew::~tabRepairNew()
     delete devicesMatchTable;
     delete groupBoxEventFilter;
     delete additionalFields;
-    delete clientModel2;
+    delete clientModel;
     delete cashRegister;
     delete repairModel;
     delete comment;
@@ -318,7 +318,7 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
     ui->lineEditClientAddress->clear();
     ui->lineEditClientEmail->clear();
 
-    clientModel2->clear();
+    clientModel->clear();
 
     if (hideCoincidence)
         ui->widgetClientMatch->hide();
@@ -345,29 +345,12 @@ void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
 
 void tabRepairNew::fillClientCreds(int id)
 {
-    clientModel = new QSqlQueryModel();
-    clientPhonesModel = new QSqlQueryModel();
-
-    QString query;
-    query = QUERY_SEL_CLIENT(id);
-    clientModel->setQuery(query, QSqlDatabase::database("connMain"));
-
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
-    if(clientModel->record(0).value("notes").toString() != "")
-    {
-        msgBox.setText(clientModel->record(0).value("notes").toString());
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-    }
-
-    if (clientModel->record(0).value("type").toBool())
-        ui->checkBoxClientType->setChecked(true);
-    else
-        ui->checkBoxClientType->setChecked(false);
-    changeClientType();
-
     client = id;
-    clientModel2->load(client);
+
+    clientModel->load(client);
+    ui->checkBoxClientType->setChecked(clientModel->type());
+    changeClientType();
     ui->checkBoxClientType->setEnabled(false);
     ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
     ui->lineEditClientFirstName->setReadOnly(true);
@@ -377,17 +360,14 @@ void tabRepairNew::fillClientCreds(int id)
     ui->lineEditClientEmail->setReadOnly(true);
 
     ui->pushButtonCreateTabClient->setEnabled(true);
-    ui->lineEditClientFirstName->setText(clientModel->record(0).value("name").toString());
-    ui->lineEditClientLastName->setText(clientModel->record(0).value("surname").toString());
-    ui->lineEditClientPatronymic->setText(clientModel->record(0).value("patronymic").toString());
-    ui->phones->setModel(clientModel2->phones());
-    ui->lineEditClientAddress->setText(clientModel->record(0).value("address").toString());
-    ui->lineEditClientEmail->setText(clientModel->record(0).value("email").toString());
+    ui->lineEditClientFirstName->setText(clientModel->firstName());
+    ui->lineEditClientLastName->setText(clientModel->lastName());
+    ui->lineEditClientPatronymic->setText(clientModel->patronymicName());
+    ui->phones->setModel(clientModel->phones());
+    ui->lineEditClientAddress->setText(clientModel->address());
+    ui->lineEditClientEmail->setText(clientModel->email());
 
     ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
-
-    clientPhonesModel->deleteLater();
-    clientModel->deleteLater();
 }
 
 void tabRepairNew::fillDeviceCreds(int id)
@@ -679,15 +659,15 @@ bool tabRepairNew::createClient()
 {
     bool nErr = 1;
 
-    clientModel2->setFirstName(ui->lineEditClientFirstName->text());
-    clientModel2->setLastName(ui->lineEditClientLastName->text());
-    clientModel2->setPatronymicName(ui->lineEditClientPatronymic->text());
-    clientModel2->appendLogText(tr("Быстрое создание клиента из формы приёма в ремонт"));
-    clientModel2->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
-    clientModel2->setAddress(ui->lineEditClientAddress->text());
-    clientModel2->setType(ui->checkBoxClientType->isChecked());
-    nErr = clientModel2->commit();
-    client = clientModel2->id();
+    clientModel->setFirstName(ui->lineEditClientFirstName->text());
+    clientModel->setLastName(ui->lineEditClientLastName->text());
+    clientModel->setPatronymicName(ui->lineEditClientPatronymic->text());
+    clientModel->appendLogText(tr("Быстрое создание клиента из формы приёма в ремонт"));
+    clientModel->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
+    clientModel->setAddress(ui->lineEditClientAddress->text());
+    clientModel->setType(ui->checkBoxClientType->isChecked());
+    nErr = clientModel->commit();
+    client = clientModel->id();
 
     return nErr;
 }
@@ -718,13 +698,13 @@ bool tabRepairNew::createRepair()
 
     try
     {
-        if (clientModel2->isNew() || clientModel2->phones()->isUpdated())
+        if (clientModel->isNew() || clientModel->phones()->isUpdated())
         {
             QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-            if(clientModel2->isNew())
+            if(clientModel->isNew())
                 nErr = createClient();
-            if(clientModel2->phones()->isUpdated())
-                nErr = clientModel2->phones()->commit();
+            if(clientModel->phones()->isUpdated())
+                nErr = clientModel->phones()->commit();
             QUERY_COMMIT_ROLLBACK(query,nErr);
             fillClientCreds(client);
         }
@@ -753,7 +733,7 @@ bool tabRepairNew::createRepair()
         repairModel->setVendorId(deviceVendorsModel->databaseIDByRow(ui->comboBoxDeviceVendor->currentIndex()));
         repairModel->setTitle(ui->comboBoxDeviceClass->currentText() + " " + ui->comboBoxDeviceVendor->currentText() + " " + ui->comboBoxDevice->currentText());
         repairModel->setDeviceId(device);
-        repairModel->setClientId(clientModel2->id());
+        repairModel->setClientId(clientModel->id());
         repairModel->setSerialNumber(ui->lineEditSN->text());
         repairModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
         repairModel->setOfficeIndex(office);
@@ -802,7 +782,7 @@ bool tabRepairNew::createRepair()
         }
 
         nErr = repairModel->commit();
-        nErr = clientModel2->updateRepairs();
+        nErr = clientModel->updateRepairs();
         repair = repairModel->id();
 
         // запись значений доп. полей
@@ -819,7 +799,7 @@ bool tabRepairNew::createRepair()
         if (ui->checkBoxIsPrepay->isChecked())
         {
             cashRegister->setId(0);
-            cashRegister->setClient(clientModel2->id());
+            cashRegister->setClient(clientModel->id());
             cashRegister->setOperationType(SCashRegisterModel::ReceiptGoods);
             cashRegister->setRepairId(repair);
             cashRegister->setReason(tr("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)));

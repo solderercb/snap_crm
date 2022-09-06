@@ -54,7 +54,7 @@ public:
     QString fullShortName();  // Фамилия И. О.
     SPhonesModel* phones();
     void setPhonesModel(SPhonesModel*);
-    bool addPhone(const QString &number, int numberMask = 0, int messangers = 0);
+    void addPhone(const QString &number, int numberMask = 0, int messangers = 0);
     bool removePhone(const QString&);
     QString address();
     void setAddress(const QString&);

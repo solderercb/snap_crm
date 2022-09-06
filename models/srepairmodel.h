@@ -25,6 +25,7 @@ public:
     void setTitle(const QString);
     int clientId();
     void setClientId(const int);
+    SClientModel *clientModel();
     int classId();
     void setClassId(const int);
     int vendorId();
@@ -147,7 +148,7 @@ public:
     bool commit();
 
 private:
-    SClientModel *clientModel;
+    SClientModel *m_clientModel;
     bool m_isHidden;
     QString m_title;
     int m_clientId;
