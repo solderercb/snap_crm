@@ -17,7 +17,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     itemDelagates = new SaleTableItemDelegates(tableModel, ui->tableView);
     clientModel = new SClientModel();
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
+    bool nErr = 1;
     cashRegister = new SCashRegisterModel();
 
     params = new int;
@@ -44,18 +44,18 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
 
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
+    QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
 
     if(doc_id)
     {
-        QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation РН№%1").arg(doc_id)));
+        QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation РН№%1").arg(doc_id)));
     }
     else
     {
-        QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Продажа")));
+        QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Продажа")));
     }
 
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    QUERY_COMMIT_ROLLBACK(query, nErr);
 
     ui->tableView->setModel(tableModel);
     ui->tableView->setItemDelegateForColumn(0, itemDelagates);
@@ -338,7 +338,7 @@ bool tabSale::checkInput()
             ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
             error = 4;
         }
-        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool() && clientModel->isClear())   // если не указан телефон и он обязятелен
+        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool() && clientModel->isNew())   // если не указан телефон и он обязятелен
         {
             ui->lineEditClientPhone->setStyleSheet(commonLineEditStyleSheetRed);
             error = 5;
@@ -411,10 +411,8 @@ bool tabSale::checkInput()
 
 bool tabSale::createClient()
 {
-    bool nDBErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nErr = 1;
 
-    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
     clientModel->setFirstName(ui->lineEditClientFirstName->text());
     clientModel->setLastName(ui->lineEditClientLastName->text());
     clientModel->setPatronymicName(ui->lineEditClientPatronymic->text());
@@ -425,12 +423,10 @@ bool tabSale::createClient()
         clientModel->addPhone(ui->lineEditClientPhone->text(),
                               ui->comboBoxClientPhoneType->currentIndex());
     }
-    nDBErr = clientModel->commit();
+    nErr = clientModel->commit();
+    client = clientModel->id();
 
-    QUERY_COMMIT_ROLLBACK(query,nDBErr);
-
-    delete query;
-    return nDBErr;
+    return nErr;
 }
 
 bool tabSale::createNewDoc()
@@ -504,6 +500,7 @@ void tabSale::clearClientCreds(bool hideCoincidence)
 
 void tabSale::fillClientCreds(int id)
 {
+    qDebug().nospace() << "[tabSale] fillClientCreds()";
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
     client = id;                // установка нового значения должна выполняться после очистки
     clientModel->load(client);
@@ -646,7 +643,7 @@ void tabSale::print()
 bool tabSale::unSale()  // распроведение
 {
     // TODO: нужно изучить вопрос возврата товара при условии использования РРО, возможно, для этого нужно создавать отдельный документ на возврат
-    bool nDBErr = 1, balance = 0;
+    bool nErr = 1, balance = 0;
     QSqlQuery *query;
     int paymentAccount = 0;
     float amount;
@@ -669,7 +666,7 @@ bool tabSale::unSale()  // распроведение
 
     try
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
+        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
         tableModel->setUnsaleReason(ui->textEditRevertReason->toPlainText());
         tableModel->unsaleItems();
@@ -707,15 +704,24 @@ bool tabSale::unSale()  // распроведение
             cashRegister->commit(-amount);
         }
 
-        QUERY_COMMIT_ROLLBACK(query,nDBErr);
+#ifdef QT_DEBUG
+//    throw 0; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+#endif
+        QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int)
+    catch (int type)
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_ROLLBACK);
-        nDBErr = 0;
+        nErr = 0;
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+        }
+        else
+            QUERY_EXEC(query,nErr)(QUERY_ROLLBACK);
     }
 
-//    nDBErr = 0; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//    nErr = 0; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 
 #ifdef QT_DEBUG
     sqlLog->saveLog();
@@ -724,7 +730,7 @@ bool tabSale::unSale()  // распроведение
 
     delete query;
 
-    if(nDBErr)
+    if(nErr)
         return false;
     else
         return true; // return 0 — OK, return 1 - ошибка
@@ -761,7 +767,7 @@ bool tabSale::sale()
     if(!checkInput())
         return true; // return 0 — OK, return 1 - ошибка
 
-    bool nDBErr = 1, balance = 0, isAnonBuyer = 0;
+    bool nErr = 1, balance = 0, isAnonBuyer = 0;
     int paymentAccount = 0, initial_doc_id = doc_id;
     float amount;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
@@ -788,17 +794,22 @@ bool tabSale::sale()
         balance = paymentAccount == -2;
     }
 
-    if(!isAnonBuyer)
-    {
-        if (clientModel->isClear())
-            createClient();
-    }
-
-    tableModel->setClient(clientModel->id());
-
     try
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
+        if(!isAnonBuyer)
+        {
+            if (clientModel->isNew())
+            {
+                QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+                nErr = createClient();
+                QUERY_COMMIT_ROLLBACK(query,nErr);
+                fillClientCreds(client);
+            }
+        }
+
+        tableModel->setClient(client);
+
+        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
         if(reserve == Sale || reserve == Reserve)
         {
@@ -851,32 +862,38 @@ bool tabSale::sale()
         docModel->commit();
 
 #ifdef QT_DEBUG
-//        throw 1; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
 
-        QUERY_COMMIT_ROLLBACK(query,nDBErr);
+        QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int)
+    catch (int type)
     {
+        nErr = 0;
         if(reserve == Sale || reserve == Reserve)
         {
             doc_id = initial_doc_id;
             docModel->setId(0);
         }
-        QUERY_EXEC(query,nDBErr)(QUERY_ROLLBACK);
-        nDBErr = 0;
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
 
 #ifdef QT_DEBUG
-//    nDBErr = 1; // и это для отладки (чтобы проверить работу дальше)
+//    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
     sqlLog->saveLog();
     delete sqlLog;
 #endif
 
     delete query;
 
-    if(nDBErr)
+    if(nErr)
     {
         p_instance.remove(initial_doc_id);   // Если всё ОК, то нужно заменить указатель
         p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
@@ -963,7 +980,7 @@ void tabSale::phoneTypeChanged(int index)
 
 void tabSale::setTrackNum()     // слот вызываемый по нажатию Return
 {
-    bool nDBErr = 1;
+    bool nErr = 1;
     QSqlQuery *query;
 
     if( QString::compare(ui->lineEditTrack->text(), docModel->trackingNumber()) == 0 )
@@ -971,12 +988,12 @@ void tabSale::setTrackNum()     // слот вызываемый по нажат
 
     query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
-    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
+    QUERY_EXEC(query,nErr)(QUERY_BEGIN);
     docModel->setTrackingNumber(ui->lineEditTrack->text());
-    nDBErr = docModel->commit();
-    QUERY_COMMIT_ROLLBACK(query,nDBErr);
+    nErr = docModel->commit();
+    QUERY_COMMIT_ROLLBACK(query,nErr);
     shortlivedNotification *newPopup;
-    if(nDBErr)
+    if(nErr)
         newPopup = new shortlivedNotification(this, "Успешно", "ТТН задана", QColor(214,239,220), QColor(229,245,234));
     else
         newPopup = new shortlivedNotification(this, "Неудача", "Ошибка установки ТТН", QColor(255,199,173), QColor(255,164,119));
@@ -993,7 +1010,7 @@ void tabSale::reserveCancelButtonClicked()
     if(m_docState != SDocumentModel::ItemsReserved)   // проверка на всякий случай, вдруг накосячу с отображением кнопок в разных режимах
         return;
 
-    bool nDBErr = 1;
+    bool nErr = 1;
     QSqlQuery *query;
 
     query = new QSqlQuery(QSqlDatabase::database("connThird"));
@@ -1003,10 +1020,10 @@ void tabSale::reserveCancelButtonClicked()
     sqlLog->truncateLog();
 #endif
 
-    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
+    QUERY_EXEC(query,nErr)(QUERY_BEGIN);
     try
     {
-        nDBErr = tableModel->freeItems();
+        nErr = tableModel->freeItems();
 
 
         // если в следствие (нескольких) частичных распроведений были возвращены все товары, то нужно изменить статус документа
@@ -1022,15 +1039,22 @@ void tabSale::reserveCancelButtonClicked()
         docModel->commit();
 
 #ifdef QT_DEBUG
-//    throw 1; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//    throw 0; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
+        QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int)
+    catch (int type)
     {
-        nDBErr = 0;
+        nErr = 0;
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query,nErr);
     }
 
-    QUERY_COMMIT_ROLLBACK(query,nDBErr);
 
 #ifdef QT_DEBUG
     sqlLog->saveLog();

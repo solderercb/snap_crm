@@ -17,11 +17,11 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     repairModel = new SRepairModel(this);
     cashRegister = new SCashRegisterModel();
     comment = new SCommentModel();
-    bool nDBErr = 1;
+    bool nErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
+    QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
+    QUERY_COMMIT_ROLLBACK(query, nErr);
     delete query;
 
     ui->setupUi(this);
@@ -144,10 +144,10 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 tabRepairNew::~tabRepairNew()
 {
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
+    bool nErr = 1;
     query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
+    QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
+    QUERY_COMMIT_ROLLBACK(query, nErr);
     delete query;
 
     delete ui;
@@ -318,9 +318,7 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
     ui->lineEditClientAddress->clear();
     ui->lineEditClientEmail->clear();
 
-    delete clientModel2;
-    clientModel2 = new SClientModel();
-    ui->phones->setModel(clientModel2->phones());
+    clientModel2->clear();
 
     if (hideCoincidence)
         ui->widgetClientMatch->hide();
@@ -679,10 +677,8 @@ bool tabRepairNew::checkInput()
 
 bool tabRepairNew::createClient()
 {
-    bool nDBErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nErr = 1;
 
-    QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
     clientModel2->setFirstName(ui->lineEditClientFirstName->text());
     clientModel2->setLastName(ui->lineEditClientLastName->text());
     clientModel2->setPatronymicName(ui->lineEditClientPatronymic->text());
@@ -690,12 +686,10 @@ bool tabRepairNew::createClient()
     clientModel2->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
     clientModel2->setAddress(ui->lineEditClientAddress->text());
     clientModel2->setType(ui->checkBoxClientType->isChecked());
-    nDBErr = clientModel2->commit();
+    nErr = clientModel2->commit();
+    client = clientModel2->id();
 
-    QUERY_COMMIT_ROLLBACK(query,nDBErr);
-
-    delete query;
-    return nDBErr;
+    return nErr;
 }
 
 bool tabRepairNew::createRepair()
@@ -703,9 +697,9 @@ bool tabRepairNew::createRepair()
     if(!checkInput())
         return true; // return 0 — OK, return 1 - ошибка
 
+    bool nErr = 1;
     int deviceClassIndex, deviceVendorIndex, deviceIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
     int device, user, office, repair, preferredPaymentAccIndex, prepaySumm;
-    bool nDBErr = 1;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     setDefaultStyleSheets();
@@ -722,15 +716,20 @@ bool tabRepairNew::createRepair()
     sqlLog->truncateLog();
 #endif
 
-    if (clientModel2->isClear())
-        createClient();
-    client = clientModel2->id();
-    if(clientModel2->phones()->isUpdated())
-        clientModel2->phones()->commit();
-
     try
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_BEGIN);
+        if (clientModel2->isNew() || clientModel2->phones()->isUpdated())
+        {
+            QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+            if(clientModel2->isNew())
+                nErr = createClient();
+            if(clientModel2->phones()->isUpdated())
+                nErr = clientModel2->phones()->commit();
+            QUERY_COMMIT_ROLLBACK(query,nErr);
+            fillClientCreds(client);
+        }
+
+        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
         // пользователь мог выбрать модель из списка, а затем отредаткировать её, поэтому пробуем найти модель в списке
         deviceIndex = devicesModel->findIndex(ui->comboBoxDevice->currentText());
@@ -741,8 +740,9 @@ bool tabRepairNew::createRepair()
             devMdl->setName(ui->comboBoxDevice->currentText());
             devMdl->setDevice(deviceClassesModel->record(deviceClassIndex).value("id").toInt());
             devMdl->setMaker(deviceVendorsModel->record(deviceVendorIndex).value("id").toInt());
-            nDBErr = devMdl->commit();
+            nErr = devMdl->commit();
             device = devMdl->id();
+            delete devMdl;
         }
         else
         {
@@ -801,19 +801,19 @@ bool tabRepairNew::createRepair()
                 repairModel->setIsCardPayment(1);
         }
 
-        nDBErr = repairModel->commit();
-        nDBErr = clientModel2->updateRepairs();
+        nErr = repairModel->commit();
+        nErr = clientModel2->updateRepairs();
         repair = repairModel->id();
 
         // запись значений доп. полей
         additionalFields->setRepair(repair);
-        nDBErr = additionalFields->commit();
+        nErr = additionalFields->commit();
 
         if (ui->lineEditInsideComment->text() != "" )
         {
             comment->setRepair(repair);
             comment->setText(ui->lineEditInsideComment->text());
-            nDBErr = comment->commit();
+            nErr = comment->commit();
         }
 
         if (ui->checkBoxIsPrepay->isChecked())
@@ -824,20 +824,19 @@ bool tabRepairNew::createRepair()
             cashRegister->setRepairId(repair);
             cashRegister->setReason(tr("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)));
             cashRegister->setLogText(tr("Внесена предоплата за ремонт №%2 в размере %3 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)));
-            nDBErr = cashRegister->commit(prepaySumm);
+            nErr = cashRegister->commit(prepaySumm);
 
             // TODO: Признак предмета расчета
         }
 
 #ifdef QT_DEBUG
-        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
-
-        QUERY_COMMIT_ROLLBACK(query, nDBErr);
+        QUERY_COMMIT_ROLLBACK(query, nErr);
     }
     catch (int type)
     {
-        nDBErr = 0;
+        nErr = 0;
         repairModel->setId(0);
         additionalFields->resetIds();
         if(type == 0)
@@ -846,16 +845,15 @@ bool tabRepairNew::createRepair()
             QUERY_ROLLBACK_MSG(query, err);
         }
         else
-            QUERY_COMMIT_ROLLBACK(query, nDBErr);
+            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
-//    nDBErr = 1; // и это для отладки (чтобы проверить работу дальше)
-
 #ifdef QT_DEBUG
+//    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
     sqlLog->saveLog();
     delete sqlLog;
 #endif
 
-    if (nDBErr)   // если все запросы выполнены без ошибок, очистить всё, кроме данных клиента
+    if (nErr)   // если все запросы выполнены без ошибок, очистить всё, кроме данных клиента
     {
         // печать квитанции
         if(comSettings->value("print_new_repair_report").toBool())
@@ -907,7 +905,7 @@ bool tabRepairNew::createRepair()
     }
 
     delete query;
-    return !nDBErr; // return 0 — OK, return 1 - ошибка
+    return !nErr; // return 0 — OK, return 1 - ошибка
 }
 
 void tabRepairNew::createRepairClose()
@@ -944,12 +942,12 @@ void tabRepairNew::randomFill()
     if (test_scheduler_counter == 0)   // клиент
 //    if (1)
     {
-        fillClientCreds(257);
-        test_scheduler_counter++;
-        test_scheduler->start(400);    //  (пере-)запускаем таймер
-        return;
-//        if(0)
-        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
+//        fillClientCreds(257);
+//        test_scheduler_counter++;
+//        test_scheduler->start(400);    //  (пере-)запускаем таймер
+//        return;
+        if(0)
+//        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {
             fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
             if (ui->lineEditClientLastName->text() == "")

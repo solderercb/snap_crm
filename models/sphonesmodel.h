@@ -23,7 +23,7 @@ public:
     bool commit();
     void clear();
     bool isUpdated();
-    void markUpdated();
+    void markUpdated(bool state = true);
 
 private:
     QSqlQuery *query;

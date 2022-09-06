@@ -37,7 +37,7 @@ public:
     enum EditStrategy { OnFieldChange, OnManualSubmit };
     explicit SClientModel(int id = 0, QObject *parent = nullptr);
     ~SClientModel();
-    bool isClear();
+    bool isNew();
     void load(int id);
     void setEditStrategy(SClientModel::EditStrategy strategy);
     bool isStandAlone();

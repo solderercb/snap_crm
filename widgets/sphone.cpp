@@ -103,7 +103,7 @@ void SPhone::testFill(const int mask, const QString &number)
 {
     ui->comboBoxPhoneMask->setCurrentIndex(mask);
     ui->lineEditPhone->setText(number);
-//    numberEditFinished();
+    numberEditFinished();
 }
 #endif
 

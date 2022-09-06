@@ -46,6 +46,8 @@ bool SPhonesModel::load(int client)
     }
 
     delete query;
+    markUpdated(false);
+
     return 0;
 }
 
@@ -85,12 +87,13 @@ bool SPhonesModel::commit()
     foreach(item, m_phonesList)
     {
         if(!item->commit())
-            return 0;
+            throw 1;
     }
 
     if(logRecord != nullptr)
     {
-        logRecord->commit();        // запись в журнал об изменении основного номера
+        if(!logRecord->commit())
+            throw 1;        // запись в журнал об изменении основного номера
         logRecord->deleteLater();
     }
 
@@ -98,11 +101,13 @@ bool SPhonesModel::commit()
     {
         item = m_removeList.last();
         if(!item->delDBRecord())
-            return 0;
+            throw 1;
 
         m_removeList.removeLast();
         item->deleteLater();
     }
+
+    markUpdated(false);
 
     return 1;
 }
@@ -123,9 +128,9 @@ bool SPhonesModel::isUpdated()
     return m_updated;
 }
 
-void SPhonesModel::markUpdated()
+void SPhonesModel::markUpdated(bool state)
 {
-    m_updated = true;
+    m_updated = state;
 }
 
 SPhoneModel *SPhonesModel::phoneItemHandler(const QSqlRecord &record)

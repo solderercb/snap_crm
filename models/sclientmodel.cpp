@@ -28,7 +28,7 @@ SClientModel::~SClientModel()
         delete balanceLog;
 }
 
-bool SClientModel::isClear()
+bool SClientModel::isNew()
 {
     if(i_id)
         return false;
@@ -417,7 +417,7 @@ void SClientModel::createBalanceObj()
 
 bool SClientModel::updateBalance(const float amount, const QString &text)
 {
-    if(isClear())   // TODO: проверка включен ли баланс у клиента
+    if(isNew())   // TODO: проверка включен ли баланс у клиента
         return 1;
 
     balanceLog->setText(text);
@@ -559,27 +559,24 @@ bool SClientModel::commit()
 {
     if(i_id)
     {
-        update();
+        if(!update())
+            throw 1;
     }
     else
     {
         i_valuesMap.insert("created", QDateTime::currentDateTime());
         i_valuesMap.insert("web_password", genWebPass());
-        insert();
+        if(!insert())
+            throw 1;
     }
 
-    if(!i_nErr)
-        return 0;
-
     i_logRecord->setClient(i_id);
-    commitLogs();
+    if(!commitLogs())
+        throw 1;
 
     m_phones->setClient(i_id);
-    i_nErr = m_phones->commit();
-    if(!i_nErr)
-        return 0;
-
-    load(i_id);
+    if(!m_phones->commit())
+        throw 1;    // исключение генерируется в SPhonesModel::commit(), поэтому это выражение не выполнится никогда
 
     return i_nErr;
 }
