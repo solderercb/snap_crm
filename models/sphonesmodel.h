@@ -9,6 +9,8 @@
 class SPhonesModel : public QObject
 {
     Q_OBJECT
+signals:
+    void modelUpdated();
 public:
     explicit SPhonesModel(int client = 0, QObject *parent = nullptr);
     ~SPhonesModel();
@@ -21,8 +23,8 @@ public:
     bool isEmpty();
     void setClient(const int id);
     bool commit();
-    void clear();
     bool isUpdated();
+    void reset();
     void markUpdated(bool state = true);
 
 private:
@@ -33,6 +35,7 @@ private:
     SLogRecordModel *logRecord = nullptr;
     int m_client = 0;
     bool m_updated = false;
+    void clear();
 
 private slots:
     void switchPrimaryPhone(SPhoneModel*);

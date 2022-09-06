@@ -39,6 +39,7 @@ public:
     ~SClientModel();
     bool isNew();
     void load(int id);
+    void clear();
     void setEditStrategy(SClientModel::EditStrategy strategy);
     bool isStandAlone();
     int id();

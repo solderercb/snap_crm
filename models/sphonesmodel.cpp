@@ -128,6 +128,13 @@ bool SPhonesModel::isUpdated()
     return m_updated;
 }
 
+void SPhonesModel::reset()
+{
+    clear();
+    primary();
+    emit modelUpdated();
+}
+
 void SPhonesModel::markUpdated(bool state)
 {
     m_updated = state;

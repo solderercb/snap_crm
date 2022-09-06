@@ -80,10 +80,12 @@ int SPhoneModel::mask()
     return m_mask;
 }
 
+/*  Установка id маски телефонного номера по индексу
+*/
 void SPhoneModel::setMask(const int index)
 {
-    m_mask = index;
-    i_valuesMap.insert("mask", clientPhoneTypesModel->databaseIDByRow(index));
+    m_mask = clientPhoneTypesModel->databaseIDByRow(index);
+    i_valuesMap.insert("mask", m_mask);
 }
 
 /*  Возвращает индекс модели данных, содержащих типы телефонных номеров

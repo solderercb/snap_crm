@@ -27,17 +27,9 @@ SPhoneModel *SPhones::phone(int item)
 
 void SPhones::setModel(SPhonesModel *model)
 {
-    deleteAllForms();
-
-    SPhoneModel *phoneModel;
     m_phonesModel = model;
-    m_phoneModelsList = m_phonesModel->phonesList();
-    foreach(phoneModel, m_phoneModelsList)
-    {
-        addForm(phoneModel);
-    }
-    if(m_phoneModelsList.isEmpty())
-        addForm(m_phonesModel->primary());
+    slotModelUpdated();
+    connect(m_phonesModel,SIGNAL(modelUpdated()),this,SLOT(slotModelUpdated()));
 }
 
 void SPhones::addForm(SPhoneModel *model)
@@ -81,6 +73,20 @@ void SPhones::markPhonesModelUpdated()
 void SPhones::primaryPhoneEdited()
 {
 
+}
+
+void SPhones::slotModelUpdated()
+{
+    deleteAllForms();
+
+    SPhoneModel *phoneModel;
+    m_phoneModelsList = m_phonesModel->phonesList();
+    foreach(phoneModel, m_phoneModelsList)
+    {
+        addForm(phoneModel);
+    }
+    if(m_phoneModelsList.isEmpty())
+        addForm(m_phonesModel->primary());
 }
 
 void SPhones::clear()

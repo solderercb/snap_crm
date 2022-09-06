@@ -108,6 +108,15 @@ void SClientModel::load(int id)
     delete clientModel;
 }
 
+void SClientModel::clear()
+{
+    i_id = 0;
+    i_valuesMap.clear();
+    i_valuesMap.insert("creator", userDbData->value("id"));
+    i_valuesMap.insert("notes", "");
+    m_phones->reset();
+}
+
 void SClientModel::setEditStrategy(EditStrategy strategy)
 {
     m_editStrategy = strategy;
