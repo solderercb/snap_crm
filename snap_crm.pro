@@ -43,6 +43,7 @@ SOURCES += \
     mainwindow.cpp \
     models/repairstablemodel.cpp \
     models/repairtablefiltermenu.cpp \
+    models/sabstractitemmodel.cpp \
     models/saletablemodel.cpp \
     models/scommentmodel.cpp \
     models/scommentsmodel.cpp \
@@ -102,6 +103,7 @@ HEADERS  += \
     mainwindow.h \
     models/repairstablemodel.h \
     models/repairtablefiltermenu.h \
+    models/sabstractitemmodel.h \
     models/saletablemodel.h \
     models/scommentmodel.h \
     models/scommentsmodel.h \
@@ -302,6 +304,8 @@ SHARED_FILES += sphonemodel.cpp
 SHARED_FILES += sphonemodel.h
 SHARED_FILES += ssaleitemmodel.cpp
 SHARED_FILES += ssaleitemmodel.h
+SHARED_FILES += sabstractitemmodel.cpp
+SHARED_FILES += sabstractitemmodel.h
 for(FILE,SHARED_FILES){
     QMAKE_POST_LINK += del \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" 2>NUL $$escape_expand(\\n\\t)
     QMAKE_POST_LINK += $$QMAKE_MKLINK \"$${SHARED_FILE_TRG_PATH}\\$$FILE\" \"$${SHARED_FILE_SRC_PATH}\\$$FILE\" >nul 2>&1 $$escape_expand(\\n\\t)
