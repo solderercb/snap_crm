@@ -33,6 +33,8 @@
 #define QUERY_SEL_ITEM_BOXES(warehouse)     QString("SELECT `name`, `id`, `places`, `color` FROM `boxes` WHERE `store_id` = %1 AND `non_items` = 0 ORDER BY `name`;").arg((warehouse))
 #define QUERY_SEL_REPAIR_BOXES              QString("SELECT `name`, `id`,`places`, `color` FROM `boxes` WHERE `non_items` = 1 ORDER BY `name`;")
 #define QUERY_SEL_PAYMENT_SYSTEMS           QString("SELECT `name`, `system_id`, `system_data`, `id` FROM `payment_systems` WHERE `is_enable` = 1 ORDER BY `name`;")
+#define QUERY_SEL_PAYMENT_TYPE(id)          QString("SELECT `name`, `id`,  `type`,  `client`,  `periodic`,  `pay_date`,  `def_summ`,  `reason`,  `is_archive`,  `updated_at`,  `payment_system` FROM `payment_types` WHERE `id` = %1;").arg((id))
+#define QUERY_SEL_EXTRA_PAYMENT_TYPES(type, archive) QString("SELECT  `name`, `id`, `type`, `client`, `periodic`, `pay_date`, `def_summ`, `reason`, `is_archive`, `updated_at`, `payment_system` FROM `payment_types` WHERE `type` = %1 AND IF(%2, 1, `is_archive` = 0);").arg((type)).arg((archive))
 #define QUERY_SEL_DEVICE(id)                QString("SELECT  `id`,  `type`,  `maker`,  `model`, `serial_number`,  `client` FROM `workshop` WHERE `id` = %1").arg((id))
 #define QUERY_SEL_DEVICES                   QString("SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`;")
 #define QUERY_SEL_DEVICE_MAKERS(device)     QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1);").arg((device))
@@ -313,9 +315,35 @@
                                                         "  `cash_orders`\n"\
                                                         "WHERE\n"\
                                                         "  `id` = %1;").arg((id))
-
+#define QUERY_SEL_INVOICE(id)               QString(\
+                                                        "SELECT\r\n"\
+                                                        "  t1.`id`,\r\n"\
+                                                        "  t1.`num`,\r\n"\
+                                                        "  t1.`created`,\r\n"\
+                                                        "  t1.`user`,\r\n"\
+                                                        "  t1.`seller`,\r\n"\
+                                                        "  t1.`customer` AS 'covenantor',\r\n"\
+                                                        "  t2.`ur_name` AS 'covenantor_name',\r\n"\
+                                                        "  t2.`client` AS 'client_id',\r\n"\
+                                                        "  t1.`paid`,\r\n"\
+                                                        "  t1.`tax`,\r\n"\
+                                                        "  t1.`summ`,\r\n"\
+                                                        "  t1.`notes`,\r\n"\
+                                                        "  t1.`total`,\r\n"\
+                                                        "  t1.`state`,\r\n"\
+                                                        "  t1.`office`,\r\n"\
+                                                        "  t1.`type`\r\n"\
+                                                        "FROM\r\n"\
+                                                        "  `invoice` AS t1\r\n"\
+                                                        "LEFT JOIN\r\n"\
+                                                        "  `banks` AS t2\r\n"\
+                                                        "ON\r\n"\
+                                                        "  t1.`customer` = t2.`id`\r\n"\
+                                                        "WHERE\r\n"\
+                                                        "  t1.`id` = %1;")\
+                                                        .arg((id))
 /**************** SELECT queries for data models for reports ******************/
-#define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg(R), QSqlDatabase::database("connMain")
+#define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg(R)
 #define QUERY_SEL_CLIENT_RPRT(C)            QString(\
                                                 "SELECT\r\n"\
                                                 "  t1.*,\r\n"\

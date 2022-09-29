@@ -132,9 +132,10 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
         str_value = "'" + value.toString().replace('\'',"\\\'") + "'";
     else if(value.typeName() == QString("QDateTime"))
     {
-        QDateTime date = value.toDateTime();
-        date.setTimeZone(QTimeZone::systemTimeZone());
-        str_value =  date.toUTC().toString("yyyy-MM-dd hh:mm:ss");
+        i_createdUtc = value.toDateTime();
+        i_createdUtc.setTimeZone(QTimeZone::systemTimeZone());
+        i_createdUtc =  i_createdUtc.toUTC();
+        str_value =  i_createdUtc.toString("yyyy-MM-dd hh:mm:ss");
         str_value =  "'" + str_value + "'";
     }
     else if(value.typeName() == QString("QDate"))
@@ -154,7 +155,7 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
  *  Передварительно производится проверка системного времени и обязательных полей
  *  Возвращает 0 в случае какой-либо ошибки
  */
-bool SDatabaseRecord::insert(bool flushValues)
+bool SDatabaseRecord::  insert(bool flushValues)
 {
     QString q;
 

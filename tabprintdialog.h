@@ -100,6 +100,9 @@ private:
     void printerAdvSettings(QPrinter *printer = nullptr);
     void fillDebugData();
     void initPrinter(bool showSettings = false);
+#ifdef QT_DEBUG
+    void randomFill(){};
+#endif
 #ifdef Q_OS_WINDOWS
     unsigned char *driverExtraData = nullptr;     // проприетарные данные драйвера
     int driverExtraDataSize = 0;
@@ -111,6 +114,10 @@ private slots:
     void setPrinter(const QString &printerName);
     void on_labelPrinterSettings_linkActivated(const QString &link);
     void pageSetupAccepted();
+#ifdef QT_DEBUG
+    void test_scheduler_handler(){};
+    void test_scheduler2_handler(){};
+#endif
 };
 
 #endif // TABPRINTDIALOG_H

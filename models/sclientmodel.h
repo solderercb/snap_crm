@@ -127,8 +127,11 @@ public:
     void setAgent2Phone(const QString&);
     QString agent2PhoneClean();
     void setAgent2PhoneClean(const QString&);
+    bool balanceEnabled();
+    bool setBalanceEnabled(bool state = 1);
     float balance();
     void createBalanceObj();
+    void deleteBalanceObj();
     bool updateBalance(const float amount, const QString &text);
     bool updateBalance(const float amount, const QString &text, const int doc_id);
     bool balanceEnough(const QString summ);
@@ -155,7 +158,6 @@ private:
     bool nIntegrityErr = 1;
     bool m_standAlone = 0;
     int m_editStrategy = OnManualSubmit;
-    SSqlQueryModel *clientModel;
     SPhonesModel *m_phones;
     QMap<QString, QVariant> updateBuffer;
     int     m_id = 0;   // ID клиента

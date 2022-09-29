@@ -32,7 +32,77 @@ void SRepairModel::load(const int id)
     if(!id)
         return;
 
+    QSqlQuery *repair = new QSqlQuery(QSqlDatabase::database("connMain"));
+    repair->exec(QUERY_SEL_REPAIR_RPRT(id));
+    if(!repair->first())
+        return;
+
     i_id = id;
+
+    m_isHidden = repair->value("Hidden").toBool();
+    m_title = repair->value("Title").toString();
+    m_clientId = repair->value("client").toInt();
+    m_type = repair->value("type").toInt();
+    m_maker = repair->value("maker").toInt();
+    m_model = repair->value("model").toInt();
+    m_serialNumber = repair->value("serial_number").toString();
+    m_company = repair->value("company").toInt();
+    m_office = repair->value("office").toInt();
+    m_startOffice = repair->value("start_office").toInt();
+    m_manager = repair->value("manager").toInt();
+    m_currentManager = repair->value("current_manager").toInt();
+    m_master = repair->value("master").toInt();
+    m_diagnosticResult = repair->value("diagnostic_result").toString();
+    m_inDate = repair->value("in_date").toDateTime();
+    m_outDate = repair->value("out_date").toDateTime();
+    m_state = repair->value("state").toInt();
+    m_newState = repair->value("new_state").toInt();
+    m_userLock = repair->value("user_lock").toInt();
+    m_lockDatetime = repair->value("lock_datetime").toDateTime();
+    m_expressRepair = repair->value("express_repair").toBool();
+    m_quickRepair = repair->value("quick_repair").toBool();
+    m_isWarranty = repair->value("is_warranty").toBool();
+    m_isRepeat = repair->value("is_repeat").toBool();
+    m_paymentSystem = repair->value("payment_system").toInt();
+    m_isCardPayment = repair->value("is_card_payment").toBool();
+    m_canFormat = repair->value("can_format").toBool();
+    m_printCheck = repair->value("print_check").toBool();
+    m_box = repair->value("box").toInt();
+    m_warrantyLabel = repair->value("warranty_label").toString();
+    m_extNotes = repair->value("ext_notes").toString();
+    m_isPrepaid = repair->value("is_prepaid").toBool();
+    m_prepaidType = repair->value("prepaid_type").toInt();
+    m_prepaidSumm = repair->value("prepaid_summ").toFloat();
+    m_prepaidOrder = repair->value("prepaid_order").toInt();
+    m_isPreAgreed = repair->value("is_pre_agreed").toBool();
+    m_isDebt = repair->value("is_debt").toBool();
+    m_preAgreedAmount = repair->value("pre_agreed_amount").toFloat();
+    m_repairCost = repair->value("repair_cost").toFloat();
+    m_realRepairCost = repair->value("real_repair_cost").toFloat();
+    m_partsCost = repair->value("parts_cost").toFloat();
+    m_fault = repair->value("fault").toString();
+    m_complect = repair->value("complect").toString();
+    m_look = repair->value("look").toString();
+    m_thirsPartySc = repair->value("thirs_party_sc").toBool();
+    m_lastSave = repair->value("last_save").toDateTime();
+    m_lastStatusChanged = repair->value("last_status_changed").toDateTime();
+    m_warrantyDays = repair->value("warranty_days").toInt();
+    m_barcode = repair->value("barcode").toString();
+    m_rejectReason = repair->value("reject_reason").toString();
+    m_informedStatus = repair->value("informed_status").toInt();
+    m_imageIds = repair->value("image_ids").toString();
+    m_color = repair->value("color").toInt();
+    m_orderMoving = repair->value("order_moving").toString();
+    m_early = repair->value("early").toInt();
+    m_extEarly = repair->value("ext_early").toString();
+    m_issuedMsg = repair->value("issued_msg").toString();
+    m_smsInform = repair->value("sms_inform").toBool();
+    m_invoice = repair->value("invoice").toInt();
+    m_cartridge = repair->value("cartridge").toInt();
+    m_vendorId = repair->value("vendor_id").toInt();
+    m_termsControl = repair->value("termsControl").toBool();
+
+    delete repair;
 }
 
 bool SRepairModel::isHidden()
@@ -72,32 +142,32 @@ SClientModel *SRepairModel::clientModel()
 
 int SRepairModel::classId()
 {
-    return m_typeIndex;
+    return m_type;
 }
 
-void SRepairModel::setClassId(const int index)
+void SRepairModel::setClassId(const int classId)
 {
-    i_valuesMap.insert("type", index);
+    i_valuesMap.insert("type", classId);
 }
 
 int SRepairModel::vendorId()
 {
-    return m_makerIndex;
+    return m_maker;
 }
 
-void SRepairModel::setVendorId(const int index)
+void SRepairModel::setVendorId(const int vendorId)
 {
-    i_valuesMap.insert("maker", index);
+    i_valuesMap.insert("maker", vendorId);
 }
 
 int SRepairModel::deviceId()
 {
-    return m_modelIndex;
+    return m_model;
 }
 
-void SRepairModel::setDeviceId(const int index)
+void SRepairModel::setDeviceId(const int deviceId)
 {
-    i_valuesMap.insert("model", index);
+    i_valuesMap.insert("model", deviceId);
 }
 
 QString SRepairModel::serialNumber()
@@ -112,37 +182,43 @@ void SRepairModel::setSerialNumber(const QString str)
 
 int SRepairModel::companyIndex()
 {
-    return m_companyIndex;
+    return companiesModel->rowByDatabaseID(m_company);
 }
 
 void SRepairModel::setCompanyIndex(const int index)
 {
+    if(index == -1)
+        return;
     i_valuesMap.insert("company", companiesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::officeIndex()
 {
-    return m_officeIndex;
+    return officesModel->rowByDatabaseID(m_office);
 }
 
 void SRepairModel::setOfficeIndex(const int index)
 {
+    if(index == -1)
+        return;
     i_valuesMap.insert("office", officesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::startOfficeIndex()
 {
-    return m_startOfficeIndex;
+    return officesModel->rowByDatabaseID(m_startOffice);
 }
 
 void SRepairModel::setStartOfficeIndex(const int index)
 {
+    if(index == -1)
+        return;
     i_valuesMap.insert("start_office", officesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::managerIndex()
 {
-    return m_managerIndex;
+    return managersModel->rowByDatabaseID(m_manager);
 }
 
 void SRepairModel::setManager(const int id)
@@ -159,7 +235,7 @@ void SRepairModel::setManagerIndex(const int index)
 
 int SRepairModel::currentManagerIndex()
 {
-    return m_currentManagerIndex;
+    return managersModel->rowByDatabaseID(m_currentManager);
 }
 
 void SRepairModel::setCurrentManager(const int id)
@@ -176,13 +252,13 @@ void SRepairModel::setCurrentManagerIndex(const int index)
 
 int SRepairModel::masterIndex()
 {
-    return m_masterIndex;
+    return engineersModel->rowByDatabaseID(m_master);
 }
 
 void SRepairModel::setMasterIndex(const int index)
 {
     if(index == -1)
-        i_valuesMap.insert("master", QVariant());
+        i_valuesMap.insert("master", QVariant());   // NULL DEFAULT '0' | FOREIGN KEY (`master`) REFERENCES `users` (`id`)
     else
         i_valuesMap.insert("master", engineersModel->databaseIDByRow(index));
 }
@@ -219,22 +295,22 @@ void SRepairModel::setOutDate(const QDateTime timestamp)
 
 int SRepairModel::stateIndex()
 {
-    return m_stateIndex;
+    return statusesModel->rowByDatabaseID(m_state);
 }
 
 void SRepairModel::setStateIndex(const int index)
 {
-    i_valuesMap.insert("state", index);
+    i_valuesMap.insert("state", statusesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::newStateIndex()
 {
-    return m_newStateIndex;
+    return statusesModel->rowByDatabaseID(m_newState);
 }
 
 void SRepairModel::setNewStateIndex(const int index)
 {
-    i_valuesMap.insert("new_state", index);
+    i_valuesMap.insert("new_state", statusesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::userLock()
@@ -299,7 +375,7 @@ void SRepairModel::setIsRepeat(const bool state)
 
 int SRepairModel::paymentSystemIndex()
 {
-    return m_paymentSystemIndex;
+    return paymentSystemsModel->rowByDatabaseID(m_paymentSystem);
 }
 
 void SRepairModel::setPaymentSystem(const int id)
@@ -344,7 +420,7 @@ void SRepairModel::setPrintCheck(const bool state)
 
 int SRepairModel::boxIndex()
 {
-    return m_boxIndex;
+    return repairBoxesModel->rowByDatabaseID(m_box);
 }
 
 void SRepairModel::setBoxIndex(const int index)
@@ -410,6 +486,27 @@ int SRepairModel::prepaidOrder()
 void SRepairModel::setPrepaidOrder(const int id)
 {
     i_valuesMap.insert("prepaid_order", id);
+}
+
+/*  Запись данных о внесении или возврате предоплаты
+ *  (возврат может использоваться при выдаче уст-ва без ремонта)
+*/
+void SRepairModel::addPrepay(float amount, QString reason)
+{
+    QString logText;
+    float new_prepaidSumm = m_prepaidSumm + (amount);
+    setPrepaidSumm(new_prepaidSumm);
+    if(amount > 0)
+    {
+        logText = tr("Предоплата в размере %1").arg(sysLocale.toCurrencyString(amount));
+        if(!reason.isEmpty())
+            logText.append(" (" + reason + ")");
+    }
+    else
+        logText = tr("Возврат предоплаты в размере %1").arg(sysLocale.toCurrencyString(-amount));
+
+    appendLogText(logText);
+    setIsPrepaid( (new_prepaidSumm != 0) );
 }
 
 bool SRepairModel::isPreAgreed()
@@ -564,12 +661,12 @@ void SRepairModel::setRejectReason(const QString str)
 
 int SRepairModel::informedStatusIndex()
 {
-    return m_informedStatusIndex;
+    return notifyStatusesModel->rowByDatabaseID(m_informedStatus);
 }
 
 void SRepairModel::setInformedStatusIndex(const int index)
 {
-    i_valuesMap.insert("informed_status", index);
+    i_valuesMap.insert("informed_status", notifyStatusesModel->databaseIDByRow(index));
 }
 
 QString SRepairModel::imageIds()
@@ -688,6 +785,8 @@ bool SRepairModel::commit()
             throw 1;
         appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
     }
+
+    i_logRecord->setRepairId(i_id);
     commitLogs();
 
     return i_nErr;

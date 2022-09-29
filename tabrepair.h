@@ -120,6 +120,9 @@ private:
     bool save_state_on_close = 0;
     bool worksAndPartsEditEnabled = 0;
     SGroupBoxEventFilter *groupBoxEventFilter;
+#ifdef QT_DEBUG
+    void randomFill(){};
+#endif
 
 private slots:
     void updateRepairData();
@@ -140,6 +143,10 @@ private slots:
     void quickAddSparePartByUID(int);
     void editIncomingSet(int);
     void setAgreedAmount(int);
+#ifdef QT_DEBUG
+    void test_scheduler_handler(){};
+    void test_scheduler2_handler(){};
+#endif
 };
 
 #endif // TABREPAIR_H

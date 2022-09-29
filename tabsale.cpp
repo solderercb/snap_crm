@@ -93,8 +93,6 @@ tabSale::~tabSale()
     delete cashRegister;
     delete docModel;
 #ifdef QT_DEBUG
-    delete test_scheduler;
-    delete test_scheduler2;
     delete testPushButton;
     delete testBtnAddRandomItem;
     delete testLineEdit;
@@ -500,7 +498,6 @@ void tabSale::clearClientCreds(bool hideCoincidence)
 
 void tabSale::fillClientCreds(int id)
 {
-    qDebug().nospace() << "[tabSale] fillClientCreds()";
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
     client = id;                // установка нового значения должна выполняться после очистки
     clientModel->load(client);
@@ -698,7 +695,7 @@ bool tabSale::unSale()  // распроведение
         else
         {
             cashRegister->setId(0); // обнулить Id, иначе будет произведён update, а не insert
-            cashRegister->setOperationType(SCashRegisterModel::MoneybackGoods);
+            cashRegister->setOperationType(SCashRegisterModel::ExpGoods);
             cashRegister->setDocumentId(doc_id);
             cashRegister->setReason(QString("Расход денег в размере %2 - возврат за товары по РН №%1").arg(doc_id).arg(sysLocale.toCurrencyString(amount)));
             cashRegister->commit(-amount);
@@ -851,7 +848,7 @@ bool tabSale::sale()
             {
                 cashRegister->setId(0); // обнулить Id, иначе будет произведён update, а не insert
                 cashRegister->setClient(clientModel->id());
-                cashRegister->setOperationType(SCashRegisterModel::ReceiptGoods);
+                cashRegister->setOperationType(SCashRegisterModel::RecptGoods);
                 cashRegister->setDocumentId(doc_id);
                 cashRegister->setReason(QString("Поступление денег в размере %2 по расходной накладной №%1").arg(doc_id).arg(sysLocale.toCurrencyString(amount)));
                 cashRegister->commit(amount);
@@ -1091,7 +1088,7 @@ void tabSale::paymentSystemChanged(int index)
     cashRegister->setSystemId(sysId);
 }
 
-tabSale* tabSale::getInstance(int doc_id, MainWindow *parent)   // singleton: одна вкладка для ремонта
+tabSale* tabSale::getInstance(int doc_id, MainWindow *parent)
 {
     if( !p_instance.contains(doc_id) )
       p_instance.insert(doc_id, new tabSale(doc_id, parent));
@@ -1245,13 +1242,6 @@ void tabSale::createTestPanel()
     testBtnAddRandomItem->setText("AddRandomItem");
     connect(testBtnAddRandomItem, &QPushButton::clicked, this, &tabSale::test_addRandomItem);
     testPanel->show();
-
-    test_scheduler = new QTimer();
-    test_scheduler->setSingleShot(true);
-    test_scheduler2 = new QTimer();
-    test_scheduler2->setSingleShot(true);
-    QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
-    QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
 }
 
 void tabSale::test_scheduler_handler()  //

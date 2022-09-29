@@ -21,10 +21,12 @@ SSqlQueryModel *engineersModel = new SSqlQueryModel;
 SSqlQueryModel *itemBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *repairBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *paymentSystemsModel = new SSqlQueryModel;
+SPaymentTypesModel *receiptTypesModel;
+SPaymentTypesModel *expenditureTypesModel;
 QStandardItemModel* clientsTypesList = new QStandardItemModel;
 SSqlQueryModel* clientAdTypesList = new SSqlQueryModel;
-QStandardItemModel *statusesModel = new QStandardItemModel();
-QStandardItemModel *notifyStatusesModel = new QStandardItemModel();
+SStandardItemModel *statusesModel = new SStandardItemModel();
+SStandardItemModel *notifyStatusesModel = new SStandardItemModel();
 SStandardItemModel *warrantyTermsModel = new SStandardItemModel();
 QMap<int, QString> *warrantyTermsMap = new QMap<int, QString>;
 
@@ -46,6 +48,8 @@ QString commonTextEditStyleSheet = "";
 QString commonTextEditStyleSheetRed = "QTextEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 QString commonDateEditStyleSheet = "";
 QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
+QString commonSpinBoxStyleSheet = "";
+QString commonSpinBoxStyleSheetRed = "QSpinBox, QDoubleSpinBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 SStandardItemModel *rejectReasonModel = new SStandardItemModel;
 SStandardItemModel *priceColModel = new SStandardItemModel;
 SStandardItemModel *itemUnitsModel = new SStandardItemModel;
@@ -175,8 +179,17 @@ void initGlobalModels()
     itemBoxesModel->setObjectName("itemBoxesModel");
     repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
     repairBoxesModel->setObjectName("repairBoxesModel");
-    paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain")); // TODO: нужна прокси-модель для отображения платёжных систем в соответствии с правами пользователя
+
+    // TODO: нужна прокси-модель для отображения платёжных систем в соответствии с правами пользователя
+    // а также таблица payment_systems_users, содержащая права на видимость
+    paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
     paymentSystemsModel->setObjectName("paymentSystemsModel");
+
+    receiptTypesModel = new SPaymentTypesModel(0);
+    receiptTypesModel->setObjectName("receiptTypesModel"); // TODO: возможно, тоже нужны прокси-модели для отображения типов ПКО и РКО в соответствии с правами пользователя
+    expenditureTypesModel = new SPaymentTypesModel(1);
+    expenditureTypesModel->setObjectName("expenditureTypesModel");
+
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     clientAdTypesList->setObjectName("clientAdTypesList");
 
@@ -200,6 +213,7 @@ void initGlobalModels()
         QList<QStandardItem*> *el = new QList<QStandardItem*>({new QStandardItem("Model init failed")});
         statusesModel->appendRow(*el);
     }
+    statusesModel->setHorizontalHeaderLabels({"name","id","color","terms","contains","actions","roles"});
 
     QVector<QString> notifyStatusesList = {"---", "Клиент оповещён", "Клиент не отвечает", "Клиент не доступен", "Не оповещён прочее"};
     for (int i=0; i<notifyStatusesList.size(); i++)
@@ -208,6 +222,7 @@ void initGlobalModels()
         *notifyStatusSelector << new QStandardItem(notifyStatusesList.at(i)) << new QStandardItem(QString::number(i));
         notifyStatusesModel->appendRow(*notifyStatusSelector);
     }
+    notifyStatusesModel->setHorizontalHeaderLabels({"name","id"});
 
     // TODO: В АСЦ в списке сроков гарантии также присутствуют "Согласно гарантии производителя", "Согласно ЗоЗПП" и "Согласно ФГТ", но, похоже, их выбор не реализован
     QVector<QString> warrantyTermsList = {"нет", "7 дней", "14 дней", "1 мес", "2 мес", "3 мес", "4 мес", "6 мес", "1 год", "2 года", "3 года"};

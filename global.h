@@ -13,6 +13,7 @@
 #include "applog.h"
 #include "models/sstandarditemmodel.h"
 #include "models/ssqlquerymodel.h"
+#include "models/spaymenttypesmodel.h"
 #ifdef QT_DEBUG
 #include "clients4test.h"
 #endif
@@ -37,10 +38,12 @@ extern SSqlQueryModel *engineersModel;
 extern SSqlQueryModel *itemBoxesModel;
 extern SSqlQueryModel *repairBoxesModel;
 extern SSqlQueryModel *paymentSystemsModel;
+extern SPaymentTypesModel *receiptTypesModel;
+extern SPaymentTypesModel *expenditureTypesModel;
 extern QStandardItemModel* clientsTypesList;
 extern SSqlQueryModel* clientAdTypesList;
-extern QStandardItemModel *statusesModel;
-extern QStandardItemModel *notifyStatusesModel;
+extern SStandardItemModel *statusesModel;
+extern SStandardItemModel *notifyStatusesModel;
 extern SStandardItemModel *warrantyTermsModel;
 extern QMap<int, QString> *warrantyTermsMap;
 extern QString commonComboBoxStyleSheet;
@@ -51,6 +54,8 @@ extern QString commonTextEditStyleSheet;
 extern QString commonTextEditStyleSheetRed;
 extern QString commonDateEditStyleSheet;
 extern QString commonDateEditStyleSheetRed;
+extern QString commonSpinBoxStyleSheet;
+extern QString commonSpinBoxStyleSheetRed;
 extern SStandardItemModel *rejectReasonModel;
 extern SStandardItemModel *priceColModel;
 extern SStandardItemModel *itemUnitsModel;

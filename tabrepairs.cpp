@@ -145,7 +145,10 @@ void tabRepairs::tableItemDoubleClick(QModelIndex item)
 {
     emit doubleClicked(repairs_table->index(item.row(), 1).data().toInt());
     if (_type == 1)
+    {
+        emit activateCaller(callerPtr);
         deleteLater();
+    }
 }
 
 void tabRepairs::lineEditSearchTextChanged(QString)

@@ -55,8 +55,12 @@ SOURCES += \
     models/sdevmdlsmodel.cpp \
     models/sfieldsmodel.cpp \
     models/sfieldvaluemodel.cpp \
+    models/sinvoicemodel.cpp \
+    models/spaymenttypemodel.cpp \
+    models/spaymenttypesmodel.cpp \
     models/srepairmodel.cpp \
     models/ssloptionsdialog.cpp \
+    models/ssortfilterproxymodel.cpp \
     models/ssqlquerymodel.cpp \
     models/sstandarditemmodel.cpp \
     models/tabsalesettingsmenu.cpp \
@@ -115,8 +119,12 @@ HEADERS  += \
     models/sdevmdlsmodel.h \
     models/sfieldsmodel.h \
     models/sfieldvaluemodel.h \
+    models/sinvoicemodel.h \
+    models/spaymenttypemodel.h \
+    models/spaymenttypesmodel.h \
     models/srepairmodel.h \
     models/ssloptionsdialog.h \
+    models/ssortfilterproxymodel.h \
     models/ssqlquerymodel.h \
     models/sstandarditemmodel.h \
     models/tabsalesettingsmenu.h \

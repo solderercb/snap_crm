@@ -24,14 +24,12 @@ class tabClients : public tabCommon
 
 signals:
     void doubleClicked(int);
-    void activateCaller(QWidget *);
 
 public:
     explicit tabClients(bool type = 0, MainWindow *parent = nullptr);
     static tabClients* getInstance(bool type, MainWindow *parent = nullptr);
     void lineEditSearchSetFocus();
     ~tabClients();
-    void setCallerPtr(QWidget *ptr){callerPtr = ptr;};
 
 private:
     Ui::tabClients *ui;
@@ -48,8 +46,10 @@ private:
     QStringList query_where;
     QStringList query_group;
     QStringList query_order;
-    QWidget *callerPtr = nullptr;
     QTimer *tableUpdateDelay;
+#ifdef QT_DEBUG
+    void randomFill(){};
+#endif
 
 private slots:
     void updateTableWidget();
@@ -62,7 +62,10 @@ private slots:
     void tableSectionResized(int, int, int);
     void tableSortingChanged(int, Qt::SortOrder);
     void togglePropertiesPanel();
-
+#ifdef QT_DEBUG
+    void test_scheduler_handler(){};
+    void test_scheduler2_handler(){};
+#endif
 };
 
 #endif // TABCLIENTS_H

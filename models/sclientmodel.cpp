@@ -24,8 +24,7 @@ SClientModel::SClientModel(int id, QObject *parent) :
 SClientModel::~SClientModel()
 {
     delete m_phones;
-    if(balanceLog)
-        delete balanceLog;
+    deleteBalanceObj();
 }
 
 bool SClientModel::isNew()
@@ -38,31 +37,31 @@ bool SClientModel::isNew()
 
 void SClientModel::load(int id)
 {
-    i_id = id;
 
-    i_valuesMap.clear();
-    clientModel = new SSqlQueryModel(this);
-    m_phones->load(i_id);
+    QSqlQueryModel *clientModel = new QSqlQueryModel(this);
+    clientModel->setQuery(QUERY_SEL_CLIENT(id), QSqlDatabase::database("connMain"));
 
-    i_logRecord->setClient(i_id);
-
-    clientModel->setQuery(QUERY_SEL_CLIENT(i_id), QSqlDatabase::database("connMain"));
-
-    m_firstName = clientModel->record(0).value("name").toString();
-    m_lastName = clientModel->record(0).value("surname").toString();
-    m_patronymicName = clientModel->record(0).value("patronymic").toString();
-    m_address = clientModel->record(0).value("address").toString();
-    m_postIndex = clientModel->record(0).value("post_index").toString();
-    m_passportNum = clientModel->record(0).value("passport_num").toString();
-    m_passportIssuedDate = clientModel->record(0).value("passport_date").toString();
-    m_passportIssuedBy = clientModel->record(0).value("passport_organ").toString();
-    m_state = clientModel->record(0).value("state").toBool();
-    m_type = clientModel->record(0).value("type").toBool();
-    m_birthday = clientModel->record(0).value("birthday").toString();
-    m_memorial = clientModel->record(0).value("memorial").toString();
-    m_notes = clientModel->record(0).value("notes").toString();
-    showNotification();
-    m_options = (clientModel->record(0).value("is_regular").toInt()?Option::Regular:0) | \
+    if(clientModel->rowCount())
+    {
+        i_id = id;
+        i_valuesMap.clear();
+        m_phones->load(i_id);
+        i_logRecord->setClient(i_id);
+        m_firstName = clientModel->record(0).value("name").toString();
+        m_lastName = clientModel->record(0).value("surname").toString();
+        m_patronymicName = clientModel->record(0).value("patronymic").toString();
+        m_address = clientModel->record(0).value("address").toString();
+        m_postIndex = clientModel->record(0).value("post_index").toString();
+        m_passportNum = clientModel->record(0).value("passport_num").toString();
+        m_passportIssuedDate = clientModel->record(0).value("passport_date").toString();
+        m_passportIssuedBy = clientModel->record(0).value("passport_organ").toString();
+        m_state = clientModel->record(0).value("state").toBool();
+        m_type = clientModel->record(0).value("type").toBool();
+        m_birthday = clientModel->record(0).value("birthday").toString();
+        m_memorial = clientModel->record(0).value("memorial").toString();
+        m_notes = clientModel->record(0).value("notes").toString();
+        showNotification();
+        m_options = (clientModel->record(0).value("is_regular").toInt()?Option::Regular:0) | \
                 (clientModel->record(0).value("is_dealer").toInt()?Option::Dealer:0) | \
                 (clientModel->record(0).value("balance_enable").toInt()?Option::BalanceEnabled:0) | \
                 (clientModel->record(0).value("prefer_cashless").toInt()?Option::PreferCashless:0) | \
@@ -71,39 +70,40 @@ void SClientModel::load(int id)
                 (clientModel->record(0).value("is_bad").toInt()?Option::Bad:0) | \
                 (clientModel->record(0).value("is_realizator").toInt()?Option::Realizator:0) | \
                 (clientModel->record(0).value("is_agent").toInt()?Option::Agent:0);
-    if(m_options&Option::BalanceEnabled)
-        createBalanceObj();
-//    m_photo = ;
-    m_photo_id = clientModel->record(0).value("photo_id").toInt();
-    m_visitSource = clientModel->record(0).value("visit_source").toInt();
-    m_INN = clientModel->record(0).value("INN").toString();
-    m_KPP = clientModel->record(0).value("KPP").toString();
-    m_OGRN = clientModel->record(0).value("OGRN").toString();
-    m_web_password = clientModel->record(0).value("web_password").toString();
-    m_ur_name = clientModel->record(0).value("ur_name").toString();
-    m_email = clientModel->record(0).value("email").toString();
-    m_icq = clientModel->record(0).value("icq").toString();
-    m_skype = clientModel->record(0).value("skype").toString();
-    m_viber = clientModel->record(0).value("viber").toString();
-    m_telegram = clientModel->record(0).value("telegram").toString();
-    m_site = clientModel->record(0).value("site").toString();
-    m_whatsapp = clientModel->record(0).value("whatsapp").toString();
-    m_agentName = clientModel->record(0).value("agent_name").toString();
-    m_agentSurname = clientModel->record(0).value("agent_surname").toString();
-    m_agentPatronymic = clientModel->record(0).value("agent_patronymic").toString();
-    m_agentPhone = clientModel->record(0).value("agent_phone").toString();
-    m_agentPhoneClean = clientModel->record(0).value("agent_phone_clean").toString();
-    m_agent2Name = clientModel->record(0).value("agent2_name").toString();
-    m_agent2Surname = clientModel->record(0).value("agent2_surname").toString();
-    m_agent2Patronymic = clientModel->record(0).value("agent2_patronymic").toString();
-    m_agent2Phone = clientModel->record(0).value("agent2_phone").toString();
-    m_agent2PhoneClean = clientModel->record(0).value("agent2_phone_clean").toString();
-    m_balance = clientModel->record(0).value("balance").toFloat();
-    m_priceColumn = clientModel->record(0).value("price_col").toInt();
-    m_repairs = clientModel->record(0).value("repairs").toInt();
-    m_purchases = clientModel->record(0).value("purchases").toInt();
-    m_token = clientModel->record(0).value("token").toString();
-    i_createdUtc = clientModel->record(0).value("created").toDateTime();
+        if(m_options&Option::BalanceEnabled)
+            createBalanceObj();
+//        m_photo = ;
+        m_photo_id = clientModel->record(0).value("photo_id").toInt();
+        m_visitSource = clientModel->record(0).value("visit_source").toInt();
+        m_INN = clientModel->record(0).value("INN").toString();
+        m_KPP = clientModel->record(0).value("KPP").toString();
+        m_OGRN = clientModel->record(0).value("OGRN").toString();
+        m_web_password = clientModel->record(0).value("web_password").toString();
+        m_ur_name = clientModel->record(0).value("ur_name").toString();
+        m_email = clientModel->record(0).value("email").toString();
+        m_icq = clientModel->record(0).value("icq").toString();
+        m_skype = clientModel->record(0).value("skype").toString();
+        m_viber = clientModel->record(0).value("viber").toString();
+        m_telegram = clientModel->record(0).value("telegram").toString();
+        m_site = clientModel->record(0).value("site").toString();
+        m_whatsapp = clientModel->record(0).value("whatsapp").toString();
+        m_agentName = clientModel->record(0).value("agent_name").toString();
+        m_agentSurname = clientModel->record(0).value("agent_surname").toString();
+        m_agentPatronymic = clientModel->record(0).value("agent_patronymic").toString();
+        m_agentPhone = clientModel->record(0).value("agent_phone").toString();
+        m_agentPhoneClean = clientModel->record(0).value("agent_phone_clean").toString();
+        m_agent2Name = clientModel->record(0).value("agent2_name").toString();
+        m_agent2Surname = clientModel->record(0).value("agent2_surname").toString();
+        m_agent2Patronymic = clientModel->record(0).value("agent2_patronymic").toString();
+        m_agent2Phone = clientModel->record(0).value("agent2_phone").toString();
+        m_agent2PhoneClean = clientModel->record(0).value("agent2_phone_clean").toString();
+        m_balance = clientModel->record(0).value("balance").toFloat();
+        m_priceColumn = clientModel->record(0).value("price_col").toInt();
+        m_repairs = clientModel->record(0).value("repairs").toInt();
+        m_purchases = clientModel->record(0).value("purchases").toInt();
+        m_token = clientModel->record(0).value("token").toString();
+        i_createdUtc = clientModel->record(0).value("created").toDateTime();
+    }
 
     delete clientModel;
 }
@@ -169,12 +169,24 @@ void SClientModel::setPatronymicName(const QString &text)
 
 QString SClientModel::fullLongName()
 {
-    return QString();
+    QString ret = m_lastName;
+    if(!m_firstName.isEmpty())
+        ret.append(" " + m_firstName);
+    if(!m_patronymicName.isEmpty())
+        ret.append(" " + m_patronymicName);
+
+    return ret;
 }
 
 QString SClientModel::fullShortName()
 {
-    return QString();
+    QString ret = m_lastName;
+    if(!m_firstName.isEmpty())
+        ret.append(" ").append(m_firstName.front()).append(".");
+    if(!m_patronymicName.isEmpty())
+        ret.append(" ").append(m_patronymicName.front()).append(".");
+
+    return ret;
 }
 
 SPhonesModel* SClientModel::phones()
@@ -413,6 +425,58 @@ QString SClientModel::agent2PhoneClean()
     return m_agent2PhoneClean;
 }
 
+bool SClientModel::balanceEnabled()
+{
+    return m_options&BalanceEnabled;
+}
+
+/*  Включение/отключение баланса клиента
+ *  Возвращает 0 в случае ошибки
+*/
+bool SClientModel::setBalanceEnabled(bool state)
+{
+    QSqlQuery *query;
+
+    if( state != (bool)(m_options&BalanceEnabled) )
+    {
+        query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
+        if(state)
+        {
+            appendLogText(tr("Включен баланс клиента"));
+            createBalanceObj();
+            m_options |= BalanceEnabled;
+        }
+        else
+        {
+            if(m_balance != 0)
+            {
+                // TODO: переделать с использованием shortlivedNotification
+                // или предложить пользователю автоматически создать РКО/ПКО
+                QMessageBox msgBox;
+                msgBox.setWindowTitle(tr("Отключение баланса"));
+                msgBox.setText(tr("Баланс клиента не равен нулю!"));
+                msgBox.setIcon(QMessageBox::Information);
+                msgBox.exec();
+                return 0;
+            }
+            else
+            {
+                appendLogText(tr("Баланс клиента отключен"));
+                deleteBalanceObj();
+                m_options &= ~BalanceEnabled;
+            }
+        }
+        i_valuesMap.insert("balance_enable", state);
+
+        QUERY_EXEC(query,i_nErr)(QUERY_BEGIN);
+        commit();
+        QUERY_COMMIT_ROLLBACK(query,i_nErr);
+        delete query;
+    }
+    return i_nErr;
+}
+
 float SClientModel::balance()
 {
     return m_balance;
@@ -423,12 +487,19 @@ void SClientModel::createBalanceObj()
     balanceLog = new SBalanceLogRecordModel(i_id);
 }
 
+void SClientModel::deleteBalanceObj()
+{
+    if(balanceLog)
+        delete balanceLog;
+}
+
 bool SClientModel::updateBalance(const float amount, const QString &text)
 {
     if(isNew())   // TODO: проверка включен ли баланс у клиента
         return 1;
 
     balanceLog->setText(text);
+    balanceLog->setClient(i_id);
     i_nErr = balanceLog->commit(amount);
 
     QUERY_EXEC(i_query,i_nErr)(QUERY_UPDATE_BALANCE(i_id, amount));
@@ -531,6 +602,7 @@ void SClientModel::showNotification()
     {
         QMessageBox msgBox;
 
+        msgBox.setWindowTitle(fullShortName());
         msgBox.setText(m_notes);
         msgBox.setIcon(QMessageBox::Information);
         msgBox.exec();
@@ -622,8 +694,6 @@ SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):
 {
     i_obligatoryFields << "client" << "summ" << "direction" << "reason" << "created" << "office" << "uid";
     i_tableName = "balance";
-    i_valuesMap.insert("uid", userDbData->value("id"));
-    i_valuesMap.insert("office", userDbData->value("current_office"));
     i_logRecord->setType(SLogRecordModel::Client);
 }
 
@@ -667,6 +737,8 @@ void SBalanceLogRecordModel::setDocumentId(int id)
 bool SBalanceLogRecordModel::commit(const float amount)
 {
     setDirection(amount);
+    i_valuesMap.insert("uid", userDbData->value("id"));
+    i_valuesMap.insert("office", userDbData->value("current_office"));
     i_valuesMap.insert("summ", amount);
     i_valuesMap.insert("created", QDateTime::currentDateTime());
 

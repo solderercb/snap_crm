@@ -50,6 +50,9 @@ private:
     QStringList query_group;
     QStringList query_order;
     QTimer *tableUpdateDelay;
+#ifdef QT_DEBUG
+    void randomFill(){};
+#endif
 
 private slots:
     void updateTableWidget();
@@ -59,6 +62,10 @@ private slots:
     void tableSectionMoved(int, int, int);
     void tableSectionResized(int, int, int);
     void tableSortingChanged(int, Qt::SortOrder);
+#ifdef QT_DEBUG
+    void test_scheduler_handler(){};
+    void test_scheduler2_handler(){};
+#endif
 };
 
 #endif // TABREPAIRS_H

@@ -2,22 +2,12 @@
 #define TABSALE_H
 
 #include <QWidget>
-#include <QObject>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QToolButton>
-#include <QStyle>
-#include <QTableWidget>
-#include <QLabel>
 #include <QSqlQueryModel>
-#include <QSqlTableModel>
-#include <QSqlField>
-#include <QScrollBar>
-#include <QTimeZone>
 #include <QDateTime>
-#include <QLocale>
-#include <QRandomGenerator>
+#include <QLabel>
 #include <QPushButton>
+#include <QToolButton>
+#include <QScrollBar>
 #include <QMessageBox>
 #include "tabcommon.h"
 #include "models/sdocumentmodel.h"
@@ -31,11 +21,6 @@
 #include "widgets/saletableitemdelegates.h"
 #include "widgets/tabsalesettingsmenu.h"
 #include "widgets/shortlivednotification.h"
-#ifdef QT_DEBUG
-#include <QTimer>
-#include <QFile>
-#include "querylog.h"
-#endif
 
 namespace Ui {
 class tabSale;
@@ -105,12 +90,9 @@ private:
     SCashRegisterModel *cashRegister;
     int m_docState = 0;
     void print();
-
 #ifdef QT_DEBUG
     void randomFill();
     void createTestPanel();
-    QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
-    uint test_scheduler_counter = 0;
     QWidget *testPanel;
     QLineEdit *testLineEdit;
     QPushButton *testPushButton;

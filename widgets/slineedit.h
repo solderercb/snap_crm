@@ -8,6 +8,7 @@
 #include <QVector>
 #include <QSignalMapper>
 #include <QMetaEnum>
+#include <QDebug>
 
 class SLineEdit : public QLineEdit
 {
@@ -22,6 +23,8 @@ public:
     enum Buttons {Clear, DownArrow, Edit, Search, Print, Apply, Open};
     SLineEdit(QWidget *parent = nullptr);
     void setButtons(QString buttons);
+    void clearButtons();
+    void arrangeButtons();
     void resize(const QSize &);
     void resize(int, int);
     QString buttons();
@@ -38,7 +41,6 @@ private:
     QStringList *buttonsList;
     int buttonsCount = 0;
     QVector<QToolButton*> lineEditButtons;
-    QToolButton* lineEditButton_;
     QSignalMapper *signalMapper;
     int frameWidth;
     QSize sz;
@@ -49,7 +51,6 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *e) override;
 
 private slots:
-    void updateCloseButton(const QString &text);
 };
 
 

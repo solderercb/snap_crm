@@ -16,19 +16,23 @@ class SCashRegisterModel : public SComRecord
 {
     Q_OBJECT
 public:
-    enum PaymentType{PaymentSimple = 1, PaymentInvoice = 2, PaymentZ = 3, PaymentBalance = 4, PaymentSubsist = 5,
-                     PaymentSalary = 6, AddSubCash = 7, MoneybackRepair = 8, MoneybackGoods = 9, ReceiptSimple = 11,
-                     ReceiptPrepayRepair = 12, ReceiptBalance = 13, ReceiptGoods = 14, ReceiptRepair = 15, ReceiptInvoice = 17,
-                     MoveCash = 18, PaymentDealer = 19, PaymentCustom = 50};
+    enum PaymentType{ExpSimple = 1, ExpInvoice = 2, ExpZ = 3, ExpBalance = 4, ExpSubsist = 5,
+                     ExpSalary = 6, AddSubCash = 7, ExpRepair = 8, ExpGoods = 9, RecptSimple = 11,
+                     RecptPrepayRepair = 12, RecptBalance = 13, RecptGoods = 14, RecptRepair = 15,
+                     ExpInvoiceUndo = 16, RecptInvoice = 17, MoveCash = 18, ExpDealer = 19, ExpCustom = 50};
     explicit SCashRegisterModel(QObject *parent = nullptr);
     explicit SCashRegisterModel(int systemId, QObject *parent = nullptr);
     ~SCashRegisterModel();
+    int id();
     void setId(int);
     void load();
     void load(int);
     bool commit();
     bool commit(float);
     void setOperationType(int);
+    float amount();
+    float amountAbs();
+    void setAmount(float);
     void setClient(int);
     void unsetClient(); // удаление id клиента (анонимный)
     void setSystemId(int);   // ID платёжной системы (`payment_systems`.`system_id`)
@@ -39,7 +43,12 @@ public:
     void setDocumentId(int);
     int repairId();
     void setRepairId(int);
+    int invoiceId();
+    void setInvoiceId(int);
     void setLogText(const QString &);
+    QString constructReason(const QString&);
+    QString constructReason(int);
+    void setSkipLogRecording(bool state = true);
 
     // методы, в необходимости которых я пока не увеврен
     int client();
@@ -50,24 +59,22 @@ public:
 
 private:
     void fieldsVerifyFormatter();
+    int m_type = -1;
     int m_systemId = userDbData->value("defaultPaymentSystem", 0).toInt();       // ID платёжной системы (DB: payment_systems.system_id)
     int m_client = 0;
-    int m_operationType = -1;
-    QString m_reason;
     int m_currency = 0;
     QStringList fields_verify;
-    int m_id;
-    int m_type;
-    float m_amount;
+    float m_amount = 0;
     QString m_amount_str;
-    int m_invoice;
+    QString m_amount_words;
+    QString m_reason;
     int m_toUser;
     int m_user;
     int m_company;
     int m_office;
-    QString m_notes;
-    int m_repair;
-    int m_document;
+    int m_invoice = 0;
+    int m_repair = 0;
+    int m_document = 0;
     QByteArray m_img;
     float m_cardFee;
     bool m_isBackdate;
@@ -75,6 +82,7 @@ private:
     QString m_customerEmail;
     int m_fdn;
     int m_paymentItemAttribute;
+    bool m_skipLogRecording = 0;
 
 signals:
 

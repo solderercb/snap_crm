@@ -90,7 +90,7 @@ private:
 #endif
 
 public slots:
-    void createTabRepairs(int type = 0);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
+    void createTabRepairs(int type = 0, QWidget *caller = nullptr);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
     void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
 
 private slots:
@@ -102,8 +102,11 @@ private slots:
     void createTabClient(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
     void createTabCashOperations();
+    void createTabCashOperation(int);
     void createTabNewPKO();
     void createTabNewRKO();
+    void createTabDocuments(int type = 0, QWidget *caller = nullptr);
+    void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void closeTab(int index);
     void updateTabLabel(QWidget*, const QString&);
 #ifdef QT_DEBUG

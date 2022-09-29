@@ -46,12 +46,15 @@ public:
     void setNotes(QString);
     QString reason();
     void setReason(QString);
+    int orderId();
+    void setOrderId(const int);
     int reserveDays();
     void setReserveDays(int);
     QString trackingNumber();
     void setTrackingNumber(const QString&);
     bool isValid();
     bool commit();
+    QString title();
 
 private:
     int m_id = 0;

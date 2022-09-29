@@ -130,13 +130,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     msgBox.setIcon(QMessageBox::Critical);
 
 #ifdef QT_DEBUG
-    test_scheduler = new QTimer();
-    test_scheduler->setSingleShot(true);
-    test_scheduler2 = new QTimer();
-    test_scheduler2->setSingleShot(true);
-    QObject::connect(test_scheduler, SIGNAL(timeout()), this, SLOT(test_scheduler_handler()));
-    QObject::connect(test_scheduler2, SIGNAL(timeout()), this, SLOT(test_scheduler2_handler()));
-
     test_scheduler->start(200);
 #endif
 }
@@ -165,10 +158,6 @@ tabRepairNew::~tabRepairNew()
     delete cashRegister;
     delete repairModel;
     delete comment;
-    #ifdef QT_DEBUG
-        delete test_scheduler;
-        delete test_scheduler2;
-    #endif
     p_instance = nullptr;   // Обязательно блять!
 }
 
@@ -327,7 +316,7 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
 void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
 {
     if (button == SLineEdit::Search)
-        emit createTabSelectPrevRepair(1);
+        emit createTabSelectPrevRepair(1, this);
     else if (button == SLineEdit::DownArrow)
     {
         if (!ui->lineEditPrevRepairFromOldDB->isVisible())
@@ -767,8 +756,7 @@ bool tabRepairNew::createRepair()
         if(ui->checkBoxIsPrepay->isChecked())
         {
             prepaySumm = sysLocale.toFloat(ui->lineEditPrepaySumm->text());
-            repairModel->setIsPrepaid(1);
-            repairModel->setPrepaidSumm(prepaySumm);
+            repairModel->addPrepay(prepaySumm, ui->comboBoxPrepayReason->currentText());
         }
         if(ui->checkBoxWasInOtherWorkshop->isChecked())
             repairModel->setThirsPartySc(1);
@@ -800,11 +788,12 @@ bool tabRepairNew::createRepair()
         {
             cashRegister->setId(0);
             cashRegister->setClient(clientModel->id());
-            cashRegister->setOperationType(SCashRegisterModel::ReceiptGoods);
+            cashRegister->setOperationType(SCashRegisterModel::RecptPrepayRepair);
             cashRegister->setRepairId(repair);
-            cashRegister->setReason(tr("Предоплата за ремонт №%1 в размере %2").arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)));
-            cashRegister->setLogText(tr("Внесена предоплата за ремонт №%2 в размере %3 (%1)").arg(ui->comboBoxPrepayReason->currentText()).arg(repair).arg(sysLocale.toCurrencyString(prepaySumm)));
-            nErr = cashRegister->commit(prepaySumm);
+            cashRegister->setAmount(prepaySumm);
+            cashRegister->setReason(QString("%1 (%2)").arg(cashRegister->constructReason(repair)).arg(ui->comboBoxPrepayReason->currentText()));
+            cashRegister->setSkipLogRecording(true);
+            nErr = cashRegister->commit();
 
             // TODO: Признак предмета расчета
         }

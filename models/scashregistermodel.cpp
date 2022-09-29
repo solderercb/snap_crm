@@ -4,6 +4,8 @@ SCashRegisterModel::SCashRegisterModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "created" << "type" << "summa" << "user" << "company" << "office" << "notes";
     i_tableName = "cash_orders";
+    m_amount_str = sysLocale.toCurrencyString(m_amount);
+    m_amount_words = amountToWords(m_amount);
 }
 
 SCashRegisterModel::SCashRegisterModel(int systemId, QObject *parent) :
@@ -14,6 +16,11 @@ SCashRegisterModel::SCashRegisterModel(int systemId, QObject *parent) :
 
 SCashRegisterModel::~SCashRegisterModel()
 {
+}
+
+int SCashRegisterModel::id()
+{
+    return i_id;
 }
 
 void SCashRegisterModel::setId(int id)
@@ -39,7 +46,7 @@ void SCashRegisterModel::load()
     m_user = order->record(0).value("user").toInt();
     m_company = order->record(0).value("company").toInt();
     m_office = order->record(0).value("office").toInt();
-    m_notes = order->record(0).value("notes").toString();
+    m_reason = order->record(0).value("notes").toString();
     m_repair = order->record(0).value("repair").toInt();
     m_document = order->record(0).value("document").toInt();
     m_img = order->record(0).value("img").toByteArray();
@@ -78,7 +85,8 @@ bool SCashRegisterModel::commit()
         i_valuesMap.insert("user", userDbData->value("id"));
         i_valuesMap.insert("company", userDbData->value("company"));
         i_valuesMap.insert("office", userDbData->value("current_office"));
-        i_valuesMap.insert("created", QDateTime::currentDateTime());
+        if(!i_valuesMap.contains("created"))
+            i_valuesMap.insert("created", QDateTime::currentDateTime());
 
         fieldsVerifyFormatter();    // вызов этого метода должен быть до вызова метода insert()
 
@@ -100,7 +108,9 @@ bool SCashRegisterModel::commit()
     if(!i_nErr)
         throw 1;
 
-    i_logRecord->commit();
+    if(!m_skipLogRecording)
+        i_logRecord->commit();
+
     // TODO: Признак предмета расчета
 
     return i_nErr;
@@ -108,8 +118,7 @@ bool SCashRegisterModel::commit()
 
 bool SCashRegisterModel::commit(float amount)
 {
-    i_valuesMap.insert("summa", amount);
-    i_valuesMap.insert("summa_str", amountToWords(amount));
+    setAmount(amount);
     return commit();
 }
 
@@ -120,6 +129,8 @@ void SCashRegisterModel::fieldsVerifyFormatter()
     fields_verify.clear();
     for (i = i_valuesMap.constBegin(); i != i_valuesMap.constEnd(); ++i)
     {
+        if(i.key() == "type" || i.key() == "notes")
+            continue; // верификацию этих полей пропускаем, т. к. костыли для АСЦ в виде триггеров могут их изменить и сессия завершится Rollback'ом
         fields_verify.append("IFNULL(`" + i.key() + "`,'NULL') = IFNULL(" + fieldValueHandler(i.value()) + ",'NULL')");
     }
 
@@ -138,12 +149,16 @@ void SCashRegisterModel::setClient(int id)
         return;
     }
 
-    i_valuesMap.insert("client", id);
-//    i_logRecord->setClient(id);   // При просмотре записей журнала, касающихся клиента, записи о кассовых операциях отображать не нужно
+    m_client = id;
+    i_valuesMap.insert("client", m_client);
+
+    // При просмотре записей журнала, касающихся клиента, записи о кассовых операциях отображать не нужно (для этого есть отдельная страница в карточке клиента)
+//    i_logRecord->setClient(id);
 }
 
 void SCashRegisterModel::unsetClient()
 {
+    m_client = 0;
     i_valuesMap.insert("client", QVariant());
 //    i_logRecord->unsetClient();
 }
@@ -194,6 +209,9 @@ void SCashRegisterModel::setCurrency(int id)
 void SCashRegisterModel::setCreated(QDateTime timestamp)
 {
     i_valuesMap.insert("created", timestamp);
+    if(timestamp.date() != QDate::currentDate())
+        i_valuesMap.insert("is_backdate", 1);
+    qDebug().nospace() << "[SCashRegisterModel] setCreated() | created = " << i_valuesMap.value("created");
 }
 
 int SCashRegisterModel::documentId()
@@ -203,9 +221,11 @@ int SCashRegisterModel::documentId()
 
 void SCashRegisterModel::setDocumentId(int id)
 {
-    i_valuesMap.insert("document", id);
+    qDebug().nospace() << "[SCashRegisterModel] setDocumentId()";
+    m_document = id;
+    i_valuesMap.insert("document", m_document);
     i_logRecord->setType(SLogRecordModel::Doc);
-    i_logRecord->setDocumentId(id);
+    i_logRecord->setDocumentId(m_document);
 }
 
 int SCashRegisterModel::repairId()
@@ -215,9 +235,24 @@ int SCashRegisterModel::repairId()
 
 void SCashRegisterModel::setRepairId(int id)
 {
-    i_valuesMap.insert("repair", id);
+    qDebug().nospace() << "[SCashRegisterModel] setRepairId() | id = " << id;
+    m_repair = id;
+    i_valuesMap.insert("repair", m_repair);
     i_logRecord->setType(SLogRecordModel::Repair);
-    i_logRecord->setRepairId(id);
+    i_logRecord->setRepairId(m_repair);
+}
+
+int SCashRegisterModel::invoiceId()
+{
+    return m_invoice;
+}
+
+void SCashRegisterModel::setInvoiceId(int id)
+{
+    m_invoice = id;
+    i_valuesMap.insert("invoice", m_invoice);
+//    i_logRecord->setType(SLogRecordModel::Invoice);   // В АСЦ v3.7.31.1123 не реализовано
+//    i_logRecord->setInvoiceId(m_invoice);
 }
 
 /* Установка текста записи в журнале
@@ -228,13 +263,95 @@ void SCashRegisterModel::setLogText(const QString &text)
     i_logRecord->setText(text);
 }
 
+QString SCashRegisterModel::constructReason(const QString &linkedObjId)
+{
+    qDebug().nospace() << "[SCashRegisterModel] constructReason() | m_type = " << m_type;
+    QString reason;
+    switch(m_type)
+    {
+    case PaymentType::ExpSimple:    reason = tr("Расход денег в размере %1").arg(m_amount_str); break;
+    case PaymentType::ExpInvoice:   reason = tr("Оплата приходной накладной №%1, в размере %2").arg(linkedObjId).arg(m_amount_str); break;
+    case PaymentType::ExpZ:         reason = tr("Z отчёт, выемка средств в размере %1").arg(m_amount_str); break;
+    case PaymentType::ExpBalance:   reason = tr("Выдача денег в размере %1 со списанием с баланса клиента №%2").arg(m_amount_str).arg(m_client); break;  // TODO: добавить короткую форму ФИО
+    case PaymentType::ExpSubsist:   reason = tr("Выплата аванса сторуднику в размере %1").arg(m_amount_str); break;
+    case PaymentType::ExpSalary:    reason = tr("Выплата заработной платы сторуднику в размере %1").arg(m_amount_str); break;
+    case PaymentType::ExpRepair:    reason = tr("Расход денег в размере %1 - возврат за невыполненный ремонт №2").arg(m_amount_str).arg(linkedObjId); break;
+    case PaymentType::ExpGoods:     reason = tr("Расход денег в размере %1 - возврат за товары по РН №%2").arg(m_amount_str).arg(linkedObjId); break;
+    case PaymentType::RecptSimple:  reason = tr("Поступление денег в размере %1").arg(m_amount_str); break;
+    case PaymentType::RecptPrepayRepair: reason = tr("Предоплата за ремонт №%1 в размере %2").arg(linkedObjId).arg(m_amount_str); break;
+    case PaymentType::RecptBalance: reason = tr("Поступление денег в размере %1 с зачислением на баланс клиента №%2").arg(m_amount_str).arg(m_client); break;
+    case PaymentType::RecptGoods:   reason = tr("Поступление денег в размере %1 по расходной накладной №%2").arg(m_amount_str).arg(linkedObjId); break;
+    case PaymentType::RecptRepair:  reason = tr("Поступление денег в размере %1 в счёт выполненого ремонта №%2").arg(m_amount_str).arg(linkedObjId); break;
+    case PaymentType::ExpInvoiceUndo: reason = tr("Поступление средств в рамере %1. за товары в распроведённой ПН №%2").arg(m_amount_str).arg(linkedObjId); break;
+    case PaymentType::RecptInvoice: reason = tr("Поступление денег в размере %1 по счёту №%2").arg(m_amount_str).arg(linkedObjId); break;
+    case PaymentType::MoveCash:     ; break;
+    case PaymentType::ExpDealer:    reason = tr("Расход денег в размере %1 в счёт выплаты поставщику за товары находившиеся на реализации").arg(m_amount_str); break;
+    }
+    if(m_type == PaymentType::AddSubCash)
+    {
+        if(m_amount > 0)
+            reason = tr("Поступление денег в размере %1 (%2) - внесение средств в кассу").arg(m_amount_str, m_amount_words);
+        else
+            reason = tr("Расход денег в размере %1 (%2) - выдача средств из кассы").arg(m_amount_str, m_amount_words);
+    }
+    else if(m_type > PaymentType::ExpCustom)  // TODO: В АСЦ v3.7.31.1123 есть шаблоны только РКО
+        reason = tr("Расход денег в размере %1, %2").arg(m_amount_str, expenditureTypesModel->reasonByDatabaseId(m_type));
+
+    setReason(reason);
+
+    return reason;
+}
+
+QString SCashRegisterModel::constructReason(int linkedObjId)
+{
+    return constructReason(QString::number(linkedObjId));
+}
+
+/*  По умолчанию каждая кассовая операция сопровождается записью в журнал
+ *  Но в некоторых случаях запись в журнал может производиться в отдельном методе класса,
+ *  использующего объект этого класса, что приведёт к созданию двух записей в журнале.
+ *  Например, при создании ПКО предоплаты ремонта. Чтобы этого избежать нужно вызвать
+ *  этот метод без параметров или с параметром state = true.
+*/
+void SCashRegisterModel::setSkipLogRecording(bool state)
+{
+    m_skipLogRecording = state;
+}
+
 int SCashRegisterModel::operationType()
 {
-    return m_operationType;
+    return m_type;
 }
 
 void SCashRegisterModel::setOperationType(int type)
 {
-    i_valuesMap.insert("type", type);
+    m_type = type;
+    i_valuesMap.insert("type", m_type);
+}
+
+float SCashRegisterModel::amount()
+{
+    return m_amount;
+}
+
+float SCashRegisterModel::amountAbs()
+{
+    if(m_amount < 0)
+        return -m_amount;
+    return m_amount;
+}
+
+void SCashRegisterModel::setAmount(float amount)
+{
+    qDebug().nospace() << "[SCashRegisterModel] setAmount() | amount = " << amount;
+    float l_amount = amount;
+    if(l_amount < 0)
+        l_amount = -l_amount;
+
+    m_amount = amount;
+    m_amount_str = sysLocale.toCurrencyString(l_amount);
+    m_amount_words = amountToWords(l_amount);
+    i_valuesMap.insert("summa", amount);
+    i_valuesMap.insert("summa_str", m_amount_words);
 }
 

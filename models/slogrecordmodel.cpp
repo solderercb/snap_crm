@@ -47,25 +47,21 @@ void SLogRecordModel::setRepairId(int id)
 void SLogRecordModel::setDocumentId(int id)
 {
     i_valuesMap.insert("document", id);
-
 }
 
 void SLogRecordModel::setItemId(int id)
 {
     i_valuesMap.insert("item", id);
-
 }
 
 void SLogRecordModel::setCashOrderId(int id)
 {
     i_valuesMap.insert("cash_order", id);
-
 }
 
 void SLogRecordModel::setPartRequestId(int id)
 {
     i_valuesMap.insert("part_request", id);
-
 }
 
 void SLogRecordModel::setValueBefore(const QString &text)
@@ -76,6 +72,11 @@ void SLogRecordModel::setValueBefore(const QString &text)
 void SLogRecordModel::setValueAfter(const QString &text)
 {
     i_valuesMap.insert("values_after", text);
+}
+
+void SLogRecordModel::clear()
+{
+    i_valuesMap.clear();
 }
 
 void SLogRecordModel::setClient(int id)
