@@ -560,7 +560,8 @@
 
 #define QUERY_VRFY_BALANCE(C)               QString(\
                                                 "SELECT\n"\
-                                                "  IF(t1.`balance` = SUM(t2.`summ`), 21930, 0)\n"\
+                                                "  IF(t1.`balance` = SUM(t2.`summ`), 21930, 0) AS 'control',\n"\
+                                                "  t1.`balance`\n"\
                                                 "FROM\n"\
                                                 "  `clients` AS t1\n"\
                                                 "LEFT JOIN\n"\

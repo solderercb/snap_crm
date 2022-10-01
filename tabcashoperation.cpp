@@ -6,6 +6,7 @@ QMap<int, tabCashOperation*> tabCashOperation::p_instance;
 
 tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     tabCommon(parent),
+    m_initialOrderId(order),
     m_orderId(order),
     ui(new Ui::tabCashOperation)
 {
@@ -26,24 +27,20 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     ui->checkBoxPrintCheck->setChecked(comSettings->value("print_check").toBool());
     ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxCompany->setCurrentIndex(companiesModel->rowByDatabaseID(userDbData->value("company").toInt()));
-    cashRegister = new SCashRegisterModel();
-    clientModel = new SClientModel();
+
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
     paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(-2)).*$"));
     paymentSystemsProxyModel->setFilterKeyColumn(1);
     ui->comboBoxPaymentAccount->setModel(paymentSystemsProxyModel);
     ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));
+    clientModel = new SClientModel();
+    cashRegister = new SCashRegisterModel();
+    initCashRegisterModel();
 
     connect(ui->lineEditClientLastName,SIGNAL(buttonClicked(int)),this,SLOT(lineEditClientLastNameButtonClickHandler(int)));
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
-
-    switch (m_orderId) {
-        case tabCashOperation::PKO: initPKO(); break;
-        case tabCashOperation::RKO: initRKO(); break;
-        default: load(m_orderId);
-    }
 
     query->exec(QUERY_BEGIN);
     QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
@@ -53,7 +50,6 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
 
     ui->comboBoxOrderType->setModel(paymentTypesModel);
 
-//    updateWidgets();
     qDebug().nospace() << "[tabCashOperation] tabCashOperation() | Out";
 
 #ifdef QT_DEBUG
@@ -203,9 +199,9 @@ void tabCashOperation::setDefaultStylesheets()
     ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
 }
 
-void tabCashOperation::buttonSaveClicked()
+bool tabCashOperation::commit(bool repeatAfter)
 {
-    qDebug().nospace() << "[tabCashOperation] buttonSaveClicked() | In";
+    qDebug().nospace() << "[tabCashOperation] commit() | In";
 
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
@@ -218,12 +214,12 @@ void tabCashOperation::buttonSaveClicked()
 #endif
 
     if(!checkInput())
-        return;
+        return 0;
 
-    amountChanged(ui->doubleSpinBoxAmount->value());
     cashRegister->setOperationType(m_orderType);
     cashRegister->setCreated(ui->dateEdit->dateTime());
     cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
+    qDebug().nospace() << "[tabCashOperation] commit() | ui->lineEditReason->text() = " << ui->lineEditReason->text();
     cashRegister->setReason(ui->lineEditReason->text());    // если пользователь отредактировал автоматически сгенерированный комментарий
     cashRegister->setSkipLogRecording(m_skipAutoLogRecord);
     if(m_client)
@@ -279,16 +275,19 @@ void tabCashOperation::buttonSaveClicked()
 
     if(nErr)
     {
-        m_tabTitle.append(QString(" %1").arg(m_orderId));
-        p_instance.remove(initial_order_id);   // Если всё ОК, то нужно заменить указатель
-        p_instance.insert(m_orderId, this);    // иначе будет падать при попытке создать новую вкладку
+        if(!repeatAfter)
+        {
+            emit updateLabel(this, tabTitle());
+            p_instance.remove(initial_order_id);   // Если всё ОК, то нужно заменить указатель
+            p_instance.insert(m_orderId, this);    // иначе будет падать при попытке создать новую вкладку
 
-        emit updateLabel(this, m_tabTitle);
+            updateWidgets();
+        }
+
         print();
-        updateWidgets();
     }
-    qDebug().nospace() << "[tabCashOperation] buttonSaveClicked() | Out";
-    return;
+    qDebug().nospace() << "[tabCashOperation] commit() | Out";
+    return nErr;
 }
 
 bool tabCashOperation::commitSimple()
@@ -301,6 +300,7 @@ bool tabCashOperation::commitBalance(float amount)
 {
     qDebug().nospace() << "[tabCashOperation] commitBalance()";
     QString note;
+    bool nErr = 1;
     if(amount > 0)
     {
         note = tr("Баланс клиента №%1 пополнен на %2").arg(m_client).arg(sysLocale.toCurrencyString(amount));
@@ -310,7 +310,9 @@ bool tabCashOperation::commitBalance(float amount)
         note = tr("С баланса клиента №%1 списано %2").arg(m_client).arg(sysLocale.toCurrencyString(-amount));
     }
 
-    return clientModel->updateBalance(amount, note);
+    nErr = clientModel->updateBalance(amount, note);
+
+    return nErr;
 }
 
 bool tabCashOperation::commitDocument()
@@ -356,12 +358,16 @@ void tabCashOperation::setAmount(const float amount)
 
 void tabCashOperation::updateOrderIdLineEdit()
 {
+    qDebug().nospace() << "[tabCashOperation] updateOrderIdLineEdit()";
     ui->lineEditOrderNum->setText(QString::number(cashRegister->id()));
     ui->lineEditOrderNum->setStyleSheet("QLineEdit { background: #90EE90;}");   // светло-зелёный
 }
 
 QString tabCashOperation::tabTitle()
 {
+    if(m_orderId > 0)
+        return m_tabTitle + QString(" %1").arg(m_orderId);
+
     return m_tabTitle;
 }
 
@@ -377,6 +383,7 @@ void tabCashOperation::updateWidgets()
         ui->buttonPrint->show();
         ui->buttonRevert->show();
         ui->buttonSave->hide();
+        ui->buttonSaveMore->hide();
         updateOrderIdLineEdit();
         ui->checkBoxPrintCheck->setVisible(false);
         ui->checkBoxAutoReason->setDisabled(true);
@@ -397,6 +404,7 @@ void tabCashOperation::updateWidgets()
         ui->dateEdit->setVisible(permissions->value("71"));    // Проводить документы задним числом
         ui->dateEdit->setDate(QDate::currentDate());
         ui->buttonSave->show();
+        ui->buttonSaveMore->show();
         ui->buttonPrint->hide();
         ui->buttonRevert->hide();
         ui->checkBoxPrintCheck->setVisible(true);
@@ -406,6 +414,11 @@ void tabCashOperation::updateWidgets()
         ui->lineEditReason->setText(m_reason);
         setAmountReadOnly(m_amountRO);
     }
+
+    if(m_showBalance)
+        ui->lineEditBalance->setText(sysLocale.toString(clientModel->balance(), 'f', 2));
+    else
+        ui->lineEditBalance->clear();
 
     ui->toolButtonApplyPaymentSystem->hide();
     showLinkedObject();
@@ -472,6 +485,8 @@ bool tabCashOperation::checkInput()
                 }
                 else
                     tmp = 0;
+
+                m_showBalance = tmp;
             }
             if(!tmp)
             {
@@ -503,9 +518,26 @@ void tabCashOperation::load(const int orderId)
     {
         initRKO();
     }
-    m_tabTitle.append(QString(" %1").arg(m_orderId));
+    clientModel->load(cashRegister->client());
+    ui->lineClientId->setText(QString::number(clientModel->id()));
+    ui->lineEditClientLastName->setText(clientModel->fullShortName());
     ui->comboBoxOrderType->setCurrentIndex(paymentTypesModel->rowByDatabaseID(cashRegister->operationType()));
+    qDebug().nospace() << "[tabCashOperation] load() | rowByDatabaseID() = " << paymentSystemsProxyModel->rowByDatabaseID(cashRegister->systemId(), "system_id");
+    ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(cashRegister->systemId(), "system_id"));
+    ui->doubleSpinBoxAmount->setValue(cashRegister->amountAbs());
     updateOrderIdLineEdit();
+}
+
+void tabCashOperation::initCashRegisterModel()
+{
+    qDebug().nospace() << "[tabCashOperation] initCashRegisterModel()";
+    cashRegister->setId(0);
+
+    switch (m_orderId) {
+        case tabCashOperation::PKO: initPKO(); break;
+        case tabCashOperation::RKO: initRKO(); break;
+        default: load(m_orderId);
+    }
 }
 
 void tabCashOperation::clearClientCreds(bool)
@@ -513,7 +545,6 @@ void tabCashOperation::clearClientCreds(bool)
     qDebug().nospace() << "[tabCashOperation] clearClientCreds()";
     m_client = 0;
     clientModel->clear();
-    ui->lineEditBalance->clear();
     m_showBalance = 0;
     ui->lineClientId->clear();
     ui->lineEditClientLastName->clear();
@@ -529,7 +560,6 @@ void tabCashOperation::fillClientCreds(int clientId)
     clearClientCreds(false);
     m_client = clientId;
     clientModel->load(clientId);
-    ui->lineEditBalance->setText(sysLocale.toString(clientModel->balance(), 'f', 2));
     m_showBalance = clientModel->balanceEnabled();
     ui->lineClientId->setText(QString::number(clientId));
     ui->lineEditClientLastName->setText(clientModel->fullShortName());
@@ -594,6 +624,7 @@ void tabCashOperation::orderTypeChanged(int index)
     m_amountRO = false;
     m_showBalance = 0;
     m_skipAutoLogRecord = 0;
+    m_reasonRO = 1;
     clearLinkedObjectFields();
     // TODO: В АСЦ v3.7.31.1123 в таблице БД docs нет метки, что товар продан в долг.
     //       Наличие типа кассовой операции "Поступление денег в счет продажи товаров (РН)" может привести к
@@ -684,6 +715,33 @@ void tabCashOperation::buttonOpenDocClicked()
     }
 }
 
+void tabCashOperation::buttonSaveClicked()
+{
+    qDebug().nospace() << "[tabCashOperation] buttonSaveClicked()";
+    commit();
+}
+
+void tabCashOperation::buttonSaveMoreClicked()
+{
+    qDebug().nospace() << "[tabCashOperation] buttonSaveMoreClicked()";
+    if(!commit(1))
+        return;
+
+    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Проведён"), tabTitle(), QColor(214,239,220), QColor(229,245,234));
+    m_orderId = m_initialOrderId;
+//    ui->comboBoxOrderType->setCurrentIndex(-1);
+    clearLinkedObjectFields();
+
+    initCashRegisterModel();
+    cashRegister->setOperationType(m_orderType);    // тип операции тот же
+    ui->doubleSpinBoxAmount->setValue(0);   // чтобы избежать случайного дабл-клика нужно или выключать на несколько мсек кнопку или сбрасывать значение в 0
+
+#ifdef QT_DEBUG
+    test_scheduler_counter = RandomFillerStep::OpType;
+    randomFill();
+#endif
+}
+
 void tabCashOperation::autoReasonEnabled(int isAuto)
 {
 //    if(m_reasonManEdited)
@@ -700,9 +758,11 @@ void tabCashOperation::reasonEdited(QString)
 
 void tabCashOperation::paymentSystemChanged(int index)
 {
+    qDebug().nospace() << "[tabCashOperation] paymentSystemChanged() | index = " << index;
     if(m_orderId > 0)
         ui->toolButtonApplyPaymentSystem->show();
-    cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(index, "system_id"));
+    if(cashRegister)
+        cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(index, "system_id"));
 }
 
 void tabCashOperation::lineEditClientLastNameButtonClickHandler(int buttonId)
@@ -739,8 +799,11 @@ void tabCashOperation::amountChanged(double amountAbs)
     if(m_orderId == Type::RKO)
         m_amount = -m_amount;
     cashRegister->setAmount(m_amount);
-    m_reason = cashRegister->constructReason(m_linkedObjIdStr);
-    ui->lineEditReason->setText(m_reason);
+    if(ui->lineEditReason->isReadOnly())
+    {
+        m_reason = cashRegister->constructReason(m_linkedObjIdStr);
+        ui->lineEditReason->setText(m_reason);
+    }
 }
 
 void tabCashOperation::applyPaymentSystem()
@@ -765,8 +828,7 @@ void tabCashOperation::randomFill()
 
     if (test_scheduler_counter == RandomFillerStep::OpType)
     {
-//        i = QRandomGenerator::global()->bounded(paymentTypesModel->rowCount());
-        i = 2;  // временно
+        i = QRandomGenerator::global()->bounded(paymentTypesModel->rowCount());
         ui->comboBoxOrderType->setCurrentIndex(i);
     }
     else if (test_scheduler_counter == RandomFillerStep::LinkedObj)
@@ -783,7 +845,7 @@ void tabCashOperation::randomFill()
         if(m_linkedObjType == LinkedObjectType::NoLink)   // только если нет связанного объекта
         {
 //            dbgRandomClient(m_showBalance);
-            dbgRandomClient(0);
+            dbgRandomClient(QRandomGenerator::global()->bounded(2));
         }
     }
     else if (test_scheduler_counter == RandomFillerStep::Amount)

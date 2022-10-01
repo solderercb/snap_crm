@@ -37,7 +37,6 @@ bool SClientModel::isNew()
 
 void SClientModel::load(int id)
 {
-
     QSqlQueryModel *clientModel = new QSqlQueryModel(this);
     clientModel->setQuery(QUERY_SEL_CLIENT(id), QSqlDatabase::database("connMain"));
 
@@ -439,7 +438,6 @@ bool SClientModel::setBalanceEnabled(bool state)
 
     if( state != (bool)(m_options&BalanceEnabled) )
     {
-        query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
         if(state)
         {
@@ -469,6 +467,7 @@ bool SClientModel::setBalanceEnabled(bool state)
         }
         i_valuesMap.insert("balance_enable", state);
 
+        query = new QSqlQuery(QSqlDatabase::database("connThird"));
         QUERY_EXEC(query,i_nErr)(QUERY_BEGIN);
         commit();
         QUERY_COMMIT_ROLLBACK(query,i_nErr);
@@ -515,6 +514,8 @@ bool SClientModel::updateBalance(const float amount, const QString &text)
         throw 2;
     }
 
+    qDebug().nospace() << "[SClientModel] updateBalance() | new_balance = " << i_query->value("balance").toFloat();
+    m_balance = i_query->value("balance").toFloat();
     return i_nErr;
 }
 

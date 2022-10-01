@@ -43,9 +43,10 @@ private:
     enum LinkedObjectType {NoLink = 0, Document = 1, Repair = 2, Invoice = 3};
     enum Client {NotVisible = 0, Client = 1, Employee = 2};
     static QMap<int, tabCashOperation*> p_instance;
-    SCashRegisterModel *cashRegister;
+    SCashRegisterModel *cashRegister = nullptr;
     SPaymentTypesModel *paymentTypesModel;
     SSortFilterProxyModel *paymentSystemsProxyModel;
+    int m_initialOrderId = 0;
     int m_orderId = 0;
     int m_orderType = 0;
     float m_amount = 0;
@@ -69,10 +70,11 @@ private:
     SDocumentModel *document = nullptr;
     SInvoiceModel *invoice = nullptr;
     Ui::tabCashOperation *ui;
-    SClientModel *clientModel;
+    SClientModel *clientModel = nullptr;
     void updateWidgets();
     bool checkInput();
     void load(const int);
+    void initCashRegisterModel();
     void initPKO();
     void initRKO();
     void clearLinkedObjectFields();
@@ -81,6 +83,7 @@ private:
     void updateLineEditButtons(int state = ClientFieldsAccess::Full);
     void setAmountReadOnly(bool state = 1);
     void setDefaultStylesheets();
+    bool commit(bool repeatAfter = 0);
     bool commitSimple();
     bool commitBalance(float amount);
     bool commitDocument();
@@ -114,6 +117,7 @@ private slots:
     void lineEditClientLastNameButtonClickHandler(int);
     void buttonOpenDocClicked();
     void buttonSaveClicked();
+    void buttonSaveMoreClicked();
     void buttonPrintClicked();
     void buttonRevertClicked();
     void amountChanged(double);
