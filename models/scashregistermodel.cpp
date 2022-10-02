@@ -211,7 +211,6 @@ void SCashRegisterModel::setCreated(QDateTime timestamp)
     i_valuesMap.insert("created", timestamp);
     if(timestamp.date() != QDate::currentDate())
         i_valuesMap.insert("is_backdate", 1);
-    qDebug().nospace() << "[SCashRegisterModel] setCreated() | created = " << i_valuesMap.value("created");
 }
 
 int SCashRegisterModel::documentId()
@@ -221,7 +220,6 @@ int SCashRegisterModel::documentId()
 
 void SCashRegisterModel::setDocumentId(int id)
 {
-    qDebug().nospace() << "[SCashRegisterModel] setDocumentId()";
     m_document = id;
     i_valuesMap.insert("document", m_document);
     i_logRecord->setType(SLogRecordModel::Doc);
@@ -235,7 +233,6 @@ int SCashRegisterModel::repairId()
 
 void SCashRegisterModel::setRepairId(int id)
 {
-    qDebug().nospace() << "[SCashRegisterModel] setRepairId() | id = " << id;
     m_repair = id;
     i_valuesMap.insert("repair", m_repair);
     i_logRecord->setType(SLogRecordModel::Repair);
@@ -265,27 +262,27 @@ void SCashRegisterModel::setLogText(const QString &text)
 
 QString SCashRegisterModel::constructReason(const QString &linkedObjId)
 {
-    qDebug().nospace() << "[SCashRegisterModel] constructReason() | m_type = " << m_type;
     QString reason;
     switch(m_type)
     {
-    case PaymentType::ExpSimple:    reason = tr("Расход денег в размере %1").arg(m_amount_str); break;
-    case PaymentType::ExpInvoice:   reason = tr("Оплата приходной накладной №%1, в размере %2").arg(linkedObjId).arg(m_amount_str); break;
-    case PaymentType::ExpZ:         reason = tr("Z отчёт, выемка средств в размере %1").arg(m_amount_str); break;
-    case PaymentType::ExpBalance:   reason = tr("Выдача денег в размере %1 со списанием с баланса клиента №%2").arg(m_amount_str).arg(m_client); break;  // TODO: добавить короткую форму ФИО
-    case PaymentType::ExpSubsist:   reason = tr("Выплата аванса сторуднику в размере %1").arg(m_amount_str); break;
-    case PaymentType::ExpSalary:    reason = tr("Выплата заработной платы сторуднику в размере %1").arg(m_amount_str); break;
-    case PaymentType::ExpRepair:    reason = tr("Расход денег в размере %1 - возврат за невыполненный ремонт №2").arg(m_amount_str).arg(linkedObjId); break;
-    case PaymentType::ExpGoods:     reason = tr("Расход денег в размере %1 - возврат за товары по РН №%2").arg(m_amount_str).arg(linkedObjId); break;
-    case PaymentType::RecptSimple:  reason = tr("Поступление денег в размере %1").arg(m_amount_str); break;
-    case PaymentType::RecptPrepayRepair: reason = tr("Предоплата за ремонт №%1 в размере %2").arg(linkedObjId).arg(m_amount_str); break;
-    case PaymentType::RecptBalance: reason = tr("Поступление денег в размере %1 с зачислением на баланс клиента №%2").arg(m_amount_str).arg(m_client); break;
-    case PaymentType::RecptGoods:   reason = tr("Поступление денег в размере %1 по расходной накладной №%2").arg(m_amount_str).arg(linkedObjId); break;
-    case PaymentType::RecptRepair:  reason = tr("Поступление денег в размере %1 в счёт выполненого ремонта №%2").arg(m_amount_str).arg(linkedObjId); break;
-    case PaymentType::ExpInvoiceUndo: reason = tr("Поступление средств в рамере %1. за товары в распроведённой ПН №%2").arg(m_amount_str).arg(linkedObjId); break;
-    case PaymentType::RecptInvoice: reason = tr("Поступление денег в размере %1 по счёту №%2").arg(m_amount_str).arg(linkedObjId); break;
-    case PaymentType::MoveCash:     ; break;
-    case PaymentType::ExpDealer:    reason = tr("Расход денег в размере %1 в счёт выплаты поставщику за товары находившиеся на реализации").arg(m_amount_str); break;
+        case PaymentType::ExpSimple:    reason = tr("Расход денег в размере %1").arg(m_amount_str); break;
+        case PaymentType::ExpInvoice:   reason = tr("Оплата приходной накладной №%1, в размере %2").arg(linkedObjId, m_amount_str); break;
+        case PaymentType::ExpZ:         reason = tr("Z отчёт, выемка средств в размере %1").arg(m_amount_str); break;
+        case PaymentType::ExpBalance:   reason = tr("Выдача денег в размере %1 со списанием с баланса клиента №%2").arg(m_amount_str).arg(m_client); break;  // TODO: добавить короткую форму ФИО
+        case PaymentType::ExpSubsist:   reason = tr("Выплата аванса сторуднику в размере %1").arg(m_amount_str); break;
+        case PaymentType::ExpSalary:    reason = tr("Выплата заработной платы сторуднику в размере %1").arg(m_amount_str); break;
+        case PaymentType::ExpRepair:    reason = tr("Расход денег в размере %1 - возврат за невыполненный ремонт №2").arg(m_amount_str, linkedObjId); break;
+        case PaymentType::ExpGoods:     reason = tr("Расход денег в размере %1 - возврат за товары по РН №%2").arg(m_amount_str, linkedObjId); break;
+        case PaymentType::RecptSimple:  reason = tr("Поступление денег в размере %1").arg(m_amount_str); break;
+        case PaymentType::RecptPrepayRepair: reason = tr("Предоплата за ремонт №%1 в размере %2").arg(linkedObjId, m_amount_str); break;
+        case PaymentType::RecptBalance: reason = tr("Поступление денег в размере %1 с зачислением на баланс клиента №%2").arg(m_amount_str).arg(m_client); break;
+        case PaymentType::RecptGoods:   reason = tr("Поступление денег в размере %1 по расходной накладной №%2").arg(m_amount_str, linkedObjId); break;
+        case PaymentType::RecptRepair:  reason = tr("Поступление денег в размере %1 в счёт выполненного ремонта №%2").arg(m_amount_str, linkedObjId); break;
+        case PaymentType::ExpInvoiceUndo: reason = tr("Поступление средств в рамере %1. за товары в распроведённой ПН №%2").arg(m_amount_str, linkedObjId); break;
+        case PaymentType::RecptInvoice: reason = tr("Поступление денег в размере %1 по счёту №%2").arg(m_amount_str, linkedObjId); break;
+        case PaymentType::MoveCash:     ; break;
+        case PaymentType::ExpDealer:    reason = tr("Расход денег в размере %1 в счёт выплаты поставщику за товары находившиеся на реализации").arg(m_amount_str); break;
+        case PaymentType::ExpRevert:    reason = tr("Возврат средств в размере %1").arg(m_amount_str); break;
     }
     if(m_type == PaymentType::AddSubCash)
     {
@@ -343,7 +340,6 @@ float SCashRegisterModel::amountAbs()
 
 void SCashRegisterModel::setAmount(float amount)
 {
-    qDebug().nospace() << "[SCashRegisterModel] setAmount() | amount = " << amount;
     float l_amount = amount;
     if(l_amount < 0)
         l_amount = -l_amount;

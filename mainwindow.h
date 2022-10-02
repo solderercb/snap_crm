@@ -102,7 +102,7 @@ private slots:
     void createTabClient(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
     void createTabCashOperations();
-    void createTabCashOperation(int);
+    void createTabCashOperation( int, QMap<int, QVariant> data = QMap<int, QVariant>() );
     void createTabNewPKO();
     void createTabNewRKO();
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);

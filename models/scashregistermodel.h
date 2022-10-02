@@ -19,7 +19,8 @@ public:
     enum PaymentType{ExpSimple = 1, ExpInvoice = 2, ExpZ = 3, ExpBalance = 4, ExpSubsist = 5,
                      ExpSalary = 6, AddSubCash = 7, ExpRepair = 8, ExpGoods = 9, RecptSimple = 11,
                      RecptPrepayRepair = 12, RecptBalance = 13, RecptGoods = 14, RecptRepair = 15,
-                     ExpInvoiceUndo = 16, RecptInvoice = 17, MoveCash = 18, ExpDealer = 19, ExpCustom = 50};
+                     ExpInvoiceUndo = 16, RecptInvoice = 17, MoveCash = 18, ExpDealer = 19, ExpRevert = 20,
+                     ExpCustom = 50};
     explicit SCashRegisterModel(QObject *parent = nullptr);
     explicit SCashRegisterModel(int systemId, QObject *parent = nullptr);
     ~SCashRegisterModel();

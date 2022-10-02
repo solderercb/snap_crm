@@ -10,8 +10,6 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     m_orderId(order),
     ui(new Ui::tabCashOperation)
 {
-    qDebug().nospace() << "[tabCashOperation] tabCashOperation() | In";
-
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
 
@@ -47,15 +45,6 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation %1").arg(m_tabTitle)));
     QUERY_COMMIT_ROLLBACK(query, nErr);
     delete query;
-
-    ui->comboBoxOrderType->setModel(paymentTypesModel);
-
-    qDebug().nospace() << "[tabCashOperation] tabCashOperation() | Out";
-
-#ifdef QT_DEBUG
-    if(order < 0)
-        test_scheduler->start(200);
-#endif
 }
 
 tabCashOperation *tabCashOperation::getInstance(int orderId, MainWindow *parent)
@@ -67,7 +56,6 @@ tabCashOperation *tabCashOperation::getInstance(int orderId, MainWindow *parent)
 
 tabCashOperation::~tabCashOperation()
 {
-    qDebug().nospace() << "[tabCashOperation] ~tabCashOperation()";
     delete ui;
     delete clientModel;
     delete cashRegister;
@@ -82,21 +70,21 @@ tabCashOperation::~tabCashOperation()
 
 void tabCashOperation::initPKO()
 {
-    qDebug().nospace() << "[tabCashOperation] initPKO()";
     m_tabTitle = tr("Приходный кассовый ордер");
     paymentTypesModel = receiptTypesModel;
+    ui->comboBoxOrderType->setModel(paymentTypesModel);
 }
 
 void tabCashOperation::initRKO()
 {
-    qDebug().nospace() << "[tabCashOperation] initRKO()";
     m_tabTitle = tr("Расходный кассовый ордер");
     paymentTypesModel = expenditureTypesModel;
+    ui->comboBoxOrderType->setModel(paymentTypesModel);
+    m_showCheckBoxPrint = 0;
 }
 
 void tabCashOperation::clearLinkedObjectFields()
 {
-    qDebug().nospace() << "[tabCashOperation] clearLinkedObjectFields()";
     if(repair != nullptr)
     {
         delete repair;
@@ -112,7 +100,6 @@ void tabCashOperation::clearLinkedObjectFields()
 
 void tabCashOperation::showLinkedObject()
 {
-    qDebug().nospace() << "[tabCashOperation] showLinkedObject()";
     bool state = 1;
     if(m_linkedObjType == LinkedObjectType::NoLink)
         state = 0;
@@ -136,7 +123,6 @@ void tabCashOperation::showLinkedObject()
 
 void tabCashOperation::showClient()
 {
-    qDebug().nospace() << "[tabCashOperation] showClient()";
     bool state = 1;
     if(m_showClient == Client::NotVisible)
         state = 0;
@@ -144,7 +130,6 @@ void tabCashOperation::showClient()
         ui->labelClient->setText(tr("Сотрудник"));
     else
         ui->labelClient->setText(tr("Плательщик"));
-    qDebug().nospace() << "[tabCashOperation] showClient() | state = " << state << "; m_showClient = " << m_showClient;
 
     ui->labelClient->setVisible(state);
     ui->lineClientId->setVisible(state);
@@ -156,7 +141,6 @@ void tabCashOperation::showClient()
 
 void tabCashOperation::updateLineEditButtons(int state)
 {
-    qDebug().nospace() << "[tabCashOperation] updateLineEditButtons() | state = " << state;
     if(state == ClientFieldsAccess::Denied)
     {
         if(permissions->value("Х")) // TODO: разрешение на просмотр карточки клиента
@@ -182,7 +166,6 @@ void tabCashOperation::updateLineEditButtons(int state)
         ui->lineEditClientLastName->setReadOnly(false);
     }
     ui->lineEditClientLastName->updateGeometry();
-    qDebug().nospace() << "[tabCashOperation] updateLineEditButtons() | Out";
 }
 
 void tabCashOperation::setAmountReadOnly(bool state)
@@ -192,7 +175,6 @@ void tabCashOperation::setAmountReadOnly(bool state)
 
 void tabCashOperation::setDefaultStylesheets()
 {
-    qDebug().nospace() << "[tabCashOperation] setDefaultStylesheets()";
     ui->lineEditLinkedObjCaption->setStyleSheet(commonLineEditStyleSheet);
     ui->doubleSpinBoxAmount->setStyleSheet(commonSpinBoxStyleSheet);
     ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheet);
@@ -201,8 +183,6 @@ void tabCashOperation::setDefaultStylesheets()
 
 bool tabCashOperation::commit(bool repeatAfter)
 {
-    qDebug().nospace() << "[tabCashOperation] commit() | In";
-
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
     int initial_order_id = m_orderId;
@@ -219,7 +199,6 @@ bool tabCashOperation::commit(bool repeatAfter)
     cashRegister->setOperationType(m_orderType);
     cashRegister->setCreated(ui->dateEdit->dateTime());
     cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
-    qDebug().nospace() << "[tabCashOperation] commit() | ui->lineEditReason->text() = " << ui->lineEditReason->text();
     cashRegister->setReason(ui->lineEditReason->text());    // если пользователь отредактировал автоматически сгенерированный комментарий
     cashRegister->setSkipLogRecording(m_skipAutoLogRecord);
     if(m_client)
@@ -243,6 +222,7 @@ bool tabCashOperation::commit(bool repeatAfter)
             case SCashRegisterModel::RecptInvoice: commitInvoice(); break;
             case SCashRegisterModel::RecptGoods: commitDocument(); break;
             case SCashRegisterModel::RecptPrepayRepair: commitPrepayRepair(); break;
+//            case SCashRegisterModel::ExpRevert: commitRevert(); break;    // см. комметарии к методу
         }
 
 #ifdef QT_DEBUG
@@ -281,24 +261,25 @@ bool tabCashOperation::commit(bool repeatAfter)
             p_instance.remove(initial_order_id);   // Если всё ОК, то нужно заменить указатель
             p_instance.insert(m_orderId, this);    // иначе будет падать при попытке создать новую вкладку
 
+            m_orderTypeRO = 1;
+            m_showCheckBoxPrint = 0;
+            ui->widgetClientMatch->hide();
             updateWidgets();
         }
 
-        print();
+        if(ui->checkBoxPrintCheck->isChecked())
+            print();
     }
-    qDebug().nospace() << "[tabCashOperation] commit() | Out";
     return nErr;
 }
 
 bool tabCashOperation::commitSimple()
 {
-    qDebug().nospace() << "[tabCashOperation] commitSimple()";
     return 1;
 }
 
 bool tabCashOperation::commitBalance(float amount)
 {
-    qDebug().nospace() << "[tabCashOperation] commitBalance()";
     QString note;
     bool nErr = 1;
     if(amount > 0)
@@ -315,12 +296,21 @@ bool tabCashOperation::commitBalance(float amount)
     return nErr;
 }
 
+/*  Дополнительные действия при проведении операций, связанных с каким-либо документом (РН или ПН)
+*/
 bool tabCashOperation::commitDocument()
 {
-    document->setOrderId(m_orderId);
+    if(document->type() == SDocumentModel::OutInvoice)
+        document->setOrderId(m_orderId); // Для РН сумма автозаполняется, поэтому нужно лишь записать номер операции.
+    else if(document->type() == SDocumentModel::InInvoice)
+    {
+        // TODO: Для ПН возможна оплата частями и нужно следить, когда сумма всех платежей будет больше равна суммы накладной
+    }
     return document->commit();
 }
 
+/*  Дополнительные действия для ПКО оплаты счёта
+*/
 bool tabCashOperation::commitInvoice()
 {
     invoice->setPaid(QDateTime::currentDateTime());
@@ -328,23 +318,31 @@ bool tabCashOperation::commitInvoice()
     return invoice->commit();
 }
 
+/*  Дополнительные действия для ПКО предоплаты ремонта
+*/
 bool tabCashOperation::commitPrepayRepair()
 {
     repair->addPrepay(m_amount);
     return repair->commit();
 }
 
+/*  Дополнительные действия для возвратного РКО
+ *  TODO: В АСЦ v3.7.31.1123 при проведении возвратного РКО соответствующий ПКО не помечается; возможно, это стоит делать (для противодействия тупости или даже умышленного вредительства со стороны пользователя)
+ *  Также при этом не производится никаких действий с ремонтом/расходной накладной/счётом, если производится возврат средств, ранее уплоченных по ним.
+*/
+bool tabCashOperation::commitRevert()
+{
+
+}
+
 void tabCashOperation::print()
 {
-    if(ui->checkBoxPrintCheck->isChecked())
-    {
-        QMessageBox msgBox;
+    QMessageBox msgBox;
 
-        msgBox.setWindowTitle(tr("Печать"));
-        msgBox.setText(tr("Печать ПКО еще не реализована"));
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-    }
+    msgBox.setWindowTitle(tr("Печать"));
+    msgBox.setText(tr("Печать ПКО еще не реализована"));
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
 }
 
 void tabCashOperation::setAmount(const float amount)
@@ -358,7 +356,6 @@ void tabCashOperation::setAmount(const float amount)
 
 void tabCashOperation::updateOrderIdLineEdit()
 {
-    qDebug().nospace() << "[tabCashOperation] updateOrderIdLineEdit()";
     ui->lineEditOrderNum->setText(QString::number(cashRegister->id()));
     ui->lineEditOrderNum->setStyleSheet("QLineEdit { background: #90EE90;}");   // светло-зелёный
 }
@@ -371,9 +368,34 @@ QString tabCashOperation::tabTitle()
     return m_tabTitle;
 }
 
+void tabCashOperation::prepareTemplate(QMap<int, QVariant> data)
+{
+    if(data.isEmpty())
+    {
+#ifdef QT_DEBUG
+        if(m_orderId < 0)
+            test_scheduler->start(200);
+#endif
+        return;
+    }
+
+    m_orderTypeRO = 1;
+    QMap<int, QVariant>::const_iterator i = data.constBegin();
+    while(i != data.constEnd())
+    {
+        switch(i.key())
+        {   // QMap сортирует данные по ключу, поэтому вызов методов будет последовательным
+            case TmplType: ui->comboBoxOrderType->setCurrentIndex(paymentTypesModel->rowByDatabaseID(i.value().toInt())); break;
+            case TmplObjId: fillLinkedObj(i.value().toInt()); break;
+            case TmplClient: fillClientCreds(i.value().toInt()); break;
+            case TmplAmount: ui->doubleSpinBoxAmount->setValue(i.value().toDouble()); break;
+        }
+        ++i;
+    }
+}
+
 void tabCashOperation::updateWidgets()
 {
-    qDebug().nospace() << "[tabCashOperation] updateWidgets() | m_orderId = " << m_orderId;
     setDefaultStylesheets();
     if(m_orderId > 0)
     {
@@ -381,15 +403,13 @@ void tabCashOperation::updateWidgets()
         ui->lineEditDate->setText(cashRegister->created());
         ui->dateEdit->setVisible(false);
         ui->buttonPrint->show();
-        ui->buttonRevert->show();
+        ui->buttonRevert->setVisible(m_buttonRevertVisible);
         ui->buttonSave->hide();
         ui->buttonSaveMore->hide();
         updateOrderIdLineEdit();
-        ui->checkBoxPrintCheck->setVisible(false);
         ui->checkBoxAutoReason->setDisabled(true);
         ui->lineEditReason->setReadOnly(true);
         ui->pushButtonOpenLinkedObject->setText(tr("Открыть"));
-        ui->comboBoxOrderType->setEnabled(false);
         ui->comboBoxCompany->setEnabled(false);
         setAmountReadOnly();
         m_clientRO = ClientFieldsAccess::Denied;
@@ -407,13 +427,16 @@ void tabCashOperation::updateWidgets()
         ui->buttonSaveMore->show();
         ui->buttonPrint->hide();
         ui->buttonRevert->hide();
-        ui->checkBoxPrintCheck->setVisible(true);
         ui->checkBoxAutoReason->setEnabled(true);
         ui->lineEditReason->setReadOnly(m_reasonRO);
         m_reason = cashRegister->constructReason(m_linkedObjIdStr);
         ui->lineEditReason->setText(m_reason);
         setAmountReadOnly(m_amountRO);
     }
+
+    ui->checkBoxPrintCheck->setVisible(m_showCheckBoxPrint);
+    ui->comboBoxOrderType->setEnabled(!m_orderTypeRO);
+    ui->comboBoxPaymentAccount->setEnabled(!m_paymentAccountRO);
 
     if(m_showBalance)
         ui->lineEditBalance->setText(sysLocale.toString(clientModel->balance(), 'f', 2));
@@ -424,12 +447,10 @@ void tabCashOperation::updateWidgets()
     showLinkedObject();
     showClient();
     updateLineEditButtons(m_clientRO);
-    qDebug().nospace() << "[tabCashOperation] updateWidgets() | Out";
 }
 
 bool tabCashOperation::checkInput()
 {
-    qDebug().nospace() << "[tabCashOperation] checkInput()";
     int error = 0;
 
     setDefaultStylesheets();
@@ -507,30 +528,39 @@ bool tabCashOperation::checkInput()
 
 void tabCashOperation::load(const int orderId)
 {
-    qDebug().nospace() << "[tabCashOperation] load() | orderId = " << orderId;
-    m_orderId = orderId;
     cashRegister->load(orderId);
-    if(cashRegister->amount() >= 0)
+    m_showCheckBoxPrint = 0;
+    m_orderTypeRO = 1;
+    m_orderId = orderId;
+    m_orderType = cashRegister->operationType();
+    m_amount = cashRegister->amount();
+    m_buttonRevertVisible = 0;
+    if(m_amount >= 0)
     {
+        if(cashRegister->systemId() == 0)   // TODO: в АСЦ возврат доступен только для ПКО в кассу Наличные, возможно, стоит это доработать
+            m_buttonRevertVisible = 1;
         initPKO();
     }
     else
     {
         initRKO();
     }
-    clientModel->load(cashRegister->client());
-    ui->lineClientId->setText(QString::number(clientModel->id()));
-    ui->lineEditClientLastName->setText(clientModel->fullShortName());
-    ui->comboBoxOrderType->setCurrentIndex(paymentTypesModel->rowByDatabaseID(cashRegister->operationType()));
-    qDebug().nospace() << "[tabCashOperation] load() | rowByDatabaseID() = " << paymentSystemsProxyModel->rowByDatabaseID(cashRegister->systemId(), "system_id");
     ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(cashRegister->systemId(), "system_id"));
+    ui->comboBoxOrderType->setCurrentIndex(paymentTypesModel->rowByDatabaseID(m_orderType));
+    switch(m_linkedObjType)
+    {
+        case LinkedObjectType::Document: fillDocumentCreds(cashRegister->documentId()); break;
+        case LinkedObjectType::Repair: fillRepairCreds(cashRegister->repairId()); break;
+        case LinkedObjectType::Invoice: fillInvoiceCreds(cashRegister->invoiceId()); break;
+        default: fillClientCreds(cashRegister->client());
+    }
     ui->doubleSpinBoxAmount->setValue(cashRegister->amountAbs());
+    ui->lineEditReason->setText(cashRegister->reason());
     updateOrderIdLineEdit();
 }
 
 void tabCashOperation::initCashRegisterModel()
 {
-    qDebug().nospace() << "[tabCashOperation] initCashRegisterModel()";
     cashRegister->setId(0);
 
     switch (m_orderId) {
@@ -542,7 +572,6 @@ void tabCashOperation::initCashRegisterModel()
 
 void tabCashOperation::clearClientCreds(bool)
 {
-    qDebug().nospace() << "[tabCashOperation] clearClientCreds()";
     m_client = 0;
     clientModel->clear();
     m_showBalance = 0;
@@ -551,12 +580,10 @@ void tabCashOperation::clearClientCreds(bool)
     m_clientRO = ClientFieldsAccess::Full;
     cashRegister->unsetClient();
     updateWidgets();
-    qDebug().nospace() << "[tabCashOperation] clearClientCreds() | Out";
 }
 
 void tabCashOperation::fillClientCreds(int clientId)
 {
-    qDebug().nospace() << "[tabCashOperation] fillClientCreds()";
     clearClientCreds(false);
     m_client = clientId;
     clientModel->load(clientId);
@@ -566,11 +593,11 @@ void tabCashOperation::fillClientCreds(int clientId)
     m_clientRO = ClientFieldsAccess::SelNClr;
     cashRegister->setClient(m_client);
     updateWidgets();
+    ui->lineEditClientLastName->setFocus();
 }
 
 void tabCashOperation::fillRepairCreds(int repairId)
 {
-    qDebug().nospace() << "[tabCashOperation] fillRepairCreds() | repairId = " << repairId;
     method = &SCashRegisterModel::setRepairId;
     m_linkedObjId = repairId;
     m_linkedObjIdStr = QString::number(repairId);
@@ -584,7 +611,6 @@ void tabCashOperation::fillRepairCreds(int repairId)
 
 void tabCashOperation::fillDocumentCreds(int documentId)
 {
-    qDebug().nospace() << "[tabCashOperation] fillDocumentCreds()";
     method = &SCashRegisterModel::setDocumentId;
     document = new SDocumentModel();
     document->load(documentId);
@@ -599,7 +625,6 @@ void tabCashOperation::fillDocumentCreds(int documentId)
 
 void tabCashOperation::fillInvoiceCreds(int invoiceId)
 {
-    qDebug().nospace() << "[tabCashOperation] fillInvoiceCreds()";
     method = &SCashRegisterModel::setInvoiceId;
     invoice = new SInvoiceModel();
     invoice->load(invoiceId);
@@ -612,12 +637,28 @@ void tabCashOperation::fillInvoiceCreds(int invoiceId)
     updateWidgets();
 }
 
+void tabCashOperation::fillLinkedObj(int objId)
+{
+    switch (m_linkedObjType)
+    {
+        case LinkedObjectType::Document: fillDocumentCreds(objId); break;
+        case LinkedObjectType::Repair: fillRepairCreds(objId); break;
+        case LinkedObjectType::Invoice: fillInvoiceCreds(objId); break;
+    }
+}
+
 void tabCashOperation::orderTypeChanged(int index)
 {
-    qDebug().nospace() << "[tabCashOperation] orderTypeChanged()";
-    m_orderType = paymentTypesModel->databaseIDByRow(index);
-    qDebug().nospace() << "[tabCashOperation] orderTypeChanged() | paymentTypesModel->databaseIDByRow(" << index << ") = " << paymentTypesModel->databaseIDByRow(index);
-    cashRegister->setOperationType(m_orderType);
+    if(m_orderId < 0)
+    {
+        m_orderType = paymentTypesModel->databaseIDByRow(index);
+        cashRegister->setOperationType(m_orderType);
+    }
+    setWidgetsParams();
+}
+
+void tabCashOperation::setWidgetsParams()
+{
     m_linkedObjType = LinkedObjectType::NoLink;
     m_showClient = Client::Client;
     m_clientRO = ClientFieldsAccess::Full;
@@ -650,6 +691,7 @@ void tabCashOperation::orderTypeChanged(int index)
     case SCashRegisterModel::ExpRepair:    m_linkedObjType = LinkedObjectType::Repair; break;       /* только просмотр */
     case SCashRegisterModel::ExpGoods:     m_linkedObjType = LinkedObjectType::Document; break;     /* только просмотр */
     case SCashRegisterModel::ExpDealer:    m_clientRO = ClientFieldsAccess::Denied; break;          /* только просмотр */
+    case SCashRegisterModel::ExpRevert:    m_paymentAccountRO = 1; m_skipAutoLogRecord = 1; break;
 //    case SCashRegisterModel::MoveCash:     m_showClient = Client::NotVisible; break;              /* TODO: */
     }
     if(m_orderType > SCashRegisterModel::ExpCustom)
@@ -692,7 +734,6 @@ void tabCashOperation::findClientByLastname(QString)
 
 void tabCashOperation::buttonOpenDocClicked()
 {
-    qDebug().nospace() << "[tabCashOperation] buttonOpenDocClicked() | m_orderId = " << m_orderId;
     if(m_orderId > 0)
     {
         switch(m_linkedObjType)
@@ -717,13 +758,11 @@ void tabCashOperation::buttonOpenDocClicked()
 
 void tabCashOperation::buttonSaveClicked()
 {
-    qDebug().nospace() << "[tabCashOperation] buttonSaveClicked()";
     commit();
 }
 
 void tabCashOperation::buttonSaveMoreClicked()
 {
-    qDebug().nospace() << "[tabCashOperation] buttonSaveMoreClicked()";
     if(!commit(1))
         return;
 
@@ -758,7 +797,6 @@ void tabCashOperation::reasonEdited(QString)
 
 void tabCashOperation::paymentSystemChanged(int index)
 {
-    qDebug().nospace() << "[tabCashOperation] paymentSystemChanged() | index = " << index;
     if(m_orderId > 0)
         ui->toolButtonApplyPaymentSystem->show();
     if(cashRegister)
@@ -767,26 +805,30 @@ void tabCashOperation::paymentSystemChanged(int index)
 
 void tabCashOperation::lineEditClientLastNameButtonClickHandler(int buttonId)
 {
-    qDebug().nospace() << "[tabCashOperation] lineEditClientLastNameButtonClickHandler() | buttonId = " << buttonId;
-
     switch (buttonId)
     {
         case SLineEdit::Clear: clearClientCreds(0); break;
         case SLineEdit::Edit: emit createTabSelectExistingClient(1, this); break;
         case SLineEdit::Open: emit createTabClient(m_client); break;
     }
-
-    qDebug().nospace() << "[tabCashOperation] lineEditClientLastNameButtonClickHandler() | Out";
 }
 
 void tabCashOperation::buttonPrintClicked()
 {
-
+    print();
 }
 
+/* Создание новой вкладки возвратного РКО
+*/
 void tabCashOperation::buttonRevertClicked()
 {
+    QMap<int, QVariant> data;
+    data.insert(TmplType, SCashRegisterModel::ExpRevert);
+    if(m_client)
+        data.insert(TmplClient, m_client);
+    data.insert(TmplAmount, m_amount);
 
+    emit createTabUndoOperation(tabCashOperation::RKO, data);
 }
 
 /* Слот, вызываемый по сигналу spinBox'а
@@ -794,7 +836,9 @@ void tabCashOperation::buttonRevertClicked()
 */
 void tabCashOperation::amountChanged(double amountAbs)
 {
-    qDebug().nospace() << "[tabCashOperation] amountChanged(double) | m_orderType = " << m_orderType;
+    if(m_orderId > 0)
+        return;
+
     m_amount = amountAbs;
     if(m_orderId == Type::RKO)
         m_amount = -m_amount;
@@ -823,7 +867,6 @@ void tabCashOperation::applyPaymentSystem()
 #ifdef QT_DEBUG
 void tabCashOperation::randomFill()
 {
-    qDebug().nospace() << "[tabCashOperation] randomFill()";
     int i;
 
     if (test_scheduler_counter == RandomFillerStep::OpType)
@@ -942,13 +985,11 @@ void tabCashOperation::dbgRandomClient(bool balanceEnabled)
 
 void tabCashOperation::test_scheduler_handler()
 {
-    qDebug().nospace() << "[tabCashOperation] test_scheduler_handler()";
     randomFill();
 }
 
 void tabCashOperation::test_scheduler2_handler()
 {
-    qDebug().nospace() << "[tabCashOperation] (test_scheduler2_handler)";
 }
 #endif
 

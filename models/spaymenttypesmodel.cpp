@@ -15,8 +15,8 @@ SPaymentTypesModel::SPaymentTypesModel(const int type, QObject *parent) : SStand
     }
     else
     {
-        paymentTypesList << tr("Расходный кассовый ордер без привязки") << tr("Оплата приходной накладной") << tr("Списание средств с баланса клиента") << tr("Z отчёт (выемка средств из кассы)");
-        paymentTypeIdsList << SCashRegisterModel::ExpSimple << SCashRegisterModel::ExpInvoice << SCashRegisterModel::ExpBalance << SCashRegisterModel::ExpZ;
+        paymentTypesList << tr("Расходный кассовый ордер без привязки") << tr("Оплата приходной накладной") << tr("Списание средств с баланса клиента") << tr("Z отчёт (выемка средств из кассы)") << tr("Возвратный РКО");
+        paymentTypeIdsList << SCashRegisterModel::ExpSimple << SCashRegisterModel::ExpInvoice << SCashRegisterModel::ExpBalance << SCashRegisterModel::ExpZ << SCashRegisterModel::ExpRevert;
     }
 
     for (int i=0; i<paymentTypesList.size(); i++)
@@ -38,7 +38,6 @@ void SPaymentTypesModel::loadExtraTypes(const int type, const bool loadArchive)
     query.exec(QUERY_SEL_EXTRA_PAYMENT_TYPES(type, loadArchive));
     while(query.next())
     {
-        qDebug().nospace() << "[SPaymentTypesModel] loadExtraTypes()";
         paymentTypeItem = new QList<QStandardItem*>();
         record = new QSqlRecord(query.record());
         *paymentTypeItem << new QStandardItem(record->value(0).toString()); // "name"

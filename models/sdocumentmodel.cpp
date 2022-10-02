@@ -75,6 +75,11 @@ void SDocumentModel::load(int id)
     load();
 }
 
+int SDocumentModel::type()
+{
+    return m_type;
+}
+
 void SDocumentModel::setType(int type)
 {
     m_type = type;

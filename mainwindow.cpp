@@ -291,7 +291,7 @@ void MainWindow::createTabRepairs(int type, QWidget* caller)
         QObject::connect(subwindow,SIGNAL(buttonRepairNewClicked()), this, SLOT(createTabRepairNew()));
         // Сигнал экземпляра вкладки выбора предыдущего ремонта подключаем к слоту вызывающей вкладки для заполнения соотв. полей
         // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
-        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), caller, SLOT(fillRepairCreds(int)));
+        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), caller, SLOT(fillLinkedObj(int)));
         subwindow->setCallerPtr(caller);
         QObject::connect(subwindow,SIGNAL(activateCaller(QWidget*)),this,SLOT(reactivateCallerTab(QWidget*)));
     }
@@ -342,7 +342,7 @@ void MainWindow::createTabCashOperations()
 
 /* Вкладка создания новой кассовой операции или просмотра проведённой операции
  */
-void MainWindow::createTabCashOperation(int orderId)
+void MainWindow::createTabCashOperation(int orderId, QMap<int, QVariant> data)
 {
     tabCashOperation *subwindow = tabCashOperation::getInstance(orderId, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
@@ -351,7 +351,10 @@ void MainWindow::createTabCashOperation(int orderId)
     QObject::connect(subwindow,SIGNAL(createTabSelectRepair(int,QWidget*)), this, SLOT(createTabRepairs(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectDocument(int,QWidget*)), this, SLOT(createTabDocuments(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectInvoice(int,QWidget*)), this, SLOT(createTabInvoices(int,QWidget*)));
-    QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*, QString)), this, SLOT(updateTabLabel(QWidget*, const QString&)));
+    QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*,const QString)), this, SLOT(updateTabLabel(QWidget*,const QString&)));
+    QObject::connect(subwindow,SIGNAL(createTabUndoOperation(int,QMap<int,QVariant>)), this, SLOT(createTabCashOperation(int,QMap<int,QVariant>)));
+    subwindow->prepareTemplate(data);
+
     ui->tabWidget->setCurrentWidget(subwindow);
 }
 
@@ -755,7 +758,9 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    if (test_scheduler_counter < 375)
 //    {
 //        createTabRepairNew();
-        createTabNewPKO();
+//        createTabNewPKO();
+        createTabCashOperation(36192);
+        createTabCashOperation(42019);
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("repair_id", 24972);
 //        report_vars.insert("type", "new_rep");

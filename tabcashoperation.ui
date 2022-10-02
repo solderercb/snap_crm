@@ -271,7 +271,7 @@
            <item>
             <widget class="QPushButton" name="pushButtonOpenLinkedObject">
              <property name="text">
-              <string>Открыть</string>
+              <string>Выбрать</string>
              </property>
             </widget>
            </item>
@@ -781,7 +781,26 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>comboBoxOrderType</tabstop>
+  <tabstop>lineEditClientLastName</tabstop>
+  <tabstop>doubleSpinBoxAmount</tabstop>
+  <tabstop>checkBoxPrintCheck</tabstop>
+  <tabstop>checkBoxAutoReason</tabstop>
+  <tabstop>comboBoxPaymentAccount</tabstop>
+  <tabstop>toolButtonApplyPaymentSystem</tabstop>
+  <tabstop>lineEditReason</tabstop>
   <tabstop>buttonSave</tabstop>
+  <tabstop>buttonSaveMore</tabstop>
+  <tabstop>pushButtonOpenLinkedObject</tabstop>
+  <tabstop>dateEdit</tabstop>
+  <tabstop>comboBoxCompany</tabstop>
+  <tabstop>lineEditOrderNum</tabstop>
+  <tabstop>lineEditLinkedObjId</tabstop>
+  <tabstop>lineEditLinkedObjCaption</tabstop>
+  <tabstop>lineEditDate</tabstop>
+  <tabstop>lineClientId</tabstop>
+  <tabstop>lineEditBalance</tabstop>
+  <tabstop>buttonRevert</tabstop>
   <tabstop>buttonPrint</tabstop>
  </tabstops>
  <resources>

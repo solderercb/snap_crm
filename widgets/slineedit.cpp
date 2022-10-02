@@ -10,7 +10,6 @@ SLineEdit::SLineEdit(QWidget *parent)
 
 void SLineEdit::setButtons(QString buttons)
 {
-    qDebug().nospace() << "[SLineEdit] setButtons()";
     if(!lineEditButtons.isEmpty())
         clearButtons();
 
@@ -44,12 +43,10 @@ void SLineEdit::setButtons(QString buttons)
         }
     }
     arrangeButtons();
-    qDebug().nospace() << "[SLineEdit] setButtons() | Out";
 }
 
 void SLineEdit::clearButtons()
 {
-    qDebug().nospace() << "[SLineEdit] clearButtons()";
     if(lineEditButtons.isEmpty())
         return;
 

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSortFilterProxyModel>
+#include <QMap>
 #include "tabcommon.h"
 #include "models/slogrecordmodel.h"
 #include "models/scashregistermodel.h"
@@ -29,6 +30,7 @@ signals:
     void createTabSelectRepair(int, QWidget *);
     void createTabSelectDocument(int, QWidget *);
     void createTabSelectInvoice(int, QWidget *);
+    void createTabUndoOperation(int, QMap<int, QVariant>);
     void createTabOpenRepair(int);
     void createTabOpenDocument(int);
     void createTabOpenInvoice(int);
@@ -39,9 +41,11 @@ public:
     static tabCashOperation* getInstance(int orderId, MainWindow *parent);
     ~tabCashOperation();
     QString tabTitle();
+    void prepareTemplate(QMap<int, QVariant>);
 private:
     enum LinkedObjectType {NoLink = 0, Document = 1, Repair = 2, Invoice = 3};
     enum Client {NotVisible = 0, Client = 1, Employee = 2};
+    enum TemplateDataType {TmplType = 0, TmplObjId, TmplClient, TmplAmount};    // QMap сортирует данные по ключу, поэтому первым должен быть тип
     static QMap<int, tabCashOperation*> p_instance;
     SCashRegisterModel *cashRegister = nullptr;
     SPaymentTypesModel *paymentTypesModel;
@@ -49,6 +53,7 @@ private:
     int m_initialOrderId = 0;
     int m_orderId = 0;
     int m_orderType = 0;
+    bool m_orderTypeRO = 0;
     float m_amount = 0;
     int m_client = 0;
     int m_employee = 0;
@@ -66,11 +71,15 @@ private:
     bool m_showBalance = 0;
     bool m_skipAutoLogRecord = 0;
     bool m_backdate = 0;
+    bool m_buttonRevertVisible = 0;
+    bool m_paymentAccountRO = 0;
+    bool m_showCheckBoxPrint = 1;
     SRepairModel *repair = nullptr;
     SDocumentModel *document = nullptr;
     SInvoiceModel *invoice = nullptr;
     Ui::tabCashOperation *ui;
     SClientModel *clientModel = nullptr;
+    void setWidgetsParams();
     void updateWidgets();
     bool checkInput();
     void load(const int);
@@ -89,6 +98,7 @@ private:
     bool commitDocument();
     bool commitInvoice();
     bool commitPrepayRepair();
+    bool commitRevert();
     void print();
     QString constructReason();
     void setAmount(const float);
@@ -108,6 +118,7 @@ private slots:
     void fillRepairCreds(int);
     void fillDocumentCreds(int);
     void fillInvoiceCreds(int);
+    void fillLinkedObj(int);
     void orderTypeChanged(int);
     void dateChanged(QDate);
     void findClientByLastname(QString);

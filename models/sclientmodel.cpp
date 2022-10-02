@@ -514,7 +514,6 @@ bool SClientModel::updateBalance(const float amount, const QString &text)
         throw 2;
     }
 
-    qDebug().nospace() << "[SClientModel] updateBalance() | new_balance = " << i_query->value("balance").toFloat();
     m_balance = i_query->value("balance").toFloat();
     return i_nErr;
 }

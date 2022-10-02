@@ -15,7 +15,7 @@ class tabCommon : public QWidget
     Q_OBJECT
 
 signals:
-    void updateLabel(QWidget*, QString);
+    void updateLabel(QWidget*, const QString);
     void updateIcon(QWidget*, QIcon);
     void activateCaller(QWidget *);
 public:
