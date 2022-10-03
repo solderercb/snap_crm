@@ -11,13 +11,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairs)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Ремонты")));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
-    delete query;
+    userActivityLog->appendRecord(tr("Navigation Ремонты"));
 
     ui->setupUi(this);
 
@@ -64,15 +58,15 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
 tabRepairs::~tabRepairs()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
-    delete query;
+    userActivityLog->updateActivityTimestamp();
 
     p_instance[this->_type] = nullptr;   // Обязательно блять!
     delete ui;
+}
+
+QString tabRepairs::tabTitle()
+{
+
 }
 
 tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

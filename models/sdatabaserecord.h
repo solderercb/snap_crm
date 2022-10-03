@@ -8,7 +8,6 @@
 #include <QDateTime>
 #include <QTimeZone>
 #include <QMessageBox>
-#include "global.h"
 #include "com_sql_queries.h"
 #include "models/ssqlquerymodel.h"
 

@@ -10,7 +10,6 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     m_orderId(order),
     ui(new Ui::tabCashOperation)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
 
     ui->setupUi(this);
@@ -40,11 +39,7 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
 
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation %1").arg(m_tabTitle)));
-    QUERY_COMMIT_ROLLBACK(query, nErr);
-    delete query;
+    userActivityLog->appendRecord("Navigation " + tabTitle());
 }
 
 tabCashOperation *tabCashOperation::getInstance(int orderId, MainWindow *parent)
@@ -56,15 +51,13 @@ tabCashOperation *tabCashOperation::getInstance(int orderId, MainWindow *parent)
 
 tabCashOperation::~tabCashOperation()
 {
+    userActivityLog->updateActivityTimestamp();
+
     delete ui;
     delete clientModel;
     delete cashRegister;
-    if(repair != nullptr)
-        delete repair;
-    if(document != nullptr)
-        delete document;
-    if(invoice != nullptr)
-        delete invoice;
+    delete paymentSystemsProxyModel;
+    deleteLinkedObjects();
     p_instance.remove(m_orderId);
 }
 
@@ -85,17 +78,31 @@ void tabCashOperation::initRKO()
 
 void tabCashOperation::clearLinkedObjectFields()
 {
-    if(repair != nullptr)
-    {
-        delete repair;
-        repair = nullptr;
-    }
-
+    deleteLinkedObjects();
     m_linkedObjId = 0;
     m_linkedObjIdStr.clear();
     method = nullptr;
     ui->lineEditLinkedObjId->clear();
     ui->lineEditLinkedObjCaption->clear();
+}
+
+void tabCashOperation::deleteLinkedObjects()
+{
+    if(repair != nullptr)
+    {
+        delete repair;
+        repair = nullptr;
+    }
+    if(document != nullptr)
+    {
+        delete document;
+        document = nullptr;
+    }
+    if(invoice != nullptr)
+    {
+        delete invoice;
+        invoice = nullptr;
+    }
 }
 
 void tabCashOperation::showLinkedObject()

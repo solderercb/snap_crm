@@ -40,7 +40,7 @@ public:
     explicit tabCashOperation(int orderId = PKO, MainWindow *parent = nullptr);
     static tabCashOperation* getInstance(int orderId, MainWindow *parent);
     ~tabCashOperation();
-    QString tabTitle();
+    QString tabTitle() override;
     void prepareTemplate(QMap<int, QVariant>);
 private:
     enum LinkedObjectType {NoLink = 0, Document = 1, Repair = 2, Invoice = 3};
@@ -87,6 +87,7 @@ private:
     void initPKO();
     void initRKO();
     void clearLinkedObjectFields();
+    void deleteLinkedObjects();
     void showLinkedObject();
     void showClient();
     void updateLineEditButtons(int state = ClientFieldsAccess::Full);

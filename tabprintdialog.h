@@ -45,6 +45,7 @@ public:
     bool loadTmpReportTemplate(QString);
     QMap<QString, QVariant> report_vars;
     void setDefaultWidgetFocus();
+    QString tabTitle() override;
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
     QMap<int, int> PageSizeMap = {

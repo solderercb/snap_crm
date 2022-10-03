@@ -58,7 +58,7 @@ public:
     explicit tabSale(int, MainWindow *parent = nullptr);
     static tabSale* getInstance(int, MainWindow *parent = nullptr);
     ~tabSale();
-
+    QString tabTitle() override;
 private:
     Ui::tabSale *ui;
     void setDefaultStyleSheets();

@@ -10,6 +10,8 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui(new Ui::tabRepair),
     repair_id(rep_id)
 {
+    repairModel2 = new SRepairModel();
+    repairModel2->load(rep_id);
     setLock(1);
     ui->setupUi(this);
     if(permissions->contains("3"))  // Печатать ценники и стикеры
@@ -109,9 +111,16 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
 tabRepair::~tabRepair()
 {
+    userActivityLog->updateActivityTimestamp();
+
     setLock(0);
     delete ui;
     p_instance.remove(repair_id);   // Обязательно блять!
+}
+
+QString tabRepair::tabTitle()
+{
+
 }
 
 void tabRepair::updateRepairData()
@@ -336,15 +345,9 @@ void tabRepair::addItemToListViewExtraInfo(QString, QString)
 
 void tabRepair::setLock(bool lock)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_LOCK_REPAIR(repair_id,lock?(userDbData->value("id").toString()):("NULL")));
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
+    repairModel2->lock();
     if(lock)
-        QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Ремонт %1").arg(repair_id)));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
-    delete query;
+        userActivityLog->appendRecord(tr("Navigation Ремонт %1").arg(repair_id));
 }
 
 void tabRepair::updateTotalSumms()

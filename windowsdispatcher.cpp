@@ -35,10 +35,14 @@ windowsDispatcher::~windowsDispatcher()
 
 void windowsDispatcher::connectOK()
 {
+    initSystemObjects();
     initUserDbData();
     initPermissions();
     initCompanies();
     initOffices();
+
+    userActivityLog->updateLoginTimestamp();
+    userActivityLog->appendRecord(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
 
     // TODO: добавить разрешение выбора компании при входе
     if (permissions->contains("59"))  // Менять офис при входе
@@ -52,15 +56,6 @@ void windowsDispatcher::connectOK()
         createMainWindow();
     }
     userDbData->insert("company", 1);   // TODO: несколько компаний
-
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_LOGIN(userDbData->value("id").toString()));
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-//            QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Выполнен вход в систему")));   // Пока отключено, потому что АСЦ не позволяет два логина
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
-    delete query;
 }
 
 void windowsDispatcher::createChooseOfficeWindow()

@@ -13,16 +13,10 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui(new Ui::tabRepairNew)
 {
     additionalFields = new SFieldsModel(SFieldsModel::Repair);
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     repairModel = new SRepairModel(this);
     cashRegister = new SCashRegisterModel();
     comment = new SCommentModel();
-    bool nErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Приём в ремонт")));
-    QUERY_COMMIT_ROLLBACK(query, nErr);
-    delete query;
+    userActivityLog->appendRecord(tr("Navigation Приём в ремонт"));
 
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
@@ -136,12 +130,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
 tabRepairNew::~tabRepairNew()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_COMMIT_ROLLBACK(query, nErr);
-    delete query;
+    userActivityLog->updateActivityTimestamp();
 
     delete ui;
     delete deviceVendorsModel;
@@ -165,6 +154,11 @@ bool tabRepairNew::tabCloseRequest()
 {
     // TODO: сделать проверку не сохранённых данных перед закрытием
     return 1;
+}
+
+QString tabRepairNew::tabTitle()
+{
+
 }
 
 tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

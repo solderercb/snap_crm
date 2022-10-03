@@ -11,13 +11,6 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabClients)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Клиенты")));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
-    delete query;
 
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -34,7 +27,10 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     {
         ui->buttonPrint->hide();
         ui->buttonClientNew->hide();
+        userActivityLog->appendRecord(tr("Navigation Выбор клиента"));
     }
+    else
+        userActivityLog->appendRecord(tr("Navigation Клиенты"));
 
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
@@ -60,16 +56,16 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
 tabClients::~tabClients()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
-    delete query;
+    userActivityLog->updateActivityTimestamp();
 
     p_instance[this->_type] = nullptr;   // Обязательно блять!
     clientsTable->clear();
     delete ui;
+}
+
+QString tabClients::tabTitle()
+{
+
 }
 
 tabClients* tabClients::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

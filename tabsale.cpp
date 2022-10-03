@@ -16,8 +16,6 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     newItemModel = new QSqlQueryModel(this);
     itemDelagates = new SaleTableItemDelegates(tableModel, ui->tableView);
     clientModel = new SClientModel();
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nErr = 1;
     cashRegister = new SCashRegisterModel();
 
     params = new int;
@@ -43,19 +41,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->widgetClientMatch->hide();
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
 
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-
-    if(doc_id)
-    {
-        QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation РН№%1").arg(doc_id)));
-    }
-    else
-    {
-        QUERY_EXEC(query, nErr)(QUERY_INS_USER_ACTIVITY(QString("Navigation Продажа")));
-    }
-
-    QUERY_COMMIT_ROLLBACK(query, nErr);
+    userActivityLog->appendRecord("Navigation " + tabTitle());
 
     ui->tableView->setModel(tableModel);
     ui->tableView->setItemDelegateForColumn(0, itemDelagates);
@@ -76,8 +62,6 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 #endif
 
     updateWidgets();
-
-    delete query;
 }
 
 tabSale::~tabSale()
@@ -98,6 +82,13 @@ tabSale::~tabSale()
     delete testLineEdit;
     delete testPanel;
 #endif
+}
+
+QString tabSale::tabTitle()
+{
+    if(doc_id)
+        return tr("РН%1").arg(doc_id);
+    return tr("Продажа");
 }
 
 void tabSale::setDefaultStyleSheets()

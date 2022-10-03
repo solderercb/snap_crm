@@ -118,6 +118,11 @@ void tabPrintDialog::setDefaultWidgetFocus()
         ui->pushButtonPrint->setFocus();
 }
 
+QString tabPrintDialog::tabTitle()
+{
+
+}
+
 QStandardItemModel* tabPrintDialog::initDemoModel(QStringList &demoHeaders, QList<QVariant> &demoValues)
 {
     QStandardItemModel *model = new QStandardItemModel();

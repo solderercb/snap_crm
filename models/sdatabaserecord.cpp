@@ -1,4 +1,5 @@
 #include "sdatabaserecord.h"
+#include "global.h"
 
 SDatabaseRecord::SDatabaseRecord(QObject *parent) : SSqlQueryModel(parent)
 {

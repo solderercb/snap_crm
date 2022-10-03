@@ -33,7 +33,7 @@ public:
     explicit tabRepairs(bool type = 0, MainWindow *parent = nullptr);
     static tabRepairs* getInstance(bool type, MainWindow *parent = nullptr);
     ~tabRepairs();
-
+    QString tabTitle() override;
 private:
     Ui::tabRepairs *ui;
     QMap<QString, int> *filterSettings;

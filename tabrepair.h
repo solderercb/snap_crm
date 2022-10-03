@@ -18,6 +18,7 @@
 #include "tabcommon.h"
 #include "widgets/getoutdialog.h"
 #include "widgets/sgroupboxeventfilter.h"
+#include "models/srepairmodel.h"
 
 namespace Ui {
 class tabRepair;
@@ -95,12 +96,13 @@ public:
     explicit tabRepair(int rep_id, MainWindow *parent = nullptr);
     static tabRepair* getInstance(int rep_id, MainWindow *parent = nullptr);
     ~tabRepair();
-
+    QString tabTitle() override;
 private:
     Ui::tabRepair *ui;
     static QMap<int, tabRepair*> p_instance;
     int repair_id;
     QSqlQueryModel *repairModel;
+    SRepairModel *repairModel2;
     QSqlQueryModel *clientModel;
     QSqlQueryModel *fieldsModel;
     QSortFilterProxyModel *statusesProxyModel;

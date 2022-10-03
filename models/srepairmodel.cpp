@@ -792,3 +792,10 @@ bool SRepairModel::commit()
     return i_nErr;
 }
 
+bool SRepairModel::lock(bool state)
+{
+    i_query->exec(QUERY_BEGIN);
+    QUERY_EXEC(i_query, i_nErr)(QUERY_LOCK_REPAIR(i_id,state?(userDbData->value("id").toString()):("NULL")));
+    QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
+}
+

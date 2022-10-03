@@ -37,7 +37,7 @@ public:
     static tabRepairNew* getInstance(MainWindow *parent = nullptr);
     ~tabRepairNew();
     virtual bool tabCloseRequest();
-
+    QString tabTitle() override;
 private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;

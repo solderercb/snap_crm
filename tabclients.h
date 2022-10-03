@@ -30,7 +30,7 @@ public:
     static tabClients* getInstance(bool type, MainWindow *parent = nullptr);
     void lineEditSearchSetFocus();
     ~tabClients();
-
+    QString tabTitle() override;
 private:
     Ui::tabClients *ui;
     static tabClients* p_instance[2];

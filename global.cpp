@@ -54,6 +54,8 @@ SStandardItemModel *rejectReasonModel = new SStandardItemModel;
 SStandardItemModel *priceColModel = new SStandardItemModel;
 SStandardItemModel *itemUnitsModel = new SStandardItemModel;
 SAppLog *appLog = new SAppLog();
+SUserActivityModel *userActivityLog;
+
 
 //QWidget *modalWidget = nullptr;
 
@@ -316,4 +318,9 @@ void initOffices()      // Список офисов
 {
     officesModel->setQuery(QUERY_SEL_OFFICES(1), QSqlDatabase::database("connMain"));
     officesModel->setObjectName("officesModel");
+}
+
+void initSystemObjects()
+{
+    userActivityLog = new SUserActivityModel();
 }

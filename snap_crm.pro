@@ -63,6 +63,7 @@ SOURCES += \
     models/ssortfilterproxymodel.cpp \
     models/ssqlquerymodel.cpp \
     models/sstandarditemmodel.cpp \
+    models/suseractivitymodel.cpp \
     models/tabsalesettingsmenu.cpp \
     models/scashregistermodel.cpp \
     models/sclientmodel.cpp \
@@ -127,6 +128,7 @@ HEADERS  += \
     models/ssortfilterproxymodel.h \
     models/ssqlquerymodel.h \
     models/sstandarditemmodel.h \
+    models/suseractivitymodel.h \
     models/tabsalesettingsmenu.h \
     models/scashregistermodel.h \
     models/sclientmodel.h \

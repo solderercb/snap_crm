@@ -11,6 +11,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include "applog.h"
+#include "models/suseractivitymodel.h"
 #include "models/sstandarditemmodel.h"
 #include "models/ssqlquerymodel.h"
 #include "models/spaymenttypesmodel.h"
@@ -60,12 +61,14 @@ extern SStandardItemModel *rejectReasonModel;
 extern SStandardItemModel *priceColModel;
 extern SStandardItemModel *itemUnitsModel;
 extern SAppLog *appLog;
+extern SUserActivityModel *userActivityLog;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;
 
 bool readStatuses(QStandardItemModel &, QJsonArray &);
 QString jsonArrayJoin(QJsonValue, const QString);
+void initSystemObjects();
 void initUserDbData();
 void initPermissions();
 void initCompanies();

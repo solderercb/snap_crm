@@ -3,6 +3,7 @@
 
 #include <qglobal.h>
 #include <QWidget>
+#include <QString>
 #include "mainwindow.h"
 #ifdef QT_DEBUG
 #include <QTimer>
@@ -23,6 +24,7 @@ public:
     ~tabCommon();
     virtual bool tabCloseRequest();
     void setCallerPtr(QWidget *ptr){callerPtr = ptr;};
+    virtual QString tabTitle() = 0;
 protected:
     QWidget *callerPtr = nullptr;
 #ifdef QT_DEBUG

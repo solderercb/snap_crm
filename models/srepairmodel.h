@@ -147,6 +147,7 @@ public:
     bool termsControl();
     void setTermsControl(const bool);
     bool commit();
+    bool lock(bool state = 1);
 
 private:
     SClientModel *m_clientModel;

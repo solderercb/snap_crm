@@ -99,15 +99,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //    } else {
 //        event->accept();
 //    }
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-    query->exec(QUERY_BEGIN);
-    QUERY_EXEC(query, nDBErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
-    QUERY_EXEC(query, nDBErr)(QUERY_INS_USER_ACTIVITY(QString("Logout")));
-    QUERY_COMMIT_ROLLBACK(query, nDBErr);
-    delete query;
     appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Normal application exit");
     appLog->appendRecord("\r\n\r\n\r\n");
+    userActivityLog->appendRecord("Logout");
 }
 
 void MainWindow::createMenu()
