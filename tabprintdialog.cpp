@@ -251,7 +251,7 @@ bool tabPrintDialog::initReportDataSources()
         // в этом случае шаблон отчета будет построен полностью на dataBand, а строки dataBand'а могут автоматичеки увеличиваться по высоте и,
         // в случае большого кол-ва данных, не придётся уменьшать размерт шрифта
         QSqlQueryModel *repairModel = new QSqlQueryModel();
-        repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString()));
+        repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString()), QSqlDatabase::database("connMain"));
         report->dataManager()->addModel("repair", repairModel, true);
         client_id = repairModel->record(0).value("client").toInt();
 
@@ -286,7 +286,7 @@ bool tabPrintDialog::initReportDataSources()
         if (report_vars.contains("repair_id"))
         {
             QSqlQueryModel *repairModel = new QSqlQueryModel();
-            repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString()));
+            repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(report_vars.value("repair_id").toString()), QSqlDatabase::database("connMain"));
             report->dataManager()->addModel("repair", repairModel, true);
             client_id = repairModel->record(0).value("client").toInt();
 
