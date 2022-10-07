@@ -1080,6 +1080,9 @@
   <tabstop>comboBoxDeviceVendor</tabstop>
   <tabstop>comboBoxDevice</tabstop>
   <tabstop>lineEditSN</tabstop>
+  <tabstop>lineEditClientLastName</tabstop>
+  <tabstop>lineEditClientFirstName</tabstop>
+  <tabstop>lineEditClientPatronymic</tabstop>
   <tabstop>comboBoxProblem</tabstop>
   <tabstop>comboBoxIncomingSet</tabstop>
   <tabstop>comboBoxExterior</tabstop>
@@ -1113,6 +1116,13 @@
   <tabstop>tableViewDeviceMatch</tabstop>
   <tabstop>CentnerButton1_2</tabstop>
   <tabstop>pushButtonCashReceipt</tabstop>
+  <tabstop>lineEditClientAddress</tabstop>
+  <tabstop>comboBoxClientAdType</tabstop>
+  <tabstop>checkBoxClientType</tabstop>
+  <tabstop>pushButtonClientFromDB</tabstop>
+  <tabstop>pushButtonClientCredsClearAll</tabstop>
+  <tabstop>pushButtonCreateTabClient</tabstop>
+  <tabstop>lineEditClientEmail</tabstop>
  </tabstops>
  <resources>
   <include location="styles/styles.qrc"/>
