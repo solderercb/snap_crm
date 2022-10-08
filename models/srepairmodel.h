@@ -37,8 +37,10 @@ public:
     int companyIndex();
     void setCompanyIndex(const int);
     int officeIndex();
+    void setOffice(const int);
     void setOfficeIndex(const int);
     int startOfficeIndex();
+    void setStartOffice(const int);
     void setStartOfficeIndex(const int);
     int managerIndex();
     void setManager(const int);

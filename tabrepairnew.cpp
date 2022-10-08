@@ -51,6 +51,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxPresetEngineer->setPlaceholderText(tr("назначить инженером"));
     ui->comboBoxPresetPlace->setPlaceholderText(tr("ячейка"));
     ui->comboBoxOffice->setPlaceholderText(tr("офис"));
+    ui->comboBoxOffice->setEnabled(false);  // TODO: назначение этого эл-та в АСЦ остаётся загадкой; выбор офиса нужно реализовать на глобальном уровне, если пользователь обаладает таким правом (например, пункт в меню)
     ui->comboBoxCompany->setPlaceholderText(tr("организация"));
     ui->comboBoxPresetPaymentAccount->setPlaceholderText(tr("тип оплаты"));
 //    ui->comboBoxPrepayAccount->setPlaceholderText(tr("тип оплаты"));
@@ -67,10 +68,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
     ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxOffice->setModel(officesModel);
-    int i = 0;
-    while (userDbData->value("current_office").toInt() != officesModel->record(i++).value("id").toInt());
-
-    ui->comboBoxOffice->setCurrentIndex(i-1);
+    ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->value("current_office").toInt()));
     ui->comboBoxPresetEngineer->setModel(engineersModel);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
@@ -492,7 +490,7 @@ void tabRepairNew::setDefaultStyleSheets()
     ui->comboBoxExterior->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetPlace->setStyleSheet(commonComboBoxStyleSheet);
-    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
+//    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
@@ -662,7 +660,7 @@ bool tabRepairNew::createRepair()
 
     bool nErr = 1;
     int deviceClassIndex, deviceVendorIndex, deviceIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
-    int device, user, office, repair, preferredPaymentAccIndex, prepaySumm;
+    int device, user, repair, preferredPaymentAccIndex, prepaySumm;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     setDefaultStyleSheets();
@@ -670,7 +668,6 @@ bool tabRepairNew::createRepair()
     deviceVendorIndex = ui->comboBoxDeviceVendor->currentIndex();
 
     user = userDbData->value("id").toInt();
-    office = officesModel->record(ui->comboBoxOffice->currentIndex()).value("id").toInt();
     preferredPaymentAccIndex = ui->comboBoxPresetPaymentAccount->currentIndex();
 
 #ifdef QT_DEBUG
@@ -719,8 +716,8 @@ bool tabRepairNew::createRepair()
         repairModel->setClientId(clientModel->id());
         repairModel->setSerialNumber(ui->lineEditSN->text());
         repairModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-        repairModel->setOfficeIndex(office);
-        repairModel->setStartOfficeIndex(office);
+        repairModel->setOffice(userDbData->value("current_office").toInt());
+        repairModel->setStartOffice(userDbData->value("current_office").toInt());
         repairModel->setManager(user);
         repairModel->setCurrentManager(user);
         repairModel->setMasterIndex(ui->comboBoxPresetEngineer->currentIndex());

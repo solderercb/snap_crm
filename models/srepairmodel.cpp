@@ -197,11 +197,16 @@ int SRepairModel::officeIndex()
     return officesModel->rowByDatabaseID(m_office);
 }
 
+void SRepairModel::setOffice(const int id)
+{
+    i_valuesMap.insert("office", id);
+}
+
 void SRepairModel::setOfficeIndex(const int index)
 {
     if(index == -1)
         return;
-    i_valuesMap.insert("office", officesModel->databaseIDByRow(index));
+    setOffice(officesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::startOfficeIndex()
@@ -209,11 +214,16 @@ int SRepairModel::startOfficeIndex()
     return officesModel->rowByDatabaseID(m_startOffice);
 }
 
+void SRepairModel::setStartOffice(const int id)
+{
+    i_valuesMap.insert("start_office", id);
+}
+
 void SRepairModel::setStartOfficeIndex(const int index)
 {
     if(index == -1)
         return;
-    i_valuesMap.insert("start_office", officesModel->databaseIDByRow(index));
+    setStartOffice(officesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::managerIndex()
