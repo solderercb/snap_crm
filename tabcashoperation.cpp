@@ -344,12 +344,10 @@ bool tabCashOperation::commitRevert()
 
 void tabCashOperation::print()
 {
-    QMessageBox msgBox;
-
-    msgBox.setWindowTitle(tr("Печать"));
-    msgBox.setText(tr("Печать ПКО еще не реализована"));
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.exec();
+    QMap<QString, QVariant> report_vars;
+    report_vars.insert("type", "pko");
+    report_vars.insert("record_id", m_orderId);
+    emit generatePrintout(report_vars);
 }
 
 void tabCashOperation::setAmount(const float amount)

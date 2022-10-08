@@ -347,6 +347,7 @@ void MainWindow::createTabCashOperation(int orderId, QMap<int, QVariant> data)
     QObject::connect(subwindow,SIGNAL(createTabSelectInvoice(int,QWidget*)), this, SLOT(createTabInvoices(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*,const QString)), this, SLOT(updateTabLabel(QWidget*,const QString&)));
     QObject::connect(subwindow,SIGNAL(createTabUndoOperation(int,QMap<int,QVariant>)), this, SLOT(createTabCashOperation(int,QMap<int,QVariant>)));
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
     subwindow->prepareTemplate(data);
 
     ui->tabWidget->setCurrentWidget(subwindow);

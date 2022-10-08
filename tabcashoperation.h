@@ -34,6 +34,7 @@ signals:
     void createTabOpenRepair(int);
     void createTabOpenDocument(int);
     void createTabOpenInvoice(int);
+    void generatePrintout(QMap<QString, QVariant>);
 public:
     enum Type {RKO = -1, PKO = -2};
     enum ClientFieldsAccess {Full = 0, SelNClr = 1, Denied = 2};

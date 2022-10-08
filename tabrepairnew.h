@@ -66,6 +66,7 @@ private:
     QMessageBox msgBox;
     SGroupBoxEventFilter *groupBoxEventFilter;
     bool createClient();
+    void print(int);
 #ifdef QT_DEBUG
     void randomFill();
 #endif

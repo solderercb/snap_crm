@@ -815,24 +815,7 @@ bool tabRepairNew::createRepair()
 
     if (nErr)   // если все запросы выполнены без ошибок, очистить всё, кроме данных клиента
     {
-        // печать квитанции
-        if(comSettings->value("print_new_repair_report").toBool())
-        {
-            QMap<QString, QVariant> report_vars;
-            report_vars.insert("type", "new_rep");
-            report_vars.insert("repair_id", repair);
-            emit generatePrintout(report_vars);
-        }
-
-        // печать стикеров
-        if(comSettings->value("print_rep_stickers").toBool())
-        {
-            QMap<QString, QVariant> report_vars;
-            report_vars.insert("type", "rep_label");
-            report_vars.insert("repair_id", repair);
-            report_vars.insert("copies", ui->spinBoxStickersCount->value());
-            emit generatePrintout(report_vars);
-        }
+        print(repair);
 
         ui->comboBoxProblem->clearEditText();
         ui->comboBoxIncomingSet->clearEditText();
@@ -890,6 +873,36 @@ void tabRepairNew::prepayPaymentSystemChanged(int index)
     cashRegister->setSystemId(sysId);
 }
 
+void tabRepairNew::print(int repair)
+{
+    QMap<QString, QVariant> report_vars;
+    // печать квитанции
+    if(comSettings->value("print_new_repair_report").toBool())
+    {
+        report_vars.insert("type", "new_rep");
+        report_vars.insert("repair_id", repair);
+        emit generatePrintout(report_vars);
+        report_vars.clear();
+    }
+
+    // печать стикеров
+    if(comSettings->value("print_rep_stickers").toBool())
+    {
+        report_vars.insert("type", "rep_label");
+        report_vars.insert("repair_id", repair);
+        report_vars.insert("copies", ui->spinBoxStickersCount->value());
+        emit generatePrintout(report_vars);
+        report_vars.clear();
+    }
+    // печать ПКО
+    if(ui->checkBoxIsCashReceiptDocNeeded->isChecked())
+    {
+        report_vars.insert("type", "pko");
+        emit generatePrintout(report_vars);
+        report_vars.clear();
+    }
+}
+
 void tabRepairNew::buttonCreateTabClientHandler()
 {
     emit createTabClient(client);
@@ -902,10 +915,10 @@ void tabRepairNew::randomFill()
     if (test_scheduler_counter == 0)   // клиент
 //    if (1)
     {
-        fillClientCreds(257);
-        test_scheduler_counter++;
-        test_scheduler->start(400);    //  (пере-)запускаем таймер
-        return;
+//        fillClientCreds(257);
+//        test_scheduler_counter++;
+//        test_scheduler->start(400);    //  (пере-)запускаем таймер
+//        return;
         if(0)
 //        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {

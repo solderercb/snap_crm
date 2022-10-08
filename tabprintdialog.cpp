@@ -14,14 +14,18 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
     report_type = report_vars.value("type").toString();
     if (!loadTemplateFromFile())
     {
+        QString error = tr("Не удалось найти файл отчета");
+        appLog->appendRecord(error);
         QMessageBox msgBox;
-        msgBox.setText(QString("Не удалось найти файл отчета"));
+        msgBox.setText(error);
         msgBox.exec();
     }
     if (!initReportDataSources())
     {
+        QString error = tr("Не удалось иницициализировать модели данных отчета");
+        appLog->appendRecord(error);
         QMessageBox msgBox;
-        msgBox.setText(QString("Не удалось иницициализировать модели данных отчета"));
+        msgBox.setText(error);
         msgBox.exec();
     }
 
@@ -341,6 +345,16 @@ bool tabPrintDialog::initReportDataSources()
             QList<QVariant> demoValues = {"016466-003790", 16466, 0, 3790, 1, 0, 0, "Гнездо micro USB, 2.0, на плату, Арт. 3790", 1, 82, 1, "2018-06-28 09:23:06", "NULL", 1, 0, 0, "NULL", "NULL", 1, 2, 26.19, 10.7629, 9.95, 22, 19.9, 22, 19.9, 22, 19.9, 22, 19.9, 22, 19.9, 2535, "NULL", "", "", "", "Бахчев: тип 45", "Прежняя ПН: 2535\r\n", "NULL", "011000164662", "NULL", 2, 20, "Похож на Бахчев P/N тип 47\r\nарт. 3392 (без \"юбки\").\r\nПохож на Бахчев P/N тип 54 (без \"юбки\").\r\nПохож на Бахчев P/N тип 106\r\nарт. 4922 (без \"юбки\").\r\nПохож на Бахчев P/N тип 124 (без \"юбки\").\r\nВозможна замена на:", "NULL", "NULL", "NULL", "NULL", "NULL", 0, 1, 0, 0, 0, 0, 0, "NULL", 0, "NULL"};
             report->dataManager()->addModel("items", initDemoModel(demoHeaders, demoValues), true);
         }
+    }
+    else if (report_type == "pko")
+    {
+        QMessageBox msgBox;
+
+        msgBox.setWindowTitle(tr("Печать"));
+        msgBox.setText(tr("Печать ПКО еще не реализована"));
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+        deleteLater();
     }
 //    else if (report_type == "")
 //    {
