@@ -76,7 +76,9 @@ SOURCES += \
     models/ssaleitemmodel.cpp \
     querylog.cpp \
     tabcashoperation.cpp \
+    tabclient.cpp \
     tabclients.cpp \
+    tabclientsummary.cpp \
     tabcommon.cpp \
     tabprintdialog.cpp \
     tabrepair.cpp \
@@ -93,6 +95,7 @@ SOURCES += \
     widgets/sphone.cpp \
     widgets/sphones.cpp \
     widgets/ssetcombobox.cpp \
+    widgets/stoolboxswitchpanel.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
@@ -142,7 +145,9 @@ HEADERS  += \
     querylog.h \
     stable.h \
     tabcashoperation.h \
+    tabclient.h \
     tabclients.h \
+    tabclientsummary.h \
     tabcommon.h \
     tabprintdialog.h \
     tabrepair.h \
@@ -159,6 +164,7 @@ HEADERS  += \
     widgets/sphone.h \
     widgets/sphones.h \
     widgets/ssetcombobox.h \
+    widgets/stoolboxswitchpanel.h \
     windowsdispatcher.h
 
 FORMS += \
@@ -170,7 +176,9 @@ FORMS += \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
     tabcashoperation.ui \
+    tabclient.ui \
     tabclients.ui \
+    tabclientsummary.ui \
     tabprintdialog.ui \
     tabrepair.ui \
     tabrepairnew.ui \
@@ -179,7 +187,8 @@ FORMS += \
     widgets/getoutdialog.ui \
     widgets/sclientmatch.ui \
     widgets/sphone.ui \
-    widgets/sphones.ui
+    widgets/sphones.ui \
+    widgets/stoolboxswitchpanel.ui
 
 RESOURCES += styles/styles.qrc
 

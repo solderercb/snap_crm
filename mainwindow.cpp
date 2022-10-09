@@ -9,6 +9,7 @@
 #include "tabrepair.h"
 #include "tabsale.h"
 #include "tabclients.h"
+#include "tabclient.h"
 #include "tabprintdialog.h"
 #include "tabcashoperation.h"
 #include "widgets/slineedit.h"
@@ -436,7 +437,11 @@ void MainWindow::createTabClients(int type, QWidget *caller)
 
 void MainWindow::createTabClient(int id)
 {
-    qDebug() << "Сейчас должна была бы открыться карточка клиента" << id;
+    tabClient *subwindow = tabClient::getInstance(id, this);
+    if(ui->tabWidget->indexOf(subwindow) == -1)
+        ui->tabWidget->addTab(subwindow, "Клиент " + QString::number(id));
+    ui->tabWidget->setCurrentWidget(subwindow);
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 }
 
 void MainWindow::closeTab(int index)
@@ -453,7 +458,7 @@ void MainWindow::closeTab(int index)
         }
     }
     delete w;
-}
+    }
 
 void MainWindow::updateTabLabel(QWidget *w, const QString &label)
 {
@@ -754,8 +759,9 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    {
 //        createTabRepairNew();
 //        createTabNewPKO();
-        createTabCashOperation(36192);
-        createTabCashOperation(42019);
+//        createTabCashOperation(36192);
+//        createTabCashOperation(42019);
+        createTabClient(143);
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("repair_id", 24972);
 //        report_vars.insert("type", "new_rep");
