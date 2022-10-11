@@ -499,23 +499,6 @@ void tabRepairNew::setDefaultStyleSheets()
     ui->lineEditPrepaySumm->setStyleSheet(commonLineEditStyleSheet);
     ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditPrevRepair->setStyleSheet(commonLineEditStyleSheet);
-/*
-    for(int i=0; i< additionalFieldsWidgets.size(); i++)   // установка стилей доп. полей
-    {
-        if ( additionalFieldsWidgets[i]->property("fieldRequired").toBool() )
-        {
-            if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QComboBox", Qt::CaseSensitive) == 0 )
-            {
-                additionalFieldsWidgets[i]->setStyleSheet(commonComboBoxStyleSheet);
-            }
-            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QLineEdit", Qt::CaseSensitive) == 0 )
-                additionalFieldsWidgets[i]->setStyleSheet(commonLineEditStyleSheet);
-            // Дату не окрашиваем, даже если она обязательна, т. к. не продуман механизм проверки
-//            else if ( QString(additionalFieldsWidgets[i]->metaObject()->className()).compare("QDateEdit", Qt::CaseSensitive) == 0 )
-//                    additionalFieldsWidgets[i]->setStyleSheet(commonDateEditStyleSheet);   // Дату не окрашиваем, даже если она обязательна, т. к. не продуман механизм проверки
-        }
-    }
-*/
 }
 
 bool tabRepairNew::checkInput()
@@ -797,7 +780,6 @@ bool tabRepairNew::createRepair()
     catch (int type)
     {
         nErr = 0;
-        repairModel->setId(0);
         additionalFields->resetIds();
         if(type == 0)
         {
@@ -847,6 +829,7 @@ bool tabRepairNew::createRepair()
         ui->comboBoxDevice->setCurrentIndex(-1);
     }
 
+    repairModel->setId(0);
     delete query;
     return !nErr; // return 0 — OK, return 1 - ошибка
 }
