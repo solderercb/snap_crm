@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMessageBox>
 #include <QRandomGenerator>
+#include "global.h"
 #include "ssqlquerymodel.h"
 #include "com_sql_queries.h"
 #include "scomrecord.h"
@@ -33,7 +34,7 @@ class SClientModel : public SComRecord
 {
     Q_OBJECT
 public:
-    enum Option{Regular = 1, Dealer = 2, BalanceEnabled = 4, PreferCashless = 8, TakeLong = 16, IgnoreCalls = 32, Bad = 64, Realizator = 128, Agent = 256};
+    enum BinaryOption{Company = 1, Regular = 2, Broker = 4, IgnoreCalls = 8, PreferCashless = 16, TakeLong = 32, Supplier = 64, SaleOrReturn = 128, BalanceEnabled = 256, Bad = 512, Archived = 1024};
     enum EditStrategy { OnFieldChange, OnManualSubmit };
     explicit SClientModel(int id = 0, QObject *parent = nullptr);
     ~SClientModel();
@@ -153,6 +154,7 @@ public:
     void appendLogText(const QString&);
     bool commit();
     bool integrityStatus();
+    QString created();
 
 private:
     bool nIntegrityErr = 1;
@@ -206,6 +208,7 @@ private:
     int     m_purchases = 0;
     QString m_token;
     SBalanceLogRecordModel *balanceLog = nullptr;
+    void initBinaryOptions(QSqlQueryModel*);
 };
 
 #endif // SCLIENTMODEL_H

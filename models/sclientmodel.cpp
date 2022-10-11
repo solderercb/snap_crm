@@ -60,16 +60,8 @@ void SClientModel::load(int id)
         m_memorial = clientModel->record(0).value("memorial").toString();
         m_notes = clientModel->record(0).value("notes").toString();
         showNotification();
-        m_options = (clientModel->record(0).value("is_regular").toInt()?Option::Regular:0) | \
-                (clientModel->record(0).value("is_dealer").toInt()?Option::Dealer:0) | \
-                (clientModel->record(0).value("balance_enable").toInt()?Option::BalanceEnabled:0) | \
-                (clientModel->record(0).value("prefer_cashless").toInt()?Option::PreferCashless:0) | \
-                (clientModel->record(0).value("take_long").toInt()?Option::TakeLong:0) | \
-                (clientModel->record(0).value("ignore_calls").toInt()?Option::IgnoreCalls:0) | \
-                (clientModel->record(0).value("is_bad").toInt()?Option::Bad:0) | \
-                (clientModel->record(0).value("is_realizator").toInt()?Option::Realizator:0) | \
-                (clientModel->record(0).value("is_agent").toInt()?Option::Agent:0);
-        if(m_options&Option::BalanceEnabled)
+        initBinaryOptions(clientModel);
+        if(m_options&BinaryOption::BalanceEnabled)
             createBalanceObj();
 //        m_photo = ;
         m_photo_id = clientModel->record(0).value("photo_id").toInt();
@@ -105,6 +97,18 @@ void SClientModel::load(int id)
     }
 
     delete clientModel;
+}
+
+void SClientModel::initBinaryOptions(QSqlQueryModel *clientModel)
+{
+    m_options = 0;
+    for(int i=0; i < clientBinaryProperties->rowCount(); i++)
+    {
+        if(clientBinaryProperties->index(i, 1).data().toInt() == BinaryOption::Archived)
+            continue;
+        m_options |= clientModel->record(0).value(clientBinaryProperties->index(i, 2).data().toString()).toBool()?clientBinaryProperties->index(i, 1).data().toInt():0;
+    }
+    m_options |= clientModel->record(0).value("state").toBool()?0:1;
 }
 
 void SClientModel::clear()
@@ -687,6 +691,14 @@ bool SClientModel::balanceEnough(const QString summ)
 bool SClientModel::integrityStatus()
 {
     return nIntegrityErr;
+}
+
+QString SClientModel::created()
+{
+    QDateTime date = i_createdUtc;
+    date.setTimeZone(QTimeZone::utc());
+
+    return date.toLocalTime().toString("dd.MM.yyyy");
 }
 
 SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):

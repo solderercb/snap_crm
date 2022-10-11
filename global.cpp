@@ -1,5 +1,6 @@
 #include "global.h"
 #include "com_sql_queries.h"
+#include "models/sclientmodel.h"
 
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
@@ -55,6 +56,7 @@ SStandardItemModel *priceColModel = new SStandardItemModel;
 SStandardItemModel *itemUnitsModel = new SStandardItemModel;
 SAppLog *appLog = new SAppLog();
 SUserActivityModel *userActivityLog;
+SStandardItemModel *clientBinaryProperties;
 
 
 //QWidget *modalWidget = nullptr;
@@ -323,4 +325,30 @@ void initOffices()      // Список офисов
 void initSystemObjects()
 {
     userActivityLog = new SUserActivityModel();
+    enum ClientBinaryOption{Company = 1, Regular = 2, Broker = 4, IgnoreCalls = 8, PreferCashless = 16, TakeLong = 32, Supplier = 64, SaleOrReturn = 128, BalanceEnabled = 256, Bad = 512, Archived = 1024};
+    clientBinaryProperties = new SStandardItemModel();
+    QVector<QString> NamesList = {QObject::tr("Юридическое лицо", "company"), QObject::tr("Постоянный клиент", "regular"),
+                                  QObject::tr("Посредник", "broker (middleman)"), QObject::tr("Игнорирует звонки", "ignores calls"),
+                                  QObject::tr("Предпочитает безнал", "prefer cashless"), QObject::tr("Не забирает технику в срок", "take out not in time"),
+                                  QObject::tr("Является поставщиком", "supplier"), QObject::tr("Даёт товар под реализацию", "sale or return"),
+                                  QObject::tr("Баланс", "client balance"), QObject::tr("Проблемный", "problematic client"), QObject::tr("Архивный", "archived")};
+    QVector<int> bitfieldsList = {SClientModel::Company, SClientModel::Regular,
+                                  SClientModel::Broker, SClientModel::IgnoreCalls,
+                                  SClientModel::PreferCashless, SClientModel::TakeLong,
+                                  SClientModel::Supplier, SClientModel::SaleOrReturn,
+                                  SClientModel::BalanceEnabled, SClientModel::Bad, SClientModel::Archived};
+    QVector<QString> DBFieldsList = {"type", "is_regular",
+                                     "is_agent", "ignore_calls",
+                                     "prefer_cashless", "take_long",
+                                     "is_dealer", "is_realizator",
+                                     "balance_enable", "is_bad", "state"};
+    QList<QStandardItem*> *selector;
+    for (int i=0; i<NamesList.size(); i++)
+    {
+        selector = new QList<QStandardItem*>();
+        *selector << new QStandardItem(NamesList.at(i)) << new QStandardItem(QString::number(bitfieldsList.at(i))) << new QStandardItem(DBFieldsList.at(i));
+        clientBinaryProperties->appendRow(*selector);
+    }
+    clientBinaryProperties->setObjectName("clientBinaryProperties");
+    clientBinaryProperties->setHorizontalHeaderLabels({"name", "bitfield", "dbField"});
 }

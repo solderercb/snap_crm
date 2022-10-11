@@ -35,6 +35,7 @@ signals:
 
 public:
     enum Buttons{Add = 0, Del = 1, Edit = 2};
+    enum Mode{EditableRW = 0, EditableRO, NotEditable};
     explicit SPhone(QWidget *parent = nullptr);
     explicit SPhone(SPhoneModel*, QWidget *parent = nullptr);
     ~SPhone();
@@ -53,11 +54,13 @@ public:
     void setButtonVisible(Buttons button, bool state = true);
     void updateButtons();
     int maskIndex();
+    void setEditable(const int);
 
 private:
     Ui::SPhone *ui;
     bool m_isPrimary = 0;
     bool m_isReadOnly = 0;
+    bool m_notEditable = 0;
     QString m_clearPhone;    // строка символов, которые ввёл пользователь (т. е. текст отображаемый в lineEdit над которым выполнена операция т. н. XOR с заданной маской
     SPhoneModel *m_phoneModel;
     int m_messengers;

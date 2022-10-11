@@ -34,7 +34,10 @@ void SPhones::setModel(SPhonesModel *model)
 
 void SPhones::addForm(SPhoneModel *model)
 {
-    SPhone *phoneForm = new SPhone(model, this);
+    SPhone *phoneForm = new SPhone(this);
+    if(m_notEditable)
+        phoneForm->setEditable(SPhone::NotEditable);
+    phoneForm->setModel(model);
     connect(phoneForm,SIGNAL(buttonAddClicked()),this,SLOT(addPhone()));
     connect(phoneForm,SIGNAL(delPhone(SPhone*)),this,SLOT(delPhone(SPhone*)));
     connect(phoneForm,SIGNAL(sigEditPhone()),this,SLOT(updateFormsButtons()));
@@ -85,7 +88,7 @@ void SPhones::slotModelUpdated()
     {
         addForm(phoneModel);
     }
-    if(m_phoneModelsList.isEmpty())
+    if(m_phoneModelsList.isEmpty() & !m_notEditable)
         addForm(m_phonesModel->primary());
 }
 
@@ -125,6 +128,16 @@ SPhone *SPhones::primary()
 QList<SPhone *> SPhones::forms()
 {
     return m_phoneFormsList;
+}
+
+void SPhones::setEditable(const int state)
+{
+    if(state == SPhone::NotEditable)
+    {
+        m_notEditable = 1;
+    }
+    else
+        m_notEditable = 0;
 }
 
 /*  SLOT

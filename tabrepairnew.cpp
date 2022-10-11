@@ -915,10 +915,10 @@ void tabRepairNew::randomFill()
     if (test_scheduler_counter == 0)   // клиент
 //    if (1)
     {
-//        fillClientCreds(257);
-//        test_scheduler_counter++;
-//        test_scheduler->start(400);    //  (пере-)запускаем таймер
-//        return;
+        fillClientCreds(257);
+        test_scheduler_counter++;
+        test_scheduler->start(400);    //  (пере-)запускаем таймер
+        return;
         if(0)
 //        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {

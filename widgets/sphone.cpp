@@ -149,12 +149,22 @@ void SPhone::updateButtons()
 {
     ui->pushButtonAddPhone->setVisible(!m_isReadOnly);
     ui->pushButtonDelPhone->setVisible(!m_isPrimary & !m_isReadOnly);
-    ui->pushButtonEditPhone->setVisible(m_isReadOnly);
+    ui->pushButtonEditPhone->setVisible(m_isReadOnly & !m_notEditable);
 }
 
 int SPhone::maskIndex()
 {
     return ui->comboBoxPhoneMask->currentIndex();
+}
+
+void SPhone::setEditable(const int state)
+{
+    switch (state)
+    {
+        case Mode::EditableRW: setReadOnly(0); break;
+        case Mode::NotEditable: m_notEditable = 1;
+        case Mode::EditableRO: setReadOnly(1); break;
+    }
 }
 
 void SPhone::phoneMaskChanged(int index)

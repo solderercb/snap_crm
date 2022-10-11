@@ -11,15 +11,21 @@ tabClient::tabClient(int id, MainWindow *parent) :
     m_clientId(id)
 {
     ui->setupUi(this);
+
+    ui->buttonPrint->setEnabled(0);
+    ui->buttonSave->setEnabled(0);
+    ui->buttonRefresh->setEnabled(0);
+
     connect(ui->toolboxSwitchPanel, SIGNAL(buttonToggled(int)), this, SLOT(switchPage(int)));
-    ui->toolboxSwitchPanel->addButton(tr("Редактировать"), QIcon(), 1);
-    ui->toolboxSwitchPanel->addButton(tr("История"), QIcon(), 2);
+    ui->toolboxSwitchPanel->addButton(tr("Редактировать"), QIcon(), Page::Edit);
+    ui->toolboxSwitchPanel->addButton(tr("История"), QIcon(), Page::History);
     ui->toolboxSwitchPanel->redraw();
     switchPage(0);  // по-умолчанию страница 0 ("Сводка")
 }
 
 tabClient::~tabClient()
 {
+    delPages();
     delete ui;
     p_instance.remove(m_clientId);   // Обязательно блять!
 }
@@ -29,11 +35,69 @@ QString tabClient::tabTitle()
     return QString();
 }
 
+bool tabClient::initPage(const int page)
+{
+    QWidget *widget;
+    switch(page)
+    {
+        case Page::Summary: widget = new tabClientSummary(m_clientId); break;
+        case Page::Edit: if(!permissions->value("11")) return 0; widget = new QWidget(); break;
+//        case Page::Repairs: ; break;
+//        case Page::Purchases: ; break;
+//        case Page::Sales: ; break;
+//        case Page::Calls: ; break;
+//        case Page::Finances: ; break;
+//        case Page::Balance: ; break;
+        case Page::History: widget = new QWidget(); break;
+        default: return 0;
+    }
+    m_pages.insert(page, widget);
+    ui->stackedWidget->addWidget(widget);
+    return 1;
+}
+
+void tabClient::delPages()
+{
+    int key;
+    QWidget *w;
+    while(!m_pages.isEmpty())
+    {
+        key = m_pages.lastKey();
+        w = m_pages.last();
+        m_pages.remove(key);
+        ui->stackedWidget->removeWidget(w);
+        delete w;
+    }
+}
+
+void tabClient::updateWidgets()
+{
+    ui->buttonPrint->setVisible(m_buttonPrintVisible);
+    ui->buttonSave->setVisible(m_buttonSaveVisible);
+    ui->buttonRefresh->setVisible(m_buttonRefreshVisible);
+    ui->lineEditFilter->setVisible(m_lineEditFilterVisible);
+}
+
 void tabClient::switchPage(const int page)
 {
-    qDebug().nospace() << "[" << this << "] switchPage() | page = " << page;
+    int pageIndex = 0;
+    if(!m_pages.contains(page))
+        if(!initPage(page))
+            return;
+    pageIndex = ui->stackedWidget->indexOf(m_pages.value(page));
+    ui->stackedWidget->setCurrentIndex(pageIndex);
 
-    ui->stackedWidget->setCurrentIndex(page);
+    m_buttonPrintVisible = 0;
+    m_buttonSaveVisible = 1;
+    m_buttonRefreshVisible = 0;
+    m_lineEditFilterVisible = 0;
+    switch (page)
+    {
+        case Page::Summary: m_buttonSaveVisible = 0; break;
+        case Page::Edit: if(!m_editStrategy) m_buttonSaveVisible = 0; break;
+        default: m_buttonPrintVisible = 1; m_buttonRefreshVisible = 1; m_buttonSaveVisible = 0; m_lineEditFilterVisible = 1;
+    }
+    updateWidgets();
 }
 
 void tabClient::buttonSaveClicked()

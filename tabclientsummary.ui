@@ -15,8 +15,8 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
    <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,1">
-     <item row="0" column="0" rowspan="2">
+    <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,1" columnminimumwidth="240,240,0">
+     <item row="1" column="0" rowspan="3">
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="sizeConstraint">
         <enum>QLayout::SetMinimumSize</enum>
@@ -44,7 +44,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QFormLayout" name="formLayout_2">
+        <layout class="QFormLayout" name="formLayoutUnderPhoto">
          <item row="0" column="0">
           <widget class="QLabel" name="labelId">
            <property name="text">
@@ -53,7 +53,11 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditId"/>
+          <widget class="QLineEdit" name="lineEditId">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="labelCreated">
@@ -63,7 +67,11 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEditCreated"/>
+          <widget class="QLineEdit" name="lineEditCreated">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="labelBalance">
@@ -73,7 +81,11 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="SLineEdit" name="lineEditBalance"/>
+          <widget class="SLineEdit" name="lineEditBalance">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="labelPriceColumn">
@@ -83,7 +95,11 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QLineEdit" name="lineEditPriceColumn"/>
+          <widget class="QLineEdit" name="lineEditPriceColumn">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="labelRepairs">
@@ -93,7 +109,11 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QLineEdit" name="lineEditRepairs"/>
+          <widget class="QLineEdit" name="lineEditRepairs">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="labelPurchases">
@@ -103,7 +123,11 @@
           </widget>
          </item>
          <item row="5" column="1">
-          <widget class="QLineEdit" name="lineEditPurchases"/>
+          <widget class="QLineEdit" name="lineEditPurchases">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -145,6 +169,21 @@
             <property name="lineWidth">
              <number>0</number>
             </property>
+            <property name="verticalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
+            <property name="showDropIndicator" stdset="0">
+             <bool>false</bool>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::NoSelection</enum>
+            </property>
            </widget>
           </item>
          </layout>
@@ -165,8 +204,8 @@
        </item>
       </layout>
      </item>
-     <item row="0" column="1" colspan="2">
-      <widget class="SPhones" name="widgetPhones" native="true">
+     <item row="1" column="1" colspan="2">
+      <widget class="SPhones" name="phones" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -181,56 +220,125 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item row="2" column="1" colspan="2">
+      <layout class="QFormLayout" name="formLayoutRightToPhotoLong">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelAddress">
+         <property name="text">
+          <string>Адрес</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEditAddress">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEditNotes">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelNotes">
+         <property name="text">
+          <string>Примечание</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="3" column="1">
+      <layout class="QVBoxLayout" name="formLayoutRightToPhoto_2">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <layout class="QFormLayout" name="formLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="labelVisitSource">
-             <property name="text">
-              <string>Источник обращения</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEditVisitSource"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="labelAddress">
-             <property name="text">
-              <string>Адрес</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEditAddress"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="lineEditEmail"/>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="lineEditPassword"/>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="labelEmail">
-             <property name="text">
-              <string>E-mail</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="labelPassword">
-             <property name="text">
-              <string>Пароль ЛК (WEB)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0" colspan="2">
-            <widget class="QLineEdit" name="lineEditNotes"/>
-           </item>
-          </layout>
+        <layout class="QFormLayout" name="formLayoutRightToPhotoShort">
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelVisitSource">
+           <property name="text">
+            <string>Источник обращения</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEditVisitSource">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="labelEmail">
+           <property name="text">
+            <string>E-mail</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="lineEditEmail">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="labelPassword">
+           <property name="text">
+            <string>Пароль ЛК (WEB)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="lineEditPassword">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="labelTaxField1">
+           <property name="text">
+            <string>ИНН</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="labelTaxField2">
+           <property name="text">
+            <string>ОГРН</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="labelTaxField3">
+           <property name="text">
+            <string>КПП</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="lineEditTaxField1">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="lineEditTaxField2">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="lineEditTaxField3">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -276,6 +384,12 @@
             <property name="horizontalScrollBarPolicy">
              <enum>Qt::ScrollBarAlwaysOff</enum>
             </property>
+            <property name="lineWrapMode">
+             <enum>QTextEdit::NoWrap</enum>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -289,14 +403,14 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>191</height>
+           <height>238</height>
           </size>
          </property>
         </spacer>
        </item>
       </layout>
      </item>
-     <item row="1" column="2">
+     <item row="3" column="2">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -308,6 +422,20 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="0" column="0" colspan="3">
+      <widget class="QLabel" name="labelFullName">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Фамилия Имя Отчество</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

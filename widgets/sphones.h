@@ -29,10 +29,12 @@ public:
     bool isValid();
     SPhone* primary();
     QList<SPhone*> forms();
+    void setEditable(const int);
 
 private:
     Ui::SPhones *ui;
     bool m_isPrimary = 0;
+    bool m_notEditable = 0;
     SPhonesModel *m_phonesModel;
     QList<SPhone*> m_phoneFormsList;
     QList<SPhoneModel*> m_phoneModelsList;

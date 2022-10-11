@@ -62,6 +62,7 @@ extern SStandardItemModel *priceColModel;
 extern SStandardItemModel *itemUnitsModel;
 extern SAppLog *appLog;
 extern SUserActivityModel *userActivityLog;
+extern SStandardItemModel *clientBinaryProperties;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

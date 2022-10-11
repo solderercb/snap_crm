@@ -437,6 +437,8 @@ void MainWindow::createTabClients(int type, QWidget *caller)
 
 void MainWindow::createTabClient(int id)
 {
+//    if(!permissions->value("X"))    // TODO: разрешение на просмотр карты клиента
+//        return;
     tabClient *subwindow = tabClient::getInstance(id, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
         ui->tabWidget->addTab(subwindow, "Клиент " + QString::number(id));
