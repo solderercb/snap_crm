@@ -12,6 +12,7 @@
 #include "tabclient.h"
 #include "tabprintdialog.h"
 #include "tabcashoperation.h"
+#include "tabcashmoveexch.h"
 #include "widgets/slineedit.h"
 #include "com_sql_queries.h"
 
@@ -211,6 +212,9 @@ void MainWindow::createMenu()
     QAction *rko_new = new QAction(tr("Расходный кассовый ордер"), this);
     finances_menu->addAction(rko_new);
     QObject::connect(rko_new,SIGNAL(triggered()),this,SLOT(createTabNewRKO()));
+    QAction *move_new = new QAction(tr("Перемещение/обмен"), this);
+    finances_menu->addAction(move_new);
+    QObject::connect(move_new,SIGNAL(triggered()),this,SLOT(createTabCashMoveExch()));
     QAction *documents = new QAction(tr("Документы"), this);
     finances_menu->addAction(documents);
 
@@ -364,6 +368,18 @@ void MainWindow::createTabNewRKO()
     createTabCashOperation(tabCashOperation::RKO);
 }
 
+/* Вкладка перемещения/обмена денежных средств
+ */
+void MainWindow::createTabCashMoveExch()
+{
+    tabCashMoveExch *subwindow = tabCashMoveExch::getInstance(this);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+    QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*,const QString)), this, SLOT(updateTabLabel(QWidget*,const QString&)));
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
+
+    ui->tabWidget->setCurrentWidget(subwindow);
+}
 void MainWindow::createTabDocuments(int type, QWidget *caller)
 {
     qDebug().nospace() << "[MainWindow] createTabDocuments()";
@@ -763,7 +779,8 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
 //        createTabCashOperation(42019);
-        createTabClient(143);
+//        createTabClient(143);
+        createTabCashMoveExch();
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("repair_id", 24972);
 //        report_vars.insert("type", "new_rep");

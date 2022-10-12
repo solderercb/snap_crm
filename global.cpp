@@ -45,11 +45,11 @@ QString commonComboBoxStyleSheetRed = "QComboBox {  height: 18px; border: 1px so
 
 QString commonLineEditStyleSheet = "QLineEdit {  height: 18px; border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
 QString commonLineEditStyleSheetRed = "QLineEdit {  height: 18px; border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
-QString commonTextEditStyleSheet = "";
+QString commonTextEditStyleSheet = "QTextEdit {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
 QString commonTextEditStyleSheetRed = "QTextEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
-QString commonDateEditStyleSheet = "";
+QString commonDateEditStyleSheet = "QDateEdit {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
 QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
-QString commonSpinBoxStyleSheet = "";
+QString commonSpinBoxStyleSheet = "QSpinBox, QDoubleSpinBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
 QString commonSpinBoxStyleSheetRed = "QSpinBox, QDoubleSpinBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 SStandardItemModel *rejectReasonModel = new SStandardItemModel;
 SStandardItemModel *priceColModel = new SStandardItemModel;

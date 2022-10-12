@@ -105,6 +105,7 @@ private slots:
     void createTabCashOperation( int, QMap<int, QVariant> data = QMap<int, QVariant>() );
     void createTabNewPKO();
     void createTabNewRKO();
+    void createTabCashMoveExch();
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void closeTab(int index);

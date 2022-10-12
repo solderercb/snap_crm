@@ -50,6 +50,8 @@ public:
     QString constructReason(const QString&);
     QString constructReason(int);
     void setSkipLogRecording(bool state = true);
+    void setOffice(const int);
+    void setOfficeIndex(const int);
 
     // методы, в необходимости которых я пока не увеврен
     int client();

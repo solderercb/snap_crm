@@ -75,6 +75,7 @@ SOURCES += \
     models/sphonesmodel.cpp \
     models/ssaleitemmodel.cpp \
     querylog.cpp \
+    tabcashmoveexch.cpp \
     tabcashoperation.cpp \
     tabclient.cpp \
     tabclients.cpp \
@@ -144,6 +145,7 @@ HEADERS  += \
     models/ssaleitemmodel.h \
     querylog.h \
     stable.h \
+    tabcashmoveexch.h \
     tabcashoperation.h \
     tabclient.h \
     tabclients.h \
@@ -175,6 +177,7 @@ FORMS += \
     models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
+    tabcashmoveexch.ui \
     tabcashoperation.ui \
     tabclient.ui \
     tabclients.ui \
