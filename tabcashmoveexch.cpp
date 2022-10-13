@@ -181,7 +181,15 @@ void tabCashMoveExch::constructReasonPart()
 
 void tabCashMoveExch::flipCurrency()
 {
-    ui->doubleSpinBoxCharge->setValue(1/ui->doubleSpinBoxCharge->value());
+    ui->toolButtonFlipCurrency->setFocus(); // Qt 5.15.4 при нажатии toolButton фокус остаётся на doubleSpinBox и сигнал editingFinished не генерируется
+    if(currencyFlipped)
+        ui->doubleSpinBoxCharge->setValue(prevCurrencyRate);
+    else
+    {
+        prevCurrencyRate = ui->doubleSpinBoxCharge->value();
+        ui->doubleSpinBoxCharge->setValue(1/ui->doubleSpinBoxCharge->value());
+    }
+    currencyFlipped ^= 1;
 }
 
 QString tabCashMoveExch::tabTitle()
@@ -220,7 +228,7 @@ void tabCashMoveExch::updateWidgets()
     ui->doubleSpinBoxSrcAmount->setReadOnly(m_widgetsRO);
     ui->doubleSpinBoxDstAmount->setReadOnly(m_widgetsRO);
     ui->doubleSpinBoxCharge->setReadOnly(m_widgetsRO);
-    ui->checkBoxPrintCheck->setVisible(m_showCheckBoxPrint);
+    ui->checkBoxPrintCheck->setVisible(!m_widgetsRO);
     ui->checkBoxAutoReason->setDisabled(m_widgetsRO);
     ui->lineEditReason->setReadOnly(m_reasonRO);
     ui->toolButtonFlipCurrency->setVisible(m_showFlipCurrencyButton && !m_widgetsRO);
@@ -261,7 +269,7 @@ bool tabCashMoveExch::checkInput()
         error |= 1<<5;
         ui->lineEditReason->setStyleSheet(commonLineEditStyleSheetRed);
     }
-    if(ui->doubleSpinBoxCharge->value() <= 0)
+    if(m_opType == Type::Move && ui->doubleSpinBoxCharge->value() < 0)
     {
         error |= 1<<6;
         ui->doubleSpinBoxCharge->setStyleSheet(commonSpinBoxStyleSheetRed);
@@ -377,13 +385,9 @@ void tabCashMoveExch::buttonPrintClicked()
     print();
 }
 
-/* Слот, вызываемый по сигналу spinBox'а
- * spinBox должен принимать только абсолютное знаение
-*/
-void tabCashMoveExch::srcAmountChanged(double amountAbs)
+void tabCashMoveExch::calculateDstAmount()
 {
     float dstValue = 0;
-    m_srcAmount = -amountAbs;
     ui->doubleSpinBoxDstAmount->blockSignals(1);
     if(m_opType == Type::Exchange)
     {
@@ -398,6 +402,15 @@ void tabCashMoveExch::srcAmountChanged(double amountAbs)
     ui->doubleSpinBoxDstAmount->blockSignals(0);
 }
 
+/* Слот, вызываемый по сигналу spinBox'а
+ * spinBox должен принимать только абсолютное знаение
+*/
+void tabCashMoveExch::srcAmountChanged(double amountAbs)
+{
+    m_srcAmount = -amountAbs;
+    calculateDstAmount();
+}
+
 void tabCashMoveExch::dstAmountChanged(double amountAbs)
 {
     m_dstAmount = amountAbs;
@@ -405,7 +418,7 @@ void tabCashMoveExch::dstAmountChanged(double amountAbs)
     if(m_opType == Type::Exchange)
     {
         ui->doubleSpinBoxCharge->setMinimum(0);
-        ui->doubleSpinBoxCharge->setValue(ui->doubleSpinBoxSrcAmount->value()/ui->doubleSpinBoxDstAmount->value());
+        ui->doubleSpinBoxCharge->setValue(ui->doubleSpinBoxDstAmount->value()/ui->doubleSpinBoxSrcAmount->value());
     }
     else
     {
@@ -419,22 +432,18 @@ void tabCashMoveExch::dstAmountChanged(double amountAbs)
 
 void tabCashMoveExch::chargeChanged(double)
 {
-    float dstValue = 0;
-    ui->doubleSpinBoxDstAmount->blockSignals(1);
     ui->doubleSpinBoxCharge->setMinimum(0);
-    if(m_opType == Type::Exchange)
-    {
-        dstValue = ui->doubleSpinBoxSrcAmount->value()*ui->doubleSpinBoxCharge->value();
-    }
-    else
-    {
-        dstValue = ui->doubleSpinBoxSrcAmount->value() - ui->doubleSpinBoxCharge->value();
-    }
-    ui->doubleSpinBoxDstAmount->setValue(dstValue);
-    cashRegisterDst->setAmount(dstValue);
-    ui->doubleSpinBoxDstAmount->blockSignals(0);
+    qDebug().nospace() << "[" << this << "] chargeChanged(double)";
+    calculateDstAmount();
     constructReasonPart();
     updateWidgets();
+}
+
+void tabCashMoveExch::chargeChanged()
+{
+    qDebug().nospace() << "[" << this << "] chargeChanged()";
+    currencyFlipped = 0;
+    prevCurrencyRate = 0;
 }
 
 #ifdef QT_DEBUG

@@ -49,6 +49,8 @@ private:
     bool m_backdate = 0;
     bool m_showCheckBoxPrint = 1;
     bool m_showFlipCurrencyButton = 0;
+    float prevCurrencyRate = 0;
+    bool currencyFlipped = 0;
     QString chargeType; // используется для подписи поля Комиссия/Курс и для создания части примечания
     Ui::tabCashMoveExch *ui;
     void setWidgetsParams();
@@ -60,6 +62,7 @@ private:
     void print();
     void updateOrderIdLineEdit();
     void constructReasonPart();
+    void calculateDstAmount();
 
 #ifdef QT_DEBUG
     enum RandomFillerStep {OpType = 1, SrcAccount, DstAccount, Amount, End};
@@ -77,6 +80,7 @@ private slots:
     void srcAmountChanged(double);
     void dstAmountChanged(double);
     void chargeChanged(double);
+    void chargeChanged();
     void flipCurrency();
 #ifdef QT_DEBUG
     void test_scheduler_handler();

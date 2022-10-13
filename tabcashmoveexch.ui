@@ -168,27 +168,6 @@
        </property>
       </spacer>
      </item>
-     <item row="6" column="1" colspan="2">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QCheckBox" name="checkBoxPrintCheck">
-         <property name="text">
-          <string>Печать ПКО</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxAutoReason">
-         <property name="text">
-          <string>Автозаполнение основания платежа</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="5" column="4">
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
@@ -364,6 +343,184 @@
        </item>
       </layout>
      </item>
+     <item row="5" column="3">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>36</pointsize>
+           <kerning>true</kerning>
+          </font>
+         </property>
+         <property name="text">
+          <string>»</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="margin">
+          <number>-8</number>
+         </property>
+         <property name="indent">
+          <number>0</number>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::NoTextInteraction</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
+         <item>
+          <widget class="QLabel" name="labelCharge">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Курс</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="doubleSpinBoxCharge">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>85</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>85</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::NoButtons</enum>
+           </property>
+           <property name="specialValueText">
+            <string notr="true"/>
+           </property>
+           <property name="correctionMode">
+            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+           </property>
+           <property name="keyboardTracking">
+            <bool>true</bool>
+           </property>
+           <property name="prefix">
+            <string notr="true"/>
+           </property>
+           <property name="suffix">
+            <string notr="true"/>
+           </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>9999999.990000000223517</double>
+           </property>
+           <property name="stepType">
+            <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButtonFlipCurrency">
+           <property name="minimumSize">
+            <size>
+             <width>21</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>21</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>1/x</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item row="7" column="1" colspan="4">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="labelComment">
+         <property name="text">
+          <string>Примечание</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditReason">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
      <item row="3" column="1" colspan="4">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
@@ -388,10 +545,22 @@
        <item>
         <widget class="QLineEdit" name="lineEditDate">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>130</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>130</width>
+           <height>16777215</height>
+          </size>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -400,10 +569,22 @@
        </item>
        <item>
         <widget class="QDateEdit" name="dateEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>120</width>
+           <width>130</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>130</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="frame">
@@ -462,213 +643,39 @@
        </item>
       </layout>
      </item>
-     <item row="5" column="3">
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+     <item row="6" column="1" colspan="4">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QCheckBox" name="checkBoxAutoReason">
+         <property name="text">
+          <string>Автозаполнение основания платежа</string>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Minimum</enum>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxPrintCheck">
+         <property name="text">
+          <string>Печать ПКО</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>10</height>
+           <width>328</width>
+           <height>20</height>
           </size>
          </property>
         </spacer>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,0,0,1">
-         <item>
-          <spacer name="horizontalSpacer_8">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Minimum</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>10</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="labelCharge">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>60</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Курс</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBoxCharge">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>85</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="buttonSymbols">
-            <enum>QAbstractSpinBox::NoButtons</enum>
-           </property>
-           <property name="specialValueText">
-            <string notr="true"/>
-           </property>
-           <property name="correctionMode">
-            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-           </property>
-           <property name="keyboardTracking">
-            <bool>true</bool>
-           </property>
-           <property name="prefix">
-            <string notr="true"/>
-           </property>
-           <property name="suffix">
-            <string notr="true"/>
-           </property>
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="maximum">
-            <double>9999999.990000000223517</double>
-           </property>
-           <property name="stepType">
-            <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButtonFlipCurrency">
-           <property name="minimumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>1/x</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_9">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Minimum</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>10</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
       </layout>
-     </item>
-     <item row="6" column="3" colspan="2">
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>328</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="7" column="1" colspan="4">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="labelComment">
-         <property name="text">
-          <string>Примечание</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEditReason">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="4" column="3">
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <pointsize>20</pointsize>
-         <kerning>true</kerning>
-        </font>
-       </property>
-       <property name="text">
-        <string>»</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::PlainText</enum>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="margin">
-        <number>-8</number>
-       </property>
-       <property name="indent">
-        <number>0</number>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::NoTextInteraction</set>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -743,6 +750,22 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="2">
+           <widget class="QWidget" name="dummyWidget" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>1</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>23</height>
+             </size>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item row="0" column="1">
@@ -792,9 +815,24 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>radioButtonMove</tabstop>
+  <tabstop>radioButtonExchange</tabstop>
+  <tabstop>dateEdit</tabstop>
+  <tabstop>comboBoxSrcOffice</tabstop>
+  <tabstop>comboBoxDstOffice</tabstop>
+  <tabstop>comboBoxSrcPaymentAccount</tabstop>
+  <tabstop>comboBoxDstPaymentAccount</tabstop>
+  <tabstop>doubleSpinBoxSrcAmount</tabstop>
+  <tabstop>doubleSpinBoxCharge</tabstop>
+  <tabstop>toolButtonFlipCurrency</tabstop>
+  <tabstop>doubleSpinBoxDstAmount</tabstop>
+  <tabstop>checkBoxAutoReason</tabstop>
+  <tabstop>checkBoxPrintCheck</tabstop>
   <tabstop>lineEditReason</tabstop>
   <tabstop>buttonSave</tabstop>
   <tabstop>buttonSaveMore</tabstop>
+  <tabstop>lineEditOrderNum</tabstop>
+  <tabstop>lineEditDate</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -837,8 +875,8 @@
    <slot>autoReasonEnabled(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>492</x>
-     <y>246</y>
+     <x>470</x>
+     <y>201</y>
     </hint>
     <hint type="destinationlabel">
      <x>1173</x>
@@ -853,8 +891,8 @@
    <slot>srcAmountChanged(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>492</x>
-     <y>198</y>
+     <x>504</x>
+     <y>175</y>
     </hint>
     <hint type="destinationlabel">
      <x>1171</x>
@@ -869,8 +907,8 @@
    <slot>reasonEdited(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>870</x>
-     <y>373</y>
+     <x>914</x>
+     <y>330</y>
     </hint>
     <hint type="destinationlabel">
      <x>1172</x>
@@ -901,8 +939,8 @@
    <slot>dstAmountChanged(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>798</x>
-     <y>189</y>
+     <x>914</x>
+     <y>175</y>
     </hint>
     <hint type="destinationlabel">
      <x>1172</x>
@@ -917,8 +955,8 @@
    <slot>chargeChanged(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>632</x>
-     <y>181</y>
+     <x>664</x>
+     <y>174</y>
     </hint>
     <hint type="destinationlabel">
      <x>1172</x>
@@ -965,12 +1003,28 @@
    <slot>flipCurrency()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>692</x>
-     <y>186</y>
+     <x>691</x>
+     <y>174</y>
     </hint>
     <hint type="destinationlabel">
      <x>1172</x>
      <y>301</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxCharge</sender>
+   <signal>editingFinished()</signal>
+   <receiver>tabCashMoveExch</receiver>
+   <slot>chargeChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>657</x>
+     <y>172</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1172</x>
+     <y>144</y>
     </hint>
    </hints>
   </connection>
@@ -995,5 +1049,6 @@
   <slot>chargeChanged(double)</slot>
   <slot>operationTypeChanged(bool)</slot>
   <slot>flipCurrency()</slot>
+  <slot>chargeChanged()</slot>
  </slots>
 </ui>
