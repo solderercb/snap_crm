@@ -80,7 +80,9 @@
                                                 "  `type`,\n"\
                                                 "  `id`,\n"\
                                                 "  `required`,\n"\
-                                                "  `printable`\n"\
+                                                "  `printable`,\n"\
+                                                "  `dev_match`,\n"\
+                                                "  `input_mask`\n"\
                                                 "FROM\n"\
                                                 "  `fields`\n"\
                                                 "WHERE\n"\
@@ -92,19 +94,45 @@
                                                 .arg((isRepair?0:1))\
                                                 .arg((id))\
                                                 .arg((isRepair?"devices":"categories"))
-#define QUERY_SEL_DEVICE_MATCH(text)        QString(\
+#define QUERY_SEL_DEVICE_MATCH              QString(\
                                                 "SELECT\n"\
                                                 "  t1.`id`,\n"\
                                                 "  CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',\n"\
                                                 "  `fault`,\n"\
                                                 "  `serial_number`,\n"\
-                                                "  CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\n"\
-                                                "  t1.`type`,\n"\
-                                                "  t1.`maker`,\n"\
-                                                "  t1.`model`,\n"\
-                                                "  t1.`client` AS 'client_id'\n"\
-                                                "FROM `workshop` AS t1 LEFT JOIN `devices` AS t2 ON t1.`type` = t2.`id` LEFT JOIN `device_makers` AS t3 ON t1.maker = t3.`id` LEFT JOIN `device_models` AS t4 ON t1.model = t4.`id` LEFT JOIN `clients` AS t5 ON t1.`client` = t5.`id` WHERE LCASE(`serial_number`) REGEXP LCASE('%1') ORDER BY `id` DESC;")\
-                                                .arg((text))
+                                                "  CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client'\n"\
+                                                "FROM\n"\
+                                                "  `workshop` AS t1\n"\
+                                                "LEFT JOIN `devices` AS t2\n"\
+                                                "  ON t1.`type` = t2.`id`\n"\
+                                                "LEFT JOIN `device_makers` AS t3\n"\
+                                                "  ON t1.maker = t3.`id`\n"\
+                                                "LEFT JOIN `device_models` AS t4\n"\
+                                                "  ON t1.model = t4.`id`\n"\
+                                                "LEFT JOIN `clients` AS t5\n"\
+                                                "  ON t1.`client` = t5.`id`\n"\
+                                                "WHERE\n"\
+                                                "  %1\n"\
+                                                "ORDER BY\n"\
+                                                "  `id` DESC;")
+#define QUERY_SEL_DEVICE_MATCH_BY_SN        QString(\
+                                                "LCASE(`serial_number`) REGEXP LCASE('%1')")
+#define QUERY_SEL_DEVICE_MATCH_BY_FIELDS     QString(\
+                                                "t1.`id` IN (\n"\
+                                                "    SELECT\n"\
+                                                "      t1.`repair_id`\n"\
+                                                "    FROM\n"\
+                                                "      `field_values` AS t1\n"\
+                                                "    LEFT JOIN `fields` AS t2\n"\
+                                                "      ON t1.field_id = t2.id\n"\
+                                                "    WHERE\n"\
+                                                "      %1\n"\
+                                                "    )")
+#define QUERY_SEL_DEVICE_MATCH_BY_FIELD     QString(\
+                                                "(\n"\
+                                                "        t1.field_id = %1 AND\n"\
+                                                "        LCASE(t1.`value`) REGEXP LCASE('%2')\n"\
+                                                "      )")
 
 #define QUERY_SEL_CLIENTS_STATIC            QString(\
                                                 "SELECT\n"\

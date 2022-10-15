@@ -825,24 +825,15 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBoxDeviceCoincidence">
+         <item row="3" column="0">
+          <widget class="SClientMatch" name="widgetClientMatch" native="true">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
              <height>500</height>
             </size>
            </property>
-           <property name="title">
-            <string>Совпадение устройства</string>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_9">
+           <layout class="QGridLayout" name="gridLayout_6">
             <property name="leftMargin">
              <number>5</number>
             </property>
@@ -858,67 +849,18 @@
             <property name="spacing">
              <number>5</number>
             </property>
-            <item row="0" column="0">
-             <widget class="QTableView" name="tableViewDeviceMatch">
-              <property name="horizontalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOff</enum>
-              </property>
-              <property name="editTriggers">
-               <set>QAbstractItemView::NoEditTriggers</set>
-              </property>
-              <property name="tabKeyNavigation">
-               <bool>false</bool>
-              </property>
-              <property name="showDropIndicator" stdset="0">
-               <bool>false</bool>
-              </property>
-              <property name="dragDropOverwriteMode">
-               <bool>false</bool>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::SingleSelection</enum>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="cornerButtonEnabled">
-               <bool>false</bool>
-              </property>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="horizontalHeaderMinimumSectionSize">
-               <number>50</number>
-              </attribute>
-              <attribute name="horizontalHeaderDefaultSectionSize">
-               <number>150</number>
-              </attribute>
-              <attribute name="horizontalHeaderHighlightSections">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="SClientMatch" name="widgetClientMatch" native="true">
+         <item row="1" column="0">
+          <widget class="SDeviceMatch" name="widgetDeviceMatch" native="true">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
              <height>500</height>
             </size>
            </property>
-           <layout class="QGridLayout" name="gridLayout_6">
+           <layout class="QGridLayout" name="gridLayout_9">
             <property name="leftMargin">
              <number>5</number>
             </property>
@@ -1074,6 +1016,12 @@
    <header>widgets/sphones.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>SDeviceMatch</class>
+   <extends>QWidget</extends>
+   <header>widgets/sdevicematch.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>comboBoxDeviceClass</tabstop>
@@ -1083,6 +1031,7 @@
   <tabstop>lineEditClientLastName</tabstop>
   <tabstop>lineEditClientFirstName</tabstop>
   <tabstop>lineEditClientPatronymic</tabstop>
+  <tabstop>comboBoxClientAdType</tabstop>
   <tabstop>comboBoxProblem</tabstop>
   <tabstop>comboBoxIncomingSet</tabstop>
   <tabstop>comboBoxExterior</tabstop>
@@ -1113,11 +1062,9 @@
   <tabstop>checkBoxIsCheckNeeded</tabstop>
   <tabstop>checkBoxIsCashReceiptDocNeeded</tabstop>
   <tabstop>spinBoxStickersCount</tabstop>
-  <tabstop>tableViewDeviceMatch</tabstop>
   <tabstop>CentnerButton1_2</tabstop>
   <tabstop>pushButtonCashReceipt</tabstop>
   <tabstop>lineEditClientAddress</tabstop>
-  <tabstop>comboBoxClientAdType</tabstop>
   <tabstop>checkBoxClientType</tabstop>
   <tabstop>pushButtonClientFromDB</tabstop>
   <tabstop>pushButtonClientCredsClearAll</tabstop>
@@ -1136,7 +1083,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>344</x>
-     <y>335</y>
+     <y>133</y>
     </hint>
     <hint type="destinationlabel">
      <x>63</x>
@@ -1184,7 +1131,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>492</x>
-     <y>343</y>
+     <y>136</y>
     </hint>
     <hint type="destinationlabel">
      <x>615</x>
@@ -1200,7 +1147,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>526</x>
-     <y>344</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>800</x>
@@ -1216,11 +1163,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>506</x>
-     <y>583</y>
+     <y>376</y>
     </hint>
     <hint type="destinationlabel">
      <x>795</x>
-     <y>585</y>
+     <y>378</y>
     </hint>
    </hints>
   </connection>
@@ -1269,38 +1216,6 @@
     <hint type="destinationlabel">
      <x>5</x>
      <y>161</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableViewDeviceMatch</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>deviceMatchTableDoubleClicked(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>920</x>
-     <y>148</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1020</x>
-     <y>106</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditSN</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>findMatchingDevice(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>886</x>
-     <y>50</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1020</x>
-     <y>21</y>
     </hint>
    </hints>
   </connection>
@@ -1360,7 +1275,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>506</x>
-     <y>611</y>
+     <y>404</y>
     </hint>
     <hint type="destinationlabel">
      <x>1021</x>
@@ -1376,7 +1291,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>560</x>
-     <y>344</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>1020</x>
@@ -1392,7 +1307,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>1000</x>
-     <y>614</y>
+     <y>407</y>
     </hint>
     <hint type="destinationlabel">
      <x>1019</x>
@@ -1423,8 +1338,8 @@
    <slot>prepayPaymentSystemChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>855</x>
-     <y>606</y>
+     <x>919</x>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>1019</x>

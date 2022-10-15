@@ -45,17 +45,12 @@ bool SFieldsModel::init(const int id)
     }
 
     SFieldValueModel *field;
-    int type = 0;
 
     query->exec(QUERY_SEL_ADDITIONAL_FIELDS_TYPES((m_isRepair?1:0), id));
     while(query->next())
     {
         field = new SFieldValueModel();
         field->createWidget(query->record());
-        field->setProperty("fieldType", query->value(2).toInt());
-        field->setProperty("fieldId", query->value(3).toInt());
-        field->setProperty("fieldRequired", query->value(4).toBool());
-        field->setProperty("fieldPrintable", query->value(5).toBool());
         add(field);
     }
     return 1;

@@ -90,6 +90,7 @@ SOURCES += \
     widgets/saletableitemdelegates.cpp \
     widgets/sclientmatch.cpp \
     widgets/scombobox.cpp \
+    widgets/sdevicematch.cpp \
     widgets/sgroupboxeventfilter.cpp \
     widgets/shortlivednotification.cpp \
     widgets/slineedit.cpp \
@@ -160,6 +161,7 @@ HEADERS  += \
     widgets/saletableitemdelegates.h \
     widgets/sclientmatch.h \
     widgets/scombobox.h \
+    widgets/sdevicematch.h \
     widgets/sgroupboxeventfilter.h \
     widgets/shortlivednotification.h \
     widgets/slineedit.h \
@@ -189,6 +191,7 @@ FORMS += \
     tabsale.ui \
     widgets/getoutdialog.ui \
     widgets/sclientmatch.ui \
+    widgets/sdevicematch.ui \
     widgets/sphone.ui \
     widgets/sphones.ui \
     widgets/stoolboxswitchpanel.ui

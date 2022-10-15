@@ -6,7 +6,7 @@ SFieldValueModel::SFieldValueModel(QObject *parent) : SComRecord(parent)
     i_tableName = "field_values";
 }
 
-SFieldValueModel::SFieldValueModel(const int id, QObject *parent) : SFieldValueModel()
+SFieldValueModel::SFieldValueModel(const int id, QObject *) : SFieldValueModel()
 {
     load(id);
 }
@@ -19,11 +19,13 @@ SFieldValueModel::~SFieldValueModel()
 void SFieldValueModel::load(const int id)
 {
     SSqlQueryModel *fieldModel = new SSqlQueryModel(this);
-    fieldModel->setQuery(QUERY_SEL_ADD_FIELD(i_id));
+    fieldModel->setQuery(QUERY_SEL_ADD_FIELD(id));
     if(fieldModel->lastError().isValid())
-        return;
-    m_isValid = 1;
-    load(fieldModel->record(0));
+    {
+        m_isValid = 1;
+        load(fieldModel->record(0));
+    }
+    delete fieldModel;
 }
 
 void SFieldValueModel::load(QSqlRecord record)
@@ -50,6 +52,12 @@ QWidget *SFieldValueModel::createWidget(const QSqlRecord &record)
 
     QSizePolicy *sizePolicy = new QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     int type = record.value(2).toInt();
+    setProperty("fieldType", type);
+    setProperty("fieldId", record.value(3).toInt());
+    setProperty("fieldRequired", record.value(4).toBool());
+    setProperty("fieldPrintable", record.value(5).toBool());
+    setProperty("fieldDevMatch", record.value(6).toBool());
+    setProperty("fieldInputMask", record.value(7).toString());
 
     switch (type)
     {
@@ -89,6 +97,18 @@ bool SFieldValueModel::validate()
             default: if(static_cast<QLineEdit*>(m_widget)->text().isEmpty()) {m_widget->setStyleSheet(commonLineEditStyleSheetRed); ret = 0;};
         }
     }
+    if(!this->property("fieldInputMask").toString().isEmpty())
+    {
+        if(this->property("fieldType").toInt() == WidgetType::LineEdit)
+        {
+            if(!static_cast<QLineEdit*>(m_widget)->hasAcceptableInput())
+            {
+                m_widget->setStyleSheet(commonLineEditStyleSheetRed);
+                ret = 0;
+            }
+        }
+    }
+
     if(ret)
         setDefaultStyleSheet();
 
@@ -118,10 +138,14 @@ QWidget *SFieldValueModel::createLineEdit(const QSqlRecord &record)
     widget->setPlaceholderText(record.value(0).toString());
     if(!record.value(1).toString().isEmpty())
     {
-        // TODO: добавить Input mask для LineEdit
         widget->setText(record.value(1).toString());
         this->setValue(widget->text());
     }
+    if(property("fieldDevMatch").toBool())
+        connect(widget,SIGNAL(textChanged(QString)),this,SLOT(textChanged(QString)));
+    if(!property("fieldInputMask").toString().isEmpty())
+        widget->setInputMask(property("fieldInputMask").toString());
+
     return widget;
 }
 
@@ -256,6 +280,11 @@ void SFieldValueModel::setValue(const QString &value)
     i_valuesMap.insert("value", value);
 }
 
+void SFieldValueModel::textChanged(QString text)
+{
+    emit textChanged(this->property("fieldId").toInt(), text);
+}
+
 bool SFieldValueModel::commit()
 {
     if(m_widget != nullptr)
@@ -296,5 +325,10 @@ bool SFieldValueModel::delDBRecord()
 bool SFieldValueModel::isValid()
 {
     return m_isValid;
+}
+
+bool SFieldValueModel::deviceMatch()
+{
+    return property("fieldDevMatch").toBool();
 }
 

@@ -10,6 +10,7 @@ class SFieldValueModel : public SComRecord
     Q_OBJECT
 signals:
     void emptied(SFieldValueModel*);
+    void textChanged(int, QString);
 public:
     enum WidgetType {LineEdit = 1, ComboBox, DateEdit, dummy};
     explicit SFieldValueModel(QObject *parent = nullptr);
@@ -35,6 +36,7 @@ public:
     bool commit();
     bool delDBRecord();
     bool isValid();
+    bool deviceMatch();
 private:
     QWidget *createLineEdit(const QSqlRecord&);
     QWidget *createComboBox(const QSqlRecord&);
@@ -50,6 +52,8 @@ private:
     QWidget *m_widget = nullptr;
 public slots:
     void setValue(const QString &);
+private slots:
+    void textChanged(QString);
 };
 
 #endif // SFIELDVALUEMODEL_H

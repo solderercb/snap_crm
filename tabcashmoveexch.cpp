@@ -433,7 +433,6 @@ void tabCashMoveExch::dstAmountChanged(double amountAbs)
 void tabCashMoveExch::chargeChanged(double)
 {
     ui->doubleSpinBoxCharge->setMinimum(0);
-    qDebug().nospace() << "[" << this << "] chargeChanged(double)";
     calculateDstAmount();
     constructReasonPart();
     updateWidgets();
@@ -441,7 +440,6 @@ void tabCashMoveExch::chargeChanged(double)
 
 void tabCashMoveExch::chargeChanged()
 {
-    qDebug().nospace() << "[" << this << "] chargeChanged()";
     currencyFlipped = 0;
     prevCurrencyRate = 0;
 }

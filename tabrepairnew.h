@@ -15,7 +15,6 @@
 #include "models/sdevmdlmodel.h"
 #include "models/srepairmodel.h"
 #include "models/scommentmodel.h"
-#include "widgets/sgroupboxeventfilter.h"
 #include "widgets/sphones.h"
 
 namespace Ui {
@@ -64,11 +63,10 @@ private:
     int client = 0;
     bool checkInput();
     QMessageBox msgBox;
-    SGroupBoxEventFilter *groupBoxEventFilter;
     bool createClient();
     void print(int);
 #ifdef QT_DEBUG
-    void randomFill();
+    void randomFill() override;
 #endif
 
 private slots:
@@ -83,9 +81,6 @@ private slots:
     void fillDeviceCreds(int);
     void buttonSelectExistingClientHandler();
     void buttonCreateTabClientHandler();
-    void findMatchingDevice(QString);
-    void deviceMatchTableDoubleClicked(QModelIndex);
-    void clientMatchTableDoubleClicked(QModelIndex);
     void lineEditSNClearHandler(int);
     bool createRepair();
     void createRepairClose();
@@ -93,8 +88,8 @@ private slots:
     void preferredPaymentSystemChanged(int);
     void prepayPaymentSystemChanged(int);
 #ifdef QT_DEBUG
-    void test_scheduler_handler();
-    void test_scheduler2_handler();
+    void test_scheduler_handler() override;
+    void test_scheduler2_handler() override;
 #endif
 };
 

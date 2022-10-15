@@ -775,12 +775,12 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    createTabSale(0);
 //    if (test_scheduler_counter < 375)
 //    {
-//        createTabRepairNew();
+        createTabRepairNew();
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
 //        createTabCashOperation(42019);
 //        createTabClient(143);
-        createTabCashMoveExch();
+//        createTabCashMoveExch();
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("repair_id", 24972);
 //        report_vars.insert("type", "new_rep");

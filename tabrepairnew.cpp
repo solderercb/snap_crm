@@ -21,7 +21,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
-    connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
 #ifdef QT_DEBUG
     main_window_test_scheduler = parent->test_scheduler;
     main_window_test_scheduler2 = parent->test_scheduler2;
@@ -29,9 +28,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
     clientModel = new SClientModel();
     ui->phones->setModel(clientModel->phones());
-    groupBoxEventFilter = new SGroupBoxEventFilter(this);
-    ui->groupBoxDeviceCoincidence->installEventFilter(groupBoxEventFilter);
-    ui->groupBoxDeviceCoincidence->hide();  // по умолчанию группу "Совпадение уст-ва" не показываем
     ui->labelPrevRepairFromOldDB->hide();   // по умолчанию поля "Предыдущий ремонт" не показываем
     ui->lineEditPrevRepairFromOldDB->hide();
     ui->lineEditPrevRepair->hide();
@@ -94,6 +90,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui->comboBoxExterior->setModel(classExteriorsModel);
 
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
+    connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
+    connect(ui->lineEditSN,SIGNAL(textEdited(QString)),ui->widgetDeviceMatch,SLOT(findBySN(QString)));
+    connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
 
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setModelColumn(0);
@@ -112,9 +111,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     }
     ui->comboBoxPrepayReason->setModel(prepayReasonsModel);
     ui->comboBoxPrepayReason->setCurrentIndex(-1);
-
-    clientsMatchTable = new QSqlQueryModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
-    devicesMatchTable = new QSqlQueryModel();       // таблица совпадения устройства (по серийному номеру)
 
     deviceClassesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
     ui->comboBoxDeviceClass->setCurrentIndex(-1);
@@ -137,9 +133,6 @@ tabRepairNew::~tabRepairNew()
     delete classProblemsModel;
     delete classIncomingSetsModel;
     delete classExteriorsModel;
-    delete clientsMatchTable;
-    delete devicesMatchTable;
-    delete groupBoxEventFilter;
     delete additionalFields;
     delete clientModel;
     delete cashRegister;
@@ -156,7 +149,7 @@ bool tabRepairNew::tabCloseRequest()
 
 QString tabRepairNew::tabTitle()
 {
-
+    return QString();
 }
 
 tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
@@ -258,7 +251,8 @@ void tabRepairNew::changeDeviceClass(int index)
     foreach(additionalField, additionalFields->list())
     {
         ui->gridLayoutDeviceDescription->addWidget(additionalField->widget(), additionalFieldRow, additionaFieldCol, 1, 1);
-
+        if(additionalField->deviceMatch())
+            connect(additionalField, SIGNAL(textChanged(int,QString)), ui->widgetDeviceMatch, SLOT(findByField(int,QString)));
         if (++additionaFieldCol > 5)
         {
             additionalFieldRow++;
@@ -408,69 +402,13 @@ void tabRepairNew::buttonSelectExistingClientHandler()
     emit createTabSelectExistingClient(1, this);
 }
 
-void tabRepairNew::findMatchingDevice(QString text)
-{
-//    qDebug() << "findMatchingDevice(QString text)";
-    QString query;
-
-    if( text.length() >= 3 )  // если пользователь ввёл более двух символов
-    {
-        ui->tableViewDeviceMatch->setModel(devicesMatchTable);  // указываем модель таблицы
-
-        // TODO: сейчас regexp будет работать неправильно, т. к. производится преобразование регистра для расширения диапазона поиска
-        // Возможно нужно доработать этот механизм, чтобы рег. выражения работали полноценно
-        query = QUERY_SEL_DEVICE_MATCH(text);
-        devicesMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
-
-        // прячем столбцы с кодами типа уст-ва, производителем, моделью и клиентом (они запрашиваются для автозаполнения полей при выборе совпадающего)
-        ui->tableViewDeviceMatch->hideColumn(5);
-        ui->tableViewDeviceMatch->hideColumn(6);
-        ui->tableViewDeviceMatch->hideColumn(7);
-        ui->tableViewDeviceMatch->hideColumn(8);
-
-        // изменяем размер столбцов под соедржимое.
-        // TODO: заменить QTableView на свой класс и реализовать в нём пропорциональное изменение ширин столбцов
-        // при изменении размера окна и тултип для длинного текста (неисправность).
-        ui->tableViewDeviceMatch->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
-        if (devicesMatchTable->rowCount() > 0)
-        {
-            ui->groupBoxDeviceCoincidence->show();  // только если возвращены результаты, показываем таблицу совпадения устройства
-            ui->tableViewDeviceMatch->show();       // может случиться ситуация, когда таблица будет скрыта, поэтому принудительно отображаем её
-        }
-        else
-            ui->groupBoxDeviceCoincidence->hide();  // иначе прячем таблицу
-    }
-    else
-    {
-        devicesMatchTable->clear(); // если кол-во введённых пользователем символов меньше трёх, то удаляем результаты предыдущего запроса и прячем таблицу.
-        ui->groupBoxDeviceCoincidence->hide();
-    }
-}
-
-void tabRepairNew::deviceMatchTableDoubleClicked(QModelIndex item)
-{
-    fillDeviceCreds(devicesMatchTable->index(item.row(), 0).data().toInt());
-    ui->tableViewDeviceMatch->hide();   // прячем таблицу, а не весь groupBox (вдруг пользователь промахнётся)
-    ui->widgetClientMatch->hide();  // прячем таблицу совпадения клиента (если она по какой-то причине отображается)
-}
-
-void tabRepairNew::clientMatchTableDoubleClicked(QModelIndex item)
-{
-    fillClientCreds(clientsMatchTable->index(item.row(), 0).data().toInt());
-//    ui->groupBoxClientCoincidence->hide();  // прячем таблицу совпадения клиента
-    ui->widgetClientMatch->hide();   // прячем таблицу, а не весь groupBox (вдруг пользователь промахнётся)
-}
-
 void tabRepairNew::lineEditSNClearHandler(int)
 {
     if(ui->lineEditSN->text().length())
         ui->lineEditSN->clear();
     else
         ui->lineEditSN->setText("НЕТ S/N");
-
-    devicesMatchTable->clear(); // то удаляем результаты предыдущего запроса и прячем таблицу.
-    ui->groupBoxDeviceCoincidence->hide();
+    ui->widgetDeviceMatch->findBySN("");
 }
 
 void tabRepairNew::setDefaultStyleSheets()
@@ -643,7 +581,7 @@ bool tabRepairNew::createRepair()
 
     bool nErr = 1;
     int deviceClassIndex, deviceVendorIndex, deviceIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
-    int device, user, repair, preferredPaymentAccIndex, prepaySumm;
+    int device, user, repair, preferredPaymentAccIndex, prepaySumm = 0;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     setDefaultStyleSheets();
@@ -765,7 +703,7 @@ bool tabRepairNew::createRepair()
             cashRegister->setOperationType(SCashRegisterModel::RecptPrepayRepair);
             cashRegister->setRepairId(repair);
             cashRegister->setAmount(prepaySumm);
-            cashRegister->setReason(QString("%1 (%2)").arg(cashRegister->constructReason(repair)).arg(ui->comboBoxPrepayReason->currentText()));
+            cashRegister->setReason(QString("%1 (%2)").arg(cashRegister->constructReason(repair), ui->comboBoxPrepayReason->currentText()));
             cashRegister->setSkipLogRecording(true);
             nErr = cashRegister->commit();
 
@@ -845,7 +783,7 @@ void tabRepairNew::primaryPhoneEdited(QString number)
     ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
 }
 
-void tabRepairNew::preferredPaymentSystemChanged(int index)
+void tabRepairNew::preferredPaymentSystemChanged(int)
 {
     // при установке модели данных автоматически устанавливается индекс 0 и в модель ремонта устанавливается предпочитаемый тип оплаты, что есть неправильно
 }
@@ -898,10 +836,10 @@ void tabRepairNew::randomFill()
     if (test_scheduler_counter == 0)   // клиент
 //    if (1)
     {
-        fillClientCreds(257);
-        test_scheduler_counter++;
-        test_scheduler->start(400);    //  (пере-)запускаем таймер
-        return;
+//        fillClientCreds(257);
+//        test_scheduler_counter++;
+//        test_scheduler->start(400);    //  (пере-)запускаем таймер
+//        return;
         if(0)
 //        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {
@@ -930,11 +868,11 @@ void tabRepairNew::randomFill()
                 ui->phones->addPhone();
                 if (QRandomGenerator::global()->bounded(100) > 50)
                 {
-                    ui->phones->forms().last()->testFill(2, clients4Test->value(i)->at(4));
+                    ui->phones->forms().at(1)->testFill(2, clients4Test->value(i)->at(4));
                 }
                 else
                 {
-                    ui->phones->forms().last()->testFill(0, clients4Test->value(i)->at(3));
+                    ui->phones->forms().at(1)->testFill(0, clients4Test->value(i)->at(3));
                 }
             }
             i = QRandomGenerator::global()->bounded(clientAdTypesList->rowCount()); // если клиент новый, то случайно выбираем источник обращения
