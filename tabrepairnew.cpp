@@ -294,6 +294,8 @@ void tabRepairNew::clearClientCreds(bool hideCoincidence)
     ui->lineEditClientEmail->clear();
 
     clientModel->clear();
+    ui->pushButtonCreateTabClient->hide();
+    ui->listWidgetClientOptions->clear();
 
     if (hideCoincidence)
         ui->widgetClientMatch->hide();
@@ -341,6 +343,8 @@ void tabRepairNew::fillClientCreds(int id)
     ui->phones->setModel(clientModel->phones());
     ui->lineEditClientAddress->setText(clientModel->address());
     ui->lineEditClientEmail->setText(clientModel->email());
+    ui->pushButtonCreateTabClient->show();
+    ui->listWidgetClientOptions->addItems(clientModel->optionsList(1));
 
     ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
 }
@@ -775,7 +779,7 @@ bool tabRepairNew::createRepair()
 void tabRepairNew::createRepairClose()
 {
     if (!createRepair())
-        this->deleteLater();
+        this->deleteLater();    // TODO: программа падает при двойном клике по кнопке.
 }
 
 void tabRepairNew::primaryPhoneEdited(QString number)
@@ -836,10 +840,10 @@ void tabRepairNew::randomFill()
     if (test_scheduler_counter == 0)   // клиент
 //    if (1)
     {
-//        fillClientCreds(257);
-//        test_scheduler_counter++;
-//        test_scheduler->start(400);    //  (пере-)запускаем таймер
-//        return;
+        fillClientCreds(33);
+        test_scheduler_counter++;
+        test_scheduler->start(400);    //  (пере-)запускаем таймер
+        return;
         if(0)
 //        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {

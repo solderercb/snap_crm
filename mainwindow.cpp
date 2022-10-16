@@ -306,6 +306,7 @@ void MainWindow::createTabRepair(int repair_id)
     ui->tabWidget->setCurrentWidget(subwindow);
     QObject::connect(subwindow,SIGNAL(createTabPrevRepair(int)), this, SLOT(createTabRepair(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
+    QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
 }
 
 void MainWindow::createTabRepairNew()

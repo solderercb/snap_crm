@@ -325,13 +325,18 @@ void initOffices()      // Список офисов
 void initSystemObjects()
 {
     userActivityLog = new SUserActivityModel();
-    enum ClientBinaryOption{Company = 1, Regular = 2, Broker = 4, IgnoreCalls = 8, PreferCashless = 16, TakeLong = 32, Supplier = 64, SaleOrReturn = 128, BalanceEnabled = 256, Bad = 512, Archived = 1024};
+//    enum ClientBinaryOption{Company = 1, Regular = 2, Broker = 4, IgnoreCalls = 8, PreferCashless = 16, TakeLong = 32, Supplier = 64, SaleOrReturn = 128, BalanceEnabled = 256, Bad = 512, Archived = 1024};
     clientBinaryProperties = new SStandardItemModel();
     QVector<QString> NamesList = {QObject::tr("Юридическое лицо", "company"), QObject::tr("Постоянный клиент", "regular"),
                                   QObject::tr("Посредник", "broker (middleman)"), QObject::tr("Игнорирует звонки", "ignores calls"),
                                   QObject::tr("Предпочитает безнал", "prefer cashless"), QObject::tr("Не забирает технику в срок", "take out not in time"),
                                   QObject::tr("Является поставщиком", "supplier"), QObject::tr("Даёт товар под реализацию", "sale or return"),
                                   QObject::tr("Баланс", "client balance"), QObject::tr("Проблемный", "problematic client"), QObject::tr("Архивный", "archived")};
+    QVector<QString> NamesListShort = {QObject::tr("юр.", "company (short)"), QObject::tr("пост.", "regular (short)"),
+                                  QObject::tr("поср.", "broker (middleman) (short)"), QObject::tr("игн. зв.", "ignores calls (short)"),
+                                  QObject::tr("безнал", "prefer cashless (short)"), QObject::tr("долго забир.", "take out not in time (short)"),
+                                  QObject::tr("поставщ.", "supplier (short)"), QObject::tr("реализ.", "sale or return (short)"),
+                                  QObject::tr("бал.", "client balance (short)"), QObject::tr("проблемный", "problematic client (short)"), QObject::tr("арх.", "archived (short)")};
     QVector<int> bitfieldsList = {SClientModel::Company, SClientModel::Regular,
                                   SClientModel::Broker, SClientModel::IgnoreCalls,
                                   SClientModel::PreferCashless, SClientModel::TakeLong,
@@ -346,9 +351,9 @@ void initSystemObjects()
     for (int i=0; i<NamesList.size(); i++)
     {
         selector = new QList<QStandardItem*>();
-        *selector << new QStandardItem(NamesList.at(i)) << new QStandardItem(QString::number(bitfieldsList.at(i))) << new QStandardItem(DBFieldsList.at(i));
+        *selector << new QStandardItem(NamesList.at(i)) << new QStandardItem(QString::number(bitfieldsList.at(i))) << new QStandardItem(DBFieldsList.at(i)) << new QStandardItem(NamesListShort.at(i));
         clientBinaryProperties->appendRow(*selector);
     }
     clientBinaryProperties->setObjectName("clientBinaryProperties");
-    clientBinaryProperties->setHorizontalHeaderLabels({"name", "bitfield", "dbField"});
+    clientBinaryProperties->setHorizontalHeaderLabels({"name", "bitfield", "dbField, shortName"});
 }

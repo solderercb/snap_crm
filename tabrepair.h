@@ -91,6 +91,7 @@ signals:
     void worksTreeDoubleClicked(int);
     void createTabPrevRepair(int);
     void generatePrintout(QMap<QString,QVariant>);
+    void createTabClient(int);
 
 public:
     explicit tabRepair(int rep_id, MainWindow *parent = nullptr);
@@ -103,7 +104,7 @@ private:
     int repair_id;
     QSqlQueryModel *repairModel;
     SRepairModel *repairModel2;
-    QSqlQueryModel *clientModel;
+    SClientModel *clientModel;
     QSqlQueryModel *fieldsModel;
     QSortFilterProxyModel *statusesProxyModel;
     commentsDataModel *commentsModel;
@@ -122,12 +123,13 @@ private:
     bool save_state_on_close = 0;
     bool worksAndPartsEditEnabled = 0;
     SGroupBoxEventFilter *groupBoxEventFilter;
+    int m_clientId = 0;
 #ifdef QT_DEBUG
     void randomFill(){};
 #endif
 
 private slots:
-    void updateRepairData();
+    void reloadRepairData();
     void updateWidgets();
     void worksTreeDoubleClicked(QModelIndex);
     void saveStatus();
@@ -145,6 +147,7 @@ private slots:
     void quickAddSparePartByUID(int);
     void editIncomingSet(int);
     void setAgreedAmount(int);
+    void buttonClientClicked();
 #ifdef QT_DEBUG
     void test_scheduler_handler(){};
     void test_scheduler2_handler(){};

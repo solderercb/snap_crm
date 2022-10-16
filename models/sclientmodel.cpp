@@ -298,6 +298,39 @@ int SClientModel::options()
     return m_options;
 }
 
+/*  Список свойств клиента, которые необходимо отображать в карточке ремонта
+ *  или в графе с данными клиента при приёме в ремонт
+*/
+QStringList SClientModel::optionsList(bool shortForm)
+{
+    int col = 0;
+    bool skip;
+    if(shortForm)
+        col = 3;
+    QStringList list;
+    for(int i = 0; i < clientBinaryProperties->rowCount(); i++)
+    {
+        switch(m_options & (1<<i))
+        {
+//            case BinaryOption::Company:
+//            case BinaryOption::Supplier:
+//            case BinaryOption::SaleOrReturn:
+//            case BinaryOption::BalanceEnabled:
+//            case BinaryOption::Archived:
+            case BinaryOption::Regular:
+            case BinaryOption::Broker:
+            case BinaryOption::IgnoreCalls:
+            case BinaryOption::PreferCashless:
+            case BinaryOption::TakeLong:
+            case BinaryOption::Bad: skip = 0; break;
+            default: skip = 1;
+        }
+        if(!skip)
+            list << clientBinaryProperties->index(i, col).data().toString();
+    }
+    return list;
+}
+
 int SClientModel::adType()
 {
     return m_visitSource;

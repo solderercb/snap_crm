@@ -11,7 +11,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     repair_id(rep_id)
 {
     repairModel2 = new SRepairModel();
-    repairModel2->load(rep_id);
+    clientModel = new SClientModel();
     setLock(1);
     ui->setupUi(this);
     if(permissions->contains("3"))  // Печатать ценники и стикеры
@@ -62,7 +62,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(ui->toolButtonSaveStatus, SIGNAL(clicked()), this, SLOT(saveStatus()));
 
     repairModel = new QSqlQueryModel();
-    clientModel = new QSqlQueryModel();
     if (repairModel->record(0).value("user_lock").toInt());
         // TODO: Добавлять символ 🔒 в название вкладки
     fieldsModel = new QSqlQueryModel();
@@ -71,7 +70,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     worksAndPartsModel = new worksAndSparePartsDataModel;
     connect(worksAndPartsModel, SIGNAL(modelReset()), this, SLOT(updateTotalSumms()));  // TODO: уточнить генерируется ли сигнал при изменении существующих данных
     commentsModel = new commentsDataModel();
-//    updateRepairData();
+//    reloadRepairData();
 
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxStatus->setModel(statusesProxyModel);
@@ -123,10 +122,16 @@ QString tabRepair::tabTitle()
 
 }
 
-void tabRepair::updateRepairData()
+void tabRepair::reloadRepairData()
 {
     repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(repair_id), QSqlDatabase::database("connMain"));
-    clientModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt()));
+    repairModel2->load(repair_id);
+
+    if(repairModel2->clientId() != m_clientId)  // перезагрузка данных клиента только при первом вызове метода или если был изменён клиент
+    {
+        m_clientId = repairModel2->clientId();
+        clientModel->load(m_clientId);
+    }
     fieldsModel->setQuery(QUERY_SEL_REPAIR_ADD_FIELDS(repair_id), QSqlDatabase::database("connMain"));
     worksAndPartsModel->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(repair_id));
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
@@ -134,11 +139,11 @@ void tabRepair::updateRepairData()
 
 void tabRepair::updateWidgets()
 {
-    updateRepairData();
+    reloadRepairData();
     ui->lineEditRepairId->setText(QString::number(repair_id));
     ui->lineEditDevice->setText(repairModel->record(0).value("Title").toString());
     ui->lineEditSN->setText(repairModel->record(0).value("serial_number").toString());
-    ui->lineEditClient->setText(clientModel->record(0).value("FioOrUrName").toString());
+    ui->lineEditClient->setText(clientModel->fullLongName());
     QDateTime date = repairModel->record(0).value("in_date").toDateTime();
     date.setTimeZone(QTimeZone::utc());
     ui->lineEditInDate->setText(date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
@@ -204,18 +209,13 @@ void tabRepair::updateWidgets()
 
     ui->listWidgetExtraInfo->setHidden(true);
     ui->listWidgetExtraInfo->clear();
-    if(clientModel->record(0).value("is_regular").toBool())
-        ui->listWidgetExtraInfo->addItem(tr("постоянный клиент"));
+    ui->listWidgetExtraInfo->addItems(clientModel->optionsList());
     if(repairModel->record(0).value("thirs_party_sc").toBool())
         ui->listWidgetExtraInfo->addItem(tr("было в другом СЦ"));
     if(repairModel->record(0).value("can_format").toBool())
         ui->listWidgetExtraInfo->addItem(tr("данные не важны"));
     if(repairModel->record(0).value("express_repair").toBool())
         ui->listWidgetExtraInfo->addItem(tr("срочный"));
-    if(clientModel->record(0).value("is_agent").toBool())
-        ui->listWidgetExtraInfo->addItem(tr("посредник"));
-//    if(clientModel->record(0).value("is_bad").toBool())
-//        ui->listWidgetExtraInfo->addItem(tr("проблемный"));
 //    if(repairModel->record(0).value("").toBool())
 //        ui->listWidgetExtraInfo->addItem("");
 //    if(repairModel->record(0).value("is_card_payment").toBool())
@@ -444,6 +444,11 @@ void tabRepair::editIncomingSet(int)
 void tabRepair::setAgreedAmount(int)
 {
 
+}
+
+void tabRepair::buttonClientClicked()
+{
+    emit createTabClient(m_clientId);
 }
 
 void tabRepair::worksTreeDoubleClicked(QModelIndex item)

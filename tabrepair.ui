@@ -915,8 +915,28 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>81</height>
+             <height>0</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QListView {
+	background-color: rgba(240, 240, 240, 0);
+}
+QListView::item  {
+	background-color: rgb(204, 204, 204);
+}</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="lineWidth">
+            <number>0</number>
+           </property>
+           <property name="verticalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
            </property>
            <property name="sizeAdjustPolicy">
             <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -931,22 +951,34 @@
             <enum>Qt::IgnoreAction</enum>
            </property>
            <property name="alternatingRowColors">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="selectionMode">
-            <enum>QAbstractItemView::SingleSelection</enum>
+            <enum>QAbstractItemView::NoSelection</enum>
            </property>
            <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
+            <enum>QAbstractItemView::SelectItems</enum>
            </property>
            <property name="textElideMode">
             <enum>Qt::ElideLeft</enum>
            </property>
+           <property name="flow">
+            <enum>QListView::LeftToRight</enum>
+           </property>
+           <property name="isWrapping" stdset="0">
+            <bool>true</bool>
+           </property>
            <property name="resizeMode">
             <enum>QListView::Adjust</enum>
            </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
            <property name="batchSize">
             <number>5</number>
+           </property>
+           <property name="selectionRectVisible">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -1371,7 +1403,7 @@
             <item row="0" column="2">
              <widget class="QPushButton" name="buttonClientCard">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1449,6 +1481,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>SLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets/slineedit.h</header>
+   <slots>
+    <signal>buttonClicked(int)</signal>
+    <signal>mouseDoubleClick()</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>commentsTable</class>
    <extends>QTableView</extends>
    <header>tabrepair.h</header>
@@ -1457,15 +1498,6 @@
    <class>worksAndSparePartsTable</class>
    <extends>QTableView</extends>
    <header>tabrepair.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">widgets/slineedit.h</header>
-   <slots>
-    <signal>buttonClicked(int)</signal>
-    <signal>mouseDoubleClick()</signal>
-   </slots>
   </customwidget>
   <customwidget>
    <class>SComboBox</class>
@@ -1502,8 +1534,8 @@
    <slot>openPrevRepair()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>213</x>
-     <y>410</y>
+     <x>308</x>
+     <y>408</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1511,9 +1543,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonClientCard</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepair</receiver>
+   <slot>buttonClientClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>540</x>
+     <y>906</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>542</x>
+     <y>942</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createGetOutDialog()</slot>
   <slot>openPrevRepair()</slot>
+  <slot>buttonClientClicked()</slot>
  </slots>
 </ui>

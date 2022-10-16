@@ -78,6 +78,7 @@ public:
     QString notes();
     void setNotes(const QString&);
     int options();
+    QStringList optionsList(bool shortForm = 0);
     void setOptions(int);
     int adType();
     void setAdType(const int);
