@@ -109,7 +109,8 @@ private slots:
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void closeTab(int index);
-    void updateTabLabel(QWidget*, const QString&);
+    void updateTabTitle(QWidget*);
+    void updateTabIcon(QWidget*);
 #ifdef QT_DEBUG
     void btnClick();
     void on_treeView_clicked(const QModelIndex &index);

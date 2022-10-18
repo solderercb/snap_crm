@@ -16,8 +16,7 @@ class tabCommon : public QWidget
     Q_OBJECT
 
 signals:
-    void updateLabel(QWidget*, const QString);
-    void updateIcon(QWidget*, QIcon);
+    void updateTabTitle(QWidget*);
     void activateCaller(QWidget *);
 public:
     explicit tabCommon(MainWindow *p = nullptr);
@@ -25,8 +24,11 @@ public:
     virtual bool tabCloseRequest();
     void setCallerPtr(QWidget *ptr){callerPtr = ptr;};
     virtual QString tabTitle() = 0;
+    virtual QIcon* tabIcon();
 protected:
     QWidget *callerPtr = nullptr;
+    QString i_tabTitle = "Untitled";
+    QIcon *i_tabIcon = nullptr;
 #ifdef QT_DEBUG
     virtual void randomFill() = 0;
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;

@@ -87,7 +87,7 @@ tabSale::~tabSale()
 QString tabSale::tabTitle()
 {
     if(doc_id)
-        return tr("РН%1").arg(doc_id);
+        return tr("Расходная накладная %1").arg(doc_id);
     return tr("Продажа");
 }
 
@@ -886,7 +886,7 @@ bool tabSale::sale()
         p_instance.remove(initial_doc_id);   // Если всё ОК, то нужно заменить указатель
         p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
 
-        emit updateLabel(this, tr("Расходная накладная %1").arg(doc_id));
+        emit updateTabTitle(this);
         print();
         return false;
     }

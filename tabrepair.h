@@ -19,6 +19,8 @@
 #include "widgets/getoutdialog.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "models/srepairmodel.h"
+#include "models/scommentmodel.h"
+#include "models/scommentsmodel.h"
 
 namespace Ui {
 class tabRepair;
@@ -117,6 +119,7 @@ private:
     void addItemToListViewExtraInfo(QString, QString);
     void setLock(bool);
     QString box_name;
+    bool modelRO = 0;   // признак блокировки карты ремонта
 
     getOutDialog *modalWidget;
     QWidget *overlay;

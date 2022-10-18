@@ -65,7 +65,10 @@ tabClients::~tabClients()
 
 QString tabClients::tabTitle()
 {
-
+    if(_type)
+        return tr("Выбрать клиента");
+    else
+        return tr("Клиенты");
 }
 
 tabClients* tabClients::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

@@ -63,14 +63,14 @@ tabCashOperation::~tabCashOperation()
 
 void tabCashOperation::initPKO()
 {
-    m_tabTitle = tr("Приходный кассовый ордер");
+    i_tabTitle = tr("Приходный кассовый ордер");
     paymentTypesModel = receiptTypesModel;
     ui->comboBoxOrderType->setModel(paymentTypesModel);
 }
 
 void tabCashOperation::initRKO()
 {
-    m_tabTitle = tr("Расходный кассовый ордер");
+    i_tabTitle = tr("Расходный кассовый ордер");
     paymentTypesModel = expenditureTypesModel;
     ui->comboBoxOrderType->setModel(paymentTypesModel);
     m_showCheckBoxPrint = 0;
@@ -264,7 +264,7 @@ bool tabCashOperation::commit(bool repeatAfter)
     {
         if(!repeatAfter)
         {
-            emit updateLabel(this, tabTitle());
+            emit updateTabTitle(this);
             p_instance.remove(initial_order_id);   // Если всё ОК, то нужно заменить указатель
             p_instance.insert(m_orderId, this);    // иначе будет падать при попытке создать новую вкладку
 
@@ -368,9 +368,9 @@ void tabCashOperation::updateOrderIdLineEdit()
 QString tabCashOperation::tabTitle()
 {
     if(m_orderId > 0)
-        return m_tabTitle + QString(" %1").arg(m_orderId);
+        return i_tabTitle + QString(" %1").arg(m_orderId);
 
-    return m_tabTitle;
+    return i_tabTitle;
 }
 
 void tabCashOperation::prepareTemplate(QMap<int, QVariant> data)

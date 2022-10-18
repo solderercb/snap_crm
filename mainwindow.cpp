@@ -30,12 +30,16 @@ bool tabBarEventFilter::eventFilter(QObject *watched, QEvent *event)
 
         if (mouseButtonPress->button() == Qt::MiddleButton)
         {
-//            qDebug() << watched->objectName() << ": viewEventFilter: " << event << "; tab = " << tabBar->tabAt(mouseButtonPress->position().toPoint());
+            QPoint point;
+            int tabId = -1;
 #if QT_VERSION >= 0x060000
-                emit tabBar->tabCloseRequested(tabBar->tabAt(mouseButtonPress->position().toPoint()));
+            point = mouseButtonPress->position().toPoint();
 #else
-                emit tabBar->tabCloseRequested(tabBar->tabAt(mouseButtonPress->localPos().toPoint()));
+            point = mouseButtonPress->localPos().toPoint();
 #endif
+            tabId = tabBar->tabAt(point);
+            if(tabId >= 0)
+                emit tabBar->tabCloseRequested(tabId);
         }
     }
     return false;
@@ -43,7 +47,7 @@ bool tabBarEventFilter::eventFilter(QObject *watched, QEvent *event)
 
 MainWindow* MainWindow::p_instance = nullptr;
 
-MainWindow::MainWindow(windowsDispatcher *parent) :
+MainWindow::MainWindow(windowsDispatcher*) :
     QMainWindow(nullptr),
 	ui(new Ui::MainWindow)
 {
@@ -275,14 +279,12 @@ MainWindow* MainWindow::getInstance(windowsDispatcher *parent)   // singleton: M
 
 void MainWindow::createTabRepairs(int type, QWidget* caller)
 {
-    const QString tabLabels[] = {"Ремонты", "Выбрать ремонт"};
     tabRepairs *subwindow = tabRepairs::getInstance(type, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
-        ui->tabWidget->addTab(subwindow, tabLabels[type]);
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
 
     if (type == 0)
     {
-        //
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabRepair(int)));
     }
     else
@@ -290,7 +292,7 @@ void MainWindow::createTabRepairs(int type, QWidget* caller)
         QObject::connect(subwindow,SIGNAL(buttonRepairNewClicked()), this, SLOT(createTabRepairNew()));
         // Сигнал экземпляра вкладки выбора предыдущего ремонта подключаем к слоту вызывающей вкладки для заполнения соотв. полей
         // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
-        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), caller, SLOT(fillLinkedObj(int)));
+        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), caller, SLOT(fillDeviceCreds(int)));
         subwindow->setCallerPtr(caller);
         QObject::connect(subwindow,SIGNAL(activateCaller(QWidget*)),this,SLOT(reactivateCallerTab(QWidget*)));
     }
@@ -302,18 +304,20 @@ void MainWindow::createTabRepair(int repair_id)
 {
     tabRepair *subwindow = tabRepair::getInstance(repair_id, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
-        ui->tabWidget->addTab(subwindow, "Ремонт " + QString::number(repair_id));
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+    updateTabIcon(subwindow);
     ui->tabWidget->setCurrentWidget(subwindow);
     QObject::connect(subwindow,SIGNAL(createTabPrevRepair(int)), this, SLOT(createTabRepair(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
+    QObject::connect(subwindow,SIGNAL(updateTabTitle(QWidget*)), this, SLOT(updateTabTitle(QWidget*)));
 }
 
 void MainWindow::createTabRepairNew()
 {
     tabRepairNew *subwindow = tabRepairNew::getInstance(this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
-        ui->tabWidget->addTab(subwindow, "Приём в ремонт");
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int,QWidget*)), this, SLOT(createTabRepairs(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
@@ -329,7 +333,7 @@ void MainWindow::createTabPrint(QMap<QString, QVariant> report_vars)
     tabPrintDialog *subwindow;
 
     subwindow = new tabPrintDialog(this, report_vars);
-    ui->tabWidget->addTab(subwindow, "Print");
+    ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow);
 }
 
@@ -351,7 +355,7 @@ void MainWindow::createTabCashOperation(int orderId, QMap<int, QVariant> data)
     QObject::connect(subwindow,SIGNAL(createTabSelectRepair(int,QWidget*)), this, SLOT(createTabRepairs(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectDocument(int,QWidget*)), this, SLOT(createTabDocuments(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectInvoice(int,QWidget*)), this, SLOT(createTabInvoices(int,QWidget*)));
-    QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*,const QString)), this, SLOT(updateTabLabel(QWidget*,const QString&)));
+    QObject::connect(subwindow,SIGNAL(updateTabTitle(QWidget*)), this, SLOT(updateTabTitle(QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabUndoOperation(int,QMap<int,QVariant>)), this, SLOT(createTabCashOperation(int,QMap<int,QVariant>)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
     subwindow->prepareTemplate(data);
@@ -376,7 +380,7 @@ void MainWindow::createTabCashMoveExch()
     tabCashMoveExch *subwindow = tabCashMoveExch::getInstance(this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
-    QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*,const QString)), this, SLOT(updateTabLabel(QWidget*,const QString&)));
+    QObject::connect(subwindow,SIGNAL(updateTabTitle(QWidget*)), this, SLOT(updateTabTitle(QWidget*)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 
     ui->tabWidget->setCurrentWidget(subwindow);
@@ -405,16 +409,13 @@ void MainWindow::createTabSale(int doc_id)
 {
     tabSale *subwindow = tabSale::getInstance(doc_id, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
-        if(doc_id)
-            ui->tabWidget->addTab(subwindow, "Расходная накладная " + QString::number(doc_id));
-        else
-            ui->tabWidget->addTab(subwindow, "Продажа");
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow);
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int, QWidget *)), this, SLOT(createTabClients(int, QWidget *)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString, QVariant>)), this, SLOT(createTabPrint(QMap<QString, QVariant>)));
-    QObject::connect(subwindow,SIGNAL(updateLabel(QWidget*, QString)), this, SLOT(updateTabLabel(QWidget*, const QString&)));
-    // TODO: QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
+    QObject::connect(subwindow,SIGNAL(updateTabTitle(QWidget*)), this, SLOT(updateTabTitle(QWidget*)));
+    QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
 }
 
 /*  Создание вкладки Клиенты (type = 0) или Выбрать клиента (type = 1)
@@ -423,14 +424,13 @@ void MainWindow::createTabSale(int doc_id)
 */
 void MainWindow::createTabClients(int type, QWidget *caller)
 {
-    const QString tabLabels[] = {"Клиенты", "Выбрать клиента"};
     tabClients *subwindow = tabClients::getInstance(type, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет
     {
         if(caller)  // если передан параметр, то вставляем её сразу после вызывающей
-            ui->tabWidget->insertTab(ui->tabWidget->indexOf(caller) + 1, subwindow, tabLabels[type]);
+            ui->tabWidget->insertTab(ui->tabWidget->indexOf(caller) + 1, subwindow, subwindow->tabTitle());
         else    // иначе добавляем в конец
-            ui->tabWidget->addTab(subwindow, tabLabels[type]);
+            ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     }
 
     if (type == 0)
@@ -447,7 +447,7 @@ void MainWindow::createTabClients(int type, QWidget *caller)
         QObject::connect(subwindow,SIGNAL(activateCaller(QWidget*)),this,SLOT(reactivateCallerTab(QWidget*)));
     }
 
-    ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Выбрать клиента
+    ui->tabWidget->setCurrentWidget(subwindow);
     subwindow->lineEditSearchSetFocus();
 
 }
@@ -458,7 +458,7 @@ void MainWindow::createTabClient(int id)
 //        return;
     tabClient *subwindow = tabClient::getInstance(id, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
-        ui->tabWidget->addTab(subwindow, "Клиент " + QString::number(id));
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow);
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 }
@@ -479,9 +479,21 @@ void MainWindow::closeTab(int index)
     delete w;
     }
 
-void MainWindow::updateTabLabel(QWidget *w, const QString &label)
+void MainWindow::updateTabTitle(QWidget *w)
 {
-    ui->tabWidget->setTabText(ui->tabWidget->indexOf(w), label);
+    ui->tabWidget->setTabText(ui->tabWidget->indexOf(w), static_cast<tabCommon*>(w)->tabTitle());
+    updateTabIcon(w);
+}
+
+void MainWindow::updateTabIcon(QWidget *w)
+{
+    QIcon *icon;
+
+    icon = static_cast<tabCommon*>(w)->tabIcon();
+    if(icon)
+        ui->tabWidget->setTabIcon(ui->tabWidget->indexOf(w), *icon);
+    else
+        ui->tabWidget->setTabIcon(ui->tabWidget->indexOf(w), QIcon());
 }
 
 #ifdef QT_DEBUG
@@ -771,12 +783,12 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-//    createTabRepair(25051);
+    createTabRepair(25528);
 //    createTabSale(16316);
 //    createTabSale(0);
 //    if (test_scheduler_counter < 375)
 //    {
-        createTabRepairNew();
+//        createTabRepairNew();
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
 //        createTabCashOperation(42019);

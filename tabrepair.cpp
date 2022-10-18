@@ -10,10 +10,13 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui(new Ui::tabRepair),
     repair_id(rep_id)
 {
-    repairModel2 = new SRepairModel();
-    clientModel = new SClientModel();
-    setLock(1);
     ui->setupUi(this);
+    i_tabTitle = tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
+    userActivityLog->appendRecord(tr("Navigation %1").arg(i_tabTitle));
+    repairModel2 = new SRepairModel();
+    repairModel2->setId(repair_id);
+    setLock(1);
+    clientModel = new SClientModel();
     if(permissions->contains("3"))  // Печатать ценники и стикеры
     {
         ui->lineEditRepairId->setButtons("Print");
@@ -62,8 +65,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(ui->toolButtonSaveStatus, SIGNAL(clicked()), this, SLOT(saveStatus()));
 
     repairModel = new QSqlQueryModel();
-    if (repairModel->record(0).value("user_lock").toInt());
-        // TODO: Добавлять символ 🔒 в название вкладки
     fieldsModel = new QSqlQueryModel();
     statusesProxyModel = new QSortFilterProxyModel;
     statusesProxyModel->setSourceModel(statusesModel);
@@ -119,7 +120,7 @@ tabRepair::~tabRepair()
 
 QString tabRepair::tabTitle()
 {
-
+    return i_tabTitle;
 }
 
 void tabRepair::reloadRepairData()
@@ -343,11 +344,21 @@ void tabRepair::addItemToListViewExtraInfo(QString, QString)
         ui->listWidgetExtraInfo->setHidden(false);
 }
 
-void tabRepair::setLock(bool lock)
+void tabRepair::setLock(bool state)
 {
-    repairModel2->lock();
-    if(lock)
-        userActivityLog->appendRecord(tr("Navigation Ремонт %1").arg(repair_id));
+    if(repairModel2->isLock())
+    {
+        modelRO = 1;
+        i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
+    }
+    else
+    {
+        modelRO = 0;
+        if(i_tabIcon)
+            delete i_tabIcon;
+        i_tabIcon = nullptr;
+        repairModel2->lock(state);
+    }
 }
 
 void tabRepair::updateTotalSumms()

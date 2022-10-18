@@ -66,7 +66,10 @@ tabRepairs::~tabRepairs()
 
 QString tabRepairs::tabTitle()
 {
-
+    if(_type)
+        return tr("Выбрать ремонт");
+    else
+        return tr("Ремонты");
 }
 
 tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

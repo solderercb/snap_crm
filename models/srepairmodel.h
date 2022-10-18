@@ -150,6 +150,7 @@ public:
     void setTermsControl(const bool);
     bool commit();
     bool lock(bool state = 1);
+    bool isLock();
 
 private:
     SClientModel *m_clientModel;

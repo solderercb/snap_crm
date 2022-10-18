@@ -25,3 +25,8 @@ bool tabCommon::tabCloseRequest()
 {
     return 1;
 }
+
+QIcon *tabCommon::tabIcon()
+{
+    return i_tabIcon;
+}

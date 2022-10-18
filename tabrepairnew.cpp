@@ -149,7 +149,7 @@ bool tabRepairNew::tabCloseRequest()
 
 QString tabRepairNew::tabTitle()
 {
-    return QString();
+    return "Приём в ремонт";
 }
 
 tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

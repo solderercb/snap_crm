@@ -68,7 +68,8 @@ private:
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
-
+public slots:
+    void fillDeviceCreds(int);
 private slots:
     void changeClientType();
     void showLineEditPrevRepair();
@@ -78,7 +79,6 @@ private slots:
     void clearClientCreds(bool hideCoincidence = true);
     void lineEditPrevRepairButtonsHandler(int);
     void fillClientCreds(int);
-    void fillDeviceCreds(int);
     void buttonSelectExistingClientHandler();
     void buttonCreateTabClientHandler();
     void lineEditSNClearHandler(int);

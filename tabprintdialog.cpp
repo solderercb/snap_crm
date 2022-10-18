@@ -124,7 +124,7 @@ void tabPrintDialog::setDefaultWidgetFocus()
 
 QString tabPrintDialog::tabTitle()
 {
-
+    return "Print";
 }
 
 QStandardItemModel* tabPrintDialog::initDemoModel(QStringList &demoHeaders, QList<QVariant> &demoValues)

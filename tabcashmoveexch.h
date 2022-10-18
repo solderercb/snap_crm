@@ -38,7 +38,6 @@ private:
     int m_dstOrderId = 0;
     float m_srcAmount = 0;
     float m_dstAmount = 0;
-    QString m_tabTitle;
     float m_rate = 1.0;
     void (SCashRegisterModel::*method)(int) = nullptr;
     QString m_reason;

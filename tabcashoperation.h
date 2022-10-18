@@ -58,7 +58,6 @@ private:
     float m_amount = 0;
     int m_client = 0;
     int m_employee = 0;
-    QString m_tabTitle;
     int m_linkedObjId = 0;
     QString m_linkedObjIdStr;
     int m_linkedObjType = LinkedObjectType::NoLink;

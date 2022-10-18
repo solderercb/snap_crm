@@ -32,7 +32,7 @@ tabClient::~tabClient()
 
 QString tabClient::tabTitle()
 {
-    return QString();
+    return tr("Клиент") + " " + QString::number(m_clientId);
 }
 
 bool tabClient::initPage(const int page)

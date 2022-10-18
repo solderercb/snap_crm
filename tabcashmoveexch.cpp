@@ -11,7 +11,7 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     bool nErr = 1;
 
     ui->setupUi(this);
-    m_tabTitle = tr("Перемещение денег");
+    i_tabTitle = tr("Перемещение денег");
     ui->checkBoxPrintCheck->setChecked(comSettings->value("print_check").toBool());
 
     paymentSystemsProxyModel = new SSortFilterProxyModel();
@@ -140,7 +140,7 @@ bool tabCashMoveExch::commit(bool repeatAfter)
     {
         if(!repeatAfter)
         {
-            emit updateLabel(this, tabTitle());
+            emit updateTabTitle(this);
             m_widgetsRO = 1;
             m_reasonRO = 1;
             m_showCheckBoxPrint = 0;
@@ -194,7 +194,7 @@ void tabCashMoveExch::flipCurrency()
 
 QString tabCashMoveExch::tabTitle()
 {
-    return m_tabTitle;
+    return i_tabTitle;
 }
 
 void tabCashMoveExch::updateWidgets()

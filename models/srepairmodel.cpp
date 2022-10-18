@@ -805,8 +805,24 @@ bool SRepairModel::commit()
 bool SRepairModel::lock(bool state)
 {
     i_query->exec(QUERY_BEGIN);
-    QUERY_EXEC(i_query, i_nErr)(QUERY_LOCK_REPAIR(i_id,state?(userDbData->value("id").toString()):("NULL")));
+    if(state)
+    {
+        QUERY_EXEC(i_query, i_nErr)(QUERY_LOCK_REPAIR(i_id,userDbData->value("id").toString()));
+    }
+    else
+    {
+        QUERY_EXEC(i_query, i_nErr)(QUERY_UNLOCK_REPAIR(i_id));
+    }
     QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
     return i_nErr;
+}
+
+bool SRepairModel::isLock()
+{
+    QUERY_EXEC(i_query, i_nErr)(QUERY_SEL_REPAIR_LOCK(i_id));
+    i_query->first();
+    if(i_query->value(0).toInt() == 0 || i_query->value(0).toInt() == userDbData->value("id").toInt())
+        return 0;
+    return 1;
 }
 
