@@ -13,8 +13,8 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->setupUi(this);
     i_tabTitle = tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
     userActivityLog->appendRecord(tr("Navigation %1").arg(i_tabTitle));
-    repairModel2 = new SRepairModel();
-    repairModel2->setId(repair_id);
+    repairModel = new SRepairModel();
+    repairModel->setId(repair_id);
     setLock(1);
     clientModel = new SClientModel();
     if(permissions->contains("3"))  // Печатать ценники и стикеры
@@ -64,8 +64,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(ui->comboBoxStatus, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxIndexChanged(int)));
     connect(ui->toolButtonSaveStatus, SIGNAL(clicked()), this, SLOT(saveStatus()));
 
-    repairModel = new QSqlQueryModel();
-    fieldsModel = new QSqlQueryModel();
+    additionalFieldsModel = new SFieldsModel(SFieldsModel::Repair);
     statusesProxyModel = new QSortFilterProxyModel;
     statusesProxyModel->setSourceModel(statusesModel);
     worksAndPartsModel = new worksAndSparePartsDataModel;
@@ -114,7 +113,13 @@ tabRepair::~tabRepair()
     userActivityLog->updateActivityTimestamp();
 
     setLock(0);
+    delAdditionalFieldsWidgets();
+    delete additionalFieldsModel;
     delete ui;
+    delete repairModel;
+    delete clientModel;
+    delete commentsModel;
+    delete worksAndPartsModel;
     p_instance.remove(repair_id);   // Обязательно блять!
 }
 
@@ -125,15 +130,14 @@ QString tabRepair::tabTitle()
 
 void tabRepair::reloadRepairData()
 {
-    repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(repair_id), QSqlDatabase::database("connMain"));
-    repairModel2->load(repair_id);
+    repairModel->load(repair_id);
 
-    if(repairModel2->clientId() != m_clientId)  // перезагрузка данных клиента только при первом вызове метода или если был изменён клиент
+    if(repairModel->clientId() != m_clientId)  // перезагрузка данных клиента только при первом вызове метода или если был изменён клиент
     {
-        m_clientId = repairModel2->clientId();
+        m_clientId = repairModel->clientId();
         clientModel->load(m_clientId);
     }
-    fieldsModel->setQuery(QUERY_SEL_REPAIR_ADD_FIELDS(repair_id), QSqlDatabase::database("connMain"));
+    additionalFieldsModel->load(repair_id);
     worksAndPartsModel->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(repair_id));
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
 }
@@ -142,22 +146,18 @@ void tabRepair::updateWidgets()
 {
     reloadRepairData();
     ui->lineEditRepairId->setText(QString::number(repair_id));
-    ui->lineEditDevice->setText(repairModel->record(0).value("Title").toString());
-    ui->lineEditSN->setText(repairModel->record(0).value("serial_number").toString());
+    ui->lineEditDevice->setText(repairModel->title());
+    ui->lineEditSN->setText(repairModel->serialNumber());
     ui->lineEditClient->setText(clientModel->fullLongName());
-    QDateTime date = repairModel->record(0).value("in_date").toDateTime();
-    date.setTimeZone(QTimeZone::utc());
-    ui->lineEditInDate->setText(date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
-    if (repairModel->record(0).value("state").toInt() != 8 && repairModel->record(0).value("state").toInt() != 12)
+    ui->lineEditInDate->setText(repairModel->created());
+    if (repairModel->state() != 8 && repairModel->state() != 12)
     {
         ui->lineEditOutDate->setHidden(true);   // TODO: нужен более гибкий способ скрытия поля с датой выдачи ремонта, если статус не "Выдано клиенту" или "Готово к выдаче без ремонта" (id!=8, id!=12)
         ui->labelOutDate->setHidden(true);
     }
     else
     {
-        date = repairModel->record(0).value("out_date").toDateTime();
-        date.setTimeZone(QTimeZone::utc());
-        ui->lineEditOutDate->setText(date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+        ui->lineEditOutDate->setText(repairModel->outDate());
         ui->lineEditOutDate->setHidden(false);
         ui->labelOutDate->setHidden(false);
     }
@@ -169,7 +169,7 @@ void tabRepair::updateWidgets()
     {
         ui->pushButtonAdmEditWorks->setHidden(false);
     }
-    if (repairModel->record(0).value("state").toInt() != 6 && repairModel->record(0).value("state").toInt() != 7 || !permissions->contains("4"))
+    if ((repairModel->state() != 6 && repairModel->state() != 7) || !permissions->contains("4"))
     {
         ui->pushButtonGetout->setHidden(true);   // TODO: нужен более гибкий способ скрытия кнопки "Выдать", если статус не "Готово к выдаче" или "Готово к выдаче без ремонта" (id!=6, id!=7)
     }
@@ -178,72 +178,65 @@ void tabRepair::updateWidgets()
         ui->pushButtonGetout->setHidden(false);
     }
 
-    if( repairModel->record(0).value("ext_early").toString() != "" )
+    if( !repairModel->extEarly().isEmpty() )
     {
         ui->labelExtPrevRepair->show();
         ui->lineEditExtPrevRepair->show();
-        ui->lineEditExtPrevRepair->setText(repairModel->record(0).value("ext_early").toString());
+        ui->lineEditExtPrevRepair->setText(repairModel->extEarly());
     }
     else
     {
         ui->labelExtPrevRepair->hide();
         ui->lineEditExtPrevRepair->hide();
     }
-    ui->lineEditOffice->setText(getDisplayRoleById(repairModel->record(0).value("office").toInt(), officesModel, getFieldIdByName("id", officesModel)));
-    ui->lineEditManager->setText(getDisplayRoleById(repairModel->record(0).value("manager").toInt(), allUsersModel, getFieldIdByName("id", allUsersModel)));
-    ui->lineEditEngineer->setText(getDisplayRoleById(repairModel->record(0).value("master").toInt(), allUsersModel, getFieldIdByName("id", allUsersModel)));
-    if (!repairModel->record(0).value("is_pre_agreed").toBool())
+    ui->lineEditOffice->setText(officesModel->getDisplayRole(repairModel->office()));
+    ui->lineEditManager->setText(allUsersModel->value(repairModel->manager(), "id", "username").toString());
+    ui->lineEditEngineer->setText(allUsersModel->value(repairModel->engineer(), "id", "username").toString());
+    if (!repairModel->isPreAgreed())
     {
         ui->lineEditPreagreedAmount->setHidden(true);
         ui->labelPreagreedAmount->setHidden(true);
     }
     else
-        ui->lineEditPreagreedAmount->setText(sysLocale.toCurrencyString(repairModel->record(0).value("pre_agreed_amount").toFloat()));        // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
+        ui->lineEditPreagreedAmount->setText(sysLocale.toCurrencyString(repairModel->preAgreedAmount()));        // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
 
-    ui->comboBoxPlace->setCurrentIndex(-1);
-    ui->comboBoxPlace->setCurrentText(getDisplayRoleById(repairModel->record(0).value("box").toInt(), repairBoxesModel, getFieldIdByName("id", repairBoxesModel)));
+    ui->comboBoxPlace->setCurrentIndex(repairModel->boxIndex());
     box_name = ui->comboBoxPlace->currentText();
-    ui->lineEditColor->setText(repairModel->record(0).value("color").toString());
-    ui->lineEditWarrantyLabel->setText(repairModel->record(0).value("warranty_label").toString());
-    if(repairModel->record(0).value("early").toInt())
-        ui->lineEditPrevRepair->setText(repairModel->record(0).value("early").toString());
+    ui->lineEditColor->setStyleSheet(QString("background-color: %1;").arg(repairModel->color()));
+    ui->lineEditWarrantyLabel->setText(repairModel->warrantyLabel());
+    if(repairModel->early())
+        ui->lineEditPrevRepair->setText(QString::number(repairModel->early()));
 
     ui->listWidgetExtraInfo->setHidden(true);
     ui->listWidgetExtraInfo->clear();
     ui->listWidgetExtraInfo->addItems(clientModel->optionsList());
-    if(repairModel->record(0).value("thirs_party_sc").toBool())
+    if(repairModel->thirsPartySc())
         ui->listWidgetExtraInfo->addItem(tr("было в другом СЦ"));
-    if(repairModel->record(0).value("can_format").toBool())
+    if(repairModel->canFormat())
         ui->listWidgetExtraInfo->addItem(tr("данные не важны"));
-    if(repairModel->record(0).value("express_repair").toBool())
+    if(repairModel->expressRepair())
         ui->listWidgetExtraInfo->addItem(tr("срочный"));
-//    if(repairModel->record(0).value("").toBool())
-//        ui->listWidgetExtraInfo->addItem("");
-//    if(repairModel->record(0).value("is_card_payment").toBool())
-//        ui->listWidgetExtraInfo->addItem("");
-    if(repairModel->record(0).value("is_repeat").toBool())
+    if(repairModel->isRepeat())
         ui->listWidgetExtraInfo->addItem(tr("повтор"));
-    if(repairModel->record(0).value("is_warranty").toBool())
+    if(repairModel->isWarranty())
         ui->listWidgetExtraInfo->addItem(tr("гарантия"));
-//    if(repairModel->record(0).value("is_pre_agreed").toBool())    // предварительная стоимость в отдельном lineEdit
-//        ui->listWidgetExtraInfo->addItem(QString(tr("предварительная стоимость: %1")).arg(sysLocale.toCurrencyString(repairModel->record(0).value("pre_agreed_amount").toFloat())));
-    if(repairModel->record(0).value("print_check").toBool())
+    if(repairModel->printCheck())
         ui->listWidgetExtraInfo->addItem(tr("чек при выдаче"));
-    if(repairModel->record(0).value("is_prepaid").toBool())
-        ui->listWidgetExtraInfo->addItem(QString(tr("предоплата: %1")).arg(sysLocale.toCurrencyString(repairModel->record(0).value("prepaid_summ").toFloat())));
-//    if(repairModel->record(0).value("is_debt").toBool())  // похоже не используется в АЦС
+    if(repairModel->isPrepaid())
+        ui->listWidgetExtraInfo->addItem(QString(tr("предоплата: %1")).arg(sysLocale.toCurrencyString(repairModel->prepaidSumm())));
+//    if(repairModel->isDebt())  // похоже не используется в АЦС
 //        ui->listWidgetExtraInfo->addItem("");
     if(ui->listWidgetExtraInfo->count())
         ui->listWidgetExtraInfo->setHidden(false);
 
-    if( repairModel->record(0).value("payment_system").toInt() == 1 && permissions->contains("65") )    // указана Безналичная оплата и есть разрешение Работать с безналичными счетами
+    if( repairModel->paymentSystem() == 1 && permissions->contains("65") )    // указана Безналичная оплата и есть разрешение Работать с безналичными счетами
     { // TODO: нужен более гибкий способ определения безналичного рассчета
 
         ui->groupBoxCashless->setHidden(false);
-        if(repairModel->record(0).value("invoice").toInt()) // если уже выставлен счет
+        if(repairModel->invoice()) // если уже выставлен счет
         {
             ui->lineEditInvoiceAmount->setText("TODO:");
-            ui->lineEditInvoice->setText(QString("id=%1; TODO:").arg(repairModel->record(0).value("invoice").toString()));
+            ui->lineEditInvoice->setText(QString("id=%1; TODO:").arg(repairModel->invoice()));
             ui->labelInvoice->setHidden(false);
             ui->lineEditInvoice->setHidden(false);
             ui->lineEditInvoicePaymentDate->setText("TODO:");
@@ -273,7 +266,7 @@ void tabRepair::updateWidgets()
     }
 
     save_state_on_close = userDbDataModel->record(0).value("save_state_on_close").toBool();
-    ui->comboBoxStatus->setCurrentText(getDisplayRoleById(repairModel->record(0).value("state").toInt(), statusesModel, 1));
+    ui->comboBoxStatus->setCurrentIndex(repairModel->stateIndex());
     if(save_state_on_close)
             {
         ui->toolButtonSaveStatus->setHidden(true);
@@ -283,27 +276,19 @@ void tabRepair::updateWidgets()
     {
         saveStatus();
     }
-    ui->comboBoxNotifyStatus->setCurrentText(getDisplayRoleById(repairModel->record(0).value("informed_status").toInt(), notifyStatusesModel, 1));
-    ui->lineEditProblem->setText(repairModel->record(0).value("fault").toString());
-    ui->lineEditIncomingSet->setText(repairModel->record(0).value("complect").toString());
-    ui->lineEditExterior->setText(repairModel->record(0).value("look").toString());
+    ui->comboBoxNotifyStatus->setCurrentIndex(repairModel->informedStatusIndex());
+    ui->lineEditProblem->setText(repairModel->fault());
+    ui->lineEditIncomingSet->setText(repairModel->complect());
+    ui->lineEditExterior->setText(repairModel->look());
 
     for(int i = ui->gridLayoutDeviceSummary->rowCount() - 1; i > 2; i-- )
     {
         ui->gridLayoutDeviceSummary->itemAtPosition(i, 1)->widget()->deleteLater();
         ui->gridLayoutDeviceSummary->itemAtPosition(i, 0)->widget()->deleteLater();
     }
-    for(int i = 0; i < fieldsModel->rowCount(); i ++)
-    {
-        QLabel *label = new QLabel(fieldsModel->record(i).value("name").toString());
-        QLineEdit *lineEdit = new QLineEdit();
-        lineEdit->setText(fieldsModel->record(i).value("value").toString());
-        lineEdit->setReadOnly(true);
-        ui->gridLayoutDeviceSummary->addWidget(label, i + 3, 0 );
-        ui->gridLayoutDeviceSummary->addWidget(lineEdit, i + 3, 1);
-    }
-    ui->textEditDiagResult->setText(repairModel->record(0).value("diagnostic_result").toString());
-    ui->lineEditAgreedAmount->setText(sysLocale.toString(repairModel->record(0).value("repair_cost").toFloat(), 'f', 2));
+    createAdditionalFieldsWidgets();
+    ui->textEditDiagResult->setText(repairModel->diagnosticResult());
+    ui->lineEditAgreedAmount->setText(sysLocale.toString(repairModel->repairCost(), 'f', 2));
 
     ui->tableViewWorksAndSpareParts->resizeRowsToContents();
     ui->tableViewComments->resizeRowsToContents();
@@ -346,7 +331,7 @@ void tabRepair::addItemToListViewExtraInfo(QString, QString)
 
 void tabRepair::setLock(bool state)
 {
-    if(repairModel2->isLock())
+    if(repairModel->isLock())
     {
         modelRO = 1;
         i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
@@ -357,7 +342,41 @@ void tabRepair::setLock(bool state)
         if(i_tabIcon)
             delete i_tabIcon;
         i_tabIcon = nullptr;
-        repairModel2->lock(state);
+        repairModel->lock(state);
+    }
+}
+
+void tabRepair::createAdditionalFieldsWidgets()
+{
+    delAdditionalFieldsWidgets();
+    int i;
+    SFieldValueModel *field;
+
+    i = 0;
+    foreach(field, additionalFieldsModel->list())
+    {
+        QLabel *label = new QLabel(field->name());
+        QLineEdit *lineEdit = new QLineEdit();
+        additionalFieldsWidgets.append(label);
+        additionalFieldsWidgets.append(lineEdit);
+        lineEdit->setText(field->value());
+        lineEdit->setReadOnly(true);
+        ui->gridLayoutDeviceSummary->addWidget(label, i + 3, 0 );
+        ui->gridLayoutDeviceSummary->addWidget(lineEdit, i + 3, 1);
+        i++;
+    }
+}
+
+void tabRepair::delAdditionalFieldsWidgets()
+{
+    QWidget *w;
+
+    while(!additionalFieldsWidgets.isEmpty())
+    {
+        w = additionalFieldsWidgets.last();
+        additionalFieldsWidgets.removeLast();
+        ui->gridLayoutDeviceSummary->removeWidget(w);
+        delete w;
     }
 }
 

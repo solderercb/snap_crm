@@ -20,23 +20,21 @@ public:
     bool load(int);
     void add(SFieldValueModel*);
     bool isEmpty();
-    void setRepair(const int id);
-    void setItem(const int id);
+    void setObjectId(const int id);
     bool commit();
     void clear();
     bool isUpdated();
     void markUpdated();
     bool validate();
     void resetIds();
+    void enableEdit();
 private:
     QSqlQuery *query;
     QList<SFieldValueModel*> m_fieldsList;
     QList<SFieldValueModel*> m_removeList;
     SFieldValueModel* itemHandler(const QSqlRecord &phone = QSqlRecord());
     SLogRecordModel *logRecord = nullptr;
-    int m_repair = 0;
-    bool m_item = 0;
-    bool m_isRepair = 0;
+    bool m_type = 0;
     bool m_nErr = 1;
     void deleteWidgets();
     void deleteFields();

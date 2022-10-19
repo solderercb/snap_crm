@@ -645,7 +645,7 @@ bool tabRepairNew::createRepair()
         repairModel->setStartOffice(userDbData->value("current_office").toInt());
         repairModel->setManager(user);
         repairModel->setCurrentManager(user);
-        repairModel->setMasterIndex(ui->comboBoxPresetEngineer->currentIndex());
+        repairModel->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
         repairModel->setFault(ui->comboBoxProblem->currentText());
         repairModel->setComplect(ui->comboBoxIncomingSet->currentText());
         repairModel->setLook(ui->comboBoxExterior->currentText());
@@ -690,7 +690,7 @@ bool tabRepairNew::createRepair()
         repair = repairModel->id();
 
         // запись значений доп. полей
-        additionalFields->setRepair(repair);
+        additionalFields->setObjectId(repair);
         nErr = additionalFields->commit();
 
         if (ui->lineEditInsideComment->text() != "" )

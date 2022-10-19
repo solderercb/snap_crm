@@ -11,8 +11,10 @@ public:
     explicit SAbstractItemModel(QObject *parent = nullptr);
     ~SAbstractItemModel();
     int getFieldIdByName(const QString &field);
-    QString getDisplayRole(int id, int searchColumn);
-    QString getDisplayRole(int id, QString searchField = "id");
+    QString getDisplayRole(int id, int idColumn);
+    QString getDisplayRole(int id, QString idField = "id");
+    QVariant value(int id, int idColumn, int dataColumn);
+    QVariant value(int id, QString idField = "id", QString dataField = "name");
     int rowByDatabaseID(int id, int column);
     int rowByDatabaseID(int id, QString field = "id");
     int databaseIDByRow(int row, int column);

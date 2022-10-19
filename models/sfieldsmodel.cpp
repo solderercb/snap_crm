@@ -2,7 +2,7 @@
 
 SFieldsModel::SFieldsModel(Type type, QObject *parent) :
     QObject(parent),
-    m_isRepair(type)
+    m_type(type)
 {
     query = new QSqlQuery(QSqlDatabase::database("connMain"));
 }
@@ -46,7 +46,7 @@ bool SFieldsModel::init(const int id)
 
     SFieldValueModel *field;
 
-    query->exec(QUERY_SEL_ADDITIONAL_FIELDS_TYPES((m_isRepair?1:0), id));
+    query->exec(QUERY_SEL_ADDITIONAL_FIELDS_TYPES((m_type?1:0), id));
     while(query->next())
     {
         field = new SFieldValueModel();
@@ -58,10 +58,7 @@ bool SFieldsModel::init(const int id)
 
 bool SFieldsModel::load(int id)
 {
-    if(m_repair == 0 && m_item == 0)
-        return 0;
-
-    if(m_repair)
+    if(m_type == Type::Repair)
         query->exec(QUERY_SEL_REPAIR_ADD_FIELDS(id));
     else
         query->exec(QUERY_SEL_ITEM_ADD_FIELDS(id));
@@ -71,13 +68,11 @@ bool SFieldsModel::load(int id)
         itemHandler(query->record());
     }
 
-    delete query;
     return 1;
 }
 
 void SFieldsModel::add(SFieldValueModel *item)
 {
-    connect(item, SIGNAL(emptied(SFieldValueModel*)), this, SLOT(remove(SFieldValueModel*)));
     m_fieldsList.append(item);
 }
 
@@ -94,23 +89,15 @@ bool SFieldsModel::isEmpty()
     return m_fieldsList.isEmpty();
 }
 
-void SFieldsModel::setRepair(const int id)
+void SFieldsModel::setObjectId(const int id)
 {
-    m_repair = id;
     SFieldValueModel *f;
     foreach(f, m_fieldsList)
     {
-        f->setRepairId(id);
-    }
-}
-
-void SFieldsModel::setItem(const int id)
-{
-    m_item = id;
-    SFieldValueModel *f;
-    foreach(f, m_fieldsList)
-    {
-        f->setItemId(id);
+        if(m_type == Type::Repair)
+            f->setRepairId(id);
+        else
+            f->setItemId(id);
     }
 }
 
@@ -160,6 +147,15 @@ void SFieldsModel::resetIds()
     {
         if(!item->value().isEmpty())
             item->setId(0);
+    }
+}
+
+void SFieldsModel::enableEdit()
+{
+    SFieldValueModel *item;
+    foreach(item, m_fieldsList)
+    {
+        connect(item, SIGNAL(emptied(SFieldValueModel*)), this, SLOT(remove(SFieldValueModel*)));
     }
 }
 

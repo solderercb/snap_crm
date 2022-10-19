@@ -19,6 +19,7 @@
 #include "widgets/getoutdialog.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "models/srepairmodel.h"
+#include "models/sfieldsmodel.h"
 #include "models/scommentmodel.h"
 #include "models/scommentsmodel.h"
 
@@ -104,10 +105,9 @@ private:
     Ui::tabRepair *ui;
     static QMap<int, tabRepair*> p_instance;
     int repair_id;
-    QSqlQueryModel *repairModel;
-    SRepairModel *repairModel2;
+    SRepairModel *repairModel;
     SClientModel *clientModel;
-    QSqlQueryModel *fieldsModel;
+    SFieldsModel *additionalFieldsModel;
     QSortFilterProxyModel *statusesProxyModel;
     commentsDataModel *commentsModel;
     worksAndSparePartsDataModel *worksAndPartsModel;
@@ -120,13 +120,15 @@ private:
     void setLock(bool);
     QString box_name;
     bool modelRO = 0;   // признак блокировки карты ремонта
-
     getOutDialog *modalWidget;
     QWidget *overlay;
     bool save_state_on_close = 0;
     bool worksAndPartsEditEnabled = 0;
     SGroupBoxEventFilter *groupBoxEventFilter;
     int m_clientId = 0;
+    QList<QWidget*> additionalFieldsWidgets;
+    void createAdditionalFieldsWidgets();
+    void delAdditionalFieldsWidgets();
 #ifdef QT_DEBUG
     void randomFill(){};
 #endif

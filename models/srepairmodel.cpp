@@ -53,7 +53,7 @@ void SRepairModel::load(const int id)
     m_currentManager = repair->value("current_manager").toInt();
     m_master = repair->value("master").toInt();
     m_diagnosticResult = repair->value("diagnostic_result").toString();
-    m_inDate = repair->value("in_date").toDateTime();
+    i_createdUtc = repair->value("in_date").toDateTime();
     m_outDate = repair->value("out_date").toDateTime();
     m_state = repair->value("state").toInt();
     m_newState = repair->value("new_state").toInt();
@@ -91,7 +91,7 @@ void SRepairModel::load(const int id)
     m_rejectReason = repair->value("reject_reason").toString();
     m_informedStatus = repair->value("informed_status").toInt();
     m_imageIds = repair->value("image_ids").toString();
-    m_color = repair->value("color").toInt();
+    m_color = repair->value("color").toString();
     m_orderMoving = repair->value("order_moving").toString();
     m_early = repair->value("early").toInt();
     m_extEarly = repair->value("ext_early").toString();
@@ -192,6 +192,11 @@ void SRepairModel::setCompanyIndex(const int index)
     i_valuesMap.insert("company", companiesModel->databaseIDByRow(index));
 }
 
+int SRepairModel::office()
+{
+    return m_office;
+}
+
 int SRepairModel::officeIndex()
 {
     return officesModel->rowByDatabaseID(m_office);
@@ -226,6 +231,11 @@ void SRepairModel::setStartOfficeIndex(const int index)
     setStartOffice(officesModel->databaseIDByRow(index));
 }
 
+int SRepairModel::manager()
+{
+    return m_manager;
+}
+
 int SRepairModel::managerIndex()
 {
     return managersModel->rowByDatabaseID(m_manager);
@@ -241,6 +251,11 @@ void SRepairModel::setManagerIndex(const int index)
     if(index == -1)
         return;
     i_valuesMap.insert("manager", managersModel->databaseIDByRow(index));
+}
+
+int SRepairModel::currentManager()
+{
+    return m_currentManager;
 }
 
 int SRepairModel::currentManagerIndex()
@@ -260,12 +275,17 @@ void SRepairModel::setCurrentManagerIndex(const int index)
     i_valuesMap.insert("current_manager", managersModel->databaseIDByRow(index));
 }
 
-int SRepairModel::masterIndex()
+int SRepairModel::engineer()
+{
+    return m_master;
+}
+
+int SRepairModel::engineerIndex()
 {
     return engineersModel->rowByDatabaseID(m_master);
 }
 
-void SRepairModel::setMasterIndex(const int index)
+void SRepairModel::setEngineerIndex(const int index)
 {
     if(index == -1)
         i_valuesMap.insert("master", QVariant());   // NULL DEFAULT '0' | FOREIGN KEY (`master`) REFERENCES `users` (`id`)
@@ -293,14 +313,27 @@ void SRepairModel::setInDate(const QDateTime timestamp)
     i_valuesMap.insert("in_date", timestamp);
 }
 
-QDateTime SRepairModel::outDate()
+QDateTime SRepairModel::outDateUtc()
 {
     return m_outDate;
+}
+
+QString SRepairModel::outDate()
+{
+    QDateTime date = m_outDate;
+    date.setTimeZone(QTimeZone::utc());
+
+    return date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 }
 
 void SRepairModel::setOutDate(const QDateTime timestamp)
 {
     i_valuesMap.insert("out_date", timestamp);
+}
+
+int SRepairModel::state()
+{
+    return m_state;
 }
 
 int SRepairModel::stateIndex()
@@ -383,6 +416,11 @@ void SRepairModel::setIsRepeat(const bool state)
     i_valuesMap.insert("is_repeat", state);
 }
 
+int SRepairModel::paymentSystem()
+{
+    return m_paymentSystem;
+}
+
 int SRepairModel::paymentSystemIndex()
 {
     return paymentSystemsModel->rowByDatabaseID(m_paymentSystem);
@@ -430,7 +468,9 @@ void SRepairModel::setPrintCheck(const bool state)
 
 int SRepairModel::boxIndex()
 {
-    return repairBoxesModel->rowByDatabaseID(m_box);
+    if(m_box)
+        return repairBoxesModel->rowByDatabaseID(m_box);
+    return -1;
 }
 
 void SRepairModel::setBoxIndex(const int index)
@@ -689,7 +729,7 @@ void SRepairModel::setImageIds(const QString str)
     i_valuesMap.insert("image_ids", str);
 }
 
-QColor SRepairModel::color()
+QString SRepairModel::color()
 {
     return m_color;
 }

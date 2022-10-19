@@ -35,15 +35,15 @@ int SAbstractItemModel::getFieldIdByName(const QString &field)
 
 /* Возвращает литеральное представление элемента модели; и предназначен для использования с ComboBox (и др. виджетами)
  * id - код записи, используемый в БД.
- * searchColumn - это номер поля, по которому будет происходить поиск id.
+ * idColumn - это номер поля, по которому будет происходить поиск id.
  * Напирмер. ComboBox содержит список платёжных систем; модель данных инициализируется запросом
  * "SELECT name, id FROM types". При вызове getDisplayRole(x, 1) будет возвращено название платёжной системы
  * с id = x.
  */
-QString SAbstractItemModel::getDisplayRole(int id, int searchColumn)
+QString SAbstractItemModel::getDisplayRole(int id, int idColumn)
 {
 
-    int row = rowByDatabaseID(id, searchColumn);
+    int row = rowByDatabaseID(id, idColumn);
     initDisplayRoleColumn();
     if(row == -1)
         return NULL;
@@ -54,11 +54,24 @@ QString SAbstractItemModel::getDisplayRole(int id, int searchColumn)
 /* Это перегруженный метод.
  * Возвращает литеральное представление элемента модели; поиск производится в столбце с указанным именем
  */
-QString SAbstractItemModel::getDisplayRole(int id, QString searchField)
+QString SAbstractItemModel::getDisplayRole(int id, QString idField)
 {
-    int searchColumn = getFieldIdByName(searchField);
+    int idColumn = getFieldIdByName(idField);
 
-    return getDisplayRole(id, searchColumn);
+    return getDisplayRole(id, idColumn);
+}
+
+QVariant SAbstractItemModel::value(int id, int idColumn, int dataColumn)
+{
+    int row = rowByDatabaseID(id, idColumn);
+    return abstractItemModel->index(row, dataColumn).data();
+}
+
+QVariant SAbstractItemModel::value(int id, QString idField, QString dataField)
+{
+    int idColumn = getFieldIdByName(idField);
+    int dataColumn = getFieldIdByName(dataField);
+    return value(id, idColumn, dataColumn);
 }
 
 /*  Аналогичен getDisplayRole(int, int), но возвращает index
