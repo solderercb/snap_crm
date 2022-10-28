@@ -595,11 +595,7 @@ bool tabRepairNew::createRepair()
     user = userDbData->value("id").toInt();
     preferredPaymentAccIndex = ui->comboBoxPresetPaymentAccount->currentIndex();
 
-#ifdef QT_DEBUG
-    queryLog *sqlLog = new queryLog(query);
-    sqlLog->setFile(QApplication::applicationDirPath() + "\\tabRepairNew.sql");
-    sqlLog->truncateLog();
-#endif
+    QUERY_LOG_START(metaObject()->className());
 
     try
     {
@@ -733,9 +729,9 @@ bool tabRepairNew::createRepair()
     }
 #ifdef QT_DEBUG
 //    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
-    sqlLog->saveLog();
-    delete sqlLog;
 #endif
+
+    QUERY_LOG_STOP;
 
     if (nErr)   // если все запросы выполнены без ошибок, очистить всё, кроме данных клиента
     {

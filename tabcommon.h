@@ -8,7 +8,7 @@
 #ifdef QT_DEBUG
 #include <QTimer>
 #include <QRandomGenerator>
-#include "querylog.h"
+#include "squerylog.h"
 #endif
 
 class tabCommon : public QWidget
@@ -30,9 +30,15 @@ protected:
     QString i_tabTitle = "Untitled";
     QIcon *i_tabIcon = nullptr;
 #ifdef QT_DEBUG
+    SQueryLog *queryLog;
     virtual void randomFill() = 0;
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
+#define QUERY_LOG_START(className)  queryLog->start((className));
+#define QUERY_LOG_STOP              queryLog->stop();
+#else
+    #define QUERY_LOG_START(className)
+    #define QUERY_LOG_STOP
 #endif
 protected slots:
 #ifdef QT_DEBUG

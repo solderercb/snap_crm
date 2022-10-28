@@ -74,7 +74,7 @@ SOURCES += \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
     models/ssaleitemmodel.cpp \
-    querylog.cpp \
+    squerylog.cpp \
     tabcashmoveexch.cpp \
     tabcashoperation.cpp \
     tabclient.cpp \
@@ -144,7 +144,7 @@ HEADERS  += \
     models/sphonemodel.h \
     models/sphonesmodel.h \
     models/ssaleitemmodel.h \
-    querylog.h \
+    squerylog.h \
     stable.h \
     tabcashmoveexch.h \
     tabcashoperation.h \

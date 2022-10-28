@@ -12,6 +12,8 @@
 class SRepairModel : public SComRecord
 {
     Q_OBJECT
+signals:
+    void modelUpdated();
 public:
     explicit SRepairModel(QObject *parent = nullptr);
     explicit SRepairModel(const int, QObject *parent = nullptr);
@@ -63,6 +65,7 @@ public:
     void setOutDate(const QDateTime);
     int state();
     int stateIndex();
+    void setState(const int);
     void setStateIndex(const int);
     int newStateIndex();
     void setNewStateIndex(const int);

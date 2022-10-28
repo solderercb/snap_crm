@@ -22,6 +22,7 @@
 #include "models/sfieldsmodel.h"
 #include "models/scommentmodel.h"
 #include "models/scommentsmodel.h"
+#include "models/ssortfilterproxymodel.h"
 
 namespace Ui {
 class tabRepair;
@@ -102,33 +103,41 @@ public:
     ~tabRepair();
     QString tabTitle() override;
 private:
+    QSqlQuery *query;
+    bool nErr = 1;
     Ui::tabRepair *ui;
     static QMap<int, tabRepair*> p_instance;
     int repair_id;
     SRepairModel *repairModel;
     SClientModel *clientModel;
     SFieldsModel *additionalFieldsModel;
-    QSortFilterProxyModel *statusesProxyModel;
+    SSortFilterProxyModel *statusesProxyModel;
     commentsDataModel *commentsModel;
     worksAndSparePartsDataModel *worksAndPartsModel;
-    bool statusUpdateFlag;
+    bool m_statusUpdateInProgress = 0;
     float works_sum, parts_sum, total_sum;
     int getFieldIdByName(const QString &, QSqlQueryModel *);
     QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
     void eventResize(QResizeEvent *);
-    void addItemToListViewExtraInfo(QString, QString);
+    void fillExtraInfo();
     void setLock(bool);
     QString box_name;
     bool modelRO = 0;   // признак блокировки карты ремонта
     getOutDialog *modalWidget;
     QWidget *overlay;
     bool save_state_on_close = 0;
-    bool worksAndPartsEditEnabled = 0;
+    bool m_worksRO = 1;
+    bool m_getOutButtonVisible = 0;
     SGroupBoxEventFilter *groupBoxEventFilter;
     int m_clientId = 0;
     QList<QWidget*> additionalFieldsWidgets;
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
+    void setInfoWidgetVisible(QWidget *w, bool state = 1);
+    bool checkStatus(const int);
+    bool checkData();
+    bool m_buttonSaveStateEnabled = 0;
+    void updateStatesModel(int index);
 #ifdef QT_DEBUG
     void randomFill(){};
 #endif

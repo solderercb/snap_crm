@@ -10,6 +10,8 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui(new Ui::tabRepair),
     repair_id(rep_id)
 {
+    query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
     ui->setupUi(this);
     i_tabTitle = tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
     userActivityLog->appendRecord(tr("Navigation %1").arg(i_tabTitle));
@@ -57,15 +59,21 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         ui->lineEditAgreedAmount->setButtons("Apply");
         connect(ui->lineEditAgreedAmount, &SLineEdit::buttonClicked, this, &tabRepair::setAgreedAmount);
     }
+    save_state_on_close = userDbDataModel->record(0).value("save_state_on_close").toBool();
+    if(save_state_on_close)
+    {
+        ui->toolButtonSaveStatus->setHidden(true);
+        ui->comboBoxStatus->disableWheelEvent(true);  // если включено автосохранение статуса ремонта, то нужно игнорировать колёсико мышки
+        connect(ui->comboBoxStatus, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxIndexChanged(int)));
+    }
 
     ui->comboBoxStatus->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxNotifyStatus->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPlace->setStyleSheet(commonComboBoxStyleSheet);
-    connect(ui->comboBoxStatus, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxIndexChanged(int)));
     connect(ui->toolButtonSaveStatus, SIGNAL(clicked()), this, SLOT(saveStatus()));
 
     additionalFieldsModel = new SFieldsModel(SFieldsModel::Repair);
-    statusesProxyModel = new QSortFilterProxyModel;
+    statusesProxyModel = new SSortFilterProxyModel;
     statusesProxyModel->setSourceModel(statusesModel);
     worksAndPartsModel = new worksAndSparePartsDataModel;
     connect(worksAndPartsModel, SIGNAL(modelReset()), this, SLOT(updateTotalSumms()));  // TODO: уточнить генерируется ли сигнал при изменении существующих данных
@@ -73,11 +81,12 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 //    reloadRepairData();
 
     ui->comboBoxPlace->setModel(repairBoxesModel);
+    ui->comboBoxStatus->blockSignals(true);
     ui->comboBoxStatus->setModel(statusesProxyModel);
     ui->comboBoxNotifyStatus->setModel(notifyStatusesModel);
     statusesProxyModel->setFilterKeyColumn(1);
     statusesProxyModel->setFilterRegularExpression("");
-    statusUpdateFlag = 0;
+    ui->comboBoxStatus->blockSignals(false);
 
     ui->tableViewComments->setModel(commentsModel);
     ui->tableViewComments->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -96,13 +105,11 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(updateWidgets()));
-
-    updateWidgets();
-
+    reloadRepairData();
 
 #ifdef QT_DEBUG
 //    createGetOutDialog();
+    connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(updateWidgets()));
 #else
     ui->pushButtonManualUpdateRepairData->setHidden(true);
 #endif
@@ -120,6 +127,7 @@ tabRepair::~tabRepair()
     delete clientModel;
     delete commentsModel;
     delete worksAndPartsModel;
+    delete query;
     p_instance.remove(repair_id);   // Обязательно блять!
 }
 
@@ -140,65 +148,29 @@ void tabRepair::reloadRepairData()
     additionalFieldsModel->load(repair_id);
     worksAndPartsModel->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(repair_id));
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
+
+    updateStatesModel(repairModel->stateIndex());
+    updateWidgets();
 }
 
 void tabRepair::updateWidgets()
 {
-    reloadRepairData();
     ui->lineEditRepairId->setText(QString::number(repair_id));
     ui->lineEditDevice->setText(repairModel->title());
     ui->lineEditSN->setText(repairModel->serialNumber());
     ui->lineEditClient->setText(clientModel->fullLongName());
     ui->lineEditInDate->setText(repairModel->created());
-    if (repairModel->state() != 8 && repairModel->state() != 12)
-    {
-        ui->lineEditOutDate->setHidden(true);   // TODO: нужен более гибкий способ скрытия поля с датой выдачи ремонта, если статус не "Выдано клиенту" или "Готово к выдаче без ремонта" (id!=8, id!=12)
-        ui->labelOutDate->setHidden(true);
-    }
-    else
-    {
-        ui->lineEditOutDate->setText(repairModel->outDate());
-        ui->lineEditOutDate->setHidden(false);
-        ui->labelOutDate->setHidden(false);
-    }
-    if ( worksAndPartsEditEnabled || !permissions->contains("TODO: разреш. на адм. правку списка раб. и дет."))
-    {
-        ui->pushButtonAdmEditWorks->setHidden(true);
-    }
-    else
-    {
-        ui->pushButtonAdmEditWorks->setHidden(false);
-    }
-    if ((repairModel->state() != 6 && repairModel->state() != 7) || !permissions->contains("4"))
-    {
-        ui->pushButtonGetout->setHidden(true);   // TODO: нужен более гибкий способ скрытия кнопки "Выдать", если статус не "Готово к выдаче" или "Готово к выдаче без ремонта" (id!=6, id!=7)
-    }
-    else
-    {
-        ui->pushButtonGetout->setHidden(false);
-    }
-
-    if( !repairModel->extEarly().isEmpty() )
-    {
-        ui->labelExtPrevRepair->show();
-        ui->lineEditExtPrevRepair->show();
-        ui->lineEditExtPrevRepair->setText(repairModel->extEarly());
-    }
-    else
-    {
-        ui->labelExtPrevRepair->hide();
-        ui->lineEditExtPrevRepair->hide();
-    }
+    setInfoWidgetVisible(ui->lineEditOutDate, repairModel->state() == 8 || repairModel->state() == 12); // TODO: нужен более гибкий способ скрытия поля с датой выдачи ремонта, если статус не "Выдано клиенту" или "Готово к выдаче без ремонта" (id!=8, id!=12)
+    ui->lineEditOutDate->setText(repairModel->outDate());
+    ui->pushButtonAdmEditWorks->setVisible(!m_worksRO && permissions->contains("TODO: разреш. на адм. правку списка раб. и дет."));
+    ui->pushButtonGetout->setVisible(m_getOutButtonVisible);
+    setInfoWidgetVisible(ui->lineEditExtPrevRepair, !repairModel->extEarly().isEmpty());
+    ui->lineEditExtPrevRepair->setText(repairModel->extEarly());
     ui->lineEditOffice->setText(officesModel->getDisplayRole(repairModel->office()));
     ui->lineEditManager->setText(allUsersModel->value(repairModel->manager(), "id", "username").toString());
     ui->lineEditEngineer->setText(allUsersModel->value(repairModel->engineer(), "id", "username").toString());
-    if (!repairModel->isPreAgreed())
-    {
-        ui->lineEditPreagreedAmount->setHidden(true);
-        ui->labelPreagreedAmount->setHidden(true);
-    }
-    else
-        ui->lineEditPreagreedAmount->setText(sysLocale.toCurrencyString(repairModel->preAgreedAmount()));        // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
+    setInfoWidgetVisible(ui->lineEditPreagreedAmount, repairModel->isPreAgreed());
+    ui->lineEditPreagreedAmount->setText(sysLocale.toCurrencyString(repairModel->preAgreedAmount()));        // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
 
     ui->comboBoxPlace->setCurrentIndex(repairModel->boxIndex());
     box_name = ui->comboBoxPlace->currentText();
@@ -207,28 +179,7 @@ void tabRepair::updateWidgets()
     if(repairModel->early())
         ui->lineEditPrevRepair->setText(QString::number(repairModel->early()));
 
-    ui->listWidgetExtraInfo->setHidden(true);
-    ui->listWidgetExtraInfo->clear();
-    ui->listWidgetExtraInfo->addItems(clientModel->optionsList());
-    if(repairModel->thirsPartySc())
-        ui->listWidgetExtraInfo->addItem(tr("было в другом СЦ"));
-    if(repairModel->canFormat())
-        ui->listWidgetExtraInfo->addItem(tr("данные не важны"));
-    if(repairModel->expressRepair())
-        ui->listWidgetExtraInfo->addItem(tr("срочный"));
-    if(repairModel->isRepeat())
-        ui->listWidgetExtraInfo->addItem(tr("повтор"));
-    if(repairModel->isWarranty())
-        ui->listWidgetExtraInfo->addItem(tr("гарантия"));
-    if(repairModel->printCheck())
-        ui->listWidgetExtraInfo->addItem(tr("чек при выдаче"));
-    if(repairModel->isPrepaid())
-        ui->listWidgetExtraInfo->addItem(QString(tr("предоплата: %1")).arg(sysLocale.toCurrencyString(repairModel->prepaidSumm())));
-//    if(repairModel->isDebt())  // похоже не используется в АЦС
-//        ui->listWidgetExtraInfo->addItem("");
-    if(ui->listWidgetExtraInfo->count())
-        ui->listWidgetExtraInfo->setHidden(false);
-
+    fillExtraInfo();
     if( repairModel->paymentSystem() == 1 && permissions->contains("65") )    // указана Безналичная оплата и есть разрешение Работать с безналичными счетами
     { // TODO: нужен более гибкий способ определения безналичного рассчета
 
@@ -265,17 +216,6 @@ void tabRepair::updateWidgets()
         ui->groupBoxCashless->setHidden(true);
     }
 
-    save_state_on_close = userDbDataModel->record(0).value("save_state_on_close").toBool();
-    ui->comboBoxStatus->setCurrentIndex(repairModel->stateIndex());
-    if(save_state_on_close)
-            {
-        ui->toolButtonSaveStatus->setHidden(true);
-        ui->comboBoxStatus->disableWheelEvent(true);  // если включено автосохранение статуса ремонта, то нужно игнорировать колёсико мышки
-    }
-    else
-    {
-        saveStatus();
-    }
     ui->comboBoxNotifyStatus->setCurrentIndex(repairModel->informedStatusIndex());
     ui->lineEditProblem->setText(repairModel->fault());
     ui->lineEditIncomingSet->setText(repairModel->complect());
@@ -292,40 +232,31 @@ void tabRepair::updateWidgets()
 
     ui->tableViewWorksAndSpareParts->resizeRowsToContents();
     ui->tableViewComments->resizeRowsToContents();
+    ui->toolButtonSaveStatus->setEnabled(m_buttonSaveStateEnabled);
 }
 
-int tabRepair::getFieldIdByName(const QString &field, QSqlQueryModel *model)
+void tabRepair::fillExtraInfo()
 {
-    for (int i = 0; i<model->columnCount(); i++)
-    {
-        if (model->record(0).field(i).name() == field)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-QString tabRepair::getDisplayRoleById(int id, QAbstractItemModel *model, int column)
-{
-    for(int i=0; i<model->rowCount(); i++)
-    {
-        if(model->index(i, column).data().toInt() == id)
-        {
-            return model->index(i, 0).data().toString();
-        }
-    }
-    return NULL;
-}
-
-void tabRepair::eventResize(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-}
-
-void tabRepair::addItemToListViewExtraInfo(QString, QString)
-{
-    if(ui->listWidgetExtraInfo->isHidden())
+    ui->listWidgetExtraInfo->setHidden(true);
+    ui->listWidgetExtraInfo->clear();
+    ui->listWidgetExtraInfo->addItems(clientModel->optionsList());
+    if(repairModel->thirsPartySc())
+        ui->listWidgetExtraInfo->addItem(tr("было в другом СЦ"));
+    if(repairModel->canFormat())
+        ui->listWidgetExtraInfo->addItem(tr("данные не важны"));
+    if(repairModel->expressRepair())
+        ui->listWidgetExtraInfo->addItem(tr("срочный"));
+    if(repairModel->isRepeat())
+        ui->listWidgetExtraInfo->addItem(tr("повтор"));
+    if(repairModel->isWarranty())
+        ui->listWidgetExtraInfo->addItem(tr("гарантия"));
+    if(repairModel->printCheck())
+        ui->listWidgetExtraInfo->addItem(tr("чек при выдаче"));
+    if(repairModel->isPrepaid())
+        ui->listWidgetExtraInfo->addItem(QString(tr("предоплата: %1")).arg(sysLocale.toCurrencyString(repairModel->prepaidSumm())));
+//    if(repairModel->isDebt())  // похоже не используется в АЦС
+//        ui->listWidgetExtraInfo->addItem("");
+    if(ui->listWidgetExtraInfo->count())
         ui->listWidgetExtraInfo->setHidden(false);
 }
 
@@ -378,6 +309,48 @@ void tabRepair::delAdditionalFieldsWidgets()
         ui->gridLayoutDeviceSummary->removeWidget(w);
         delete w;
     }
+}
+
+/*  Скрытие/отображение пары виджетов в левой верхней части вкладки (дата выдачи, предварительная стоимость и др.)
+*/
+void tabRepair::setInfoWidgetVisible(QWidget *field, bool state)
+{
+    // TODO: нужно сделать скрытие пары виджетов с удалением их из layout, т. к. пустая строка увеличивает зазор между видимыми виджетами
+    QWidget *label;
+    label = ui->formLayout->labelForField(field);
+    field->setVisible(state);
+    label->setVisible(state);
+}
+
+bool tabRepair::checkStatus(const int index)
+{
+    bool ret = 0;
+
+    QString allowedForRoles = statusesProxyModel->index(index, 6).data().toString();
+
+    if(userDbData->value("roles").toString().contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
+        ret = 1;
+    else
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
+
+    if(!ret)
+        throw 2;
+
+    return ret;
+}
+
+/* Проверка данных перед сметой статуса или выдачей
+*/
+bool tabRepair::checkData()
+{
+    bool ret = 1;
+
+    // проверка данных...
+
+    if(!ret)
+        throw 2;
+
+    return ret;
 }
 
 void tabRepair::updateTotalSumms()
@@ -491,21 +464,58 @@ void tabRepair::saveStatus()
     saveStatus(ui->comboBoxStatus->currentIndex());
 }
 
+void tabRepair::updateStatesModel(int index)
+{
+    int statusId = statusesProxyModel->databaseIDByRow(index);
+    QString allowedStates = statusesProxyModel->index(index, 4).data().toString();
+    QString activeStatus = statusesProxyModel->getDisplayRole(statusId);
+    ui->comboBoxStatus->blockSignals(true);
+    statusesProxyModel->setFilterRegularExpression(QString("\\b(%1)\\b").arg(allowedStates));
+    ui->comboBoxStatus->setCurrentIndex(-1);
+    // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
+    ui->comboBoxStatus->setPlaceholderText(activeStatus);
+    ui->comboBoxStatus->blockSignals(false);
+}
+
 void tabRepair::saveStatus(int index)
 {
-    if (index >= 0)
+    if (index < 0)
+        return;
+
+    m_getOutButtonVisible = 0;
+    try
     {
-        if (!statusUpdateFlag)
-        {
-            QString activeStatus = statusesProxyModel->index(index, 0).data().toString();
-            statusUpdateFlag = 1; // защита от зацикливания: при обновлении фильтра прокси модели происходит установка текущего индекса равным 0 и генерируется сигнал currentIndexChanged()
-            statusesProxyModel->setFilterRegularExpression(QString("\\b(") + statusesProxyModel->index(index, 4).data().toString() + QString(")\\b"));
-            ui->comboBoxStatus->setCurrentIndex(-1);
-            // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-            ui->comboBoxStatus->setPlaceholderText(activeStatus);
-            statusUpdateFlag = 0;
-        }
+        checkStatus(index);
+        checkData();
+        repairModel->setState(statusesProxyModel->databaseIDByRow(index));
+        QUERY_LOG_START(metaObject()->className());
+        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        nErr = repairModel->commit();
+        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_LOG_STOP;
+        updateStatesModel(index);
     }
+    catch (int type)
+    {
+        nErr = 0;
+        ui->comboBoxStatus->blockSignals(true);
+        ui->comboBoxStatus->setCurrentIndex(-1);
+        ui->comboBoxStatus->blockSignals(false);
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query, nErr);
+        return;
+    }
+
+    m_buttonSaveStateEnabled = 0;
+    if((repairModel->state() == 6 || repairModel->state() == 7) && permissions->contains("4"))
+        m_getOutButtonVisible = 1;
+
+    updateWidgets();
 }
 
 void tabRepair::comboBoxIndexChanged(int index)
@@ -513,6 +523,12 @@ void tabRepair::comboBoxIndexChanged(int index)
     if(save_state_on_close)
     {
         saveStatus(index);
+        return;
+    }
+    else
+    {
+        m_buttonSaveStateEnabled = 1;
+        ui->toolButtonSaveStatus->setEnabled(true); // нет смысла вызывать метод updateWidgets() ради одной кнопки
     }
 }
 

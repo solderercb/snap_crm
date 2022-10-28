@@ -73,11 +73,7 @@ bool tabCashMoveExch::commit(bool repeatAfter)
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
 
-#ifdef QT_DEBUG
-    queryLog *sqlLog = new queryLog(query);
-    sqlLog->setFile(QApplication::applicationDirPath() + "\\" + metaObject()->className() + ".sql");
-    sqlLog->truncateLog();
-#endif
+    QUERY_LOG_START(metaObject()->className());
 
     if(!checkInput())
         return 0;
@@ -130,9 +126,9 @@ bool tabCashMoveExch::commit(bool repeatAfter)
 
 #ifdef QT_DEBUG
 //    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
-    sqlLog->saveLog();
-    delete sqlLog;
 #endif
+
+    QUERY_LOG_STOP;
 
     delete query;
 

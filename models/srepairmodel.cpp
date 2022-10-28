@@ -341,9 +341,16 @@ int SRepairModel::stateIndex()
     return statusesModel->rowByDatabaseID(m_state);
 }
 
+void SRepairModel::setState(const int id)
+{
+    m_state = id;
+    i_valuesMap.insert("state", m_state);
+    appendLogText(tr("Статус заказа изменён на %1").arg(statusesModel->getDisplayRole(m_state)));
+}
+
 void SRepairModel::setStateIndex(const int index)
 {
-    i_valuesMap.insert("state", statusesModel->databaseIDByRow(index));
+    setState(statusesModel->databaseIDByRow(index));
 }
 
 int SRepairModel::newStateIndex()

@@ -646,11 +646,8 @@ bool tabSale::unSale()  // распроведение
     }
 
     query = new QSqlQuery(QSqlDatabase::database("connThird"));
-#ifdef QT_DEBUG
-    queryLog *sqlLog = new queryLog(query);
-    sqlLog->setFile(QApplication::applicationDirPath() + "\\tabSale.sql");
-    sqlLog->truncateLog();
-#endif
+
+    QUERY_LOG_START(metaObject()->className());
 
     try
     {
@@ -709,12 +706,7 @@ bool tabSale::unSale()  // распроведение
             QUERY_EXEC(query,nErr)(QUERY_ROLLBACK);
     }
 
-//    nErr = 0; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
-
-#ifdef QT_DEBUG
-    sqlLog->saveLog();
-    delete sqlLog;
-#endif
+    QUERY_LOG_STOP;
 
     delete query;
 
@@ -762,11 +754,7 @@ bool tabSale::sale()
 
     amount = tableModel->totalAmount();
 
-#ifdef QT_DEBUG
-    queryLog *sqlLog = new queryLog(query);
-    sqlLog->setFile(QApplication::applicationDirPath() + "\\tabSale.sql");
-    sqlLog->truncateLog();
-#endif
+    QUERY_LOG_START(metaObject()->className());
 
     isAnonBuyer = ui->checkBoxAnonymous->isChecked();
 
@@ -875,9 +863,9 @@ bool tabSale::sale()
 
 #ifdef QT_DEBUG
 //    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
-    sqlLog->saveLog();
-    delete sqlLog;
 #endif
+
+    QUERY_LOG_STOP;
 
     delete query;
 
@@ -1002,11 +990,8 @@ void tabSale::reserveCancelButtonClicked()
     QSqlQuery *query;
 
     query = new QSqlQuery(QSqlDatabase::database("connThird"));
-#ifdef QT_DEBUG
-    queryLog *sqlLog = new queryLog(query);
-    sqlLog->setFile(QApplication::applicationDirPath() + "\\tabSale.sql");
-    sqlLog->truncateLog();
-#endif
+
+    QUERY_LOG_START(metaObject()->className());
 
     QUERY_EXEC(query,nErr)(QUERY_BEGIN);
     try
@@ -1043,11 +1028,7 @@ void tabSale::reserveCancelButtonClicked()
             QUERY_COMMIT_ROLLBACK(query,nErr);
     }
 
-
-#ifdef QT_DEBUG
-    sqlLog->saveLog();
-    delete sqlLog;
-#endif
+    QUERY_LOG_STOP;
 
     updateWidgets();
     delete query;

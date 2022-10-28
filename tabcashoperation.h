@@ -13,9 +13,6 @@
 #include "models/sdocumentmodel.h"
 #include "models/ssortfilterproxymodel.h"
 #include "widgets/shortlivednotification.h"
-#ifdef QT_DEBUG
-#include "querylog.h"
-#endif
 
 namespace Ui {
 class tabCashOperation;
