@@ -19,6 +19,17 @@
 #include "clients4test.h"
 #endif
 
+namespace Global
+{
+    Q_NAMESPACE
+    enum RepStateHeaders{Name, Id, Color, Terms, Contains, Actions, Roles};
+    Q_ENUM_NS(RepStateHeaders)
+    enum RepStateIds{GetIn, Diag, Negotiation, Agreed, InWork, PartsRequested, Ready, ReadyNoRepair, Returned, IssueNotAppeared, OfficeChange, NotAgreed, ReturnedNoRepair, OnApprovement, Approved, DiagFinished, ReturnedInCredit};
+    Q_ENUM_NS(RepStateIds)
+    enum RepStateActions{EditWorksParts = 1, ResetInformedStatus = 2, EditDiagSumm = 3, InformManager = 4, InformEngineer = 5, InformTimeout = 6};
+    Q_ENUM_NS(RepStateActions)
+}
+
 extern QLocale sysLocale;
 extern QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 extern QMap<QString, QVariant> *userDbData;

@@ -1048,7 +1048,7 @@ QListView::item  {
            </property>
            <layout class="QGridLayout" name="gridLayout_8">
             <item row="0" column="0">
-             <widget class="SComboBox" name="comboBoxStatus">
+             <widget class="SComboBox" name="comboBoxState">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -1064,7 +1064,7 @@ QListView::item  {
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QToolButton" name="toolButtonSaveStatus">
+             <widget class="QToolButton" name="toolButtonSaveState">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                 <horstretch>0</horstretch>
@@ -1225,13 +1225,25 @@ QListView::item  {
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="SLineEdit" name="lineEditInvoice"/>
+             <widget class="SLineEdit" name="lineEditInvoice">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLineEdit" name="lineEditInvoicePaymentDate"/>
+             <widget class="QLineEdit" name="lineEditInvoicePaymentDate">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QLineEdit" name="lineEditInvoiceAmount"/>
+             <widget class="QLineEdit" name="lineEditInvoiceAmount">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item row="0" column="0" colspan="2">
              <widget class="QPushButton" name="pushButtonCreateInvoice">

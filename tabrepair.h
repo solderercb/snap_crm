@@ -128,16 +128,18 @@ private:
     bool save_state_on_close = 0;
     bool m_worksRO = 1;
     bool m_getOutButtonVisible = 0;
+    bool m_comboBoxStateEnabled = 1;
     SGroupBoxEventFilter *groupBoxEventFilter;
     int m_clientId = 0;
     QList<QWidget*> additionalFieldsWidgets;
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);
-    bool checkStatus(const int);
-    bool checkData();
+    bool stateHandler(const int);
+    bool checkStateAcl(const int);
+    bool checkData(const int);
     bool m_buttonSaveStateEnabled = 0;
-    void updateStatesModel(int index);
+    void updateStatesModel(const int statusId);
 #ifdef QT_DEBUG
     void randomFill(){};
 #endif
@@ -146,8 +148,8 @@ private slots:
     void reloadRepairData();
     void updateWidgets();
     void worksTreeDoubleClicked(QModelIndex);
-    void saveStatus();
-    void saveStatus(int);
+    void saveState();
+    void saveState(int);
     void comboBoxIndexChanged(int);
     void updateTotalSumms();
     void createGetOutDialog();
