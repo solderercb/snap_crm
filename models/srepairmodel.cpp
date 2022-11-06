@@ -300,7 +300,9 @@ QString SRepairModel::diagnosticResult()
 
 void SRepairModel::setDiagnosticResult(const QString str)
 {
-    i_valuesMap.insert("diagnostic_result", str);
+    m_diagnosticResult = str;
+    i_valuesMap.insert("diagnostic_result", m_diagnosticResult);
+    appendLogText(tr("Результат диагностики изменён на \"%1\"").arg(m_diagnosticResult));
 }
 
 QDateTime SRepairModel::inDate()
@@ -345,7 +347,7 @@ void SRepairModel::setState(const int id)
 {
     m_state = id;
     i_valuesMap.insert("state", m_state);
-    appendLogText(tr("Статус заказа изменён на %1").arg(statusesModel->getDisplayRole(m_state)));
+    appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
 }
 
 void SRepairModel::setStateIndex(const int index)
@@ -601,9 +603,11 @@ float SRepairModel::repairCost()
     return m_repairCost;
 }
 
-void SRepairModel::setRepairCost(const float summ)
+void SRepairModel::setRepairCost(const float amount)
 {
-    i_valuesMap.insert("repair_cost", summ);
+    m_repairCost = amount;
+    i_valuesMap.insert("repair_cost", m_repairCost);
+    appendLogText(tr("Стоимость ремонта в результатах диагностики изменёна на %1").arg(sysLocale.toCurrencyString(m_repairCost)));
 }
 
 float SRepairModel::realRepairCost()
@@ -676,6 +680,11 @@ void SRepairModel::setLastSave(const QDateTime timestamp)
     i_valuesMap.insert("last_save", timestamp);
 }
 
+void SRepairModel::updateLastSave()
+{
+    setLastSave(QDateTime::currentDateTime());
+}
+
 QDateTime SRepairModel::lastStatusChanged()
 {
     return m_lastStatusChanged;
@@ -723,7 +732,9 @@ int SRepairModel::informedStatusIndex()
 
 void SRepairModel::setInformedStatusIndex(const int index)
 {
-    i_valuesMap.insert("informed_status", notifyStatusesModel->databaseIDByRow(index));
+    m_informedStatus = index;
+    i_valuesMap.insert("informed_status", m_informedStatus);
+    appendLogText(tr("Статус информирования клиента изменён на \"%1\"").arg(notifyStatusesModel->getDisplayRole(m_informedStatus)));
 }
 
 QString SRepairModel::imageIds()

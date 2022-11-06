@@ -97,6 +97,7 @@ SOURCES += \
     widgets/sphone.cpp \
     widgets/sphones.cpp \
     widgets/ssetcombobox.cpp \
+    widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
     windowsdispatcher.cpp
 
@@ -168,6 +169,7 @@ HEADERS  += \
     widgets/sphone.h \
     widgets/sphones.h \
     widgets/ssetcombobox.h \
+    widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
     windowsdispatcher.h
 

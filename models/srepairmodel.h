@@ -128,6 +128,7 @@ public:
     void setThirsPartySc(const bool);
     QDateTime lastSave();
     void setLastSave(const QDateTime);
+    void updateLastSave();
     QDateTime lastStatusChanged();
     void setLastStatusChanged(const QDateTime);
     int warrantyDays();

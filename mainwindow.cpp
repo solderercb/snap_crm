@@ -473,8 +473,8 @@ void MainWindow::closeTab(int index)
         {
             delete w;
 //            ui->tabWidget->removeTab(index);
-            return;
         }
+        return;
     }
     delete w;
     }

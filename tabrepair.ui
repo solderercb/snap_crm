@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1176</width>
-    <height>948</height>
+    <height>968</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -184,12 +184,12 @@
              <number>5</number>
             </property>
             <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayoutDiagResult">
+             <layout class="QGridLayout" name="gridLayoutDiagResult" columnstretch="0,0,1" columnminimumwidth="120,0,0">
               <property name="spacing">
                <number>3</number>
               </property>
               <item row="1" column="1">
-               <widget class="QPushButton" name="pushButtonSaveAgreedAmount">
+               <widget class="QPushButton" name="pushButtonSaveDiagAmount">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -198,27 +198,31 @@
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>Сохранить результат диагностики и стоимость</string>
                 </property>
                 <property name="text">
-                 <string>Сохранить стоимость</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="SLineEdit" name="lineEditAgreedAmount">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
+                 <string>Сохранить</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0" colspan="3">
-               <widget class="QTextEdit" name="textEditDiagResult"/>
+               <widget class="STextEdit" name="textEditDiagResult">
+                <property name="tabChangesFocus">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QDoubleSpinBox" name="doubleSpinBoxAmount">
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="maximum">
+                 <double>9999999.990000000223517</double>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -1098,9 +1102,9 @@ QListView::item  {
            </property>
            <layout class="QGridLayout" name="gridLayout_15">
             <item row="0" column="0">
-             <widget class="QComboBox" name="comboBoxNotifyStatus">
+             <widget class="SComboBox" name="comboBoxNotifyStatus">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1516,6 +1520,14 @@ QListView::item  {
    <extends>QComboBox</extends>
    <header location="global">widgets/scombobox.h</header>
   </customwidget>
+  <customwidget>
+   <class>STextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>widgets/stextedit.h</header>
+   <slots>
+    <signal>editFinished()</signal>
+   </slots>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>buttonMedia</tabstop>
@@ -1530,8 +1542,8 @@ QListView::item  {
    <slot>createGetOutDialog()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>362</x>
-     <y>911</y>
+     <x>366</x>
+     <y>942</y>
     </hint>
     <hint type="destinationlabel">
      <x>362</x>
@@ -1546,8 +1558,8 @@ QListView::item  {
    <slot>openPrevRepair()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>308</x>
-     <y>408</y>
+     <x>310</x>
+     <y>452</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1562,12 +1574,108 @@ QListView::item  {
    <slot>buttonClientClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>540</x>
-     <y>906</y>
+     <x>566</x>
+     <y>956</y>
     </hint>
     <hint type="destinationlabel">
      <x>542</x>
      <y>942</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxNotifyStatus</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>tabRepair</receiver>
+   <slot>setInformedStatus(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>131</x>
+     <y>636</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>631</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textEditDiagResult</sender>
+   <signal>textChanged()</signal>
+   <receiver>tabRepair</receiver>
+   <slot>diagChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>957</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1169</x>
+     <y>191</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textEditDiagResult</sender>
+   <signal>editFinished()</signal>
+   <receiver>tabRepair</receiver>
+   <slot>diagEditFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1067</x>
+     <y>227</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1170</x>
+     <y>250</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxAmount</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>tabRepair</receiver>
+   <slot>spinBoxAmountChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>386</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1169</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonSaveDiagAmount</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepair</receiver>
+   <slot>saveDiagAmount()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>516</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1171</x>
+     <y>331</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxAmount</sender>
+   <signal>editingFinished()</signal>
+   <receiver>tabRepair</receiver>
+   <slot>spinBoxAmountEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>416</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1172</x>
+     <y>281</y>
     </hint>
    </hints>
   </connection>
@@ -1576,5 +1684,11 @@ QListView::item  {
   <slot>createGetOutDialog()</slot>
   <slot>openPrevRepair()</slot>
   <slot>buttonClientClicked()</slot>
+  <slot>setInformedStatus(int)</slot>
+  <slot>diagChanged()</slot>
+  <slot>diagEditFinished()</slot>
+  <slot>spinBoxAmountChanged(double)</slot>
+  <slot>saveDiagAmount()</slot>
+  <slot>spinBoxAmountEditingFinished()</slot>
  </slots>
 </ui>

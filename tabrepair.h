@@ -102,6 +102,7 @@ public:
     static tabRepair* getInstance(int rep_id, MainWindow *parent = nullptr);
     ~tabRepair();
     QString tabTitle() override;
+    bool tabCloseRequest() override;
 private:
     QSqlQuery *query;
     bool nErr = 1;
@@ -127,21 +128,33 @@ private:
     QWidget *overlay;
     bool save_state_on_close = 0;
     bool m_worksRO = 1;
+    bool m_diagRO = 1;
+    bool m_summRO = 1;
     bool m_getOutButtonVisible = 0;
     bool m_comboBoxStateEnabled = 1;
+    bool m_comboBoxNotifyStatusEnabled = 1;
+    bool m_outDateVisible = 0;
     SGroupBoxEventFilter *groupBoxEventFilter;
     int m_clientId = 0;
     QList<QWidget*> additionalFieldsWidgets;
+    bool m_autosaveDiag = 0;
+    QTimer *m_autosaveDiagTimer;
+    bool m_diagChanged = 0;
+    bool m_spinBoxAmountChanged = 0;
+    bool m_groupUpdate = 0;
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);
-    bool stateHandler(const int);
+    bool setWidgetsParams(const int);
     bool checkStateAcl(const int);
     bool checkData(const int);
     bool m_buttonSaveStateEnabled = 0;
     void updateStatesModel(const int statusId);
+    void doStateActions(const int);
+    void setPricesToZero();
+    bool commit(const QString &notificationCaption = tr("Успешно"), const QString &notificationText = tr("Данные сохранены"));
 #ifdef QT_DEBUG
-    void randomFill(){};
+    void randomFill() override {};
 #endif
 
 private slots:
@@ -150,7 +163,7 @@ private slots:
     void worksTreeDoubleClicked(QModelIndex);
     void saveState();
     void saveState(int);
-    void comboBoxIndexChanged(int);
+    void comboBoxStateIndexChanged(int);
     void updateTotalSumms();
     void createGetOutDialog();
     void closeGetOutDialog();
@@ -164,6 +177,13 @@ private slots:
     void editIncomingSet(int);
     void setAgreedAmount(int);
     void buttonClientClicked();
+    void setInformedStatus(int);
+    void diagChanged();
+    void diagEditFinished();
+    void spinBoxAmountChanged(double);
+    void spinBoxAmountEditingFinished();
+    void saveDiagAmount();
+    void diagAmountSaved();
 #ifdef QT_DEBUG
     void test_scheduler_handler(){};
     void test_scheduler2_handler(){};
