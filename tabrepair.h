@@ -19,6 +19,7 @@
 #include "widgets/getoutdialog.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "models/srepairmodel.h"
+#include "models/srepairstatuslog.h"
 #include "models/sfieldsmodel.h"
 #include "models/scommentmodel.h"
 #include "models/scommentsmodel.h"
@@ -142,6 +143,7 @@ private:
     bool m_diagChanged = 0;
     bool m_spinBoxAmountChanged = 0;
     bool m_groupUpdate = 0;
+    SRepairStatusLog *repairStatusLog;
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);

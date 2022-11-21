@@ -27,7 +27,7 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
 
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
-    paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(-2)).*$"));
+    paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
     paymentSystemsProxyModel->setFilterKeyColumn(1);
     ui->comboBoxPaymentAccount->setModel(paymentSystemsProxyModel);
     ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));

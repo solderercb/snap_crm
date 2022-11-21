@@ -59,11 +59,13 @@ SOURCES += \
     models/spaymenttypemodel.cpp \
     models/spaymenttypesmodel.cpp \
     models/srepairmodel.cpp \
+    models/srepairstatuslog.cpp \
     models/ssloptionsdialog.cpp \
     models/ssortfilterproxymodel.cpp \
     models/ssqlquerymodel.cpp \
     models/sstandarditemmodel.cpp \
     models/suseractivitymodel.cpp \
+    models/sworkshopissuedmodel.cpp \
     models/tabsalesettingsmenu.cpp \
     models/scashregistermodel.cpp \
     models/sclientmodel.cpp \
@@ -130,11 +132,13 @@ HEADERS  += \
     models/spaymenttypemodel.h \
     models/spaymenttypesmodel.h \
     models/srepairmodel.h \
+    models/srepairstatuslog.h \
     models/ssloptionsdialog.h \
     models/ssortfilterproxymodel.h \
     models/ssqlquerymodel.h \
     models/sstandarditemmodel.h \
     models/suseractivitymodel.h \
+    models/sworkshopissuedmodel.h \
     models/tabsalesettingsmenu.h \
     models/scashregistermodel.h \
     models/sclientmodel.h \

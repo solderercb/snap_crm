@@ -324,8 +324,8 @@
    <slot>cancel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>425</x>
-     <y>245</y>
+     <x>547</x>
+     <y>293</y>
     </hint>
     <hint type="destinationlabel">
      <x>427</x>
@@ -340,8 +340,8 @@
    <slot>getOut()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>254</x>
-     <y>246</y>
+     <x>360</x>
+     <y>293</y>
     </hint>
     <hint type="destinationlabel">
      <x>252</x>
@@ -356,12 +356,44 @@
    <slot>createLooseDoc()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>85</x>
-     <y>114</y>
+     <x>97</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
      <x>86</x>
      <y>268</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxPaymentAccount</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>getOutDialog</receiver>
+   <slot>paymentSystemChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>510</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>558</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxCreditPayment</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>getOutDialog</receiver>
+   <slot>checkBoxInCreditToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>340</x>
+     <y>197</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>542</x>
+     <y>206</y>
     </hint>
    </hints>
   </connection>
@@ -370,5 +402,7 @@
   <slot>getOut()</slot>
   <slot>cancel()</slot>
   <slot>createLooseDoc()</slot>
+  <slot>paymentSystemChanged(int)</slot>
+  <slot>checkBoxInCreditToggled(bool)</slot>
  </slots>
 </ui>

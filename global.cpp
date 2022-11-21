@@ -242,7 +242,9 @@ void initGlobalModels()
     warrantyTermsModel->setObjectName("warrantyTermsModel");
     warrantyTermsModel->setHorizontalHeaderLabels({"name","days"});
 
+
     QVector<QString> rejectReasonList = {"отказ от ремонта", "ремонт не возможен", "ремонт не возможен из-за отсутствия запчастей", "ремонт не рентабелен", "неисправносте не проявилась", "другие причины"};
+    rejectReasonModel->setProperty("other_reject_reason", 5); // более элегантный способ не придумал (такой, чтобы задавать id причины отказа в "одном месте" и чтобы это не поломалось при переводе)
     QList<QStandardItem*> *rejectReasonSelector;
     for (int i=0; i<rejectReasonList.size(); i++)
     {

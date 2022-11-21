@@ -532,7 +532,20 @@ void SClientModel::deleteBalanceObj()
 bool SClientModel::updateBalance(const float amount, const QString &text)
 {
     if(isNew())   // TODO: проверка включен ли баланс у клиента
-        return 1;
+        throw 3;
+
+    if(amount < 0 && m_balance < -amount)
+    {
+        QMessageBox resBtn( QMessageBox::Question, "SNAP CRM",
+                            tr("На балансе недостаточно средств, продолжить?"),
+                            QMessageBox::No | QMessageBox::Yes);
+        QAbstractButton *noButton = resBtn.button(QMessageBox::No);
+        resBtn.setDefaultButton(QMessageBox::No);
+        resBtn.setWindowModality(Qt::ApplicationModal);
+        resBtn.exec();
+        if (resBtn.clickedButton() == noButton)
+            throw 4;
+    }
 
     balanceLog->setText(text);
     balanceLog->setClient(i_id);

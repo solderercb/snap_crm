@@ -103,6 +103,12 @@ void SRepairModel::load(const int id)
     m_termsControl = repair->value("termsControl").toBool();
 
     delete repair;
+    emit modelUpdated();
+}
+
+void SRepairModel::reload()
+{
+    load(i_id);
 }
 
 bool SRepairModel::isHidden()
@@ -244,13 +250,14 @@ int SRepairModel::managerIndex()
 void SRepairModel::setManager(const int id)
 {
     i_valuesMap.insert("manager", id);
+    // Запись в журнал не производится, т. к. значение в поле manager записывается только при приёме в ремонт и в дальнейшем не изменяется
 }
 
 void SRepairModel::setManagerIndex(const int index)
 {
     if(index == -1)
         return;
-    i_valuesMap.insert("manager", managersModel->databaseIDByRow(index));
+    setManager(managersModel->databaseIDByRow(index));
 }
 
 int SRepairModel::currentManager()
@@ -266,13 +273,14 @@ int SRepairModel::currentManagerIndex()
 void SRepairModel::setCurrentManager(const int id)
 {
     i_valuesMap.insert("current_manager", id);
+    appendLogText(tr("Менеджером ремонта назначен %1").arg(managersModel->value(id, "id", "username").toString()));
 }
 
 void SRepairModel::setCurrentManagerIndex(const int index)
 {
     if(index == -1)
         return;
-    i_valuesMap.insert("current_manager", managersModel->databaseIDByRow(index));
+    setCurrentManager(managersModel->databaseIDByRow(index));
 }
 
 int SRepairModel::engineer()
@@ -285,12 +293,17 @@ int SRepairModel::engineerIndex()
     return engineersModel->rowByDatabaseID(m_master);
 }
 
+void SRepairModel::setEngineer(const int id)
+{
+    i_valuesMap.insert("master", id);
+    appendLogText(tr("Инженером назначен %1").arg(engineersModel->value(id, "id", "username").toString()));
+}
+
 void SRepairModel::setEngineerIndex(const int index)
 {
     if(index == -1)
-        i_valuesMap.insert("master", QVariant());   // NULL DEFAULT '0' | FOREIGN KEY (`master`) REFERENCES `users` (`id`)
-    else
-        i_valuesMap.insert("master", engineersModel->databaseIDByRow(index));
+        return;
+    setEngineer(engineersModel->databaseIDByRow(index));
 }
 
 QString SRepairModel::diagnosticResult()
@@ -298,10 +311,15 @@ QString SRepairModel::diagnosticResult()
     return m_diagnosticResult;
 }
 
+void SRepairModel::setDiagnosticResult(const QVariant value)
+{
+    i_valuesMap.insert("diagnostic_result", value);
+}
+
 void SRepairModel::setDiagnosticResult(const QString str)
 {
     m_diagnosticResult = str;
-    i_valuesMap.insert("diagnostic_result", m_diagnosticResult);
+    setDiagnosticResult(QVariant(m_diagnosticResult));
     appendLogText(tr("Результат диагностики изменён на \"%1\"").arg(m_diagnosticResult));
 }
 
@@ -484,7 +502,21 @@ int SRepairModel::boxIndex()
 
 void SRepairModel::setBoxIndex(const int index)
 {
-    i_valuesMap.insert("box", repairBoxesModel->databaseIDByRow(index));
+    if(index < 0 && m_box)
+    {
+        appendLogText(tr("Заказаз-наряд %1 изъят из ячейки \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(m_box)));
+        i_valuesMap.insert("box", QVariant());
+        m_box = 0;
+    }
+    else if(index >= 0)
+    {
+        if(m_box)
+            appendLogText(tr("Заказаз-наряд %1 перемещён в ячейку \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(m_box)));
+        else
+            appendLogText(tr("Заказаз-наряд %1 помещён в ячейку \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(m_box)));
+        m_box = repairBoxesModel->databaseIDByRow(index);
+        i_valuesMap.insert("box", repairBoxesModel->databaseIDByRow(index));
+    }
 }
 
 QString SRepairModel::warrantyLabel()
@@ -535,6 +567,17 @@ float SRepairModel::prepaidSumm()
 void SRepairModel::setPrepaidSumm(const float summ)
 {
     i_valuesMap.insert("prepaid_summ", summ);
+}
+
+float SRepairModel::realPrepaidSumm()
+{
+    float summ;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    query->exec(QUERY_SEL_REPAIR_PREPAYS(i_id));
+    query->first();
+    summ = query->value(0).toFloat();
+    delete query;
+    return summ;
 }
 
 int SRepairModel::prepaidOrder()
@@ -628,6 +671,32 @@ float SRepairModel::partsCost()
 void SRepairModel::setPartsCost(const float summ)
 {
     i_valuesMap.insert("parts_cost", summ);
+}
+
+/*  Метод возвращает сумму всех записанных работ из таблицы works
+*/
+float SRepairModel::realWorksCost()
+{
+    float summ;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    query->exec(QUERY_SEL_REPAIR_WORKS(i_id));
+    query->first();
+    summ = query->value(0).toFloat();
+    delete query;
+    return summ;
+}
+
+/*  Метод возвращает сумму всех добавленных в ремонт товаров из таблицы store_int_reserve
+*/
+float SRepairModel::realPartsCost()
+{
+    float summ;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    query->exec(QUERY_SEL_REPAIR_PARTS(i_id));
+    query->first();
+    summ = query->value(0).toFloat();
+    delete query;
+    return summ;
 }
 
 QString SRepairModel::fault()
@@ -846,7 +915,7 @@ bool SRepairModel::commit()
     }
     else
     {
-        setDiagnosticResult("");
+        setDiagnosticResult(QVariant());
         setRejectReason("");
         setInDate(QDateTime::currentDateTime());
         if(!insert())

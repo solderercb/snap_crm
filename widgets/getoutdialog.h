@@ -6,7 +6,13 @@
 #include "global.h"
 #include "shortlivednotification.h"
 #include "amountToWords.h"
-#define OTHER_REJECT_REASON_ID 5
+#include "squerylog.h"
+#include "models/srepairmodel.h"
+#include "models/sclientmodel.h"
+#include "models/scashregistermodel.h"
+#include "models/ssortfilterproxymodel.h"
+#include "models/sworkshopissuedmodel.h"
+#include "models/srepairstatuslog.h"
 
 namespace Ui {
 class getOutDialog;
@@ -22,23 +28,31 @@ signals:
 public:
     explicit getOutDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~getOutDialog();
+    void setRepairModel(SRepairModel *model);
+    void setClientModel(SClientModel *model);
 
 private:
     Ui::getOutDialog *ui;
-    void checkSums();
     bool summsNotEq = 0;
     bool balanceNotEnough = 1;
     QWidget *parent;
-    int state, newState;
+    int newState;
+    int m_repairId;
     void setDefaultStyleSheets();
-
+    SRepairModel *repairModel;
+    SClientModel *clientModel;
+    float summToPay;
+    SSortFilterProxyModel *paymentSystemsProxyModel;
+    void initPaymentSystems();
+    bool checkAmounts();
 private slots:
     void getOut();
     void cancel();
     void createLooseDoc();
-    void enableComboBoxPaymentAccount(int);
     void otheRejectReasonShow(QString);
     void textEditTextChanged();
+    void paymentSystemChanged(int);
+    void checkBoxInCreditToggled(bool);
 };
 
 #endif // GETOUTDIALOG_H

@@ -587,6 +587,7 @@ bool tabRepairNew::createRepair()
     int deviceClassIndex, deviceVendorIndex, deviceIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
     int device, user, repair, preferredPaymentAccIndex, prepaySumm = 0;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    SRepairStatusLog *repairStatusLog = new SRepairStatusLog(0);
 
     setDefaultStyleSheets();
     deviceClassIndex = ui->comboBoxDeviceClass->currentIndex();
@@ -684,6 +685,11 @@ bool tabRepairNew::createRepair()
         nErr = repairModel->commit();
         nErr = clientModel->updateRepairs();
         repair = repairModel->id();
+        repairStatusLog->setRepair(repair);
+        repairStatusLog->setStatus(0);
+        repairStatusLog->setManager(user);
+        repairStatusLog->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
+        repairStatusLog->commit();
 
         // запись значений доп. полей
         additionalFields->setObjectId(repair);
@@ -769,6 +775,7 @@ bool tabRepairNew::createRepair()
 
     repairModel->setId(0);
     delete query;
+    delete repairStatusLog;
     return !nErr; // return 0 — OK, return 1 - ошибка
 }
 

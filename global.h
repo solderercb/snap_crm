@@ -28,6 +28,8 @@ namespace Global
     Q_ENUM_NS(RepStateIds)
     enum RepStateActions{EditWorksParts = 1, ResetInformedStatus = 2, EditDiagSumm = 3, InformManager = 4, InformEngineer = 5, InformTimeout = 6, NoPayDiag = 7}; // значения больше 6 - мои доработки
     Q_ENUM_NS(RepStateActions)
+    enum PaymentSystemIds{Balance = -2, Card = -1, Cash = 0, Cashless = 1};
+    Q_ENUM_NS(PaymentSystemIds)
 }
 
 extern QLocale sysLocale;

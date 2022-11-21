@@ -21,6 +21,7 @@ public:
     int id();
     void setId(const int);
     void load(const int);
+    void reload();
     bool isHidden();
     void setHidden(const bool);
     QString title();
@@ -55,8 +56,10 @@ public:
     void setCurrentManagerIndex(const int);
     int engineer();
     int engineerIndex();
+    void setEngineer(const int);
     void setEngineerIndex(const int);
     QString diagnosticResult();
+    void setDiagnosticResult(const QVariant);
     void setDiagnosticResult(const QString);
     QDateTime inDate();
     void setInDate(const QDateTime);
@@ -103,6 +106,7 @@ public:
     void setPrepaidType(const int);
     float prepaidSumm();
     void setPrepaidSumm(const float);
+    float realPrepaidSumm();
     int prepaidOrder();
     void setPrepaidOrder(const int);
     void addPrepay(float amount, QString reason = QString());
@@ -118,6 +122,8 @@ public:
     void setRealRepairCost(const float);
     float partsCost();
     void setPartsCost(const float);
+    float realWorksCost();
+    float realPartsCost();
     QString fault();
     void setFault(const QString);
     QString complect();

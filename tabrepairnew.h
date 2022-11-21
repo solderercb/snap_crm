@@ -15,6 +15,7 @@
 #include "models/sdevmdlmodel.h"
 #include "models/srepairmodel.h"
 #include "models/scommentmodel.h"
+#include "models/srepairstatuslog.h"
 #include "widgets/sphones.h"
 
 namespace Ui {
