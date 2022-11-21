@@ -12,7 +12,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 {
     ui->setupUi(this);
     docModel = new SDocumentModel();
-    tableModel = new SaleTableModel(this);
+    tableModel = new SSaleTableModel(this);
     newItemModel = new QSqlQueryModel(this);
     itemDelagates = new SaleTableItemDelegates(tableModel, ui->tableView);
     clientModel = new SClientModel();
@@ -583,7 +583,7 @@ void tabSale::addItemByUID()
 */
 void tabSale::addItemByUID(int uid)
 {
-    if(tableModel->modelState() == SaleTableModel::New || tableModel->modelState() == SaleTableModel::Reserved )
+    if(tableModel->modelState() == SSaleTableModel::New || tableModel->modelState() == SSaleTableModel::Reserved )
     {
         int row = isItemAlreadyInList(uid);
         if( row == -1)
@@ -798,14 +798,14 @@ bool tabSale::sale()
 
         if(reserve == Reserve)
         {
-            tableModel->saleItems(SaleTableModel::Reserve);
+            tableModel->saleItems(SSaleTableModel::Reserve);
             docModel->setType(SDocumentModel::ReserveInvoice);
             docModel->appendLogText(QString("Расходная накладная №%1 создана (резерв)").arg(doc_id));
             docModel->setState(SDocumentModel::ItemsReserved);
         }
         else
         {
-           tableModel->saleItems(SaleTableModel::Sale);
+           tableModel->saleItems(SSaleTableModel::Sale);
             if(reserve == SaleReserved)
             {
                 docModel->setAmount(amount);

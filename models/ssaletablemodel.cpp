@@ -1,6 +1,6 @@
-#include "saletablemodel.h"
+#include "ssaletablemodel.h"
 
-SaleTableModel::SaleTableModel(QObject *parent) :
+SSaleTableModel::SSaleTableModel(QObject *parent) :
     QStandardItemModel(parent),
     queryData(new QSqlQueryModel)
 {
@@ -19,14 +19,14 @@ SaleTableModel::SaleTableModel(QObject *parent) :
 #endif
 }
 
-SaleTableModel::~SaleTableModel()
+SSaleTableModel::~SSaleTableModel()
 {
     delete fields;
     delete pendingRemoveList;
     delete queryData;
 }
 
-QVariant SaleTableModel::data(const QModelIndex &index, int role) const
+QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole)
     {
@@ -55,7 +55,7 @@ QVariant SaleTableModel::data(const QModelIndex &index, int role) const
     return QStandardItemModel::data(index, role);
 }
 
-Qt::ItemFlags SaleTableModel::flags(const QModelIndex &index) const
+Qt::ItemFlags SSaleTableModel::flags(const QModelIndex &index) const
 {
     if( m_modelState == State::New || m_modelState == State::Reserved )   // у вкладки будет дополнительный режим — правка резерва (в АСЦ такого вроде не было)
     {
@@ -75,7 +75,7 @@ Qt::ItemFlags SaleTableModel::flags(const QModelIndex &index) const
     }
 }
 
-bool SaleTableModel::insertRecord(int row, const QSqlRecord &record)
+bool SSaleTableModel::insertRecord(int row, const QSqlRecord &record)
 {
     bool firstRun = 0;
     Q_ASSERT_X(record.count() == columnCount(), "insertRecord()", "different column count");
@@ -116,7 +116,7 @@ bool SaleTableModel::insertRecord(int row, const QSqlRecord &record)
     return true;
 }
 
-bool SaleTableModel::appendRecord(const QSqlRecord &record)
+bool SSaleTableModel::appendRecord(const QSqlRecord &record)
 {
     return insertRecord(rowCount(), record);
 }
@@ -127,7 +127,7 @@ bool SaleTableModel::appendRecord(const QSqlRecord &record)
  * row  - номер строки
  * db_id - id записи в таблице store_sales
  */
-bool SaleTableModel::removeRowHandler(int row, int db_id)
+bool SSaleTableModel::removeRowHandler(int row, int db_id)
 {
     if(pendingRemoveList->contains(row))
     {
@@ -149,12 +149,12 @@ bool SaleTableModel::removeRowHandler(int row, int db_id)
     return 0;
 }
 
-QMap<int, int>* SaleTableModel::getPendingRemoveList()
+QMap<int, int>* SSaleTableModel::getPendingRemoveList()
 {
     return pendingRemoveList;
 }
 
-int SaleTableModel::pendingRemoveItemsCount()
+int SSaleTableModel::pendingRemoveItemsCount()
 {
     if(pendingRemoveList->isEmpty())
         return rowCount();
@@ -165,13 +165,13 @@ int SaleTableModel::pendingRemoveItemsCount()
 /* Обновление цены
  * в данном методе для всех товаров, уже добавленных в таблицу, будут запрошен соответствующая колонка цен
  */
-void SaleTableModel::setPriceColumn(QSqlQuery *query)
+void SSaleTableModel::setPriceColumn(QSqlQuery *query)
 {
     QString qry = query->lastQuery();   // для проверки правильности запроса
     int  item_id;
     item_id = fields->value("item_id");
 
-    Q_ASSERT_X(qry.contains(":id", Qt::CaseSensitive), "SaleTableModel::setPriceColumn(QSqlQuery *)", "в подготовленном запросе не задан (или задан не подходящий) placeholder");
+    Q_ASSERT_X(qry.contains(":id", Qt::CaseSensitive), "SSaleTableModel::setPriceColumn(QSqlQuery *)", "в подготовленном запросе не задан (или задан не подходящий) placeholder");
     for(int i = 0; i < rowCount(); i++)
     {
         query->bindValue(":id", index(i,  item_id).data().toInt());
@@ -184,7 +184,7 @@ void SaleTableModel::setPriceColumn(QSqlQuery *query)
 /* Загрузка таблицы товаров ранее сохранённого документа
  * Возвращает 1 в случае ошибки
 */
-bool SaleTableModel::load(int doc_id)
+bool SSaleTableModel::load(int doc_id)
 {
     documentId = doc_id;
     if(m_modelState == State::Payed)
@@ -197,19 +197,19 @@ bool SaleTableModel::load(int doc_id)
     return 0;
 }
 
-void SaleTableModel::setClient(int id)
+void SSaleTableModel::setClient(int id)
 {
 //    values.insert("client", QString::number(id));
     m_client = id;
 }
 
-void SaleTableModel::unsetClient()
+void SSaleTableModel::unsetClient()
 {
 //    values.insert("client", "NULL");
     m_client = 0;
 }
 
-void SaleTableModel::setDocumentId(int id)
+void SSaleTableModel::setDocumentId(int id)
 {
 //    values.insert("document_id", QString::number(id));
     documentId = id;
@@ -219,7 +219,7 @@ void SaleTableModel::setDocumentId(int id)
  *  Допускается, что покупатель откажется от части зарезервированных товаров (помеченные пользователем строки)
  *  Возвращает 0 в случае ошибки
  */
-bool SaleTableModel::saleItems(SaleOpType type)
+bool SSaleTableModel::saleItems(SaleOpType type)
 {
     bool ret = 1;
 
@@ -256,7 +256,7 @@ bool SaleTableModel::saleItems(SaleOpType type)
     return ret;
 }
 
-bool SaleTableModel::reserveItems()
+bool SSaleTableModel::reserveItems()
 {
     return saleItems(Reserve);
 }
@@ -265,7 +265,7 @@ bool SaleTableModel::reserveItems()
  * Допускается полный возврат товара (если пользователь не пометил отдельные cтроки)
  * или частичный. Также допускается многократный частичный возврат.
  */
-bool SaleTableModel::unsaleItems()
+bool SSaleTableModel::unsaleItems()
 {
     bool ret = 1;
 
@@ -278,13 +278,13 @@ bool SaleTableModel::unsaleItems()
     return ret;
 }
 
-bool SaleTableModel::unsaleItems(const QString &reason)
+bool SSaleTableModel::unsaleItems(const QString &reason)
 {
     setUnsaleReason(reason);
     unsaleItems();
 }
 
-void SaleTableModel::setUnsaleReason(const QString &reason)
+void SSaleTableModel::setUnsaleReason(const QString &reason)
 {
     m_unsaleReason = reason;
 }
@@ -292,7 +292,7 @@ void SaleTableModel::setUnsaleReason(const QString &reason)
 /* Полное снятие резерва
  * Помеченные пользователем строки игнорируются
  */
-bool SaleTableModel::freeItems()
+bool SSaleTableModel::freeItems()
 {
     bool ret = 1;
 
@@ -305,7 +305,7 @@ bool SaleTableModel::freeItems()
 
 /*  В данном методе производится непосредственно возврат/снятие резерва
  */
-bool SaleTableModel::backOutItems(BackOutOpType type)
+bool SSaleTableModel::backOutItems(BackOutOpType type)
 {
     bool ret = 1;
     m_itemsAffected = 0;
@@ -343,14 +343,14 @@ bool SaleTableModel::backOutItems(BackOutOpType type)
     return ret;
 }
 
-int SaleTableModel::itemsAffected()
+int SSaleTableModel::itemsAffected()
 {
     return m_itemsAffected;
 }
 
 /*  Помещает все строки таблицы в список на удаление
  */
-void SaleTableModel::markAllItemsToRemove(BackOutOpType type)
+void SSaleTableModel::markAllItemsToRemove(BackOutOpType type)
 {
     for(int i = 0; i < rowCount(); i++)
     {
@@ -362,18 +362,18 @@ void SaleTableModel::markAllItemsToRemove(BackOutOpType type)
     }
 }
 
-SSaleItemModel *SaleTableModel::item(const int rownum)
+SSaleItemModel *SSaleTableModel::item(const int rownum)
 {
     SSaleItemModel *item = new SSaleItemModel(row(rownum), parent());
     return item;
 }
 
-bool SaleTableModel::integrityStatus()
+bool SSaleTableModel::integrityStatus()
 {
     return  nIntegrityErr;
 }
 
-QList<QStandardItem *> SaleTableModel::row(int row)
+QList<QStandardItem *> SSaleTableModel::row(int row)
 {
     QList<QStandardItem *> rowItems;
     for(int column = 0; column < columnCount(); column++)
@@ -395,12 +395,12 @@ QList<QStandardItem *> SaleTableModel::row(int row)
  * В этом методе будет производиться сравнение со значениями из списока по умолчанию
  * TODO: вообще, нужны более универсальные способы получения данных конкретного столбца, но это потом...
  */
-void SaleTableModel::setHorizontalHeaderLabels(const QStringList &labels)
+void SSaleTableModel::setHorizontalHeaderLabels(const QStringList &labels)
 {
 
     for(int i = 0; i < labels.count(); i++)
     {
-        Q_ASSERT_X(horizontalHeaderItem(i)->text() == fieldsDep.at(i), "SaleTableModel::setHorizontalHeaderLabels()", "fields dependencies");
+        Q_ASSERT_X(horizontalHeaderItem(i)->text() == fieldsDep.at(i), "SSaleTableModel::setHorizontalHeaderLabels()", "fields dependencies");
     }
     QStandardItemModel::setHorizontalHeaderLabels(labels);
 }
@@ -408,7 +408,7 @@ void SaleTableModel::setHorizontalHeaderLabels(const QStringList &labels)
 /* Сумма всех товаров
  *
  */
-double SaleTableModel::totalAmount()
+double SSaleTableModel::totalAmount()
 {
     double amount = 0;
     int isCancellationCol = fields->value("is_cancellation");
@@ -419,22 +419,22 @@ double SaleTableModel::totalAmount()
     return amount;
 }
 
-QString SaleTableModel::totalAmountLocal()
+QString SSaleTableModel::totalAmountLocal()
 {
     return sysLocale.toString(totalAmount(), 'f', 2);
 }
 
-QVariant SaleTableModel::value(int row, int column) const
+QVariant SSaleTableModel::value(int row, int column) const
 {
     return QStandardItemModel::data(index(row, column));
 }
 
-QVariant SaleTableModel::value(int row, QString field) const
+QVariant SSaleTableModel::value(int row, QString field) const
 {
     return QStandardItemModel::data(index(row, fields->value(field)));
 }
 
-QVariant SaleTableModel::value(int row, QString field, int role) const
+QVariant SSaleTableModel::value(int row, QString field, int role) const
 {
     return QStandardItemModel::data(index(row, fields->value(field)), role);
 }
@@ -443,7 +443,7 @@ QVariant SaleTableModel::value(int row, QString field, int role) const
  * Для просмотра проведённого документа будет достаточно вызвать метод this->setQuery()
  *
  */
-void SaleTableModel::sqlDataChanged()
+void SSaleTableModel::sqlDataChanged()
 {
     setRowCount(queryData->rowCount());
     setColumnCount(queryData->columnCount());
@@ -473,9 +473,9 @@ void SaleTableModel::sqlDataChanged()
 }
 
 #if QT_VERSION >= 0x060000
-void SaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+void SSaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
 #else
-void SaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void SSaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 #endif
 {
     int row = topLeft.row();
@@ -487,7 +487,7 @@ void SaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex 
     }
 }
 
-bool SaleTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (role == Qt::EditRole) {
         if (!checkIndex(index))
@@ -521,7 +521,7 @@ bool SaleTableModel::setData(const QModelIndex &index, const QVariant &value, in
     return false;
 }
 
-void SaleTableModel::setQuery(const QString &query, const QSqlDatabase &db)
+void SSaleTableModel::setQuery(const QString &query, const QSqlDatabase &db)
 {
     queryData->setQuery(query, db);
 }

@@ -13,7 +13,7 @@
 #include "models/sdocumentmodel.h"
 #include "models/sstandarditemmodel.h"
 #include "models/ssqlquerymodel.h"
-#include "models/saletablemodel.h"
+#include "models/ssaletablemodel.h"
 #include "models/slogrecordmodel.h"
 #include "models/scashregistermodel.h"
 #include "models/sclientmodel.h"
@@ -74,7 +74,7 @@ private:
     int price_col = 2;
     void updateWidgets();
     bool checkInput();
-    SaleTableModel *tableModel;
+    SSaleTableModel *tableModel;
     QSqlQueryModel *newItemModel;
     SaleTableItemDelegates *itemDelagates;
     int reserve = 0;

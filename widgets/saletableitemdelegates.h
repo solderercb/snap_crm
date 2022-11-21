@@ -9,17 +9,17 @@
 #include <QLineEdit>
 #include <QMouseEvent>
 #include <QAbstractItemView>
-#include "../models/saletablemodel.h"
+#include "../models/ssaletablemodel.h"
 #include "../global.h"
 
 class SaleTableItemDelegates : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    SaleTableItemDelegates(SaleTableModel*, QObject *parent = nullptr);
+    SaleTableItemDelegates(SSaleTableModel*, QObject *parent = nullptr);
     ~SaleTableItemDelegates();
 
-    SaleTableModel *tableModel;
+    SSaleTableModel *tableModel;
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;

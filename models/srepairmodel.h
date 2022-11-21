@@ -7,7 +7,7 @@
 #include <QDate>
 #include "sdevmdlmodel.h"
 #include "sclientmodel.h"
-#include "saletablemodel.h"
+#include "ssaletablemodel.h"
 
 class SRepairModel : public SComRecord
 {

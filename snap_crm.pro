@@ -44,7 +44,6 @@ SOURCES += \
     models/repairstablemodel.cpp \
     models/repairtablefiltermenu.cpp \
     models/sabstractitemmodel.cpp \
-    models/saletablemodel.cpp \
     models/scommentmodel.cpp \
     models/scommentsmodel.cpp \
     models/sdevicemakermodel.cpp \
@@ -60,6 +59,7 @@ SOURCES += \
     models/spaymenttypesmodel.cpp \
     models/srepairmodel.cpp \
     models/srepairstatuslog.cpp \
+    models/ssaletablemodel.cpp \
     models/ssloptionsdialog.cpp \
     models/ssortfilterproxymodel.cpp \
     models/ssqlquerymodel.cpp \
@@ -117,7 +117,6 @@ HEADERS  += \
     models/repairstablemodel.h \
     models/repairtablefiltermenu.h \
     models/sabstractitemmodel.h \
-    models/saletablemodel.h \
     models/scommentmodel.h \
     models/scommentsmodel.h \
     models/sdevicemakermodel.h \
@@ -133,6 +132,7 @@ HEADERS  += \
     models/spaymenttypesmodel.h \
     models/srepairmodel.h \
     models/srepairstatuslog.h \
+    models/ssaletablemodel.h \
     models/ssloptionsdialog.h \
     models/ssortfilterproxymodel.h \
     models/ssqlquerymodel.h \
