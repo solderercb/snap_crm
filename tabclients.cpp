@@ -90,6 +90,8 @@ void tabClients::updateTableWidget()
     query.clear();
 
     query_where.clear();
+    query_group.clear();
+    query_order.clear();
 
     /* Собираем условия для запроса */
     //    query_where << "";    // default WHERE part of query

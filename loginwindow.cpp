@@ -470,7 +470,13 @@ void LoginWindow::btnLoginHandler()
     else
     {
         qDebug("DB successfully opened.");
-        QSqlQuery queryCheckUser = QSqlQuery(QSqlDatabase::database("connMain"));   // проверка состояния учетной записи пользователя (база программы, а не mysql)
+
+        // установка режимов; начиная с MySQL v5.7.5 по умолчанию включен режим  ONLY_FULL_GROUP_BY
+        QSqlQuery querySetSqlMode = QSqlQuery(QSqlDatabase::database("connMain"));
+        querySetSqlMode.exec("SET SESSION sql_mode = sys.list_drop(@@session.sql_mode, 'ONLY_FULL_GROUP_BY');");
+
+        // проверка состояния учетной записи пользователя (база программы, а не mysql)
+        QSqlQuery queryCheckUser = QSqlQuery(QSqlDatabase::database("connMain"));
         queryCheckUser.exec(QUERY_SEL_USER_STATE(QSqlDatabase::database("connMain").userName()));
         queryCheckUser.first();
         try

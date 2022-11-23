@@ -198,7 +198,7 @@ void initGlobalModels()
     clientAdTypesList->setObjectName("clientAdTypesList");
 
     QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы"};
-    QVector<QString> clientTypesQueryFilterList = {"`type` = '%'", "`type` = 1", "`is_agent` = 1", "`is_dealer` = 1", "`is_regular` = 1", "`is_bad` = 1", "`is_realizator` = 1"};
+    QVector<QString> clientTypesQueryFilterList = {"`type` IN (0, 1)", "`type` = 1", "`is_agent` = 1", "`is_dealer` = 1", "`is_regular` = 1", "`is_bad` = 1", "`is_realizator` = 1"};
     for (int i=0; i<clientTypesList.size(); i++)
     {
         QList<QStandardItem*> *clientTypeSelector = new QList<QStandardItem*>();
