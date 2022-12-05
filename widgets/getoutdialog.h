@@ -10,6 +10,7 @@
 #include "models/srepairmodel.h"
 #include "models/sclientmodel.h"
 #include "models/scashregistermodel.h"
+#include "models/ssaletablemodel.h"
 #include "models/ssortfilterproxymodel.h"
 #include "models/sworkshopissuedmodel.h"
 #include "models/srepairstatuslog.h"
@@ -30,6 +31,7 @@ public:
     ~getOutDialog();
     void setRepairModel(SRepairModel *model);
     void setClientModel(SClientModel *model);
+    void setSaleTableModel(SSaleTableModel *model);
 
 private:
     Ui::getOutDialog *ui;
@@ -45,6 +47,7 @@ private:
     SSortFilterProxyModel *paymentSystemsProxyModel;
     void initPaymentSystems();
     bool checkAmounts();
+    SSaleTableModel *saleTableModel;
 private slots:
     void getOut();
     void cancel();

@@ -24,6 +24,8 @@
 #include "models/scommentmodel.h"
 #include "models/scommentsmodel.h"
 #include "models/ssortfilterproxymodel.h"
+#include "models/ssaletablemodel.h"
+#include "widgets/saletableitemdelegates.h"
 
 namespace Ui {
 class tabRepair;
@@ -115,7 +117,8 @@ private:
     SFieldsModel *additionalFieldsModel;
     SSortFilterProxyModel *statusesProxyModel;
     commentsDataModel *commentsModel;
-    worksAndSparePartsDataModel *worksAndPartsModel;
+    SSaleTableModel *worksAndPartsModel;
+    SaleTableItemDelegates *itemDelagates;
     bool m_statusUpdateInProgress = 0;
     float works_sum, parts_sum, total_sum;
     int getFieldIdByName(const QString &, QSqlQueryModel *);
@@ -166,7 +169,7 @@ private slots:
     void saveState();
     void saveState(int);
     void comboBoxStateIndexChanged(int);
-    void updateTotalSumms();
+    void updateTotalSumms(const float, const float, const float);
     void createGetOutDialog();
     void closeGetOutDialog();
     void openPrevRepair();

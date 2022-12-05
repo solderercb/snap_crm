@@ -521,6 +521,12 @@ float SClientModel::balance()
 void SClientModel::createBalanceObj()
 {
     balanceLog = new SBalanceLogRecordModel(i_id);
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    query->exec(QUERY_SEL_BALANCE(i_id));
+    query->first();
+    if(query->isValid())
+        m_balance = query->value(0).toFloat();
+    delete query;
 }
 
 void SClientModel::deleteBalanceObj()
@@ -568,9 +574,14 @@ bool SClientModel::updateBalance(const float amount, const QString &text)
     return i_nErr;
 }
 
-bool SClientModel::updateBalance(const float amount, const QString &text, const int doc_id)
+bool SClientModel::updateBalance(const float amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason reason, const int reason_id)
 {
-    balanceLog->setDocumentId(doc_id);
+    switch(reason)
+    {
+        case SBalanceLogRecordModel::RoyaltyReason::Repair: balanceLog->setRepair(reason_id); break;
+        case SBalanceLogRecordModel::RoyaltyReason::Document: balanceLog->setDocumentId(reason_id); break;
+        case SBalanceLogRecordModel::RoyaltyReason::CashOrder: balanceLog->setCashOrderId(reason_id); break;
+    }
     updateBalance(amount, text);
 
     return i_nErr;
@@ -787,9 +798,19 @@ void SBalanceLogRecordModel::setDirection(float amount)
         i_valuesMap.insert("direction", 0);
 }
 
-void SBalanceLogRecordModel::setDocumentId(int id)
+void SBalanceLogRecordModel::setRepair(const int id)
+{
+    i_logRecord->setRepairId(id);
+}
+
+void SBalanceLogRecordModel::setDocumentId(const int id)
 {
     i_logRecord->setDocumentId(id);
+}
+
+void SBalanceLogRecordModel::setCashOrderId(const int id)
+{
+    i_logRecord->setCashOrderId(id);
 }
 
 bool SBalanceLogRecordModel::commit(const float amount)

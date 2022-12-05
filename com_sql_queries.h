@@ -4,6 +4,7 @@
 #include "appver.h"
 
 #define QUERY_SEL_CLIENT(id)                QString("SELECT  `id`,  `name`,  `surname`,  `patronymic`,  `agent_phone_mask`,  `agent2_phone_mask`,  `address`,  `post_index`,  `type`,  `memorial`,  `notes`,  `prefer_cashless`,  `visit_source`,  `ur_name`,  `email`,  `balance_enable`,  `balance`,  `price_col`,  `repairs`,  `purchases`, `creator`,  `post_index`,  `passport_num`,  `passport_date`,  `passport_organ`,  `state`,  `birthday`,  `is_regular`,  `is_dealer`,  `take_long`,  `ignore_calls`,  `is_bad`,  `is_realizator`,  `is_agent`,  `photo_id`,  `INN`,  `KPP`,  `OGRN`,  `web_password`,  `icq`,  `skype`,  `viber`,  `telegram`,  `site`,  `whatsapp`,  `agent_name`,  `agent_surname`,  `agent_patronymic`,  `agent_phone`,  `agent_phone_clean`,  `agent2_name`,  `agent2_surname`,  `agent2_patronymic`,  `agent2_phone`,  `agent2_phone_clean`,  `created`,  `token` FROM `clients` WHERE `id` = %1 AND `state` = 1").arg((id))
+#define QUERY_SEL_BALANCE(id)               QString("SELECT `balance` FROM clients WHERE `id` = %1;").arg((id))
 #define QUERY_SEL_CLIENT_AD_TYPES           QString("SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC;")
 #define QUERY_SEL_CLIENT_MATCH              QString("SELECT t1.`id`, CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO', t1.`balance`, t1.`repairs`, t1.`purchases`, IF(t1.`type` = 1, 'Ю', '') AS 'type', GROUP_CONCAT(IFNULL(t2.`phone`, '') ORDER BY t2.`type` DESC, t2.`id` DESC SEPARATOR '\r\n')  AS 'phone' FROM `clients` AS t1 LEFT JOIN `tel` AS t2 ON t1.`id` = t2.`customer` WHERE `state` = 1 %1 GROUP BY t1.`id`;")
 #define QUERY_SEL_CLIENT_PHONES(id)         QString("SELECT `phone`, `mask`, `type`, `phone_clean`, `note`, `viber`, `telegram`, `whatsapp`, `id`, `customer` FROM `tel` WHERE `customer` = " + QString::number((id)) + " ORDER BY `type` DESC, `id` DESC")
@@ -228,44 +229,73 @@
 
 #define QUERY_SEL_REPAIR_COMMENTS(id)       QString("SELECT `created`, `user`, `text` FROM `comments` WHERE `remont` = %1 ORDER BY `id` DESC;").arg((id)), QSqlDatabase::database("connMain")
 
-#define QUERY_SEL_REPAIR_WORKS_AND_PARTS(id) QString(\
+#define QUERY_SEL_REPAIR_WORKS_AND_PARTS(id)    QString(\
+                                                "SELECT `id`, `UID`, `name`, `count`, `avail`, `price`, `summ`, `box`, `sn`, `warranty`, `user`, `is_realization`, `return_percent`, `state`, `notes`, `item_id`, `in_price`, `obj_id`, `dealer`, `buyer`, `created`, `work_id`, `is_item` FROM (\n"\
                                                 "SELECT\n"\
-                                                "  'X  +' AS '*',\n"\
+                                                "  t1.`id`,\n"\
+                                                "  t1.`price_id` AS 'UID',\n"\
                                                 "  t1.`name`,\n"\
                                                 "  t1.`count`,\n"\
+                                                "  0 AS 'avail',\n"\
                                                 "  ROUND(t1.`price`, 2) AS 'price',\n"\
                                                 "  t1.`count`*ROUND(t1.`price`, 2) AS 'summ',\n"\
+                                                "  NULL AS 'box',\n"\
+                                                "  '' AS 'sn',\n"\
                                                 "  t1.`warranty`,\n"\
                                                 "  t1.`user`,\n"\
-                                                "  '' AS 'item_sn',\n"\
-                                                "  t1.`id`,\n"\
-                                                "  t1.`id` AS 'work_id',\n"\
-                                                "  '' AS 'item_rsrv_id'\n"\
+                                                "  0 AS 'is_realization',\n"\
+                                                "  0 AS 'return_percent',\n"\
+                                                "  2 AS 'state',\n"\
+                                                "  '' AS 'notes',\n"\
+                                                "  0 AS 'item_id',\n"\
+                                                "  0 AS 'in_price',\n"\
+                                                "  t1.`repair` AS 'obj_id',\n"\
+                                                "  0 AS 'dealer',\n"\
+                                                "  0 AS 'buyer',\n"\
+                                                "  NULL AS 'created',\n"\
+                                                "  `id` AS 'work_id',\n"\
+                                                "  0 AS 'item_rsrv_id',\n"\
+                                                "  0 AS 'is_item'\n"\
                                                 "FROM\n"\
                                                 "  `works` AS t1\n"\
                                                 "WHERE\n"\
                                                 "  `repair` = %1\n"\
                                                 "UNION ALL\n"\
                                                 "SELECT\n"\
-                                                "  '   X',\n"\
+                                                "  t2.`id`,\n"\
+                                                "  CONCAT(LPAD(t3.articul, 6, '0'), '-', LPAD(t3.id, 6, '0')),\n"\
                                                 "  t2.`name`,\n"\
                                                 "  t2.`count`,\n"\
+                                                "  t3.`count` - t3.`reserved`,\n"\
                                                 "  ROUND(t2.`price`, 2),\n"\
                                                 "  t2.`count`*ROUND(t2.`price`, 2),\n"\
+                                                "  t3.`box`,\n"\
+                                                "  t2.`sn`,\n"\
                                                 "  t2.`warranty`,\n"\
                                                 "  t2.`to_user`,\n"\
-                                                "  t2.`sn`,\n"\
-                                                "  t2.`id`,\n"\
+                                                "  t3.`is_realization`,\n"\
+                                                "  t3.`return_percent`,\n"\
+                                                "  t2.`state`,\n"\
+                                                "  t2.`notes`,\n"\
+                                                "  t3.`id`,\n"\
+                                                "  t3.`in_price`,\n"\
+                                                "  t2.`repair_id`,\n"\
+                                                "  t3.`dealer`,\n"\
+                                                "  0,\n"\
+                                                "  t2.`created`,\n"\
                                                 "  t2.`work_id`,\n"\
-                                                "  t2.`id`\n"\
+                                                "  t2.`id`,\n"\
+                                                "  1\n"\
                                                 "FROM\n"\
                                                 "  `store_int_reserve` AS t2\n"\
+                                                "  LEFT JOIN\n"\
+                                                "  `store_items` AS t3 ON t2.`item_id` = t3.`id`\n"\
                                                 "WHERE\n"\
-                                                "  t2.work_id IN (SELECT `id` FROM `works` WHERE `repair` = %1)\n"\
+                                                "  t2.work_id IN (SELECT `id` FROM `works` WHERE `repair` = %1)) AS `tbl`\n"\
                                                 "ORDER BY\n"\
                                                 "  `work_id` ASC,\n"\
                                                 "  `item_rsrv_id` ASC;")\
-                                                .arg((id)), QSqlDatabase::database("connMain")
+                                                .arg((id))
 
 #define QUERY_SEL_REPAIR_PREPAYS(R)         QString("SELECT IFNULL(SUM(`summa`), 0) AS 'summa' FROM `cash_orders` WHERE `repair` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_WORKS(R)           QString("SELECT SUM(`price` * `count`) AS 'summa' FROM `works` WHERE `repair` = %1 GROUP BY `repair`;").arg((R))
@@ -276,9 +306,75 @@
 #define QUERY_SEL_ITEM_ADD_FIELDS(I)        QString("SELECT t2.`name`, t1.`value`, '' AS 'comment' FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`item_id` = %1 ORDER BY t1.`field_id` ASC;").arg((I))
 #define QUERY_SEL_IS_BALANCE_EN(C)          QString("SELECT SUM(`summ`) AS 'summa' FROM `balance` WHERE `client` = %1;").arg((C))
 #define QUERY_SEL_DOC(id)                   QString("SELECT  `id`,  `type`,  `state`,  `is_realization`,  `payment_system`,  `company`,  `store`,  `user`,  `total`,  `notes`,  `created`,  `updated_at`,  `office`,  `dealer`,  `currency_rate`,  `reason`,  `order_id`,  `price_option`,  `return_percent`,  `reserve_days`, DiffDays(UTC_TIMESTAMP(), `created`) AS 'diff_days', `master_id`,  `repair_id`,  `works_included`,  `invoice`,  `track`,  `d_store`,  `d_pay` FROM `docs` WHERE `id` = %1;").arg((id))
-#define QUERY_SEL_ITEMS_IN_DOC(id)          QString("SELECT t1.`id`, CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID', t2.`name`, t1.`count`, t2.`count` - t2.`reserved` AS 'avail', t1.`price`, t1.`count`*t1.`price` AS 'summ', t2.`box`, t1.`sn`, t1.`warranty`, t2.`is_realization`, t2.`return_percent`, t1.`is_cancellation`, t1.`cancellation_reason`, t2.`id` AS 'item_id', t2.`in_price`, t1.`document_id`, t2.`dealer`, t1.`customer_id` FROM store_sales AS t1 LEFT JOIN store_items AS t2 ON t1.`item_id`=t2.id WHERE (`document_id` = %1);").arg((id))
-#define QUERY_SEL_ITEMS_IN_DOC_RSRV(id)     QString("SELECT t1.`id`, CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID', t2.`name`, t1.`count`, t2.`count` - t2.`reserved` + t1.`count` AS 'avail', t1.`price`, t1.`count`*t1.`price` AS 'summ', t2.`box`, t1.`sn`, t1.`warranty`, t2.`is_realization`, t2.`return_percent`, t1.`is_cancellation`, t1.`cancellation_reason`, t2.`id` AS 'item_id', t2.`in_price`, t1.`document_id`, t2.`dealer`, t1.`customer_id` FROM store_sales AS t1 LEFT JOIN store_items AS t2 ON t1.`item_id`=t2.id WHERE (`document_id` = %1);").arg((id))
-#define QUERY_SEL_PART_FOR_SALE(uid, price_field_name)   QString(\
+
+#define QUERY_SEL_ITEMS_IN_DOC(id)                      QString(\
+                                                        "SELECT\n"\
+                                                        "	t1.`id`,\n"\
+                                                        "	CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID',\n"\
+                                                        "	t2.`name`,\n"\
+                                                        "	t1.`count`,\n"\
+                                                        "	t2.`count` - t2.`reserved` AS 'avail',\n"\
+                                                        "	t1.`price`,\n"\
+                                                        "	t1.`count`*t1.`price` AS 'summ',\n"\
+                                                        "	t2.`box`,\n"\
+                                                        "	t1.`sn`,\n"\
+                                                        "	t1.`warranty`,\n"\
+                                                        "	t1.`user`,\n"\
+                                                        "	t2.`is_realization`,\n"\
+                                                        "	t2.`return_percent`,\n"\
+                                                        "	t1.`is_cancellation`,\n"\
+                                                        "	t1.`cancellation_reason`,\n"\
+                                                        "	t2.`id` AS 'item_id',\n"\
+                                                        "	t2.`in_price`,\n"\
+                                                        "	t1.`document_id` AS 'obj_id',\n"\
+                                                        "	t2.`dealer`,\n"\
+                                                        "	t1.`customer_id` AS 'buyer',\n"\
+                                                        "	NULL AS 'created',\n"\
+                                                        "	NULL AS 'work_id',\n"\
+                                                        "	1 AS 'is_item'\n"\
+                                                        "FROM\n"\
+                                                        "	store_sales AS t1 LEFT JOIN\n"\
+                                                        "	store_items AS t2\n"\
+                                                        "	ON\n"\
+                                                        "	t1.`item_id`=t2.id\n"\
+                                                        "WHERE\n"\
+                                                        "(`document_id` = %1);").arg((id))
+                                                        
+#define QUERY_SEL_ITEMS_IN_DOC_RSRV(id)                 QString(\
+                                                        "SELECT\n"\
+                                                        "  t1.`id`,\n"\
+                                                        "  CONCAT(LPAD(t2.articul, 6, '0'), '-', LPAD(t2.id, 6, '0')) AS 'UID',\n"\
+                                                        "  t2.`name`,\n"\
+                                                        "  t1.`count`,\n"\
+                                                        "  t2.`count` - t2.`reserved` + t1.`count` AS 'avail',\n"\
+                                                        "  t1.`price`,\n"\
+                                                        "  t1.`count`*t1.`price` AS 'summ',\n"\
+                                                        "  t2.`box`,\n"\
+                                                        "  t1.`sn`,\n"\
+                                                        "  t1.`warranty`,\n"\
+                                                        "  t1.`user`,\n"\
+                                                        "  t2.`is_realization`,\n"\
+                                                        "  t2.`return_percent`,\n"\
+                                                        "  t1.`is_cancellation` AS 'state',\n"\
+                                                        "  t1.`cancellation_reason` AS 'notes',\n"\
+                                                        "  t2.`id` AS 'item_id',\n"\
+                                                        "  t2.`in_price`,\n"\
+                                                        "  t1.`document_id` AS 'obj_id',\n"\
+                                                        "  t2.`dealer`,\n"\
+                                                        "  t1.`customer_id` AS 'buyer',\n"\
+                                                        "  NULL AS 'created',\n"\
+                                                        "  NULL AS 'work_id',\n"\
+                                                        "	1 AS 'is_item'\n"\
+                                                        "FROM\n"\
+                                                        "  store_sales AS t1 LEFT JOIN\n"\
+                                                        "  store_items AS t2\n"\
+                                                        "  ON\n"\
+                                                        "    t1.`item_id`=t2.id\n"\
+                                                        "WHERE\n"\
+                                                        "  (`document_id` = %1);")\
+                                                        .arg((id))
+                                                        
+#define QUERY_SEL_PART_FOR_SALE(uid, price_field_name)  QString(\
                                                         "SELECT\n"\
                                                         "  0 AS 'id',\n"\
                                                         "  CONCAT(LPAD(t1.articul, 6, '0'), '-', LPAD(t1.id, 6, '0')) AS 'UID',\n"\
@@ -290,19 +386,24 @@
                                                         "  t1.`box`,\n"\
                                                         "  t1.`SN` AS 'sn',\n"\
                                                         "  t1.`warranty`,\n"\
+                                                        "  0 AS 'user',\n"\
                                                         "  t1.`is_realization`,\n"\
                                                         "  t1.`return_percent`,\n"\
-                                                        "  0 AS 'is_cancellation',\n"\
-                                                        "  NULL AS 'cancellation_reason',\n"\
+                                                        "  0 AS 'state',\n"\
+                                                        "  NULL  AS 'notes',\n"\
                                                         "  t1.`id` AS 'item_id',\n"\
                                                         "  t1.`in_price`,\n"\
-                                                        "  0 AS 'document_id',\n"\
+                                                        "  0 AS 'obj_id',\n"\
                                                         "  t1.`dealer`,\n"\
-                                                        "  0 AS 'customer_id'\n"\
+                                                        "  0 AS 'buyer',\n"\
+                                                        "  NULL AS 'created',\n"\
+                                                        "  NULL AS 'work_id',\n"\
+                                                        "  1 AS 'is_item'\n"\
                                                         "FROM\n"\
                                                         "  store_items AS t1\n"\
                                                         "WHERE\n"\
-                                                        "  `id` IN (%1);").arg(uid).arg((price_field_name))
+                                                        "  `id` IN (%1);").arg(uid)\
+                                                        .arg((price_field_name))
 
 #define QUERY_SEL_ITEM_ACTUAL_QTY(item_id)   QString(\
                                                         "SELECT\n"\
@@ -316,6 +417,7 @@
                                                         .arg((item_id))
 
 #define QUERY_SEL_STORE_SALES_QTY(id)       QString("SELECT `count` FROM store_sales WHERE `id` = %1;").arg((id))
+#define QUERY_SEL_REPAIR_SALES_QTY(id)       QString("SELECT `count` FROM store_int_reserve WHERE `id` = %1;").arg((id))
 #define QUERY_SEL_CASH_ORDER(id)            QString(\
                                                         "SELECT\n"\
                                                         "  `id`,\n"\

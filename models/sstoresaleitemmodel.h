@@ -1,5 +1,5 @@
-#ifndef SSALEITEMMODEL_H
-#define SSALEITEMMODEL_H
+#ifndef SSTORESALEITEMMODEL_H
+#define SSTORESALEITEMMODEL_H
 
 #include "global.h"
 #include "scomrecord.h"
@@ -8,17 +8,17 @@
 #include <QObject>
 #include <QSqlRecord>
 
-class SSaleItemModel : public SComRecord
+class SStoreSaleItemModel : public SComRecord
 {
     Q_OBJECT
 signals:
     void qtyNotEnough();
 public:
     enum Operation{ Nop = 0, Sale = 1, Reserve = 2, SaleReserved = 3, SaleRepair = 4, Unsale = 5, Free = 6 };
-    enum DBTable {RegularSales = 0, WorkshopSales = 1};
-    enum Columns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColRealization, ColRetPercent, ColIsCancellation, ColCancellationReason, ColItemId, ColInPrice, ColDocument, ColDealer, ColCustomer};
-    explicit SSaleItemModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
-    ~SSaleItemModel();
+    enum Columns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColUser, ColRealization, ColRetPercent, ColState, ColNotes, ColItemId, ColInPrice, ColDocument, ColDealer, ColCustomer, ColCreated, ColWorkId, ColRecordType};
+    enum State {Active = 0, Cancelled = 1};
+    explicit SStoreSaleItemModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
+    ~SStoreSaleItemModel();
     void setId(int);
     void setMode(int);
     void setClient(int);  // установка id клиента
@@ -29,8 +29,6 @@ public:
     bool unsale();
     void setUnsaleReason(const QString&);
     bool free();
-    bool saleReserve();
-    bool saleRepair();
     QSqlRecord* actualStoreQtys();
     bool isProfitable();
     bool integrityStatus();
@@ -47,7 +45,6 @@ private:
     float m_inPrice = 0;
     float m_price = 0;
     int m_doc_id = 0;
-    int m_mode = 0;   // 0 - обычная продажа, 1 - продажа в ремонте
     Operation m_op_type = Nop;
     int m_count = 0;
     int m_old_count = 0; // только для случаев продажи ранее зарезервированного товара и возврата
@@ -64,4 +61,4 @@ private:
 
 };
 
-#endif // SSALEITEMMODEL_H
+#endif // SSTORESALEITEMMODEL_H

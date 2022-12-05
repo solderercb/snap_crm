@@ -79,8 +79,9 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     additionalFieldsModel = new SFieldsModel(SFieldsModel::Repair);
     statusesProxyModel = new SSortFilterProxyModel;
     statusesProxyModel->setSourceModel(statusesModel);
-    worksAndPartsModel = new worksAndSparePartsDataModel;
-    connect(worksAndPartsModel, SIGNAL(modelReset()), this, SLOT(updateTotalSumms()));  // TODO: уточнить генерируется ли сигнал при изменении существующих данных
+    worksAndPartsModel = new SSaleTableModel();
+    connect(worksAndPartsModel, SIGNAL(amountChanged(float,float,float)), this, SLOT(updateTotalSumms(float,float,float)));
+    itemDelagates = new SaleTableItemDelegates(worksAndPartsModel, ui->tableViewWorksAndSpareParts);
     commentsModel = new commentsDataModel();
 //    reloadRepairData();
 
@@ -101,6 +102,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->tableViewComments->horizontalHeader()->hide();
 
     ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
+    ui->tableViewWorksAndSpareParts->setItemDelegate(itemDelagates);
     ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 //    ui->tableViewWorksAndSpareParts->setReadOnly(true);
 
@@ -116,7 +118,8 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     reloadRepairData();
 
 #ifdef QT_DEBUG
-    createGetOutDialog();
+    if(repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair )
+        createGetOutDialog();
     connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(updateWidgets()));
 #else
     ui->pushButtonManualUpdateRepairData->setHidden(true);
@@ -174,9 +177,10 @@ void tabRepair::reloadRepairData()
     {
         m_clientId = repairModel->clientId();
         clientModel->load(m_clientId);
+        worksAndPartsModel->setClient(m_clientId);
     }
     additionalFieldsModel->load(repair_id);
-    worksAndPartsModel->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(repair_id));
+    worksAndPartsModel->loadWorkshopSale(repair_id);
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
 
     updateStatesModel(repairModel->state());
@@ -286,6 +290,7 @@ void tabRepair::updateWidgets()
     ui->comboBoxState->setEnabled(m_comboBoxStateEnabled && !modelRO);
     ui->toolButtonSaveState->setEnabled(!modelRO);
 
+    worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
     ui->tableViewWorksAndSpareParts->resizeRowsToContents();
     ui->tableViewComments->resizeRowsToContents();
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled);
@@ -413,7 +418,7 @@ bool tabRepair::setWidgetsParams(const int stateId)
     {
         switch (action.toInt())
         {
-            case Global::RepStateActions::EditWorksParts: m_worksRO = 0; break;
+//            case Global::RepStateActions::EditWorksParts: m_worksRO = 0; break;
             case Global::RepStateActions::EditDiagSumm: m_diagRO = 0; m_summRO = 0; break;
         }
     }
@@ -458,23 +463,11 @@ bool tabRepair::checkData(const int stateId)
     return ret;
 }
 
-void tabRepair::updateTotalSumms()
+void tabRepair::updateTotalSumms(const float, const float, const float)
 {
-    works_sum = 0;
-    parts_sum = 0;
-    total_sum = 0;
-    for(int i=0;i<worksAndPartsModel->rowCount();i++)
-    {
-        if(worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::item_rsrv_id).toInt())
-            parts_sum += worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::summ).toFloat();
-        else
-            works_sum += worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::summ).toFloat();
-
-        total_sum +=  worksAndPartsModel->record(i).value(worksAndSparePartsDataModel::summ).toFloat();
-    }
-    ui->lineEditWorksAmount->setText(sysLocale.toString(works_sum, 'f', 2));
-    ui->lineEditSparePartsAmount->setText(sysLocale.toString(parts_sum, 'f', 2));
-    ui->lineEditTotalAmount->setText(sysLocale.toString(total_sum, 'f', 2));
+    ui->lineEditTotalAmount->setText(worksAndPartsModel->amountTotalLocale());
+    ui->lineEditWorksAmount->setText(worksAndPartsModel->amountWorksLocale());
+    ui->lineEditSparePartsAmount->setText(worksAndPartsModel->amountItemsLocale());
 }
 
 void tabRepair::createGetOutDialog()
@@ -863,24 +856,29 @@ worksAndSparePartsTable::~worksAndSparePartsTable()
 void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
 {
     QTableView::resizeEvent(event);
-    int i;
-    int colWidths[] = {30,0,30,50,50,60,60,100};
+    int i, j;
     int colNameWidth = 0;
+    int colWidths[] = {40,90,0,45,0,70,70,120,120,80,100};
 
-    horizontalHeader()->hideSection(10); // прячем служебные столбцы
-    horizontalHeader()->hideSection(9);
-    horizontalHeader()->hideSection(8);
+    verticalHeader()->hide();
+    colNameWidth = geometry().width();
 
-    for (i = 0; i < 8; i++)
+    for (i = 0, j = 0; i < model()->columnCount(); i++)
     {
-        colNameWidth += colWidths[i];
-        setColumnWidth(i, colWidths[i]);
+        if(static_cast<SSaleTableModel*>(model())->isColumnHidden(i))
+            hideColumn(i);
+        else
+        {
+            colNameWidth -= colWidths[j];
+            setColumnWidth(i, colWidths[j]);
+            j++;
+        }
     }
-    colNameWidth = geometry().width() - verticalScrollBar()->width() - colNameWidth;
+    colNameWidth -= 2; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
     if (verticalScrollBar()->isVisible())
-        setColumnWidth(1, colNameWidth - verticalScrollBar()->width());
+        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth - verticalScrollBar()->width());
     else
-        setColumnWidth(1, colNameWidth);
+        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth);
     resizeRowsToContents();
 }
 
@@ -914,11 +912,11 @@ QVariant worksAndSparePartsDataModel::data(const QModelIndex &index, int role) c
     if (role == Qt::DisplayRole)
     {
         switch (index.column()) {
-            case actions: return QSqlQueryModel::data(index, role);
-            case price: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
-            case summ: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
-            case user: return allUsersMap->value(QSqlQueryModel::data(index, role).toInt());
-            case warranty: return warrantyTermsMap->value(QSqlQueryModel::data(index, role).toInt());
+            case SStoreSaleItemModel::ColPrice: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
+            case SStoreSaleItemModel::ColSumm: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
+            case SStoreSaleItemModel::ColBox: return itemBoxesModel->value(QSqlQueryModel::data(index, role).toInt());
+            case SStoreSaleItemModel::ColUser: return allUsersMap->value(QSqlQueryModel::data(index, role).toInt());
+            case SStoreSaleItemModel::ColWarranty: return warrantyTermsMap->value(QSqlQueryModel::data(index, role).toInt());
         }
     }
     return QSqlQueryModel::data(index, role);   // или если просто возвращать данные наследуемого объекта, то тоже всё ОК

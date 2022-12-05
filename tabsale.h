@@ -105,7 +105,7 @@ private slots:
     void clearClientCreds(bool hideCoincidence = true);
     void fillClientCreds(int);
     void comboBoxIndexChanged(int);
-    void updateTotalSumms(float);
+    void updateTotalSumms(const float amountTotal, const float, const float);
     void phoneNumberEdited(QString);
     void buttonSelectExistingClientHandler();
     void buttonCreateTabClientHandler();

@@ -16,6 +16,7 @@ getOutDialog::getOutDialog(QWidget *p, Qt::WindowFlags f) :
     tabRepair *parentTab = static_cast<tabRepair*>(parent);
     setRepairModel(parentTab->repairModel);
     setClientModel(parentTab->clientModel);
+    setSaleTableModel(parentTab->worksAndPartsModel);
 
     m_repairId = repairModel->id();
     repairModel->reload();
@@ -46,7 +47,7 @@ getOutDialog::getOutDialog(QWidget *p, Qt::WindowFlags f) :
         ui->labelIssuedMessage->setHidden(true);
     else
         ui->labelIssuedMessage->setText(repairModel->issuedMsg());
-    if(repairModel->repairCost() != parentTab->total_sum) // если сумма работ и деталей не равна согласованной, отобразится сообщение
+    if(repairModel->repairCost() != saleTableModel->amountTotal()) // если сумма работ и деталей не равна согласованной, отобразится сообщение
         summsNotEq = 1;
 
     // Деньги это важно, поэтому перепроверяем суммы
@@ -89,6 +90,11 @@ void getOutDialog::setRepairModel(SRepairModel *model)
 void getOutDialog::setClientModel(SClientModel *model)
 {
     clientModel = model;
+}
+
+void getOutDialog::setSaleTableModel(SSaleTableModel *model)
+{
+    saleTableModel = model;
 }
 
 void getOutDialog::setDefaultStyleSheets()
@@ -209,6 +215,7 @@ void getOutDialog::getOut()
             else
                 repairModel->setRejectReason(ui->textEditRejectReason->toPlainText());
         }
+        saleTableModel->saveTablesWorkshop(SRepairSaleItemModel::Operation::Sale);
         repairModel->commit();
         repairStatusLog->setStatus(newState);
         repairStatusLog->setManager(repairModel->currentManager());
@@ -216,50 +223,6 @@ void getOutDialog::getOut()
         repairStatusLog->commit();
         workshopIssuedModel->setRepair(m_repairId);
         workshopIssuedModel->commit();
-
-        // Зачисления за товары на реализации
-        QUERY_EXEC(query,nErr)(QUERY_INS_BALANCE_LOG2(office, user, m_repairId));
-        QUERY_EXEC(query,nErr)(QUERY_UPDATE_BALANCE2(m_repairId));
-        QUERY_EXEC(query,nErr)(QUERY_VRFY_BALANCE2(m_repairId));
-        while(query->next() && nErr)  // верификация баланса (-ов, если в ремонте товары разных поставщиков)
-             nErr = (query->value(0).toInt() == 21930)?1:0;
-
-        QUERY_EXEC(query,nErr)(QUERY_UPDATE_STORE_INT_RSRV(3,m_repairId));
-
-        QUERY_EXEC(query2,nErr)(QUERY_SEL_PRE_UPD_STORE_ITEMS(m_repairId));    // кол-ва товара, которое должно получиться после обновления
-        QUERY_EXEC(query,nErr)(QUERY_UPD_STORE_ITEMS(m_repairId));
-        QUERY_EXEC(query,nErr)(QUERY_SEL_PST_UPD_STORE_ITEMS(m_repairId));     // кол-ва товара после обновления
-        if (query->size() == query2->size())    // проверка одинакового кол-ва строк (чтобы не вылетело приложение)
-        {
-            while(query->next() && query2->next() && nIntegrityErr)
-            {
-                for(int i = query->record().count() - 1; i >= 0; i--)   // проверка одинаковости всех полей
-                {
-//                    qDebug() << QString("query->value(%1) =").arg(i) << query->value(i).toInt() << QString("query2->value(%1) =").arg(i) << query2->value(i).toInt();
-                    if (query->value(i).toInt() != query2->value(i).toInt())
-                    {
-                        nIntegrityErr = 0;
-                    }
-                }
-            }
-        }
-        else
-            nIntegrityErr = 0;
-
-        if (!nIntegrityErr)
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Ошибка");
-            msgBox.setIcon(QMessageBox::Critical);
-//            qDebug() << "Ошибка целостности данных (товары)!";
-            msgBox.setText(QString("Ошибка целостности данных!"));
-            msgBox.exec();
-            nErr = 0;
-        }
-//            else
-//                qDebug() << "Верификация данных: ОК";
-        // QUERY_INS_LOG(G,T,U,O,C,R,I,D,B,t)
-        QUERY_EXEC(query,nErr)(QUERY_INS_LOG_PARTS_IN_REPAIR(user,office,client,m_repairId));
 
 #ifdef QT_DEBUG
         throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)

@@ -18,6 +18,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     clientModel = new SClientModel();
     cashRegister = new SCashRegisterModel();
 
+    tableModel->setTableMode(SSaleTableModel::TablesSet::StoreSale);
     params = new int;
     *params = 0;
     *params |= comSettings->value("qs_print_rn").toBool()?tabSaleSettingsMenu::PrintDoc:0;
@@ -44,14 +45,13 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     userActivityLog->appendRecord("Navigation " + tabTitle());
 
     ui->tableView->setModel(tableModel);
-    ui->tableView->setItemDelegateForColumn(0, itemDelagates);
     ui->tableView->setItemDelegate(itemDelagates);
 
 //    connect(ui->lineEditAddByUID, SIGNAL(returnPressed()), this, SLOT(addItemByUID()));    // подключены в дизайнере
 //    connect(ui->buttonReserve, SIGNAL(clicked()), this, SLOT(reserveButtonClicked()));    // подключены в дизайнере
 //    connect(ui->buttonSale, SIGNAL(clicked()), this, SLOT(saleButtonClicked()));    // подключены в дизайнере
     connect(ui->comboBoxPriceCol, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPriceCol(int)));    // нужно подключать здесь, иначе возникает глюк с доступом к QMap<> fields
-    connect(tableModel, SIGNAL(amountChanged(float)), this, SLOT(updateTotalSumms(float)));
+    connect(tableModel, SIGNAL(amountChanged(float, float, float)), this, SLOT(updateTotalSumms(float, float, float)));
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
     connect(ui->comboBoxClientPhoneType,SIGNAL(currentIndexChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
     connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(phoneNumberEdited(QString)));
@@ -189,8 +189,8 @@ void tabSale::updateWidgets()
             ui->buttonReserveCancel->show();
             ui->buttonSaleMore->show();
             ui->buttonSale->show();
-            tableModel->setModelState(2);
-            tableModel->load(doc_id);
+            tableModel->setModelState(SSaleTableModel::StoreReserved);
+            tableModel->loadStoreSale(doc_id);
 #ifdef QT_DEBUG
             ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toFloat(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2)); // это для отладки
 #else
@@ -213,8 +213,8 @@ void tabSale::updateWidgets()
             ui->buttonSale->hide();
             ui->labelTrack->hide();
             ui->lineEditTrack->hide();
-            tableModel->setModelState(3);
-            tableModel->load(doc_id);
+            tableModel->setModelState(SSaleTableModel::StoreCancelled);
+            tableModel->loadStoreSale(doc_id);
             ui->lineEditTakeIn->setText(sysLocale.toString(0.00, 'f', 2));
         }
         else    // если открыта проведённая РН
@@ -239,11 +239,11 @@ void tabSale::updateWidgets()
             {
                 ui->groupBoxAdm->hide();
             }
-            tableModel->setModelState(1);
-            tableModel->load(doc_id);
+            tableModel->setModelState(SSaleTableModel::StoreSold);
+            tableModel->loadStoreSale(doc_id);
             ui->lineEditTotal->setText(docModel->amountLocal());  // устанавливать суммы нужно только после заполнения таблицы
             ui->lineEditTakeIn->setReadOnly(true);
-            ui->lineEditTakeIn->setText(tableModel->totalAmountLocal());  // тут применю хитрость: поля будут заполняться из разных "источников" и, в случае возврата товаров, сравниваться
+            ui->lineEditTakeIn->setText(tableModel->amountTotalLocale());  // тут применю хитрость: поля будут заполняться из разных "источников" и, в случае возврата товаров, сравниваться
         }
     }
     else    // новая расходная накладная
@@ -287,7 +287,7 @@ void tabSale::updateWidgets()
         ui->pushButtonClientCredsClearAll->setEnabled(true);
         ui->pushButtonClientFromDB->setEnabled(true);
 
-        tableModel->setModelState(0);
+        tableModel->setModelState(SSaleTableModel::StoreNew);
 
 #ifdef QT_DEBUG
         test_scheduler_counter = 0;
@@ -360,20 +360,20 @@ bool tabSale::checkInput()
         ui->lineEditTotal->setStyleSheet(commonLineEditStyleSheetRed);
         error = 10;
     }
-    for(int i = 0; i < tableModel->rowCount(); i++)
+    for(int i = 0; i < tableModel->rowCount(); i++) // TODO: Это нужно перенести в SSaleTableModel
     {
-        if(!tableModel->value(i, "is_cancellation").toBool())   // только не помеченные на снятие резерва/возврат
+        if(!tableModel->value(i, SStoreSaleItemModel::ColState).toBool())   // только не помеченные на снятие резерва/возврат
         {
-            if ( tableModel->value(i, "price").toFloat() <= 0 ) // цена меньше нуля
+            if ( tableModel->value(i, SStoreSaleItemModel::ColPrice).toFloat() <= 0 ) // цена меньше нуля
             {
-                tableModel->setData(tableModel->index(i, tableModel->fields->value("price")), QColor(255, 209, 209), Qt::BackgroundRole);
+                tableModel->setData(tableModel->index(i, SStoreSaleItemModel::ColPrice), QColor(255, 209, 209), Qt::BackgroundRole);
 
                 error = 11;
             }
-            if( tableModel->value(i, "price").toFloat() < tableModel->value(i, "in_price").toFloat() ) // цена меньше закупочной
+            if( tableModel->value(i, SStoreSaleItemModel::ColPrice).toFloat() < tableModel->value(i, SStoreSaleItemModel::ColInPrice).toFloat() ) // цена меньше закупочной
             {
                 QMessageBox::StandardButton resBtn = QMessageBox::question( this, "SNAP CRM",
-                                                                            tr("Цена ниже закупочной, продолжить?\n\"%1\"").arg(tableModel->value(i, "name").toString()),
+                                                                            tr("Цена ниже закупочной, продолжить?\n\"%1\"").arg(tableModel->value(i, SStoreSaleItemModel::ColName).toString()),
                                                                             QMessageBox::No | QMessageBox::Yes,
                                                                             QMessageBox::No);
                 if (resBtn == QMessageBox::No)
@@ -425,7 +425,7 @@ bool tabSale::createNewDoc()
 
     reserveDays = ui->spinBoxReserve->value();
     priceCol = priceColModel->index(ui->comboBoxPriceCol->currentIndex(), 1).data().toInt();
-    amount = tableModel->totalAmount();
+    amount = tableModel->amountTotal();
 
     docModel->setType(SDocumentModel::OutInvoice);
     docModel->setState(0);
@@ -438,16 +438,12 @@ bool tabSale::createNewDoc()
     return docModel->commit();
 }
 
-void tabSale::updateTotalSumms(float amount)
+void tabSale::updateTotalSumms(const float amountTotal, const float, const float)
 {
-#ifdef QT_DEBUG
-//    ui->lineEditTakeIn->setText(sysLocale.toString(amount + QRandomGenerator::global()->bounded(100), 'f', 2));
-#endif
-
     float takeInSumm = sysLocale.toFloat(ui->lineEditTakeIn->text());
-    ui->lineEditTotal->setText(sysLocale.toString(amount, 'f', 2));
-    if(takeInSumm >= amount)
-        ui->lineEditCharge->setText(sysLocale.toString(takeInSumm - amount, 'f', 2));
+    ui->lineEditTotal->setText(sysLocale.toString(amountTotal, 'f', 2));
+    if(takeInSumm >= amountTotal)
+        ui->lineEditCharge->setText(sysLocale.toString(takeInSumm - amountTotal, 'f', 2));
     else
         ui->lineEditCharge->setText(sysLocale.toString(0.00, 'f', 2));
 }
@@ -537,7 +533,7 @@ void tabSale::buttonCreateTabClientHandler()
 
 void tabSale::tableRowDoubleClick(QModelIndex tableIndex)
 {
-    emit createTabSparePart(tableModel->value(tableIndex.row(), "item_id").toInt());
+    emit createTabSparePart(tableModel->value(tableIndex.row(), SStoreSaleItemModel::ColItemId).toInt());
 }
 
 void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
@@ -583,7 +579,7 @@ void tabSale::addItemByUID()
 */
 void tabSale::addItemByUID(int uid)
 {
-    if(tableModel->modelState() == SSaleTableModel::New || tableModel->modelState() == SSaleTableModel::Reserved )
+    if(tableModel->modelState() == SSaleTableModel::StoreNew || tableModel->modelState() == SSaleTableModel::StoreReserved )
     {
         int row = isItemAlreadyInList(uid);
         if( row == -1)
@@ -602,8 +598,8 @@ void tabSale::addItemByUID(int uid)
         }
         else
         {
-            qDebug() << QString("товар UID %1 уже добавлен").arg(tableModel->value(row, "UID").toString());
-            shortlivedNotification *newPopup = new shortlivedNotification(this, "Повтор", "\"" + tableModel->value(row, "name").toString()+"\" (UID " + tableModel->value(row, "UID").toString() + ") уже добавлен", QColor(255,255,255), QColor(245,245,245));
+            qDebug() << QString("товар UID %1 уже добавлен").arg(tableModel->value(row, SStoreSaleItemModel::ColUID).toString());
+            shortlivedNotification *newPopup = new shortlivedNotification(this, "Повтор", "\"" + tableModel->value(row, SStoreSaleItemModel::ColName).toString()+"\" (UID " + tableModel->value(row, SStoreSaleItemModel::ColUID).toString() + ") уже добавлен", QColor(255,255,255), QColor(245,245,245));
         }
     }
 }
@@ -658,7 +654,7 @@ bool tabSale::unSale()  // распроведение
         clientModel->updatePurchases(-tableModel->itemsAffected());
 
         // если в следствие (нескольких) частичных распроведений были возвращены все товары, то нужно изменить статус документа
-        if(tableModel->totalAmount() == 0)
+        if(tableModel->amountTotal() == 0)
         {
             QStringList logText;
             logText << tr("Расходная накладная №%1 распроведена").arg(doc_id);
@@ -670,7 +666,7 @@ bool tabSale::unSale()  // распроведение
             docModel->appendLogText(logText.join(", "));
         }
         else
-            docModel->setAmount(tableModel->totalAmount());
+            docModel->setAmount(tableModel->amountTotal());
 
         amount = sysLocale.toFloat(ui->lineEditCharge->text()); // в поле Сдача будет записана сумма товаров, помеченных на удаление (т. е. сумма возврата)
 
@@ -678,7 +674,7 @@ bool tabSale::unSale()  // распроведение
 
         if(balance)
         {
-            clientModel->updateBalance(amount, QString("Зачисление %1 - возврат за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), doc_id);
+            clientModel->updateBalance(amount, QString("Зачисление %1 - возврат за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), SBalanceLogRecordModel::RoyaltyReason::Document, doc_id);
         }
         else
         {
@@ -736,7 +732,7 @@ int tabSale::isItemAlreadyInList(int id)
 {
     for(int i = 0; i < tableModel->rowCount(); i++)
     {
-        if(tableModel->value(i, "item_id").toInt() == id)
+        if(tableModel->value(i, SStoreSaleItemModel::ColItemId).toInt() == id)
             return i;
     }
     return -1;
@@ -752,7 +748,7 @@ bool tabSale::sale()
     float amount;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
-    amount = tableModel->totalAmount();
+    amount = tableModel->amountTotal();
 
     QUERY_LOG_START(metaObject()->className());
 
@@ -798,14 +794,14 @@ bool tabSale::sale()
 
         if(reserve == Reserve)
         {
-            tableModel->saleItems(SSaleTableModel::Reserve);
+            tableModel->saveTablesStore(SSaleTableModel::Reserve);
             docModel->setType(SDocumentModel::ReserveInvoice);
             docModel->appendLogText(QString("Расходная накладная №%1 создана (резерв)").arg(doc_id));
             docModel->setState(SDocumentModel::ItemsReserved);
         }
         else
         {
-           tableModel->saleItems(SSaleTableModel::Sale);
+           tableModel->saveTablesStore(SSaleTableModel::Sale);
             if(reserve == SaleReserved)
             {
                 docModel->setAmount(amount);
@@ -821,7 +817,7 @@ bool tabSale::sale()
 
             if(balance)   // если продажа в долг
             {
-                clientModel->updateBalance(-amount, QString("Списание %1 за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), doc_id);
+                clientModel->updateBalance(-amount, QString("Списание %1 за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), SBalanceLogRecordModel::RoyaltyReason::Document, doc_id);
             }
             else
             {
@@ -1000,14 +996,14 @@ void tabSale::reserveCancelButtonClicked()
 
 
         // если в следствие (нескольких) частичных распроведений были возвращены все товары, то нужно изменить статус документа
-        if(tableModel->totalAmount() == 0)
+        if(tableModel->amountTotal() == 0)
         {
             docModel->setAmount(0.00);
             docModel->setState(SDocumentModel::ReserveCancelled);
             docModel->appendLogText(tr("Резерв товара по РН №%1 снят").arg(doc_id));
         }
         else
-            docModel->setAmount(tableModel->totalAmount());
+            docModel->setAmount(tableModel->amountTotal());
 
         docModel->commit();
 
@@ -1082,31 +1078,29 @@ sparePartsTable::~sparePartsTable()
 void sparePartsTable::resizeEvent(QResizeEvent *event)
 {
     QTableView::resizeEvent(event);
-    int i;
-    int colWidths[] = {30,100,0,45,45,70,70,120,120,80};
+    int i, j;
     int colNameWidth = 0;
+    int colWidths[] = {30,100,0,45,45,70,70,120,120,80};
 
     verticalHeader()->hide();
-    hideColumn(10); // прячем служебные столбцы
-    hideColumn(11);
-    hideColumn(12);
-    hideColumn(13);
-    hideColumn(14);
-    hideColumn(15);
-    hideColumn(16);
-    hideColumn(17);
-    hideColumn(18);
+    colNameWidth = geometry().width();
 
-    for (i = 0; i < 10; i++)
+    for (i = 0, j = 0; i < model()->columnCount(); i++)
     {
-        colNameWidth += colWidths[i];
-        setColumnWidth(i, colWidths[i]);
+        if(static_cast<SSaleTableModel*>(model())->isColumnHidden(i))
+            hideColumn(i);
+        else
+        {
+            colNameWidth -= colWidths[j];
+            setColumnWidth(i, colWidths[j]);
+            j++;
+        }
     }
-    colNameWidth = geometry().width() /*- verticalScrollBar()->width()*/ - colNameWidth - 10;
+    colNameWidth -= 11; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
     if (verticalScrollBar()->isVisible())
-        setColumnWidth(2, colNameWidth - verticalScrollBar()->width());
+        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth - verticalScrollBar()->width());
     else
-        setColumnWidth(2, colNameWidth);
+        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth);
     resizeRowsToContents();
 }
 

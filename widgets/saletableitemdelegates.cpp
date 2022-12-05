@@ -15,119 +15,64 @@ SaleTableItemDelegates::~SaleTableItemDelegates()
 
 QWidget *SaleTableItemDelegates::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if( index.column() == SSaleTableModel::ColCount )
+    if( tableModel->index(index.row(), SStoreSaleItemModel::ColRecordType).data().toBool() == SSaleTableModel::Item )
+    {}
+    switch (index.column())
     {
-        // Create the spinbox and populate it
-        QSpinBox *sb = new QSpinBox(parent);
-        sb->setMinimum(1);
-        sb->setMaximum(tableModel->index(index.row(), SSaleTableModel::ColAvail).data().toInt());
-        return sb;
-    }
-    else if( index.column() == SSaleTableModel::ColPrice )
-    {
-        // Create the spinbox and populate it
-        QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
-        sb->setDecimals(2);
-        sb->setMinimum(0.01);
-        sb->setMaximum(9999999999.99);
-        return sb;
-    }
-    else if( index.column() == SSaleTableModel::ColWarranty )
-    {
-    // Create the combobox and populate it
-        QComboBox *cb = new QComboBox(parent);
-        cb->setEditable(false);
-        cb->setModel(warrantyTermsModel);
-        cb->setCurrentIndex(-1);
-        return cb;
-    }
-    else
-    {
-//            MLineEdit *lineEdit = new MLineEdit(parent);
-//            lineEdit->setFrame(false);
-//            return lineEdit;
-        return QStyledItemDelegate::createEditor(parent, option, index);
+        case SStoreSaleItemModel::ColCount:
+            return createSpinBox(parent, index);
+        case SStoreSaleItemModel::ColPrice:
+            return createDoubleSpinBox(parent);
+        case SStoreSaleItemModel::ColWarranty:
+            return createComboBox(parent, warrantyTermsModel);
+        case SStoreSaleItemModel::ColUser:
+            return createComboBox(parent, allUsersModel);
+        default:
+            return QStyledItemDelegate::createEditor(parent, option, index);
     }
 }
 
 
 void SaleTableItemDelegates::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    if( index.column() == SSaleTableModel::ColCount )
+    switch (index.column())
     {
-        QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
-        Q_ASSERT(sb);
-        sb->setValue(index.data().toInt());
-    }
-    else if( index.column() == SSaleTableModel::ColPrice )
-    {
-        QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
-        Q_ASSERT(sb);
-        sb->setValue(sysLocale.toFloat(index.data().toString()));
-    }
-    else if( index.column() == SSaleTableModel::ColWarranty )
-    {
-        QComboBox *cb = qobject_cast<QComboBox *>(editor);
-        Q_ASSERT(cb);
-        cb->setCurrentText(index.data().toString());
-        if(m_must_open_box) // авто раскрытие списка комбобокса при; взято: https://stackoverflow.com/a/53304106
-        {
-            m_must_open_box = false;
-            cb->showPopup();
-        }
-    }
-    else
-    {
-//            MLineEdit *lineEdit = qobject_cast<MLineEdit *>(editor);
-        QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
-        Q_ASSERT(lineEdit);
-        lineEdit->setFrame(false);
-        const QString text = index.data().toString();
-        lineEdit->setText(text);
+        case SStoreSaleItemModel::ColCount:
+            setSpinBoxData(editor, index.data().toInt()); return;
+        case SStoreSaleItemModel::ColPrice:
+            setDoubleSpinBoxData(editor, sysLocale.toFloat(index.data().toString())); return;
+        case SStoreSaleItemModel::ColWarranty:
+        case SStoreSaleItemModel::ColUser:
+            setComboBoxData(editor, index.data().toString()); return;
+        default:
+            setLineEditData(editor, index.data().toString());
     }
 }
 
 
 void SaleTableItemDelegates::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    if( index.column() == SSaleTableModel::ColCount )
+    switch (index.column())
     {
-        QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
-        Q_ASSERT(sb);
-        model->setData(index, sb->value(), Qt::EditRole);
+        case SStoreSaleItemModel::ColCount:
+            setModelDataFromSpinBox(editor, model, index); return;
+        case SStoreSaleItemModel::ColPrice:
+            setModelDataFromDoubleSpinBox(editor, model, index); return;
+        case SStoreSaleItemModel::ColWarranty:
+        case SStoreSaleItemModel::ColUser:
+            setModelDataFromComboBox(editor, model, index); return;
+        default:
+            QStyledItemDelegate::setModelData(editor, model, index);
     }
-    else if( index.column() == SSaleTableModel::ColPrice )
-    {
-        QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
-        Q_ASSERT(sb);
-        model->setData(index, sb->value(), Qt::EditRole);
-    }
-    else if( index.column() == SSaleTableModel::ColWarranty )
-    {
-        QComboBox *cb = qobject_cast<QComboBox *>(editor);
-        Q_ASSERT(cb);
-        if(cb->currentIndex() >= 0)
-        {
-            model->setData(index, warrantyTermsModel->index(cb->currentIndex(), 1).data().toInt(), Qt::EditRole);
-        }
-    }
-    else
-    {
-//            MLineEdit *lineEdit = qobject_cast<MLineEdit *>(editor);
-//            Q_ASSERT(lineEdit);
-//            model->setData(index, lineEdit->text(), Qt::EditRole);
-        QStyledItemDelegate::setModelData(editor, model, index);
-    }
-    model->setData(index, 1, SSaleTableModel::Changed);
 }
 
 void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if(index.column() == SSaleTableModel::ColId )
+    if(index.column() == SStoreSaleItemModel::ColId )
     {
-        if(tableModel->modelState() != SSaleTableModel::Cancelled)
+        if(tableModel->modelState() != SSaleTableModel::StoreCancelled)
         {
-            if(!index.data(Qt::UserRole).toBool()) // В UserRole хранится значение is_cancellation (чтобы лишний раз не лезть в другие индексы объекта модели)
+            if(!index.data(SSaleTableModel::DataRoles::State).toBool())
             {
                 // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
                 QStyleOptionButton button;
@@ -157,11 +102,11 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
     if( event->type() == QEvent::MouseButtonRelease )
     {
         QMouseEvent * e = (QMouseEvent *)event;
-        if( index.column() == SSaleTableModel::ColId )
+        if( index.column() == SStoreSaleItemModel::ColId )
         {
-            if(tableModel->modelState() != SSaleTableModel::Cancelled)
+            if(tableModel->modelState() != SSaleTableModel::StoreCancelled)
             {
-                if(!index.data(Qt::UserRole).toBool()) // В UserRole хранится значение is_cancellation (чтобы лишний раз не лезть в другие индексы объекта модели)
+                if(!index.data(SSaleTableModel::DataRoles::State).toBool())
                 {
                     // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
 #if QT_VERSION >= 0x060000
@@ -182,12 +127,8 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
                     if( clickX > x && clickX < x + w )
                         if( clickY > y && clickY < y + h )
                         {
-                            if(tableModel->modelState() == SSaleTableModel::New)   // в режиме создания новой РН удаляем строки
-                                model->removeRows(index.row(), 1);
-                            else    // в режимах просмотра резерва или проведённой накладной, помечаем строки на возврат/отмену резерва
-                                tableModel->removeRowHandler(index.row(), index.data().toInt());
-                        emit tableModel->amountChanged(tableModel->totalAmount());
-                    }
+                            tableModel->removeRowHandler(index.row(), index.data().toInt());
+                        }
                 }
             }
             // Если   modelState() == 3, то никакой реакции
@@ -236,4 +177,108 @@ bool SaleTableItemDelegates::eventFilter(QObject *obj, QEvent *event)
     }
 
     return QStyledItemDelegate::eventFilter(obj, event);
+}
+
+QLineEdit *SaleTableItemDelegates::createLineEdit(QWidget *parent, QAbstractItemModel *index) const
+{
+//    MLineEdit *lineEdit = new MLineEdit(parent);
+    QLineEdit *lineEdit = new QLineEdit(parent);
+    lineEdit->setFrame(false);
+    return lineEdit;
+}
+
+void SaleTableItemDelegates::setLineEditData(QWidget *editor, const QString &text) const
+{
+//    MLineEdit *lineEdit = qobject_cast<MLineEdit *>(editor);
+    QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
+    Q_ASSERT(lineEdit);
+    lineEdit->setFrame(false);
+    lineEdit->setText(text);
+}
+
+void SaleTableItemDelegates::setModelDataFromLineEdit(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+//    MLineEdit *lineEdit = qobject_cast<MLineEdit *>(editor);
+    QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
+    Q_ASSERT(lineEdit);
+    model->setData(index, lineEdit->text(), Qt::EditRole);
+}
+
+// Create the comboBox editor
+QComboBox *SaleTableItemDelegates::createComboBox(QWidget *parent, QAbstractItemModel *model) const
+{
+        QComboBox *cb = new QComboBox(parent);
+        cb->setEditable(false);
+        cb->setModel(model);
+        cb->setCurrentIndex(-1);
+        return cb;
+}
+
+void SaleTableItemDelegates::setComboBoxData(QWidget *editor, const QString &text) const
+{
+    QComboBox *cb = qobject_cast<QComboBox *>(editor);
+    Q_ASSERT(cb);
+    cb->setCurrentText(text);
+    if(m_must_open_box) // авто раскрытие списка комбобокса при; взято: https://stackoverflow.com/a/53304106
+    {
+        m_must_open_box = false;
+        cb->showPopup();
+    }
+}
+
+void SaleTableItemDelegates::setModelDataFromComboBox(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QComboBox *cb = qobject_cast<QComboBox *>(editor);
+    Q_ASSERT(cb);
+    if(cb->currentIndex() >= 0)
+    {
+        model->setData(index, cb->model()->index(cb->currentIndex(), 1).data().toInt(), Qt::EditRole);
+    }
+}
+
+// Create the spinbox and populate it
+QSpinBox *SaleTableItemDelegates::createSpinBox(QWidget *parent, const QModelIndex &index) const
+{
+    QSpinBox *sb = new QSpinBox(parent);
+    sb->setMinimum(1);
+    sb->setMaximum(tableModel->index(index.row(), SStoreSaleItemModel::ColAvail).data().toInt());
+    return sb;
+}
+
+void SaleTableItemDelegates::setSpinBoxData(QWidget *editor, const int value) const
+{
+    QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
+    Q_ASSERT(sb);
+    sb->setValue(value);
+}
+
+void SaleTableItemDelegates::setModelDataFromSpinBox(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
+    Q_ASSERT(sb);
+    model->setData(index, sb->value(), Qt::EditRole);
+}
+
+// Create the spinbox and populate it
+QDoubleSpinBox *SaleTableItemDelegates::createDoubleSpinBox(QWidget *parent) const
+{
+    QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
+    sb->setDecimals(2);
+    sb->setMinimum(0.01);   // TODO: в гарантийном ремонте минимальная цена должна быть равна нулю
+    sb->setMaximum(9999999999.99);
+    return sb;
+}
+
+void SaleTableItemDelegates::setDoubleSpinBoxData(QWidget *editor, const float value) const
+{
+    QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
+    Q_ASSERT(sb);
+    sb->setValue(value);
+}
+
+void SaleTableItemDelegates::setModelDataFromDoubleSpinBox(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
+    Q_ASSERT(sb);
+    model->setData(index, sb->value(), Qt::EditRole);
 }

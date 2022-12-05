@@ -58,13 +58,17 @@ SOURCES += \
     models/spaymenttypemodel.cpp \
     models/spaymenttypesmodel.cpp \
     models/srepairmodel.cpp \
+    models/srepairsaleitemmodel.cpp \
     models/srepairstatuslog.cpp \
     models/ssaletablemodel.cpp \
     models/ssloptionsdialog.cpp \
     models/ssortfilterproxymodel.cpp \
     models/ssqlquerymodel.cpp \
     models/sstandarditemmodel.cpp \
+    models/sstoreitemmodel.cpp \
+    models/sstoresaleitemmodel.cpp \
     models/suseractivitymodel.cpp \
+    models/sworkmodel.cpp \
     models/sworkshopissuedmodel.cpp \
     models/tabsalesettingsmenu.cpp \
     models/scashregistermodel.cpp \
@@ -75,7 +79,6 @@ SOURCES += \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
-    models/ssaleitemmodel.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
     tabcashoperation.cpp \
@@ -131,13 +134,17 @@ HEADERS  += \
     models/spaymenttypemodel.h \
     models/spaymenttypesmodel.h \
     models/srepairmodel.h \
+    models/srepairsaleitemmodel.h \
     models/srepairstatuslog.h \
     models/ssaletablemodel.h \
     models/ssloptionsdialog.h \
     models/ssortfilterproxymodel.h \
     models/ssqlquerymodel.h \
     models/sstandarditemmodel.h \
+    models/sstoreitemmodel.h \
+    models/sstoresaleitemmodel.h \
     models/suseractivitymodel.h \
+    models/sworkmodel.h \
     models/sworkshopissuedmodel.h \
     models/tabsalesettingsmenu.h \
     models/scashregistermodel.h \
@@ -148,7 +155,6 @@ HEADERS  += \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
     models/sphonesmodel.h \
-    models/ssaleitemmodel.h \
     squerylog.h \
     stable.h \
     tabcashmoveexch.h \

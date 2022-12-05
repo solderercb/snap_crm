@@ -1,9 +1,9 @@
-#include "ssaleitemmodel.h"
+#include "sstoresaleitemmodel.h"
 
-SSaleItemModel::SSaleItemModel(const QList<QStandardItem *> &record, QObject *parent) : SComRecord(parent)
+SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, QObject *parent) : SComRecord(parent)
 {
-    i_obligatoryFields << "dealer" << "item_id" << "document_id" << "user";
     i_tableName = "store_sales";
+    i_obligatoryFields << "dealer" << "item_id" << "document_id" << "user";
 
     i_id = record.at(ColId)->data(Qt::DisplayRole).toInt();
     m_item_id = record.at(ColItemId)->data(Qt::DisplayRole).toInt();
@@ -30,7 +30,7 @@ SSaleItemModel::SSaleItemModel(const QList<QStandardItem *> &record, QObject *pa
         i_valuesMap.insert("dealer", m_dealer);
         i_valuesMap.insert("warranty", record.at(ColWarranty)->data(Qt::DisplayRole).toInt());
         i_valuesMap.insert("is_realization", m_isRealization);
-        i_valuesMap.insert("is_cancellation", record.at(ColIsCancellation)->data(Qt::DisplayRole).toBool());
+        i_valuesMap.insert("is_cancellation", record.at(ColState)->data(Qt::DisplayRole).toBool());
 //        i_valuesMap.insert("dealer_payment", record.at()->data(Qt::DisplayRole).toBool());
         i_valuesMap.insert("return_percent", m_returnPercent);
         i_valuesMap.insert("sn", record.at(ColSN)->data(Qt::DisplayRole).toString());
@@ -48,16 +48,11 @@ SSaleItemModel::SSaleItemModel(const QList<QStandardItem *> &record, QObject *pa
         i_logRecord->setClient(m_customer);
 }
 
-SSaleItemModel::~SSaleItemModel()
+SStoreSaleItemModel::~SStoreSaleItemModel()
 {
 }
 
-void SSaleItemModel::setMode(int mode)
-{
-    m_mode = mode;
-}
-
-void SSaleItemModel::setClient(int id)
+void SStoreSaleItemModel::setClient(int id)
 {
     if(id == 0)
     {
@@ -69,13 +64,13 @@ void SSaleItemModel::setClient(int id)
     i_logRecord->setClient(id);
 }
 
-void SSaleItemModel::unsetClient()
+void SStoreSaleItemModel::unsetClient()
 {
     i_valuesMap.insert("customer_id", QVariant());
     i_logRecord->unsetClient();
 }
 
-void SSaleItemModel::setDocumentId(int id)
+void SStoreSaleItemModel::setDocumentId(int id)
 {
     m_doc_id = id;
     i_valuesMap.insert("document_id", id);
@@ -85,25 +80,34 @@ void SSaleItemModel::setDocumentId(int id)
 /*
  * Возвращает 0 в случае ошибки
  */
-bool SSaleItemModel::sale()
+bool SStoreSaleItemModel::sale()
 {
+    QString text;
     if(i_id)
-        return saleReserve();
+    {
+        if(m_count < m_old_count)
+            text = tr("Продажа ранее зарезервированного товара: %1ед.; отмена резерва (невостребовано): %2ед.").arg(m_count).arg(m_old_count - m_count);
+        else if(m_count > m_old_count)
+            text = tr("Продажа ранее зарезервированного товара: %1ед.; дополнительно: %2ед.").arg(m_old_count).arg(m_count - m_old_count);
+        else
+            text = tr("Продажа ранее зарезервированного товара: %1ед.").arg(m_count);
+    }
+    else
+        text = tr("Продажа товара в кол-ве %1ед.").arg(m_count);
 
-    i_logRecord->setText(tr("Продажа товара в кол-ве %1ед.").arg(m_count));
-    commit(Sale);
+    i_logRecord->setText(text);
+    commit(i_id?SaleReserved:Sale);
     return i_nErr;
 }
 
-
-bool SSaleItemModel::reserve()
+bool SStoreSaleItemModel::reserve()
 {
     i_logRecord->setText(tr("Резерв %1ед. товара").arg(m_count));
     commit(Reserve);
     return i_nErr;
 }
 
-bool SSaleItemModel::unsale()
+bool SStoreSaleItemModel::unsale()
 {
     QString logText = tr("Возврат %1ед. товара").arg(m_old_count);
     if(!m_unsaleReason.isEmpty())
@@ -113,36 +117,22 @@ bool SSaleItemModel::unsale()
     return i_nErr;
 }
 
-void SSaleItemModel::setUnsaleReason(const QString &reason)
+void SStoreSaleItemModel::setUnsaleReason(const QString &reason)
 {
     m_unsaleReason = reason;
 }
 
-bool SSaleItemModel::free()
+bool SStoreSaleItemModel::free()
 {
     i_logRecord->setText(tr("Отмена резерва %1ед. товара").arg(m_old_count));
     commit(Free);
     return i_nErr;
 }
 
-bool SSaleItemModel::saleReserve()
-{
-    QString text;
-    if(m_count < m_old_count)
-        text = tr("Продажа ранее зарезервированного товара: %1ед.; отмена резерва (невостребовано): %2ед.").arg(m_count).arg(m_old_count - m_count);
-    else if(m_count > m_old_count)
-        text = tr("Продажа ранее зарезервированного товара: %1ед.; дополнительно: %2ед.").arg(m_old_count).arg(m_count - m_old_count);
-    else
-        text = tr("Продажа ранее зарезервированного товара: %1ед.").arg(m_count);
-    i_logRecord->setText(text);
-    commit(SaleReserved);
-    return i_nErr;
-}
-
 /* Получение "свежих известий" о кол-ве товаров
  * Пока первый пользователь собирал заказ, товар мог быть продан другим пользователем
  */
-QSqlRecord* SSaleItemModel::actualStoreQtys()
+QSqlRecord* SStoreSaleItemModel::actualStoreQtys()
 {
 
     QSqlRecord *record = new QSqlRecord();
@@ -154,13 +144,13 @@ QSqlRecord* SSaleItemModel::actualStoreQtys()
     return record;
 }
 
-bool SSaleItemModel::isProfitable()
+bool SStoreSaleItemModel::isProfitable()
 {
     // TODO: проверка указанной цены; выдача предупреждения при продаже в минус
     return 1;
 }
 
-bool SSaleItemModel::integrityStatus()
+bool SStoreSaleItemModel::integrityStatus()
 {
     return nIntegrityErr;
 }
@@ -168,7 +158,7 @@ bool SSaleItemModel::integrityStatus()
 /* Верификация записанных данных
  *
  */
-bool SSaleItemModel::verifyQty(QSqlRecord *before, QSqlRecord *after)
+bool SStoreSaleItemModel::verifyQty(QSqlRecord *before, QSqlRecord *after)
 {
     if( count() != m_count )
         nIntegrityErr = 0;
@@ -211,7 +201,7 @@ bool SSaleItemModel::verifyQty(QSqlRecord *before, QSqlRecord *after)
     return nIntegrityErr;
 }
 
-void SSaleItemModel::showNotification(const QString &text)
+void SStoreSaleItemModel::showNotification(const QString &text)
 {
     QMessageBox msgBox;
 
@@ -221,7 +211,7 @@ void SSaleItemModel::showNotification(const QString &text)
 }
 
 /*  Возвращает значение `store_sales`.`count` из БД или 0 */
-int SSaleItemModel::count()
+int SStoreSaleItemModel::count()
 {
     if( i_id == 0 )
         return 0;
@@ -231,7 +221,7 @@ int SSaleItemModel::count()
     return i_query->value(0).toInt();
 }
 
-bool SSaleItemModel::dealerRoyalty()
+bool SStoreSaleItemModel::dealerRoyalty()
 {
     SClientModel *dealer = new SClientModel();
     dealer->setId(m_dealer);
@@ -241,12 +231,12 @@ bool SSaleItemModel::dealerRoyalty()
         if(m_op_type == Unsale)
         {
             float dealerRoyalty = m_old_count*( m_inPrice + (m_price - m_inPrice)*m_returnPercent/100 );
-            i_nErr = dealer->updateBalance(-dealerRoyalty, tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_old_count).arg(m_item_id), m_doc_id);
+            i_nErr = dealer->updateBalance(-dealerRoyalty, tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_old_count).arg(m_item_id), SBalanceLogRecordModel::RoyaltyReason::Document, m_doc_id);
         }
         else
         {
             float dealerRoyalty = m_count*( m_inPrice + (m_price - m_inPrice)*m_returnPercent/100 );
-            i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_count).arg(m_item_id), m_doc_id);
+            i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_count).arg(m_item_id), SBalanceLogRecordModel::RoyaltyReason::Document, m_doc_id);
         }
     }
     catch (int)
@@ -259,7 +249,7 @@ bool SSaleItemModel::dealerRoyalty()
     return i_nErr;
 }
 
-bool SSaleItemModel::commit()
+bool SStoreSaleItemModel::commit()
 {
     QSqlRecord *before, *after;
 
@@ -305,13 +295,13 @@ bool SSaleItemModel::commit()
     return i_nErr;
 }
 
-bool SSaleItemModel::commit(Operation op)
+bool SStoreSaleItemModel::commit(Operation op)
 {
     m_op_type = op;
     return commit();
 }
 
-bool SSaleItemModel::checkAvailabilityBefore(QSqlRecord *before)
+bool SStoreSaleItemModel::checkAvailabilityBefore(QSqlRecord *before)
 {
     // В накладной резерва допускается изменение кол-ва (вдруг клиент решил купить меньше/больше);
     // в этом случае при проверке не будет учитываться старое кол-во
@@ -323,7 +313,7 @@ bool SSaleItemModel::checkAvailabilityBefore(QSqlRecord *before)
     return 0;
 }
 
-bool SSaleItemModel::updateStoreItemsTable()
+bool SStoreSaleItemModel::updateStoreItemsTable()
 {
     switch (m_op_type)
     {

@@ -16,13 +16,16 @@ class SBalanceLogRecordModel : public SComRecord
 {
     Q_OBJECT
 public:
+    enum RoyaltyReason {Repair = 0, Document, CashOrder};
     explicit SBalanceLogRecordModel(QObject *parent = nullptr);
     explicit SBalanceLogRecordModel(int, QObject *parent = nullptr);
     ~SBalanceLogRecordModel();
     void setClient(int);
     void setText(const QString &);
     void setDirection(float);
-    void setDocumentId(int);
+    void setRepair(const int);
+    void setDocumentId(const int);
+    void setCashOrderId(const int);
     bool commit(const float);
     bool commit(const float, const QString &);
 private:
@@ -135,7 +138,7 @@ public:
     void createBalanceObj();
     void deleteBalanceObj();
     bool updateBalance(const float amount, const QString &text);
-    bool updateBalance(const float amount, const QString &text, const int doc_id);
+    bool updateBalance(const float amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason, const int doc_id);
     bool balanceEnough(const QString summ);
     bool receiptBalance();
     bool paymentBalance();
