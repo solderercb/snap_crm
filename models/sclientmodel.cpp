@@ -59,7 +59,8 @@ void SClientModel::load(int id)
         m_birthday = clientModel->record(0).value("birthday").toString();
         m_memorial = clientModel->record(0).value("memorial").toString();
         m_notes = clientModel->record(0).value("notes").toString();
-        showNotification();
+        if(!m_notes.isEmpty())
+            showNotification(m_notes, QMessageBox::Information);
         initBinaryOptions(clientModel);
         if(m_options&BinaryOption::BalanceEnabled)
             createBalanceObj();
@@ -561,12 +562,15 @@ bool SClientModel::updateBalance(const float amount, const QString &text)
     QUERY_EXEC(i_query,i_nErr)(QUERY_VRFY_BALANCE(i_id));
 
     if(!i_nErr)
+    {
         throw 1;
+    }
 
     QUERY_EXEC_VRFY(i_query,nIntegrityErr);
 
     if(!nIntegrityErr)
     {
+        showNotification(tr("Ошибка целостности данных баланса (id = %1)").arg(i_id), QMessageBox::Critical);
         throw 2;
     }
 
@@ -657,17 +661,14 @@ bool SClientModel::paymentBalance()
     return 0;
 }
 
-void SClientModel::showNotification()
+void SClientModel::showNotification(const QString &message, const QMessageBox::Icon icon)
 {
-    if(!m_notes.isEmpty())
-    {
-        QMessageBox msgBox;
+    QMessageBox msgBox;
 
-        msgBox.setWindowTitle(fullShortName());
-        msgBox.setText(m_notes);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-    }
+    msgBox.setWindowTitle(fullShortName());
+    msgBox.setText(message);
+    msgBox.setIcon(icon);
+    msgBox.exec();
 }
 
 // https://stackoverflow.com/a/18866593

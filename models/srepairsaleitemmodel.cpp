@@ -35,7 +35,16 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
 //        setPrice(record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat());
 //        setSn(record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString());
 //        setWarranty(record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt());
-//    }
+    //    }
+}
+
+SRepairSaleItemModel::~SRepairSaleItemModel()
+{
+    if(m_storeItem)
+    {
+        delete m_storeItem;
+        m_storeItem = nullptr;
+    }
 }
 
 int SRepairSaleItemModel::id()

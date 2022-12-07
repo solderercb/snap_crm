@@ -10,6 +10,7 @@ SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
     SWorkModel(parent)
 {
     i_id = record.at(ColId)->data(Qt::DisplayRole).toInt();
+
     m_user = record.at(ColUser)->data(Qt::DisplayRole).toInt();
     m_repair = record.at(ColRepairId)->data(Qt::DisplayRole).toInt();
     m_documentId = record.at(ColDocumentId)->data(Qt::DisplayRole).toInt();
@@ -23,6 +24,11 @@ SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
     m_type = record.at(ColType)->data(Qt::DisplayRole).toInt();
     m_payRepair = record.at(ColPayRepair)->data(Qt::DisplayRole).toInt();
     m_payRepair_quick = record.at(ColPayRepairQuick)->data(Qt::DisplayRole).toInt();
+    // TODO: сделать выборочную передачу значений: для не новой РН нужно передавать только изменённые данные
+//    if(i_id == 0)
+//    {
+//    }
+
 }
 
 int SWorkModel::id()
@@ -160,13 +166,26 @@ void SWorkModel::setPayRepairQuick(const int pay_repair_quick)
     i_valuesMap.insert("pay_repair_quick", pay_repair_quick);
 }
 
+bool SWorkModel::update()
+{
+
+}
+
+bool SWorkModel::remove()
+{
+
+}
+
 bool SWorkModel::commit()
 {
     if(i_id)
         update();
     else
     {
+        setUser(userDbData->value("id").toInt());
         setCreated(QDateTime::currentDateTime());
+        setPayRepair(userDbData->value("pay_repair").toInt());
+        setPayRepairQuick(userDbData->value("pay_repair_quick").toInt());
         insert();
     }
 

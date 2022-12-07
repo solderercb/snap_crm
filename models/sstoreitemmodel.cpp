@@ -20,11 +20,13 @@ SStoreItemModel::SStoreItemModel(const QList<QStandardItem *> &record, const int
     m_savedSaleQty = savedSaleQty;
     m_saleQty = record.value(SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
     m_saleObjId = record.value(SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
+    m_saleUser = record.value(SaleOpColumns::ColUser)->data(Qt::DisplayRole).toInt();
     m_dealer = record.value(SaleOpColumns::ColDealer)->data(Qt::DisplayRole).toInt();
     m_buyerId = record.value(SaleOpColumns::ColBuyer)->data(Qt::DisplayRole).toInt();
     i_logRecord->setType(SLogRecordModel::Part);
     i_logRecord->setItemId(i_id);
-    i_logRecord->setClient(m_buyerId);
+    if(m_buyerId)
+        i_logRecord->setClient(m_buyerId);
 }
 
 SStoreItemModel::~SStoreItemModel()
@@ -780,12 +782,29 @@ bool SStoreItemModel::saleReserved()
     return i_nErr;
 }
 
+bool SStoreItemModel::free()
+{
+    if(checkBeforeSale())
+        return 0;
+
+    m_opOnItemType = OpOnItem::Free;
+    setReserved(m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty);
+    i_logRecord->setText(tr("Отмена резерва %1ед. товара").arg(m_savedSaleQty));
+    if(!commit())
+        return 0;
+
+    return i_nErr;
+}
+
 bool SStoreItemModel::unsale()
 {
+    if(checkBeforeSale())
+        return 0;
+
     QString logText = tr("Возврат %1ед. товара").arg(m_savedSaleQty);
     m_opOnItemType = OpOnItem::Unsale;
-    setCount(m_qtysBeforeSale->value(QtyField::Count) + m_saleQty);
-    setSold(m_qtysBeforeSale->value(QtyField::Sold) - m_saleQty);
+    setCount(m_qtysBeforeSale->value(QtyField::Count) + m_savedSaleQty);
+    setSold(m_qtysBeforeSale->value(QtyField::Sold) - m_savedSaleQty);
     if(!m_unsaleReason.isEmpty())
         logText.append(tr(", причина: %1").arg(m_unsaleReason));
     i_logRecord->setText(logText);
@@ -836,6 +855,9 @@ bool SStoreItemModel::reserveRepair()
 
 bool SStoreItemModel::unsaleRepair()
 {
+    if(checkBeforeSale())
+        return 0;
+
     // TODO: Возврат ремонта с возвратом запчастей и без возврата
     m_opOnItemType = OpOnItem::UnsaleRepair;
     setCount(m_qtysBeforeSale->value(QtyField::Count) + m_saleQty);
@@ -851,11 +873,19 @@ bool SStoreItemModel::unsaleRepair()
     return i_nErr;
 }
 
-bool SStoreItemModel::free()
+bool SStoreItemModel::freeRepair()
 {
-    m_opOnItemType = OpOnItem::Free;
+    i_logRecord->setText(tr("Удаление %1ед. товара из карты ремонта №%2.").arg(m_savedSaleQty).arg(m_saleObjId));
+    if(!i_logRecord->commit())
+        return 0;
+
+    return 1;
+}
+
+bool SStoreItemModel::freeEngineer()
+{
     setReserved(m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty);
-    i_logRecord->setText(tr("Возврат %1ед. товара на склад.").arg(m_saleQty));
+    i_logRecord->setText(tr("Возврат %1ед. товара на склад.").arg(m_savedSaleQty).arg(m_saleObjId));
     if(!commit())
         return 0;
 
@@ -881,13 +911,12 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
         else
         {
             float dealerRoyalty = m_saleQty*royaltyForItem;
-            i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_count).arg(i_id), source, m_saleObjId);
+            i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_saleQty).arg(i_id), source, m_saleObjId);
         }
     }
     catch (int)
     {
         i_nErr = 0;
-        showNotification(tr("Ошибка целостности данных баланса, dealer = %1").arg(m_dealer));
     }
     delete dealer;
 
@@ -906,6 +935,7 @@ void SStoreItemModel::showNotification(const QString &text)
 void SStoreItemModel::setUnsaleReason(const QString &text)
 {
     m_unsaleReason = text;
+    i_logRecord->setText(m_unsaleReason);
 }
 
 bool SStoreItemModel::commit()
@@ -922,7 +952,10 @@ bool SStoreItemModel::commit()
     }
 
     if(!checkAfterSale())
+    {
         showNotification(tr("Ошибка целостности данных item_id = %1").arg(i_id));
+        return 0;
+    }
 
     i_logRecord->commit();
 

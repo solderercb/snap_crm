@@ -129,11 +129,13 @@ public:
     bool sale();
     bool reserve();
     bool saleReserved();
+    bool free();
     bool unsale();
     bool saleRepair();
     bool reserveRepair();
     bool unsaleRepair();
-    bool free();
+    bool freeRepair();
+    bool freeEngineer();
     bool writeOff();
     bool cancelWriteOff();
     bool dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason);
@@ -203,6 +205,7 @@ private:
     int m_saleQty;
     int m_buyerId;
     QString m_unsaleReason;
+    int m_saleUser;
 };
 
 #endif // SSTOREITEMMODEL_H

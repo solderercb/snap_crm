@@ -362,18 +362,18 @@ bool tabSale::checkInput()
     }
     for(int i = 0; i < tableModel->rowCount(); i++) // TODO: Это нужно перенести в SSaleTableModel
     {
-        if(!tableModel->value(i, SStoreSaleItemModel::ColState).toBool())   // только не помеченные на снятие резерва/возврат
+        if(!tableModel->value(i, SStoreItemModel::SaleOpColumns::ColState).toBool())   // только не помеченные на снятие резерва/возврат
         {
-            if ( tableModel->value(i, SStoreSaleItemModel::ColPrice).toFloat() <= 0 ) // цена меньше нуля
+            if ( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toFloat() <= 0 ) // цена меньше нуля
             {
-                tableModel->setData(tableModel->index(i, SStoreSaleItemModel::ColPrice), QColor(255, 209, 209), Qt::BackgroundRole);
+                tableModel->setData(tableModel->index(i, SStoreItemModel::SaleOpColumns::ColPrice), QColor(255, 209, 209), Qt::BackgroundRole);
 
                 error = 11;
             }
-            if( tableModel->value(i, SStoreSaleItemModel::ColPrice).toFloat() < tableModel->value(i, SStoreSaleItemModel::ColInPrice).toFloat() ) // цена меньше закупочной
+            if( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toFloat() < tableModel->value(i, SStoreItemModel::SaleOpColumns::ColInPrice).toFloat() ) // цена меньше закупочной
             {
                 QMessageBox::StandardButton resBtn = QMessageBox::question( this, "SNAP CRM",
-                                                                            tr("Цена ниже закупочной, продолжить?\n\"%1\"").arg(tableModel->value(i, SStoreSaleItemModel::ColName).toString()),
+                                                                            tr("Цена ниже закупочной, продолжить?\n\"%1\"").arg(tableModel->value(i, SStoreItemModel::SaleOpColumns::ColName).toString()),
                                                                             QMessageBox::No | QMessageBox::Yes,
                                                                             QMessageBox::No);
                 if (resBtn == QMessageBox::No)
@@ -533,7 +533,7 @@ void tabSale::buttonCreateTabClientHandler()
 
 void tabSale::tableRowDoubleClick(QModelIndex tableIndex)
 {
-    emit createTabSparePart(tableModel->value(tableIndex.row(), SStoreSaleItemModel::ColItemId).toInt());
+    emit createTabSparePart(tableModel->value(tableIndex.row(), SStoreItemModel::SaleOpColumns::ColItemId).toInt());
 }
 
 void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
@@ -598,8 +598,8 @@ void tabSale::addItemByUID(int uid)
         }
         else
         {
-            qDebug() << QString("товар UID %1 уже добавлен").arg(tableModel->value(row, SStoreSaleItemModel::ColUID).toString());
-            shortlivedNotification *newPopup = new shortlivedNotification(this, "Повтор", "\"" + tableModel->value(row, SStoreSaleItemModel::ColName).toString()+"\" (UID " + tableModel->value(row, SStoreSaleItemModel::ColUID).toString() + ") уже добавлен", QColor(255,255,255), QColor(245,245,245));
+            qDebug() << QString("товар UID %1 уже добавлен").arg(tableModel->value(row, SStoreItemModel::SaleOpColumns::ColUID).toString());
+            shortlivedNotification *newPopup = new shortlivedNotification(this, "Повтор", "\"" + tableModel->value(row, SStoreItemModel::SaleOpColumns::ColName).toString()+"\" (UID " + tableModel->value(row, SStoreItemModel::SaleOpColumns::ColUID).toString() + ") уже добавлен", QColor(255,255,255), QColor(245,245,245));
         }
     }
 }
@@ -699,7 +699,7 @@ bool tabSale::unSale()  // распроведение
             QUERY_ROLLBACK_MSG(query, err);
         }
         else
-            QUERY_EXEC(query,nErr)(QUERY_ROLLBACK);
+            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     QUERY_LOG_STOP;
@@ -732,7 +732,7 @@ int tabSale::isItemAlreadyInList(int id)
 {
     for(int i = 0; i < tableModel->rowCount(); i++)
     {
-        if(tableModel->value(i, SStoreSaleItemModel::ColItemId).toInt() == id)
+        if(tableModel->value(i, SStoreItemModel::SaleOpColumns::ColItemId).toInt() == id)
             return i;
     }
     return -1;
@@ -801,7 +801,7 @@ bool tabSale::sale()
         }
         else
         {
-           tableModel->saveTablesStore(SSaleTableModel::Sale);
+            tableModel->saveTablesStore(SSaleTableModel::Sale);
             if(reserve == SaleReserved)
             {
                 docModel->setAmount(amount);
@@ -1098,9 +1098,9 @@ void sparePartsTable::resizeEvent(QResizeEvent *event)
     }
     colNameWidth -= 11; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
     if (verticalScrollBar()->isVisible())
-        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth - verticalScrollBar()->width());
+        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth - verticalScrollBar()->width());
     else
-        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth);
+        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
     resizeRowsToContents();
 }
 

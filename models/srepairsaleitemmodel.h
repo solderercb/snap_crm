@@ -11,12 +11,10 @@ class SRepairSaleItemModel : public SComRecord
 {
     Q_OBJECT
 public:
-    enum Operation{ Nop = 0, Sale = 1, Update = 2, Unsale = 3, Free = 4 };
-//    enum Columns {ColId = 0, ColItemId, ColName, ColCount, ColCreated, ColFromUser, ColToUser, ColNotes, ColState, ColRepairId, ColWorkId, ColPrice, ColSN, ColWarranty, ColRLock};
-    enum Columns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColUser, ColRealization, ColRetPercent, ColState, ColNotes, ColItemId, ColInPrice, ColRepairId, ColDealer, ColCustomer, ColCreated, ColWorkId, ColRecordType};
     enum State {Requested = 0, EngineerBasket = 1, RepairLinked = 2, Sold = 3, Archive = 4};
     explicit SRepairSaleItemModel(QObject *parent = nullptr);
     explicit SRepairSaleItemModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
+    ~SRepairSaleItemModel();
     int id();
     void load(const int);
     int itemId();
@@ -56,7 +54,7 @@ public:
     bool isProfitable();
     bool integrityStatus();
 private:
-    SStoreItemModel *m_storeItem;
+    SStoreItemModel *m_storeItem = nullptr;
     bool nIntegrityErr = 1;
     int m_itemId;
     QString m_name;
@@ -76,7 +74,6 @@ private:
     float m_returnPercent = 0;
     float m_inPrice = 0;
     QString m_unsaleReason;
-    Operation m_op_type = Nop;
     int m_dealer;
     int m_buyer;
     bool commit();

@@ -876,9 +876,9 @@ void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
     }
     colNameWidth -= 2; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
     if (verticalScrollBar()->isVisible())
-        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth - verticalScrollBar()->width());
+        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth - verticalScrollBar()->width());
     else
-        setColumnWidth(SStoreSaleItemModel::ColName, colNameWidth);
+        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
     resizeRowsToContents();
 }
 
@@ -912,11 +912,11 @@ QVariant worksAndSparePartsDataModel::data(const QModelIndex &index, int role) c
     if (role == Qt::DisplayRole)
     {
         switch (index.column()) {
-            case SStoreSaleItemModel::ColPrice: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
-            case SStoreSaleItemModel::ColSumm: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
-            case SStoreSaleItemModel::ColBox: return itemBoxesModel->value(QSqlQueryModel::data(index, role).toInt());
-            case SStoreSaleItemModel::ColUser: return allUsersMap->value(QSqlQueryModel::data(index, role).toInt());
-            case SStoreSaleItemModel::ColWarranty: return warrantyTermsMap->value(QSqlQueryModel::data(index, role).toInt());
+            case SStoreItemModel::SaleOpColumns::ColPrice: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
+            case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
+            case SStoreItemModel::SaleOpColumns::ColBox: return itemBoxesModel->value(QSqlQueryModel::data(index, role).toInt());
+            case SStoreItemModel::SaleOpColumns::ColUser: return allUsersMap->value(QSqlQueryModel::data(index, role).toInt());
+            case SStoreItemModel::SaleOpColumns::ColWarranty: return warrantyTermsMap->value(QSqlQueryModel::data(index, role).toInt());
         }
     }
     return QSqlQueryModel::data(index, role);   // или если просто возвращать данные наследуемого объекта, то тоже всё ОК

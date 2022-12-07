@@ -153,7 +153,7 @@ public:
     bool updatePurchases(int);
     QString token();
     void setToken(const QString&);
-    void showNotification();
+    void showNotification(const QString &, const QMessageBox::Icon);
     QString genWebPass();
     void appendLogText(const QString&);
     bool commit();

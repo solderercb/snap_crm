@@ -15,7 +15,8 @@
 #include "../global.h"
 #include "../com_sql_queries.h"
 #include "models/sstoresaleitemmodel.h"
-#include "models/SRepairSaleItemModel.h"
+#include "models/srepairsaleitemmodel.h"
+#include "models/sworkmodel.h"
 
 class SSaleTableModel : public QStandardItemModel
 
@@ -25,6 +26,7 @@ public:
     enum State {StoreNew = 0, StoreSold = 1, StoreReserved = 2, StoreCancelled = 3, WorkshopRW = 4, WorkshopRO = 5};
     enum BackOutOpType {FreeReserved = 0, Unsale = 1};
     enum SaleOpType {Reserve = 0, Sale = 1, Repair = 2};
+    enum class RepairOpType { Nop = 0, Sale = 1, Update = 2, Unsale = 3, Free = 4 };
     enum DataRoles {QtyBackup = Qt::UserRole, Changed = Qt::UserRole + 1, State = Qt::UserRole + 2, RecordType = Qt::UserRole + 3};
     enum RecordType {Item = 0, Work = 1};
     enum TablesSet {StoreSale = 0, WorkshopSale = 1};
@@ -61,7 +63,7 @@ public:
     void setDocumentState(int state){m_documentState = state;};
     bool commit();
     bool saveTablesStore(SaleOpType type = SaleOpType::Sale);
-    bool saveTablesWorkshop(SRepairSaleItemModel::Operation operation = SRepairSaleItemModel::Operation::Update);
+    bool saveTablesWorkshop(RepairOpType operation = RepairOpType::Update);
     bool reserveItems();
     bool unsaleItems();
     bool unsaleItems(const QString&);
@@ -73,6 +75,7 @@ public:
     void markAllItemsToRemove(BackOutOpType);
     SStoreSaleItemModel* storeItem(const int);
     SRepairSaleItemModel* repairItem(const int);
+    SWorkModel* repairWork(const int);
     bool integrityStatus();
     int tableMode();
     void setTableMode(const TablesSet mode = TablesSet::StoreSale);

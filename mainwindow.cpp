@@ -783,7 +783,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-    createTabSale(17720);
+    createTabSale(0);
     createTabRepair(24927);
 //    createTabSale(16316);
 //    if (test_scheduler_counter < 375)

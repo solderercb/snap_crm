@@ -38,6 +38,8 @@ public:
     void setPayRepair(const int);
     int payRepairQuick();
     void setPayRepairQuick(const int);
+    bool update();
+    bool remove();
     bool commit();
 private:
     int m_user;

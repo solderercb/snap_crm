@@ -15,17 +15,17 @@ SaleTableItemDelegates::~SaleTableItemDelegates()
 
 QWidget *SaleTableItemDelegates::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if( tableModel->index(index.row(), SStoreSaleItemModel::ColRecordType).data().toBool() == SSaleTableModel::Item )
+    if( tableModel->index(index.row(), SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == SSaleTableModel::Item )
     {}
     switch (index.column())
     {
-        case SStoreSaleItemModel::ColCount:
+        case SStoreItemModel::SaleOpColumns::ColCount:
             return createSpinBox(parent, index);
-        case SStoreSaleItemModel::ColPrice:
+        case SStoreItemModel::SaleOpColumns::ColPrice:
             return createDoubleSpinBox(parent);
-        case SStoreSaleItemModel::ColWarranty:
+        case SStoreItemModel::SaleOpColumns::ColWarranty:
             return createComboBox(parent, warrantyTermsModel);
-        case SStoreSaleItemModel::ColUser:
+        case SStoreItemModel::SaleOpColumns::ColUser:
             return createComboBox(parent, allUsersModel);
         default:
             return QStyledItemDelegate::createEditor(parent, option, index);
@@ -37,12 +37,12 @@ void SaleTableItemDelegates::setEditorData(QWidget *editor, const QModelIndex &i
 {
     switch (index.column())
     {
-        case SStoreSaleItemModel::ColCount:
+        case SStoreItemModel::SaleOpColumns::ColCount:
             setSpinBoxData(editor, index.data().toInt()); return;
-        case SStoreSaleItemModel::ColPrice:
+        case SStoreItemModel::SaleOpColumns::ColPrice:
             setDoubleSpinBoxData(editor, sysLocale.toFloat(index.data().toString())); return;
-        case SStoreSaleItemModel::ColWarranty:
-        case SStoreSaleItemModel::ColUser:
+        case SStoreItemModel::SaleOpColumns::ColWarranty:
+        case SStoreItemModel::SaleOpColumns::ColUser:
             setComboBoxData(editor, index.data().toString()); return;
         default:
             setLineEditData(editor, index.data().toString());
@@ -54,12 +54,12 @@ void SaleTableItemDelegates::setModelData(QWidget *editor, QAbstractItemModel *m
 {
     switch (index.column())
     {
-        case SStoreSaleItemModel::ColCount:
+        case SStoreItemModel::SaleOpColumns::ColCount:
             setModelDataFromSpinBox(editor, model, index); return;
-        case SStoreSaleItemModel::ColPrice:
+        case SStoreItemModel::SaleOpColumns::ColPrice:
             setModelDataFromDoubleSpinBox(editor, model, index); return;
-        case SStoreSaleItemModel::ColWarranty:
-        case SStoreSaleItemModel::ColUser:
+        case SStoreItemModel::SaleOpColumns::ColWarranty:
+        case SStoreItemModel::SaleOpColumns::ColUser:
             setModelDataFromComboBox(editor, model, index); return;
         default:
             QStyledItemDelegate::setModelData(editor, model, index);
@@ -68,7 +68,7 @@ void SaleTableItemDelegates::setModelData(QWidget *editor, QAbstractItemModel *m
 
 void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if(index.column() == SStoreSaleItemModel::ColId )
+    if(index.column() == SStoreItemModel::SaleOpColumns::ColId )
     {
         if(tableModel->modelState() != SSaleTableModel::StoreCancelled)
         {
@@ -102,7 +102,7 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
     if( event->type() == QEvent::MouseButtonRelease )
     {
         QMouseEvent * e = (QMouseEvent *)event;
-        if( index.column() == SStoreSaleItemModel::ColId )
+        if( index.column() == SStoreItemModel::SaleOpColumns::ColId )
         {
             if(tableModel->modelState() != SSaleTableModel::StoreCancelled)
             {
@@ -241,7 +241,7 @@ QSpinBox *SaleTableItemDelegates::createSpinBox(QWidget *parent, const QModelInd
 {
     QSpinBox *sb = new QSpinBox(parent);
     sb->setMinimum(1);
-    sb->setMaximum(tableModel->index(index.row(), SStoreSaleItemModel::ColAvail).data().toInt());
+    sb->setMaximum(tableModel->index(index.row(), SStoreItemModel::SaleOpColumns::ColAvail).data().toInt());
     return sb;
 }
 

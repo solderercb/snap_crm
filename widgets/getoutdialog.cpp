@@ -40,7 +40,7 @@ getOutDialog::getOutDialog(QWidget *p, Qt::WindowFlags f) :
     ui->lineEditPrepay->setText(sysLocale.toString(repairModel->prepaidSumm(), 'f', 2));
     ui->lineEditAgreedAmount->setText(sysLocale.toString(repairModel->repairCost(), 'f', 2));
     ui->lineEditAlreadyPayed->setText(sysLocale.toString(repairModel->prepaidSumm(), 'f', 2));  // назначение данного поля не понятно, оно вроде бы, всегда равно полю Предоплата
-    ui->lineEditTotalAmount->setText(sysLocale.toString(parentTab->total_sum, 'f', 2));
+    ui->lineEditTotalAmount->setText(sysLocale.toString(repairModel->realRepairCost(), 'f', 2));
     ui->lineEditCurrentPaymentAmount->setText(sysLocale.toString(summToPay, 'f', 2));
     initPaymentSystems();
     if(repairModel->issuedMsg().isEmpty())
@@ -215,7 +215,7 @@ void getOutDialog::getOut()
             else
                 repairModel->setRejectReason(ui->textEditRejectReason->toPlainText());
         }
-        saleTableModel->saveTablesWorkshop(SRepairSaleItemModel::Operation::Sale);
+        saleTableModel->saveTablesWorkshop(SSaleTableModel::RepairOpType::Sale);
         repairModel->commit();
         repairStatusLog->setStatus(newState);
         repairStatusLog->setManager(repairModel->currentManager());

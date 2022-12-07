@@ -1,80 +1,242 @@
 #include "sstoresaleitemmodel.h"
 
-SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, QObject *parent) : SComRecord(parent)
+SStoreSaleItemModel::SStoreSaleItemModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "store_sales";
     i_obligatoryFields << "dealer" << "item_id" << "document_id" << "user";
+}
 
-    i_id = record.at(ColId)->data(Qt::DisplayRole).toInt();
-    m_item_id = record.at(ColItemId)->data(Qt::DisplayRole).toInt();
-    m_item_name = record.at(ColName)->data(Qt::DisplayRole).toString();
-    m_doc_id = record.at(ColDocument)->data(Qt::DisplayRole).toInt();
-    m_dealer = record.at(ColDealer)->data(Qt::DisplayRole).toInt();
-    m_customer = record.at(ColCustomer)->data(Qt::DisplayRole).toInt();
-    m_isRealization = record.at(ColRealization)->data(Qt::DisplayRole).toBool();
-    m_returnPercent = record.at(ColRetPercent)->data(Qt::DisplayRole).toInt();
-    m_inPrice = record.at(ColInPrice)->data(Qt::DisplayRole).toFloat();
-    m_price = record.at(ColPrice)->data(Qt::DisplayRole).toFloat();
-    m_count = record.at(ColCount)->data(Qt::DisplayRole).toInt();
-    m_avail = record.at(ColAvail)->data(Qt::DisplayRole).toInt();
-    m_old_count = count();
+SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, QObject *parent) :
+    SStoreSaleItemModel(parent)
+{
+    i_id = record.at(SStoreItemModel::SaleOpColumns::ColId)->data(Qt::DisplayRole).toInt();
+
+    m_storeItem = new SStoreItemModel(record, count());
+    m_storeItem->setSaleMode(SStoreItemModel::SaleMode::Store);
+
+    m_itemId = record.at(SStoreItemModel::SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt();
+    m_itemName = record.at(SStoreItemModel::SaleOpColumns::ColName)->data(Qt::DisplayRole).toString();
+    setDocumentId(record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt());
+    m_dealer = record.at(SStoreItemModel::SaleOpColumns::ColDealer)->data(Qt::DisplayRole).toInt();
+    m_customer = record.at(SStoreItemModel::SaleOpColumns::ColBuyer)->data(Qt::DisplayRole).toInt();
+    m_isRealization = record.at(SStoreItemModel::SaleOpColumns::ColRealization)->data(Qt::DisplayRole).toBool();
+    m_returnPercent = record.at(SStoreItemModel::SaleOpColumns::ColRetPercent)->data(Qt::DisplayRole).toInt();
+    m_inPrice = record.at(SStoreItemModel::SaleOpColumns::ColInPrice)->data(Qt::DisplayRole).toFloat();
+    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
+    m_count = record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
+    m_avail = record.at(SStoreItemModel::SaleOpColumns::ColAvail)->data(Qt::DisplayRole).toInt();
 
     // TODO: сделать выборочную передачу значений: для не новой РН нужно передавать только изменённые данные
 //    if(!i_id)
 //    {
         i_valuesMap.insert("user", userDbData->value("id"));
-        i_valuesMap.insert("item_id", m_item_id);
+        i_valuesMap.insert("item_id", m_itemId);
         i_valuesMap.insert("count", m_count);
         i_valuesMap.insert("in_price", m_inPrice);
         i_valuesMap.insert("price", m_price);
         i_valuesMap.insert("dealer", m_dealer);
-        i_valuesMap.insert("warranty", record.at(ColWarranty)->data(Qt::DisplayRole).toInt());
+        i_valuesMap.insert("warranty", record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt());
         i_valuesMap.insert("is_realization", m_isRealization);
-        i_valuesMap.insert("is_cancellation", record.at(ColState)->data(Qt::DisplayRole).toBool());
+        i_valuesMap.insert("is_cancellation", record.at(SStoreItemModel::SaleOpColumns::ColState)->data(Qt::DisplayRole).toBool());
 //        i_valuesMap.insert("dealer_payment", record.at()->data(Qt::DisplayRole).toBool());
         i_valuesMap.insert("return_percent", m_returnPercent);
-        i_valuesMap.insert("sn", record.at(ColSN)->data(Qt::DisplayRole).toString());
+        i_valuesMap.insert("sn", record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString());
 //    }
 //    else
 //    {
 //        i_valuesMap.insert("count", m_count);
 //    }
-
-    i_logRecord->setType(SLogRecordModel::Part);
-    i_logRecord->setItemId(m_item_id);
-    if(m_doc_id)
-        i_logRecord->setDocumentId(m_doc_id);
-    if(m_customer)
-        i_logRecord->setClient(m_customer);
 }
 
 SStoreSaleItemModel::~SStoreSaleItemModel()
 {
+    if(m_storeItem)
+    {
+        delete m_storeItem;
+        m_storeItem = nullptr;
+    }
 }
 
-void SStoreSaleItemModel::setClient(int id)
+int SStoreSaleItemModel::id()
+{
+    return i_id;
+}
+
+int SStoreSaleItemModel::dealer()
+{
+    return m_dealer;
+}
+
+void SStoreSaleItemModel::setDealer(const int dealer)
+{
+    i_valuesMap.insert("dealer", dealer);
+}
+
+int SStoreSaleItemModel::itemId()
+{
+    return m_itemId;
+}
+
+void SStoreSaleItemModel::setItemId(const int item_id)
+{
+    i_valuesMap.insert("item_id", item_id);
+}
+
+int SStoreSaleItemModel::documentId()
+{
+    return m_docId;
+}
+
+void SStoreSaleItemModel::setDocumentId(const int id)
+{
+    m_docId = id;
+    i_valuesMap.insert("document_id", id);
+}
+
+/*  Возвращает значение `store_sales`.`count` из БД или 0 */
+int SStoreSaleItemModel::count()
+{
+    if( i_id == 0 )
+        return 0;
+
+    QUERY_EXEC(i_query,i_nErr)( QUERY_SEL_STORE_SALES_QTY(i_id));
+    i_query->first();
+    m_savedCount = i_query->value(0).toInt();
+    return m_savedCount;
+}
+
+void SStoreSaleItemModel::setCount(const int count)
+{
+    i_valuesMap.insert("count", count);
+}
+
+float SStoreSaleItemModel::inPrice()
+{
+    return m_inPrice;
+}
+
+void SStoreSaleItemModel::setInPrice(const float in_price)
+{
+    i_valuesMap.insert("in_price", in_price);
+}
+
+float SStoreSaleItemModel::price()
+{
+    return m_price;
+}
+
+void SStoreSaleItemModel::setPrice(const float price)
+{
+    i_valuesMap.insert("price", price);
+}
+
+int SStoreSaleItemModel::warranty()
+{
+    return m_warranty;
+}
+
+void SStoreSaleItemModel::setWarranty(const int warranty)
+{
+    i_valuesMap.insert("warranty", warranty);
+}
+
+bool SStoreSaleItemModel::realizatorPayed()
+{
+    return m_realizatorPayed;
+}
+
+void SStoreSaleItemModel::setRealizatorPayed(const bool realizator_payed)
+{
+    i_valuesMap.insert("realizator_payed", realizator_payed);
+}
+
+bool SStoreSaleItemModel::isRealization()
+{
+    return m_isRealization;
+}
+
+void SStoreSaleItemModel::setIsRealization(const bool is_realization)
+{
+    i_valuesMap.insert("is_realization", is_realization);
+}
+
+int SStoreSaleItemModel::dealerPayment()
+{
+    return m_dealerPayment;
+}
+
+void SStoreSaleItemModel::setDealerPayment(const int dealer_payment)
+{
+    i_valuesMap.insert("dealer_payment", dealer_payment);
+}
+
+int SStoreSaleItemModel::returnPercent()
+{
+    return m_returnPercent;
+}
+
+void SStoreSaleItemModel::setReturnPercent(const int return_percent)
+{
+    i_valuesMap.insert("return_percent", return_percent);
+}
+
+int SStoreSaleItemModel::user()
+{
+    return m_user;
+}
+
+void SStoreSaleItemModel::setUser(const int user)
+{
+    i_valuesMap.insert("user", user);
+}
+
+QString SStoreSaleItemModel::unsaleReason()
+{
+    return m_cancellationReason;
+}
+
+/*  Метод предназначен для передачи причины возврата, указанной польователем и записи её в журнал
+*/
+void SStoreSaleItemModel::setExtraUnsaleReason(const QString& reason)
+{
+    m_unsaleReason = reason;
+    m_storeItem->setUnsaleReason(m_unsaleReason);
+}
+
+QString SStoreSaleItemModel::sn()
+{
+    return m_sn;
+}
+
+void SStoreSaleItemModel::setSN(const QString& sn)
+{
+    i_valuesMap.insert("sn", sn);
+}
+
+int SStoreSaleItemModel::dCategory()
+{
+    return m_dCategory;
+}
+
+void SStoreSaleItemModel::setDCategory(const int d_category)
+{
+    i_valuesMap.insert("d_category", d_category);
+}
+
+void SStoreSaleItemModel::setBuyer(int id)
 {
     if(id == 0)
     {
-        unsetClient();
+        unsetBuyer();
         return;
     }
 
     i_valuesMap.insert("customer_id", id);
-    i_logRecord->setClient(id);
 }
 
-void SStoreSaleItemModel::unsetClient()
+void SStoreSaleItemModel::unsetBuyer()
 {
     i_valuesMap.insert("customer_id", QVariant());
-    i_logRecord->unsetClient();
-}
-
-void SStoreSaleItemModel::setDocumentId(int id)
-{
-    m_doc_id = id;
-    i_valuesMap.insert("document_id", id);
-    i_logRecord->setDocumentId(id);
 }
 
 /*
@@ -82,66 +244,42 @@ void SStoreSaleItemModel::setDocumentId(int id)
  */
 bool SStoreSaleItemModel::sale()
 {
-    QString text;
+    commit();
     if(i_id)
-    {
-        if(m_count < m_old_count)
-            text = tr("Продажа ранее зарезервированного товара: %1ед.; отмена резерва (невостребовано): %2ед.").arg(m_count).arg(m_old_count - m_count);
-        else if(m_count > m_old_count)
-            text = tr("Продажа ранее зарезервированного товара: %1ед.; дополнительно: %2ед.").arg(m_old_count).arg(m_count - m_old_count);
-        else
-            text = tr("Продажа ранее зарезервированного товара: %1ед.").arg(m_count);
-    }
+        i_nErr &= m_storeItem->saleReserved();
     else
-        text = tr("Продажа товара в кол-ве %1ед.").arg(m_count);
-
-    i_logRecord->setText(text);
-    commit(i_id?SaleReserved:Sale);
+        i_nErr &= m_storeItem->sale();
     return i_nErr;
 }
 
 bool SStoreSaleItemModel::reserve()
 {
-    i_logRecord->setText(tr("Резерв %1ед. товара").arg(m_count));
-    commit(Reserve);
+    commit();
+    i_nErr &= m_storeItem->reserve();
     return i_nErr;
 }
 
 bool SStoreSaleItemModel::unsale()
 {
-    QString logText = tr("Возврат %1ед. товара").arg(m_old_count);
-    if(!m_unsaleReason.isEmpty())
-        logText.append(tr(", причина: %1").arg(m_unsaleReason));
-    i_logRecord->setText(logText);
-    commit(Unsale);
+    setState(State::Cancelled);
+    i_valuesMap.insert("cancellation_reason", "unsale");
+    commit();
+    i_nErr &= m_storeItem->unsale();
     return i_nErr;
-}
-
-void SStoreSaleItemModel::setUnsaleReason(const QString &reason)
-{
-    m_unsaleReason = reason;
 }
 
 bool SStoreSaleItemModel::free()
 {
-    i_logRecord->setText(tr("Отмена резерва %1ед. товара").arg(m_old_count));
-    commit(Free);
+    setState(State::Cancelled);
+    i_valuesMap.insert("cancellation_reason", "cancel reserve");
+    commit();
+    i_nErr &= m_storeItem->free();
     return i_nErr;
 }
 
-/* Получение "свежих известий" о кол-ве товаров
- * Пока первый пользователь собирал заказ, товар мог быть продан другим пользователем
- */
-QSqlRecord* SStoreSaleItemModel::actualStoreQtys()
+void SStoreSaleItemModel::setState(const State state)
 {
-
-    QSqlRecord *record = new QSqlRecord();
-
-    QUERY_EXEC(i_query,i_nErr)(QUERY_SEL_ITEM_ACTUAL_QTY(m_item_id));
-    if((i_nErr && i_query->first()))
-        *record = i_query->record();
-
-    return record;
+    i_valuesMap.insert("is_cancellation", state);
 }
 
 bool SStoreSaleItemModel::isProfitable()
@@ -155,176 +293,15 @@ bool SStoreSaleItemModel::integrityStatus()
     return nIntegrityErr;
 }
 
-/* Верификация записанных данных
- *
- */
-bool SStoreSaleItemModel::verifyQty(QSqlRecord *before, QSqlRecord *after)
-{
-    if( count() != m_count )
-        nIntegrityErr = 0;
-
-    if(nIntegrityErr && m_op_type == Sale)
-    {
-        if(nIntegrityErr && before->value(0).toInt() - m_count != after->value(0).toInt())   // `count`
-            nIntegrityErr = 0;
-        if(nIntegrityErr && before->value(1).toInt() + m_count != after->value(1).toInt())   // `sold`
-            nIntegrityErr = 0;
-    }
-    else if(nIntegrityErr && m_op_type == Reserve)
-    {
-        if(nIntegrityErr && before->value(2).toInt() + m_count != after->value(2).toInt())   // `reserved`
-            nIntegrityErr = 0;
-    }
-    else if(nIntegrityErr && m_op_type == SaleReserved)
-    {
-        if(nIntegrityErr && before->value(0).toInt() - m_count != after->value(0).toInt())   // `count`
-            nIntegrityErr = 0;
-        if(nIntegrityErr && before->value(1).toInt() + m_count != after->value(1).toInt())   // `sold`
-            nIntegrityErr = 0;
-
-        if(nIntegrityErr && before->value(2).toInt() - m_old_count != after->value(2).toInt())   // `reserved`
-            nIntegrityErr = 0;
-    }
-    else if(nIntegrityErr && m_op_type == Unsale)
-    {
-        if(nIntegrityErr && before->value(0).toInt() + m_old_count != after->value(0).toInt())   // `count`
-            nIntegrityErr = 0;
-        if(nIntegrityErr && before->value(1).toInt() - m_old_count != after->value(1).toInt())   // `sold`
-            nIntegrityErr = 0;
-    }
-    else if(nIntegrityErr && m_op_type == Free)
-    {
-        if(nIntegrityErr && before->value(2).toInt() - m_old_count != after->value(2).toInt())   // `reserved`
-            nIntegrityErr = 0;
-    }
-
-    return nIntegrityErr;
-}
-
-void SStoreSaleItemModel::showNotification(const QString &text)
-{
-    QMessageBox msgBox;
-
-    msgBox.setText(text);
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.exec();
-}
-
-/*  Возвращает значение `store_sales`.`count` из БД или 0 */
-int SStoreSaleItemModel::count()
-{
-    if( i_id == 0 )
-        return 0;
-
-    QUERY_EXEC(i_query,i_nErr)( QUERY_SEL_STORE_SALES_QTY(i_id));
-    i_query->first();
-    return i_query->value(0).toInt();
-}
-
-bool SStoreSaleItemModel::dealerRoyalty()
-{
-    SClientModel *dealer = new SClientModel();
-    dealer->setId(m_dealer);
-    dealer->createBalanceObj();
-    try
-    {
-        if(m_op_type == Unsale)
-        {
-            float dealerRoyalty = m_old_count*( m_inPrice + (m_price - m_inPrice)*m_returnPercent/100 );
-            i_nErr = dealer->updateBalance(-dealerRoyalty, tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_old_count).arg(m_item_id), SBalanceLogRecordModel::RoyaltyReason::Document, m_doc_id);
-        }
-        else
-        {
-            float dealerRoyalty = m_count*( m_inPrice + (m_price - m_inPrice)*m_returnPercent/100 );
-            i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_count).arg(m_item_id), SBalanceLogRecordModel::RoyaltyReason::Document, m_doc_id);
-        }
-    }
-    catch (int)
-    {
-        i_nErr = 0;
-        showNotification(tr("Ошибка целостности данных баланса, dealer = %1").arg(m_dealer));
-    }
-    delete dealer;
-
-    return i_nErr;
-}
-
 bool SStoreSaleItemModel::commit()
 {
-    QSqlRecord *before, *after;
-
-    before = actualStoreQtys();
-    if(checkAvailabilityBefore(before))
+    if(i_id)    // продажа ранее зарезервированного товара, возврат или отмена резерва
     {
-        shortlivedNotification *newPopup = new shortlivedNotification(parent(), tr("Товар отсутствует"), tr("\"%1\" (UID %2) больше не доступен для продажи").arg(m_item_name).arg(m_item_id), QColor(255,164,119), QColor(255,199,173));
-        i_nErr = 0;
+        update();
     }
     else
     {
-        if( (m_op_type == Sale) || (m_op_type == Reserve) )
-        {
-            insert();
-        }
-        else    // продажа ранее зарезервированного товара, возврат или отмена резерва
-        {
-            update();
-        }
-
-        i_logRecord->commit();
-
-        if( m_isRealization && (m_op_type == Sale || m_op_type == SaleReserved || m_op_type == Unsale) )
-        {
-            dealerRoyalty();
-        }
-
-        updateStoreItemsTable();
-        after = actualStoreQtys();
-        // TODO: если последняя единица товара, нужно удалить ячейку и сделать соотв. запись в журнал (но! нужно чтобы при вызове updateWidgets() в таблице место не обновлялось)
-        // а может и не нужно; в АСЦ удалялась, но за годы пользования я так и не понял зачем это сделано
-
-        if(i_nErr && !verifyQty(before, after))
-        {
-            i_nErr = 0;
-            showNotification(tr("Ошибка целостности данных item_id = %1").arg(m_item_id));
-        }
-
-        delete after;
-    }
-    delete before;
-
-    return i_nErr;
-}
-
-bool SStoreSaleItemModel::commit(Operation op)
-{
-    m_op_type = op;
-    return commit();
-}
-
-bool SStoreSaleItemModel::checkAvailabilityBefore(QSqlRecord *before)
-{
-    // В накладной резерва допускается изменение кол-ва (вдруг клиент решил купить меньше/больше);
-    // в этом случае при проверке не будет учитываться старое кол-во
-    if(m_count > (before->value(0).toInt() - before->value(2).toInt() + m_old_count) )
-    {
-        emit qtyNotEnough();
-        return 1;
-    }
-    return 0;
-}
-
-bool SStoreSaleItemModel::updateStoreItemsTable()
-{
-    switch (m_op_type)
-    {
-        case Sale         : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_SALE(m_count, m_item_id)); break;
-        case Reserve      : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_RESERVE(m_count, m_item_id)); break;
-        case SaleReserved : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_SALE_RESERVED(m_item_id, m_count, m_old_count)); break;
-        case Unsale       : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_UNSALE(m_item_id, m_old_count)); break;
-        case Free         : QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(m_item_id, m_old_count)); break;
-        case Nop:
-        case SaleRepair: break;
-        default: break;
+        insert();
     }
 
     return i_nErr;
