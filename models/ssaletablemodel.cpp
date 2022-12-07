@@ -388,15 +388,18 @@ bool SSaleTableModel::unsaleItems()
     return workshopBackOutItems(Unsale);
 }
 
+/*
+ * reason — причина возврата, указанная пользователем; будет записана в журнал
+*/
 bool SSaleTableModel::unsaleItems(const QString &reason)
 {
-    setUnsaleReason(reason);
+    setExtraUnsaleReason(reason);
     unsaleItems();
 }
 
-void SSaleTableModel::setUnsaleReason(const QString &reason)
+void SSaleTableModel::setExtraUnsaleReason(const QString &reason)
 {
-    m_unsaleReason = reason;
+    m_extraUnsaleReason = reason;
 }
 
 /* Полное снятие резерва
@@ -426,7 +429,7 @@ bool SSaleTableModel::storeBackOutItems(BackOutOpType type)
         SStoreSaleItemModel *itm = storeItem(i.key());
         if(type == Unsale)
         {
-            itm->setExtraUnsaleReason(m_unsaleReason);
+            itm->setExtraUnsaleReason(m_extraUnsaleReason);
             ret = itm->unsale();
         }
         else

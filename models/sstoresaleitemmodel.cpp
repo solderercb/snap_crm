@@ -16,15 +16,18 @@ SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, Q
 
     m_itemId = record.at(SStoreItemModel::SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt();
     m_itemName = record.at(SStoreItemModel::SaleOpColumns::ColName)->data(Qt::DisplayRole).toString();
-    setDocumentId(record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt());
+    m_docId = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
     m_dealer = record.at(SStoreItemModel::SaleOpColumns::ColDealer)->data(Qt::DisplayRole).toInt();
-    m_customer = record.at(SStoreItemModel::SaleOpColumns::ColBuyer)->data(Qt::DisplayRole).toInt();
+    m_buyer = record.at(SStoreItemModel::SaleOpColumns::ColBuyer)->data(Qt::DisplayRole).toInt();
     m_isRealization = record.at(SStoreItemModel::SaleOpColumns::ColRealization)->data(Qt::DisplayRole).toBool();
     m_returnPercent = record.at(SStoreItemModel::SaleOpColumns::ColRetPercent)->data(Qt::DisplayRole).toInt();
     m_inPrice = record.at(SStoreItemModel::SaleOpColumns::ColInPrice)->data(Qt::DisplayRole).toFloat();
     m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
     m_count = record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
     m_avail = record.at(SStoreItemModel::SaleOpColumns::ColAvail)->data(Qt::DisplayRole).toInt();
+    m_state = record.at(SStoreItemModel::SaleOpColumns::ColState)->data(Qt::DisplayRole).toBool();
+    m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
+    m_sn = record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString();
 
     // TODO: сделать выборочную передачу значений: для не новой РН нужно передавать только изменённые данные
 //    if(!i_id)
@@ -35,16 +38,16 @@ SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, Q
         i_valuesMap.insert("in_price", m_inPrice);
         i_valuesMap.insert("price", m_price);
         i_valuesMap.insert("dealer", m_dealer);
-        i_valuesMap.insert("warranty", record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt());
+        i_valuesMap.insert("warranty", m_warranty);
         i_valuesMap.insert("is_realization", m_isRealization);
-        i_valuesMap.insert("is_cancellation", record.at(SStoreItemModel::SaleOpColumns::ColState)->data(Qt::DisplayRole).toBool());
-//        i_valuesMap.insert("dealer_payment", record.at()->data(Qt::DisplayRole).toBool());
+        i_valuesMap.insert("is_cancellation", m_state);
         i_valuesMap.insert("return_percent", m_returnPercent);
-        i_valuesMap.insert("sn", record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString());
+        i_valuesMap.insert("sn", m_sn);
+        setBuyer(m_buyer);
+        i_valuesMap.insert("document_id", m_docId);
 //    }
 //    else
 //    {
-//        i_valuesMap.insert("count", m_count);
 //    }
 }
 
@@ -190,17 +193,11 @@ void SStoreSaleItemModel::setUser(const int user)
     i_valuesMap.insert("user", user);
 }
 
-QString SStoreSaleItemModel::unsaleReason()
-{
-    return m_cancellationReason;
-}
-
-/*  Метод предназначен для передачи причины возврата, указанной польователем и записи её в журнал
+/*  Метод предназначен для передачи причины возврата, указанной пользователем и записи её в журнал
 */
 void SStoreSaleItemModel::setExtraUnsaleReason(const QString& reason)
 {
-    m_unsaleReason = reason;
-    m_storeItem->setUnsaleReason(m_unsaleReason);
+    m_storeItem->setUnsaleReason(reason);
 }
 
 QString SStoreSaleItemModel::sn()
@@ -244,8 +241,9 @@ void SStoreSaleItemModel::unsetBuyer()
  */
 bool SStoreSaleItemModel::sale()
 {
+    int id = i_id;
     commit();
-    if(i_id)
+    if(id)
         i_nErr &= m_storeItem->saleReserved();
     else
         i_nErr &= m_storeItem->sale();
@@ -286,11 +284,6 @@ bool SStoreSaleItemModel::isProfitable()
 {
     // TODO: проверка указанной цены; выдача предупреждения при продаже в минус
     return 1;
-}
-
-bool SStoreSaleItemModel::integrityStatus()
-{
-    return nIntegrityErr;
 }
 
 bool SStoreSaleItemModel::commit()

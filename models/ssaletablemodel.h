@@ -67,7 +67,7 @@ public:
     bool reserveItems();
     bool unsaleItems();
     bool unsaleItems(const QString&);
-    void setUnsaleReason(const QString&);
+    void setExtraUnsaleReason(const QString&);
     bool freeItems();
     bool storeBackOutItems(BackOutOpType);
     bool workshopBackOutItems(BackOutOpType);
@@ -103,7 +103,7 @@ private:
     QString m_priceFieldName = "`price2`";
     bool m_amountChangedSignalFilter = 0;
      bool m_nIntegrityErr = 1;
-     QString m_unsaleReason;
+     QString m_extraUnsaleReason;
      bool m_tableMode = TablesSet::StoreSale;
      int m_editStrategy = EditStrategy::OnFieldChange;
      float m_amountItems = 0, m_amountWorks = 0, m_amountTotal = 0;

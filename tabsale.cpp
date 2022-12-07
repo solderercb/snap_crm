@@ -649,8 +649,7 @@ bool tabSale::unSale()  // распроведение
     {
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
-        tableModel->setUnsaleReason(ui->textEditRevertReason->toPlainText());
-        tableModel->unsaleItems();
+        tableModel->unsaleItems(ui->textEditRevertReason->toPlainText());
         clientModel->updatePurchases(-tableModel->itemsAffected());
 
         // если в следствие (нескольких) частичных распроведений были возвращены все товары, то нужно изменить статус документа

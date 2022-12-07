@@ -61,18 +61,14 @@ public:
     bool unsale();
     bool free();
     bool isProfitable();
-    bool integrityStatus();
 private:
     SStoreItemModel *m_storeItem = nullptr;
     int m_itemId = 0;
-    bool nIntegrityErr = 1;
     QString m_itemName;
-    int m_customer = 0;
+    int m_buyer = 0;
     int m_docId = 0;
     int m_avail = 0;
-    QString m_unsaleReason;
     int m_dealer = 0;
-    int m_customerId;
     int m_savedCount = 0;
     int m_count = 0;
     float m_inPrice = 0;
@@ -83,8 +79,7 @@ private:
     int m_dealerPayment;
     int m_returnPercent = 0;
     int m_user;
-    bool m_isCancellation;
-    QString m_cancellationReason;
+    bool m_state;
     QString m_sn;
     int m_dCategory;
     bool commit();

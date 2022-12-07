@@ -31,6 +31,7 @@ SStoreItemModel::SStoreItemModel(const QList<QStandardItem *> &record, const int
 
 SStoreItemModel::~SStoreItemModel()
 {
+    delIntegrityCheckObjects();
 }
 
 int id();
@@ -897,10 +898,14 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
     if(!m_isRealization)
         return 1;
 
+    float royaltyForItem = m_inPrice + (m_price - m_inPrice)*m_returnPercent/100;
+
+    if(royaltyForItem == 0)
+        return 1;
+
     SClientModel *dealer = new SClientModel();
     dealer->setId(m_dealer);
     dealer->createBalanceObj();
-    float royaltyForItem = m_inPrice + (m_price - m_inPrice)*m_returnPercent/100;
     try
     {
         if(m_opOnItemType == Unsale || m_opOnItemType == UnsaleRepair)

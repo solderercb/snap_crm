@@ -16,9 +16,6 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
     m_storeItem = new SStoreItemModel(record, count());
     m_storeItem->setSaleMode(SStoreItemModel::SaleMode::Repair);
 
-    m_dealer = record.at(SStoreItemModel::SaleOpColumns::ColDealer)->data(Qt::DisplayRole).toInt();
-    m_buyer = record.at(SStoreItemModel::SaleOpColumns::ColBuyer)->data(Qt::DisplayRole).toInt();
-
     // TODO: сделать выборочную передачу значений: для не новой РН нужно передавать только изменённые данные
 //    if(i_id == 0)
 //    {
@@ -246,54 +243,13 @@ bool SRepairSaleItemModel::free()
     return i_nErr;
 }
 
-void SRepairSaleItemModel::setClient(const int id)
-{
-    m_customer = id;
-}
-
-void SRepairSaleItemModel::setUnsaleReason(const QString &reason)
-{
-    m_unsaleReason = reason;
-}
-
-QSqlRecord *SRepairSaleItemModel::actualStoreQtys()
-{
-    QSqlRecord *record = new QSqlRecord();
-
-    QUERY_EXEC(i_query,i_nErr)(QUERY_SEL_ITEM_ACTUAL_QTY(m_itemId));
-    if((i_nErr && i_query->first()))
-        *record = i_query->record();
-
-    return record;
-}
-
-bool SRepairSaleItemModel::isProfitable()
-{
-    // TODO: проверка указанной цены; выдача предупреждения при продаже в минус
-    return 1;
-}
-
-bool SRepairSaleItemModel::integrityStatus()
-{
-    return nIntegrityErr;
-}
-
 bool SRepairSaleItemModel::commit()
 {
-    if(i_id)    // продажа ранее зарезервированного товара, возврат или отмена резерва
+    if(i_id)
         update();
     else
         insert();
 
     return i_nErr;
-}
-
-void SRepairSaleItemModel::showNotification(const QString &text)
-{
-    QMessageBox msgBox;
-
-    msgBox.setText(text);
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.exec();
 }
 

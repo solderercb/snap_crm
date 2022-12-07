@@ -48,14 +48,8 @@ public:
     bool reserve();
     bool unsale();
     bool free();
-    void setClient(const int);
-    void setUnsaleReason(const QString&);
-    QSqlRecord* actualStoreQtys();
-    bool isProfitable();
-    bool integrityStatus();
 private:
     SStoreItemModel *m_storeItem = nullptr;
-    bool nIntegrityErr = 1;
     int m_itemId;
     QString m_name;
     int m_count;
@@ -69,20 +63,7 @@ private:
     QString m_sn;
     int m_warranty;
     bool m_rLock;
-    int m_customer = 0;
-    bool m_isRealization = 0;
-    float m_returnPercent = 0;
-    float m_inPrice = 0;
-    QString m_unsaleReason;
-    int m_dealer;
-    int m_buyer;
     bool commit();
-    bool checkAvailabilityBefore(QSqlRecord*);
-    bool updateStoreItemsTable();
-    bool verifyQty(QSqlRecord*, QSqlRecord*);
-    void showNotification(const QString&);
-    bool dealerRoyalty();
-
 };
 
 #endif // SREPAIRSALEITEMMODEL_H
