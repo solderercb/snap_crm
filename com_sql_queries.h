@@ -245,7 +245,7 @@
                                                 "  t1.`user`,\n"\
                                                 "  0 AS 'is_realization',\n"\
                                                 "  0 AS 'return_percent',\n"\
-                                                "  2 AS 'state',\n"\
+                                                "  0 AS 'state',\n"\
                                                 "  '' AS 'notes',\n"\
                                                 "  0 AS 'item_id',\n"\
                                                 "  0 AS 'in_price',\n"\
@@ -275,7 +275,7 @@
                                                 "  t2.`to_user`,\n"\
                                                 "  t3.`is_realization`,\n"\
                                                 "  t3.`return_percent`,\n"\
-                                                "  t2.`state`,\n"\
+                                                "  0 AS 'state',\n"\
                                                 "  t2.`notes`,\n"\
                                                 "  t3.`id`,\n"\
                                                 "  t3.`in_price`,\n"\
@@ -374,36 +374,76 @@
                                                         "  (`document_id` = %1);")\
                                                         .arg((id))
                                                         
-#define QUERY_SEL_PART_FOR_SALE(uid, price_field_name)  QString(\
+#define QUERY_SEL_PART_FOR_SALE(uid, price_field_name, count)  QString(\
                                                         "SELECT\n"\
                                                         "  0 AS 'id',\n"\
-                                                        "  CONCAT(LPAD(t1.articul, 6, '0'), '-', LPAD(t1.id, 6, '0')) AS 'UID',\n"\
-                                                        "  t1.`name`,\n"\
-                                                        "  1 AS 'count',\n"\
-                                                        "  t1.`count` - t1.`reserved` AS 'avail',\n"\
-                                                        "  t1.%2 AS 'price',\n"\
-                                                        "  t1.%2 AS 'summ',\n"\
-                                                        "  t1.`box`,\n"\
-                                                        "  t1.`SN` AS 'sn',\n"\
-                                                        "  t1.`warranty`,\n"\
+                                                        "  CONCAT(LPAD(articul, 6, '0'), '-', LPAD(id, 6, '0')) AS 'UID',\n"\
+                                                        "  `name`,\n"\
+                                                        "  %3 AS 'count',\n"\
+                                                        "  `count` - `reserved` AS 'avail',\n"\
+                                                        "  %2 AS 'price',\n"\
+                                                        "  %2*%3 AS 'summ',\n"\
+                                                        "  `box`,\n"\
+                                                        "  `SN` AS 'sn',\n"\
+                                                        "  `warranty`,\n"\
                                                         "  0 AS 'user',\n"\
-                                                        "  t1.`is_realization`,\n"\
-                                                        "  t1.`return_percent`,\n"\
+                                                        "  `is_realization`,\n"\
+                                                        "  `return_percent`,\n"\
                                                         "  0 AS 'state',\n"\
                                                         "  NULL  AS 'notes',\n"\
-                                                        "  t1.`id` AS 'item_id',\n"\
-                                                        "  t1.`in_price`,\n"\
+                                                        "  `id` AS 'item_id',\n"\
+                                                        "  `in_price`,\n"\
                                                         "  0 AS 'obj_id',\n"\
-                                                        "  t1.`dealer`,\n"\
+                                                        "  `dealer`,\n"\
                                                         "  0 AS 'buyer',\n"\
                                                         "  NULL AS 'created',\n"\
                                                         "  NULL AS 'work_id',\n"\
                                                         "  1 AS 'is_item'\n"\
                                                         "FROM\n"\
-                                                        "  store_items AS t1\n"\
+                                                        "  store_items\n"\
                                                         "WHERE\n"\
-                                                        "  `id` IN (%1);").arg(uid)\
-                                                        .arg((price_field_name))
+                                                        "  `id` IN (%1);")\
+                                                        .arg((uid))\
+                                                        .arg((price_field_name))\
+                                                        .arg((count))
+#define QUERY_SEL_PART_FROM_BASKET(uid, price_field_name, count)  QString(\
+                                                        "SELECT\n"\
+                                                        "  `id`,\n"\
+                                                        "  CONCAT(LPAD(`articul`, 6, '0'), '-', LPAD(`item_id`, 6, '0')) AS 'UID',\n"\
+                                                        "  `name`,\n"\
+                                                        "  %3 AS 'count',\n"\
+                                                        "  `avail`,\n"\
+                                                        "  %2,\n"\
+                                                        "  %2*%3 AS 'summ',\n"\
+                                                        "  `box`,\n"\
+                                                        "  `sn`,\n"\
+                                                        "  `warranty`,\n"\
+                                                        "  `to_user` AS 'user',\n"\
+                                                        "  `is_realization`,\n"\
+                                                        "  `return_percent`,\n"\
+                                                        "  0 AS 'state',\n"\
+                                                        "  `notes` AS 'notes',\n"\
+                                                        "  `item_id`,\n"\
+                                                        "  `in_price`,\n"\
+                                                        "  `repair_id` AS 'obj_id',\n"\
+                                                        "  `dealer`,\n"\
+                                                        "  0 AS 'buyer',\n"\
+                                                        "  `created`,\n"\
+                                                        "  NULL AS 'work_id',\n"\
+                                                        "  1 AS 'is_item'\n"\
+                                                        "FROM (\n"\
+                                                        "  SELECT t1.`id`,  t1.`item_id`,  t1.`name`,  t1.`count`,  t1.`created`,  t1.`from_user`,  t1.`to_user`,  t1.`notes`,  t1.`state`,  t1.`repair_id`,  t1.`work_id`,  t1.`sn`,  t1.`warranty`, t2.`articul`, t2.`count` - t2.`reserved` AS 'avail', t2.`price`, t2.`price2`, t2.`price3`, t2.`price4`, t2.`price5`, t2.`in_price`, t2.`document`, t2.`box`, t2.`is_realization`, t2.`return_percent`, t3.`dealer` FROM\n"\
+                                                        "  store_int_reserve AS t1 \n"\
+                                                        "  LEFT JOIN store_items AS t2\n"\
+                                                        "    ON t1.`item_id` = t2.`id`\n"\
+                                                        "  LEFT JOIN docs AS t3\n"\
+                                                        "    ON t2.`document` = t3.`id`\n"\
+                                                        "  ) AS `item`\n"\
+                                                        "WHERE\n"\
+                                                        "  `id` IN (%1);")\
+                                                        .arg((uid))\
+                                                        .arg((price_field_name))\
+                                                        .arg((count))
 
 #define QUERY_SEL_ITEM_ACTUAL_QTY(item_id)   QString(\
                                                         "SELECT\n"\

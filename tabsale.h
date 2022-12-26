@@ -54,44 +54,39 @@ signals:
     void generatePrintout(QMap<QString, QVariant> report_vars);
 
 public:
-    enum DocState {Sale = 0, Reserve = 1, SaleReserved = 2};
+    enum OpType {Sale = 0, Reserve = 1, SaleReserved = 2};
     explicit tabSale(int, MainWindow *parent = nullptr);
     static tabSale* getInstance(int, MainWindow *parent = nullptr);
     ~tabSale();
     QString tabTitle() override;
 private:
     Ui::tabSale *ui;
-    void setDefaultStyleSheets();
-    void setBalanceWidgetsVisible(bool);
     static QMap<int, tabSale*> p_instance;
     int doc_id = 0;
     SDocumentModel *docModel;
     SClientModel *clientModel;
-    float total_sum, takein_sum, charge_sum;
-    void eventResize(QResizeEvent *);
     QSqlQueryModel* clientPhonesModel;
+    SSaleTableModel *tableModel;
+    SaleTableItemDelegates *itemDelagates;
+    tabSaleSettingsMenu *widgetAction;
+    SCashRegisterModel *cashRegister;
     int client = 0;
     int price_col = 2;
+    int m_opType = 0;
+    int *params;
+    int m_docState = 0;
+    void eventResize(QResizeEvent *);
+    void setDefaultStyleSheets();
+    void setBalanceWidgetsVisible(bool);
     void updateWidgets();
     bool checkInput();
-    SSaleTableModel *tableModel;
-    QSqlQueryModel *newItemModel;
-    SaleTableItemDelegates *itemDelagates;
-    int reserve = 0;
     bool createClient();
     bool createNewDoc();
     bool sale();
     void clearAll();
-    int isItemAlreadyInList(int);
-    void addItemByUID(int);
-    tabSaleSettingsMenu *widgetAction;
-    int *params;
-    QMessageBox msgBox;
-    SCashRegisterModel *cashRegister;
-    int m_docState = 0;
     void print();
 #ifdef QT_DEBUG
-    void randomFill();
+    void randomFill() override;
     void createTestPanel();
     QWidget *testPanel;
     QLineEdit *testLineEdit;
@@ -129,8 +124,8 @@ private slots:
     void unSaleButtonClicked();
     void paymentSystemChanged(int);
 #ifdef QT_DEBUG
-    void test_scheduler_handler();
-    void test_scheduler2_handler();
+    void test_scheduler_handler() override;
+    void test_scheduler2_handler() override;
     void test_updateWidgetsWithDocNum();
     void test_addRandomItem();
 #endif

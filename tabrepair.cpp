@@ -53,8 +53,9 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     }
     if(permissions->contains("69"))  // Устанавливать детали со склада
     {
-        ui->lineEditQuickAddSparePartByUID->setButtons("Apply");
-        connect(ui->lineEditQuickAddSparePartByUID, &SLineEdit::buttonClicked, this, &tabRepair::quickAddSparePartByUID);
+        ui->lineEditQuickAddPart->setButtons("Apply");
+        connect(ui->lineEditQuickAddPart, &SLineEdit::buttonClicked, this, &tabRepair::onReturnQuickAddPart);
+        connect(ui->lineEditQuickAddPart, &SLineEdit::returnPressed, this, &tabRepair::onReturnQuickAddPart);
     }
     if(1)   // userDbData->value("TODO: автосохранение результата диагностики").toBool()
     {
@@ -102,9 +103,11 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->tableViewComments->horizontalHeader()->hide();
 
     ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
+    connect(ui->tableViewWorksAndSpareParts, SIGNAL(pressed(QModelIndex)), worksAndPartsModel, SLOT(indexSelected(QModelIndex)));
     ui->tableViewWorksAndSpareParts->setItemDelegate(itemDelagates);
     ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 //    ui->tableViewWorksAndSpareParts->setReadOnly(true);
+    connect(ui->pushButtonAddWork, SIGNAL(clicked()), worksAndPartsModel, SLOT(addCustomWork()));
 
     // сворачивание групп элементов (ну как в АСЦ чтобы). TODO: Отключено, т. к. требует доработки класса SGroupBoxEventFilter
 //    groupBoxEventFilter = new SGroupBoxEventFilter(this);
@@ -418,7 +421,7 @@ bool tabRepair::setWidgetsParams(const int stateId)
     {
         switch (action.toInt())
         {
-//            case Global::RepStateActions::EditWorksParts: m_worksRO = 0; break;
+            case Global::RepStateActions::EditWorksParts: m_worksRO = 0; break;
             case Global::RepStateActions::EditDiagSumm: m_diagRO = 0; m_summRO = 0; break;
         }
     }
@@ -532,9 +535,24 @@ void tabRepair::openInvoice(int)
 
 }
 
-void tabRepair::quickAddSparePartByUID(int)
+void tabRepair::onReturnQuickAddPart()
 {
+    qDebug().nospace() << "[" << this << "] onReturnQuickAddPart()";
+    if(quickAddPart(ui->lineEditQuickAddPart->text().toInt()))
+        ui->lineEditQuickAddPart->setText("");
+}
 
+/*
+ * Возвращает 0 в случае неудачи
+*/
+bool tabRepair::quickAddPart(const int uid)
+{
+    qDebug().nospace() << "[" << this << "] quickAddPart()";
+
+    if(m_worksRO)
+        return 0;
+
+    return worksAndPartsModel->addItemByUID(uid, 1);
 }
 
 void tabRepair::editIncomingSet(int)
@@ -858,7 +876,7 @@ void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
     QTableView::resizeEvent(event);
     int i, j;
     int colNameWidth = 0;
-    int colWidths[] = {40,90,0,45,0,70,70,120,120,80,100};
+    int colWidths[] = {60,90,0,45,40,70,70,120,120,80,100};
 
     verticalHeader()->hide();
     colNameWidth = geometry().width();

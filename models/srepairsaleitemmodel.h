@@ -39,15 +39,19 @@ public:
     float price();
     void setPrice(const float);
     QString sn();
-    void setSn(const QString);
+    void setSN(const QString);
     int warranty();
     void setWarranty(const int);
     bool rLock();
     void setRLock(const bool);
-    bool sale();
     bool reserve();
+    bool commit(const bool skipLog = 0);
+    bool linkRepair();
+    bool sale();
     bool unsale();
+    bool unlinkRepair();
     bool free();
+    void setField(const int fieldNum, const QVariant value);
 private:
     SStoreItemModel *m_storeItem = nullptr;
     int m_itemId;
@@ -63,7 +67,6 @@ private:
     QString m_sn;
     int m_warranty;
     bool m_rLock;
-    bool commit();
 };
 
 #endif // SREPAIRSALEITEMMODEL_H

@@ -29,26 +29,18 @@ SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, Q
     m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
     m_sn = record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString();
 
-    // TODO: сделать выборочную передачу значений: для не новой РН нужно передавать только изменённые данные
-//    if(!i_id)
-//    {
+    if(!i_id)
         i_valuesMap.insert("user", userDbData->value("id"));
-        i_valuesMap.insert("item_id", m_itemId);
-        i_valuesMap.insert("count", m_count);
-        i_valuesMap.insert("in_price", m_inPrice);
-        i_valuesMap.insert("price", m_price);
-        i_valuesMap.insert("dealer", m_dealer);
-        i_valuesMap.insert("warranty", m_warranty);
-        i_valuesMap.insert("is_realization", m_isRealization);
-        i_valuesMap.insert("is_cancellation", m_state);
-        i_valuesMap.insert("return_percent", m_returnPercent);
-        i_valuesMap.insert("sn", m_sn);
-        setBuyer(m_buyer);
-        i_valuesMap.insert("document_id", m_docId);
-//    }
-//    else
-//    {
-//    }
+
+    for(int i = 1; i < record.count(); i++) // в нулевом столбце id записи в таблице, он не изменяется средствами программы
+    {
+        if(!record.at(i)->data(Qt::UserRole+1).toBool())
+            continue;
+
+        setField(i, record.at(i)->data(Qt::DisplayRole));
+        record.at(i)->setData(0, Qt::UserRole+1);   // снятие пометки изменённого поля
+    }
+    record.at(0)->setData(0, Qt::UserRole+1);   // снятие пометки изменённой строки
 }
 
 SStoreSaleItemModel::~SStoreSaleItemModel()
@@ -92,7 +84,6 @@ int SStoreSaleItemModel::documentId()
 
 void SStoreSaleItemModel::setDocumentId(const int id)
 {
-    m_docId = id;
     i_valuesMap.insert("document_id", id);
 }
 
@@ -260,7 +251,7 @@ bool SStoreSaleItemModel::reserve()
 bool SStoreSaleItemModel::unsale()
 {
     setState(State::Cancelled);
-    i_valuesMap.insert("cancellation_reason", "unsale");
+    setCancellationReason("unsale");
     commit();
     i_nErr &= m_storeItem->unsale();
     return i_nErr;
@@ -269,7 +260,7 @@ bool SStoreSaleItemModel::unsale()
 bool SStoreSaleItemModel::free()
 {
     setState(State::Cancelled);
-    i_valuesMap.insert("cancellation_reason", "cancel reserve");
+    setCancellationReason("cancel reserve");
     commit();
     i_nErr &= m_storeItem->free();
     return i_nErr;
@@ -280,10 +271,34 @@ void SStoreSaleItemModel::setState(const State state)
     i_valuesMap.insert("is_cancellation", state);
 }
 
+void SStoreSaleItemModel::setCancellationReason(const QString &text)
+{
+    i_valuesMap.insert("cancellation_reason", text);
+}
+
 bool SStoreSaleItemModel::isProfitable()
 {
     // TODO: проверка указанной цены; выдача предупреждения при продаже в минус
     return 1;
+}
+
+void SStoreSaleItemModel::setField(const int fieldNum, const QVariant value)
+{
+    switch(fieldNum)
+    {
+        case SStoreItemModel::ColDealer: setDealer(value.toInt()); break;
+        case SStoreItemModel::ColItemId: setItemId(value.toInt()); break;
+        case SStoreItemModel::ColObjId: setDocumentId(value.toInt()); break;
+        case SStoreItemModel::ColBuyer: setBuyer(value.toInt()); break;
+        case SStoreItemModel::ColCount: setCount(value.toInt()); break;
+        case SStoreItemModel::ColInPrice: setInPrice(value.toFloat()); break;
+        case SStoreItemModel::ColPrice: setPrice(value.toFloat()); break;
+        case SStoreItemModel::ColWarranty: setWarranty(value.toInt()); break;
+        case SStoreItemModel::ColRealization: setIsRealization(value.toBool()); break;
+        case SStoreItemModel::ColRetPercent: setReturnPercent(value.toInt()); break;
+        case SStoreItemModel::ColState: setState((State)value.toInt()); break;
+        case SStoreItemModel::ColSN: setSN(value.toString()); break;
+    }
 }
 
 bool SStoreSaleItemModel::commit()

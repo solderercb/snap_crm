@@ -178,7 +178,8 @@ private slots:
     void changeManager(int);
     void changeEngineer(int);
     void openInvoice(int);
-    void quickAddSparePartByUID(int);
+    void onReturnQuickAddPart();
+    bool quickAddPart(const int);
     void editIncomingSet(int);
     void setAgreedAmount(int);
     void buttonClientClicked();

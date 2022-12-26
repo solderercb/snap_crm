@@ -3,12 +3,12 @@
 
 #include "scomrecord.h"
 #include <QObject>
+#include "models/sstoreitemmodel.h"
 
 class SWorkModel : public SComRecord
 {
     Q_OBJECT
 public:
-    enum Columns {ColId = 0, ColUser, ColRepairId, ColDocumentId, ColName, ColPrice, ColCount, ColWarranty, ColPriceId, ColIsPay, ColAdded, ColType, ColPayRepair, ColPayRepairQuick};
     explicit SWorkModel(QObject *parent = nullptr);
     explicit SWorkModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
     int id();
@@ -40,6 +40,7 @@ public:
     void setPayRepairQuick(const int);
     bool update();
     bool remove();
+    void setField(const int fieldNum, const QVariant value);
     bool commit();
 private:
     int m_user;

@@ -4,6 +4,7 @@ SRepairSaleItemModel::SRepairSaleItemModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "store_int_reserve";
     i_obligatoryFields << "item_id" << "count" << "from_user" << "to_user" << "notes" << "state" << "price";
+    i_logRecord->setType(SLogRecordModel::Repair);
 }
 
 /*  Конструктор класса, предназначенный для использования при продаже товара
@@ -16,23 +17,34 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
     m_storeItem = new SStoreItemModel(record, count());
     m_storeItem->setSaleMode(SStoreItemModel::SaleMode::Repair);
 
-    // TODO: сделать выборочную передачу значений: для не новой РН нужно передавать только изменённые данные
-//    if(i_id == 0)
-//    {
-//        setItemId(record.at(SStoreItemModel::SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt());
-//        setName(record.at(SStoreItemModel::SaleOpColumns::ColName)->data(Qt::DisplayRole).toString());
-//        setCount(record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt());
-//        setCreated(record.at(SStoreItemModel::SaleOpColumns::ColCreated)->data(Qt::DisplayRole).toDateTime());
-//        setFromUser(userDbData->value("id").toInt());
-//        setToUser(userDbData->value("id").toInt());
-//        setNotes(record.at(SStoreItemModel::SaleOpColumns::ColNotes)->data(Qt::DisplayRole).toString());
-//        setState(record.at(SStoreItemModel::SaleOpColumns::ColState)->data(Qt::DisplayRole).toInt());
-//        setRepairId(record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt());
-//        setWorkId(record.at(SStoreItemModel::SaleOpColumns::ColWorkId)->data(Qt::DisplayRole).toInt());
-//        setPrice(record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat());
-//        setSn(record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString());
-//        setWarranty(record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt());
-    //    }
+    i_id = record.at(SStoreItemModel::SaleOpColumns::ColId)->data(Qt::DisplayRole).toInt();
+    m_itemId = record.at(SStoreItemModel::SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt();
+    m_name = record.at(SStoreItemModel::SaleOpColumns::ColName)->data(Qt::DisplayRole).toString();
+    m_count = record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
+    i_createdUtc = record.at(SStoreItemModel::SaleOpColumns::ColCreated)->data(Qt::DisplayRole).toDateTime();
+    m_notes = record.at(SStoreItemModel::SaleOpColumns::ColNotes)->data(Qt::DisplayRole).toString();
+    m_state = record.at(SStoreItemModel::SaleOpColumns::ColState)->data(Qt::DisplayRole).toInt();
+    m_repairId = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
+    m_workId = record.at(SStoreItemModel::SaleOpColumns::ColWorkId)->data(Qt::DisplayRole).toInt();
+    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
+    m_sn = record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString();
+    m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
+
+    i_logRecord->setType(SLogRecordModel::Repair);
+    i_logRecord->setRepairId(m_repairId);
+
+    if(!i_id)
+        i_valuesMap.insert("user", userDbData->value("id"));
+
+    for(int i = 1; i < record.count(); i++) // в нулевом столбце id записи в таблице, он не изменяется средствами программы
+    {
+        if(!record.at(i)->data(Qt::UserRole+1).toBool())
+            continue;
+
+        setField(i, record.at(i)->data(Qt::DisplayRole));
+        record.at(i)->setData(0, Qt::UserRole+1);   // снятие пометки изменённого поля
+    }
+    record.at(0)->setData(0, Qt::UserRole+1);   // снятие пометки изменённой строки
 }
 
 SRepairSaleItemModel::~SRepairSaleItemModel()
@@ -61,7 +73,6 @@ int SRepairSaleItemModel::itemId()
 
 void SRepairSaleItemModel::setItemId(const int id)
 {
-    m_itemId = id;
     i_valuesMap.insert("item_id", m_itemId);
 }
 
@@ -72,7 +83,6 @@ QString SRepairSaleItemModel::name()
 
 void SRepairSaleItemModel::setName(const QString name)
 {
-    m_name = name;
     i_valuesMap.insert("name", m_name);
 }
 
@@ -88,7 +98,6 @@ int SRepairSaleItemModel::count()
 
 void SRepairSaleItemModel::setCount(const int count)
 {
-    m_count = count;
     i_valuesMap.insert("count", m_count);
 }
 
@@ -109,7 +118,6 @@ int SRepairSaleItemModel::fromUser()
 
 void SRepairSaleItemModel::setFromUser(const int id)
 {
-    m_fromUser = id;
     i_valuesMap.insert("from_user", m_fromUser);
 }
 
@@ -120,7 +128,6 @@ int SRepairSaleItemModel::toUser()
 
 void SRepairSaleItemModel::setToUser(const int id)
 {
-    m_toUser = id;
     i_valuesMap.insert("to_user", m_toUser);
 }
 
@@ -131,7 +138,6 @@ QString SRepairSaleItemModel::notes()
 
 void SRepairSaleItemModel::setNotes(const QString notes)
 {
-    m_notes = notes;
     i_valuesMap.insert("notes", m_notes);
 }
 
@@ -142,8 +148,7 @@ int SRepairSaleItemModel::state()
 
 void SRepairSaleItemModel::setState(const int state)
 {
-    m_state = state;
-    i_valuesMap.insert("state", m_state);
+    i_valuesMap.insert("state", state);
 }
 
 int SRepairSaleItemModel::repairId()
@@ -153,9 +158,15 @@ int SRepairSaleItemModel::repairId()
 
 void SRepairSaleItemModel::setRepairId(const int id)
 {
-    m_repairId = id;
-    i_valuesMap.insert("repair_id", id);
-    i_logRecord->setRepairId(id);
+    if(id)
+    {
+        i_valuesMap.insert("repair_id", id);
+        i_logRecord->setRepairId(m_repairId);
+    }
+    else
+    {
+        i_valuesMap.insert("repair_id", QVariant());
+    }
 }
 
 int SRepairSaleItemModel::workId()
@@ -165,8 +176,10 @@ int SRepairSaleItemModel::workId()
 
 void SRepairSaleItemModel::setWorkId(const int id)
 {
-    m_workId = id;
-    i_valuesMap.insert("work_id", m_workId);
+    if(id)
+        i_valuesMap.insert("work_id", m_workId);
+    else
+        i_valuesMap.insert("work_id", QVariant());
 }
 
 float SRepairSaleItemModel::price()
@@ -176,7 +189,6 @@ float SRepairSaleItemModel::price()
 
 void SRepairSaleItemModel::setPrice(const float price)
 {
-    m_price = price;
     i_valuesMap.insert("price", m_price);
 }
 
@@ -185,9 +197,8 @@ QString SRepairSaleItemModel::sn()
     return m_sn;
 }
 
-void SRepairSaleItemModel::setSn(const QString sn)
+void SRepairSaleItemModel::setSN(const QString sn)
 {
-    m_sn = sn;
     i_valuesMap.insert("sn", m_sn);
 }
 
@@ -211,44 +222,91 @@ void SRepairSaleItemModel::setRLock(const bool r_lock)
     i_valuesMap.insert("r_lock", r_lock);
 }
 
-bool SRepairSaleItemModel::sale()
+bool SRepairSaleItemModel::reserve()
 {
-    setState(State::Sold);
-    commit();
-    i_nErr &= m_storeItem->saleRepair();
+    i_nErr = m_storeItem->reserveRepair();
+    commit(1);
+    // Запись в журнал производится в методе класса SStoreItemModel
     return i_nErr;
 }
 
-bool SRepairSaleItemModel::reserve()
+bool SRepairSaleItemModel::linkRepair()
 {
     setState(State::RepairLinked);
+    setRepairId(m_repairId);
+    i_logRecord->setText(tr("Установлена запчасть: %1, стоимость %2 из ремонта №%3").arg(m_name).arg(m_price).arg(m_repairId));
     commit();
-    i_nErr &= m_storeItem->reserveRepair();
+    return i_nErr;
+}
+
+bool SRepairSaleItemModel::sale()
+{
+    setState(State::Sold);
+    commit(1);
+    // Запись в журнал производится в методе класса SStoreItemModel
+    i_nErr &= m_storeItem->saleRepair();
     return i_nErr;
 }
 
 bool SRepairSaleItemModel::unsale()
 {
     setState(State::RepairLinked);
-    commit();
+    commit(1);
+    // Запись в журнал производится в методе класса SStoreItemModel
     i_nErr &= m_storeItem->unsaleRepair();
+    return i_nErr;
+}
+
+bool SRepairSaleItemModel::unlinkRepair()
+{
+    setState(State::EngineerBasket);
+    setSN("");
+    setRepairId(0);
+    setWorkId(0);
+    i_logRecord->setText(tr("Удалена запчасть: %1, стоимость %2 из ремонта №%3").arg(m_name).arg(m_price).arg(m_repairId));
+    commit();
     return i_nErr;
 }
 
 bool SRepairSaleItemModel::free()
 {
-    setState(State::EngineerBasket);
-    commit();
-    i_nErr &= m_storeItem->free();
-    return i_nErr;
+    setState(State::Archive);
+    commit(1);
+    // Запись в журнал производится в методе класса SStoreItemModel
 }
 
-bool SRepairSaleItemModel::commit()
+void SRepairSaleItemModel::setField(const int fieldNum, const QVariant value)
 {
+    switch(fieldNum)
+    {
+        case SStoreItemModel::ColItemId: setItemId(value.toInt()); break;
+    case SStoreItemModel::ColName: setName(value.toString()); break;
+        case SStoreItemModel::ColObjId: setRepairId(value.toInt()); break;
+        case SStoreItemModel::ColCount: setCount(value.toInt()); break;
+        case SStoreItemModel::ColPrice: setPrice(value.toFloat()); break;
+        case SStoreItemModel::ColWarranty: setWarranty(value.toInt()); break;
+        case SStoreItemModel::ColState: setState((State)value.toInt()); break;
+        case SStoreItemModel::ColSN: setSN(value.toString()); break;
+    }
+}
+
+bool SRepairSaleItemModel::commit(const bool skipLogRecording)
+{
+    qDebug().nospace() << "[" << this << "] commit()";
     if(i_id)
         update();
     else
+    {
+        setCreated(QDateTime::currentDateTime());
+        setFromUser(userDbData->value("id").toInt());
+        setToUser(userDbData->value("id").toInt());
+        if(!i_valuesMap.contains("notes"))
+            setNotes(tr("Выдача товара \"%1\" сотруднику %2").arg(m_name, QSqlDatabase::database("connMain").userName()));
         insert();
+    }
+
+    if(!skipLogRecording)
+        i_logRecord->commit();
 
     return i_nErr;
 }

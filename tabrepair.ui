@@ -269,7 +269,7 @@
                 <item>
                  <widget class="QPushButton" name="pushButtonAddWork">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -333,9 +333,9 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="SLineEdit" name="lineEditQuickAddSparePartByUID">
+                 <widget class="SLineEdit" name="lineEditQuickAddPart">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1054,7 +1054,7 @@ QListView::item  {
             <item row="0" column="0">
              <widget class="SComboBox" name="comboBoxState">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1558,8 +1558,8 @@ QListView::item  {
    <slot>openPrevRepair()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>310</x>
-     <y>452</y>
+     <x>308</x>
+     <y>408</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1575,7 +1575,7 @@ QListView::item  {
    <hints>
     <hint type="sourcelabel">
      <x>566</x>
-     <y>956</y>
+     <y>942</y>
     </hint>
     <hint type="destinationlabel">
      <x>542</x>
@@ -1590,8 +1590,8 @@ QListView::item  {
    <slot>setInformedStatus(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>131</x>
-     <y>636</y>
+     <x>153</x>
+     <y>572</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -1638,8 +1638,8 @@ QListView::item  {
    <slot>spinBoxAmountChanged(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>386</x>
-     <y>300</y>
+     <x>444</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
      <x>1169</x>
@@ -1654,8 +1654,8 @@ QListView::item  {
    <slot>saveDiagAmount()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>516</x>
-     <y>301</y>
+     <x>522</x>
+     <y>325</y>
     </hint>
     <hint type="destinationlabel">
      <x>1171</x>
@@ -1690,5 +1690,6 @@ QListView::item  {
   <slot>spinBoxAmountChanged(double)</slot>
   <slot>saveDiagAmount()</slot>
   <slot>spinBoxAmountEditingFinished()</slot>
+  <slot>onReturnQuickAddPart()</slot>
  </slots>
 </ui>

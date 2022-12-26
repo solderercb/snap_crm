@@ -4,6 +4,7 @@ SStoreItemModel::SStoreItemModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "store_items";
     i_obligatoryFields << "" << "articul" << "dealer" << "name" << "state" << "category" << "store" << "shop_description" << "description";
+    i_logRecord->setType(SLogRecordModel::Part);
 }
 
 /*  Конструктор класса, предназначенный для использования при продаже товара
@@ -23,7 +24,6 @@ SStoreItemModel::SStoreItemModel(const QList<QStandardItem *> &record, const int
     m_saleUser = record.value(SaleOpColumns::ColUser)->data(Qt::DisplayRole).toInt();
     m_dealer = record.value(SaleOpColumns::ColDealer)->data(Qt::DisplayRole).toInt();
     m_buyerId = record.value(SaleOpColumns::ColBuyer)->data(Qt::DisplayRole).toInt();
-    i_logRecord->setType(SLogRecordModel::Part);
     i_logRecord->setItemId(i_id);
     if(m_buyerId)
         i_logRecord->setClient(m_buyerId);

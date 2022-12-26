@@ -13,12 +13,12 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->setupUi(this);
     docModel = new SDocumentModel();
     tableModel = new SSaleTableModel(this);
-    newItemModel = new QSqlQueryModel(this);
-    itemDelagates = new SaleTableItemDelegates(tableModel, ui->tableView);
+    itemDelagates = new SaleTableItemDelegates(ui->tableView);
     clientModel = new SClientModel();
     cashRegister = new SCashRegisterModel();
 
     tableModel->setTableMode(SSaleTableModel::TablesSet::StoreSale);
+    itemDelagates->setTableModel(tableModel);
     params = new int;
     *params = 0;
     *params |= comSettings->value("qs_print_rn").toBool()?tabSaleSettingsMenu::PrintDoc:0;
@@ -71,7 +71,6 @@ tabSale::~tabSale()
     delete params;
     delete widgetAction;
     delete tableModel;
-    delete newItemModel;
     delete itemDelagates;
     delete clientModel;
     delete cashRegister;
@@ -127,13 +126,12 @@ void tabSale::updateWidgets()
     setDefaultStyleSheets();
     if(doc_id)
     {
+        tableModel->setModelState(SSaleTableModel::StoreSold);
         docModel->load(doc_id);
         if(!docModel->isValid())
             return;
         m_docState = docModel->state();
         client = docModel->client();
-
-        tableModel->setDocumentState(m_docState);
 
         ui->labelDocNum->show();
         ui->lineEditDocNum->show();
@@ -158,7 +156,6 @@ void tabSale::updateWidgets()
         else
             ui->checkBoxAnonymous->setChecked(true);
 
-        ui->comboBoxPriceCol->setCurrentIndex(docModel->priceOptionIndex());  // это должно быть после fillClientCreds()
         ui->comboBoxPriceCol->setEnabled(false);
         ui->checkBoxAnonymous->setEnabled(false);
         ui->lineEditComment->setText(docModel->notes());
@@ -169,7 +166,8 @@ void tabSale::updateWidgets()
 
         if(m_docState == SDocumentModel::ItemsReserved)
         {
-            reserve = SaleReserved;    // это флаг для функции sale()
+            tableModel->setModelState(SSaleTableModel::StoreReserved);
+            m_opType = SaleReserved;    // это флаг для функции sale()
             ui->comboBoxPaymentAccount->setEnabled(true);
             ui->comboBoxPriceCol->setEnabled(true);
             ui->lineEditTakeIn->setReadOnly(false);
@@ -189,7 +187,6 @@ void tabSale::updateWidgets()
             ui->buttonReserveCancel->show();
             ui->buttonSaleMore->show();
             ui->buttonSale->show();
-            tableModel->setModelState(SSaleTableModel::StoreReserved);
             tableModel->loadStoreSale(doc_id);
 #ifdef QT_DEBUG
             ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toFloat(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2)); // это для отладки
@@ -250,7 +247,7 @@ void tabSale::updateWidgets()
     {
         clearAll();
         setBalanceWidgetsVisible(false);
-        reserve = Sale;    // это флаг для функции sale()
+        m_opType = Sale;    // это флаг для функции sale()
         ui->lineEditTakeIn->setReadOnly(false);
         ui->labelDate->hide();
         ui->lineEditDate->hide();
@@ -509,7 +506,8 @@ void tabSale::fillClientCreds(int id)
     ui->comboBoxClientAdType->setEnabled(false);
     ui->checkBoxAnonymous->setChecked(false);
 
-    ui->comboBoxPriceCol->setCurrentIndex(clientModel->priceColumnIndex());
+    if(tableModel->modelState() == SSaleTableModel::StoreNew)
+        ui->comboBoxPriceCol->setCurrentIndex(clientModel->priceColumnIndex());
     ui->comboBoxClientAdType->setCurrentIndex(clientModel->adTypeIndex());
     if(clientModel->options() & SClientModel::BalanceEnabled)
     {
@@ -561,47 +559,20 @@ void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
 
 void tabSale::selectPriceCol(int comboBoxIndex)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    if(tableModel->modelState() == SSaleTableModel::State::StoreNew || tableModel->modelState() == SSaleTableModel::State::StoreReserved)
+    {
+        QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
 
-    query->prepare(QUERY_SEL_STORE_ITEMS_ITEM_PRICE(priceColModel->index(comboBoxIndex, 2).data().toString()));
-    tableModel->setPriceColumn(query);
-    delete query;
+        query->prepare(QUERY_SEL_STORE_ITEMS_ITEM_PRICE(priceColModel->index(comboBoxIndex, 2).data().toString()));
+        tableModel->setPriceColumn(query);
+        delete query;
+    }
 }
 
 void tabSale::addItemByUID()
 {
-    addItemByUID(ui->lineEditAddByUID->text().toInt());
+    tableModel->addItemByUID(ui->lineEditAddByUID->text().toInt(), ui->comboBoxPriceCol->currentIndex());
     ui->lineEditAddByUID->setText("");
-}
-
-/*  Добавление товара по id
- *  Запрещено добавлять один и тот же товар дважды (TODO: пересмотреть это решение)
-*/
-void tabSale::addItemByUID(int uid)
-{
-    if(tableModel->modelState() == SSaleTableModel::StoreNew || tableModel->modelState() == SSaleTableModel::StoreReserved )
-    {
-        int row = isItemAlreadyInList(uid);
-        if( row == -1)
-        {
-            newItemModel->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->index(ui->comboBoxPriceCol->currentIndex(), 2).data().toString()), QSqlDatabase::database("connMain"));
-            for(int i = 0; i < newItemModel->rowCount(); i++)
-            {
-                if(newItemModel->record(i).value("avail").toInt())
-                    tableModel->appendRecord(newItemModel->record(i));
-                else
-                {
-                    qDebug() << QString("Товар UID %1 не доступен").arg(newItemModel->record(i).value("UID").toString());
-                    shortlivedNotification *newPopup = new shortlivedNotification(this, "Товар отсутствует", "\"" + newItemModel->record(i).value("name").toString() + "\" (UID " + newItemModel->record(i).value("UID").toString() + ") не доступен для продажи", QColor(255,199,173), QColor(255,164,119));
-                }
-            }
-        }
-        else
-        {
-            qDebug() << QString("товар UID %1 уже добавлен").arg(tableModel->value(row, SStoreItemModel::SaleOpColumns::ColUID).toString());
-            shortlivedNotification *newPopup = new shortlivedNotification(this, "Повтор", "\"" + tableModel->value(row, SStoreItemModel::SaleOpColumns::ColName).toString()+"\" (UID " + tableModel->value(row, SStoreItemModel::SaleOpColumns::ColUID).toString() + ") уже добавлен", QColor(255,255,255), QColor(245,245,245));
-        }
-    }
 }
 
 void tabSale::print()
@@ -719,22 +690,11 @@ void tabSale::clearAll()
     ui->lineEditTakeIn->setText("");
     ui->lineEditComment->setText("");
     tableModel->removeRows(0, tableModel->rowCount());
-    newItemModel->clear();
     delete docModel;
     delete clientModel;
     docModel = new SDocumentModel();
     clientModel = new SClientModel();
 
-}
-
-int tabSale::isItemAlreadyInList(int id)
-{
-    for(int i = 0; i < tableModel->rowCount(); i++)
-    {
-        if(tableModel->value(i, SStoreItemModel::SaleOpColumns::ColItemId).toInt() == id)
-            return i;
-    }
-    return -1;
 }
 
 bool tabSale::sale()
@@ -782,7 +742,7 @@ bool tabSale::sale()
 
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
-        if(reserve == Sale || reserve == Reserve)
+        if(m_opType == Sale || m_opType == Reserve)
         {
             createNewDoc();
             doc_id = docModel->id();
@@ -791,17 +751,17 @@ bool tabSale::sale()
 
         docModel->setPaymentSystem(paymentAccount);
 
-        if(reserve == Reserve)
+        if(m_opType == Reserve)
         {
-            tableModel->saveTablesStore(SSaleTableModel::Reserve);
+            tableModel->saveTablesStore(SSaleTableModel::StoreOpType::Reserve);
             docModel->setType(SDocumentModel::ReserveInvoice);
             docModel->appendLogText(QString("Расходная накладная №%1 создана (резерв)").arg(doc_id));
             docModel->setState(SDocumentModel::ItemsReserved);
         }
         else
         {
-            tableModel->saveTablesStore(SSaleTableModel::Sale);
-            if(reserve == SaleReserved)
+            tableModel->saveTablesStore(SSaleTableModel::StoreOpType::Sale);
+            if(m_opType == SaleReserved)
             {
                 docModel->setAmount(amount);
                 docModel->appendLogText(QString("Расходная накладная №%1 проведена").arg(doc_id));
@@ -841,7 +801,7 @@ bool tabSale::sale()
     catch (int type)
     {
         nErr = 0;
-        if(reserve == Sale || reserve == Reserve)
+        if(m_opType == Sale || m_opType == Reserve)
         {
             doc_id = initial_doc_id;
             docModel->setId(0);
@@ -854,7 +814,6 @@ bool tabSale::sale()
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
     }
-
 
 #ifdef QT_DEBUG
 //    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
@@ -900,16 +859,16 @@ void tabSale::saleMoreButtonClicked()
 
     shortlivedNotification *newPopup = new shortlivedNotification(this, "Успешно", "Расходная накладная проведена", QColor(214,239,220), QColor(229,245,234));
     doc_id = 0;
-    reserve = Sale;
+    m_opType = Sale;
     updateWidgets();
 }
 
 /* При нажатии "Резерв" вызывается тот же метод, что и при продаже; для изменения набора запросов к БД используется
- * флаг reserve.
+ * флаг m_opType.
  */
 void tabSale::reserveButtonClicked()
 {
-    reserve = Reserve;
+    m_opType = Reserve;
 
     if(sale())
         return;
@@ -1079,7 +1038,7 @@ void sparePartsTable::resizeEvent(QResizeEvent *event)
     QTableView::resizeEvent(event);
     int i, j;
     int colNameWidth = 0;
-    int colWidths[] = {30,100,0,45,45,70,70,120,120,80};
+    int colWidths[] = {60,100,0,45,45,70,70,120,120,80};
 
     verticalHeader()->hide();
     colNameWidth = geometry().width();
@@ -1223,7 +1182,10 @@ void tabSale::test_scheduler2_handler()  // обработик таймера з
 
 void tabSale::test_updateWidgetsWithDocNum()
 {
+    p_instance.remove(doc_id);   // заменить указатель
     doc_id = testLineEdit->text().toInt();
+    p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
+    emit updateTabTitle(this);
     updateWidgets();
 }
 
@@ -1243,7 +1205,7 @@ void tabSale::test_addRandomItem()
 
         query->first();
         if(query->isValid())
-            addItemByUID(query->record().value(0).toInt());
+            tableModel->addItemByUID(query->record().value(0).toInt(), ui->comboBoxPriceCol->currentIndex());
     }
     delete query;
 }

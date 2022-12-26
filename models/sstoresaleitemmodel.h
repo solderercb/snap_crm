@@ -47,6 +47,7 @@ public:
     void setReturnPercent(const int);
     bool state();
     void setState(const State);
+    void setCancellationReason(const QString&);
     int user();
     void setUser(const int);
     QString unsaleReason();
@@ -61,6 +62,7 @@ public:
     bool unsale();
     bool free();
     bool isProfitable();
+    void setField(const int fieldNum, const QVariant value);
 private:
     SStoreItemModel *m_storeItem = nullptr;
     int m_itemId = 0;

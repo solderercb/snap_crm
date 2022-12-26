@@ -1,9 +1,15 @@
 #include "saletableitemdelegates.h"
 
-SaleTableItemDelegates::SaleTableItemDelegates(SSaleTableModel *model, QObject *parent) :
-    QStyledItemDelegate(parent),
-    tableModel(model)   // tableModel нужен для установки spinBox'у максимального значения, равного доступному кол-ву товаров
+SaleTableItemDelegates::SaleTableItemDelegates(QObject *parent) :
+    QStyledItemDelegate(parent)
 {
+
+}
+
+SaleTableItemDelegates::SaleTableItemDelegates(SSaleTableModel *model, QObject *parent) :
+    SaleTableItemDelegates(parent)
+{
+    setTableModel(model);
     // пример itemDelegate взят по https://wiki.qt.io/Combo_Boxes_in_Item_Views
 }
 
@@ -68,33 +74,60 @@ void SaleTableItemDelegates::setModelData(QWidget *editor, QAbstractItemModel *m
 
 void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
     if(index.column() == SStoreItemModel::SaleOpColumns::ColId )
     {
-        if(tableModel->modelState() != SSaleTableModel::StoreCancelled)
+        int sw = tableModel->tableMode() << 16 | tableModel->modelState() << 8 | index.data(SSaleTableModel::DataRoles::State).toInt() << 1 | index.data(SSaleTableModel::DataRoles::RecordType).toBool();
+        switch (sw)
         {
-            if(!index.data(SSaleTableModel::DataRoles::State).toBool())
-            {
-                // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
-                QStyleOptionButton button;
-                QRect r = option.rect;//getting the rect of the cell
-                int x,y,w,h;
-                x = r.left();//the X coordinate
-                y = r.top();//the Y coordinate
-                w = r.width();//button width
-                h = r.height();//button height
-                button.rect = QRect(x,y,w,h);
-                button.icon = QIcon(":/icons/light/1F5D1_32.png");
-                button.iconSize = QSize(16,16);
-//                button.text = "🗑"; // 🛠🛒🗙📦
-                button.state = QStyle::State_Enabled;
-
-                QApplication::style()->drawControl( QStyle::CE_PushButton, &button, painter);
-            }
+            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreNew << 8 | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreReserved << 8 | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreSold << 8 | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8 | SRepairSaleItemModel::State::Sold << 1 | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, RemovePart, painter); drawPixmap(option.rect, Part, painter); break;
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, RemoveWork, painter); drawPixmap(option.rect, Work, painter); drawPixmap(option.rect, AddPart, painter); break;
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreSold << 8 | SStoreSaleItemModel::Cancelled << 1 | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::Sold << 1 | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, Part, painter); break;
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, Work, painter); break;
         }
-        // Если   modelState() == 3, то ничего не отображаем
+        ;
     }
     else
         QStyledItemDelegate::paint(painter, option, index);
+}
+
+QRect SaleTableItemDelegates::pixmapRect(const QRect &delegateRect, const PixmapType p) const
+{
+    int x,y,w,h;
+    switch (p)
+    {
+        case RemoveWork: x = delegateRect.left() + PIXMAP_GAP; break;
+        case RemovePart:
+        case Work: x = delegateRect.left() + PIXMAP_GAP + (PIXMAP_W + PIXMAP_GAP); break;
+        case AddPart:
+        case Part: x = delegateRect.left() + PIXMAP_GAP + (PIXMAP_W + PIXMAP_GAP)*2; break;
+    }
+    y = delegateRect.top()+(delegateRect.height()-PIXMAP_W)/2;
+    w = PIXMAP_W;
+    h = PIXMAP_W;
+
+    return QRect(x,y,w,h);
+}
+
+void SaleTableItemDelegates::drawPixmap(const QRect &rect, PixmapType p, QPainter *painter) const
+{
+    QPixmap pixmap;
+    switch (p)
+    {
+        case RemoveWork:
+        case RemovePart: pixmap = QPixmap(":/icons/light/1F5D1_32.png"); break;
+        case Work: pixmap = QPixmap(":/icons/light/1F6E0_32.png"); break;
+        case AddPart: pixmap = QPixmap(":/icons/light/1F4E6_32.png"); break;
+        case Part: pixmap = QPixmap(":/icons/light/1F6D2_32.png"); break;
+    }
+//      🗑🛠🛒🗙📦
+    QApplication::style()->drawItemPixmap(painter, pixmapRect(rect, p), 1, pixmap.scaled(PIXMAP_W,PIXMAP_H));
 }
 
 bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
@@ -104,34 +137,42 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
         QMouseEvent * e = (QMouseEvent *)event;
         if( index.column() == SStoreItemModel::SaleOpColumns::ColId )
         {
-            if(tableModel->modelState() != SSaleTableModel::StoreCancelled)
+            int sw = tableModel->tableMode() << 16 | tableModel->modelState() << 8 | index.data(SSaleTableModel::DataRoles::State).toInt() << 1 | tableModel->index(index.row(), SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
+            switch (sw) // условия, при которых обработка не требуется
             {
-                if(!index.data(SSaleTableModel::DataRoles::State).toBool())
-                {
-                    // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
+                case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreCancelled << 8 | SStoreSaleItemModel::State::Cancelled << 1 | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreReserved << 8 | SStoreSaleItemModel::State::Cancelled << 1 | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreSold << 8 | SStoreSaleItemModel::State::Cancelled << 1 | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::Sold << 1 | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Work): return true;
+            }
+
+            // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
 #if QT_VERSION >= 0x060000
-                    int clickX = e->position().x();
-                    int clickY = e->position().y();
+            int clickX = e->position().x();
 #else
-                    int clickX = e->localPos().x();
-                    int clickY = e->localPos().y();
+            int clickX = e->localPos().x();
 #endif
 
-                    QRect r = option.rect;//getting the rect of the cell
-                    int x,y,w,h;
-                    x = r.left();//the X coordinate
-                    y = r.top();//the Y coordinate
-                    w = r.width();//button width
-                    h = r.height();//button height
+            //  0                     10                  20                  30                  40                  50
+            //  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+            // |gap|        p i x m a p            |gap|        p i x m a p            |gap|        p i x m a p            |gap|
+            int button = 1; // определение номера нажатой кнопки начинается со средней
+            int button_x = PIXMAP_GAP+button*(PIXMAP_W + PIXMAP_GAP); // step 0: 2+1*(16+2)=20; clickX = 18
+            while(button_x >= 0 && button_x <= option.rect.width())
+            {
+                if(clickX >= (button_x - PIXMAP_GAP/2) && clickX < (button_x + PIXMAP_W + PIXMAP_GAP/2))
+                    break;
 
-                    if( clickX > x && clickX < x + w )
-                        if( clickY > y && clickY < y + h )
-                        {
-                            tableModel->removeRowHandler(index.row(), index.data().toInt());
-                        }
-                }
+                if(clickX - button_x >= 0)
+                    button++;
+                else
+                    button--;
+                button_x = PIXMAP_GAP+button*(PIXMAP_W + PIXMAP_GAP);
             }
-            // Если   modelState() == 3, то никакой реакции
+
+            tableModel->buttonHandler(button, index.row());
         }
         else
         {
@@ -153,7 +194,6 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
         }
     }
     return QStyledItemDelegate::editorEvent(event, model, option, index);
-    return true;
 }
 
 bool SaleTableItemDelegates::event(QEvent *event)
@@ -281,4 +321,10 @@ void SaleTableItemDelegates::setModelDataFromDoubleSpinBox(QWidget *editor, QAbs
     QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
     Q_ASSERT(sb);
     model->setData(index, sb->value(), Qt::EditRole);
+}
+
+void SaleTableItemDelegates::setTableModel(SSaleTableModel *model)
+{
+    tableModel = model;
+    m_tableMode = tableModel->tableMode();
 }

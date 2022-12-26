@@ -4,31 +4,42 @@ SWorkModel::SWorkModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "works";
     i_obligatoryFields << "user" << "name" << "warranty";
+    i_logRecord->setType(SLogRecordModel::Repair);
 }
 
 SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
     SWorkModel(parent)
 {
-    i_id = record.at(ColId)->data(Qt::DisplayRole).toInt();
+    i_id = record.at(SStoreItemModel::SaleOpColumns::ColId)->data(Qt::DisplayRole).toInt();
 
-    m_user = record.at(ColUser)->data(Qt::DisplayRole).toInt();
-    m_repair = record.at(ColRepairId)->data(Qt::DisplayRole).toInt();
-    m_documentId = record.at(ColDocumentId)->data(Qt::DisplayRole).toInt();
-    m_name = record.at(ColName)->data(Qt::DisplayRole).toString();
-    m_price = record.at(ColPrice)->data(Qt::DisplayRole).toFloat();
-    m_count = record.at(ColCount)->data(Qt::DisplayRole).toInt();
-    m_warranty = record.at(ColWarranty)->data(Qt::DisplayRole).toInt();
-    m_priceId = record.at(ColPriceId)->data(Qt::DisplayRole).toInt();
-    m_isPay = record.at(ColIsPay)->data(Qt::DisplayRole).toBool();
-    i_createdUtc = record.at(ColAdded)->data(Qt::DisplayRole).toDateTime();
-    m_type = record.at(ColType)->data(Qt::DisplayRole).toInt();
-    m_payRepair = record.at(ColPayRepair)->data(Qt::DisplayRole).toInt();
-    m_payRepair_quick = record.at(ColPayRepairQuick)->data(Qt::DisplayRole).toInt();
-    // TODO: сделать выборочную передачу значений: для не новой РН нужно передавать только изменённые данные
-//    if(i_id == 0)
-//    {
-//    }
+    m_user = record.at(SStoreItemModel::SaleOpColumns::ColUser)->data(Qt::DisplayRole).toInt();
+    m_repair = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
+    m_name = record.at(SStoreItemModel::SaleOpColumns::ColName)->data(Qt::DisplayRole).toString();
+    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
+    m_count = record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
+    m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
+    m_priceId = record.at(SStoreItemModel::SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt();
+    i_createdUtc = record.at(SStoreItemModel::SaleOpColumns::ColCreated)->data(Qt::DisplayRole).toDateTime();
+//    m_documentId = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
+//    m_isPay = record.at(SStoreItemModel::SaleOpColumns::)->data(Qt::DisplayRole).toBool();
+//    m_type = record.at(SStoreItemModel::SaleOpColumns::Col)->data(Qt::DisplayRole).toInt();
 
+    if(!i_id)
+    {
+        i_logRecord->setText(tr("Добавлена работа: %1, стоимость %2 из ремонта №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
+        i_valuesMap.insert("pay_repair", userDbData->value("pay_repair"));
+        i_valuesMap.insert("pay_repair_quick", userDbData->value("pay_repair_quick"));
+    }
+
+    for(int i = 1; i < record.count(); i++) // в нулевом столбце id записи в таблице, он не изменяется средствами программы
+    {
+        if(!record.at(i)->data(Qt::UserRole+1).toBool())
+            continue;
+
+        setField(i, record.at(i)->data(Qt::DisplayRole));
+        record.at(i)->setData(0, Qt::UserRole+1);   // снятие пометки изменённого поля
+    }
+    record.at(0)->setData(0, Qt::UserRole+1);   // снятие пометки изменённой строки
 }
 
 int SWorkModel::id()
@@ -173,7 +184,28 @@ bool SWorkModel::update()
 
 bool SWorkModel::remove()
 {
+    bool ret = 1;
 
+    i_logRecord->setText(tr("Удалена работа: %1, стоимость %2 из ремонта №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
+    ret &= del();
+    ret &= i_logRecord->commit();
+
+    return ret;
+}
+
+void SWorkModel::setField(const int fieldNum, const QVariant value)
+{
+    switch(fieldNum)
+    {
+        case SStoreItemModel::ColUser: setUser(value.toInt()); break;
+        case SStoreItemModel::ColObjId: setRepair(value.toInt()); break;
+        case SStoreItemModel::ColName: setName(value.toString()); break;
+        case SStoreItemModel::ColPrice: setPrice(value.toFloat()); break;
+        case SStoreItemModel::ColCount: setCount(value.toInt()); break;
+        case SStoreItemModel::ColWarranty: setWarranty(value.toInt()); break;
+        case SStoreItemModel::ColItemId: setPriceId(value.toInt()); break;
+        case SStoreItemModel::ColCreated: setCreated(value.toDateTime()); break;
+    }
 }
 
 bool SWorkModel::commit()
@@ -188,6 +220,7 @@ bool SWorkModel::commit()
         setPayRepairQuick(userDbData->value("pay_repair_quick").toInt());
         insert();
     }
+    i_logRecord->commit();
 
     return i_nErr;
 }
