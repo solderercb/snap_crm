@@ -81,7 +81,9 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     statusesProxyModel = new SSortFilterProxyModel;
     statusesProxyModel->setSourceModel(statusesModel);
     worksAndPartsModel = new SSaleTableModel();
+    worksAndPartsModel->setPriceColumn(0);
     connect(worksAndPartsModel, SIGNAL(amountChanged(float,float,float)), this, SLOT(updateTotalSumms(float,float,float)));
+    connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
     itemDelagates = new SaleTableItemDelegates(worksAndPartsModel, ui->tableViewWorksAndSpareParts);
     commentsModel = new commentsDataModel();
 //    reloadRepairData();
@@ -124,8 +126,10 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     if(repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair )
         createGetOutDialog();
     connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(updateWidgets()));
+    connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItem);
 #else
     ui->pushButtonManualUpdateRepairData->setHidden(true);
+    ui->dbgBtnAddRandomPart->setHidden(true);
 #endif
 }
 
@@ -183,7 +187,7 @@ void tabRepair::reloadRepairData()
         worksAndPartsModel->setClient(m_clientId);
     }
     additionalFieldsModel->load(repair_id);
-    worksAndPartsModel->loadWorkshopSale(repair_id);
+    worksAndPartsModel->repair_loadTable(repair_id);
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
 
     updateStatesModel(repairModel->state());
@@ -279,7 +283,7 @@ void tabRepair::updateWidgets()
     ui->doubleSpinBoxAmount->setReadOnly(m_summRO || modelRO);
     ui->doubleSpinBoxAmount->blockSignals(false);
 //    ui->pushButtonSaveDiagAmount->setEnabled(!m_diagRO && !modelRO);
-//    ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO);
+    ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO);
 //    ui->pushButtonAddWorkFromPriceList->setEnabled(!m_worksRO && !modelRO);
 //    ui->pushButtonAdmEditWorks->setEnabled(m_worksRO && !modelRO);
 //    ui->pushButtonCreateInvoice->setEnabled(!modelRO);
@@ -570,10 +574,12 @@ void tabRepair::buttonClientClicked()
     emit createTabClient(m_clientId);
 }
 
-void tabRepair::worksTreeDoubleClicked(QModelIndex item)
+void tabRepair::tableRowDoubleClick(QModelIndex tableIndex)
 {
-    //    emit this->worksTreeDoubleClicked(ui->tableWidget->item(item->row(), item->column())->text().toInt());
+    if(worksAndPartsModel->value(tableIndex.row(), SStoreItemModel::SaleOpColumns::ColRecordType).toBool())
+        emit createTabSparePart(worksAndPartsModel->value(tableIndex.row(), SStoreItemModel::SaleOpColumns::ColItemId).toInt());
 }
+
 
 void tabRepair::saveState()
 {
@@ -773,6 +779,11 @@ void tabRepair::diagAmountSaved()
     ui->pushButtonSaveDiagAmount->setEnabled(false);
 }
 
+void tabRepair::buttonAddItemClicked()
+{
+    emit createTabSelectItem(1, this);
+}
+
 void tabRepair::comboBoxStateIndexChanged(int index)
 {
     if(save_state_on_close)
@@ -892,7 +903,7 @@ void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
             j++;
         }
     }
-    colNameWidth -= 2; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
+    colNameWidth -= 15; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах (при 125% норм -15)
     if (verticalScrollBar()->isVisible())
         setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth - verticalScrollBar()->width());
     else

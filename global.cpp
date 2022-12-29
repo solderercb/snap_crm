@@ -17,6 +17,7 @@ QSqlQueryModel *warehousesModel = new QSqlQueryModel;
 SSqlQueryModel *allUsersModel = new SSqlQueryModel;
 QMap<int, QString> *allUsersMap = new QMap<int, QString>;
 SSqlQueryModel *usersModel = new SSqlQueryModel;
+SSqlQueryModel *usersSalaryTaxesModel = new SSqlQueryModel;
 SSqlQueryModel *managersModel = new SSqlQueryModel;
 SSqlQueryModel *engineersModel = new SSqlQueryModel;
 SSqlQueryModel *itemBoxesModel = new SSqlQueryModel;
@@ -168,16 +169,22 @@ void initGlobalModels()
     warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     warehousesModel->setObjectName("warehousesModel");
     allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
+    allUsersModel->setDisplayRoleColumn("username");
     allUsersModel->setObjectName("allUsersModel");
     for(int i = 0; i < allUsersModel->rowCount(); i++)
     {
         allUsersMap->insert(allUsersModel->record(i).value("id").toInt(), allUsersModel->record(i).value("username").toString());
     }
     usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
+    usersModel->setDisplayRoleColumn("username");
     usersModel->setObjectName("usersModel");
+    usersSalaryTaxesModel->setQuery(QUERY_SEL_USERS_SALARY_TAXES, QSqlDatabase::database("connMain"));
+    usersSalaryTaxesModel->setObjectName("usersSalaryTaxesModel");
     managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database("connMain"));
+    managersModel->setDisplayRoleColumn("username");
     managersModel->setObjectName("managersModel");
     engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
+    engineersModel->setDisplayRoleColumn("username");
     engineersModel->setObjectName("engineersModel");
     itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
     itemBoxesModel->setObjectName("itemBoxesModel");

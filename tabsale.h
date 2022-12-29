@@ -52,6 +52,7 @@ signals:
     void createTabClient(int);
     void createTabSparePart(int);
     void generatePrintout(QMap<QString, QVariant> report_vars);
+    void createTabSelectItem(int, QWidget*);
 
 public:
     enum OpType {Sale = 0, Reserve = 1, SaleReserved = 2};
@@ -127,7 +128,6 @@ private slots:
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;
     void test_updateWidgetsWithDocNum();
-    void test_addRandomItem();
 #endif
 };
 

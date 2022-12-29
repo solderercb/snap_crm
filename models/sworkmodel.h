@@ -14,19 +14,19 @@ public:
     int id();
     void load(const int);
     int user();
-    void setUser(const int);
+    void setUser(const int id, const QVariant oldValue = QVariant());
     int repair();
     void setRepair(const int);
     int documentId();
     void setDocumentId(const int);
     QString name();
-    void setName(const QString);
+    void setName(const QString name, const QVariant oldValue = QVariant());
     float price();
-    void setPrice(const float);
+    void setPrice(const float price, const QVariant oldValue = QVariant());
     int count();
-    void setCount(const int);
+    void setCount(const int count, const QVariant oldValue = QVariant());
     int warranty();
-    void setWarranty(const int);
+    void setWarranty(const int warranty, const QVariant oldValue = QVariant());
     int priceId();
     void setPriceId(const int);
     bool isPay();
@@ -38,9 +38,8 @@ public:
     void setPayRepair(const int);
     int payRepairQuick();
     void setPayRepairQuick(const int);
-    bool update();
     bool remove();
-    void setField(const int fieldNum, const QVariant value);
+    void setField(const int fieldNum, const QVariant value, const QVariant oldValue = QVariant());
     bool commit();
 private:
     int m_user;

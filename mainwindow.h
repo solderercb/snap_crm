@@ -108,6 +108,7 @@ private slots:
     void createTabCashMoveExch();
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
+    void createTabWarehouseItems(int type = 0, QWidget *caller = nullptr);
     void closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);

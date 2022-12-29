@@ -21,18 +21,16 @@ SaleTableItemDelegates::~SaleTableItemDelegates()
 
 QWidget *SaleTableItemDelegates::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if( tableModel->index(index.row(), SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == SSaleTableModel::Item )
-    {}
     switch (index.column())
     {
         case SStoreItemModel::SaleOpColumns::ColCount:
-            return createSpinBox(parent, index);
+            return createSpinBox(parent, index); break;
         case SStoreItemModel::SaleOpColumns::ColPrice:
-            return createDoubleSpinBox(parent);
+            return createDoubleSpinBox(parent); break;
         case SStoreItemModel::SaleOpColumns::ColWarranty:
-            return createComboBox(parent, warrantyTermsModel);
+            return createComboBox(parent, warrantyTermsModel); break;
         case SStoreItemModel::SaleOpColumns::ColUser:
-            return createComboBox(parent, allUsersModel);
+            return createComboBox(parent, usersModel); break;
         default:
             return QStyledItemDelegate::createEditor(parent, option, index);
     }
@@ -80,16 +78,14 @@ void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem
         int sw = tableModel->tableMode() << 16 | tableModel->modelState() << 8 | index.data(SSaleTableModel::DataRoles::State).toInt() << 1 | index.data(SSaleTableModel::DataRoles::RecordType).toBool();
         switch (sw)
         {
-            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreNew << 8 | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreReserved << 8 | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreSold << 8 | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8 | SRepairSaleItemModel::State::Sold << 1 | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, RemovePart, painter); drawPixmap(option.rect, Part, painter); break;
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, RemoveWork, painter); drawPixmap(option.rect, Work, painter); drawPixmap(option.rect, AddPart, painter); break;
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreSold << 8 | SStoreSaleItemModel::Cancelled << 1 | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::Sold << 1 | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, Part, painter); break;
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, Work, painter); break;
+            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreNew << 8                                                       | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreReserved << 8                                                  | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8                                                      | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8                                                     | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, RemovePart, painter); drawPixmap(option.rect, Part, painter); break;
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8                                                     | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, RemoveWork, painter); drawPixmap(option.rect, Work, painter); drawPixmap(option.rect, AddPart, painter); break;
+            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8     | SStoreSaleItemModel::Cancelled << 1            | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, Part, painter); break;
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, Work, painter); break;
         }
         ;
     }
@@ -140,12 +136,11 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
             int sw = tableModel->tableMode() << 16 | tableModel->modelState() << 8 | index.data(SSaleTableModel::DataRoles::State).toInt() << 1 | tableModel->index(index.row(), SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
             switch (sw) // условия, при которых обработка не требуется
             {
-                case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreCancelled << 8 | SStoreSaleItemModel::State::Cancelled << 1 | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreReserved << 8 | SStoreSaleItemModel::State::Cancelled << 1 | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::StoreSale << 16 | SSaleTableModel::StoreSold << 8 | SStoreSaleItemModel::State::Cancelled << 1 | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::Sold << 1 | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8 | SRepairSaleItemModel::State::RepairLinked << 1 | SSaleTableModel::RecordType::Work): return true;
+                case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreCancelled << 8 | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreReserved << 8  | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8      | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                      | SSaleTableModel::RecordType::Item):
+                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                      | SSaleTableModel::RecordType::Work): return true;
             }
 
             // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012

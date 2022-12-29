@@ -215,7 +215,7 @@ void getOutDialog::getOut()
             else
                 repairModel->setRejectReason(ui->textEditRejectReason->toPlainText());
         }
-        saleTableModel->saveTablesWorkshop(SSaleTableModel::RepairOpType::Sale);
+        saleTableModel->repair_saveTables(SSaleTableModel::RepairOpType::Sale);
         repairModel->commit();
         repairStatusLog->setStatus(newState);
         repairStatusLog->setManager(repairModel->currentManager());

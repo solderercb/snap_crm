@@ -24,19 +24,12 @@ SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
 //    m_isPay = record.at(SStoreItemModel::SaleOpColumns::)->data(Qt::DisplayRole).toBool();
 //    m_type = record.at(SStoreItemModel::SaleOpColumns::Col)->data(Qt::DisplayRole).toInt();
 
-    if(!i_id)
-    {
-        i_logRecord->setText(tr("Добавлена работа: %1, стоимость %2 из ремонта №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
-        i_valuesMap.insert("pay_repair", userDbData->value("pay_repair"));
-        i_valuesMap.insert("pay_repair_quick", userDbData->value("pay_repair_quick"));
-    }
-
     for(int i = 1; i < record.count(); i++) // в нулевом столбце id записи в таблице, он не изменяется средствами программы
     {
         if(!record.at(i)->data(Qt::UserRole+1).toBool())
             continue;
 
-        setField(i, record.at(i)->data(Qt::DisplayRole));
+        setField(i, record.at(i)->data(Qt::DisplayRole), record.at(i)->data(Qt::UserRole));
         record.at(i)->setData(0, Qt::UserRole+1);   // снятие пометки изменённого поля
     }
     record.at(0)->setData(0, Qt::UserRole+1);   // снятие пометки изменённой строки
@@ -57,9 +50,14 @@ int SWorkModel::user()
     return m_user;
 }
 
-void SWorkModel::setUser(const int user)
+void SWorkModel::setUser(const int id, const QVariant oldValue)
 {
-    i_valuesMap.insert("user", user);
+    if(oldValue.isValid())
+        appendLogText(tr("Исполнитель работы изменён с %1 на %2").arg(usersModel->getDisplayRole(oldValue.toInt())).arg(usersModel->getDisplayRole(id)));
+    else
+        appendLogText(tr("Исполнителем работы назначен %1").arg(usersModel->getDisplayRole(id, 1)));
+
+    i_valuesMap.insert("user", id);
 }
 
 int SWorkModel::repair()
@@ -87,8 +85,13 @@ QString SWorkModel::name()
     return m_name;
 }
 
-void SWorkModel::setName(const QString name)
+void SWorkModel::setName(const QString name, const QVariant oldValue)
 {
+    if(!oldValue.toString().isEmpty())
+        appendLogText(tr("Название работы изменено с \"%1\" на \"%2\"").arg(oldValue.toString(), name));
+    else if(i_id)   // для новой произвольной работы или работы из прайс-листа запись в журнал не нужна
+        appendLogText(tr("Название работы изменено на \"%1\"").arg(name));
+
     i_valuesMap.insert("name", name);
 }
 
@@ -97,8 +100,12 @@ float SWorkModel::price()
     return m_price;
 }
 
-void SWorkModel::setPrice(const float price)
+void SWorkModel::setPrice(const float price, const QVariant oldValue)
 {
+    if(oldValue.isValid())
+        appendLogText(tr("Стоимость работы изменёна с %1 на %2").arg(sysLocale.toCurrencyString(oldValue.toFloat())).arg(sysLocale.toCurrencyString(price)));
+    else if(i_id)
+        appendLogText(tr("Установлена стоимость работы %1").arg(sysLocale.toCurrencyString(price)));
     i_valuesMap.insert("price", price);
 }
 
@@ -107,8 +114,11 @@ int SWorkModel::count()
     return m_count;
 }
 
-void SWorkModel::setCount(const int count)
+void SWorkModel::setCount(const int count, const QVariant oldValue)
 {
+    if(oldValue.isValid())
+        appendLogText(tr("Кол-во изменёно с \"%1\" на \"%2\"").arg(oldValue.toInt()).arg(count));
+
     i_valuesMap.insert("count", count);
 }
 
@@ -117,8 +127,15 @@ int SWorkModel::warranty()
     return m_warranty;
 }
 
-void SWorkModel::setWarranty(const int warranty)
+void SWorkModel::setWarranty(const int warranty, const QVariant oldValue)
 {
+    if(!oldValue.toString().isEmpty())
+        appendLogText(tr("Срок гарантии изменён с \"%1\" на \"%2\"").arg(warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1)).arg(warrantyTermsModel->getDisplayRole(warranty, 1)));
+    else if(i_id)
+        appendLogText(tr("Срок гарантии установлен \"%1\"").arg(warrantyTermsModel->getDisplayRole(warranty, 1)));
+    else
+        appendLogText(tr("Установлен срок гарантии по умолчанию (\"%1\")").arg(warrantyTermsModel->getDisplayRole(warranty, 1)));
+
     i_valuesMap.insert("warranty", warranty);
 }
 
@@ -127,9 +144,12 @@ int SWorkModel::priceId()
     return m_priceId;
 }
 
-void SWorkModel::setPriceId(const int price_id)
+void SWorkModel::setPriceId(const int id)
 {
-    i_valuesMap.insert("price_id", price_id);
+    if(id)
+        i_valuesMap.insert("price_id", id);
+    else
+        i_valuesMap.insert("price_id", QVariant());
 }
 
 bool SWorkModel::isPay()
@@ -177,32 +197,27 @@ void SWorkModel::setPayRepairQuick(const int pay_repair_quick)
     i_valuesMap.insert("pay_repair_quick", pay_repair_quick);
 }
 
-bool SWorkModel::update()
-{
-
-}
-
 bool SWorkModel::remove()
 {
     bool ret = 1;
 
-    i_logRecord->setText(tr("Удалена работа: %1, стоимость %2 из ремонта №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
+    i_logRecord->setText(tr("Удалена работа \"%1\" стоимостью %2 из ремонта №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
     ret &= del();
     ret &= i_logRecord->commit();
 
     return ret;
 }
 
-void SWorkModel::setField(const int fieldNum, const QVariant value)
+void SWorkModel::setField(const int fieldNum, const QVariant value, const QVariant oldValue)
 {
     switch(fieldNum)
     {
-        case SStoreItemModel::ColUser: setUser(value.toInt()); break;
+        case SStoreItemModel::ColUser: setUser(value.toInt(), oldValue); break;
         case SStoreItemModel::ColObjId: setRepair(value.toInt()); break;
-        case SStoreItemModel::ColName: setName(value.toString()); break;
-        case SStoreItemModel::ColPrice: setPrice(value.toFloat()); break;
-        case SStoreItemModel::ColCount: setCount(value.toInt()); break;
-        case SStoreItemModel::ColWarranty: setWarranty(value.toInt()); break;
+        case SStoreItemModel::ColName: setName(value.toString(), oldValue); break;
+        case SStoreItemModel::ColPrice: setPrice(value.toFloat(), oldValue); break;
+        case SStoreItemModel::ColCount: setCount(value.toInt(), oldValue); break;
+        case SStoreItemModel::ColWarranty: setWarranty(value.toInt(), oldValue); break;
         case SStoreItemModel::ColItemId: setPriceId(value.toInt()); break;
         case SStoreItemModel::ColCreated: setCreated(value.toDateTime()); break;
     }
@@ -211,16 +226,20 @@ void SWorkModel::setField(const int fieldNum, const QVariant value)
 bool SWorkModel::commit()
 {
     if(i_id)
+    {
+        qDebug().nospace() << "[" << this << "] commit() [update]";
         update();
+    }
     else
     {
-        setUser(userDbData->value("id").toInt());
+        qDebug().nospace() << "[" << this << "] commit() [insert]";
+        appendLogText(tr("Добавлена работа \"%1\" стоимостью %2 в ремонт №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
         setCreated(QDateTime::currentDateTime());
-        setPayRepair(userDbData->value("pay_repair").toInt());
-        setPayRepairQuick(userDbData->value("pay_repair_quick").toInt());
+        setPayRepair(usersSalaryTaxesModel->value(userDbData->value("id").toInt(), "id", "pay_repair").toInt());
+        setPayRepairQuick(usersSalaryTaxesModel->value(userDbData->value("id").toInt(), "id", "pay_repair_quick").toInt());
         insert();
     }
-    i_logRecord->commit();
+    commitLogs();
 
     return i_nErr;
 }

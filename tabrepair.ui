@@ -1282,6 +1282,13 @@ QListView::item  {
            </property>
           </widget>
          </item>
+         <item row="21" column="1">
+          <widget class="QPushButton" name="dbgBtnAddRandomPart">
+           <property name="text">
+            <string>Add random part</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>

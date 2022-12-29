@@ -311,6 +311,7 @@ void MainWindow::createTabRepair(int repair_id)
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(updateTabTitle(QWidget*)), this, SLOT(updateTabTitle(QWidget*)));
+    QObject::connect(subwindow,SIGNAL(createTabSelectItem(int,QWidget*)), this, SLOT(createTabWarehouseItems(int,QWidget*)));
 }
 
 void MainWindow::createTabRepairNew()
@@ -393,6 +394,11 @@ void MainWindow::createTabDocuments(int type, QWidget *caller)
 void MainWindow::createTabInvoices(int type, QWidget *caller)
 {
     qDebug().nospace() << "[MainWindow] createTabInvoices()";
+}
+
+void MainWindow::createTabWarehouseItems(int type, QWidget *caller)
+{
+    qDebug().nospace() << "TODO: [MainWindow] createTabWarehouseItems()";
 }
 
 void MainWindow::reactivateCallerTab(QWidget *caller)
@@ -783,8 +789,8 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        qDebug() << rand_rep_id.value(0);
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
-    createTabSale(0);
-//    createTabRepair(25463);
+//    createTabSale(0);
+    createTabRepair(25129);
 //    createTabSale(16316);
 //    if (test_scheduler_counter < 375)
 //    {

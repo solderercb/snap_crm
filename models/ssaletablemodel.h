@@ -13,6 +13,7 @@
 #ifdef QT_DEBUG
 #include <QRandomGenerator>
 #endif
+#include "squerylog.h"
 #include "../global.h"
 #include "../com_sql_queries.h"
 #include "models/sstoresaleitemmodel.h"
@@ -24,10 +25,10 @@ class SSaleTableModel : public QStandardItemModel
 {
     Q_OBJECT
 public:
-    enum State {StoreNew = 0, StoreSold = 1, StoreReserved = 2, StoreCancelled = 3, WorkshopRW = 4, WorkshopRO = 5};
+    enum State {StoreNew = 0, StoreSold = 1, StoreReserved = 2, StoreCancelled = 3, WorkshopRW = 4, WorkshopRO = 5, WorkshopAdm = 6};
     enum class StoreOpType {Reserve = 0, Sale, Unsale, FreeReserved};
     enum class RepairOpType {Reserve = 0, Link, Sale, Unsale, Unlink, Update};
-    enum DataRoles {QtyBackup = Qt::UserRole, Changed = Qt::UserRole + 1, State = Qt::UserRole + 2, RecordType = Qt::UserRole + 3};
+    enum DataRoles {OldValue = Qt::UserRole, Changed = Qt::UserRole + 1, State = Qt::UserRole + 2, RecordType = Qt::UserRole + 3};
     enum RecordType {Work = 0, Item = 1};
     enum TablesSet {StoreSale = 0, WorkshopSale = 1};
     enum EditStrategy {OnFieldChange = 0, OnRowChange = 1, OnManualSubmit = 2};
@@ -46,11 +47,11 @@ public:
     bool addWorkByUID(const int uid, const int priceOption);
     bool addItemByUID(const int uid, const int priceOption, const int count = 1);
     bool addItemFromBasket(const int id, const int qty = 0, const int priceOpt = 0);
-    void insertRepairItem(const int);
+    void insertrepair_item(const int);
     void removeRowHandler(const int, const int);
     void buttonHandler(const int buttonNum, const int row);
-    void storeSaleRemoveRow(const int, const int);
-    void repairSaleRemoveRow(const int, const int);
+    void store_markRowRemove(const int, const int);
+    void repair_markRowRemove(const int, const int);
     QMap<int, int>* getPendingRemoveList();
     int pendingRemoveItemsCount();
     void setHorizontalHeaderLabels(const QStringList &labels);
@@ -59,44 +60,51 @@ public:
     QString amountItemsLocale();
     QString amountWorksLocale();
     QMap<QString, int> *fields;
-    void setPriceColumn(QSqlQuery*);
-    bool loadStoreSale(const int);
-    bool loadWorkshopSale(const int);
+    void setPriceColumn(const int index);
+    bool store_loadTable(const int);
+    bool repair_loadTable(const int);
     void setClient(int);
     void unsetClient();
     void setDocumentId(int);
     void setRepairId(int);
     void setDocumentState(int state){m_documentState = state;};
     bool commit();
-    bool saveTablesStore(StoreOpType type = StoreOpType::Sale);
-    bool saveTablesWorkshop();
-    bool saveTablesWorkshop(RepairOpType operation);
+    bool store_saveTables(StoreOpType type = StoreOpType::Sale);
+    bool repair_saveTables();
+    bool repair_saveTables(RepairOpType operation);
+    bool repair_autoSaveTables();
     bool reserveItems();
     bool unsaleItems();
     bool unsaleItems(const QString&);
     void setExtraUnsaleReason(const QString&);
     bool freeItems();
-    bool storeBackOutItems(StoreOpType);
-    bool repairRemoveRows();
-    bool repairRemoveItems();
-    bool repairRemoveWorks();
+    bool store_backOutItems(StoreOpType);
+    bool repair_removeRows();
+    bool repair_removeItems();
+    bool repair_removeWorks();
     void sale();
     int itemsAffected();
-    void storeMarkAllItemsToRemove(StoreOpType);
-    SStoreSaleItemModel* storeItem(const int);
-    SRepairSaleItemModel* repairItem(const int);
-    SWorkModel* repairWork(const int);
+    void store_markAllItemsToRemove(StoreOpType);
+    SStoreSaleItemModel* store_item(const int);
+    SRepairSaleItemModel* repair_item(const int);
+    SWorkModel* repair_work(const int);
     bool integrityStatus();
     int tableMode();
     void setTableMode(const TablesSet mode = TablesSet::StoreSale);
-    bool saleRepairItems();
     bool isColumnHidden(const int);
     int editStrategy();
+    void setEditStrategy(const int);
+    bool isWarranty();
+    void setIsWarranty(const bool);
+#ifdef QT_DEBUG
+    void dbgAddRandomItem();
+#endif
 
 signals:
     void dataChanged();
     void amountChanged(float, float, float);
     void modelReset();
+    void addItem();
 
 private:
     QSqlQueryModel *m_queryData;
@@ -108,7 +116,7 @@ private:
     QMap<int, int> *m_itemsPendingRemoveList;
     QMap<int, int> *m_worksPendingRemoveList;
     QMap<int, int> *m_itemsPendingSplitList;
-    QString m_priceFieldName = "`price2`";
+    int m_priceIndex = 1; // по умолчанию "Цена розница" ("`price2`")
     bool m_amountChangedSignalFilter = 0;
     QString m_extraUnsaleReason;
     bool m_tableMode = TablesSet::StoreSale;
@@ -116,12 +124,14 @@ private:
     float m_amountItems = 0, m_amountWorks = 0, m_amountTotal = 0;
     int m_currentIndex = -1;
     int m_lastHandledWorkId = -1;
+    bool m_isWarranty = 0;
     QList<QStandardItem *> row(int) const;
 
     // названия столбцов по-умолчанию; подробнее см. в комментарии к методу SaleTableModel::setHorizontalHeaderLabels
     QStringList m_fieldsDep = {"id", "UID", "name", "count", "avail", "price", "summ", "box", "sn", "warranty", "user", "is_realization", "return_percent", "state", "notes", "item_id", "in_price", "obj_id", "dealer", "buyer", "created", "work_id", "is_item"};
     int m_hiddenColumns = 0x00000000;
     int getItemInsertionRow();
+    int getParentWorkRow(const int itemRow);
     bool recordType(const int row);
     void setItemWorkId(const int row, const int workId);
 

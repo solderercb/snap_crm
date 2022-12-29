@@ -47,6 +47,7 @@ extern QSqlQueryModel *warehousesModel;
 extern SSqlQueryModel *allUsersModel;
 extern QMap<int, QString> *allUsersMap;
 extern SSqlQueryModel *usersModel;
+extern SSqlQueryModel *usersSalaryTaxesModel;
 extern SSqlQueryModel *managersModel;
 extern SSqlQueryModel *engineersModel;
 extern SSqlQueryModel *itemBoxesModel;

@@ -99,6 +99,8 @@ signals:
     void createTabPrevRepair(int);
     void generatePrintout(QMap<QString,QVariant>);
     void createTabClient(int);
+    void createTabSparePart(int);
+    void createTabSelectItem(int, QWidget*);
 
 public:
     explicit tabRepair(int rep_id, MainWindow *parent = nullptr);
@@ -165,7 +167,7 @@ private:
 private slots:
     void reloadRepairData();
     void updateWidgets();
-    void worksTreeDoubleClicked(QModelIndex);
+    void tableRowDoubleClick(QModelIndex);
     void saveState();
     void saveState(int);
     void comboBoxStateIndexChanged(int);
@@ -190,6 +192,7 @@ private slots:
     void spinBoxAmountEditingFinished();
     void saveDiagAmount();
     void diagAmountSaved();
+    void buttonAddItemClicked();
 #ifdef QT_DEBUG
     void test_scheduler_handler(){};
     void test_scheduler2_handler(){};

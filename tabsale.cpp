@@ -157,6 +157,7 @@ void tabSale::updateWidgets()
             ui->checkBoxAnonymous->setChecked(true);
 
         ui->comboBoxPriceCol->setEnabled(false);
+        ui->comboBoxPriceCol->setCurrentIndex(docModel->priceOptionIndex());
         ui->checkBoxAnonymous->setEnabled(false);
         ui->lineEditComment->setText(docModel->notes());
         ui->lineEditComment->setReadOnly(true);
@@ -187,7 +188,7 @@ void tabSale::updateWidgets()
             ui->buttonReserveCancel->show();
             ui->buttonSaleMore->show();
             ui->buttonSale->show();
-            tableModel->loadStoreSale(doc_id);
+            tableModel->store_loadTable(doc_id);
 #ifdef QT_DEBUG
             ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toFloat(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2)); // это для отладки
 #else
@@ -211,7 +212,7 @@ void tabSale::updateWidgets()
             ui->labelTrack->hide();
             ui->lineEditTrack->hide();
             tableModel->setModelState(SSaleTableModel::StoreCancelled);
-            tableModel->loadStoreSale(doc_id);
+            tableModel->store_loadTable(doc_id);
             ui->lineEditTakeIn->setText(sysLocale.toString(0.00, 'f', 2));
         }
         else    // если открыта проведённая РН
@@ -237,7 +238,7 @@ void tabSale::updateWidgets()
                 ui->groupBoxAdm->hide();
             }
             tableModel->setModelState(SSaleTableModel::StoreSold);
-            tableModel->loadStoreSale(doc_id);
+            tableModel->store_loadTable(doc_id);
             ui->lineEditTotal->setText(docModel->amountLocal());  // устанавливать суммы нужно только после заполнения таблицы
             ui->lineEditTakeIn->setReadOnly(true);
             ui->lineEditTakeIn->setText(tableModel->amountTotalLocale());  // тут применю хитрость: поля будут заполняться из разных "источников" и, в случае возврата товаров, сравниваться
@@ -560,13 +561,7 @@ void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
 void tabSale::selectPriceCol(int comboBoxIndex)
 {
     if(tableModel->modelState() == SSaleTableModel::State::StoreNew || tableModel->modelState() == SSaleTableModel::State::StoreReserved)
-    {
-        QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-
-        query->prepare(QUERY_SEL_STORE_ITEMS_ITEM_PRICE(priceColModel->index(comboBoxIndex, 2).data().toString()));
-        tableModel->setPriceColumn(query);
-        delete query;
-    }
+        tableModel->setPriceColumn(comboBoxIndex);
 }
 
 void tabSale::addItemByUID()
@@ -753,14 +748,14 @@ bool tabSale::sale()
 
         if(m_opType == Reserve)
         {
-            tableModel->saveTablesStore(SSaleTableModel::StoreOpType::Reserve);
+            tableModel->store_saveTables(SSaleTableModel::StoreOpType::Reserve);
             docModel->setType(SDocumentModel::ReserveInvoice);
             docModel->appendLogText(QString("Расходная накладная №%1 создана (резерв)").arg(doc_id));
             docModel->setState(SDocumentModel::ItemsReserved);
         }
         else
         {
-            tableModel->saveTablesStore(SSaleTableModel::StoreOpType::Sale);
+            tableModel->store_saveTables(SSaleTableModel::StoreOpType::Sale);
             if(m_opType == SaleReserved)
             {
                 docModel->setAmount(amount);
@@ -878,7 +873,7 @@ void tabSale::reserveButtonClicked()
 
 void tabSale::addItemButtonClicked()
 {
-
+    emit createTabSelectItem(1, this);
 }
 
 void tabSale::paramsButtonClicked()
@@ -1114,7 +1109,7 @@ void tabSale::randomFill()
     }
     else if (test_scheduler_counter == 2)   // товары
     {
-        test_addRandomItem();
+        tableModel->dbgAddRandomItem();
     }
     else if (test_scheduler_counter == 3)   // продажа в долг или с оплатой
     {
@@ -1164,7 +1159,7 @@ void tabSale::createTestPanel()
     testBtnAddRandomItem = new QPushButton(testPanel);
     testBtnAddRandomItem->setGeometry(95,30, 90, 20);
     testBtnAddRandomItem->setText("AddRandomItem");
-    connect(testBtnAddRandomItem, &QPushButton::clicked, this, &tabSale::test_addRandomItem);
+    connect(testBtnAddRandomItem, &QPushButton::clicked, tableModel, &SSaleTableModel::dbgAddRandomItem);
     testPanel->show();
 }
 
@@ -1187,27 +1182,6 @@ void tabSale::test_updateWidgetsWithDocNum()
     p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
     emit updateTabTitle(this);
     updateWidgets();
-}
-
-void tabSale::test_addRandomItem()
-{
-    int i;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    i = QRandomGenerator::global()->bounded(3); // кол-во товаров от 1 до 3
-    if(i < 3)
-        i += 3;
-
-    for(int j = 0; j < i; j++)
-    {
-        query->exec(QString("SELECT `id` FROM (SELECT ROUND(@i * RAND(), 0) AS 'rand') AS `rand` LEFT JOIN (SELECT @i := @i + 1 AS 'num', t1.`id` FROM store_items AS t1 CROSS JOIN (SELECT @i := 0) AS dummy WHERE t1.`count` - t1.`reserved` > 0 AND t1.`is_realization` = 1) AS t1 ON t1.`num` = `rand`.`rand`;"));
-        if(j<2)
-            continue;   // после обновления сервера на mysql 5.6.51 (win) пришлось чуть-чуть изменить запрос для случайного товара; также в только что открытой сессии результаты первых двух запросов будут состоять из NULL, поэтому пропускаем их
-
-        query->first();
-        if(query->isValid())
-            tableModel->addItemByUID(query->record().value(0).toInt(), ui->comboBoxPriceCol->currentIndex());
-    }
-    delete query;
 }
 
 #endif
