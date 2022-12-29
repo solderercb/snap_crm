@@ -24,15 +24,7 @@ SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
 //    m_isPay = record.at(SStoreItemModel::SaleOpColumns::)->data(Qt::DisplayRole).toBool();
 //    m_type = record.at(SStoreItemModel::SaleOpColumns::Col)->data(Qt::DisplayRole).toInt();
 
-    for(int i = 1; i < record.count(); i++) // в нулевом столбце id записи в таблице, он не изменяется средствами программы
-    {
-        if(!record.at(i)->data(Qt::UserRole+1).toBool())
-            continue;
-
-        setField(i, record.at(i)->data(Qt::DisplayRole), record.at(i)->data(Qt::UserRole));
-        record.at(i)->setData(0, Qt::UserRole+1);   // снятие пометки изменённого поля
-    }
-    record.at(0)->setData(0, Qt::UserRole+1);   // снятие пометки изменённой строки
+    initQueryFields(record);
 }
 
 int SWorkModel::id()
@@ -208,7 +200,7 @@ bool SWorkModel::remove()
     return ret;
 }
 
-void SWorkModel::setField(const int fieldNum, const QVariant value, const QVariant oldValue)
+void SWorkModel::setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue)
 {
     switch(fieldNum)
     {

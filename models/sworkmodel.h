@@ -39,7 +39,7 @@ public:
     int payRepairQuick();
     void setPayRepairQuick(const int);
     bool remove();
-    void setField(const int fieldNum, const QVariant value, const QVariant oldValue = QVariant());
+    void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue = QVariant()) override;
     bool commit();
 private:
     int m_user;

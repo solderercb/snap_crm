@@ -51,7 +51,7 @@ public:
     bool unsale();
     bool unlinkRepair();
     bool free();
-    void setField(const int fieldNum, const QVariant value, const QVariant oldValue);
+    void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue) override;
 private:
     SStoreItemModel *m_storeItem = nullptr;
     int m_itemId;

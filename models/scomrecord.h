@@ -8,6 +8,9 @@
 
 #include "sdatabaserecord.h"
 #include <QObject>
+#include <QList>
+#include <QStandardItem>
+#include <QVariant>
 #include "models/slogrecordmodel.h"
 
 class SComRecord : public SDatabaseRecord
@@ -20,7 +23,10 @@ public:
     void appendLogText(const QString&, const QString &disambiguation);
     void removeLogText(const QString &disambiguation);
 protected:
+    enum DataRoles {OldValue = Qt::UserRole, Changed = Qt::UserRole + 1};
     bool commitLogs();
+    void initQueryFields(const QList<QStandardItem *> &record);
+    virtual void setQueryField(const int, const QVariant, const QVariant){};
     QMap<QString, QString> *i_logTexts;
     SLogRecordModel *i_logRecord;
 

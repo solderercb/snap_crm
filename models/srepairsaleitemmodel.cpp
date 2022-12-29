@@ -33,15 +33,7 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
     qDebug().nospace() << "[" << this << "] SRepairSaleItemModel() | " << QString("m_workId = %1 | m_repairId = %2").arg(m_workId).arg(m_repairId);
     i_logRecord->setRepairId(m_repairId);
 
-    for(int i = 1; i < record.count(); i++) // в нулевом столбце id записи в таблице, он не изменяется средствами программы
-    {
-        if(!record.at(i)->data(Qt::UserRole+1).toBool())
-            continue;
-
-        setField(i, record.at(i)->data(Qt::DisplayRole), record.at(i)->data(Qt::UserRole));
-        record.at(i)->setData(0, Qt::UserRole+1);   // снятие пометки изменённого поля
-    }
-    record.at(0)->setData(0, Qt::UserRole+1);   // снятие пометки изменённой строки
+    initQueryFields(record);
 }
 
 SRepairSaleItemModel::~SRepairSaleItemModel()
@@ -293,7 +285,7 @@ bool SRepairSaleItemModel::free()
     // Запись в журнал производится в методе класса SStoreItemModel
 }
 
-void SRepairSaleItemModel::setField(const int fieldNum, const QVariant value, const QVariant oldValue)
+void SRepairSaleItemModel::setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue)
 {
     switch(fieldNum)
     {

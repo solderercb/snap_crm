@@ -62,7 +62,7 @@ public:
     bool unsale();
     bool free();
     bool isProfitable();
-    void setField(const int fieldNum, const QVariant value);
+    void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue = QVariant()) override;
 private:
     SStoreItemModel *m_storeItem = nullptr;
     int m_itemId = 0;
