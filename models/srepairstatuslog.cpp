@@ -35,6 +35,8 @@ int SRepairStatusLog::status()
 
 void SRepairStatusLog::setStatus(const int status_id)
 {
+    m_changed = 1;
+    i_id = 0;
     i_valuesMap.insert("status_id", status_id);
 }
 
@@ -121,6 +123,9 @@ void SRepairStatusLog::load(const int id)
 
 bool SRepairStatusLog::commit()
 {
+    if(!m_changed)
+        return 1;
+
     if(i_id)
     {
         update();

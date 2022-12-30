@@ -31,6 +31,7 @@ private:
     int m_user;
     int m_manager;
     int m_master;
+    bool m_changed = 0;
     void setManager(const QVariant);
     void setEngineer(const QVariant);
 };
