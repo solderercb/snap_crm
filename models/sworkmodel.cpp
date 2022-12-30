@@ -23,6 +23,10 @@ SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
 //    m_documentId = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
 //    m_isPay = record.at(SStoreItemModel::SaleOpColumns::)->data(Qt::DisplayRole).toBool();
 //    m_type = record.at(SStoreItemModel::SaleOpColumns::Col)->data(Qt::DisplayRole).toInt();
+    i_logRecord->setRepairId(m_repair);
+
+    if(!i_id)
+        appendLogText(tr("Добавлена работа \"%1\" стоимостью %2").arg(m_name, sysLocale.toCurrencyString(m_price)));
 
     initQueryFields(record);
 }
@@ -44,11 +48,13 @@ int SWorkModel::user()
 
 void SWorkModel::setUser(const int id, const QVariant oldValue)
 {
+    QString text;
     if(oldValue.isValid())
-        appendLogText(tr("Исполнитель работы изменён с %1 на %2").arg(usersModel->getDisplayRole(oldValue.toInt())).arg(usersModel->getDisplayRole(id)));
+        text = tr("Исполнитель работы \"%1\" изменён с %2 на %3").arg(m_name, usersModel->getDisplayRole(oldValue.toInt()), usersModel->getDisplayRole(id));
     else
-        appendLogText(tr("Исполнителем работы назначен %1").arg(usersModel->getDisplayRole(id, 1)));
+        text = tr("Исполнителем работы \"%1\" назначен %2").arg(m_name, usersModel->getDisplayRole(id, 1));
 
+    appendLogText(text);
     i_valuesMap.insert("user", id);
 }
 
@@ -95,9 +101,9 @@ float SWorkModel::price()
 void SWorkModel::setPrice(const float price, const QVariant oldValue)
 {
     if(oldValue.isValid())
-        appendLogText(tr("Стоимость работы изменёна с %1 на %2").arg(sysLocale.toCurrencyString(oldValue.toFloat())).arg(sysLocale.toCurrencyString(price)));
+        appendLogText(tr("Стоимость работы \"%1\" изменёна с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toFloat()), sysLocale.toCurrencyString(price)));
     else if(i_id)
-        appendLogText(tr("Установлена стоимость работы %1").arg(sysLocale.toCurrencyString(price)));
+        appendLogText(tr("Стоимость работы \"%1\" установлена %1").arg(m_name, sysLocale.toCurrencyString(price)));
     i_valuesMap.insert("price", price);
 }
 
@@ -109,7 +115,7 @@ int SWorkModel::count()
 void SWorkModel::setCount(const int count, const QVariant oldValue)
 {
     if(oldValue.isValid())
-        appendLogText(tr("Кол-во изменёно с \"%1\" на \"%2\"").arg(oldValue.toInt()).arg(count));
+        appendLogText(tr("Кол-во \"%1\" изменёно с \"%2\" на \"%3\"").arg(m_name).arg(oldValue.toInt()).arg(count));
 
     i_valuesMap.insert("count", count);
 }
@@ -121,13 +127,15 @@ int SWorkModel::warranty()
 
 void SWorkModel::setWarranty(const int warranty, const QVariant oldValue)
 {
+    QString text;
     if(!oldValue.toString().isEmpty())
-        appendLogText(tr("Срок гарантии изменён с \"%1\" на \"%2\"").arg(warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1)).arg(warrantyTermsModel->getDisplayRole(warranty, 1)));
+        text = tr("Срок гарантии на работу \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1), warrantyTermsModel->getDisplayRole(warranty, 1));
     else if(i_id)
-        appendLogText(tr("Срок гарантии установлен \"%1\"").arg(warrantyTermsModel->getDisplayRole(warranty, 1)));
+        text = tr("Срок гарантии на работу \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
     else
-        appendLogText(tr("Установлен срок гарантии по умолчанию (\"%1\")").arg(warrantyTermsModel->getDisplayRole(warranty, 1)));
+        text = tr("Срок гарантии на работу \"%1\" установлен по умолчанию (\"%2\")").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
 
+    appendLogText(text);
     i_valuesMap.insert("warranty", warranty);
 }
 
@@ -193,7 +201,7 @@ bool SWorkModel::remove()
 {
     bool ret = 1;
 
-    i_logRecord->setText(tr("Удалена работа \"%1\" стоимостью %2 из ремонта №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
+    i_logRecord->setText(tr("Удалена работа \"%1\" стоимостью %2").arg(m_name, sysLocale.toCurrencyString(m_price)));
     ret &= del();
     ret &= i_logRecord->commit();
 
@@ -225,7 +233,6 @@ bool SWorkModel::commit()
     else
     {
         qDebug().nospace() << "[" << this << "] commit() [insert]";
-        appendLogText(tr("Добавлена работа \"%1\" стоимостью %2 в ремонт №%3").arg(m_name).arg(sysLocale.toCurrencyString(m_price)).arg(m_repair));
         setCreated(QDateTime::currentDateTime());
         setPayRepair(usersSalaryTaxesModel->value(userDbData->value("id").toInt(), "id", "pay_repair").toInt());
         setPayRepairQuick(usersSalaryTaxesModel->value(userDbData->value("id").toInt(), "id", "pay_repair_quick").toInt());
