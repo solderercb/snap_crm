@@ -180,7 +180,7 @@ void SStoreSaleItemModel::setUser(const int user)
 */
 void SStoreSaleItemModel::setExtraUnsaleReason(const QString& reason)
 {
-    m_storeItem->setUnsaleReason(reason);
+    m_unsaleReason = reason;
 }
 
 QString SStoreSaleItemModel::sn()
@@ -225,27 +225,43 @@ void SStoreSaleItemModel::unsetBuyer()
 bool SStoreSaleItemModel::sale()
 {
     int id = i_id;
+    QString logText;
     commit();
     if(id)
-        i_nErr &= m_storeItem->saleReserved();
+    {
+        if(m_count < m_savedCount)
+            logText = tr("Продажа ранее зарезервированного товара: %1ед.; отмена резерва (невостребовано): %2ед.").arg(m_count).arg(m_savedCount - m_count);
+        else if(m_count > m_savedCount)
+            logText = tr("Продажа ранее зарезервированного товара: %1ед.; дополнительно: %2ед.").arg(m_savedCount).arg(m_count - m_savedCount);
+        else
+            logText = tr("Продажа ранее зарезервированного товара: %1ед.").arg(m_count);
+        i_nErr &= m_storeItem->saleReserved(logText);
+    }
     else
-        i_nErr &= m_storeItem->sale();
+    {
+        logText = tr("Продажа товара в кол-ве %1ед.").arg(m_count);
+        i_nErr &= m_storeItem->sale(logText);
+    }
     return i_nErr;
 }
 
 bool SStoreSaleItemModel::reserve()
 {
     commit();
-    i_nErr &= m_storeItem->reserve();
+    i_nErr &= m_storeItem->reserve(tr("Резерв %1ед. товара").arg(m_count));
     return i_nErr;
 }
 
 bool SStoreSaleItemModel::unsale()
 {
+    QString logText = tr("Возврат %1ед. товара").arg(m_savedCount);
+
+    if(!m_unsaleReason.isEmpty())
+        logText.append(tr(", причина: %1", "причина возврата, указанная пользователем").arg(m_unsaleReason));
     setState(State::Cancelled);
     setCancellationReason("unsale");
     commit();
-    i_nErr &= m_storeItem->unsale();
+    i_nErr &= m_storeItem->unsale(logText);
     return i_nErr;
 }
 
@@ -254,7 +270,7 @@ bool SStoreSaleItemModel::free()
     setState(State::Cancelled);
     setCancellationReason("cancel reserve");
     commit();
-    i_nErr &= m_storeItem->free();
+    i_nErr &= m_storeItem->free(tr("Отмена резерва %1ед. товара").arg(m_savedCount));
     return i_nErr;
 }
 

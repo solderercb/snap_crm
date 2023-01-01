@@ -54,7 +54,7 @@ public:
     void repair_markRowRemove(const int, const int);
     QMap<int, int>* getPendingRemoveList();
     int pendingRemoveItemsCount();
-    void setHorizontalHeaderLabels(const QStringList &labels);
+    void setHorizontalHeaderLabels();
     double amountTotal();
     QString amountTotalLocale();
     QString amountItemsLocale();
@@ -98,12 +98,13 @@ public:
     void setIsWarranty(const bool);
 #ifdef QT_DEBUG
     void dbgAddRandomItem();
+    void dbgAddRandomItemBasket();
 #endif
 
 signals:
     void dataChanged();
     void amountChanged(float, float, float);
-    void modelReset();
+//    void modelReset();
     void addItem();
 
 private:
@@ -133,7 +134,8 @@ private:
     int getItemInsertionRow();
     int getParentWorkRow(const int itemRow);
     bool recordType(const int row);
-    void setItemWorkId(const int row, const int workId);
+    void linkItemToWork(const int row, const int workId);
+    void clearChangedFlagForAllField();
 
 public slots:
     void addCustomWork();
@@ -141,7 +143,6 @@ public slots:
 
 private slots:
     void sqlDataChanged();
-    void rowAfterInsert(const QModelIndex &parent, int first, int last);
 #if QT_VERSION >= 0x060000
     void dataChanaged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
 #else

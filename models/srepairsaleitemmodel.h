@@ -44,9 +44,10 @@ public:
     void setWarranty(const int, const QVariant oldValue = QVariant());
     bool rLock();
     void setRLock(const bool);
+    bool request();
     bool reserve();
     bool commit();
-    bool linkRepair();
+    bool linkRepair(const int);
     bool sale();
     bool unsale();
     bool unlinkRepair();

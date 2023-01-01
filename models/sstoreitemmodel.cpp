@@ -505,7 +505,7 @@ bool SStoreItemModel::isNotForSale()
     return m_isNotForSale;
 }
 
-void SStoreItemModel::setNotNorSale(const bool not_for_sale)
+void SStoreItemModel::setNotForSale(const bool not_for_sale)
 {
     i_valuesMap.insert("not_for_sale", not_for_sale);
 }
@@ -601,8 +601,6 @@ void SStoreItemModel::setSaleMode(SaleMode mode)
     m_saleMode = mode;
     if(m_saleMode == SaleMode::Store)
         i_logRecord->setDocumentId(m_saleObjId);
-    else
-        i_logRecord->setRepairId(m_saleObjId);
 }
 
 QMap<int, int>* SStoreItemModel::loadQtys()
@@ -723,7 +721,7 @@ bool SStoreItemModel::checkAfterSale()
 /*
  * Возвращает 0 в случае ошибки
 */
-bool SStoreItemModel::sale()
+bool SStoreItemModel::sale(const QString &logText)
 {
     if(checkBeforeSale())
         return 0;
@@ -731,7 +729,7 @@ bool SStoreItemModel::sale()
     m_opOnItemType = OpOnItem::Sale;
     setCount(m_qtysBeforeSale->value(QtyField::Count) - m_saleQty);
     setSold(m_qtysBeforeSale->value(QtyField::Sold) + m_saleQty);
-    i_logRecord->setText(tr("Продажа товара в кол-ве %1ед.").arg(m_saleQty));
+    i_logRecord->setText(logText);
 
     if(!commit())
         return 0;
@@ -742,36 +740,29 @@ bool SStoreItemModel::sale()
     return i_nErr;
 }
 
-bool SStoreItemModel::reserve()
+bool SStoreItemModel::reserve(const QString &logText)
 {
     if(checkBeforeSale())
         return 0;
 
     m_opOnItemType = OpOnItem::Reserve;
     setReserved(m_qtysBeforeSale->value(QtyField::Reserved) + m_saleQty);
-    i_logRecord->setText(tr("Резерв %1ед. товара").arg(m_saleQty));
+    i_logRecord->setText(logText);
     if(!commit())
         return 0;
 
     return i_nErr;
 }
 
-bool SStoreItemModel::saleReserved()
+bool SStoreItemModel::saleReserved(const QString &logText)
 {
     if(checkBeforeSale())
         return 0;
 
-    QString logText;
     m_opOnItemType = OpOnItem::SaleReserved;
     setCount(m_qtysBeforeSale->value(QtyField::Count) - m_saleQty);
     setSold(m_qtysBeforeSale->value(QtyField::Sold) + m_saleQty);
     setReserved(m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty);
-    if(m_saleQty < m_savedSaleQty)
-        logText = tr("Продажа ранее зарезервированного товара: %1ед.; отмена резерва (невостребовано): %2ед.").arg(m_saleQty).arg(m_savedSaleQty - m_saleQty);
-    else if(m_saleQty > m_savedSaleQty)
-        logText = tr("Продажа ранее зарезервированного товара: %1ед.; дополнительно: %2ед.").arg(m_savedSaleQty).arg(m_saleQty - m_savedSaleQty);
-    else
-        logText = tr("Продажа ранее зарезервированного товара: %1ед.").arg(m_saleQty);
     i_logRecord->setText(logText);
 
     if(!commit())
@@ -783,31 +774,28 @@ bool SStoreItemModel::saleReserved()
     return i_nErr;
 }
 
-bool SStoreItemModel::free()
+bool SStoreItemModel::free(const QString &logText)
 {
     if(checkBeforeSale())
         return 0;
 
     m_opOnItemType = OpOnItem::Free;
     setReserved(m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty);
-    i_logRecord->setText(tr("Отмена резерва %1ед. товара").arg(m_savedSaleQty));
+    i_logRecord->setText(logText);
     if(!commit())
         return 0;
 
     return i_nErr;
 }
 
-bool SStoreItemModel::unsale()
+bool SStoreItemModel::unsale(const QString &logText)
 {
     if(checkBeforeSale())
         return 0;
 
-    QString logText = tr("Возврат %1ед. товара").arg(m_savedSaleQty);
     m_opOnItemType = OpOnItem::Unsale;
     setCount(m_qtysBeforeSale->value(QtyField::Count) + m_savedSaleQty);
     setSold(m_qtysBeforeSale->value(QtyField::Sold) - m_savedSaleQty);
-    if(!m_unsaleReason.isEmpty())
-        logText.append(tr(", причина: %1").arg(m_unsaleReason));
     i_logRecord->setText(logText);
     if(!commit())
         return 0;
@@ -818,43 +806,7 @@ bool SStoreItemModel::unsale()
     return i_nErr;
 }
 
-/*  Продажа товаров, добавленных в ремонт.
- *  Метод аналогичен SaleReserved()
-*/
-bool SStoreItemModel::saleRepair()
-{
-    if(checkBeforeSale())
-        return 0;
-
-    m_opOnItemType = OpOnItem::SaleRepair;
-    setCount(m_qtysBeforeSale->value(QtyField::Count) - m_saleQty);
-    setSold(m_qtysBeforeSale->value(QtyField::Sold) + m_saleQty);
-    setReserved(m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty);
-    i_logRecord->setText(tr("Продажа %1ед. товара в связи с выдачей ремонта №%2.").arg(m_saleQty).arg(m_saleObjId));
-    if(!commit())
-        return 0;
-
-    if(!dealerRoyalty(SBalanceLogRecordModel::RoyaltyReason::Repair))
-        return 0;
-
-    return i_nErr;
-}
-
-bool SStoreItemModel::reserveRepair()
-{
-    if(checkBeforeSale())
-        return 0;
-
-    m_opOnItemType = OpOnItem::ReserveRepair;
-    setReserved(m_qtysBeforeSale->value(QtyField::Reserved) + m_saleQty);
-    i_logRecord->setText(tr("Резерв %1ед. товара для ремонта №%2.").arg(m_saleQty).arg(m_saleObjId));
-    if(!commit())
-        return 0;
-
-    return i_nErr;
-}
-
-bool SStoreItemModel::unsaleRepair()
+bool SStoreItemModel::unsaleRepair(const QString &logText)
 {
     if(checkBeforeSale())
         return 0;
@@ -864,30 +816,11 @@ bool SStoreItemModel::unsaleRepair()
     setCount(m_qtysBeforeSale->value(QtyField::Count) + m_saleQty);
     setSold(m_qtysBeforeSale->value(QtyField::Sold) - m_saleQty);
     setReserved(m_qtysBeforeSale->value(QtyField::Reserved) + m_savedSaleQty);
-    i_logRecord->setText(tr("Возврат %1ед. товара по причене отмены выдачи ремонта №%2.").arg(m_saleQty).arg(m_saleObjId));
+    i_logRecord->setText(logText);
     if(!commit())
         return 0;
 
     if(!dealerRoyalty(SBalanceLogRecordModel::RoyaltyReason::Repair))
-        return 0;
-
-    return i_nErr;
-}
-
-bool SStoreItemModel::freeRepair()
-{
-    i_logRecord->setText(tr("Удаление %1ед. товара из карты ремонта №%2.").arg(m_savedSaleQty).arg(m_saleObjId));
-    if(!i_logRecord->commit())
-        return 0;
-
-    return 1;
-}
-
-bool SStoreItemModel::freeEngineer()
-{
-    setReserved(m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty);
-    i_logRecord->setText(tr("Возврат %1ед. товара на склад.").arg(m_savedSaleQty).arg(m_saleObjId));
-    if(!commit())
         return 0;
 
     return i_nErr;
@@ -899,6 +832,7 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
         return 1;
 
     float royaltyForItem = m_inPrice + (m_price - m_inPrice)*m_returnPercent/100;
+    QString logText;
 
     if(royaltyForItem == 0)
         return 1;
@@ -906,12 +840,17 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
     SClientModel *dealer = new SClientModel();
     dealer->setId(m_dealer);
     dealer->createBalanceObj();
+
     try
     {
         if(m_opOnItemType == Unsale || m_opOnItemType == UnsaleRepair)
         {
             float dealerRoyalty = m_savedSaleQty*royaltyForItem;
-            i_nErr = dealer->updateBalance(-dealerRoyalty, tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id), source, m_saleObjId);
+            if(m_opOnItemType == Unsale)
+                logText = tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id);
+            else
+                logText = tr("Списание %1 за %2ед. товара %3, находившегося на реализации, по причение отмены выдачи ремонта").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id);
+            i_nErr = dealer->updateBalance(-dealerRoyalty, logText, source, m_saleObjId);
         }
         else
         {
@@ -935,12 +874,6 @@ void SStoreItemModel::showNotification(const QString &text)
     msgBox.setText(text);
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
-}
-
-void SStoreItemModel::setUnsaleReason(const QString &text)
-{
-    m_unsaleReason = text;
-    i_logRecord->setText(m_unsaleReason);
 }
 
 bool SStoreItemModel::commit()

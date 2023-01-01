@@ -127,9 +127,11 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         createGetOutDialog();
     connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(updateWidgets()));
     connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItem);
+    connect(ui->dbgBtnAddRandomPartBasket, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItemBasket);
 #else
     ui->pushButtonManualUpdateRepairData->setHidden(true);
     ui->dbgBtnAddRandomPart->setHidden(true);
+    ui->dbgBtnAddRandomPartBasket->setHidden(true);
 #endif
 }
 
@@ -486,7 +488,7 @@ void tabRepair::createGetOutDialog()
 
     modalWidget = new getOutDialog(this, Qt::SplashScreen);
     QObject::connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
-    QObject::connect(modalWidget, SIGNAL(getOutOk()), this, SLOT(updateWidgets()));
+    QObject::connect(modalWidget, SIGNAL(getOutOk()), this, SLOT(reloadRepairData()));
 
     modalWidget ->setWindowModality(Qt::WindowModal);
     modalWidget ->show();

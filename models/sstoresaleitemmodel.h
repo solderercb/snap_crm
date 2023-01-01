@@ -84,6 +84,7 @@ private:
     bool m_state;
     QString m_sn;
     int m_dCategory;
+    QString m_unsaleReason;
     bool commit();
 };
 

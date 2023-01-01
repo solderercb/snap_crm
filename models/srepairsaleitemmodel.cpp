@@ -155,7 +155,7 @@ void SRepairSaleItemModel::setRepairId(const int id)
 {
     if(id)
     {
-        appendLogText(tr("Установлена запчасть \"%1\" стоимостью %2").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_repairId));
+        appendLogText(tr("Добавлен товар \"%1\" стоимостью %2 в кол-ве %3ед").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_count));
         i_valuesMap.insert("repair_id", id);
         i_logRecord->setRepairId(id);
     }
@@ -203,7 +203,7 @@ void SRepairSaleItemModel::setSN(const QString sn, const QVariant oldValue)
     else if (i_id && !sn.isEmpty())
         appendLogText(tr("Серийный номер товара \"%1\" установлен \"%2\"").arg(m_name, sn));
 
-    i_valuesMap.insert("sn", sn);
+    i_valuesMap.insert("sn", sn.isEmpty()?QVariant():sn);
 }
 
 int SRepairSaleItemModel::warranty()
@@ -235,16 +235,38 @@ void SRepairSaleItemModel::setRLock(const bool r_lock)
     i_valuesMap.insert("r_lock", r_lock);
 }
 
-bool SRepairSaleItemModel::reserve()
+bool SRepairSaleItemModel::request()
 {
-    qDebug().nospace() << "[" << this << "] ()";
-    i_nErr = m_storeItem->reserveRepair();
-    i_nErr = linkRepair();
+    qDebug().nospace() << "[" << this << "] request()";
+    setState(State::Requested);
+    // TODO: создание уведомления ответственному сотруднику
+    commit();
+
     return i_nErr;
 }
 
-bool SRepairSaleItemModel::linkRepair()
+/*  Выдача товара сотруднику
+ *  Может быть инициирована ответственным сотрудником или как ответ на запрос детали
+*/
+bool SRepairSaleItemModel::reserve()
 {
+    qDebug().nospace() << "[" << this << "] reserve()";
+    if(!i_id)
+        i_nErr = m_storeItem->reserve(tr("Выдача %1ед. товара сотруднику %2").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())));
+    setState(State::EngineerBasket);
+    commit();
+    return i_nErr;
+}
+
+/*  Установка товара в ремонт (привязка)
+ *  Может быть инициирована сотрудником, обладающим правом "Брать детали со склада", или при добавлении товара из корзины сотрудника
+*/
+bool SRepairSaleItemModel::linkRepair(const int id)
+{
+    qDebug().nospace() << "[" << this << "] linkRepair()";
+    setRepairId(id);
+    if(!i_id)
+        i_nErr = m_storeItem->reserve(tr("Быстрая выдача %1ед. товара сотруднику %2 для ремонта №%3").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())).arg(id));
     setState(State::RepairLinked);
     commit();
     return i_nErr;
@@ -254,8 +276,7 @@ bool SRepairSaleItemModel::sale()
 {
     setState(State::Sold);
     commit();
-    // Запись в журнал производится в методе класса SStoreItemModel
-    i_nErr &= m_storeItem->saleRepair();
+    i_nErr &= m_storeItem->saleReserved(tr("Продажа %1ед. товара в связи с выдачей ремонта №%2.").arg(m_count).arg(m_repairId));
     return i_nErr;
 }
 
@@ -263,8 +284,7 @@ bool SRepairSaleItemModel::unsale()
 {
     setState(State::RepairLinked);
     commit();
-    // Запись в журнал производится в методе класса SStoreItemModel
-    i_nErr &= m_storeItem->unsaleRepair();
+    i_nErr &= m_storeItem->unsaleRepair(tr("Возврат %1ед. товара по причене отмены выдачи ремонта №%2.").arg(m_count).arg(m_repairId));
     return i_nErr;
 }
 
@@ -274,7 +294,7 @@ bool SRepairSaleItemModel::unlinkRepair()
     setSN("");
     setRepairId(0);
     setWorkId(0);
-    appendLogText(tr("Удалена запчасть \"%1\" стоимостью %2").arg(m_name, sysLocale.toCurrencyString(m_price)));
+    appendLogText(tr("Удален товар \"%1\" стоимостью %2 в кол-ве %3ед.").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_count));
     commit();
     return i_nErr;
 }
@@ -282,8 +302,9 @@ bool SRepairSaleItemModel::unlinkRepair()
 bool SRepairSaleItemModel::free()
 {
     setState(State::Archive);
-    return commit();
-    // Запись в журнал производится в методе класса SStoreItemModel
+    commit();
+    i_nErr &= m_storeItem->free(tr("Возврат %1ед. товара на склад").arg(m_count));
+    return i_nErr;
 }
 
 void SRepairSaleItemModel::setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue)

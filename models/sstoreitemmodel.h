@@ -111,7 +111,7 @@ public:
     int warrantyDealer();
     void setWarrantyDealer(const int);
     bool isNotForSale();
-    void setNotNorSale(const bool);
+    void setNotForSale(const bool);
     int stState();
     void setStState(const int);
     QString stNotes();
@@ -126,21 +126,16 @@ public:
     void delIntegrityCheckObjects();
     bool checkBeforeSale();
     bool checkAfterSale();
-    bool sale();
-    bool reserve();
-    bool saleReserved();
-    bool free();
-    bool unsale();
-    bool saleRepair();
-    bool reserveRepair();
-    bool unsaleRepair();
-    bool freeRepair();
-    bool freeEngineer();
-    bool writeOff();
-    bool cancelWriteOff();
+    bool sale(const QString &logText);
+    bool reserve(const QString &logText);
+    bool saleReserved(const QString &logText);
+    bool free(const QString &logText);
+    bool unsale(const QString &logText);
+    bool unsaleRepair(const QString &logText);
+    bool writeOff(const QString &logText);
+    bool cancelWriteOff(const QString &logText);
     bool dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason);
     void showNotification(const QString&);
-    void setUnsaleReason(const QString&);
     bool commit();
 private:
     bool m_isHidden;

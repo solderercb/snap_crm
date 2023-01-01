@@ -7,8 +7,7 @@ SSaleTableModel::SSaleTableModel(QObject *parent) :
     m_itemsPendingRemoveList = new QMap<int, int>;
     m_worksPendingRemoveList = new QMap<int, int>;
 
-    QStandardItemModel::setHorizontalHeaderLabels(m_fieldsDep);
-    setHorizontalHeaderLabels({"",tr("UID"),tr("Наименование"),tr("Кол-во"),tr("Доступно"),tr("Цена"),tr("Сумма"),tr("Место"),tr("Серийный номер"),tr("Гарантия"),tr("Сотрудник")});
+    setHorizontalHeaderLabels();
 
     connect(m_queryData, SIGNAL(modelReset()), this, SLOT(sqlDataChanged()));
 #if QT_VERSION >= 0x060000
@@ -39,9 +38,7 @@ QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
     }
     if ( role == Qt::BackgroundRole )
     {
-        int state = value(index.row(), SStoreItemModel::SaleOpColumns::ColState).toInt();
-        if( (m_tableMode == TablesSet::StoreSale && state) ||
-            (m_tableMode == TablesSet::WorkshopSale && state == SRepairSaleItemModel::State::EngineerBasket) )
+        if(value(index.row(), SStoreItemModel::SaleOpColumns::ColState).toBool())
             return QColor("light gray");
     }
 
@@ -99,9 +96,6 @@ bool SSaleTableModel::insertRecord(int row, const QSqlRecord &record, const int 
     {
         item = new QStandardItem();
         item->setData(record.value(i), Qt::EditRole);
-        if(i == SStoreItemModel::SaleOpColumns::ColItemId)
-        {
-        }
 
         if( recordId == 0 || i == 0)   // все поля новых записей (добавленных в таблицу store_int_reserve впервые или для работ)
         {                              // или только 0-й столбец записи о товаре, добавленном из корзины сотрудника
@@ -202,62 +196,62 @@ void SSaleTableModel::addCustomWork()
     }
     insertRecord(m_currentIndex, *customWork);
     delete customWork;
-    emit modelReset();
 }
 
 /* Добавление работы из прайс-листа
 */
 bool SSaleTableModel::addWorkByUID(const int uid, const int priceOption)
 {
-//    QSqlQueryModel *newItemModel;
+//    QSqlQueryModel *work;
 //    int row = -1;
-//    bool ret = 1;
+    bool ret = 1;
 
 //    if(m_modelState == SSaleTableModel::StoreNew || m_modelState == SSaleTableModel::StoreReserved || m_modelState == SSaleTableModel::WorkshopRW )
 //    {
-//        newItemModel = new QSqlQueryModel(this);
-//        newItemModel->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->index(priceOption, 2).data().toString()), QSqlDatabase::database("connMain"));
-//        newItemModel->record(0).setValue(SStoreItemModel::SaleOpColumns::ColObjId, m_objId);
-//        ret = appendRecord(newItemModel->record(0));
-//        delete newItemModel;
+//        work = new QSqlQueryModel(this);
+//        work->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->index(priceOption, 2).data().toString()), QSqlDatabase::database("connMain"));
+//        work->record(0).setValue(SStoreItemModel::SaleOpColumns::ColObjId, m_objId);
+//        ret = appendRecord(work->record(0));
+//        delete work;
 //    }
-//    emit modelReset();
-//    return ret;
+
+    return ret;
 }
 
 /*  Добавление товара по id
- *  Запрещено добавлять один и тот же товар дважды (TODO: пересмотреть это решение)
+ *  В режиме простой продажи нельзя добавить один и тот же товар дважды (TODO: пересмотреть это решение)
  *  возвращает 0 в случае неудачи
 */
 bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const int count)
 {
-    QSqlQueryModel *newItemModel;
+    QSqlQueryModel *item = nullptr;
     int row = -1;
     bool ret = 1;
+    int rowItemAlreadyInList;
 
     if(m_modelState == SSaleTableModel::StoreNew || m_modelState == SSaleTableModel::StoreReserved || m_modelState == SSaleTableModel::WorkshopRW )
     {
         try
         {
-            if(m_tableMode == TablesSet::StoreSale && isItemAlreadyInList(uid) >= 0)
+            item = new QSqlQueryModel(this);
+            rowItemAlreadyInList = isItemAlreadyInList(uid);
+            if(m_tableMode == TablesSet::StoreSale && rowItemAlreadyInList >= 0)
                 throw 0;
 
-            newItemModel = new QSqlQueryModel(this);
-            newItemModel->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->index(priceOption, 2).data().toString(), count), QSqlDatabase::database("connMain"));
-            if(count > newItemModel->record(0).value("avail").toInt())
+            item->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->index(priceOption, 2).data().toString(), count), QSqlDatabase::database("connMain"));
+            if(count > item->record(0).value("avail").toInt())
                 throw 1;
 
             if(m_tableMode == TablesSet::StoreSale)
             {
-                ret = appendRecord(newItemModel->record(0));
+                ret = appendRecord(item->record(0));
             }
             else
             {
                 if(m_currentIndex == -1 && rowCount())  // если не выбрана строка и таблица не пуста
                     throw 2;
 
-//                newItemModel->record(0).setValue(SStoreItemModel::SaleOpColumns::ColCount, count);    // альтернатива запросу с передачей требуемого кол-ва
-                ret = insertRecord(getItemInsertionRow(), newItemModel->record(0));
+                ret = insertRecord(getItemInsertionRow(), item->record(0));
             }
         }
         catch (int exception)
@@ -265,15 +259,15 @@ bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const i
             QString msgCaption, msgText;
             if(exception == 0)
             {
-                qDebug() << QString("товар UID %1 уже добавлен").arg(value(row, SStoreItemModel::SaleOpColumns::ColUID).toString());
+                qDebug() << QString("товар UID %1 уже добавлен").arg(uid);
                 msgCaption = tr("Повтор");
-                msgText = tr("\"%1\" (UID %2) уже добавлен").arg(value(row, SStoreItemModel::SaleOpColumns::ColName).toString()).arg(value(row, SStoreItemModel::SaleOpColumns::ColUID).toString());
+                msgText = tr("\"%1\" (UID %2) уже добавлен").arg(value(rowItemAlreadyInList, SStoreItemModel::SaleOpColumns::ColName).toString()).arg(uid);
             }
             else if(exception == 1)
             {
-                qDebug() << QString("Товар UID %1 не доступен").arg(newItemModel->record(0).value("UID").toString());
+                qDebug() << QString("Запрошенное кол-во товара UID %1 не доступно").arg(item->record(0).value("UID").toString());
                 msgCaption = tr("Товар отсутствует");
-                msgText = tr("\"%1\" (UID %2) не доступен для продажи").arg(value(row, SStoreItemModel::SaleOpColumns::ColName).toString()).arg(value(row, SStoreItemModel::SaleOpColumns::ColUID).toString());
+                msgText = tr("Запрошенное кол-во товара \"%1\" (UID %2) не доступно для продажи").arg(value(row, SStoreItemModel::SaleOpColumns::ColName).toString()).arg(value(row, SStoreItemModel::SaleOpColumns::ColUID).toString());
             }
             else if(exception == 2)
             {
@@ -284,26 +278,53 @@ bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const i
             shortlivedNotification *newPopup = new shortlivedNotification(this, msgCaption, msgText, QColor(255,255,255), QColor(245,245,245));
             ret = 0;
         }
-        delete newItemModel;
+        if(item)
+            delete item;
     }
-    emit modelReset();
+
     return ret;
 }
 
 bool SSaleTableModel::addItemFromBasket(const int id, const int qty, const int priceOpt)
 {
+    QSqlQueryModel *item = nullptr;
     bool ret = 1;
+    int insertionRow;
     const QString count = qty?QString::number(qty):"`count`";
-    int insertionRow = getItemInsertionRow();
-    QSqlQueryModel *newItemModel = new QSqlQueryModel(this);
-    newItemModel->setQuery(QUERY_SEL_PART_FROM_BASKET(id, priceColModel->index(priceOpt, 2).data().toString(), count), QSqlDatabase::database("connMain"));
-    ret = insertRecord(insertionRow, newItemModel->record(0));
-    if(qty) // добавление части товара из корзины сотрудника
+    if(m_modelState == SSaleTableModel::StoreNew || m_modelState == SSaleTableModel::StoreReserved || m_modelState == SSaleTableModel::WorkshopRW )
     {
-        /**/qDebug() << "[" << this << "] addItemFromBasket() | TODO: создать копию записи в табл. store_int_reserve с разницей кол-ва";
-//        m_itemsPendingSplitList
-        setData(index(insertionRow, SStoreItemModel::SaleOpColumns::ColCount), qty);   // обновить кол-во товара в старой записи
+        try
+        {
+            if(m_currentIndex == -1 && rowCount())  // если не выбрана строка и таблица не пуста
+                throw 2;
+
+            insertionRow = getItemInsertionRow();
+            item = new QSqlQueryModel(this);
+            item->setQuery(QUERY_SEL_PART_FROM_BASKET(id, priceColModel->index(priceOpt, 2).data().toString(), count), QSqlDatabase::database("connMain"));
+            ret = insertRecord(insertionRow, item->record(0));
+            if(qty) // добавление части товара из корзины сотрудника
+            {
+                /**/qDebug() << "[" << this << "] addItemFromBasket() | TODO: создать копию записи в табл. store_int_reserve с разницей кол-ва";
+//                m_itemsPendingSplitList
+                setData(index(insertionRow, SStoreItemModel::SaleOpColumns::ColCount), qty);   // обновить кол-во товара в старой записи
+            }
+        }
+        catch (int exception)
+        {
+            QString msgCaption, msgText;
+            if(exception == 2)
+            {
+                msgCaption = tr("Информация");
+                msgText = tr("Не выбрана работа. Укажите работу в которой была использована деталь");
+            }
+            shortlivedNotification *newPopup = new shortlivedNotification(this, msgCaption, msgText, QColor(255,255,255), QColor(245,245,245));
+            ret = 0;
+        }
+
+        if(item)
+            delete item;
     }
+    return ret;
 }
 
 void SSaleTableModel::removeRowHandler(const int row, const int db_id)
@@ -322,7 +343,7 @@ void SSaleTableModel::removeRowHandler(const int row, const int db_id)
     }
 
     emit amountChanged(amountTotal(), m_amountItems, m_amountWorks);
-    emit modelReset();
+    endResetModel();    // генерация сигнала modelReset() нужна для корректной раскраски строки, помеченной на удаление
 }
 
 void SSaleTableModel::buttonHandler(const int buttonNum, const int row)
@@ -520,6 +541,7 @@ bool SSaleTableModel::store_saveTables(StoreOpType type)
     if(!ret)
         throw 1;
 
+    clearChangedFlagForAllField();
     return ret;
 }
 
@@ -561,22 +583,24 @@ bool SSaleTableModel::repair_saveTables()
         }
         else if(rowModified)   // обработка записи товара (только изменённые строки)
         {
-            qDebug().nospace() << "[" << this << "] repair_saveTables() | " << QString("saving item's data linked with work id %1").arg(m_lastHandledWorkId);
-            setItemWorkId(i, m_lastHandledWorkId);
             SRepairSaleItemModel *itm = repair_item(i);
-            if(!index(i, SStoreItemModel::SaleOpColumns::ColId).data().toInt())
+            if(!index(i, SStoreItemModel::SaleOpColumns::ColObjId).data().toInt())
             {
-                ret = itm->reserve();
+                itm->setWorkId(m_lastHandledWorkId);
+                ret = itm->linkRepair(m_objId);
                 QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), itm->id());
+                QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColObjId), m_objId);
             }
             else
                 ret = itm->commit();
+
             delete itm;
         }
     }
     if(!ret)
         throw 1;
 
+    clearChangedFlagForAllField();
     return ret;
 }
 
@@ -612,6 +636,7 @@ bool SSaleTableModel::repair_saveTables(RepairOpType operation)
     if(!ret)
         throw 1;
 
+    clearChangedFlagForAllField();
     return ret;
 }
 
@@ -665,6 +690,7 @@ bool SSaleTableModel::repair_autoSaveTables()
         {
             shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Список работ и деталей сохранён"), QColor(214,239,220), QColor(229,245,234));
         }
+        delete query;
     }
 
     return nErr;
@@ -784,6 +810,7 @@ bool SSaleTableModel::repair_removeRows()
         m_worksPendingRemoveList->clear();
     }
 
+    endResetModel();
     return ret;
 }
 
@@ -941,7 +968,10 @@ int SSaleTableModel::getItemInsertionRow()
     // если таблица пуста, то добавляем произвольную работу
     if(!rows)
     {
+        int editStrategyBackup = m_editStrategy;
+        m_editStrategy = OnManualSubmit;
         addCustomWork();
+        m_editStrategy = editStrategyBackup;
     }
 
     // если в таблице только одна запись или следующая строка соотв. тоже работе, то вставить деталь нужно перед ней
@@ -983,7 +1013,7 @@ bool SSaleTableModel::recordType(const int row)
 /* Установка id работы и номера ремонта
  * сброс значений производится в методе SRepairSaleItemModel::unlinkRepair()
 */
-void SSaleTableModel::setItemWorkId(const int row, const int workId)
+void SSaleTableModel::linkItemToWork(const int row, const int workId)
 {
     if(index(row, SStoreItemModel::SaleOpColumns::ColWorkId).data() == workId)
         return;
@@ -991,11 +1021,26 @@ void SSaleTableModel::setItemWorkId(const int row, const int workId)
     int editStrategyBackup = m_editStrategy;
     m_editStrategy = OnManualSubmit;
 
-    qDebug().nospace() << "[" << this << "] setItemWorkId() | " << QString("workId = %1 | objId = %2").arg(workId).arg(m_objId);
+    qDebug().nospace() << "[" << this << "] linkItemToWork() | " << QString("workId = %1 | objId = %2").arg(workId).arg(m_objId);
     setData(index(row, SStoreItemModel::SaleOpColumns::ColWorkId), workId);
-    setData(index(row, SStoreItemModel::SaleOpColumns::ColObjId), m_objId);
 
     m_editStrategy = editStrategyBackup;
+}
+
+void SSaleTableModel::clearChangedFlagForAllField()
+{
+    for(int i = 0; i < rowCount(); i++)
+    {
+        if(index(i, 0).data(DataRoles::Changed).toBool())
+        {
+            for(int j = 1; j < columnCount(); j++) // в нулевом столбце — id записи в таблице, он не изменяется средствами программы
+            {
+                if(index(i, j).data(DataRoles::Changed).toBool())
+                    QStandardItemModel::setData(index(i, j), 0, DataRoles::Changed);   // снятие флага о наличии изменений в поле
+            }
+            QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), 0, DataRoles::Changed);   // снятие флага о наличии изменений в строке
+        }
+    }
 }
 
 void SSaleTableModel::indexSelected(const QModelIndex &index)
@@ -1007,9 +1052,10 @@ void SSaleTableModel::indexSelected(const QModelIndex &index)
  * В этом методе будет производиться сравнение со значениями из списка по умолчанию
  * TODO: вообще, нужны более универсальные способы получения данных конкретного столбца, но это потом...
  */
-void SSaleTableModel::setHorizontalHeaderLabels(const QStringList &labels)
+void SSaleTableModel::setHorizontalHeaderLabels()
 {
-
+    QStringList labels = {"",tr("UID"),tr("Наименование"),tr("Кол-во"),tr("Доступно"),tr("Цена"),tr("Сумма"),tr("Место"),tr("Серийный номер"),tr("Гарантия"),tr("Сотрудник")};
+    QStandardItemModel::setHorizontalHeaderLabels(m_fieldsDep);
     for(int i = 0; i < labels.count(); i++)
     {
         Q_ASSERT_X(horizontalHeaderItem(i)->text() == m_fieldsDep.at(i), "SSaleTableModel::setHorizontalHeaderLabels()", "fields dependencies");
@@ -1064,7 +1110,9 @@ QVariant SSaleTableModel::value(const int row, const int column, const int role)
  */
 void SSaleTableModel::sqlDataChanged()
 {
-    setRowCount(m_queryData->rowCount());
+    clear();
+    setHorizontalHeaderLabels();
+        setRowCount(m_queryData->rowCount());
     setColumnCount(m_queryData->columnCount());
     m_itemsPendingRemoveList->clear();
     this->blockSignals(true);
@@ -1086,7 +1134,8 @@ void SSaleTableModel::sqlDataChanged()
     m_queryData->clear();
     m_queryData->blockSignals(false);
     emit amountChanged(amountTotal(), m_amountItems, m_amountWorks);
-    emit modelReset();
+
+    endResetModel();
 }
 
 #if QT_VERSION >= 0x060000
@@ -1180,6 +1229,24 @@ void SSaleTableModel::dbgAddRandomItem()
         query->first();
         if(query->isValid())
             addItemByUID(query->record().value(0).toInt(), m_priceIndex);
+    }
+    delete query;
+}
+
+void SSaleTableModel::dbgAddRandomItemBasket()
+{
+    int i;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+
+    for(int j = 0; j < 3; j++)
+    {
+        query->exec(QString("SELECT `id` FROM (SELECT ROUND(@i * RAND(), 0) AS 'rand') AS `rand` LEFT JOIN (SELECT @i := @i + 1 AS 'num', t1.`id` FROM store_int_reserve AS t1 CROSS JOIN (SELECT @i := 0) AS dummy WHERE t1.`state` = 1) AS t1 ON t1.`num` = `rand`.`rand`;"));
+        if(j<2)
+            continue;   // после обновления сервера на mysql 5.6.51 (win) пришлось чуть-чуть изменить запрос для случайного товара; также в только что открытой сессии результаты первых двух запросов будут состоять из NULL, поэтому пропускаем их
+
+        query->first();
+        if(query->isValid())
+            addItemFromBasket(query->record().value(0).toInt(), 0, m_priceIndex);
     }
     delete query;
 }

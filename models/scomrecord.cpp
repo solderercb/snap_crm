@@ -59,8 +59,6 @@ void SComRecord::initQueryFields(const QList<QStandardItem *> &record)
             continue;
 
         setQueryField(i, record.at(i)->data(Qt::DisplayRole), record.at(i)->data(DataRoles::OldValue));
-        record.at(i)->setData(0, DataRoles::Changed);   // снятие флага о наличии изменений в поле
     }
-    record.at(0)->setData(0, DataRoles::Changed);   // снятие флага о наличии изменений в строке
 }
 

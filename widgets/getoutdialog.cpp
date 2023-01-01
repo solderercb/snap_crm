@@ -157,14 +157,8 @@ void getOutDialog::getOut()
     SQueryLog *queryLog = new SQueryLog();
 #endif
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    QSqlQuery *query2 = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nErr = 1, nIntegrityErr = 1;
-    int user, client, office;
+    bool nErr = 1;
 
-    user = userDbData->value("id").toInt();
-    office = userDbData->value("current_office").toInt();
-
-    client = repairModel->clientId();
     if( ui->checkBoxPaymentCheckout->isVisible() && !ui->checkBoxPaymentCheckout->isChecked())
     {
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), tr("Подтвердите правильность ввода данных"), QColor("#FFC7AD"), QColor("#FFA477"));
@@ -201,7 +195,7 @@ void getOutDialog::getOut()
                 cashRegister->setRepairId(m_repairId);
                 cashRegister->setAmount(summToPay);
                 cashRegister->setReason(cashRegister->constructReason(m_repairId));
-                cashRegister->setSkipLogRecording(true);
+//                cashRegister->setSkipLogRecording(true);
                 nErr = cashRegister->commit();
             }
         }
@@ -225,7 +219,7 @@ void getOutDialog::getOut()
         workshopIssuedModel->commit();
 
 #ifdef QT_DEBUG
-        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
