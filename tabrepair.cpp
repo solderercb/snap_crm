@@ -190,6 +190,7 @@ void tabRepair::reloadRepairData()
     }
     additionalFieldsModel->load(repair_id);
     worksAndPartsModel->repair_loadTable(repair_id);
+    worksAndPartsModel->setIsWarranty(repairModel->isWarranty());
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
 
     updateStatesModel(repairModel->state());

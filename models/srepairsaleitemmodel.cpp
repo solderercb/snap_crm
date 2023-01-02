@@ -183,7 +183,7 @@ float SRepairSaleItemModel::price()
     return m_price;
 }
 
-void SRepairSaleItemModel::setPrice(const float price, const QVariant oldValue)
+void SRepairSaleItemModel::setPrice(const double price, const QVariant oldValue)
 {
     if(oldValue.isValid())  // возможность изменять цену товара должна быть доступна только при административной правке
         appendLogText(tr("Стоимость товара \"%1\" изменена с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toFloat()), sysLocale.toCurrencyString(price)));

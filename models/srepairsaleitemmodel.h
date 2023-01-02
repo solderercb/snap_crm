@@ -37,7 +37,7 @@ public:
     int workId();
     void setWorkId(const int);
     float price();
-    void setPrice(const float, const QVariant oldValue = QVariant());
+    void setPrice(const double, const QVariant oldValue = QVariant());
     QString sn();
     void setSN(const QString, const QVariant oldValue = QVariant());
     int warranty();

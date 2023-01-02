@@ -22,7 +22,7 @@ public:
     QString name();
     void setName(const QString name, const QVariant oldValue = QVariant());
     float price();
-    void setPrice(const float price, const QVariant oldValue = QVariant());
+    void setPrice(const double price, const QVariant oldValue = QVariant());
     int count();
     void setCount(const int count, const QVariant oldValue = QVariant());
     int warranty();

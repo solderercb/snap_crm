@@ -146,6 +146,8 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
     }
     else if(value.typeName() == QString("float"))
         str_value =  QString::number(value.toFloat(), 'f', 4);
+    else if(value.typeName() == QString("double"))
+        str_value =  QString::number(value.toDouble(), 'f', 4);
     else
         str_value = value.toString();
 

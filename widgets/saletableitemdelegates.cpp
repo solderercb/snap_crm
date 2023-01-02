@@ -44,7 +44,7 @@ void SaleTableItemDelegates::setEditorData(QWidget *editor, const QModelIndex &i
         case SStoreItemModel::SaleOpColumns::ColCount:
             setSpinBoxData(editor, index.data().toInt()); return;
         case SStoreItemModel::SaleOpColumns::ColPrice:
-            setDoubleSpinBoxData(editor, sysLocale.toFloat(index.data().toString())); return;
+            setDoubleSpinBoxData(editor, sysLocale.toDouble(index.data().toString())); return;
         case SStoreItemModel::SaleOpColumns::ColWarranty:
         case SStoreItemModel::SaleOpColumns::ColUser:
             setComboBoxData(editor, index.data().toString()); return;
@@ -298,13 +298,24 @@ void SaleTableItemDelegates::setModelDataFromSpinBox(QWidget *editor, QAbstractI
 QDoubleSpinBox *SaleTableItemDelegates::createDoubleSpinBox(QWidget *parent) const
 {
     QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
-    sb->setDecimals(2);
-    sb->setMinimum(0.01);   // TODO: в гарантийном ремонте минимальная цена должна быть равна нулю
-    sb->setMaximum(9999999999.99);
+    if(comSettings->value("classic_kassa").toBool())
+    {
+        sb->setDecimals(2);
+        sb->setMinimum(0.01);   // TODO: в гарантийном ремонте минимальная цена должна быть равна нулю
+        sb->setMaximum(999999.99);
+    }
+    else
+    {
+        sb->setDecimals(0);
+        sb->setMinimum(1);
+        sb->setMaximum(999999);
+    }
+    if(tableModel->isWarranty())
+        sb->setMinimum(0);
     return sb;
 }
 
-void SaleTableItemDelegates::setDoubleSpinBoxData(QWidget *editor, const float value) const
+void SaleTableItemDelegates::setDoubleSpinBoxData(QWidget *editor, const double value) const
 {
     QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
     Q_ASSERT(sb);

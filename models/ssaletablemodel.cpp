@@ -30,7 +30,7 @@ QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
     {
         switch (index.column()) {
         case SStoreItemModel::SaleOpColumns::ColPrice:
-        case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QStandardItemModel::data(index, role).toFloat(), 'f', 2);
+        case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QStandardItemModel::data(index, role).toDouble(), 'f', 2);
         case SStoreItemModel::SaleOpColumns::ColBox: return itemBoxesModel->getDisplayRole(QStandardItemModel::data(index, role).toInt(), 1);
         case SStoreItemModel::SaleOpColumns::ColWarranty: return warrantyTermsModel->getDisplayRole(QStandardItemModel::data(index, role).toInt(), 1);
         case SStoreItemModel::SaleOpColumns::ColUser: return allUsersMap->value(QStandardItemModel::data(index, role).toInt());
@@ -1149,7 +1149,7 @@ void SSaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex
     int column = topLeft.column();
     if( (column == SStoreItemModel::SaleOpColumns::ColCount || column == SStoreItemModel::SaleOpColumns::ColPrice) /*&& m_amountChangedSignalFilter*/ )   // был глюк, что без фильтра при добавлении первого товара в таблицу не обновляется общая сумма документа
     {
-        QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColSumm), value(row, SStoreItemModel::SaleOpColumns::ColCount).toInt() * value(row, SStoreItemModel::SaleOpColumns::ColPrice).toFloat() );
+        QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColSumm), value(row, SStoreItemModel::SaleOpColumns::ColCount).toInt() * value(row, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() );
         emit amountChanged(amountTotal(), m_amountItems, m_amountWorks);
     }
 //    QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColId), 1, DataRoles::Changed );

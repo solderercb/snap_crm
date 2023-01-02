@@ -205,7 +205,7 @@ float SStoreItemModel::currencyRate()
     return m_currencyRate;
 }
 
-void SStoreItemModel::setCurrencyRate(const float currency_rate)
+void SStoreItemModel::setCurrencyRate(const double currency_rate)
 {
     i_valuesMap.insert("currency_rate", currency_rate);
 }
@@ -215,7 +215,7 @@ float SStoreItemModel::inPrice()
     return m_inPrice;
 }
 
-void SStoreItemModel::setInPrice(const float in_price)
+void SStoreItemModel::setInPrice(const double in_price)
 {
     i_valuesMap.insert("in_price", in_price);
 }
@@ -225,7 +225,7 @@ float SStoreItemModel::price()
     return m_price;
 }
 
-void SStoreItemModel::setPrice(const float price)
+void SStoreItemModel::setPrice(const double price)
 {
     i_valuesMap.insert("price", price);
 }
@@ -235,7 +235,7 @@ float SStoreItemModel::price2()
     return m_price2;
 }
 
-void SStoreItemModel::setPrice2(const float price2)
+void SStoreItemModel::setPrice2(const double price2)
 {
     i_valuesMap.insert("price2", price2);
 }
@@ -245,7 +245,7 @@ float SStoreItemModel::price3()
     return m_price3;
 }
 
-void SStoreItemModel::setPrice3(const float price3)
+void SStoreItemModel::setPrice3(const double price3)
 {
     i_valuesMap.insert("price3", price3);
 }
@@ -255,7 +255,7 @@ float SStoreItemModel::price4()
     return m_price4;
 }
 
-void SStoreItemModel::setPrice4(const float price4)
+void SStoreItemModel::setPrice4(const double price4)
 {
     i_valuesMap.insert("price4", price4);
 }
@@ -265,7 +265,7 @@ float SStoreItemModel::price5()
     return m_price5;
 }
 
-void SStoreItemModel::setPrice5(const float price5)
+void SStoreItemModel::setPrice5(const double price5)
 {
     i_valuesMap.insert("price5", price5);
 }
@@ -385,7 +385,7 @@ float SStoreItemModel::inSumm()
     return m_inSumm;
 }
 
-void SStoreItemModel::setInSumm(const float in_summ)
+void SStoreItemModel::setInSumm(const double in_summ)
 {
     i_valuesMap.insert("in_summ", in_summ);
 }

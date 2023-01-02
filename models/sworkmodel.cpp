@@ -15,7 +15,7 @@ SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
     m_user = record.at(SStoreItemModel::SaleOpColumns::ColUser)->data(Qt::DisplayRole).toInt();
     m_repair = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
     m_name = record.at(SStoreItemModel::SaleOpColumns::ColName)->data(Qt::DisplayRole).toString();
-    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
+    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toDouble();
     m_count = record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
     m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
     m_priceId = record.at(SStoreItemModel::SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt();
@@ -98,7 +98,7 @@ float SWorkModel::price()
     return m_price;
 }
 
-void SWorkModel::setPrice(const float price, const QVariant oldValue)
+void SWorkModel::setPrice(const double price, const QVariant oldValue)
 {
     if(oldValue.isValid())
         appendLogText(tr("Стоимость работы \"%1\" изменёна с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toFloat()), sysLocale.toCurrencyString(price)));
@@ -215,7 +215,7 @@ void SWorkModel::setQueryField(const int fieldNum, const QVariant value, const Q
         case SStoreItemModel::ColUser: setUser(value.toInt(), oldValue); break;
         case SStoreItemModel::ColObjId: setRepair(value.toInt()); break;
         case SStoreItemModel::ColName: setName(value.toString(), oldValue); break;
-        case SStoreItemModel::ColPrice: setPrice(value.toFloat(), oldValue); break;
+        case SStoreItemModel::ColPrice: setPrice(value.toDouble(), oldValue); break;
         case SStoreItemModel::ColCount: setCount(value.toInt(), oldValue); break;
         case SStoreItemModel::ColWarranty: setWarranty(value.toInt(), oldValue); break;
         case SStoreItemModel::ColItemId: setPriceId(value.toInt()); break;
