@@ -29,10 +29,10 @@ void SInvoiceModel::load(int id)
         m_covenantorName = invoiceModel->record(0).value("covenantor_name").toString();
         m_clientId = invoiceModel->record(0).value("client_id").toInt();
         m_paid = invoiceModel->record(0).value("paid").toDateTime();
-        m_tax = invoiceModel->record(0).value("tax").toFloat();
-        m_summ = invoiceModel->record(0).value("summ").toFloat();
+        m_tax = invoiceModel->record(0).value("tax").toDouble();
+        m_summ = invoiceModel->record(0).value("summ").toDouble();
         m_notes = invoiceModel->record(0).value("notes").toString();
-        m_total = invoiceModel->record(0).value("total").toFloat();
+        m_total = invoiceModel->record(0).value("total").toDouble();
         m_state = invoiceModel->record(0).value("state").toInt();
         m_office = invoiceModel->record(0).value("office").toInt();
         m_type = invoiceModel->record(0).value("type").toInt();
@@ -121,22 +121,22 @@ void SInvoiceModel::setPaid(const QDateTime paid)
     i_valuesMap.insert("paid", paid);
 }
 
-float SInvoiceModel::tax()
+double SInvoiceModel::tax()
 {
     return m_tax;
 }
 
-void SInvoiceModel::setTax(const float tax)
+void SInvoiceModel::setTax(const double tax)
 {
     i_valuesMap.insert("tax", tax);
 }
 
-float SInvoiceModel::summ()
+double SInvoiceModel::summ()
 {
     return m_summ;
 }
 
-void SInvoiceModel::setSumm(const float summ)
+void SInvoiceModel::setSumm(const double summ)
 {
     i_valuesMap.insert("summ", summ);
 }
@@ -151,12 +151,12 @@ void SInvoiceModel::setNotes(const QString notes)
     i_valuesMap.insert("notes", notes);
 }
 
-float SInvoiceModel::total()
+double SInvoiceModel::total()
 {
     return m_total;
 }
 
-void SInvoiceModel::setTotal(const float total)
+void SInvoiceModel::setTotal(const double total)
 {
     i_valuesMap.insert("total", total);
 }

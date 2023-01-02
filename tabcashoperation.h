@@ -52,7 +52,7 @@ private:
     int m_orderId = 0;
     int m_orderType = 0;
     bool m_orderTypeRO = 0;
-    float m_amount = 0;
+    double m_amount = 0;
     int m_client = 0;
     int m_employee = 0;
     int m_linkedObjId = 0;
@@ -92,14 +92,14 @@ private:
     void setDefaultStylesheets();
     bool commit(bool repeatAfter = 0);
     bool commitSimple();
-    bool commitBalance(float amount);
+    bool commitBalance(const double amount);
     bool commitDocument();
     bool commitInvoice();
     bool commitPrepayRepair();
     bool commitRevert();
     void print();
     QString constructReason();
-    void setAmount(const float);
+    void setAmount(const double);
     void updateOrderIdLineEdit();
 #ifdef QT_DEBUG
     enum RandomFillerStep {OpType = 1, LinkedObj, RClient, Amount, PaymentSys, End};

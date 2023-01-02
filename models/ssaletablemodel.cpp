@@ -453,7 +453,7 @@ void SSaleTableModel::setPriceColumn(const int idx)
         query->bindValue(":id", index(i,  SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
         query->exec();
         query->first();
-        setData(index(i,  SStoreItemModel::SaleOpColumns::ColPrice), query->record().value(0).toFloat());
+        setData(index(i,  SStoreItemModel::SaleOpColumns::ColPrice), query->record().value(0).toDouble());
     }
     delete query;
 }
@@ -1067,13 +1067,13 @@ void SSaleTableModel::setHorizontalHeaderLabels()
  */
 double SSaleTableModel::amountTotal()
 {
-    float summ;
+    double summ;
     m_amountTotal = 0;
     m_amountItems = 0;
     m_amountWorks = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        summ = value(i, SStoreItemModel::SaleOpColumns::ColSumm).toFloat();
+        summ = value(i, SStoreItemModel::SaleOpColumns::ColSumm).toDouble();
         if(value(i, SStoreItemModel::SaleOpColumns::ColRecordType).toBool())
             m_amountItems += summ;
         else

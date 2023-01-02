@@ -281,7 +281,7 @@ bool tabCashOperation::commitSimple()
     return 1;
 }
 
-bool tabCashOperation::commitBalance(float amount)
+bool tabCashOperation::commitBalance(const double amount)
 {
     QString note;
     bool nErr = 1;
@@ -346,9 +346,9 @@ void tabCashOperation::print()
     emit generatePrintout(report_vars);
 }
 
-void tabCashOperation::setAmount(const float amount)
+void tabCashOperation::setAmount(const double amount)
 {
-    float l_amount = amount;
+    double l_amount = amount;
     if(l_amount < 0)
         l_amount = -l_amount;
     ui->doubleSpinBoxAmount->setValue(l_amount);

@@ -89,7 +89,7 @@ void SClientModel::load(int id)
         m_agent2Patronymic = clientModel->record(0).value("agent2_patronymic").toString();
         m_agent2Phone = clientModel->record(0).value("agent2_phone").toString();
         m_agent2PhoneClean = clientModel->record(0).value("agent2_phone_clean").toString();
-        m_balance = clientModel->record(0).value("balance").toFloat();
+        m_balance = clientModel->record(0).value("balance").toDouble();
         m_priceColumn = clientModel->record(0).value("price_col").toInt();
         m_repairs = clientModel->record(0).value("repairs").toInt();
         m_purchases = clientModel->record(0).value("purchases").toInt();
@@ -514,7 +514,7 @@ bool SClientModel::setBalanceEnabled(bool state)
     return i_nErr;
 }
 
-float SClientModel::balance()
+double SClientModel::balance()
 {
     return m_balance;
 }
@@ -526,7 +526,7 @@ void SClientModel::createBalanceObj()
     query->exec(QUERY_SEL_BALANCE(i_id));
     query->first();
     if(query->isValid())
-        m_balance = query->value(0).toFloat();
+        m_balance = query->value(0).toDouble();
     delete query;
 }
 
@@ -536,7 +536,7 @@ void SClientModel::deleteBalanceObj()
         delete balanceLog;
 }
 
-bool SClientModel::updateBalance(const float amount, const QString &text)
+bool SClientModel::updateBalance(const double amount, const QString &text)
 {
     if(isNew())   // TODO: проверка включен ли баланс у клиента
         throw 3;
@@ -574,11 +574,11 @@ bool SClientModel::updateBalance(const float amount, const QString &text)
         throw 2;
     }
 
-    m_balance = i_query->value("balance").toFloat();
+    m_balance = i_query->value("balance").toDouble();
     return i_nErr;
 }
 
-bool SClientModel::updateBalance(const float amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason reason, const int reason_id)
+bool SClientModel::updateBalance(const double amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason reason, const int reason_id)
 {
     switch(reason)
     {
@@ -725,7 +725,7 @@ bool SClientModel::commit()
 
 bool SClientModel::balanceEnough(const QString summ)
 {
-    if( sysLocale.toFloat(summ) <= m_balance )
+    if( sysLocale.toDouble(summ) <= m_balance )
         return 1;
 
     QMessageBox msgBox;
@@ -791,7 +791,7 @@ void SBalanceLogRecordModel::setText(const QString &text)
     i_valuesMap.insert("reason", text);
 }
 
-void SBalanceLogRecordModel::setDirection(float amount)
+void SBalanceLogRecordModel::setDirection(double amount)
 {
     if(amount > 0)
         i_valuesMap.insert("direction", 1);
@@ -814,7 +814,7 @@ void SBalanceLogRecordModel::setCashOrderId(const int id)
     i_logRecord->setCashOrderId(id);
 }
 
-bool SBalanceLogRecordModel::commit(const float amount)
+bool SBalanceLogRecordModel::commit(const double amount)
 {
     setDirection(amount);
     i_valuesMap.insert("uid", userDbData->value("id"));
@@ -828,7 +828,7 @@ bool SBalanceLogRecordModel::commit(const float amount)
     return i_nErr;
 }
 
-bool SBalanceLogRecordModel::commit(const float amount, const QString &text)
+bool SBalanceLogRecordModel::commit(const double amount, const QString &text)
 {
     setText(text);
     commit(amount);

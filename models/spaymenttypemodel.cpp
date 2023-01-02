@@ -36,7 +36,7 @@ void SPaymentTypeModel::load()
     m_client = query.value("client").toInt();
     m_periodic = query.value("periodic").toBool();
     m_payDate = query.value("pay_date").toDateTime();
-    m_defSumm = query.value("def_summ").toFloat();
+    m_defSumm = query.value("def_summ").toDouble();
     m_reason = query.value("reason").toString();
     m_isArchive = query.value("is_archive").toBool();
     m_paymentSystem = query.value("payment_system").toInt();
@@ -114,12 +114,12 @@ void SPaymentTypeModel::setPayDate(const QDateTime payDate)
     i_valuesMap.insert("pay_date", payDate);
 }
 
-float SPaymentTypeModel::defSumm()
+double SPaymentTypeModel::defSumm()
 {
     return m_defSumm;
 }
 
-void SPaymentTypeModel::setDefSumm(const float defSumm)
+void SPaymentTypeModel::setDefSumm(const double defSumm)
 {
     if(i_id)
         appendLogText(tr("Сумма по умолчанию изменена с %1 на %2").arg(sysLocale.toString(m_defSumm, 'f', 2), sysLocale.toString(defSumm, 'f', 2)));

@@ -33,9 +33,9 @@ private:
     bool m_opType = Type::Move;
     int m_srcOrderId = 0;
     int m_dstOrderId = 0;
-    float m_srcAmount = 0;
-    float m_dstAmount = 0;
-    float m_rate = 1.0;
+    double m_srcAmount = 0;
+    double m_dstAmount = 0;
+    double m_rate = 1.0;
     void (SCashRegisterModel::*method)(int) = nullptr;
     QString m_reason;
     bool m_widgetsRO = 0;
@@ -45,7 +45,7 @@ private:
     bool m_backdate = 0;
     bool m_showCheckBoxPrint = 1;
     bool m_showFlipCurrencyButton = 0;
-    float prevCurrencyRate = 0;
+    double prevCurrencyRate = 0;
     bool currencyFlipped = 0;
     QString chargeType; // используется для подписи поля Комиссия/Курс и для создания части примечания
     Ui::tabCashMoveExch *ui;

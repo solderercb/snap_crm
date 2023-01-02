@@ -43,7 +43,7 @@ private:
     void setDefaultStyleSheets();
     SRepairModel *repairModel;
     SClientModel *clientModel;
-    float summToPay;
+    double summToPay;
     SSortFilterProxyModel *paymentSystemsProxyModel;
     void initPaymentSystems();
     bool checkAmounts();

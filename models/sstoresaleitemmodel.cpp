@@ -21,8 +21,8 @@ SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, Q
     m_buyer = record.at(SStoreItemModel::SaleOpColumns::ColBuyer)->data(Qt::DisplayRole).toInt();
     m_isRealization = record.at(SStoreItemModel::SaleOpColumns::ColRealization)->data(Qt::DisplayRole).toBool();
     m_returnPercent = record.at(SStoreItemModel::SaleOpColumns::ColRetPercent)->data(Qt::DisplayRole).toInt();
-    m_inPrice = record.at(SStoreItemModel::SaleOpColumns::ColInPrice)->data(Qt::DisplayRole).toFloat();
-    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
+    m_inPrice = record.at(SStoreItemModel::SaleOpColumns::ColInPrice)->data(Qt::DisplayRole).toDouble();
+    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toDouble();
     m_count = record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
     m_avail = record.at(SStoreItemModel::SaleOpColumns::ColAvail)->data(Qt::DisplayRole).toInt();
     m_state = record.at(SStoreItemModel::SaleOpColumns::ColState)->data(Qt::DisplayRole).toBool();
@@ -96,22 +96,22 @@ void SStoreSaleItemModel::setCount(const int count)
     i_valuesMap.insert("count", count);
 }
 
-float SStoreSaleItemModel::inPrice()
+double SStoreSaleItemModel::inPrice()
 {
     return m_inPrice;
 }
 
-void SStoreSaleItemModel::setInPrice(const float in_price)
+void SStoreSaleItemModel::setInPrice(const double in_price)
 {
     i_valuesMap.insert("in_price", in_price);
 }
 
-float SStoreSaleItemModel::price()
+double SStoreSaleItemModel::price()
 {
     return m_price;
 }
 
-void SStoreSaleItemModel::setPrice(const float price)
+void SStoreSaleItemModel::setPrice(const double price)
 {
     i_valuesMap.insert("price", price);
 }
@@ -299,8 +299,8 @@ void SStoreSaleItemModel::setQueryField(const int fieldNum, const QVariant value
         case SStoreItemModel::ColObjId: setDocumentId(value.toInt()); break;
         case SStoreItemModel::ColBuyer: setBuyer(value.toInt()); break;
         case SStoreItemModel::ColCount: setCount(value.toInt()); break;
-        case SStoreItemModel::ColInPrice: setInPrice(value.toFloat()); break;
-        case SStoreItemModel::ColPrice: setPrice(value.toFloat()); break;
+        case SStoreItemModel::ColInPrice: setInPrice(value.toDouble()); break;
+        case SStoreItemModel::ColPrice: setPrice(value.toDouble()); break;
         case SStoreItemModel::ColWarranty: setWarranty(value.toInt()); break;
         case SStoreItemModel::ColRealization: setIsRealization(value.toBool()); break;
         case SStoreItemModel::ColRetPercent: setReturnPercent(value.toInt()); break;

@@ -70,9 +70,9 @@ int SPaymentTypesModel::clientByDatabaseId(int id)
     return dataByDatabaseId(id, Qt::UserRole + 3).toInt();
 }
 
-float SPaymentTypesModel::defaultAmountByDatabaseId(int id)
+double SPaymentTypesModel::defaultAmountByDatabaseId(int id)
 {
-    return dataByDatabaseId(id, Qt::UserRole + 6).toFloat();
+    return dataByDatabaseId(id, Qt::UserRole + 6).toDouble();
 }
 
 int SPaymentTypesModel::paymentSystemByDatabaseId(int id)

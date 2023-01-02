@@ -103,7 +103,7 @@ public:
 
 signals:
     void dataChanged();
-    void amountChanged(float, float, float);
+    void amountChanged(double, double, double);
 //    void modelReset();
     void addItem();
 
@@ -122,7 +122,7 @@ private:
     QString m_extraUnsaleReason;
     bool m_tableMode = TablesSet::StoreSale;
     int m_editStrategy = EditStrategy::OnFieldChange;
-    float m_amountItems = 0, m_amountWorks = 0, m_amountTotal = 0;
+    double m_amountItems = 0, m_amountWorks = 0, m_amountTotal = 0;
     int m_currentIndex = -1;
     int m_lastHandledWorkId = -1;
     bool m_isWarranty = 0;

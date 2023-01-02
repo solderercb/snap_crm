@@ -26,7 +26,7 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
     m_state = record.at(SStoreItemModel::SaleOpColumns::ColState)->data(Qt::DisplayRole).toInt();
     m_repairId = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
     m_workId = record.at(SStoreItemModel::SaleOpColumns::ColWorkId)->data(Qt::DisplayRole).toInt();
-    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
+    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toDouble();
     m_sn = record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString();
     m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
 
@@ -178,7 +178,7 @@ void SRepairSaleItemModel::setWorkId(const int id)
         i_valuesMap.insert("work_id", QVariant());
 }
 
-float SRepairSaleItemModel::price()
+double SRepairSaleItemModel::price()
 {
     return m_price;
 }
@@ -186,7 +186,7 @@ float SRepairSaleItemModel::price()
 void SRepairSaleItemModel::setPrice(const double price, const QVariant oldValue)
 {
     if(oldValue.isValid())  // возможность изменять цену товара должна быть доступна только при административной правке
-        appendLogText(tr("Стоимость товара \"%1\" изменена с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toFloat()), sysLocale.toCurrencyString(price)));
+        appendLogText(tr("Стоимость товара \"%1\" изменена с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toDouble()), sysLocale.toCurrencyString(price)));
 
     i_valuesMap.insert("price", price);
 }
@@ -315,7 +315,7 @@ void SRepairSaleItemModel::setQueryField(const int fieldNum, const QVariant valu
         case SStoreItemModel::ColName: setName(value.toString()); break;
         case SStoreItemModel::ColObjId: setRepairId(value.toInt()); break;
         case SStoreItemModel::ColCount: setCount(value.toInt(), oldValue); break;
-        case SStoreItemModel::ColPrice: setPrice(value.toFloat(), oldValue); break;
+        case SStoreItemModel::ColPrice: setPrice(value.toDouble(), oldValue); break;
         case SStoreItemModel::ColWarranty: setWarranty(value.toInt(), oldValue); break;
         case SStoreItemModel::ColState: setState((State)value.toInt()); break;
         case SStoreItemModel::ColSN: setSN(value.toString(), oldValue); break;

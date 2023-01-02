@@ -17,7 +17,7 @@ public:
     QString reasonByDatabaseId(int id);
     int clientByDatabaseId(int id);
     int paymentSystemByDatabaseId(int id);
-    float defaultAmountByDatabaseId(int id);
+    double defaultAmountByDatabaseId(int id);
 };
 
 #endif // SPAYMENTTYPESMODEL_H

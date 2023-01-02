@@ -8,7 +8,7 @@ getOutDialog::getOutDialog(QWidget *p, Qt::WindowFlags f) :
     ui(new Ui::getOutDialog),
     parent(p)
 {
-    float worksAndSparePartsSumm;
+    double worksAndSparePartsSumm;
     ui->setupUi(this);
     setDefaultStyleSheets();
     connect(ui->comboBoxRejectReason, SIGNAL(currentTextChanged(QString)), this, SLOT(otheRejectReasonShow(QString)));

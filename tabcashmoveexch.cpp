@@ -383,7 +383,7 @@ void tabCashMoveExch::buttonPrintClicked()
 
 void tabCashMoveExch::calculateDstAmount()
 {
-    float dstValue = 0;
+    double dstValue = 0;
     ui->doubleSpinBoxDstAmount->blockSignals(1);
     if(m_opType == Type::Exchange)
     {

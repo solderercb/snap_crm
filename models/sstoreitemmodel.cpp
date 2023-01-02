@@ -14,8 +14,8 @@ SStoreItemModel::SStoreItemModel(const QList<QStandardItem *> &record, const int
 {
     i_id = record.value(SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt();
     m_saleId = record.value(SaleOpColumns::ColId)->data(Qt::DisplayRole).toInt();
-    m_inPrice = record.value(SaleOpColumns::ColInPrice)->data(Qt::DisplayRole).toFloat();
-    m_price = record.value(SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toFloat();
+    m_inPrice = record.value(SaleOpColumns::ColInPrice)->data(Qt::DisplayRole).toDouble();
+    m_price = record.value(SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toDouble();
     m_returnPercent = record.value(SaleOpColumns::ColRetPercent)->data(Qt::DisplayRole).toInt();
     m_isRealization = record.value(SaleOpColumns::ColRealization)->data(Qt::DisplayRole).toBool();
     m_savedSaleQty = savedSaleQty;
@@ -200,7 +200,7 @@ void SStoreItemModel::setPriceOption(const int price_option)
     i_valuesMap.insert("price_option", price_option);
 }
 
-float SStoreItemModel::currencyRate()
+double SStoreItemModel::currencyRate()
 {
     return m_currencyRate;
 }
@@ -210,7 +210,7 @@ void SStoreItemModel::setCurrencyRate(const double currency_rate)
     i_valuesMap.insert("currency_rate", currency_rate);
 }
 
-float SStoreItemModel::inPrice()
+double SStoreItemModel::inPrice()
 {
     return m_inPrice;
 }
@@ -220,7 +220,7 @@ void SStoreItemModel::setInPrice(const double in_price)
     i_valuesMap.insert("in_price", in_price);
 }
 
-float SStoreItemModel::price()
+double SStoreItemModel::price()
 {
     return m_price;
 }
@@ -230,7 +230,7 @@ void SStoreItemModel::setPrice(const double price)
     i_valuesMap.insert("price", price);
 }
 
-float SStoreItemModel::price2()
+double SStoreItemModel::price2()
 {
     return m_price2;
 }
@@ -240,7 +240,7 @@ void SStoreItemModel::setPrice2(const double price2)
     i_valuesMap.insert("price2", price2);
 }
 
-float SStoreItemModel::price3()
+double SStoreItemModel::price3()
 {
     return m_price3;
 }
@@ -250,7 +250,7 @@ void SStoreItemModel::setPrice3(const double price3)
     i_valuesMap.insert("price3", price3);
 }
 
-float SStoreItemModel::price4()
+double SStoreItemModel::price4()
 {
     return m_price4;
 }
@@ -260,7 +260,7 @@ void SStoreItemModel::setPrice4(const double price4)
     i_valuesMap.insert("price4", price4);
 }
 
-float SStoreItemModel::price5()
+double SStoreItemModel::price5()
 {
     return m_price5;
 }
@@ -380,7 +380,7 @@ void SStoreItemModel::setInCount(const int in_count)
     i_valuesMap.insert("in_count", in_count);
 }
 
-float SStoreItemModel::inSumm()
+double SStoreItemModel::inSumm()
 {
     return m_inSumm;
 }
@@ -559,13 +559,13 @@ void SStoreItemModel::load()
     m_box = i_query->value("box").toInt();
     m_boxName = i_query->value("box_name").toString();
     m_priceOption = i_query->value("price_option").toInt();
-    m_currencyRate = i_query->value("currency_rate").toFloat();
-    m_inPrice = i_query->value("in_price").toFloat();
-    m_price = i_query->value("price").toFloat();
-    m_price2 = i_query->value("price2").toFloat();
-    m_price3 = i_query->value("price3").toFloat();
-    m_price4 = i_query->value("price4").toFloat();
-    m_price5 = i_query->value("price5").toFloat();
+    m_currencyRate = i_query->value("currency_rate").toDouble();
+    m_inPrice = i_query->value("in_price").toDouble();
+    m_price = i_query->value("price").toDouble();
+    m_price2 = i_query->value("price2").toDouble();
+    m_price3 = i_query->value("price3").toDouble();
+    m_price4 = i_query->value("price4").toDouble();
+    m_price5 = i_query->value("price5").toDouble();
     m_document = i_query->value("document").toInt();
     m_partRequest = i_query->value("part_request").toInt();
     m_shopTitle = i_query->value("shop_title").toString();
@@ -577,7 +577,7 @@ void SStoreItemModel::load()
     m_intBarcode = i_query->value("int_barcode").toString();
     m_extBarcode = i_query->value("ext_barcode").toInt();
     m_inCount = i_query->value("in_count").toInt();
-    m_inSumm = i_query->value("in_summ").toFloat();
+    m_inSumm = i_query->value("in_summ").toDouble();
     m_notes = i_query->value("notes").toString();
 //    m_img1 = i_query->value("img1").toInt();
 //    m_img2 = i_query->value("img2").toInt();
@@ -831,7 +831,7 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
     if(!m_isRealization)
         return 1;
 
-    float royaltyForItem = m_inPrice + (m_price - m_inPrice)*m_returnPercent/100;
+    double royaltyForItem = m_inPrice + (m_price - m_inPrice)*m_returnPercent/100;
     QString logText;
 
     if(royaltyForItem == 0)
@@ -845,7 +845,7 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
     {
         if(m_opOnItemType == Unsale || m_opOnItemType == UnsaleRepair)
         {
-            float dealerRoyalty = m_savedSaleQty*royaltyForItem;
+            double dealerRoyalty = m_savedSaleQty*royaltyForItem;
             if(m_opOnItemType == Unsale)
                 logText = tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id);
             else
@@ -854,7 +854,7 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
         }
         else
         {
-            float dealerRoyalty = m_saleQty*royaltyForItem;
+            double dealerRoyalty = m_saleQty*royaltyForItem;
             i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_saleQty).arg(i_id), source, m_saleObjId);
         }
     }

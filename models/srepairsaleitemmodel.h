@@ -36,7 +36,7 @@ public:
     void setRepairId(const int);
     int workId();
     void setWorkId(const int);
-    float price();
+    double price();
     void setPrice(const double, const QVariant oldValue = QVariant());
     QString sn();
     void setSN(const QString, const QVariant oldValue = QVariant());
@@ -64,7 +64,7 @@ private:
     int m_state;
     int m_repairId;
     int m_workId;
-    float m_price;
+    double m_price;
     QString m_sn;
     int m_warranty;
     bool m_rLock;

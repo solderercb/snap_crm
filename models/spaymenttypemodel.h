@@ -27,8 +27,8 @@ public:
     void setPeriodic(const bool);
     QDateTime payDate();
     void setPayDate(const QDateTime);
-    float defSumm();
-    void setDefSumm(const float);
+    double defSumm();
+    void setDefSumm(const double);
     QString reason();
     void setReason(const QString&);
     bool isArchive();
@@ -45,7 +45,7 @@ private:
     bool m_periodic;
     QDateTime m_payDate;
     QDateTime m_updateTime;
-    float m_defSumm;
+    double m_defSumm;
     QString m_reason;
     bool m_isArchive;
     int m_paymentSystem;

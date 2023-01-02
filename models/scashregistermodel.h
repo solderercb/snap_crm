@@ -29,11 +29,11 @@ public:
     void load();
     void load(int);
     bool commit();
-    bool commit(float);
+    bool commit(double);
     void setOperationType(int);
-    float amount();
-    float amountAbs();
-    void setAmount(float);
+    double amount();
+    double amountAbs();
+    void setAmount(double);
     void setClient(int);
     void unsetClient(); // удаление id клиента (анонимный)
     void setSystemId(int);   // ID платёжной системы (`payment_systems`.`system_id`)
@@ -67,7 +67,7 @@ private:
     int m_client = 0;
     int m_currency = 0;
     QStringList fields_verify;
-    float m_amount = 0;
+    double m_amount = 0;
     QString m_amount_str;
     QString m_amount_words;
     QString m_reason;
@@ -79,7 +79,7 @@ private:
     int m_repair = 0;
     int m_document = 0;
     QByteArray m_img;
-    float m_cardFee;
+    double m_cardFee;
     bool m_isBackdate;
     int m_cardInfo;
     QString m_customerEmail;

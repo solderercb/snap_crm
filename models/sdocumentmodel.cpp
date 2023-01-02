@@ -48,7 +48,7 @@ void SDocumentModel::load()
         m_updated = docModel->record(0).value("updated_at").toDateTime();
         m_office = docModel->record(0).value("office").toInt();
         m_client = docModel->record(0).value("dealer").toInt();
-        m_currencyRate = docModel->record(0).value("currency_rate").toFloat();
+        m_currencyRate = docModel->record(0).value("currency_rate").toDouble();
 //        m_img1 = docModel->record(0).value("img1").toInt();
 //        m_img2 = docModel->record(0).value("img2").toInt();
 //        m_img3 = docModel->record(0).value("img3").toInt();
@@ -136,7 +136,7 @@ void SDocumentModel::setPaymentSystem(int id)
     i_valuesMap.insert("payment_system", id);
 }
 
-float SDocumentModel::amount()
+double SDocumentModel::amount()
 {
     return m_amount;
 }
@@ -146,13 +146,13 @@ QString SDocumentModel::amountLocal()
     return sysLocale.toString(m_amount, 'f', 2);
 }
 
-void SDocumentModel::setAmount(float amount)
+void SDocumentModel::setAmount(double amount)
 {
     m_amount = amount;
     i_valuesMap.insert("total", amount);
 }
 
-float SDocumentModel::currencyRate()
+double SDocumentModel::currencyRate()
 {
     return m_currencyRate;
 }
@@ -162,7 +162,7 @@ QString SDocumentModel::currencyRateLocal()
     return sysLocale.toString(m_currencyRate, 'f', 4);
 }
 
-void SDocumentModel::setCurrencyRate(float rate)
+void SDocumentModel::setCurrencyRate(double rate)
 {
     m_currencyRate = rate;
     i_valuesMap.insert("currency_rate", rate);

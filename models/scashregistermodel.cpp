@@ -38,7 +38,7 @@ void SCashRegisterModel::load()
     i_valuesMap.clear();
     i_createdUtc = order->record(0).value("created").toDateTime();
     m_type = order->record(0).value("type").toInt();
-    m_amount = order->record(0).value("summa").toFloat();
+    m_amount = order->record(0).value("summa").toDouble();
     m_amount_str = order->record(0).value("summa_str").toString();
     m_invoice = order->record(0).value("invoice").toInt();
     m_client = order->record(0).value("client").toInt();
@@ -51,7 +51,7 @@ void SCashRegisterModel::load()
     m_document = order->record(0).value("document").toInt();
     m_img = order->record(0).value("img").toByteArray();
     m_systemId = order->record(0).value("payment_system").toInt();
-    m_cardFee = order->record(0).value("card_fee").toFloat();
+    m_cardFee = order->record(0).value("card_fee").toDouble();
     m_isBackdate = order->record(0).value("is_backdate").toBool();
     m_cardInfo = order->record(0).value("card_info").toInt();
     m_customerEmail = order->record(0).value("customer_email").toString();
@@ -117,7 +117,7 @@ bool SCashRegisterModel::commit()
     return i_nErr;
 }
 
-bool SCashRegisterModel::commit(float amount)
+bool SCashRegisterModel::commit(double amount)
 {
     setAmount(amount);
     return commit();
@@ -338,21 +338,21 @@ void SCashRegisterModel::setOperationType(int type)
     i_valuesMap.insert("type", m_type);
 }
 
-float SCashRegisterModel::amount()
+double SCashRegisterModel::amount()
 {
     return m_amount;
 }
 
-float SCashRegisterModel::amountAbs()
+double SCashRegisterModel::amountAbs()
 {
     if(m_amount < 0)
         return -m_amount;
     return m_amount;
 }
 
-void SCashRegisterModel::setAmount(float amount)
+void SCashRegisterModel::setAmount(double amount)
 {
-    float l_amount = amount;
+    double l_amount = amount;
     if(l_amount < 0)
         l_amount = -l_amount;
 

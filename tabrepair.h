@@ -67,25 +67,6 @@ public:
     explicit worksAndSparePartsTable(QWidget *parent = nullptr);
     ~worksAndSparePartsTable();
     void resizeEvent(QResizeEvent*);
-#if QT_VERSION >= 0x060000
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
-#else
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
-#endif
-private:
-};
-
-class worksAndSparePartsDataModel : public QSqlQueryModel
-{
-    Q_OBJECT
-
-public:
-    enum {actions, name, qty, price, summ, warranty, user, sn, id, work_id, item_rsrv_id};
-    explicit worksAndSparePartsDataModel(QWidget *parent = nullptr);
-    ~worksAndSparePartsDataModel();
-    void update();
-private:
-    QVariant data(const QModelIndex &index, int role) const;
 };
 
 class tabRepair : public tabCommon
@@ -122,7 +103,7 @@ private:
     SSaleTableModel *worksAndPartsModel;
     SaleTableItemDelegates *itemDelagates;
     bool m_statusUpdateInProgress = 0;
-    float works_sum, parts_sum, total_sum;
+    double works_sum, parts_sum, total_sum;
     int getFieldIdByName(const QString &, QSqlQueryModel *);
     QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
     void eventResize(QResizeEvent *);
@@ -171,7 +152,7 @@ private slots:
     void saveState();
     void saveState(int);
     void comboBoxStateIndexChanged(int);
-    void updateTotalSumms(const float, const float, const float);
+    void updateTotalSumms(const double, const double, const double);
     void createGetOutDialog();
     void closeGetOutDialog();
     void openPrevRepair();

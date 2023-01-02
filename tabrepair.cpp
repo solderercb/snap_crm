@@ -82,7 +82,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     statusesProxyModel->setSourceModel(statusesModel);
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setPriceColumn(0);
-    connect(worksAndPartsModel, SIGNAL(amountChanged(float,float,float)), this, SLOT(updateTotalSumms(float,float,float)));
+    connect(worksAndPartsModel, SIGNAL(amountChanged(double,double,double)), this, SLOT(updateTotalSumms(double,double,double)));
     connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
     itemDelagates = new SaleTableItemDelegates(worksAndPartsModel, ui->tableViewWorksAndSpareParts);
     commentsModel = new commentsDataModel();
@@ -473,7 +473,7 @@ bool tabRepair::checkData(const int stateId)
     return ret;
 }
 
-void tabRepair::updateTotalSumms(const float, const float, const float)
+void tabRepair::updateTotalSumms(const double, const double, const double)
 {
     ui->lineEditTotalAmount->setText(worksAndPartsModel->amountTotalLocale());
     ui->lineEditWorksAmount->setText(worksAndPartsModel->amountWorksLocale());
@@ -912,44 +912,4 @@ void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
     else
         setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
     resizeRowsToContents();
-}
-
-#if QT_VERSION >= 0x060000
-void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#else
-void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#endif
-{
-    QTableView::dataChanged(topLeft,bottomRight,roles);
-    resizeRowsToContents();
-}
-
-worksAndSparePartsDataModel::worksAndSparePartsDataModel(QWidget *parent) :
-    QSqlQueryModel(parent)
-{
-
-}
-
-worksAndSparePartsDataModel::~worksAndSparePartsDataModel()
-{
-
-}
-
-QVariant worksAndSparePartsDataModel::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid())
-        return false;
-
-    // FIXME: Implement me!
-    if (role == Qt::DisplayRole)
-    {
-        switch (index.column()) {
-            case SStoreItemModel::SaleOpColumns::ColPrice: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
-            case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QSqlQueryModel::data(index, role).toFloat(), 'f', 2);
-            case SStoreItemModel::SaleOpColumns::ColBox: return itemBoxesModel->value(QSqlQueryModel::data(index, role).toInt());
-            case SStoreItemModel::SaleOpColumns::ColUser: return allUsersMap->value(QSqlQueryModel::data(index, role).toInt());
-            case SStoreItemModel::SaleOpColumns::ColWarranty: return warrantyTermsMap->value(QSqlQueryModel::data(index, role).toInt());
-        }
-    }
-    return QSqlQueryModel::data(index, role);   // или если просто возвращать данные наследуемого объекта, то тоже всё ОК
 }

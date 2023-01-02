@@ -51,7 +51,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 //    connect(ui->buttonReserve, SIGNAL(clicked()), this, SLOT(reserveButtonClicked()));    // подключены в дизайнере
 //    connect(ui->buttonSale, SIGNAL(clicked()), this, SLOT(saleButtonClicked()));    // подключены в дизайнере
     connect(ui->comboBoxPriceCol, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPriceCol(int)));    // нужно подключать здесь, иначе возникает глюк с доступом к QMap<> fields
-    connect(tableModel, SIGNAL(amountChanged(float, float, float)), this, SLOT(updateTotalSumms(float, float, float)));
+    connect(tableModel, SIGNAL(amountChanged(double, double, double)), this, SLOT(updateTotalSumms(double, double, double)));
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
     connect(ui->comboBoxClientPhoneType,SIGNAL(currentIndexChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
     connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(phoneNumberEdited(QString)));
@@ -190,7 +190,7 @@ void tabSale::updateWidgets()
             ui->buttonSale->show();
             tableModel->store_loadTable(doc_id);
 #ifdef QT_DEBUG
-            ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toFloat(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2)); // это для отладки
+            ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toDouble(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2)); // это для отладки
 #else
             ui->lineEditTakeIn->setText(sysLocale.toString(0.00, 'f', 2));
 #endif
@@ -338,7 +338,7 @@ bool tabSale::checkInput()
         error = 6;
     }
 
-    if (sysLocale.toFloat(ui->lineEditTakeIn->text()) < sysLocale.toFloat(ui->lineEditTotal->text()) )   //
+    if (sysLocale.toDouble(ui->lineEditTakeIn->text()) < sysLocale.toDouble(ui->lineEditTotal->text()) )   //
     {
         ui->lineEditTakeIn->setStyleSheet(commonLineEditStyleSheetRed);
         error = 7;
@@ -353,7 +353,7 @@ bool tabSale::checkInput()
         // будет слишкм стрёмно, если окрасить tableView в красный, поэтому просто ничего не делаем.
         error = 9;
     }
-    if ( sysLocale.toFloat(ui->lineEditTotal->text()) <= 0 )
+    if ( sysLocale.toDouble(ui->lineEditTotal->text()) <= 0 )
     {
         ui->lineEditTotal->setStyleSheet(commonLineEditStyleSheetRed);
         error = 10;
@@ -362,13 +362,13 @@ bool tabSale::checkInput()
     {
         if(!tableModel->value(i, SStoreItemModel::SaleOpColumns::ColState).toBool())   // только не помеченные на снятие резерва/возврат
         {
-            if ( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toFloat() <= 0 ) // цена меньше нуля
+            if ( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() <= 0 ) // цена меньше нуля
             {
                 tableModel->setData(tableModel->index(i, SStoreItemModel::SaleOpColumns::ColPrice), QColor(255, 209, 209), Qt::BackgroundRole);
 
                 error = 11;
             }
-            if( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toFloat() < tableModel->value(i, SStoreItemModel::SaleOpColumns::ColInPrice).toFloat() ) // цена меньше закупочной
+            if( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() < tableModel->value(i, SStoreItemModel::SaleOpColumns::ColInPrice).toDouble() ) // цена меньше закупочной
             {
                 QMessageBox::StandardButton resBtn = QMessageBox::question( this, "SNAP CRM",
                                                                             tr("Цена ниже закупочной, продолжить?\n\"%1\"").arg(tableModel->value(i, SStoreItemModel::SaleOpColumns::ColName).toString()),
@@ -419,7 +419,7 @@ bool tabSale::createClient()
 bool tabSale::createNewDoc()
 {
     int reserveDays = 5, priceCol = 2;
-    float amount, currency = 0.00 /* TODO: запрос валюты, даже если программа не перезапускалась несколько дней */;
+    double amount, currency = 0.00 /* TODO: запрос валюты, даже если программа не перезапускалась несколько дней */;
 
     reserveDays = ui->spinBoxReserve->value();
     priceCol = priceColModel->index(ui->comboBoxPriceCol->currentIndex(), 1).data().toInt();
@@ -436,9 +436,9 @@ bool tabSale::createNewDoc()
     return docModel->commit();
 }
 
-void tabSale::updateTotalSumms(const float amountTotal, const float, const float)
+void tabSale::updateTotalSumms(const double amountTotal, const double, const double)
 {
-    float takeInSumm = sysLocale.toFloat(ui->lineEditTakeIn->text());
+    double takeInSumm = sysLocale.toDouble(ui->lineEditTakeIn->text());
     ui->lineEditTotal->setText(sysLocale.toString(amountTotal, 'f', 2));
     if(takeInSumm >= amountTotal)
         ui->lineEditCharge->setText(sysLocale.toString(takeInSumm - amountTotal, 'f', 2));
@@ -596,7 +596,7 @@ bool tabSale::unSale()  // распроведение
     bool nErr = 1, balance = 0;
     QSqlQuery *query;
     int paymentAccount = 0;
-    float amount;
+    double amount;
 
     tableModel->setClient(clientModel->id());
     paymentAccount = paymentSystemsModel->databaseIDByRow(ui->comboBoxMoneyBackAccount->currentIndex(), "system_id");
@@ -633,7 +633,7 @@ bool tabSale::unSale()  // распроведение
         else
             docModel->setAmount(tableModel->amountTotal());
 
-        amount = sysLocale.toFloat(ui->lineEditCharge->text()); // в поле Сдача будет записана сумма товаров, помеченных на удаление (т. е. сумма возврата)
+        amount = sysLocale.toDouble(ui->lineEditCharge->text()); // в поле Сдача будет записана сумма товаров, помеченных на удаление (т. е. сумма возврата)
 
         docModel->commit();
 
@@ -699,7 +699,7 @@ bool tabSale::sale()
 
     bool nErr = 1, balance = 0, isAnonBuyer = 0;
     int paymentAccount = 0, initial_doc_id = doc_id;
-    float amount;
+    double amount;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     amount = tableModel->amountTotal();
@@ -884,8 +884,8 @@ void tabSale::paramsButtonClicked()
 void tabSale::updateChargeAmount(QString text)
 {
     // TODO: применить стиль по умолчанию, если поле было красным
-    float takeInSumm = sysLocale.toFloat(text);
-    float amount = sysLocale.toFloat(ui->lineEditTotal->text());
+    double takeInSumm = sysLocale.toDouble(text);
+    double amount = sysLocale.toDouble(ui->lineEditTotal->text());
     if(amount <= takeInSumm )
         ui->lineEditCharge->setText(sysLocale.toString(takeInSumm - amount, 'f', 2));
     else
@@ -1121,7 +1121,7 @@ void tabSale::randomFill()
     }
     else if (test_scheduler_counter == 4)   // поле полученной суммы
     {
-        ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toFloat(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2));
+        ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toDouble(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2));
     }
     else if (test_scheduler_counter == 5)  // платёжная система
     {

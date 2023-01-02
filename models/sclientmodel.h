@@ -22,12 +22,12 @@ public:
     ~SBalanceLogRecordModel();
     void setClient(int);
     void setText(const QString &);
-    void setDirection(float);
+    void setDirection(double);
     void setRepair(const int);
     void setDocumentId(const int);
     void setCashOrderId(const int);
-    bool commit(const float);
-    bool commit(const float, const QString &);
+    bool commit(const double);
+    bool commit(const double, const QString &);
 private:
     QString m_reason;
     int m_client;
@@ -134,11 +134,11 @@ public:
     void setAgent2PhoneClean(const QString&);
     bool balanceEnabled();
     bool setBalanceEnabled(bool state = 1);
-    float balance();
+    double balance();
     void createBalanceObj();
     void deleteBalanceObj();
-    bool updateBalance(const float amount, const QString &text);
-    bool updateBalance(const float amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason, const int doc_id);
+    bool updateBalance(const double amount, const QString &text);
+    bool updateBalance(const double amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason, const int doc_id);
     bool balanceEnough(const QString summ);
     bool receiptBalance();
     bool paymentBalance();
@@ -206,7 +206,7 @@ private:
     QString m_agent2Patronymic;
     QString m_agent2Phone;
     QString m_agent2PhoneClean;
-    float   m_balance = 0;
+    double   m_balance = 0;
     int     m_priceColumn = 2;
     int     m_repairs = 0;
     int     m_purchases = 0;

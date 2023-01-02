@@ -31,10 +31,10 @@ public:
     void unsetBuyer();
     int count();
     void setCount(const int);
-    float inPrice();
-    void setInPrice(const float);
-    float price();
-    void setPrice(const float);
+    double inPrice();
+    void setInPrice(const double);
+    double price();
+    void setPrice(const double);
     int warranty();
     void setWarranty(const int);
     bool realizatorPayed();
@@ -73,8 +73,8 @@ private:
     int m_dealer = 0;
     int m_savedCount = 0;
     int m_count = 0;
-    float m_inPrice = 0;
-    float m_price = 0;
+    double m_inPrice = 0;
+    double m_price = 0;
     int m_warranty;
     bool m_realizatorPayed;
     bool m_isRealization = 0;

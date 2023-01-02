@@ -93,7 +93,7 @@ void SWorkModel::setName(const QString name, const QVariant oldValue)
     i_valuesMap.insert("name", name);
 }
 
-float SWorkModel::price()
+double SWorkModel::price()
 {
     return m_price;
 }
@@ -101,7 +101,7 @@ float SWorkModel::price()
 void SWorkModel::setPrice(const double price, const QVariant oldValue)
 {
     if(oldValue.isValid())
-        appendLogText(tr("Стоимость работы \"%1\" изменёна с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toFloat()), sysLocale.toCurrencyString(price)));
+        appendLogText(tr("Стоимость работы \"%1\" изменёна с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toDouble()), sysLocale.toCurrencyString(price)));
     else if(i_id)
         appendLogText(tr("Стоимость работы \"%1\" установлена %1").arg(m_name, sysLocale.toCurrencyString(price)));
     i_valuesMap.insert("price", price);

@@ -21,7 +21,7 @@ public:
     void setDocumentId(const int);
     QString name();
     void setName(const QString name, const QVariant oldValue = QVariant());
-    float price();
+    double price();
     void setPrice(const double price, const QVariant oldValue = QVariant());
     int count();
     void setCount(const int count, const QVariant oldValue = QVariant());
@@ -46,7 +46,7 @@ private:
     int m_repair;
     int m_documentId;
     QString m_name;
-    float m_price;
+    double m_price;
     int m_count;
     int m_warranty;
     int m_priceId;

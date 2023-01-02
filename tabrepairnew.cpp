@@ -658,7 +658,7 @@ bool tabRepairNew::createRepair()
         if(ui->checkBoxIsEstPrice->isChecked())
         {
             repairModel->setIsPreAgreed(1);
-            repairModel->setPreAgreedAmount(sysLocale.toFloat(ui->lineEditEstPrice->text()));
+            repairModel->setPreAgreedAmount(sysLocale.toDouble(ui->lineEditEstPrice->text()));
         }
         if(ui->checkBoxIsNonImportantData->isChecked())
             repairModel->setCanFormat(1);
@@ -668,7 +668,7 @@ bool tabRepairNew::createRepair()
             repairModel->setBoxIndex(ui->comboBoxPresetPlace->currentIndex());
         if(ui->checkBoxIsPrepay->isChecked())
         {
-            prepaySumm = sysLocale.toFloat(ui->lineEditPrepaySumm->text());
+            prepaySumm = sysLocale.toDouble(ui->lineEditPrepaySumm->text());
             repairModel->addPrepay(prepaySumm, ui->comboBoxPrepayReason->currentText());
         }
         if(ui->checkBoxWasInOtherWorkshop->isChecked())

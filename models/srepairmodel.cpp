@@ -73,14 +73,14 @@ void SRepairModel::load(const int id)
     m_extNotes = repair->value("ext_notes").toString();
     m_isPrepaid = repair->value("is_prepaid").toBool();
     m_prepaidType = repair->value("prepaid_type").toInt();
-    m_prepaidSumm = repair->value("prepaid_summ").toFloat();
+    m_prepaidSumm = repair->value("prepaid_summ").toDouble();
     m_prepaidOrder = repair->value("prepaid_order").toInt();
     m_isPreAgreed = repair->value("is_pre_agreed").toBool();
     m_isDebt = repair->value("is_debt").toBool();
-    m_preAgreedAmount = repair->value("pre_agreed_amount").toFloat();
-    m_repairCost = repair->value("repair_cost").toFloat();
-    m_realRepairCost = repair->value("real_repair_cost").toFloat();
-    m_partsCost = repair->value("parts_cost").toFloat();
+    m_preAgreedAmount = repair->value("pre_agreed_amount").toDouble();
+    m_repairCost = repair->value("repair_cost").toDouble();
+    m_realRepairCost = repair->value("real_repair_cost").toDouble();
+    m_partsCost = repair->value("parts_cost").toDouble();
     m_fault = repair->value("fault").toString();
     m_complect = repair->value("complect").toString();
     m_look = repair->value("look").toString();
@@ -560,23 +560,23 @@ void SRepairModel::setPrepaidType(const int id)
     i_valuesMap.insert("prepaid_type", id);
 }
 
-float SRepairModel::prepaidSumm()
+double SRepairModel::prepaidSumm()
 {
     return m_prepaidSumm;
 }
 
-void SRepairModel::setPrepaidSumm(const float summ)
+void SRepairModel::setPrepaidSumm(const double summ)
 {
     i_valuesMap.insert("prepaid_summ", summ);
 }
 
-float SRepairModel::realPrepaidSumm()
+double SRepairModel::realPrepaidSumm()
 {
-    float summ;
+    double summ;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
     query->exec(QUERY_SEL_REPAIR_PREPAYS(i_id));
     query->first();
-    summ = query->value(0).toFloat();
+    summ = query->value(0).toDouble();
     delete query;
     return summ;
 }
@@ -594,10 +594,10 @@ void SRepairModel::setPrepaidOrder(const int id)
 /*  Запись данных о внесении или возврате предоплаты
  *  (возврат может использоваться при выдаче уст-ва без ремонта)
 */
-void SRepairModel::addPrepay(float amount, QString reason)
+void SRepairModel::addPrepay(double amount, QString reason)
 {
     QString logText;
-    float new_prepaidSumm = m_prepaidSumm + (amount);
+    double new_prepaidSumm = m_prepaidSumm + (amount);
     setPrepaidSumm(new_prepaidSumm);
     if(amount > 0)
     {
@@ -632,70 +632,70 @@ void SRepairModel::setIsDebt(const bool state)
     i_valuesMap.insert("is_debt", state);
 }
 
-float SRepairModel::preAgreedAmount()
+double SRepairModel::preAgreedAmount()
 {
     return m_preAgreedAmount;
 }
 
-void SRepairModel::setPreAgreedAmount(const float summ)
+void SRepairModel::setPreAgreedAmount(const double summ)
 {
     i_valuesMap.insert("pre_agreed_amount", summ);
 }
 
-float SRepairModel::repairCost()
+double SRepairModel::repairCost()
 {
     return m_repairCost;
 }
 
-void SRepairModel::setRepairCost(const float amount)
+void SRepairModel::setRepairCost(const double amount)
 {
     m_repairCost = amount;
     i_valuesMap.insert("repair_cost", m_repairCost);
     appendLogText(tr("Стоимость ремонта в результатах диагностики изменёна на %1").arg(sysLocale.toCurrencyString(m_repairCost)));
 }
 
-float SRepairModel::realRepairCost()
+double SRepairModel::realRepairCost()
 {
     return m_realRepairCost;
 }
 
-void SRepairModel::setRealRepairCost(const float summ)
+void SRepairModel::setRealRepairCost(const double summ)
 {
     i_valuesMap.insert("real_repair_cost", summ);
 }
 
-float SRepairModel::partsCost()
+double SRepairModel::partsCost()
 {
     return m_partsCost;
 }
 
-void SRepairModel::setPartsCost(const float summ)
+void SRepairModel::setPartsCost(const double summ)
 {
     i_valuesMap.insert("parts_cost", summ);
 }
 
 /*  Метод возвращает сумму всех записанных работ из таблицы works
 */
-float SRepairModel::realWorksCost()
+double SRepairModel::realWorksCost()
 {
-    float summ;
+    double summ;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
     query->exec(QUERY_SEL_REPAIR_WORKS(i_id));
     query->first();
-    summ = query->value(0).toFloat();
+    summ = query->value(0).toDouble();
     delete query;
     return summ;
 }
 
 /*  Метод возвращает сумму всех добавленных в ремонт товаров из таблицы store_int_reserve
 */
-float SRepairModel::realPartsCost()
+double SRepairModel::realPartsCost()
 {
-    float summ;
+    double summ;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
     query->exec(QUERY_SEL_REPAIR_PARTS(i_id));
     query->first();
-    summ = query->value(0).toFloat();
+    summ = query->value(0).toDouble();
     delete query;
     return summ;
 }
