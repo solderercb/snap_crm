@@ -91,6 +91,16 @@ bool SSaleTableModel::insertRecord(int row, const QSqlRecord &record, const int 
     QStandardItem *item;
     int recordId = record.value(SStoreItemModel::SaleOpColumns::ColId).toInt();
 
+#ifdef QT_DEBUG
+    int qtyLimit;
+    if(record.value(SStoreItemModel::SaleOpColumns::ColAvail).toInt() > 5)
+        qtyLimit = 5;
+    else
+        qtyLimit = record.value(SStoreItemModel::SaleOpColumns::ColAvail).toInt() + 1;
+
+    int rand = QRandomGenerator::global()->bounded(qtyLimit);
+#endif
+
     int i;
     for(i = 0; i < record.count(); i++)
     {
@@ -110,17 +120,10 @@ bool SSaleTableModel::insertRecord(int row, const QSqlRecord &record, const int 
         }
 
 #ifdef QT_DEBUG
-        if(i == SStoreItemModel::SaleOpColumns::ColCount)
-        {
-            int qtyLimit;
-            if(record.value(SStoreItemModel::SaleOpColumns::ColAvail).toInt() > 5)
-                qtyLimit = 5;
-            else
-                qtyLimit = record.value(SStoreItemModel::SaleOpColumns::ColAvail).toInt() + 1;
-
-            int rand = QRandomGenerator::global()->bounded(qtyLimit);
-            item->setData(rand?rand:1, Qt::DisplayRole);
-        }
+        if(rand > 1 && i == SStoreItemModel::SaleOpColumns::ColCount)
+            item->setData(rand, Qt::EditRole);
+        if(rand > 1 && i == SStoreItemModel::SaleOpColumns::ColSumm)
+            item->setData(rand*item->data(Qt::DisplayRole).toDouble(), Qt::EditRole);
 #endif
 
         rowData << item;
