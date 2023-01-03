@@ -75,8 +75,7 @@ void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem
     // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
     if(index.column() == SStoreItemModel::SaleOpColumns::ColId )
     {
-        int sw = tableModel->tableMode() << 16 | tableModel->modelState() << 8 | index.data(SSaleTableModel::DataRoles::State).toInt() << 1 | index.data(SSaleTableModel::DataRoles::RecordType).toBool();
-        switch (sw)
+        switch (rowConditionsForPixmap(index))
         {
             case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreNew << 8                                                       | SSaleTableModel::RecordType::Item):
             case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreReserved << 8                                                  | SSaleTableModel::RecordType::Item):
@@ -87,7 +86,6 @@ void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem
             case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, Part, painter); break;
             case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, Work, painter); break;
         }
-        ;
     }
     else
         QStyledItemDelegate::paint(painter, option, index);
@@ -126,6 +124,19 @@ void SaleTableItemDelegates::drawPixmap(const QRect &rect, PixmapType p, QPainte
     QApplication::style()->drawItemPixmap(painter, pixmapRect(rect, p), 1, pixmap.scaled(PIXMAP_W,PIXMAP_H));
 }
 
+int SaleTableItemDelegates::rowConditionsForPixmap(const QModelIndex &index) const
+{
+    return m_tableModelMode << 16 |\
+           m_tableModelState << 8 |\
+           index.data(SSaleTableModel::DataRoles::State).toBool() << 1 |\
+           index.data(SSaleTableModel::DataRoles::RecordType).toBool();
+}
+
+void SaleTableItemDelegates::modelStateChanged(const int state)
+{
+    m_tableModelState = state;
+}
+
 bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
     if( event->type() == QEvent::MouseButtonRelease )
@@ -133,8 +144,7 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
         QMouseEvent * e = (QMouseEvent *)event;
         if( index.column() == SStoreItemModel::SaleOpColumns::ColId )
         {
-            int sw = tableModel->tableMode() << 16 | tableModel->modelState() << 8 | index.data(SSaleTableModel::DataRoles::State).toInt() << 1 | tableModel->index(index.row(), SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
-            switch (sw) // условия, при которых обработка не требуется
+            switch (rowConditionsForPixmap(index)) // условия, при которых обработка не требуется
             {
                 case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreCancelled << 8 | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
                 case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreReserved << 8  | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
@@ -332,5 +342,7 @@ void SaleTableItemDelegates::setModelDataFromDoubleSpinBox(QWidget *editor, QAbs
 void SaleTableItemDelegates::setTableModel(SSaleTableModel *model)
 {
     tableModel = model;
-    m_tableMode = tableModel->tableMode();
+    connect(tableModel, &SSaleTableModel::modelStateChanged, this, &SaleTableItemDelegates::modelStateChanged);
+    m_tableModelMode = tableModel->tableMode();
+    m_tableModelState = tableModel->modelState();
 }

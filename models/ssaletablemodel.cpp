@@ -11,9 +11,9 @@ SSaleTableModel::SSaleTableModel(QObject *parent) :
 
     connect(m_queryData, SIGNAL(modelReset()), this, SLOT(sqlDataChanged()));
 #if QT_VERSION >= 0x060000
-    connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &)), this, SLOT(dataChanaged(const QModelIndex&, const QModelIndex&, const QList<int> &)));
+    connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &)), this, SLOT(dataChangedHook(const QModelIndex&, const QModelIndex&, const QList<int> &)));
 #else
-    connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &)), this, SLOT(dataChanaged(const QModelIndex&, const QModelIndex&, const QVector<int> &)));
+    connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &)), this, SLOT(dataChangedHook(const QModelIndex&, const QModelIndex&, const QVector<int> &)));
 #endif
 }
 
@@ -38,7 +38,7 @@ QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
     }
     if ( role == Qt::BackgroundRole )
     {
-        if(value(index.row(), SStoreItemModel::SaleOpColumns::ColState).toBool())
+        if(isRowMarkedRemove(index.row()))
             return QColor("light gray");
     }
 
@@ -173,7 +173,7 @@ void SSaleTableModel::addCustomWork()
             case SStoreItemModel::SaleOpColumns::ColUID: field->setValue(""); break;
             case SStoreItemModel::SaleOpColumns::ColName: field->setValue(""); break;
             case SStoreItemModel::SaleOpColumns::ColCount: field->setValue(1); break;
-            case SStoreItemModel::SaleOpColumns::ColAvail: field->setValue(""); break;
+            case SStoreItemModel::SaleOpColumns::ColAvail: field->setValue("999999"); break;
             case SStoreItemModel::SaleOpColumns::ColPrice: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColSumm: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColBox: field->setValue(0); break;
@@ -186,7 +186,7 @@ void SSaleTableModel::addCustomWork()
             case SStoreItemModel::SaleOpColumns::ColNotes: field->setValue(""); break;
             case SStoreItemModel::SaleOpColumns::ColItemId: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColInPrice: field->setValue(0); break;
-            case SStoreItemModel::SaleOpColumns::ColObjId: field->setValue(m_objId); break;
+            case SStoreItemModel::SaleOpColumns::ColObjId: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColDealer: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColBuyer: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColCreated: field->setValue(QDateTime::currentDateTimeUtc()); break;
@@ -227,6 +227,7 @@ bool SSaleTableModel::addWorkByUID(const int uid, const int priceOption)
 */
 bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const int count)
 {
+    qDebug().nospace() << "[" << this << "] addItemByUID() | m_currentIndex = " << m_currentIndex;
     QSqlQueryModel *item = nullptr;
     int row = -1;
     bool ret = 1;
@@ -290,6 +291,7 @@ bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const i
 
 bool SSaleTableModel::addItemFromBasket(const int id, const int qty, const int priceOpt)
 {
+    qDebug().nospace() << "[" << this << "] addItemFromBasket() | m_currentIndex = " << m_currentIndex;
     QSqlQueryModel *item = nullptr;
     bool ret = 1;
     int insertionRow;
@@ -374,28 +376,31 @@ void SSaleTableModel::buttonHandler(const int buttonNum, const int row)
  */
 void SSaleTableModel::store_markRowRemove(const int row, const int db_id)
 {
+    int newState = SStoreSaleItemModel::Cancelled;
+    int newValue = 0;
+
     if(m_itemsPendingRemoveList->contains(row))
     {
+        newState = SStoreSaleItemModel::Active;
+        newValue = value(row, SStoreItemModel::SaleOpColumns::ColCount, DataRoles::OldValue).toInt();
         m_itemsPendingRemoveList->remove(row);
-        setData(index(row, SStoreItemModel::SaleOpColumns::ColState), SStoreSaleItemModel::Active);
-        setData(index(row, SStoreItemModel::SaleOpColumns::ColCount), value(row, SStoreItemModel::SaleOpColumns::ColCount, DataRoles::OldValue).toInt());   // восстанавливаем значение из UserRole
     }
     else
     {
         m_itemsPendingRemoveList->insert(row, db_id);
-        setData(index(row, SStoreItemModel::SaleOpColumns::ColState), SStoreSaleItemModel::Cancelled);
         setData(index(row, SStoreItemModel::SaleOpColumns::ColCount), value(row, SStoreItemModel::SaleOpColumns::ColCount), DataRoles::OldValue); // при пометке на удаление, в UserRole сохраняем текущее кол-во; это на случай, если пользователь промахнулся строкой и тут же нажал кнопку еще раз
-        setData(index(row, SStoreItemModel::SaleOpColumns::ColCount), 0);   // кол-во устанавливаем 0
     }
+    setData(index(row, SStoreItemModel::SaleOpColumns::ColState), newState);
+    setData(index(row, SStoreItemModel::SaleOpColumns::ColCount), newValue);   // кол-во устанавливаем 0
 }
 
 /* Пометка строки на удаление в режиме ремонта
  * row  - номер строки
  * db_id - id записей в таблицах store_int_reserve и works
 */
-void SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
+int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
 {
-    bool newState = 1;
+    int newState = SRepairSaleItemModel::EngineerBasket;
     int recordType = index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
     QMap<int, int> *pendingRemoveList;
     qDebug().nospace() << "[" << this << "] repair_markRowRemove() | " << QString("row = %1, recordType = %2").arg(row).arg(recordType);
@@ -405,25 +410,28 @@ void SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
         int i = row + 1;
         while(i < rowCount() && index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == RecordType::Item)
         {
-            repair_markRowRemove(i, index(i, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
-            i++;
+            i = repair_markRowRemove(i, index(i, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
         }
     }
     else
         pendingRemoveList = m_itemsPendingRemoveList;
 
-    if(pendingRemoveList->contains(row))
+    if(m_editStrategy == OnManualSubmit && !index(row, SStoreItemModel::SaleOpColumns::ColObjId).data().toInt())
+    {
+        removeRows(row, 1);
+        return row;
+    }
+    else if(pendingRemoveList->contains(row))
     {   // в режиме ручного сохранения списка работ и деталей можно отменить пометку на удаление
         pendingRemoveList->remove(row);
-        newState = 0;
+        newState = SRepairSaleItemModel::RepairLinked;
     }
     else
     {
         pendingRemoveList->insert(row, db_id);
     }
-    qDebug().nospace() << "[" << this << "] repair_markRowRemove() | pendingRemoveList = " << *pendingRemoveList;
-    qDebug().nospace() << "[" << this << "] repair_markRowRemove() | newState = " << newState;
     QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColState), newState);
+    return row + 1;
 }
 
 QMap<int, int>* SSaleTableModel::getPendingRemoveList()
@@ -483,7 +491,6 @@ bool SSaleTableModel::store_loadTable(const int doc_id)
 */
 bool SSaleTableModel::repair_loadTable(const int repair_id)
 {
-    setTableMode(TablesSet::WorkshopSale);
     setRepairId(repair_id);
     m_queryData->setQuery(QUERY_SEL_REPAIR_WORKS_AND_PARTS(m_objId), QSqlDatabase::database("connMain"));
 
@@ -576,6 +583,8 @@ bool SSaleTableModel::repair_saveTables()
 
         if(index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == RecordType::Work)
         {
+            if(!index(i, SStoreItemModel::SaleOpColumns::ColObjId).data().toInt())
+                QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColObjId), m_objId);
             SWorkModel *work = repair_work(i);
             if(rowModified)
                 ret = work->commit();
@@ -607,8 +616,60 @@ bool SSaleTableModel::repair_saveTables()
     return ret;
 }
 
-/*
- * типы операций:
+/* Данный метод предназначен для сохранения данных таблицы автономно
+ * (отличается от repair_saveTables отправкой запросов начала и завершения транзакции).
+*/
+bool SSaleTableModel::repair_saveTablesStandalone()
+{
+    bool nErr = 1;
+
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
+#ifdef QT_DEBUG
+    SQueryLog *queryLog = new SQueryLog();
+    queryLog->start(metaObject()->className());
+#endif
+
+    try
+    {
+        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+
+        repair_saveTables();
+
+#ifdef QT_DEBUG
+//            throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+#endif
+
+        QUERY_COMMIT_ROLLBACK(query,nErr);
+    }
+    catch(int type)
+    {
+        nErr = 0;
+
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query, nErr);
+    }
+#ifdef QT_DEBUG
+    queryLog->stop();
+    delete queryLog;
+#endif
+
+    if(nErr)
+    {
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Список работ и деталей сохранён"), QColor(214,239,220), QColor(229,245,234));
+    }
+    delete query;
+
+    return nErr;
+}
+
+/*  Метод сохранения таблицы для случаев выдачи ремонта или возврата ранее выданного ремонта
+ *  типы операций:
  *  - выдача ремонта: поле State = Sold; UPDATE store_items и UPDATE store_int_reserve; пропуск полей State == Sold (¹)
  *  - возврат ремонта (с возвратом ЗИП на склад): поле State = Linked; UPDATE store_items и UPDATE store_int_reserve
  *  - возврат ремонта (без возврата ЗИП на склад): нет действий
@@ -643,57 +704,22 @@ bool SSaleTableModel::repair_saveTables(RepairOpType operation)
     return ret;
 }
 
-/*  Метод предназначен для автоматического сохранения изменений в таблице работ и деталей
- *  в режиме ремонта
+/*  В данном методе производится вызов метода repair_saveTablesStandalone()
+ *  или эмиссия сигнала tableDataChanged(), в зависимости от режима сохранения
 */
 bool SSaleTableModel::repair_autoSaveTables()
 {
+    qDebug().nospace() << "[" << this << "] repair_autoSaveTables()";
     bool nErr = 1;
 
-    if((m_editStrategy == OnFieldChange || m_editStrategy == OnRowChange) && m_tableMode == TablesSet::WorkshopSale)
+    if( m_editStrategy == OnFieldChange || m_editStrategy == OnRowChange )
     {
-        qDebug().nospace() << "[" << this << "] repair_autoSaveTables()";
-        QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-
-#ifdef QT_DEBUG
-        SQueryLog *queryLog = new SQueryLog();
-        queryLog->start(metaObject()->className());
-#endif
-
-        try
-        {
-            QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-
-            repair_saveTables();
-
-#ifdef QT_DEBUG
-//            throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
-#endif
-
-            QUERY_COMMIT_ROLLBACK(query,nErr);
-        }
-        catch(int type)
-        {
-            nErr = 0;
-
-            if(type == 0)
-            {
-                QString err = "DEBUG ROLLBACK";
-                QUERY_ROLLBACK_MSG(query, err);
-            }
-            else
-                QUERY_COMMIT_ROLLBACK(query, nErr);
-        }
-#ifdef QT_DEBUG
-        queryLog->stop();
-        delete queryLog;
-#endif
-
-        if(nErr)
-        {
-            shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Список работ и деталей сохранён"), QColor(214,239,220), QColor(229,245,234));
-        }
-        delete query;
+        nErr = repair_saveTablesStandalone();
+    }
+    else if(m_editStrategy == OnManualSubmit)
+    {
+        m_unsaved = 1;
+        emit tableDataChanged();
     }
 
     return nErr;
@@ -784,6 +810,16 @@ bool SSaleTableModel::store_backOutItems(StoreOpType type)
     return ret;
 }
 
+bool SSaleTableModel::isRowMarkedRemove(const int row) const
+{
+    int state = value(row, SStoreItemModel::SaleOpColumns::ColState).toInt();
+    if((m_tableMode == SSaleTableModel::WorkshopSale && state == SRepairSaleItemModel::EngineerBasket) || \
+       (m_tableMode == SSaleTableModel::StoreSale && state == SStoreSaleItemModel::Cancelled))
+        return 1;
+
+    return 0;
+}
+
 bool SSaleTableModel::repair_removeRows()
 {
     qDebug().nospace() << "[" << this << "] repair_removeRows()";
@@ -803,7 +839,7 @@ bool SSaleTableModel::repair_removeRows()
 
     for(int i = rowCount() - 1; i >= 0 && ret; i--)
     {
-        if(index(i, SStoreItemModel::SaleOpColumns::ColState).data().toInt())
+        if(isRowMarkedRemove(i))
             removeRows(i, 1);
     }
 
@@ -922,12 +958,11 @@ void SSaleTableModel::setTableMode(const TablesSet mode)
     if(mode == TablesSet::StoreSale)
     {
         m_hiddenColumns = 1 << SStoreItemModel::SaleOpColumns::ColUser | 1 << SStoreItemModel::SaleOpColumns::ColRealization | 1 << SStoreItemModel::SaleOpColumns::ColRetPercent | 1 << SStoreItemModel::SaleOpColumns::ColState | 1 << SStoreItemModel::SaleOpColumns::ColNotes | 1 << SStoreItemModel::SaleOpColumns::ColItemId | 1 << SStoreItemModel::SaleOpColumns::ColInPrice | 1 << SStoreItemModel::SaleOpColumns::ColObjId | 1 << SStoreItemModel::SaleOpColumns::ColDealer | 1 << SStoreItemModel::SaleOpColumns::ColBuyer | 1 << SStoreItemModel::SaleOpColumns::ColRecordType | 1 << SStoreItemModel::SaleOpColumns::ColCreated | 1 << SStoreItemModel::SaleOpColumns::ColWorkId;
-        m_editStrategy = EditStrategy::OnManualSubmit;
+        m_editStrategy = EditStrategy::OnManualSubmit; // режим редактирования при продаже всегда OnManualSubmit
     }
     else
     {
         m_hiddenColumns = 1 << SStoreItemModel::SaleOpColumns::ColAvail | 1 << SStoreItemModel::SaleOpColumns::ColRealization | 1 << SStoreItemModel::SaleOpColumns::ColRetPercent | 1 << SStoreItemModel::SaleOpColumns::ColState | 1 << SStoreItemModel::SaleOpColumns::ColNotes | 1 << SStoreItemModel::SaleOpColumns::ColItemId | 1 << SStoreItemModel::SaleOpColumns::ColInPrice | 1 << SStoreItemModel::SaleOpColumns::ColObjId | 1 << SStoreItemModel::SaleOpColumns::ColDealer | 1 << SStoreItemModel::SaleOpColumns::ColBuyer | 1 << SStoreItemModel::SaleOpColumns::ColRecordType | 1 << SStoreItemModel::SaleOpColumns::ColCreated | 1 << SStoreItemModel::SaleOpColumns::ColWorkId;
-        m_editStrategy = EditStrategy::OnFieldChange;
     }
 }
 
@@ -941,6 +976,11 @@ int SSaleTableModel::editStrategy()
     return m_editStrategy;
 }
 
+void SSaleTableModel::setEditStrategy(const int strategy)
+{
+    m_editStrategy = strategy;
+}
+
 bool SSaleTableModel::isWarranty()
 {
     return m_isWarranty;
@@ -949,6 +989,12 @@ bool SSaleTableModel::isWarranty()
 void SSaleTableModel::setIsWarranty(const bool isWarranty)
 {
     m_isWarranty = isWarranty;
+}
+
+bool SSaleTableModel::isUnsaved()
+{
+    qDebug().nospace() << "[" << this << "] isUnsaved() | m_unsaved = " << m_unsaved;
+    return m_unsaved;
 }
 
 QList<QStandardItem *> SSaleTableModel::row(int row) const
@@ -969,10 +1015,10 @@ int SSaleTableModel::getItemInsertionRow()
     int rows = rowCount();
 
     // если таблица пуста, то добавляем произвольную работу
-    if(!rows)
+    if(!activeRowCount())
     {
         int editStrategyBackup = m_editStrategy;
-        m_editStrategy = OnManualSubmit;
+        m_editStrategy = EditStrategy::Nop;
         addCustomWork();
         m_editStrategy = editStrategyBackup;
     }
@@ -1022,7 +1068,7 @@ void SSaleTableModel::linkItemToWork(const int row, const int workId)
         return;
 
     int editStrategyBackup = m_editStrategy;
-    m_editStrategy = OnManualSubmit;
+    m_editStrategy = EditStrategy::Nop;
 
     qDebug().nospace() << "[" << this << "] linkItemToWork() | " << QString("workId = %1 | objId = %2").arg(workId).arg(m_objId);
     setData(index(row, SStoreItemModel::SaleOpColumns::ColWorkId), workId);
@@ -1044,6 +1090,22 @@ void SSaleTableModel::clearChangedFlagForAllField()
             QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), 0, DataRoles::Changed);   // снятие флага о наличии изменений в строке
         }
     }
+    m_unsaved = 0;
+}
+
+/*  Возвращает кол-во строк в таблице, не помеченных на удаление
+ *  (данный метод нужен для работы в режиме OnManualSubmit)
+*/
+int SSaleTableModel::activeRowCount() const
+{
+    int rows = 0;
+    for(int i = 0; i < rowCount(); i++)
+    {
+        if(isRowMarkedRemove(i))
+            continue;
+        rows++;
+    }
+    return rows;
 }
 
 void SSaleTableModel::indexSelected(const QModelIndex &index)
@@ -1076,6 +1138,9 @@ double SSaleTableModel::amountTotal()
     m_amountWorks = 0;
     for(int i = 0; i < rowCount(); i++)
     {
+        if(isRowMarkedRemove(i))
+            continue;
+
         summ = value(i, SStoreItemModel::SaleOpColumns::ColSumm).toDouble();
         if(value(i, SStoreItemModel::SaleOpColumns::ColRecordType).toBool())
             m_amountItems += summ;
@@ -1107,6 +1172,18 @@ QVariant SSaleTableModel::value(const int row, const int column, const int role)
     return QStandardItemModel::data(index(row, column), role);
 }
 
+void SSaleTableModel::setModelState(int state)
+{
+    m_modelState = state;
+    modelStateChanged(m_modelState);
+    endResetModel();    // для перерисовки кнопок в таблице
+}
+
+int SSaleTableModel::modelState()
+{
+    return m_modelState;
+}
+
 /* В этом слоте происходит копирование данных из QSqlQueryModel в QStandardItemModel
  * Для сохранённых данных будет достаточно вызвать метод this->setQuery()
  *
@@ -1123,7 +1200,6 @@ void SSaleTableModel::sqlDataChanged()
     {
         for(int j = 0; j < m_queryData->columnCount(); j++)
         {
-//            QStandardItemModel::setHeaderData(j, Qt::Horizontal, m_queryData->headerData(j, Qt::Horizontal));
             QStandardItemModel::setData(index(i, j), m_queryData->index(i, j).data());
         }
         // Чтобы лишний раз не лезть в другие индексы объекта, в UserRole записываем значение is_cancellation (state);
@@ -1141,22 +1217,23 @@ void SSaleTableModel::sqlDataChanged()
     endResetModel();
 }
 
+/*  Обновление числа в столбце "Сумма" при изменении чисел в стобцах "Кол-во" или "Цена"
+*/
 #if QT_VERSION >= 0x060000
-void SSaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+void SSaleTableModel::dataChangedHook(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
 #else
-void SSaleTableModel::dataChanaged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void SSaleTableModel::dataChangedHook(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 #endif
 {
     int row = topLeft.row();
-//    qDebug().nospace() << "[" << this << "] dataChanaged() | TopLeft[R,C] = [" << topLeft.row() << "," << topLeft.column() << "] | BottomRight[R,C] = [" << bottomRight.row() << "," << bottomRight.column() << "] | changed flag = " << index(row, SStoreItemModel::SaleOpColumns::ColId).data(DataRoles::Changed ).toBool();
+//    qDebug().nospace() << "[" << this << "] dataChangedHook() | TopLeft[R,C] = [" << topLeft.row() << "," << topLeft.column() << "] | BottomRight[R,C] = [" << bottomRight.row() << "," << bottomRight.column() << "] | changed flag = " << index(row, SStoreItemModel::SaleOpColumns::ColId).data(DataRoles::Changed ).toBool();
     int column = topLeft.column();
     if( (column == SStoreItemModel::SaleOpColumns::ColCount || column == SStoreItemModel::SaleOpColumns::ColPrice) /*&& m_amountChangedSignalFilter*/ )   // был глюк, что без фильтра при добавлении первого товара в таблицу не обновляется общая сумма документа
     {
         QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColSumm), value(row, SStoreItemModel::SaleOpColumns::ColCount).toInt() * value(row, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() );
         emit amountChanged(amountTotal(), m_amountItems, m_amountWorks);
     }
-//    QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColId), 1, DataRoles::Changed );
-//    qDebug().nospace() << "[" << this << "] dataChanaged() | changed flag = " << index(row, SStoreItemModel::SaleOpColumns::ColId).data(DataRoles::Changed ).toBool();
+//    qDebug().nospace() << "[" << this << "] dataChangedHook() | changed flag = " << index(row, SStoreItemModel::SaleOpColumns::ColId).data(DataRoles::Changed ).toBool();
 }
 
 bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -1197,6 +1274,7 @@ bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, i
         ret = QStandardItemModel::setData(index, value);
         if(ret)
             repair_autoSaveTables();
+
         return ret;
     }
 

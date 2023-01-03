@@ -174,6 +174,9 @@ private slots:
     void saveDiagAmount();
     void diagAmountSaved();
     void buttonAddItemClicked();
+    void switchEditStrategy(bool);
+    void saveSaleTableClicked();
+    void setSaveSaleTableEnabled();
 #ifdef QT_DEBUG
     void test_scheduler_handler(){};
     void test_scheduler2_handler(){};

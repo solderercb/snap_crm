@@ -433,7 +433,7 @@
                                                         "  NULL AS 'work_id',\n"\
                                                         "  1 AS 'is_item'\n"\
                                                         "FROM (\n"\
-                                                        "  SELECT t1.`id`,  t1.`item_id`,  t1.`name`,  t1.`count`,  t1.`created`,  t1.`from_user`,  t1.`to_user`,  t1.`notes`,  t1.`state`,  t1.`repair_id`,  t1.`work_id`,  t1.`sn`,  t1.`warranty`, t2.`articul`, t2.`count` - t2.`reserved` AS 'avail', t2.`price`, t2.`price2`, t2.`price3`, t2.`price4`, t2.`price5`, t2.`in_price`, t2.`document`, t2.`box`, t2.`is_realization`, t2.`return_percent`, t3.`dealer` FROM\n"\
+                                                        "  SELECT t1.`id`,  t1.`item_id`,  t1.`name`,  t1.`count`,  t1.`created`,  t1.`from_user`,  t1.`to_user`,  t1.`notes`,  t1.`state`,  t1.`repair_id`,  t1.`work_id`,  t1.`sn`,  t1.`warranty`, t2.`articul`, t2.`count` - t2.`reserved` AS 'avail', t1.`price`, t2.`in_price`, t2.`document`, t2.`box`, t2.`is_realization`, t2.`return_percent`, t3.`dealer` FROM\n"\
                                                         "  store_int_reserve AS t1 \n"\
                                                         "  LEFT JOIN store_items AS t2\n"\
                                                         "    ON t1.`item_id` = t2.`id`\n"\

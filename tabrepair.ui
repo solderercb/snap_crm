@@ -346,6 +346,55 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QToolButton" name="toolButtonSaveSaleTable">
+                  <property name="toolTip">
+                   <string>Сохранить список работ и деталей</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="styles/styles.qrc">
+                    <normaloff>:/icons/light/1F4BE_32.png</normaloff>:/icons/light/1F4BE_32.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="switchEditStrategy">
+                  <property name="toolTip">
+                   <string>Сохранять список работ и деталей после каждого изменения</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton{ background-color: rgba(255, 255, 255, 0); border: none;}
+QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
+</string>
+                  </property>
+                  <property name="text">
+                   <string notr="true"/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="styles/styles.qrc">
+                    <normaloff>:/icons/light/toggle_sw_off.png</normaloff>
+                    <normalon>:/icons/light/toggle_sw_on.png</normalon>:/icons/light/toggle_sw_off.png</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>30</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                  <property name="flat">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <spacer name="horizontalSpacer">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
@@ -1547,7 +1596,9 @@ QListView::item  {
   <tabstop>buttonMedia</tabstop>
   <tabstop>buttonClientCard</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="styles/styles.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>pushButtonGetout</sender>
@@ -1693,6 +1744,38 @@ QListView::item  {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>switchEditStrategy</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tabRepair</receiver>
+   <slot>switchEditStrategy(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>827</x>
+     <y>359</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1173</x>
+     <y>362</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonSaveSaleTable</sender>
+   <signal>clicked()</signal>
+   <receiver>tabRepair</receiver>
+   <slot>saveSaleTableClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>795</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1167</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createGetOutDialog()</slot>
@@ -1705,5 +1788,7 @@ QListView::item  {
   <slot>saveDiagAmount()</slot>
   <slot>spinBoxAmountEditingFinished()</slot>
   <slot>onReturnQuickAddPart()</slot>
+  <slot>switchEditStrategy(bool)</slot>
+  <slot>saveSaleTableClicked()</slot>
  </slots>
 </ui>

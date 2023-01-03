@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>light/1F4BE_32.png</file>
     <file>light/1F4C2_32.png</file>
     <file>light/1F4E6_32.png</file>
     <file>light/1F5A8_32.png</file>
@@ -18,5 +19,7 @@
     <file>light/1F464_32.png</file>
     <file>light/1F512_32.png</file>
     <file>light/down-arrow.png</file>
+    <file>light/toggle_sw_on.png</file>
+    <file>light/toggle_sw_off.png</file>
   </qresource>
 </RCC>

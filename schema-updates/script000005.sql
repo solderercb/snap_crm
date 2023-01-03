@@ -1,0 +1,1 @@
+INSERT INTO `settings` (`name`, `value`) VALUES ('autosave_part_list', '0');

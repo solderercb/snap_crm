@@ -31,12 +31,12 @@ public:
     enum DataRoles {OldValue = Qt::UserRole, Changed = Qt::UserRole + 1, State = Qt::UserRole + 2, RecordType = Qt::UserRole + 3};
     enum RecordType {Work = 0, Item = 1};
     enum TablesSet {StoreSale = 0, WorkshopSale = 1};
-    enum EditStrategy {OnFieldChange = 0, OnRowChange = 1, OnManualSubmit = 2};
+    enum EditStrategy {OnFieldChange = 0, OnRowChange = 1, OnManualSubmit = 2, Nop = 0x55AA};
     explicit SSaleTableModel(QObject *parent = nullptr);
     ~SSaleTableModel();
     QVariant value(const int, const int, const int role = Qt::DisplayRole) const;
-    void setModelState(int state) {m_modelState = state;};
-    int modelState() {return m_modelState;};
+    void setModelState(int state);
+    int modelState();
     void setQuery(const QString&, const QSqlDatabase &db = QSqlDatabase());
     QVariant data(const QModelIndex&, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex&, const QVariant&, int role = Qt::EditRole) override;
@@ -51,7 +51,7 @@ public:
     void removeRowHandler(const int, const int);
     void buttonHandler(const int buttonNum, const int row);
     void store_markRowRemove(const int, const int);
-    void repair_markRowRemove(const int, const int);
+    int repair_markRowRemove(const int, const int);
     QMap<int, int>* getPendingRemoveList();
     int pendingRemoveItemsCount();
     void setHorizontalHeaderLabels();
@@ -70,6 +70,7 @@ public:
     void setDocumentState(int state){m_documentState = state;};
     bool commit();
     bool store_saveTables(StoreOpType type = StoreOpType::Sale);
+    bool repair_saveTablesStandalone();
     bool repair_saveTables();
     bool repair_saveTables(RepairOpType operation);
     bool repair_autoSaveTables();
@@ -79,6 +80,7 @@ public:
     void setExtraUnsaleReason(const QString&);
     bool freeItems();
     bool store_backOutItems(StoreOpType);
+    bool isRowMarkedRemove(const int) const;
     bool repair_removeRows();
     bool repair_removeItems();
     bool repair_removeWorks();
@@ -96,15 +98,16 @@ public:
     void setEditStrategy(const int);
     bool isWarranty();
     void setIsWarranty(const bool);
+    bool isUnsaved();
 #ifdef QT_DEBUG
     void dbgAddRandomItem();
     void dbgAddRandomItemBasket();
 #endif
 
 signals:
-    void dataChanged();
+    void tableDataChanged();
     void amountChanged(double, double, double);
-//    void modelReset();
+    void modelStateChanged(int);
     void addItem();
 
 private:
@@ -126,6 +129,7 @@ private:
     int m_currentIndex = -1;
     int m_lastHandledWorkId = -1;
     bool m_isWarranty = 0;
+    bool m_unsaved = 0;
     QList<QStandardItem *> row(int) const;
 
     // названия столбцов по-умолчанию; подробнее см. в комментарии к методу SaleTableModel::setHorizontalHeaderLabels
@@ -136,6 +140,7 @@ private:
     bool recordType(const int row);
     void linkItemToWork(const int row, const int workId);
     void clearChangedFlagForAllField();
+    int activeRowCount() const;
 
 public slots:
     void addCustomWork();
@@ -144,9 +149,9 @@ public slots:
 private slots:
     void sqlDataChanged();
 #if QT_VERSION >= 0x060000
-    void dataChanaged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
+    void dataChangedHook(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
 #else
-    void dataChanaged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
+    void dataChangedHook(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
 #endif
 
 };

@@ -240,6 +240,7 @@ bool SRepairSaleItemModel::request()
     qDebug().nospace() << "[" << this << "] request()";
     setState(State::Requested);
     // TODO: создание уведомления ответственному сотруднику
+    setNotes("");
     commit();
 
     return i_nErr;
@@ -250,9 +251,14 @@ bool SRepairSaleItemModel::request()
 */
 bool SRepairSaleItemModel::reserve()
 {
+    QString logText;
     qDebug().nospace() << "[" << this << "] reserve()";
     if(!i_id)
-        i_nErr = m_storeItem->reserve(tr("Выдача %1ед. товара сотруднику %2").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())));
+    {
+        logText = tr("Выдача %1ед. товара сотруднику %2").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt()));
+        setNotes(logText);
+        i_nErr = m_storeItem->reserve(logText);
+    }
     setState(State::EngineerBasket);
     commit();
     return i_nErr;
@@ -263,10 +269,15 @@ bool SRepairSaleItemModel::reserve()
 */
 bool SRepairSaleItemModel::linkRepair(const int id)
 {
+    QString logText;
     qDebug().nospace() << "[" << this << "] linkRepair()";
     setRepairId(id);
     if(!i_id)
-        i_nErr = m_storeItem->reserve(tr("Быстрая выдача %1ед. товара сотруднику %2 для ремонта №%3").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())).arg(id));
+    {
+        logText = tr("Автовыдача %1ед. товара сотруднику %2 для ремонта №%3").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())).arg(id);
+        setNotes(logText);
+        i_nErr = m_storeItem->reserve(logText);
+    }
     setState(State::RepairLinked);
     commit();
     return i_nErr;

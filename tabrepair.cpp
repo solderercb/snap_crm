@@ -81,9 +81,15 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     statusesProxyModel = new SSortFilterProxyModel;
     statusesProxyModel->setSourceModel(statusesModel);
     worksAndPartsModel = new SSaleTableModel();
+    worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
     worksAndPartsModel->setPriceColumn(0);
+    if(comSettings->value("autosave_part_list").toInt() == SSaleTableModel::EditStrategy::OnManualSubmit)
+        ui->switchEditStrategy->setChecked(false);
+    else
+        ui->switchEditStrategy->setChecked(true);
     connect(worksAndPartsModel, SIGNAL(amountChanged(double,double,double)), this, SLOT(updateTotalSumms(double,double,double)));
     connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
+    connect(worksAndPartsModel, &SSaleTableModel::tableDataChanged, this, &tabRepair::setSaveSaleTableEnabled);
     itemDelagates = new SaleTableItemDelegates(worksAndPartsModel, ui->tableViewWorksAndSpareParts);
     commentsModel = new commentsDataModel();
 //    reloadRepairData();
@@ -125,7 +131,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 #ifdef QT_DEBUG
     if(repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair )
         createGetOutDialog();
-    connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(updateWidgets()));
+    connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(reloadRepairData()));
     connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItem);
     connect(ui->dbgBtnAddRandomPartBasket, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItemBasket);
 #else
@@ -162,9 +168,9 @@ QString tabRepair::tabTitle()
 
 bool tabRepair::tabCloseRequest()
 {
-    if(!m_autosaveDiag && (m_diagChanged || m_spinBoxAmountChanged))
+    if((!m_autosaveDiag && (m_diagChanged || m_spinBoxAmountChanged)) || (!ui->switchEditStrategy->isChecked() && worksAndPartsModel->isUnsaved()))
     {
-        auto result = QMessageBox::question(this, tr("Введённые данные не сохранены"), tr("Результат диагностики или согласованная сумма не сохранены!\nСохранить перед закрытием?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
+        auto result = QMessageBox::question(this, tr("Данные не сохранены"), tr("Результат диагностики, согласованная сумма или список работ и деталей не сохранены!\nСохранить перед закрытием?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
         if (result == QMessageBox::Cancel)
         {
             return 0;
@@ -175,6 +181,7 @@ bool tabRepair::tabCloseRequest()
         }
     }
     saveDiagAmount();
+    worksAndPartsModel->repair_saveTablesStandalone();
     return 1;
 }
 
@@ -583,12 +590,6 @@ void tabRepair::tableRowDoubleClick(QModelIndex tableIndex)
         emit createTabSparePart(worksAndPartsModel->value(tableIndex.row(), SStoreItemModel::SaleOpColumns::ColItemId).toInt());
 }
 
-
-void tabRepair::saveState()
-{
-    saveState(ui->comboBoxState->currentIndex());
-}
-
 void tabRepair::updateStatesModel(const int stateId)
 {
     QString allowedStates = statusesProxyModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Contains).toString();
@@ -655,6 +656,11 @@ bool tabRepair::commit(const QString &notificationCaption, const QString &notifi
     return 1;
 }
 
+void tabRepair::saveState()
+{
+    saveState(ui->comboBoxState->currentIndex());
+}
+
 void tabRepair::saveState(int index)
 {
     if (index < 0)
@@ -664,6 +670,9 @@ void tabRepair::saveState(int index)
 
     if(!m_autosaveDiag)
         saveDiagAmount();
+
+    if(worksAndPartsModel->isUnsaved())
+        saveSaleTableClicked();
 
     int newStateId = statusesProxyModel->databaseIDByRow(index);
     try
@@ -785,6 +794,33 @@ void tabRepair::diagAmountSaved()
 void tabRepair::buttonAddItemClicked()
 {
     emit createTabSelectItem(1, this);
+}
+
+void tabRepair::switchEditStrategy(bool state)
+{
+    if(state)
+    {
+        if(worksAndPartsModel->isUnsaved())
+            worksAndPartsModel->repair_saveTablesStandalone();
+        worksAndPartsModel->setEditStrategy(SSaleTableModel::OnFieldChange);
+    }
+    else
+    {
+        worksAndPartsModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
+    }
+    ui->toolButtonSaveSaleTable->setEnabled(worksAndPartsModel->isUnsaved());
+}
+
+void tabRepair::saveSaleTableClicked()
+{
+    if(worksAndPartsModel->repair_saveTablesStandalone())
+        ui->toolButtonSaveSaleTable->setEnabled(false);
+}
+
+void tabRepair::setSaveSaleTableEnabled()
+{
+    if(worksAndPartsModel->editStrategy() == SSaleTableModel::OnManualSubmit)
+        ui->toolButtonSaveSaleTable->setEnabled(true);
 }
 
 void tabRepair::comboBoxStateIndexChanged(int index)

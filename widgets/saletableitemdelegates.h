@@ -36,7 +36,7 @@ public:
     void setTableModel(SSaleTableModel*);
 private:
     mutable bool m_must_open_box;
-    int m_tableMode = SSaleTableModel::TablesSet::StoreSale;
+    int m_tableModelMode = SSaleTableModel::TablesSet::StoreSale;
     int m_tableModelState = SSaleTableModel::State::StoreNew;
     QLineEdit* createLineEdit(QWidget*, QAbstractItemModel *) const;
     void setLineEditData(QWidget *editor, const QString&) const;
@@ -52,6 +52,9 @@ private:
     void setModelDataFromDoubleSpinBox(QWidget*, QAbstractItemModel*, const QModelIndex&) const;
     QRect pixmapRect(const QRect &delegateRect, const PixmapType p) const;
     void drawPixmap(const QRect &delegateRect, PixmapType p, QPainter *painter) const;
+    int rowConditionsForPixmap(const QModelIndex&) const;
+private slots:
+    void modelStateChanged(const int state);
 };
 
 #endif // SaleTableItemDelegates_H
