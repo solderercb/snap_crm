@@ -58,6 +58,7 @@ bool SFieldsModel::init(const int id)
 
 bool SFieldsModel::load(int id)
 {
+    clear();
     if(m_type == Type::Repair)
         query->exec(QUERY_SEL_REPAIR_ADD_FIELDS(id));
     else

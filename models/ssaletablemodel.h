@@ -57,6 +57,7 @@ public:
     void setHorizontalHeaderLabels();
     double amountTotal();
     QString amountTotalLocale();
+    double amountItems();
     QString amountItemsLocale();
     QString amountWorksLocale();
     QMap<QString, int> *fields;
@@ -106,6 +107,7 @@ public:
 
 signals:
     void tableDataChanged();
+    void tableSaved();
     void amountChanged(double, double, double);
     void modelStateChanged(int);
     void addItem();

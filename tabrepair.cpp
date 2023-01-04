@@ -90,6 +90,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(worksAndPartsModel, SIGNAL(amountChanged(double,double,double)), this, SLOT(updateTotalSumms(double,double,double)));
     connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
     connect(worksAndPartsModel, &SSaleTableModel::tableDataChanged, this, &tabRepair::setSaveSaleTableEnabled);
+    connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &tabRepair::saveTotalSumms);
     itemDelagates = new SaleTableItemDelegates(worksAndPartsModel, ui->tableViewWorksAndSpareParts);
     commentsModel = new commentsDataModel();
 //    reloadRepairData();
@@ -97,13 +98,13 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxState->blockSignals(true);
     ui->comboBoxState->setModel(statusesProxyModel);
+    statusesProxyModel->setFilterKeyColumn(Global::RepStateHeaders::Id);
+    statusesProxyModel->setFilterRegularExpression("");
+    ui->comboBoxState->blockSignals(false);
     ui->comboBoxNotifyStatus->disableWheelEvent(true);
     ui->comboBoxNotifyStatus->blockSignals(true);
     ui->comboBoxNotifyStatus->setModel(notifyStatusesModel);
     ui->comboBoxNotifyStatus->blockSignals(false);
-    statusesProxyModel->setFilterKeyColumn(Global::RepStateHeaders::Id);
-    statusesProxyModel->setFilterRegularExpression("");
-    ui->comboBoxState->blockSignals(false);
 
     ui->tableViewComments->setModel(commentsModel);
     ui->tableViewComments->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -200,6 +201,7 @@ void tabRepair::reloadRepairData()
     worksAndPartsModel->setIsWarranty(repairModel->isWarranty());
     commentsModel->setQuery(QUERY_SEL_REPAIR_COMMENTS(repair_id));
 
+    statusesProxyModel->setFilterRegularExpression("");
     updateStatesModel(repairModel->state());
     setWidgetsParams(repairModel->state());
     updateWidgets();
@@ -485,6 +487,13 @@ void tabRepair::updateTotalSumms(const double, const double, const double)
     ui->lineEditTotalAmount->setText(worksAndPartsModel->amountTotalLocale());
     ui->lineEditWorksAmount->setText(worksAndPartsModel->amountWorksLocale());
     ui->lineEditSparePartsAmount->setText(worksAndPartsModel->amountItemsLocale());
+}
+
+void tabRepair::saveTotalSumms()
+{
+    repairModel->setRealRepairCost(worksAndPartsModel->amountTotal());
+    repairModel->setPartsCost(worksAndPartsModel->amountItems());
+    repairModel->commit();
 }
 
 void tabRepair::createGetOutDialog()

@@ -153,6 +153,7 @@ private slots:
     void saveState(int);
     void comboBoxStateIndexChanged(int);
     void updateTotalSumms(const double, const double, const double);
+    void saveTotalSumms();
     void createGetOutDialog();
     void closeGetOutDialog();
     void openPrevRepair();

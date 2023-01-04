@@ -237,7 +237,7 @@
                                                 "  t1.`price_id` AS 'UID',\n"\
                                                 "  t1.`name`,\n"\
                                                 "  t1.`count`,\n"\
-                                                "  0 AS 'avail',\n"\
+                                                "  999999 AS 'avail',\n"\
                                                 "  ROUND(t1.`price`, 2) AS 'price',\n"\
                                                 "  t1.`count`*ROUND(t1.`price`, 2) AS 'summ',\n"\
                                                 "  NULL AS 'box',\n"\

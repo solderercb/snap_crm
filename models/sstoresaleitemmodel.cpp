@@ -235,7 +235,7 @@ bool SStoreSaleItemModel::sale()
             logText = tr("Продажа ранее зарезервированного товара: %1ед.; дополнительно: %2ед.").arg(m_savedCount).arg(m_count - m_savedCount);
         else
             logText = tr("Продажа ранее зарезервированного товара: %1ед.").arg(m_count);
-        i_nErr &= m_storeItem->saleReserved(logText);
+        i_nErr &= m_storeItem->saleStore(logText);
     }
     else
     {

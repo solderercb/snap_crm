@@ -129,6 +129,8 @@ public:
     bool sale(const QString &logText);
     bool reserve(const QString &logText);
     bool saleReserved(const QString &logText);
+    bool saleStore(const QString &logText);
+    bool saleRepair(const QString &logText);
     bool free(const QString &logText);
     bool unsale(const QString &logText);
     bool unsaleRepair(const QString &logText);

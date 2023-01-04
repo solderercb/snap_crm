@@ -403,7 +403,7 @@ int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
     int newState = SRepairSaleItemModel::EngineerBasket;
     int recordType = index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
     QMap<int, int> *pendingRemoveList;
-    qDebug().nospace() << "[" << this << "] repair_markRowRemove() | " << QString("row = %1, recordType = %2").arg(row).arg(recordType);
+    qDebug().nospace() << "[" << this << "] repair_markRowRemove() | " << QString("row = %1, recordType = %2, m_currentIndex = %3").arg(row).arg(recordType).arg(m_currentIndex);
     if(recordType == RecordType::Work)   // сначала обрабатываем записи о товарах привязанных к удаляемой работе
     {
         pendingRemoveList = m_worksPendingRemoveList;
@@ -419,6 +419,7 @@ int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
     if(m_editStrategy == OnManualSubmit && !index(row, SStoreItemModel::SaleOpColumns::ColObjId).data().toInt())
     {
         removeRows(row, 1);
+        m_currentIndex = row - 1;
         return row;
     }
     else if(pendingRemoveList->contains(row))
@@ -613,6 +614,7 @@ bool SSaleTableModel::repair_saveTables()
         throw 1;
 
     clearChangedFlagForAllField();
+    emit tableSaved();
     return ret;
 }
 
@@ -1085,7 +1087,10 @@ void SSaleTableModel::clearChangedFlagForAllField()
             for(int j = 1; j < columnCount(); j++) // в нулевом столбце — id записи в таблице, он не изменяется средствами программы
             {
                 if(index(i, j).data(DataRoles::Changed).toBool())
+                {
                     QStandardItemModel::setData(index(i, j), 0, DataRoles::Changed);   // снятие флага о наличии изменений в поле
+                    QStandardItemModel::setData(index(i, j), QVariant(), DataRoles::OldValue);   // очистка старого значения
+                }
             }
             QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), 0, DataRoles::Changed);   // снятие флага о наличии изменений в строке
         }
@@ -1155,6 +1160,11 @@ double SSaleTableModel::amountTotal()
 QString SSaleTableModel::amountTotalLocale()
 {
     return sysLocale.toString(amountTotal(), 'f', 2);
+}
+
+double SSaleTableModel::amountItems()
+{
+    return m_amountItems;
 }
 
 QString SSaleTableModel::amountItemsLocale()
@@ -1267,7 +1277,8 @@ bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, i
         if(index.data(Qt::DisplayRole) != value)
         {
             QStandardItemModel::setData(index, 1, Changed); // пометка поля изменённым
-            QStandardItemModel::setData(index, QStandardItemModel::data(index), DataRoles::OldValue); // сохраняем старое значение (для записи в журнал)
+            if(!index.data(DataRoles::OldValue).isValid())
+                QStandardItemModel::setData(index, QStandardItemModel::data(index), DataRoles::OldValue); // сохраняем старое значение (для записи в журнал)
             QStandardItemModel::setData(this->index(index.row(), SStoreItemModel::SaleOpColumns::ColId), 1, Changed); // пометка строки изменённой
         }
 

@@ -768,10 +768,29 @@ bool SStoreItemModel::saleReserved(const QString &logText)
     if(!commit())
         return 0;
 
+    return i_nErr;
+}
+
+bool SStoreItemModel::saleStore(const QString &logText)
+{
+    if(!saleReserved(logText))
+        return 0;
+
     if(!dealerRoyalty(SBalanceLogRecordModel::RoyaltyReason::Document))
         return 0;
 
-    return i_nErr;
+    return 1;
+}
+
+bool SStoreItemModel::saleRepair(const QString &logText)
+{
+    if(!saleReserved(logText))
+        return 0;
+
+    if(!dealerRoyalty(SBalanceLogRecordModel::RoyaltyReason::Repair))
+        return 0;
+
+    return 1;
 }
 
 bool SStoreItemModel::free(const QString &logText)

@@ -287,7 +287,7 @@ bool SRepairSaleItemModel::sale()
 {
     setState(State::Sold);
     commit();
-    i_nErr &= m_storeItem->saleReserved(tr("Продажа %1ед. товара в связи с выдачей ремонта №%2.").arg(m_count).arg(m_repairId));
+    i_nErr &= m_storeItem->saleRepair(tr("Продажа %1ед. товара в связи с выдачей ремонта №%2.").arg(m_count).arg(m_repairId));
     return i_nErr;
 }
 
