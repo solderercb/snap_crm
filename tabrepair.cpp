@@ -832,6 +832,18 @@ void tabRepair::setSaveSaleTableEnabled()
         ui->toolButtonSaveSaleTable->setEnabled(true);
 }
 
+void tabRepair::buttonWorksAdminEdit(bool state)
+{
+    if(state)
+        worksAndPartsModel->setModelState(SSaleTableModel::State::WorkshopAdm);
+    else
+    {
+        worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
+        if(worksAndPartsModel->isUnsaved())
+            saveSaleTableClicked();
+    }
+}
+
 void tabRepair::comboBoxStateIndexChanged(int index)
 {
     if(save_state_on_close)

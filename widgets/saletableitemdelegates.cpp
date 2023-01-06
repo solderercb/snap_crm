@@ -80,9 +80,12 @@ void SaleTableItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem
             case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreNew << 8                                                       | SSaleTableModel::RecordType::Item):
             case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreReserved << 8                                                  | SSaleTableModel::RecordType::Item):
             case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8                                                      | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopAdm << 8                                                    | SSaleTableModel::RecordType::Item):
             case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8                                                     | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, RemovePart, painter); drawPixmap(option.rect, Part, painter); break;
+            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopAdm << 8                                                    | SSaleTableModel::RecordType::Work):
             case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8                                                     | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, RemoveWork, painter); drawPixmap(option.rect, Work, painter); drawPixmap(option.rect, AddPart, painter); break;
             case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8     | SStoreSaleItemModel::Cancelled << 1            | SSaleTableModel::RecordType::Item):
+            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreCancelled << 8| SStoreSaleItemModel::Cancelled << 1            | SSaleTableModel::RecordType::Item):
             case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, Part, painter); break;
             case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, Work, painter); break;
         }

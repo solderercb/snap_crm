@@ -129,7 +129,6 @@ private:
     int m_editStrategy = EditStrategy::OnFieldChange;
     double m_amountItems = 0, m_amountWorks = 0, m_amountTotal = 0;
     int m_currentIndex = -1;
-    int m_lastHandledWorkId = -1;
     bool m_isWarranty = 0;
     bool m_unsaved = 0;
     QList<QStandardItem *> row(int) const;
@@ -140,7 +139,6 @@ private:
     int getItemInsertionRow();
     int getParentWorkRow(const int itemRow);
     bool recordType(const int row);
-    void linkItemToWork(const int row, const int workId);
     void clearChangedFlagForAllField();
     int activeRowCount() const;
 

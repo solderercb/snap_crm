@@ -666,7 +666,7 @@ bool SStoreItemModel::checkAfterSale()
             }
             case Reserve:
             {
-                if( m_qtysBeforeSale->value(QtyField::Reserved) + m_saleQty != m_qtysAfterSale->value(QtyField::Reserved) )   // `reserved`
+                if( m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty + m_saleQty != m_qtysAfterSale->value(QtyField::Reserved) )   // `reserved`
                     throw 1;
                 break;
             }
@@ -746,7 +746,7 @@ bool SStoreItemModel::reserve(const QString &logText)
         return 0;
 
     m_opOnItemType = OpOnItem::Reserve;
-    setReserved(m_qtysBeforeSale->value(QtyField::Reserved) + m_saleQty);
+    setReserved(m_qtysBeforeSale->value(QtyField::Reserved) - m_savedSaleQty + m_saleQty);
     i_logRecord->setText(logText);
     if(!commit())
         return 0;

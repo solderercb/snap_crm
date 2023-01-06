@@ -410,10 +410,13 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
                 <item>
                  <widget class="QPushButton" name="pushButtonAdmEditWorks">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="text">
                    <string>Адм. правка</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -1776,6 +1779,22 @@ QListView::item  {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButtonAdmEditWorks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tabRepair</receiver>
+   <slot>buttonWorksAdminEdit(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1139</x>
+     <y>367</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1169</x>
+     <y>396</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createGetOutDialog()</slot>
@@ -1790,5 +1809,6 @@ QListView::item  {
   <slot>onReturnQuickAddPart()</slot>
   <slot>switchEditStrategy(bool)</slot>
   <slot>saveSaleTableClicked()</slot>
+  <slot>buttonWorksAdminEdit(bool)</slot>
  </slots>
 </ui>

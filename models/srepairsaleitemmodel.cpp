@@ -14,7 +14,8 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
 {
     i_id = record.at(SStoreItemModel::SaleOpColumns::ColId)->data(Qt::DisplayRole).toInt();
 
-    m_storeItem = new SStoreItemModel(record, count());
+    m_savedCount = count();
+    m_storeItem = new SStoreItemModel(record, m_savedCount);
     m_storeItem->setSaleMode(SStoreItemModel::SaleMode::Repair);
 
     i_id = record.at(SStoreItemModel::SaleOpColumns::ColId)->data(Qt::DisplayRole).toInt();
@@ -87,8 +88,22 @@ int SRepairSaleItemModel::count()
 
 void SRepairSaleItemModel::setCount(const int count, const QVariant oldValue)
 {
+    QString logText;
+    qDebug().nospace() << "[" << this << "] setCount() | " << QString("m_state = %1 | oldValue = %2 | count = %3").arg(m_state).arg(oldValue.toInt()).arg(count);
     if(oldValue.isValid())
-        appendLogText(tr("Количество \"%1\" изменёно с %2 на %3").arg(m_name, usersModel->getDisplayRole(oldValue.toInt())).arg(count));
+    {
+        appendLogText(tr("[Админ. правка] Количество товара \"%1\" изменёно с %2 на %3").arg(m_name).arg(oldValue.toInt()).arg(count));
+    }
+    if(i_id)
+    {
+        logText = tr("[Админ. правка] Количество ранее зарезервированного товара изменено с %1 на %2").arg(m_savedCount).arg(count);
+    }
+    else
+    {
+        logText = tr("Автовыдача %1ед. товара сотруднику %2 для ремонта №%3").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())).arg(m_repairId);
+        setNotes(logText);
+    }
+    m_storeItem->reserve(logText);
 
     i_valuesMap.insert("count", count);
 }
@@ -155,7 +170,10 @@ void SRepairSaleItemModel::setRepairId(const int id)
 {
     if(id)
     {
-        appendLogText(tr("Добавлен товар \"%1\" стоимостью %2 в кол-ве %3ед").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_count));
+        int count = m_count;
+        if(m_savedCount > 0 && m_savedCount != m_count)
+            count = m_savedCount;
+        appendLogText(tr("Добавлен товар \"%1\" стоимостью %2 в кол-ве %3ед").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(count), "!itemAdded");
         i_valuesMap.insert("repair_id", id);
         i_logRecord->setRepairId(id);
     }
@@ -216,10 +234,8 @@ void SRepairSaleItemModel::setWarranty(const int warranty, const QVariant oldVal
     QString text;
     if(oldValue.isValid())
         text = tr("Срок гарантии на товар \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1), warrantyTermsModel->getDisplayRole(warranty, 1));
-    else if(i_id)
-        text = tr("Срок гарантии на товар \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
     else
-        text = tr("Срок гарантии на товар \"%1\" установлен по умолчанию (\"%2\")").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
+        text = tr("Срок гарантии на товар \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
 
     appendLogText(text, QString::number(SStoreItemModel::SaleOpColumns::ColWarranty)); // disambiguation здесь нужен для установки порядка записей в журнал
     i_valuesMap.insert("warranty", warranty);
@@ -279,7 +295,6 @@ bool SRepairSaleItemModel::linkRepair(const int id)
         i_nErr = m_storeItem->reserve(logText);
     }
     setState(State::RepairLinked);
-    commit();
     return i_nErr;
 }
 
@@ -338,7 +353,12 @@ bool SRepairSaleItemModel::commit()
 {
     qDebug().nospace() << "[" << this << "] commit()";
     if(i_id)
+    {
+        if(m_storeItemUpdated)
+            m_storeItem->commit();
+        m_storeItemUpdated = 0;
         update();
+    }
     else
     {
         setCreated(QDateTime::currentDateTime());

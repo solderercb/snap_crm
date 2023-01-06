@@ -21,14 +21,20 @@ void SComRecord::appendLogText(const QString &text)
     i_logTexts->insert(QString::number(i_logTexts->size()), text);
 }
 
-void SComRecord::appendLogText(const QString &text, const QString &disambiguation)
+/*  Добавление текста журнала с возможностью переопределить порядок записи.
+ *  Метод appendLogText(const QString&) в качестве ключа использует порядковый номер
+ *  записи ("0", "1", "2", ...). Если какая-то из записей журнала должа быть сделана
+ *  раньше, нужно указать ключ, который при алфивитной сортировке будет выше чисел,
+ *  например, "!".
+*/
+void SComRecord::appendLogText(const QString &text, const QString &order_key)
 {
-    i_logTexts->insert(disambiguation, text);
+    i_logTexts->insert(order_key, text);
 }
 
-void SComRecord::removeLogText(const QString &disambiguation)
+void SComRecord::removeLogText(const QString &key)
 {
-    i_logTexts->remove(disambiguation);
+    i_logTexts->remove(key);
 }
 
 bool SComRecord::commitLogs()

@@ -246,7 +246,7 @@
                                                 "  t1.`user`,\n"\
                                                 "  0 AS 'is_realization',\n"\
                                                 "  0 AS 'return_percent',\n"\
-                                                "  0 AS 'state',\n"\
+                                                "  2 AS 'state',\n"\
                                                 "  '' AS 'notes',\n"\
                                                 "  0 AS 'item_id',\n"\
                                                 "  0 AS 'in_price',\n"\
@@ -267,7 +267,7 @@
                                                 "  CONCAT(LPAD(t3.articul, 6, '0'), '-', LPAD(t3.id, 6, '0')),\n"\
                                                 "  t2.`name`,\n"\
                                                 "  t2.`count`,\n"\
-                                                "  t3.`count` - t3.`reserved`,\n"\
+                                                "  t3.`count` - t3.`reserved` + t2.`count`,\n"\
                                                 "  ROUND(t2.`price`, 2),\n"\
                                                 "  t2.`count`*ROUND(t2.`price`, 2),\n"\
                                                 "  t3.`box`,\n"\
@@ -276,7 +276,7 @@
                                                 "  t2.`to_user`,\n"\
                                                 "  t3.`is_realization`,\n"\
                                                 "  t3.`return_percent`,\n"\
-                                                "  0 AS 'state',\n"\
+                                                "  t2.`state`,\n"\
                                                 "  t2.`notes`,\n"\
                                                 "  t3.`id`,\n"\
                                                 "  t3.`in_price`,\n"\
@@ -433,7 +433,7 @@
                                                         "  NULL AS 'work_id',\n"\
                                                         "  1 AS 'is_item'\n"\
                                                         "FROM (\n"\
-                                                        "  SELECT t1.`id`,  t1.`item_id`,  t1.`name`,  t1.`count`,  t1.`created`,  t1.`from_user`,  t1.`to_user`,  t1.`notes`,  t1.`state`,  t1.`repair_id`,  t1.`work_id`,  t1.`sn`,  t1.`warranty`, t2.`articul`, t2.`count` - t2.`reserved` AS 'avail', t1.`price`, t2.`in_price`, t2.`document`, t2.`box`, t2.`is_realization`, t2.`return_percent`, t3.`dealer` FROM\n"\
+                                                        "  SELECT t1.`id`,  t1.`item_id`,  t1.`name`,  t1.`count`,  t1.`created`,  t1.`from_user`,  t1.`to_user`,  t1.`notes`,  t1.`state`,  t1.`repair_id`,  t1.`work_id`,  t1.`sn`,  t1.`warranty`, t2.`articul`, t2.`count` - t2.`reserved` + t1.`count` AS 'avail', t1.`price`, t2.`in_price`, t2.`document`, t2.`box`, t2.`is_realization`, t2.`return_percent`, t3.`dealer` FROM\n"\
                                                         "  store_int_reserve AS t1 \n"\
                                                         "  LEFT JOIN store_items AS t2\n"\
                                                         "    ON t1.`item_id` = t2.`id`\n"\

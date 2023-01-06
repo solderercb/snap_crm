@@ -55,8 +55,10 @@ public:
     void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue) override;
 private:
     SStoreItemModel *m_storeItem = nullptr;
+    bool m_storeItemUpdated = 0;
     int m_itemId;
     QString m_name;
+    int m_savedCount;
     int m_count;
     int m_fromUser;
     int m_toUser;
