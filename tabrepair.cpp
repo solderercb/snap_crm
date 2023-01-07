@@ -560,7 +560,6 @@ void tabRepair::openInvoice(int)
 
 void tabRepair::onReturnQuickAddPart()
 {
-    qDebug().nospace() << "[" << this << "] onReturnQuickAddPart()";
     if(quickAddPart(ui->lineEditQuickAddPart->text().toInt()))
         ui->lineEditQuickAddPart->setText("");
 }
@@ -570,8 +569,6 @@ void tabRepair::onReturnQuickAddPart()
 */
 bool tabRepair::quickAddPart(const int uid)
 {
-    qDebug().nospace() << "[" << this << "] quickAddPart()";
-
     if(m_worksRO)
         return 0;
 

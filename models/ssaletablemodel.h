@@ -47,7 +47,6 @@ public:
     bool addWorkByUID(const int uid, const int priceOption);
     bool addItemByUID(const int uid, const int priceOption, const int count = 1);
     bool addItemFromBasket(const int id, const int qty = 0, const int priceOpt = 0);
-    void insertrepair_item(const int);
     void removeRowHandler(const int, const int);
     void buttonHandler(const int buttonNum, const int row);
     void store_markRowRemove(const int, const int);
@@ -68,7 +67,6 @@ public:
     void unsetClient();
     void setDocumentId(int);
     void setRepairId(int);
-    void setDocumentState(int state){m_documentState = state;};
     bool commit();
     bool store_saveTables(StoreOpType type = StoreOpType::Sale);
     bool repair_saveTablesStandalone();
@@ -91,7 +89,6 @@ public:
     SStoreSaleItemModel* store_item(const int);
     SRepairSaleItemModel* repair_item(const int);
     SWorkModel* repair_work(const int);
-    bool integrityStatus();
     int tableMode();
     void setTableMode(const TablesSet mode = TablesSet::StoreSale);
     bool isColumnHidden(const int);
@@ -116,14 +113,12 @@ private:
     QSqlQueryModel *m_queryData;
     int m_modelState = 0; // 0 - новая РН (всё редактируется, строки удаляются); 1 - проведённая РН (не редактируется, строки помечаются серым); 2 - резерв (всё редактируется, строки помечаются серым); 3 - распроведённая РН или снятый резерв (не редактируется, кнопок в первом столбце нет)
     int m_objId = 0;
-    int m_documentState = 0;
     int m_client = 0;
     int m_itemsAffected = 0;
     QMap<int, int> *m_itemsPendingRemoveList;
     QMap<int, int> *m_worksPendingRemoveList;
     QMap<int, int> *m_itemsPendingSplitList;
     int m_priceIndex = 1; // по умолчанию "Цена розница" ("`price2`")
-    bool m_amountChangedSignalFilter = 0;
     QString m_extraUnsaleReason;
     bool m_tableMode = TablesSet::StoreSale;
     int m_editStrategy = EditStrategy::OnFieldChange;

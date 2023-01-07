@@ -165,7 +165,6 @@ int SSaleTableModel::isItemAlreadyInList(int id)
 */
 void SSaleTableModel::addCustomWork()
 {
-    qDebug().nospace() << "[" << this << "] addCustomWork()";
     QSqlRecord *customWork = new QSqlRecord();
     QSqlField *field;
     m_currentIndex = rowCount();
@@ -232,7 +231,6 @@ bool SSaleTableModel::addWorkByUID(const int uid, const int priceOption)
 */
 bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const int count)
 {
-    qDebug().nospace() << "[" << this << "] addItemByUID() | m_currentIndex = " << m_currentIndex;
     QSqlQueryModel *item = nullptr;
     int row = -1;
     bool ret = 1;
@@ -296,7 +294,6 @@ bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const i
 
 bool SSaleTableModel::addItemFromBasket(const int id, const int qty, const int priceOpt)
 {
-    qDebug().nospace() << "[" << this << "] addItemFromBasket() | m_currentIndex = " << m_currentIndex;
     QSqlQueryModel *item = nullptr;
     bool ret = 1;
     int insertionRow;
@@ -358,7 +355,6 @@ void SSaleTableModel::removeRowHandler(const int row, const int db_id)
 
 void SSaleTableModel::buttonHandler(const int buttonNum, const int row)
 {
-    qDebug().nospace() << "[" << this << "] buttonHandler() | " << QString("buttonId = %1, row = %2").arg(buttonNum).arg(row);
     // действия при прямой продаже и в карте ремонта разные; формируем уникальный идентификатор
     int action = m_tableMode << 8 | index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt() << 4 | buttonNum;
     switch(action)
@@ -408,7 +404,6 @@ int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
     int newState = SRepairSaleItemModel::EngineerBasket;
     int recordType = index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
     QMap<int, int> *pendingRemoveList;
-    qDebug().nospace() << "[" << this << "] repair_markRowRemove() | " << QString("row = %1, recordType = %2, m_currentIndex = %3").arg(row).arg(recordType).arg(m_currentIndex);
     if(recordType == RecordType::Work)   // сначала обрабатываем записи о товарах привязанных к удаляемой работе
     {
         pendingRemoveList = m_worksPendingRemoveList;
@@ -574,7 +569,6 @@ bool SSaleTableModel::repair_saveTables()
     int lastHandledWorkId = 0, lastInsertId = 0;
     int editStrategyBackup = m_editStrategy;
 
-    qDebug().nospace() << "[" << this << "] repair_saveTables()";
     ret = repair_removeRows();
 
     // Перед вызовом методов записи данных в БД нужно дополнительно задать значения некоторых полей
@@ -680,13 +674,11 @@ bool SSaleTableModel::repair_saveTablesStandalone()
  */
 bool SSaleTableModel::repair_saveTables(RepairOpType operation)
 {
-    qDebug().nospace() << "[" << this << "] repair_saveTables(RepairOpType)";
     bool ret = 1;
 
     ret = repair_saveTables();   // если по каким-либо причинам таблица не сохранена
     for(int i = 0; i < rowCount() && ret; i++)
     {
-        qDebug().nospace() << "[" << this << "] repair_saveTables(RepairOpType) | " << QString("i = %1").arg(i);
         if(index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == RecordType::Work)
             continue;
 
@@ -712,7 +704,6 @@ bool SSaleTableModel::repair_saveTables(RepairOpType operation)
 */
 bool SSaleTableModel::repair_autoSaveTables()
 {
-    qDebug().nospace() << "[" << this << "] repair_autoSaveTables()";
     bool nErr = 1;
 
     if( m_editStrategy == OnFieldChange || m_editStrategy == OnRowChange )
@@ -825,7 +816,6 @@ bool SSaleTableModel::isRowMarkedRemove(const int row) const
 
 bool SSaleTableModel::repair_removeRows()
 {
-    qDebug().nospace() << "[" << this << "] repair_removeRows()";
     bool ret = 1;
 
     if(ret && !m_itemsPendingRemoveList->isEmpty())
@@ -861,7 +851,6 @@ bool SSaleTableModel::repair_removeRows()
 */
 bool SSaleTableModel::repair_removeItems()
 {
-    qDebug().nospace() << "[" << this << "] repair_removeItems()";
     bool nErr = 1;
 
     QMap<int, int>::const_iterator i;
@@ -884,7 +873,6 @@ bool SSaleTableModel::repair_removeItems()
 
 bool SSaleTableModel::repair_removeWorks()
 {
-    qDebug().nospace() << "[" << this << "] repair_removeWorks()";
     bool nErr = 1;
 
     QMap<int, int>::const_iterator i;
@@ -996,7 +984,6 @@ void SSaleTableModel::setIsWarranty(const bool isWarranty)
 
 bool SSaleTableModel::isUnsaved()
 {
-    qDebug().nospace() << "[" << this << "] isUnsaved() | m_unsaved = " << m_unsaved;
     return m_unsaved;
 }
 
@@ -1220,14 +1207,12 @@ void SSaleTableModel::dataChangedHook(const QModelIndex &topLeft, const QModelIn
 #endif
 {
     int row = topLeft.row();
-//    qDebug().nospace() << "[" << this << "] dataChangedHook() | TopLeft[R,C] = [" << topLeft.row() << "," << topLeft.column() << "] | BottomRight[R,C] = [" << bottomRight.row() << "," << bottomRight.column() << "] | changed flag = " << index(row, SStoreItemModel::SaleOpColumns::ColId).data(DataRoles::Changed ).toBool();
     int column = topLeft.column();
-    if( (column == SStoreItemModel::SaleOpColumns::ColCount || column == SStoreItemModel::SaleOpColumns::ColPrice) /*&& m_amountChangedSignalFilter*/ )   // был глюк, что без фильтра при добавлении первого товара в таблицу не обновляется общая сумма документа
+    if( (column == SStoreItemModel::SaleOpColumns::ColCount || column == SStoreItemModel::SaleOpColumns::ColPrice) )
     {
         QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColSumm), value(row, SStoreItemModel::SaleOpColumns::ColCount).toInt() * value(row, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() );
         emit amountChanged(amountTotal(), m_amountItems, m_amountWorks);
     }
-//    qDebug().nospace() << "[" << this << "] dataChangedHook() | changed flag = " << index(row, SStoreItemModel::SaleOpColumns::ColId).data(DataRoles::Changed ).toBool();
 }
 
 bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -1235,7 +1220,6 @@ bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, i
     bool ret = 0;
     if (role == Qt::EditRole)
     {
-        qDebug().nospace() << "[" << this << "] setData() | " << QString("index[%1, %2]").arg(index.row()).arg(index.column());
         if (!checkIndex(index))
             return ret;
 
@@ -1258,7 +1242,6 @@ bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, i
             }
         }
 
-        qDebug().nospace() << "[" << this << "] setData() | index.data = " << index.data(Qt::DisplayRole) << "; value = " << value;
         if(index.data(Qt::DisplayRole) != value)
         {
             QStandardItemModel::setData(index, 1, Changed); // пометка поля изменённым

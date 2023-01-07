@@ -31,7 +31,6 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
     m_sn = record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString();
     m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
 
-    qDebug().nospace() << "[" << this << "] SRepairSaleItemModel() | " << QString("m_workId = %1 | m_repairId = %2").arg(m_workId).arg(m_repairId);
     i_logRecord->setRepairId(m_repairId);
 
     initQueryFields(record);
@@ -89,7 +88,6 @@ int SRepairSaleItemModel::count()
 void SRepairSaleItemModel::setCount(const int count, const QVariant oldValue)
 {
     QString logText;
-    qDebug().nospace() << "[" << this << "] setCount() | " << QString("m_state = %1 | oldValue = %2 | count = %3").arg(m_state).arg(oldValue.toInt()).arg(count);
     if(oldValue.isValid())
     {
         appendLogText(tr("[Админ. правка] Количество товара \"%1\" изменёно с %2 на %3").arg(m_name).arg(oldValue.toInt()).arg(count));
@@ -253,7 +251,6 @@ void SRepairSaleItemModel::setRLock(const bool r_lock)
 
 bool SRepairSaleItemModel::request()
 {
-    qDebug().nospace() << "[" << this << "] request()";
     setState(State::Requested);
     // TODO: создание уведомления ответственному сотруднику
     setNotes("");
@@ -268,7 +265,6 @@ bool SRepairSaleItemModel::request()
 bool SRepairSaleItemModel::reserve()
 {
     QString logText;
-    qDebug().nospace() << "[" << this << "] reserve()";
     if(!i_id)
     {
         logText = tr("Выдача %1ед. товара сотруднику %2").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt()));
@@ -277,24 +273,6 @@ bool SRepairSaleItemModel::reserve()
     }
     setState(State::EngineerBasket);
     commit();
-    return i_nErr;
-}
-
-/*  Установка товара в ремонт (привязка)
- *  Может быть инициирована сотрудником, обладающим правом "Брать детали со склада", или при добавлении товара из корзины сотрудника
-*/
-bool SRepairSaleItemModel::linkRepair(const int id)
-{
-    QString logText;
-    qDebug().nospace() << "[" << this << "] linkRepair()";
-    setRepairId(id);
-    if(!i_id)
-    {
-        logText = tr("Автовыдача %1ед. товара сотруднику %2 для ремонта №%3").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())).arg(id);
-        setNotes(logText);
-        i_nErr = m_storeItem->reserve(logText);
-    }
-    setState(State::RepairLinked);
     return i_nErr;
 }
 
@@ -351,7 +329,6 @@ void SRepairSaleItemModel::setQueryField(const int fieldNum, const QVariant valu
 
 bool SRepairSaleItemModel::commit()
 {
-    qDebug().nospace() << "[" << this << "] commit()";
     if(i_id)
     {
         if(m_storeItemUpdated)

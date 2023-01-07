@@ -47,7 +47,6 @@ public:
     bool request();
     bool reserve();
     bool commit();
-    bool linkRepair(const int);
     bool sale();
     bool unsale();
     bool unlinkRepair();
