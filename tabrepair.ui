@@ -635,7 +635,13 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
                  <bool>true</bool>
                 </property>
                 <property name="selectionBehavior">
-                 <enum>QAbstractItemView::SelectItems</enum>
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <property name="verticalScrollMode">
+                 <enum>QAbstractItemView::ScrollPerPixel</enum>
+                </property>
+                <property name="horizontalScrollMode">
+                 <enum>QAbstractItemView::ScrollPerPixel</enum>
                 </property>
                 <property name="cornerButtonEnabled">
                  <bool>false</bool>
@@ -643,9 +649,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEditNewComment">
+               <widget class="SLineEdit" name="lineEditComment">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">

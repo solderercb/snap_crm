@@ -13,7 +13,7 @@ public:
     explicit SUserActivityModel(QObject *parent = nullptr);
     ~SUserActivityModel();
     void setNotes(const QString);
-    void appendRecord(const QString &notes);
+    void appendRecord(const QString &notes, const bool standalone = 1);
     void updateActivityTimestamp();
     void updateLoginTimestamp();
 private:

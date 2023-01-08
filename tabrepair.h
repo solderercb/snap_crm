@@ -15,6 +15,7 @@
 #include <QTimeZone>
 #include <QDateTime>
 #include <QLocale>
+#include <QClipboard>
 #include "tabcommon.h"
 #include "widgets/getoutdialog.h"
 #include "widgets/sgroupboxeventfilter.h"
@@ -34,29 +35,15 @@ class tabRepair;
 class commentsTable : public QTableView
 {
     Q_OBJECT
-
+signals:
+    void copyText();
 public:
     explicit commentsTable(QWidget *parent = nullptr);
     ~commentsTable();
-    void resizeEvent(QResizeEvent*);
-#if QT_VERSION >= 0x060000
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
-#else
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
-#endif
+    void resizeEvent(QResizeEvent*) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    QModelIndexList selectedIndexes() const override;
 private:
-};
-
-class commentsDataModel : public QSqlQueryModel
-{
-    Q_OBJECT
-
-public:
-    explicit commentsDataModel(QWidget *parent = nullptr);
-    ~commentsDataModel();
-    void update();
-private:
-    QVariant data(const QModelIndex &index, int role) const;
 };
 
 class worksAndSparePartsTable : public QTableView
@@ -99,7 +86,7 @@ private:
     SClientModel *clientModel;
     SFieldsModel *additionalFieldsModel;
     SSortFilterProxyModel *statusesProxyModel;
-    commentsDataModel *commentsModel;
+    SCommentsModel *commentsModel;
     SSaleTableModel *worksAndPartsModel;
     SaleTableItemDelegates *itemDelagates;
     bool m_statusUpdateInProgress = 0;
@@ -179,9 +166,15 @@ private slots:
     void saveSaleTableClicked();
     void setSaveSaleTableEnabled();
     void buttonWorksAdminEdit(bool state);
+    void commentMenuRequest(QPoint pos);
+    bool commentIsEditable(const int row);
+    void commentRemove();
+    void commentEdit();
+    void commentCopyToClipboard(const bool copyTimeStamp = 0);
+    void lineEditCommentKeyPressEvent(QKeyEvent *event);
 #ifdef QT_DEBUG
-    void test_scheduler_handler(){};
-    void test_scheduler2_handler(){};
+    void test_scheduler_handler() override{};
+    void test_scheduler2_handler() override{};
 #endif
 };
 

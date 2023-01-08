@@ -17,13 +17,13 @@ class SComRecord : public SDatabaseRecord
 {
     Q_OBJECT
 public:
+    enum DataRoles {OldValue = Qt::UserRole, Changed = Qt::UserRole + 1};
     explicit SComRecord(QObject *parent = nullptr);
     ~SComRecord();
     void appendLogText(const QString&);
     void appendLogText(const QString&, const QString &disambiguation);
     void removeLogText(const QString &disambiguation);
 protected:
-    enum DataRoles {OldValue = Qt::UserRole, Changed = Qt::UserRole + 1};
     bool commitLogs();
     void initQueryFields(const QList<QStandardItem *> &record);
     virtual void setQueryField(const int, const QVariant, const QVariant){};

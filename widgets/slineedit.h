@@ -18,6 +18,7 @@ class SLineEdit : public QLineEdit
 signals:
     void buttonClicked(int buttonId = 0);
     void mouseDoubleClick();
+    void keyPress(QKeyEvent *event);
 
 public:
     enum Buttons {Clear, DownArrow, Edit, Search, Print, Apply, Open};
@@ -29,6 +30,7 @@ public:
     void resize(int, int);
     QString buttons();
     void tmp_set_buttons_style_sheet(const QString&);
+    void enableExtKeyPressHandler(bool);
     ~SLineEdit();
     Q_ENUM(Buttons);
 
@@ -45,10 +47,12 @@ private:
     int frameWidth;
     QSize sz;
     QSize buttonSize;
+    bool m_extKeyPressHandler = 0;
 
 protected:
     void resizeEvent(QResizeEvent *) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
 };

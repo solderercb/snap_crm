@@ -1173,9 +1173,11 @@ void SSaleTableModel::sqlDataChanged()
 {
     clear();
     setHorizontalHeaderLabels();
-        setRowCount(m_queryData->rowCount());
+    setRowCount(m_queryData->rowCount());
     setColumnCount(m_queryData->columnCount());
     m_itemsPendingRemoveList->clear();
+//    m_worksPendingRemoveList->clear();
+//    m_itemsPendingSplitList->clear();
     this->blockSignals(true);
     for(int i = 0; i < m_queryData->rowCount(); i++)
     {

@@ -10,7 +10,10 @@ class SCommentModel : public SComRecord
 {
     Q_OBJECT
 public:
+    enum Columns {ColId = 0, ColCreated, ColUser, ColText, ColRepair, ColClient, ColTask, ColPartRequest};
+    enum Mode {Repair = 0, Client, Task, PartRequest};
     explicit SCommentModel(QObject *parent = nullptr);
+    explicit SCommentModel(QList<QStandardItem*> &record, QObject *parent = nullptr);
     ~SCommentModel();
     int id();
     void setId(const int);
@@ -25,10 +28,13 @@ public:
     int client();
     void setClient(const int);
     int taskId();
-    void setTaskId(const int);
+    void setTask(const int);
     int partRequest();
     void setPartRequest(const int);
     bool commit();
+    void setObjId(const int mode, const int id);
+    void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue) override;
+    bool remove();
 private:
     int m_id;
     QString m_text;

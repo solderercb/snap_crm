@@ -81,6 +81,11 @@ void SLineEdit::tmp_set_buttons_style_sheet(const QString &styleSheet)
     }
 }
 
+void SLineEdit::enableExtKeyPressHandler(bool state)
+{
+    m_extKeyPressHandler = state;
+}
+
 void SLineEdit::resize(const QSize &size)
 {
     sz.setHeight(size.height());
@@ -120,6 +125,13 @@ void SLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
 {
     emit mouseDoubleClick();
     QLineEdit::mouseDoubleClickEvent(e);
+}
+
+void SLineEdit::keyPressEvent(QKeyEvent *event)
+{
+    if(m_extKeyPressHandler)
+        emit keyPress(event);
+    QLineEdit::keyPressEvent(event);
 }
 
 SLineEdit::~SLineEdit()

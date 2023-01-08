@@ -81,13 +81,19 @@ void SUserActivityModel::setMachineName(const QString machine_name)
     i_valuesMap.insert("machine_name", machine_name);
 }
 
-void SUserActivityModel::appendRecord(const QString &notes)
+void SUserActivityModel::appendRecord(const QString &notes, const bool standalone)
 {
     setNotes(notes);
-    i_query->exec(QUERY_BEGIN);
+    if(standalone)
+    {
+        i_query->exec(QUERY_BEGIN);
+    }
     QUERY_EXEC(i_query, i_nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->value("id").toString()));
     commit();
-    QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
+    if(standalone)
+    {
+        QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
+    }
     if(i_nErr)
         setId(0);
 }

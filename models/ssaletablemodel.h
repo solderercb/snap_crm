@@ -28,7 +28,7 @@ public:
     enum State {StoreNew = 0, StoreSold = 1, StoreReserved = 2, StoreCancelled = 3, WorkshopRW = 4, WorkshopRO = 5, WorkshopAdm = 6};
     enum class StoreOpType {Reserve = 0, Sale, Unsale, FreeReserved};
     enum class RepairOpType {Reserve = 0, Link, Sale, Unsale, Unlink, Update};
-    enum DataRoles {OldValue = Qt::UserRole, Changed = Qt::UserRole + 1, State = Qt::UserRole + 2, RecordType = Qt::UserRole + 3};
+    enum DataRoles {OldValue = SComRecord::DataRoles::OldValue, Changed = SComRecord::DataRoles::Changed, State, RecordType};
     enum RecordType {Work = 0, Item = 1};
     enum TablesSet {StoreSale = 0, WorkshopSale = 1};
     enum EditStrategy {OnFieldChange = 0, OnRowChange = 1, OnManualSubmit = 2, Nop = 0x55AA};

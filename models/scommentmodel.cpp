@@ -6,6 +6,18 @@ SCommentModel::SCommentModel(QObject *parent) : SComRecord(parent)
     i_tableName = "comments";
 }
 
+SCommentModel::SCommentModel(QList<QStandardItem *> &record, QObject *parent) :
+    SCommentModel(parent)
+{
+    i_id = record.at(SCommentModel::ColId)->data(Qt::DisplayRole).toInt();
+
+    m_created = record.at(SCommentModel::ColCreated)->data(Qt::DisplayRole).toDateTime();
+    m_user = record.at(SCommentModel::ColUser)->data(Qt::DisplayRole).toInt();
+    m_text = record.at(SCommentModel::ColText)->data(Qt::DisplayRole).toString();
+
+    initQueryFields(record);
+}
+
 SCommentModel::~SCommentModel()
 {
 }
@@ -36,7 +48,7 @@ QDateTime SCommentModel::created()
     return m_created;
 }
 
-void SCommentModel::setCreated(QDateTime created)
+void SCommentModel::setCreated(const QDateTime created)
 {
     i_valuesMap.insert("created", created);
 }
@@ -56,12 +68,12 @@ int SCommentModel::remont()
     return m_remont;
 }
 
-void SCommentModel::setRepair(int repairId)
+void SCommentModel::setRepair(int id)
 {
-    i_valuesMap.insert("remont", repairId);
-    i_logRecord->setType(SLogRecordModel::Repair);
-    i_logRecord->setRepairId(repairId);
-    i_logRecord->setText(tr("Добавлен внутренний комментарий к ремонту №%1").arg(repairId));
+    if(!i_id)
+    {
+        i_valuesMap.insert("remont", id);
+    }
 }
 
 int SCommentModel::client()
@@ -72,10 +84,10 @@ int SCommentModel::client()
 void SCommentModel::setClient(int clientId)
 {
     // В АСЦ v3.7.31.1123 не реализовано
-    i_valuesMap.insert("client", clientId);
-    i_logRecord->setType(SLogRecordModel::Client);
-    i_logRecord->setClient(clientId);
-    i_logRecord->setText(tr("Добавлен комментарий к карте клиента №%1").arg(clientId));
+    if(!i_id)
+    {
+        i_valuesMap.insert("client", clientId);
+    }
 }
 
 int SCommentModel::taskId()
@@ -83,13 +95,12 @@ int SCommentModel::taskId()
     return m_taskId;
 }
 
-void SCommentModel::setTaskId(int taskId)
+void SCommentModel::setTask(int taskId)
 {
-    i_valuesMap.insert("task_id", taskId);
-    // TODO: В АСЦ v3.7.31.1123 не реализовано журналирование этой операции
-//    i_logRecord->setType(SLogRecordModel::Client);
-//    i_logRecord->setTaskId(taskId);
-//    i_logRecord->setText(tr("Добавлен комментарий к заданию №%1").arg(taskId));
+    if(!i_id)
+    {
+        i_valuesMap.insert("task_id", taskId);
+    }
 }
 
 int SCommentModel::partRequest()
@@ -99,10 +110,10 @@ int SCommentModel::partRequest()
 
 void SCommentModel::setPartRequest(int partRequestId)
 {
-    i_valuesMap.insert("part_request", partRequestId);
-    i_logRecord->setType(SLogRecordModel::PartRequest);
-    i_logRecord->setPartRequestId(partRequestId);
-    i_logRecord->setText(tr("Добавлен комментарий к заявке на закупку №%1").arg(partRequestId));
+    if(!i_id)
+    {
+        i_valuesMap.insert("part_request", partRequestId);
+    }
 }
 
 bool SCommentModel::commit()
@@ -111,11 +122,42 @@ bool SCommentModel::commit()
         update();
     else
     {
-        setUser(userDbData->value("id").toInt());
-        setCreated(QDateTime::currentDateTime());
+        if(!i_valuesMap.contains("user"))
+            setUser(userDbData->value("id").toInt());
+        if(!i_valuesMap.contains("created"))
+            setCreated(QDateTime::currentDateTime());
         insert();
     }
-    i_logRecord->commit();
+
     return i_nErr;
+}
+
+void SCommentModel::setObjId(const int mode, const int id)
+{
+    switch (mode)
+    {
+        case Mode::Repair: setRepair(id); break;
+        case Mode::Client: setClient(id); break;
+        case Mode::Task: setTask(id); break;
+        case Mode::PartRequest: setPartRequest(id); break;
+    }
+}
+
+void SCommentModel::setQueryField(const int fieldNum, const QVariant value, const QVariant)
+{
+    switch(fieldNum)
+    {
+        case SCommentModel::ColCreated: setCreated(value.toDateTime()); break;
+        case SCommentModel::ColUser: setUser(value.toInt()); break;
+        case SCommentModel::ColText: setText(value.toString()); break;
+    }
+}
+
+bool SCommentModel::remove()
+{
+    if(!i_id)
+        return 0;
+
+    return del();
 }
 
