@@ -221,7 +221,8 @@ void tabRepair::updateWidgets()
     ui->lineEditInDate->setText(repairModel->created());
     setInfoWidgetVisible(ui->lineEditOutDate, m_outDateVisible);
     ui->lineEditOutDate->setText(repairModel->outDate());
-    ui->pushButtonAdmEditWorks->setVisible(!m_worksRO && permissions->contains("TODO: разреш. на адм. правку списка раб. и дет."));
+    ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->contains("Адм. правка работ и деталей")); // TODO: добавить разрешение
+    ui->pushButtonAdmEditWorks->setChecked(false);
     ui->pushButtonGetout->setVisible(m_getOutButtonVisible && !modelRO);
     setInfoWidgetVisible(ui->lineEditExtPrevRepair, !repairModel->extEarly().isEmpty());
     ui->lineEditExtPrevRepair->setText(repairModel->extEarly());
@@ -301,6 +302,8 @@ void tabRepair::updateWidgets()
     ui->doubleSpinBoxAmount->blockSignals(false);
 //    ui->pushButtonSaveDiagAmount->setEnabled(!m_diagRO && !modelRO);
     ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO);
+    ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
+    ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO && worksAndPartsModel->isUnsaved());
 //    ui->pushButtonAddWorkFromPriceList->setEnabled(!m_worksRO && !modelRO);
 //    ui->pushButtonAdmEditWorks->setEnabled(m_worksRO && !modelRO);
 //    ui->pushButtonCreateInvoice->setEnabled(!modelRO);
@@ -837,12 +840,18 @@ void tabRepair::setSaveSaleTableEnabled()
 void tabRepair::buttonWorksAdminEdit(bool state)
 {
     if(state)
+    {
         worksAndPartsModel->setModelState(SSaleTableModel::State::WorkshopAdm);
+        ui->switchEditStrategy->setEnabled(true);
+        ui->toolButtonSaveSaleTable->setEnabled(worksAndPartsModel->isUnsaved());
+    }
     else
     {
         worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
         if(worksAndPartsModel->isUnsaved())
             saveSaleTableClicked();
+        ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
+        ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO);
     }
 }
 
