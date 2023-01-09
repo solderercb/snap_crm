@@ -588,7 +588,7 @@ void tabPrintDialog::initPrinter(bool showSettings)
     fillDebugData();
 }
 
-void tabPrintDialog::on_labelPrinterSettings_linkActivated(const QString &link)
+void tabPrintDialog::on_labelPrinterSettings_linkActivated(const QString&)
 {
     initPrinter(true);
 }

@@ -118,13 +118,13 @@ void tabClients::updateTableWidget()
     ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));
 }
 
-void tabClients::clientTypeChanged(QModelIndex index)
+void tabClients::clientTypeChanged(QModelIndex)
 {
 //    qDebug() << "clientTypeChanged(QModelIndex): item1 =" << clientsTypesList->index(index.row(), 0).data() << ", item2 = " << clientsTypesList->index(index.row(), 1).data() << "item3 = " << clientsTypesList->index(index.row(), 2).data();
     updateTableWidget();
 }
 
-void tabClients::clientAdvertisingChanged(int index)
+void tabClients::clientAdvertisingChanged(int)
 {
 //    qDebug() << "SLOT clientAdvertisingChanged(int index), index = " << ui->comboBoxClientAdType->currentIndex();
     updateTableWidget();
@@ -140,7 +140,7 @@ void tabClients::tableItemDoubleClick(QModelIndex item)
     }
 }
 
-void tabClients::lineEditSearchTextChanged(QString search_str)
+void tabClients::lineEditSearchTextChanged(QString)
 {   // задержка поиска; запрос к базе будет выполняться после каждого введённого символа и при быстром наборе текста прога тормозит
 //    qDebug() << "SLOT tabClients::lineEditSearchTextChanged(QString search_str), search_str = " << search_str;
     tableUpdateDelay->stop();
@@ -153,13 +153,13 @@ void tabClients::lineEditSearchReturnPressed()
 }
 
 /* В слоте будем сохранять настроенное пользователем положение столбца */
-void tabClients::tableSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
+void tabClients::tableSectionMoved(int, int, int)
 {
     qDebug() << "SLOT tableSectionMoved(int, int, int)";
 }
 
 /* В слоте будем сохранять настроенную пользователем ширину столбца */
-void tabClients::tableSectionResized(int logicalIndex, int oldSize, int newSize)
+void tabClients::tableSectionResized(int, int, int)
 {
     qDebug() << "SLOT tableSectionResized(int, int, int)";
 }

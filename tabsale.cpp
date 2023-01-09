@@ -893,7 +893,7 @@ void tabSale::updateChargeAmount(QString text)
 
 }
 
-void tabSale::comboBoxIndexChanged(int index)
+void tabSale::comboBoxIndexChanged(int)
 {
 }
 

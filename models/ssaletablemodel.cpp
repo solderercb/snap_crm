@@ -749,7 +749,7 @@ bool SSaleTableModel::unsaleItems()
 bool SSaleTableModel::unsaleItems(const QString &reason)
 {
     setExtraUnsaleReason(reason);
-    unsaleItems();
+    return unsaleItems();
 }
 
 void SSaleTableModel::setExtraUnsaleReason(const QString &reason)

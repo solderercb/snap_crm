@@ -176,13 +176,13 @@ void tabRepairs::lineEditSearchReturnPressed()
 }
 
 /* В слоте будем сохранять настроенное пользователем положение столбца */
-void tabRepairs::tableSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
+void tabRepairs::tableSectionMoved(int, int, int)
 {
     qDebug() << "Slot tableSectionMoved(int, int, int)";
 }
 
 /* В слоте будем сохранять настроенную пользователем ширину столбца */
-void tabRepairs::tableSectionResized(int logicalIndex, int oldSize, int newSize)
+void tabRepairs::tableSectionResized(int, int, int)
 {
 //    qDebug() << "Slot tableSectionResized(int, int, int)";
 }

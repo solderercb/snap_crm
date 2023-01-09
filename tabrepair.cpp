@@ -185,9 +185,12 @@ bool tabRepair::tabCloseRequest()
         {
             return 1;
         }
+        else
+        {
+            saveDiagAmount();
+            worksAndPartsModel->repair_saveTablesStandalone();
+        }
     }
-    saveDiagAmount();
-    worksAndPartsModel->repair_saveTablesStandalone();
     return 1;
 }
 
@@ -757,7 +760,7 @@ void tabRepair::diagEditFinished()  // слот вызывается при по
         saveDiagAmount();
 }
 
-void tabRepair::spinBoxAmountChanged(double value)
+void tabRepair::spinBoxAmountChanged(double)
 {
     m_spinBoxAmountChanged = 1;
     ui->pushButtonSaveDiagAmount->setEnabled(true);
@@ -937,7 +940,7 @@ void tabRepair::commentEdit()
 /* Копирование текста комментария в буфер обмена
  * подсмотрено: https://www.medo64.com/2019/12/copy-to-clipboard-in-qt/
 */
-void tabRepair::commentCopyToClipboard(const bool copyTimeStamp)
+void tabRepair::commentCopyToClipboard(const bool)
 {
     // TODO: решить какие данные копировать, если выделена одна строка или несколько. Или сделать два варианта копирования в контекстном меню
     QModelIndexList indexesList =  ui->tableViewComments->selectedIndexes();

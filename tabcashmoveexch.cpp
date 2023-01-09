@@ -8,8 +8,6 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabCashMoveExch)
 {
-    bool nErr = 1;
-
     ui->setupUi(this);
     i_tabTitle = tr("Перемещение денег");
     ui->checkBoxPrintCheck->setChecked(comSettings->value("print_check").toBool());

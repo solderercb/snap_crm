@@ -56,6 +56,8 @@ void SWorkModel::setUser(const int id, const QVariant oldValue)
 
     appendLogText(text);
     i_valuesMap.insert("user", id);
+    setPayRepair(usersSalaryTaxesModel->value(id, "id", "pay_repair").toInt());
+    setPayRepairQuick(usersSalaryTaxesModel->value(id, "id", "pay_repair_quick").toInt());
 }
 
 int SWorkModel::repair()
@@ -184,7 +186,7 @@ int SWorkModel::payRepair()
 
 void SWorkModel::setPayRepair(const int pay_repair)
 {
-    i_valuesMap.insert("pay_repair", pay_repair);
+    i_valuesMap.insert("pay_repair", pay_repair?pay_repair:QVariant());
 }
 
 int SWorkModel::payRepairQuick()
@@ -194,7 +196,7 @@ int SWorkModel::payRepairQuick()
 
 void SWorkModel::setPayRepairQuick(const int pay_repair_quick)
 {
-    i_valuesMap.insert("pay_repair_quick", pay_repair_quick);
+    i_valuesMap.insert("pay_repair_quick", pay_repair_quick?pay_repair_quick:QVariant());
 }
 
 bool SWorkModel::remove()
@@ -227,15 +229,11 @@ bool SWorkModel::commit()
 {
     if(i_id)
     {
-        qDebug().nospace() << "[" << this << "] commit() [update]";
         update();
     }
     else
     {
-        qDebug().nospace() << "[" << this << "] commit() [insert]";
         setCreated(QDateTime::currentDateTime());
-        setPayRepair(usersSalaryTaxesModel->value(userDbData->value("id").toInt(), "id", "pay_repair").toInt());
-        setPayRepairQuick(usersSalaryTaxesModel->value(userDbData->value("id").toInt(), "id", "pay_repair_quick").toInt());
         insert();
     }
     commitLogs();

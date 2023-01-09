@@ -98,9 +98,12 @@ QVariant SCommentsModel::data(const QModelIndex &index, int role) const
 
 bool SCommentsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    QStandardItemModel::setData(index, value, role);
-    QStandardItemModel::setData(index, 1, SComRecord::Changed); // пометка поля изменённым
-    QStandardItemModel::setData(this->index(index.row(), SCommentModel::ColId), 1, SComRecord::Changed); // пометка строки изменённой
+    bool nErr = 1;
+    nErr &= QStandardItemModel::setData(index, value, role);
+    nErr &= QStandardItemModel::setData(index, 1, SComRecord::Changed); // пометка поля изменённым
+    nErr &= QStandardItemModel::setData(this->index(index.row(), SCommentModel::ColId), 1, SComRecord::Changed); // пометка строки изменённой
+
+    return nErr;
 }
 
 int SCommentsModel::mode()

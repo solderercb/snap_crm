@@ -10,8 +10,6 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     m_orderId(order),
     ui(new Ui::tabCashOperation)
 {
-    bool nErr = 1;
-
     ui->setupUi(this);
     ui->labelOfLinkedObject->hide();
     ui->lineEditLinkedObjId->setReadOnly(true);
@@ -335,7 +333,7 @@ bool tabCashOperation::commitPrepayRepair()
 */
 bool tabCashOperation::commitRevert()
 {
-
+    return 1;
 }
 
 void tabCashOperation::print()
