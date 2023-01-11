@@ -1,4 +1,4 @@
-﻿#ifndef WINDOWSDISPATCHER_H
+#ifndef WINDOWSDISPATCHER_H
 #define WINDOWSDISPATCHER_H
 #include <QObject>
 #include <QSqlQuery>
@@ -14,7 +14,8 @@ signals:
 public:
     windowsDispatcher(QObject* parent = nullptr);
     virtual ~windowsDispatcher();
-
+private:
+    void debugInitSettings();
 public slots:
     void connectOK();
     void createChooseOfficeWindow();

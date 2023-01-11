@@ -58,7 +58,8 @@ SStandardItemModel *itemUnitsModel = new SStandardItemModel;
 SAppLog *appLog = new SAppLog();
 SUserActivityModel *userActivityLog;
 SStandardItemModel *clientBinaryProperties;
-
+QSettings *debugOptions = nullptr;
+QMap<QString, QVariant> *debugLoginOptions = nullptr;
 
 //QWidget *modalWidget = nullptr;
 

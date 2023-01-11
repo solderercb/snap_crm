@@ -2,7 +2,6 @@
 #include "appver.h"
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
-#include "sqlcreds.h"
 #include "com_sql_queries.h"
 
 LoginWindow::LoginWindow(QObject *parent) :
@@ -16,6 +15,7 @@ LoginWindow::LoginWindow(QObject *parent) :
     ui->graphicsLogo->setScene(logoScene);
     ui->labelAppVer->setText(QString(APP_VER));
 
+    debugInitLoginOptions();
     if (settingsDOM == nullptr)
         settingsDOM = new QDomDocument("settingsDOM");
 
@@ -392,18 +392,48 @@ void LoginWindow::closeConnections()
     }
 }
 
+void LoginWindow::debugInitLoginOptions()
+{
+    QVariant tmp;
+    if(debugOptions == nullptr)
+        return;
+
+    if (debugOptions->childGroups().contains("debugLogin"))
+    {
+        debugLoginOptions = new QMap<QString, QVariant>;
+        QStringList loginCreds;
+        debugOptions->beginGroup("debugLogin");
+
+        QStringList allKeys = debugOptions->allKeys();
+        for(int i = 0; i < allKeys.size(); i++)
+        {
+            tmp = debugOptions->value(allKeys.at(i));
+            if(tmp.isValid())
+            {
+                debugLoginOptions->insert(allKeys.at(i), tmp);
+            }
+
+        }
+        debugOptions->endGroup();
+
+        if(!loginCreds.isEmpty())
+        {
+            qDebug().noquote() << "Connection creds got from " << debugOptions->property("fileName").toString() << ": " << loginCreds.join(", ");
+            appLog->appendRecord(QString("Connection creds got from %1: %2").arg(debugOptions->property("fileName").toString()).arg(loginCreds.join(", ")));
+        }
+    }
+}
+
 void LoginWindow::editPassword_onReturnPressed()
 {
     if(ui->editPassword->text() != "")
         btnLoginHandler();
 }
 
-#ifdef NO_LOGIN_
 void LoginWindow::debugLogin()
 {
     btnLoginHandler();
 }
-#endif
 
 void LoginWindow::btnLoginHandler()
 {
@@ -446,19 +476,22 @@ void LoginWindow::btnLoginHandler()
     }
     for (int i=0; i<connections.size(); i++)
     {
-#ifdef NO_LOGIN_
-    connections[i]->setUserName(SQL_USER);
-    connections[i]->setPassword(SQL_PSWD);
-    connections[i]->setHostName(SQL_HOST);
-    connections[i]->setPort(SQL_PORT);
-    connections[i]->setDatabaseName(SQL_DB);
-#else
-    connections[i]->setUserName(ui->editLogin->text());
-    connections[i]->setPassword(hash.result().toHex());
-    connections[i]->setHostName(ui->editIPaddr->text());
-    connections[i]->setPort(ui->editPort->text().toUInt());
-    connections[i]->setDatabaseName(ui->editDBName->text());
-#endif
+        if(debugLoginOptions)
+        {
+            connections[i]->setUserName(debugLoginOptions->value("user", "user").toString());
+            connections[i]->setPassword(debugLoginOptions->value("password", "password").toString());
+            connections[i]->setHostName(debugLoginOptions->value("host", "127.0.0.2").toString());
+            connections[i]->setPort(debugLoginOptions->value("port", 3306).toInt());
+            connections[i]->setDatabaseName(debugLoginOptions->value("database", "service").toString());
+        }
+        else
+        {
+            connections[i]->setUserName(ui->editLogin->text());
+            connections[i]->setPassword(hash.result().toHex());
+            connections[i]->setHostName(ui->editIPaddr->text());
+            connections[i]->setPort(ui->editPort->text().toUInt());
+            connections[i]->setDatabaseName(ui->editDBName->text());
+        }
     connections[i]->setConnectOptions(connOptions.join(";")+";");
     }
 

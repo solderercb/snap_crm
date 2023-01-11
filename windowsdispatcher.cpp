@@ -4,18 +4,13 @@
 #include "loginwindow.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
 #include "chooseofficewindow.h"
-#define AUTO_CHOOSE_OFFICE
-#ifdef QT_DEBUG
-#ifdef AUTO_CHOOSE_OFFICE
-#define AUTO_CHOOSE_OFFICE_
-#endif
-#endif
 
 windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject(parent)
 {
     setObjectName("windowsDispatcherObj");
 
+    debugInitSettings();
     appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Application start");
     LoginWindow *windowLogin = new LoginWindow(this);
 
@@ -23,14 +18,26 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject::connect(windowLogin,SIGNAL(btnCancelClick()),this,SIGNAL(quit()));
 
     windowLogin->show();
-#ifdef NO_LOGIN_     // NO_LOGIN объявляется в loginwindow.h
-    windowLogin->debugLogin();
-#endif
 
+    if(debugLoginOptions)
+        windowLogin->debugLogin();
 }
 
 windowsDispatcher::~windowsDispatcher()
 {
+}
+
+void windowsDispatcher::debugInitSettings()
+{
+    QFile file;
+    QDir appDataDir = QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));   // C:/Users/user/AppData/Local
+    file.setFileName(appDataDir.path()+"/debug.ini");
+
+    if (file.exists())
+    {
+        debugOptions = new  QSettings(file.fileName(), QSettings::IniFormat);
+        debugOptions->setProperty("fileName", file.fileName());
+    }
 }
 
 void windowsDispatcher::connectOK()
@@ -56,20 +63,25 @@ void windowsDispatcher::connectOK()
         createMainWindow();
     }
     userDbData->insert("company", 1);   // TODO: несколько компаний
+
+    if(debugLoginOptions)
+        delete debugLoginOptions;
 }
 
 void windowsDispatcher::createChooseOfficeWindow()
 {
-#ifdef AUTO_CHOOSE_OFFICE_
-#define AUTO_OFFICE_ID 0
-    userDbData->insert("current_office", officesModel->record(AUTO_OFFICE_ID).value("id").toInt());
-    userDbData->insert("current_office_name", officesModel->record(AUTO_OFFICE_ID).value("name").toString());
-    createMainWindow();
-#else
+    if(debugLoginOptions)
+        if(debugLoginOptions->contains("office"))
+        {
+            userDbData->insert("current_office", officesModel->record(debugLoginOptions->value("office").toInt()).value("id").toInt());
+            userDbData->insert("current_office_name", officesModel->record(debugLoginOptions->value("office").toInt()).value("name").toString());
+            createMainWindow();
+            return;
+        }
+
     chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
     QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));
     windowChooseOffice->show();
-#endif
 }
 
 void windowsDispatcher::createMainWindow()

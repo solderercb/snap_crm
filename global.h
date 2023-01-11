@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QSettings>
 #include "applog.h"
 #include "models/suseractivitymodel.h"
 #include "models/sstandarditemmodel.h"
@@ -77,6 +78,8 @@ extern SStandardItemModel *itemUnitsModel;
 extern SAppLog *appLog;
 extern SUserActivityModel *userActivityLog;
 extern SStandardItemModel *clientBinaryProperties;
+extern QSettings *debugOptions;
+extern QMap<QString, QVariant> *debugLoginOptions;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;
