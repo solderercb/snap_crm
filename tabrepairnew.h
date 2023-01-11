@@ -41,13 +41,9 @@ public:
 private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
-    MainWindow *parent;
     SRepairModel *repairModel;
     SCashRegisterModel *cashRegister;
     SCommentModel *comment;
-    void setDefaultStyleSheets();
-    void getDevices();
-//    QStandardItemModel* deviceClassesModel;
     SSqlQueryModel* deviceClassesModel;
     SSqlQueryModel* deviceVendorsModel;
     SSqlQueryModel* devicesModel;
@@ -56,14 +52,12 @@ private:
     QSqlQueryModel* classExteriorsModel;
     SClientModel *clientModel;
     SFieldsModel *additionalFields;
-    QSqlQueryModel* queryDevice;
     QStandardItemModel* prepayReasonsModel;
-    QList<QStandardItem*> *prepayReason;
-    QSqlQueryModel* clientsMatchTable;
-    QSqlQueryModel* devicesMatchTable;
-    int client = 0;
+    int m_client = 0;
+    int m_prevRepair = 0;
+    void setDefaultStyleSheets();
+    void getDevices();
     bool checkInput();
-    QMessageBox msgBox;
     bool createClient();
     void print(int);
 #ifdef QT_DEBUG
@@ -87,7 +81,6 @@ private slots:
     void createRepairClose();
     void primaryPhoneEdited(QString);
     void preferredPaymentSystemChanged(int);
-    void prepayPaymentSystemChanged(int);
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

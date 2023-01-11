@@ -1407,22 +1407,6 @@ QListView::item  {
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>comboBoxPrepayAccount</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>tabRepairNew</receiver>
-   <slot>prepayPaymentSystemChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>919</x>
-     <y>405</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1019</x>
-     <y>580</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>changeClientType()</slot>
@@ -1443,6 +1427,5 @@ QListView::item  {
   <slot>enablePrepayWidgets(bool)</slot>
   <slot>buttonCreateTabClientHandler()</slot>
   <slot>preferredPaymentSystemChanged(int)</slot>
-  <slot>prepayPaymentSystemChanged(int)</slot>
  </slots>
 </ui>

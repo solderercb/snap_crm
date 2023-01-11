@@ -13,9 +13,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     ui(new Ui::tabRepairNew)
 {
     additionalFields = new SFieldsModel(SFieldsModel::Repair);
-    repairModel = new SRepairModel(this);
-    cashRegister = new SCashRegisterModel();
-    comment = new SCommentModel();
     userActivityLog->appendRecord(tr("Navigation Приём в ремонт"));
 
     ui->setupUi(this);
@@ -100,6 +97,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
     connect(ui->phones,SIGNAL(primaryPhoneEdited(QString)),this,SLOT(primaryPhoneEdited(QString)));
 
+    QList<QStandardItem*> *prepayReason;
     QStringList prepayReasonsList = {tr("полная предоплата"), tr("за детали"), tr("за часть стоимости деталей"), tr("за часть стоимости работ"), tr("за диагностику")};
     prepayReasonsModel = new QStandardItemModel();
     for (int i=0; i<prepayReasonsList.size(); i++)
@@ -114,8 +112,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
     deviceClassesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
     ui->comboBoxDeviceClass->setCurrentIndex(-1);
-    msgBox.setText(tr("Ошибка"));
-    msgBox.setIcon(QMessageBox::Critical);
 
 #ifdef QT_DEBUG
     test_scheduler->start(200);
@@ -135,9 +131,6 @@ tabRepairNew::~tabRepairNew()
     delete classExteriorsModel;
     delete additionalFields;
     delete clientModel;
-    delete cashRegister;
-    delete repairModel;
-    delete comment;
     p_instance = nullptr;   // Обязательно блять!
 }
 
@@ -276,7 +269,7 @@ void tabRepairNew::changeDeviceVendor(int index)
 void tabRepairNew::clearClientCreds(bool hideCoincidence)
 {
     setDefaultStyleSheets();
-    client = 0;
+    m_client = 0;
     ui->checkBoxClientType->setEnabled(true);
     ui->lineEditClientLastName->setReadOnly(false);  // разрешение редактирования
     ui->lineEditClientFirstName->setReadOnly(false);
@@ -323,9 +316,9 @@ void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
 void tabRepairNew::fillClientCreds(int id)
 {
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
-    client = id;
+    m_client = id;
 
-    clientModel->load(client);
+    clientModel->load(m_client);
     ui->checkBoxClientType->setChecked(clientModel->type());
     changeClientType();
     ui->checkBoxClientType->setEnabled(false);
@@ -352,52 +345,36 @@ void tabRepairNew::fillClientCreds(int id)
 void tabRepairNew::fillDeviceCreds(int id)
 {
     int i;
-    int repair, deviceClass, deviceVendor, device, client;
-    queryDevice = new QSqlQueryModel();
+    int deviceClass, deviceVendor, device;
 
-    QString query;
-    query = QUERY_SEL_DEVICE(id);
-    queryDevice->setQuery(query, QSqlDatabase::database("connMain"));
+    m_prevRepair = 0;
+    QSqlQueryModel* queryDevice = new QSqlQueryModel();
+    queryDevice->setQuery(QUERY_SEL_DEVICE(id), QSqlDatabase::database("connMain"));
 
-    repair = queryDevice->record(0).value("id").toInt();
-    deviceClass = queryDevice->record(0).value("type").toInt();
-    deviceVendor = queryDevice->record(0).value("maker").toInt();
-    device = queryDevice->record(0).value("model").toInt();
-    client = queryDevice->record(0).value("client").toInt();
-
-    fillClientCreds(client);
-//    if (ui->comboBoxDeviceClass->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
+    if(queryDevice->rowCount())
     {
-        for (i = 0; i < deviceClassesModel->rowCount(); i++)  // перебираем все типы уст-в в поисках нужного id
-        {
-            if (deviceClassesModel->index(i, 1).data().toInt() == deviceClass)
-                break;
-        }
-        ui->comboBoxDeviceClass->setCurrentIndex(i);
-        // TODO: сделать запросы к БД асинхронными. Готовые классы https://github.com/micjabbour/MSqlQuery
-        // на данный момент по локальной сети всё работает быстро, поэтому не буду заморачиваться
+        m_prevRepair = id;
+        deviceClass = queryDevice->record(0).value("type").toInt();
+        deviceVendor = queryDevice->record(0).value("maker").toInt();
+        device = queryDevice->record(0).value("model").toInt();
 
-        for (i = 0; i < deviceVendorsModel->rowCount(); i++)  // перебираем всех производителей уст-в в поисках нужного id
+        fillClientCreds(queryDevice->record(0).value("client").toInt());
+//        if (ui->comboBoxDeviceClass->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
         {
-            if (deviceVendorsModel->index(i, 1).data().toInt() == deviceVendor)
-                break;
+            // TODO: сделать запросы к БД асинхронными. Готовые классы https://github.com/micjabbour/MSqlQuery
+            // на данный момент по локальной сети всё работает быстро, поэтому не буду заморачиваться
+
+            ui->comboBoxDeviceClass->setCurrentIndex(deviceClassesModel->rowByDatabaseID(deviceClass));
+            ui->comboBoxDeviceVendor->setCurrentIndex(deviceVendorsModel->rowByDatabaseID(deviceVendor));
+            ui->comboBoxDevice->setCurrentIndex(devicesModel->rowByDatabaseID(device));
+            ui->lineEditSN->setText(queryDevice->record(0).value("serial_number").toString());
         }
-        ui->comboBoxDeviceVendor->setCurrentIndex(i);
-        for (i = 0; i < devicesModel->rowCount(); i++)  // перебираем все модели уст-в в поисках нужной id
-        {
-            if (devicesModel->index(i, 1).data().toInt() == device)
-                break;
-        }
-        ui->comboBoxDevice->setCurrentIndex(i);
-        ui->lineEditSN->setText(queryDevice->record(0).value("serial_number").toString());
+        ui->lineEditPrevRepair->setText(QString::number(m_prevRepair));  // устанавливаем номер предыдущего ремонта в соотв. поле
+        ui->checkBoxWasEarlier->setCheckState(Qt::Checked);     // ставим галочку "Ранее было в ремонте" чтобы поле с номером ремонта отобразилось
+
+        ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
+
     }
-    ui->lineEditPrevRepair->setText(QString::number(repair));  // устанавливаем номер предыдущего ремонта в соотв. поле
-    ui->checkBoxWasEarlier->setCheckState(Qt::Checked);     // ставим галочку "Ранее было в ремонте" чтобы поле с номером ремонта отобразилось
-    repairModel->setEarly(repair);
-    repairModel->setIsRepeat(1);
-
-    ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
-
     delete queryDevice;
 }
 
@@ -435,7 +412,6 @@ void tabRepairNew::setDefaultStyleSheets()
 //    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
-    ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditEstPrice->setStyleSheet(commonLineEditStyleSheet);
     ui->comboBoxPrepayReason->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditPrepaySumm->setStyleSheet(commonLineEditStyleSheet);
@@ -478,22 +454,22 @@ bool tabRepairNew::checkInput()
         ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
         error = 6;
     }
-    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->value("is_patronymic_required").toBool() && !client)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
+    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->value("is_patronymic_required").toBool() && !m_client)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
     {
         ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
         error = 7;
     }
-    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->value("visit_source_force").toBool() && !client)        // если не указан источник обращения, а он обязателен и клиент новый
+    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->value("visit_source_force").toBool() && !m_client)        // если не указан источник обращения, а он обязателен и клиент новый
     {
         ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 8;
     }
-    if (ui->lineEditClientAddress->text() == "" && comSettings->value("address_required").toBool() && !client)   // если не указан адрес, а он обязателен и клиент новый
+    if (ui->lineEditClientAddress->text() == "" && comSettings->value("address_required").toBool() && !m_client)   // если не указан адрес, а он обязателен и клиент новый
     {
         ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheetRed);
         error = 9;
     }
-    if (ui->lineEditClientEmail->text() == "" && comSettings->value("email_required").toBool() && !client)   // если не указан email, а он обязателен и клиент новый
+    if (ui->lineEditClientEmail->text() == "" && comSettings->value("email_required").toBool() && !m_client)   // если не указан email, а он обязателен и клиент новый
     {
         ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheetRed);
         error = 10;
@@ -573,7 +549,7 @@ bool tabRepairNew::createClient()
     clientModel->setAddress(ui->lineEditClientAddress->text());
     clientModel->setType(ui->checkBoxClientType->isChecked());
     nErr = clientModel->commit();
-    client = clientModel->id();
+    m_client = clientModel->id();
 
     return nErr;
 }
@@ -587,6 +563,7 @@ bool tabRepairNew::createRepair()
     int deviceClassIndex, deviceVendorIndex, deviceIndex;    // это currentIndex'ы combobox'ов, а не id записей в соответствующих таблицах БД
     int device, user, repair, preferredPaymentAccIndex, prepaySumm = 0;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    repairModel = new SRepairModel(this);
     SRepairStatusLog *repairStatusLog = new SRepairStatusLog(0);
 
     setDefaultStyleSheets();
@@ -604,11 +581,11 @@ bool tabRepairNew::createRepair()
         {
             QUERY_EXEC(query,nErr)(QUERY_BEGIN);
             if(clientModel->isNew())
-                nErr = createClient();
+                nErr &= createClient();
             if(clientModel->phones()->isUpdated())
-                nErr = clientModel->phones()->commit();
+                nErr &= clientModel->phones()->commit();
             QUERY_COMMIT_ROLLBACK(query,nErr);
-            fillClientCreds(client);
+            fillClientCreds(m_client);
         }
 
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
@@ -622,7 +599,7 @@ bool tabRepairNew::createRepair()
             devMdl->setName(ui->comboBoxDevice->currentText());
             devMdl->setDevice(deviceClassesModel->record(deviceClassIndex).value("id").toInt());
             devMdl->setMaker(deviceVendorsModel->record(deviceVendorIndex).value("id").toInt());
-            nErr = devMdl->commit();
+            nErr &= devMdl->commit();
             device = devMdl->id();
             delete devMdl;
         }
@@ -631,6 +608,11 @@ bool tabRepairNew::createRepair()
             device = devicesModel->databaseIDByRow(deviceIndex);
         }
 
+        if(m_prevRepair)
+        {
+            repairModel->setEarly(m_prevRepair);
+            repairModel->setIsRepeat(1);
+        }
         repairModel->setClassId(deviceClassesModel->databaseIDByRow(ui->comboBoxDeviceClass->currentIndex()));
         repairModel->setVendorId(deviceVendorsModel->databaseIDByRow(ui->comboBoxDeviceVendor->currentIndex()));
         repairModel->setTitle(ui->comboBoxDeviceClass->currentText() + " " + ui->comboBoxDeviceVendor->currentText() + " " + ui->comboBoxDevice->currentText());
@@ -682,8 +664,8 @@ bool tabRepairNew::createRepair()
                 repairModel->setIsCardPayment(1);
         }
 
-        nErr = repairModel->commit();
-        nErr = clientModel->updateRepairs();
+        nErr &= repairModel->commit();
+        nErr &= clientModel->updateRepairs();
         repair = repairModel->id();
         repairStatusLog->setRepair(repair);
         repairStatusLog->setStatus(0);
@@ -693,17 +675,21 @@ bool tabRepairNew::createRepair()
 
         // запись значений доп. полей
         additionalFields->setObjectId(repair);
-        nErr = additionalFields->commit();
+        nErr &= additionalFields->commit();
 
         if (ui->lineEditInsideComment->text() != "" )
         {
+            comment = new SCommentModel();
             comment->setRepair(repair);
             comment->setText(ui->lineEditInsideComment->text());
-            nErr = comment->commit();
+            nErr &= comment->commit();
+            delete comment;
         }
 
         if (ui->checkBoxIsPrepay->isChecked())
         {
+            cashRegister = new SCashRegisterModel();
+            cashRegister->setSystemId(paymentSystemsModel->databaseIDByRow(ui->comboBoxPrepayAccount->currentIndex(), "system_id"));
             cashRegister->setId(0);
             cashRegister->setClient(clientModel->id());
             cashRegister->setOperationType(SCashRegisterModel::RecptPrepayRepair);
@@ -711,7 +697,8 @@ bool tabRepairNew::createRepair()
             cashRegister->setAmount(prepaySumm);
             cashRegister->setReason(QString("%1 (%2)").arg(cashRegister->constructReason(repair), ui->comboBoxPrepayReason->currentText()));
             cashRegister->setSkipLogRecording(true);
-            nErr = cashRegister->commit();
+            nErr &= cashRegister->commit();
+            delete cashRegister;
 
             // TODO: Признак предмета расчета
         }
@@ -743,6 +730,7 @@ bool tabRepairNew::createRepair()
     {
         print(repair);
 
+        m_prevRepair = 0;
         ui->comboBoxProblem->clearEditText();
         ui->comboBoxIncomingSet->clearEditText();
         ui->comboBoxExterior->clearEditText();
@@ -773,7 +761,7 @@ bool tabRepairNew::createRepair()
         ui->comboBoxDevice->setCurrentIndex(-1);
     }
 
-    repairModel->setId(0);
+    delete repairModel;
     delete query;
     delete repairStatusLog;
     return !nErr; // return 0 — OK, return 1 - ошибка
@@ -793,12 +781,6 @@ void tabRepairNew::primaryPhoneEdited(QString number)
 void tabRepairNew::preferredPaymentSystemChanged(int)
 {
     // при установке модели данных автоматически устанавливается индекс 0 и в модель ремонта устанавливается предпочитаемый тип оплаты, что есть неправильно
-}
-
-void tabRepairNew::prepayPaymentSystemChanged(int index)
-{
-    int sysId = paymentSystemsModel->databaseIDByRow(index, "system_id");
-    cashRegister->setSystemId(sysId);
 }
 
 void tabRepairNew::print(int repair)
@@ -833,7 +815,7 @@ void tabRepairNew::print(int repair)
 
 void tabRepairNew::buttonCreateTabClientHandler()
 {
-    emit createTabClient(client);
+    emit createTabClient(m_client);
 }
 
 #ifdef QT_DEBUG
@@ -843,11 +825,11 @@ void tabRepairNew::randomFill()
     if (test_scheduler_counter == 0)   // клиент
 //    if (1)
     {
-        fillClientCreds(33);
-        test_scheduler_counter++;
-        test_scheduler->start(400);    //  (пере-)запускаем таймер
-        return;
-        if(0)
+//        fillClientCreds(33);
+//        test_scheduler_counter++;
+//        test_scheduler->start(400);    //  (пере-)запускаем таймер
+//        return;
+        if(1)
 //        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
         {
             fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
@@ -926,7 +908,7 @@ void tabRepairNew::randomFill()
         QKeyEvent* newEvent2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
         QCoreApplication::postEvent(ui->comboBoxProblem->view(), newEvent2);
     }
-    else if (test_scheduler_counter == 6)   // космолектность
+    else if (test_scheduler_counter == 6)   // комплектность
     {
         ui->comboBoxIncomingSet->setFocus();
         i = classIncomingSetsModel->rowCount();

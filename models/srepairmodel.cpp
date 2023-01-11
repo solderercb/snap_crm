@@ -274,7 +274,7 @@ int SRepairModel::currentManagerIndex()
 void SRepairModel::setCurrentManager(const int id)
 {
     i_valuesMap.insert("current_manager", id);
-    appendLogText(tr("Менеджером ремонта назначен %1").arg(managersModel->value(id, "id", "username").toString()));
+    appendLogText(tr("Менеджером ремонта назначен %1").arg(usersModel->value(id, "id", "username").toString()));
 }
 
 void SRepairModel::setCurrentManagerIndex(const int index)
@@ -296,14 +296,19 @@ int SRepairModel::engineerIndex()
 
 void SRepairModel::setEngineer(const int id)
 {
-    i_valuesMap.insert("master", id);
-    appendLogText(tr("Инженером назначен %1").arg(engineersModel->value(id, "id", "username").toString()));
+    if(id)
+    {
+        i_valuesMap.insert("master", id);
+        appendLogText(tr("Инженером назначен %1").arg(engineersModel->value(id, "id", "username").toString()));
+    }
+    else
+        i_valuesMap.insert("master", QVariant());
 }
 
 void SRepairModel::setEngineerIndex(const int index)
 {
     if(index == -1)
-        return;
+        setEngineer(0);
     setEngineer(engineersModel->databaseIDByRow(index));
 }
 

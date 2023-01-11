@@ -26,7 +26,7 @@ QWidget *SaleTableItemDelegates::createEditor(QWidget *parent, const QStyleOptio
         case SStoreItemModel::SaleOpColumns::ColCount:
             return createSpinBox(parent, index); break;
         case SStoreItemModel::SaleOpColumns::ColPrice:
-            return createDoubleSpinBox(parent); break;
+            return createDoubleSpinBox(parent, index); break;
         case SStoreItemModel::SaleOpColumns::ColWarranty:
             return createComboBox(parent, warrantyTermsModel); break;
         case SStoreItemModel::SaleOpColumns::ColUser:
@@ -308,7 +308,7 @@ void SaleTableItemDelegates::setModelDataFromSpinBox(QWidget *editor, QAbstractI
 }
 
 // Create the spinbox and populate it
-QDoubleSpinBox *SaleTableItemDelegates::createDoubleSpinBox(QWidget *parent) const
+QDoubleSpinBox *SaleTableItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
 {
     QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
     if(comSettings->value("classic_kassa").toBool())
@@ -323,7 +323,7 @@ QDoubleSpinBox *SaleTableItemDelegates::createDoubleSpinBox(QWidget *parent) con
         sb->setMinimum(1);
         sb->setMaximum(999999);
     }
-    if(tableModel->isWarranty())
+    if(tableModel->isWarranty() || !tableModel->index(index.row(), 0).data(SSaleTableModel::DataRoles::RecordType).toBool())
         sb->setMinimum(0);
     return sb;
 }

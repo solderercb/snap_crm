@@ -47,7 +47,7 @@ private:
     QSpinBox* createSpinBox(QWidget*, const QModelIndex &) const;
     void setSpinBoxData(QWidget *editor, const int) const;
     void setModelDataFromSpinBox(QWidget*, QAbstractItemModel*, const QModelIndex&) const;
-    QDoubleSpinBox* createDoubleSpinBox(QWidget*) const;
+    QDoubleSpinBox* createDoubleSpinBox(QWidget*, const QModelIndex&) const;
     void setDoubleSpinBoxData(QWidget *editor, const double) const;
     void setModelDataFromDoubleSpinBox(QWidget*, QAbstractItemModel*, const QModelIndex&) const;
     QRect pixmapRect(const QRect &delegateRect, const PixmapType p) const;
