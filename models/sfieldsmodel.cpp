@@ -168,3 +168,13 @@ SFieldValueModel *SFieldsModel::itemHandler(const QSqlRecord &record)
     return item;
 }
 
+#ifdef QT_DEBUG
+void SFieldsModel::randomFill()
+{
+    for(int j=0; j< m_fieldsList.size(); j++)   // автозаполнение обязательных доп. полей
+    {
+        if ( m_fieldsList[j]->property("fieldRequired").toBool() )
+            m_fieldsList[j]->randomFill();
+    }
+}
+#endif

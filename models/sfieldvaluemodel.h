@@ -37,11 +37,22 @@ public:
     bool delDBRecord();
     bool isValid();
     bool deviceMatch();
+#ifdef QT_DEBUG
+    void randomFill();
+#endif
 private:
     QWidget *createLineEdit(const QSqlRecord&);
     QWidget *createComboBox(const QSqlRecord&);
     QWidget *createDateTime(const QSqlRecord&);
     QWidget *createDummyWidget(const QSqlRecord&);
+    QComboBox *comboBox();
+    QLineEdit *lineEdit();
+    QDateEdit *dateEdit();
+#ifdef QT_DEBUG
+    void randomLineEditText();
+    void randomComboBoxIndex();
+    void randomDateEditValue();
+#endif
     int m_id;
     int m_fieldId;
     QString m_name;

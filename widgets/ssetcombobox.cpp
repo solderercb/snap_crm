@@ -77,7 +77,7 @@ void SSetComboBox::clearEditText()
     }
 }
 
-bool daughterLineEdit::eventFilter(QObject *watched, QEvent *event)
+bool daughterLineEdit::eventFilter(QObject*, QEvent*)
 {
 //    if ( event->type() != QEvent::Paint && event->type() != QEvent::Paint && event->type() != QEvent::HoverMove &&
 //         event->type() != QEvent::HoverEnter && event->type() != QEvent::HoverLeave && event->type() != QEvent::MouseMove &&
@@ -157,24 +157,24 @@ CBLineEdit::~CBLineEdit()
 
 }
 
-void CBLineEdit::mousePressEvent(QMouseEvent *event)
+void CBLineEdit::mousePressEvent(QMouseEvent*)
 {
 //    qDebug() << this->objectName() << ": lineEditMousePressEvent(QMouseEvent *event))";
     emit mouseButtonPress();
 }
 
-void CBLineEdit::mouseReleaseEvent(QMouseEvent *event)
+void CBLineEdit::mouseReleaseEvent(QMouseEvent*)
 {
 //    qDebug() << this->objectName() << ": lineEditMouseReleaseEvent(QMouseEvent *event))";
     /* Ничего не делаем */
 }
 
-void CBLineEdit::resizeEvent(QResizeEvent *event)
+void CBLineEdit::resizeEvent(QResizeEvent*)
 {
 //    qDebug() << this->parent()->objectName() << ": lineEditResizeEvent(QResizeEvent *event): event: " << event;
 }
 
-bool CBLineEdit::eventFilter(QObject *obj, QEvent *event)
+bool CBLineEdit::eventFilter(QObject*, QEvent*)
 {
 //    if ( event->type() != QEvent::Paint && event->type() != QEvent::Paint && event->type() != QEvent::HoverMove &&
 //         event->type() != QEvent::HoverEnter && event->type() != QEvent::HoverLeave && event->type() != QEvent::MouseMove &&
@@ -190,7 +190,7 @@ viewEventFilter::viewEventFilter(QObject *parent) :
 {
 }
 
-bool viewEventFilter::eventFilter(QObject *watched, QEvent *event)
+bool viewEventFilter::eventFilter(QObject*, QEvent *event)
 {
 //    qDebug() << watched->objectName() << ": viewEventFilter: " << event;
 
@@ -208,9 +208,11 @@ bool viewEventFilter::eventFilter(QObject *watched, QEvent *event)
         // прячем раскрывающийся список при (ИЛИ):
         //      Tab/Shift+Tab
         //      Enter/Return при пустой строке
+        //      Escape
         if( (shortcutEvent->key() == Qt::Key_Tab && shortcutEvent->modifiers() == Qt::Key_Shift) ||
             (shortcutEvent->key() == Qt::Key_Tab && shortcutEvent->modifiers() == Qt::NoModifier) ||
-            ( ((shortcutEvent->key() == Qt::Key_Enter) || (shortcutEvent->key() == Qt::Key_Return)) && cparent->lineEdit()->text() == "" ) )
+            ( ((shortcutEvent->key() == Qt::Key_Enter) || (shortcutEvent->key() == Qt::Key_Return)) && cparent->lineEdit()->text() == "" ) ||
+            (shortcutEvent->key() == Qt::Key_Escape && shortcutEvent->modifiers() == Qt::NoModifier) )
         {
 //            qDebug() << watched->objectName() << ": viewEventFilter: Enter/Return on empty lineEdit pressed";
             cparent->hidePopup();
@@ -292,7 +294,7 @@ SSetComboBox::~SSetComboBox()
 }
 
 // Event filter forwards view key events to the line edit.
-bool SSetComboBox::eventFilter(QObject *watched, QEvent *event)
+bool SSetComboBox::eventFilter(QObject*, QEvent *event)
 {
 //    if ( event->type() != QEvent::Paint && event->type() != QEvent::Paint && event->type() != QEvent::HoverMove &&
 //         event->type() != QEvent::HoverEnter && event->type() != QEvent::HoverLeave && event->type() != QEvent::MouseMove &&
@@ -570,6 +572,7 @@ void SSetComboBox::deleteDaughterLineEdit(daughterLineEdit *widget)
     widget->deleteLater();
     rearrangeDaughterLineEdits(this->width());
 
+    isPopupShown = 0;
     this->lineEdit()->setFocus();    // возвращаем фокус
 }
 
@@ -733,7 +736,7 @@ void SSetComboBox::setSeparator(char c)
 void SSetComboBox::setSizePolicy(QSizePolicy sp)
 {
     // Проверка соответствия политики размена комбобокса. Если будет не такой, то растягивание/сжатие по высоте не будет работать как задумано.
-    QSizePolicy tsp(QSizePolicy::Preferred, QSizePolicy::Minimum);  // target sizePolicy
+//    QSizePolicy tsp(QSizePolicy::Preferred, QSizePolicy::Minimum);  // target sizePolicy
 //    if (sp != tsp)
 //        qDebug() << this->objectName() << "ACHTUNG! Политика размера не соответствует, должна быть QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum)";
     QComboBox::setSizePolicy(sp);
@@ -744,7 +747,7 @@ void SSetComboBox::setSizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Po
     setSizePolicy(QSizePolicy(horizontal, vertical));
 }
 
-void SSetComboBox::resizeEvent(QResizeEvent *event)
+void SSetComboBox::resizeEvent(QResizeEvent*)
 {
 //    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent: event: " << event << "; eventTrigger = " << eventTrigger;
 //    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent: minimumHeight() = " << minimumHeight() << "; maximumHeight()" << maximumHeight();
@@ -763,12 +766,12 @@ void SSetComboBox::resizeEvent(QResizeEvent *event)
 //    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent (return); eventTrigger = " << eventTrigger;
 }
 
-void SSetComboBox::mouseMoveEvent(QMouseEvent *event)
+void SSetComboBox::mouseMoveEvent(QMouseEvent*)
 {
 //    qDebug() << this->objectName() << ": SSetComboBox::mouseMoveEvent(QMouseEvent *event): event =" <<event;
 }
 
-void SSetComboBox::wheelEvent(QWheelEvent *event)
+void SSetComboBox::wheelEvent(QWheelEvent*)
 {
 //    qDebug() << this->objectName() << ": SSetComboBox::wheelEvent(QWheelEvent *event): event =" <<event;
     /* Ничего не делаем, чтобы при прокручивании колёсика мыши не добавлялись дочерние элементы */
@@ -800,9 +803,59 @@ void SSetComboBox::mousePressEvent(QMouseEvent *event)
     QComboBox::mousePressEvent(event);
 }
 
-void SSetComboBox::mouseDoubleClickEvent(QMouseEvent *event)
+void SSetComboBox::mouseDoubleClickEvent(QMouseEvent*)
 {
     // это срабатывает только при нажатии на кнопку "v"; двойной клик пока не нужен, поэтому ничего не делаем
 //    qDebug() << this->objectName() << ": SSetComboBox::mouseDoubleClickEvent(QMouseEvent *event)";
     // TODO: добавить обработку двойного клика
 }
+
+#ifdef QT_DEBUG
+/*  Добавление случайного дочернего lineEdit из списка элементов модели данных
+ *  или случайное число, если модель пуста
+ *  Метод использует
+*/
+void SSetComboBox::addRandomItem()
+{
+    // нормальное добавление
+    int i = QRandomGenerator::global()->bounded(model()->rowCount());
+    addItem(model()->index(i, 0).data().toString());
+    if (daughterLineEdits.isEmpty())
+    {
+        addItem(QString::number(QRandomGenerator::global()->bounded(2147483647)));
+    }
+
+    // Добавление путём иммитации работы пользователя (может глючить из-за недостаточных задержек)
+//    showPopup();
+
+//    QListView *lw = this->findChild<QListView *>();
+//    if(lw)
+//    {
+//        while(!lw->isVisible())
+//            QTest::qWait(10);
+
+//        int i = QRandomGenerator::global()->bounded(lw->model()->rowCount());
+//        QModelIndex idx = lw->model()->index(i,0);
+//        lw->scrollTo(idx);
+//        QPoint itemPt = lw->visualRect(idx).center();
+//        if(!itemPt.isNull())
+//        {
+//            QTest::mouseClick(lw->viewport(), Qt::LeftButton, Qt::NoModifier, itemPt);
+//            QTest::qWait(200);
+//            if(isPopupShown)
+//            {
+//                QTest::keyPress(lw, Qt::Key_Return);
+//            }
+//            QTest::qWait(200);
+//        }
+//    }
+//    if (daughterLineEdits.isEmpty())
+//    {
+//        setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
+//        QTest::keyPress(lineEdit(), Qt::Key_Return);
+//        QTest::qWait(200);
+//    }
+//    hidePopup();
+}
+#endif
+

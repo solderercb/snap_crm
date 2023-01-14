@@ -10,6 +10,10 @@ QT	+= sql
 QT      += printsupport
 QT      += xml
 QT      += qml
+CONFIG(debug, debug|release){
+    QT      += testlib
+}
+
 greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
 TARGET = snap

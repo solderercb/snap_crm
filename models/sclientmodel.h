@@ -146,8 +146,8 @@ public:
     void setPriceColumn(int);
     int priceColumnIndex();
     int repairs();
-    void setRepairs(int);
-    bool updateRepairs();
+    void setRepairs(const int val);
+    bool updateRepairs(const int val);
     int purchases();
     void setPurchases(int);
     bool updatePurchases(int);

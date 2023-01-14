@@ -28,6 +28,9 @@ public:
     bool validate();
     void resetIds();
     void enableEdit();
+#ifdef QT_DEBUG
+    void randomFill();
+#endif
 private:
     QSqlQuery *query;
     QList<SFieldValueModel*> m_fieldsList;

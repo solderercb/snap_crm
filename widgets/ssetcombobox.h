@@ -18,6 +18,9 @@
 #include <QStyle>
 #include <QToolButton>
 #include <QRegularExpression>
+//#include <QDebug>
+//#include <QTest>
+//#include <QListView>
 
 class daughterLineEdit : public QLineEdit
 {
@@ -133,6 +136,9 @@ public:
     void deleteDaughterLineEditOnKeyPress(int);
     QString version();
     void clearEditText();
+#ifdef QT_DEBUG
+    void addRandomItem();
+#endif
 
 public slots:
 

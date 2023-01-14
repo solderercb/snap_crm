@@ -17,6 +17,10 @@
 #include "models/scommentmodel.h"
 #include "models/srepairstatuslog.h"
 #include "widgets/sphones.h"
+#include "widgets/ssetcombobox.h"
+#ifdef QT_DEBUG
+#include <QTest>
+#endif
 
 namespace Ui {
     class tabRepairNew;
@@ -58,8 +62,16 @@ private:
     void setDefaultStyleSheets();
     void getDevices();
     bool checkInput();
-    bool createClient();
+    void createClient();
+    int deviceId();
+    int createDeviceModel();
     void print(int);
+    void initDataModels();
+    void initWidgets();
+    void clearWidgets();
+    void getPrepayment(double summ);
+    void saveInternalComment();
+    void setModelData();
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
@@ -84,6 +96,7 @@ private slots:
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;
+    void dbgRandomFillClicked();
 #endif
 };
 

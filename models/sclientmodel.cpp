@@ -609,16 +609,23 @@ int SClientModel::repairs()
     return m_repairs;
 }
 
-bool SClientModel::updateRepairs()
+void SClientModel::setRepairs(const int val)
+{
+    i_valuesMap.insert("repairs", val);
+}
+
+bool SClientModel::updateRepairs(const int val)
 {
     if(i_id == 0)
         return 1;
 
-    QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_CLIENT_REPAIRS(i_id));
+    setRepairs(repairs()+val);
+    commit();
 
     if(!i_nErr)
         throw 1;
 
+    m_repairs += val;
     return i_nErr;
 }
 

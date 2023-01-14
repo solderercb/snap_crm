@@ -91,17 +91,17 @@ bool SFieldValueModel::validate()
     {
         switch (this->property("fieldType").toInt())
         {
-            case WidgetType::LineEdit: if(static_cast<QLineEdit*>(m_widget)->text().isEmpty()) {m_widget->setStyleSheet(commonLineEditStyleSheetRed); ret = 0;}; break;
-            case WidgetType::ComboBox: if(static_cast<QComboBox*>(m_widget)->currentIndex() == -1) {m_widget->setStyleSheet(commonComboBoxStyleSheetRed); ret = 0;}; break;
-//            case WidgetType::DateEdit: if(static_cast<QDateEdit*>(m_widget)->method()) {m_widget->setStyleSheet(commonDateEditStyleSheetRed); ret = 0;}; break; // TODO: придумать критерии проверки DateEdit
-            default: if(static_cast<QLineEdit*>(m_widget)->text().isEmpty()) {m_widget->setStyleSheet(commonLineEditStyleSheetRed); ret = 0;};
+            case WidgetType::ComboBox: if(comboBox()->currentIndex() == -1) {m_widget->setStyleSheet(commonComboBoxStyleSheetRed); ret = 0;}; break;
+//            case WidgetType::DateEdit: if(dateEdit()->method()) {m_widget->setStyleSheet(commonDateEditStyleSheetRed); ret = 0;}; break; // TODO: придумать критерии проверки DateEdit
+            case WidgetType::LineEdit:
+            default: if(lineEdit()->text().isEmpty()) {m_widget->setStyleSheet(commonLineEditStyleSheetRed); ret = 0;};
         }
     }
     if(!this->property("fieldInputMask").toString().isEmpty())
     {
         if(this->property("fieldType").toInt() == WidgetType::LineEdit)
         {
-            if(!static_cast<QLineEdit*>(m_widget)->hasAcceptableInput())
+            if(!lineEdit()->hasAcceptableInput())
             {
                 m_widget->setStyleSheet(commonLineEditStyleSheetRed);
                 ret = 0;
@@ -122,9 +122,8 @@ void SFieldValueModel::deleteWidget()
 
     if(property("fieldType") == WidgetType::ComboBox)
     {
-        QComboBox *cb = static_cast<QComboBox*>(m_widget);
         QAbstractItemModel* widgetModel;
-        widgetModel = cb->model();
+        widgetModel = comboBox()->model();
         if(widgetModel)
             delete widgetModel;
     }
@@ -214,6 +213,21 @@ QWidget *SFieldValueModel::createDummyWidget(const QSqlRecord &record)
     return widget;
 }
 
+QComboBox *SFieldValueModel::comboBox()
+{
+    return static_cast<QComboBox*>(m_widget);
+}
+
+QLineEdit *SFieldValueModel::lineEdit()
+{
+    return static_cast<QLineEdit*>(m_widget);
+}
+
+QDateEdit *SFieldValueModel::dateEdit()
+{
+    return static_cast<QDateEdit*>(m_widget);
+}
+
 int SFieldValueModel::id()
 {
     return m_id;
@@ -292,10 +306,10 @@ bool SFieldValueModel::commit()
         setFieldId(this->property("fieldId").toInt());
         switch (this->property("fieldType").toInt())
         {
-            case WidgetType::LineEdit: setValue(static_cast<QLineEdit*>(m_widget)->text()); break;
-            case WidgetType::ComboBox: setValue(static_cast<QComboBox*>(m_widget)->currentText()); break;
-            case WidgetType::DateEdit: setValue(static_cast<QDateEdit*>(m_widget)->date().toString("yyyy-MM-dd")); break;
-            default: setValue(static_cast<QLineEdit*>(m_widget)->text());
+            case WidgetType::ComboBox: setValue(comboBox()->currentText()); break;
+            case WidgetType::DateEdit: setValue(dateEdit()->date().toString("yyyy-MM-dd")); break;
+            case WidgetType::LineEdit:
+            default: setValue(lineEdit()->text());
         }
     }
     if(value().isEmpty())
@@ -331,4 +345,39 @@ bool SFieldValueModel::deviceMatch()
 {
     return property("fieldDevMatch").toBool();
 }
+
+#ifdef QT_DEBUG
+void SFieldValueModel::randomFill()
+{
+    switch (this->property("fieldType").toInt())
+    {
+        case WidgetType::ComboBox: randomComboBoxIndex(); break;
+        case WidgetType::DateEdit: randomDateEditValue(); break;
+        case WidgetType::LineEdit:
+        default: randomLineEditText();
+    }
+}
+
+/*  Случайное число
+*/
+void SFieldValueModel::randomLineEditText()
+{
+    lineEdit()->setText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
+}
+
+/*  Выбирает случайный индекс модели данных
+*/
+void SFieldValueModel::randomComboBoxIndex()
+{
+    int i = comboBox()->model()->rowCount();
+    comboBox()->setCurrentIndex(QRandomGenerator::global()->bounded(i));
+}
+
+/*  Прибавляет к текущей дате случайное число от 0 до 90
+*/
+void SFieldValueModel::randomDateEditValue()
+{
+    dateEdit()->setDate(QDate::fromJulianDay(QDate::currentDate().toJulianDay() + QRandomGenerator::global()->bounded(90)));
+}
+#endif
 
