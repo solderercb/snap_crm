@@ -1,24 +1,31 @@
-#ifndef STEXTEDIT_H
-#define STEXTEDIT_H
+#ifndef SPLAINTEXTEDIT_H
+#define SPLAINTEXTEDIT_H
 
 #include <QWidget>
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QDebug>
 #include <QScrollBar>
 #include "widgets/scomtextedit.h"
 
-class STextEdit : public QTextEdit, public SComTextEdit
+class SPlainTextEdit : public QPlainTextEdit, public SComTextEdit
 {
     Q_OBJECT
     friend class SComTextEdit;
+signals:
+    void keyPress(int key);
 public:
-    explicit STextEdit(QWidget *parent = nullptr);
+    enum PressedKey{Undef = 0, Enter = 1, ShiftEnter, Up, Escape};
+    explicit SPlainTextEdit(QWidget *parent = nullptr);
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
     void setFixedHeight(int);
+    void enableExtKeyPressHandler(bool);
+    bool isEmpty();
 protected:
+    void keyPressEvent(QKeyEvent *event) override;
 private:
     int m_minimumHeightHint = 21;
+    bool m_extKeyPressHandler = 0;
     void focusOutEvent(QFocusEvent *event) override;
     void setMinimumHeight(const int rows);
     void resizeEvent(QResizeEvent *e) override;
@@ -29,4 +36,4 @@ public slots:
     void updateHeight();
 };
 
-#endif // STEXTEDIT_H
+#endif // SPLAINTEXTEDIT_H

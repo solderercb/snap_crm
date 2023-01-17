@@ -22,8 +22,6 @@
 #include "models/srepairmodel.h"
 #include "models/srepairstatuslog.h"
 #include "models/sfieldsmodel.h"
-#include "models/scommentmodel.h"
-#include "models/scommentsmodel.h"
 #include "models/ssortfilterproxymodel.h"
 #include "models/ssaletablemodel.h"
 #include "widgets/saletableitemdelegates.h"
@@ -31,20 +29,6 @@
 namespace Ui {
 class tabRepair;
 }
-
-class commentsTable : public QTableView
-{
-    Q_OBJECT
-signals:
-    void copyText();
-public:
-    explicit commentsTable(QWidget *parent = nullptr);
-    ~commentsTable();
-    void resizeEvent(QResizeEvent*) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    QModelIndexList selectedIndexes() const override;
-private:
-};
 
 class worksAndSparePartsTable : public QTableView
 {
@@ -86,16 +70,10 @@ private:
     SClientModel *clientModel;
     SFieldsModel *additionalFieldsModel;
     SSortFilterProxyModel *statusesProxyModel;
-    SCommentsModel *commentsModel;
     SSaleTableModel *worksAndPartsModel;
     SaleTableItemDelegates *itemDelagates;
     bool m_statusUpdateInProgress = 0;
     double works_sum, parts_sum, total_sum;
-    int getFieldIdByName(const QString &, QSqlQueryModel *);
-    QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
-    void eventResize(QResizeEvent *);
-    void fillExtraInfo();
-    void setLock(bool);
     QString box_name;
     bool modelRO = 0;   // признак блокировки карты ремонта
     getOutDialog *modalWidget;
@@ -117,13 +95,18 @@ private:
     bool m_spinBoxAmountChanged = 0;
     bool m_groupUpdate = 0;
     SRepairStatusLog *repairStatusLog;
+    bool m_buttonSaveStateEnabled = 0;
+    int getFieldIdByName(const QString &, QSqlQueryModel *);
+    QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
+    void eventResize(QResizeEvent *);
+    void fillExtraInfo();
+    void setLock(bool);
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);
     bool setWidgetsParams(const int);
     bool checkStateAcl(const int);
     bool checkData(const int);
-    bool m_buttonSaveStateEnabled = 0;
     void updateStatesModel(const int statusId);
     void doStateActions(const int);
     void setPricesToZero();
@@ -166,12 +149,6 @@ private slots:
     void saveSaleTableClicked();
     void setSaveSaleTableEnabled();
     void buttonWorksAdminEdit(bool state);
-    void commentMenuRequest(QPoint pos);
-    bool commentIsEditable(const int row);
-    void commentRemove();
-    void commentEdit();
-    void commentCopyToClipboard(const bool copyTimeStamp = 0);
-    void lineEditCommentKeyPressEvent(QKeyEvent *event);
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

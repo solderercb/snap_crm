@@ -13,6 +13,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     ui->setupUi(this);
+
     i_tabTitle = tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
     userActivityLog->appendRecord(tr("Navigation %1").arg(i_tabTitle));
     repairModel = new SRepairModel();
@@ -92,8 +93,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(worksAndPartsModel, &SSaleTableModel::tableDataChanged, this, &tabRepair::setSaveSaleTableEnabled);
     connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &tabRepair::saveTotalSumms);
     itemDelagates = new SaleTableItemDelegates(worksAndPartsModel, ui->tableViewWorksAndSpareParts);
-    commentsModel = new SCommentsModel();
-    commentsModel->setMode(SCommentModel::Repair);
 
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxState->blockSignals(true);
@@ -106,22 +105,15 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->comboBoxNotifyStatus->setModel(notifyStatusesModel);
     ui->comboBoxNotifyStatus->blockSignals(false);
 
-    ui->lineEditComment->enableExtKeyPressHandler(true);
-    connect(ui->lineEditComment, &SLineEdit::keyPress, this, &tabRepair::lineEditCommentKeyPressEvent);
-    ui->tableViewComments->setModel(commentsModel);
-    ui->tableViewComments->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->tableViewComments->verticalHeader()->hide();
-    ui->tableViewComments->horizontalHeader()->hide();
-    ui->tableViewComments->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->tableViewComments, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(commentMenuRequest(QPoint)));
-    connect(ui->tableViewComments, SIGNAL(copyText()), this, SLOT(commentCopyToClipboard()));
-
     ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
     connect(ui->tableViewWorksAndSpareParts, SIGNAL(pressed(QModelIndex)), worksAndPartsModel, SLOT(indexSelected(QModelIndex)));
     ui->tableViewWorksAndSpareParts->setItemDelegate(itemDelagates);
     ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 //    ui->tableViewWorksAndSpareParts->setReadOnly(true);
     connect(ui->pushButtonAddWork, SIGNAL(clicked()), worksAndPartsModel, SLOT(addCustomWork()));
+
+    ui->widgetComments->setParentTab(this);
+    ui->widgetComments->setMode(SCommentModel::Repair);
 
     // сворачивание групп элементов (ну как в АСЦ чтобы). TODO: Отключено, т. к. требует доработки класса SGroupBoxEventFilter
 //    groupBoxEventFilter = new SGroupBoxEventFilter(this);
@@ -157,7 +149,6 @@ tabRepair::~tabRepair()
     delete ui;
     delete repairModel;
     delete clientModel;
-    delete commentsModel;
     delete worksAndPartsModel;
     delete query;
     if(m_autosaveDiag)
@@ -207,7 +198,7 @@ void tabRepair::reloadRepairData()
     additionalFieldsModel->load(repair_id);
     worksAndPartsModel->repair_loadTable(repair_id);
     worksAndPartsModel->setIsWarranty(repairModel->isWarranty());
-    commentsModel->load(repair_id);
+    ui->widgetComments->load(repair_id);
 
     statusesProxyModel->setFilterRegularExpression("");
     updateStatesModel(repairModel->state());
@@ -322,7 +313,6 @@ void tabRepair::updateWidgets()
 
     worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
     ui->tableViewWorksAndSpareParts->resizeRowsToContents();
-    ui->tableViewComments->resizeRowsToContents();
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled);
 }
 
@@ -858,168 +848,6 @@ void tabRepair::buttonWorksAdminEdit(bool state)
     }
 }
 
-void tabRepair::commentMenuRequest(QPoint pos)
-{
-    int recordsEditable = commentIsEditable(ui->tableViewComments->selectionModel()->currentIndex().row());
-
-    QMenu * menu = new QMenu(this);
-    QAction * copy = new QAction(tr("Копировать"), this);
-    connect(copy, SIGNAL(triggered()), this, SLOT(commentCopyToClipboard()));
-    menu->addAction(copy);
-    if(recordsEditable)
-    {
-        QAction * edit = new QAction(tr("Редактировать"), this);
-        connect(edit, SIGNAL(triggered()), this, SLOT(commentEdit()));
-        menu->addAction(edit);
-        QAction * remove = new QAction(tr("Удалить"), this);
-        connect(remove, SIGNAL(triggered()), this, SLOT(commentRemove()));
-        menu->addAction(remove);
-    }
-    menu->popup(ui->tableViewComments->viewport()->mapToGlobal(pos));
-}
-
-bool tabRepair::commentIsEditable(const int row)
-{
-    int timeDiff = commentsModel->created(row).secsTo(QDateTime::currentDateTimeUtc());
-    int authorId = commentsModel->userId(row);
-    bool editAllowed = permissions->contains("Редактировать чужие комментарии");    // TODO: добавить разрешение
-
-    // Удаление и редактирование доступно только в течение некоторого времени после создания (подсмотрено в Telegram).
-    // Удалять и редактировать можно только свои комментарии или при наличии особого разрешения
-    if((timeDiff < 3600 && authorId == userDbData->value("id").toInt()) || editAllowed )
-        return 1;
-
-    return 0;
-}
-
-void tabRepair::commentRemove()
-{
-    int row = ui->tableViewComments->selectionModel()->currentIndex().row();
-    if(row >= 0){
-        if (QMessageBox::warning(this,
-                                 tr("Удаление записи"),
-                                 tr("Вы уверены, что хотите удалить эту запись?"),
-                                 QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-        {
-            try
-            {
-                QUERY_LOG_START(metaObject()->className());
-                QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-                commentsModel->remove(row);
-                QUERY_COMMIT_ROLLBACK(query,nErr);
-                QUERY_LOG_STOP;
-            }
-            catch (int type)
-            {
-                nErr = 0;
-                if(type == 0)
-                {
-                    QString err = "DEBUG ROLLBACK";
-                    QUERY_ROLLBACK_MSG(query, err);
-                }
-                else
-                    QUERY_COMMIT_ROLLBACK(query, nErr);
-                return;
-            }
-        }
-    }
-}
-
-void tabRepair::commentEdit()
-{
-    int row = ui->tableViewComments->selectionModel()->currentIndex().row();
-    QString text = commentsModel->text(row);
-    int id = commentsModel->recordId(row);
-    ui->lineEditComment->setText(text);
-    ui->lineEditComment->setProperty("recordId", id);
-    ui->lineEditComment->setProperty("recordRow", row);
-    ui->lineEditComment->setCursorPosition(text.length());
-    ui->lineEditComment->setFocus();
-}
-
-/* Копирование текста комментария в буфер обмена
- * подсмотрено: https://www.medo64.com/2019/12/copy-to-clipboard-in-qt/
-*/
-void tabRepair::commentCopyToClipboard(const bool)
-{
-    // TODO: решить какие данные копировать, если выделена одна строка или несколько. Или сделать два варианта копирования в контекстном меню
-    QModelIndexList indexesList =  ui->tableViewComments->selectedIndexes();
-    QStringList text;
-
-    for(int i = 0; i < indexesList.count(); i++)
-    {
-        if(indexesList.at(i).column() == SCommentModel::ColText)
-            text.append(indexesList.at(i).data().toString());
-    }
-
-    QClipboard* clipboard = QApplication::clipboard();
-
-    clipboard->setText(text.join("\r\n"), QClipboard::Clipboard);
-
-    if (clipboard->supportsSelection())
-    {
-        clipboard->setText(text.join("\r\n"), QClipboard::Selection);
-    }
-
-    #if defined(Q_OS_LINUX)
-        QThread::msleep(1); // workaround for copied text not being available...
-#endif
-}
-
-void tabRepair::lineEditCommentKeyPressEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-    {
-        try
-        {
-            QUERY_LOG_START(metaObject()->className());
-            QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-            if(!ui->lineEditComment->property("recordId").isValid())
-            {
-                commentsModel->add(ui->lineEditComment->text());
-                userActivityLog->appendRecord(QString("Comment %1").arg(i_tabTitle), 0);
-            }
-            else
-            {
-                commentsModel->setText(ui->lineEditComment->property("recordRow").toInt(), ui->lineEditComment->text());
-                ui->lineEditComment->setProperty("recordId", QVariant());
-                ui->lineEditComment->setProperty("recordRow", QVariant());
-            }
-
-            ui->lineEditComment->clear();
-
-            QUERY_COMMIT_ROLLBACK(query,nErr);
-            QUERY_LOG_STOP;
-        }
-        catch (int type)
-        {
-            nErr = 0;
-            if(type == 0)
-            {
-                QString err = "DEBUG ROLLBACK";
-                QUERY_ROLLBACK_MSG(query, err);
-            }
-            else
-                QUERY_COMMIT_ROLLBACK(query, nErr);
-            return;
-        }
-    }
-    else if(event->key() == Qt::Key_Escape)
-    {
-        ui->lineEditComment->setProperty("recordId", QVariant());
-        ui->lineEditComment->setProperty("recordRow", QVariant());
-        ui->lineEditComment->clear();
-    }
-    else if(event->key() == Qt::Key_Up)
-    {
-        if(commentIsEditable(0))
-        {
-            ui->tableViewComments->selectRow(0);
-            commentEdit();
-        }
-    }
-}
-
 void tabRepair::comboBoxStateIndexChanged(int index)
 {
     if(save_state_on_close)
@@ -1039,58 +867,6 @@ tabRepair* tabRepair::getInstance(int rep_id, MainWindow *parent)   // singleton
 if( !p_instance.contains(rep_id) )
   p_instance.insert(rep_id, new tabRepair(rep_id, parent));
 return p_instance.value(rep_id);
-}
-
-commentsTable::commentsTable(QWidget *parent) :
-    QTableView(parent)
-{
-    setShowGrid(false);
-}
-
-commentsTable::~commentsTable()
-{
-
-}
-
-void commentsTable::resizeEvent(QResizeEvent *event)
-{
-    QTableView::resizeEvent(event);
-    int i, j;
-    int colTextWidth = 0;
-    int colWidths[] = {120,90,0};
-
-    colTextWidth = this->geometry().width();
-
-    for (i = 0, j = 0; i < model()->columnCount(); i++)
-    {
-        if(static_cast<SCommentsModel*>(model())->isColumnHidden(i))
-            hideColumn(i);
-        else
-        {
-            colTextWidth -= colWidths[j];
-            setColumnWidth(i, colWidths[j]);
-            j++;
-        }
-    }
-    if (verticalScrollBar()->isVisible())
-        setColumnWidth(SCommentModel::Columns::ColText, colTextWidth - verticalScrollBar()->width());
-    else
-        setColumnWidth(SCommentModel::Columns::ColText, colTextWidth);
-    resizeRowsToContents();
-}
-
-void commentsTable::keyPressEvent(QKeyEvent *event)
-{
-    if( (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_C) || \
-        (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Insert) )
-        emit copyText();
-    else
-        QTableView::keyPressEvent(event);
-}
-
-QModelIndexList commentsTable::selectedIndexes() const
-{
-    return QTableView::selectedIndexes();
 }
 
 // =====================================

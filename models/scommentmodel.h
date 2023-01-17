@@ -11,7 +11,7 @@ class SCommentModel : public SComRecord
     Q_OBJECT
 public:
     enum Columns {ColId = 0, ColCreated, ColUser, ColText, ColRepair, ColClient, ColTask, ColPartRequest};
-    enum Mode {Repair = 0, Client, Task, PartRequest};
+    enum Mode {NotSet = 0, Repair = 1, Client, Task, PartRequest};
     explicit SCommentModel(QObject *parent = nullptr);
     explicit SCommentModel(QList<QStandardItem*> &record, QObject *parent = nullptr);
     ~SCommentModel();

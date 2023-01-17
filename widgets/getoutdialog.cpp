@@ -3,10 +3,9 @@
 #include "ui_getoutdialog.h"
 #include "tabrepair.h"
 
-getOutDialog::getOutDialog(QWidget *p, Qt::WindowFlags f) :
-    QWidget(p, f),
-    ui(new Ui::getOutDialog),
-    parent(p)
+getOutDialog::getOutDialog(QWidget *parent, Qt::WindowFlags flags) :
+    SWidget(parent, flags),
+    ui(new Ui::getOutDialog)
 {
     double worksAndSparePartsSumm;
     ui->setupUi(this);
@@ -153,9 +152,7 @@ void getOutDialog::getOut()
     SCashRegisterModel *cashRegister = new SCashRegisterModel();
     SWorkshopIssuedModel *workshopIssuedModel = new SWorkshopIssuedModel();
     SRepairStatusLog *repairStatusLog = new SRepairStatusLog(m_repairId);
-#ifdef QT_DEBUG
-    SQueryLog *queryLog = new SQueryLog();
-#endif
+
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
 
@@ -176,8 +173,7 @@ void getOutDialog::getOut()
     {
         return;
     }
-
-    QUERY_LOG_START(metaObject()->className());
+    QUERY_LOG_START(parent()->metaObject()->className());
     try
     {
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);

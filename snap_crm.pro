@@ -99,15 +99,19 @@ SOURCES += \
     widgets/saletableitemdelegates.cpp \
     widgets/sclientmatch.cpp \
     widgets/scombobox.cpp \
+    widgets/scomments.cpp \
+    widgets/scomtextedit.cpp \
     widgets/sdevicematch.cpp \
     widgets/sgroupboxeventfilter.cpp \
     widgets/shortlivednotification.cpp \
     widgets/slineedit.cpp \
     widgets/sphone.cpp \
     widgets/sphones.cpp \
+    widgets/splaintextedit.cpp \
     widgets/ssetcombobox.cpp \
     widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
+    widgets/swidget.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
@@ -176,15 +180,19 @@ HEADERS  += \
     widgets/saletableitemdelegates.h \
     widgets/sclientmatch.h \
     widgets/scombobox.h \
+    widgets/scomments.h \
+    widgets/scomtextedit.h \
     widgets/sdevicematch.h \
     widgets/sgroupboxeventfilter.h \
     widgets/shortlivednotification.h \
     widgets/slineedit.h \
     widgets/sphone.h \
     widgets/sphones.h \
+    widgets/splaintextedit.h \
     widgets/ssetcombobox.h \
     widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
+    widgets/swidget.h \
     windowsdispatcher.h
 
 FORMS += \
@@ -207,6 +215,7 @@ FORMS += \
     tabsale.ui \
     widgets/getoutdialog.ui \
     widgets/sclientmatch.ui \
+    widgets/scomments.ui \
     widgets/sdevicematch.ui \
     widgets/sphone.ui \
     widgets/sphones.ui \

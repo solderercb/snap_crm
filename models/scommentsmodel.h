@@ -30,7 +30,7 @@ public:
 
 private:
     QSqlQueryModel *m_queryData;
-    int m_mode = SCommentModel::Repair;
+    int m_mode = SCommentModel::NotSet;
     int m_objId = 0;
     int m_hiddenColumns = 0xFFF1;
     void setQuery(const QString&, const QSqlDatabase &db = QSqlDatabase());

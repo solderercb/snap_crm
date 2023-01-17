@@ -1,10 +1,9 @@
 #include "tabcommon.h"
 
 tabCommon::tabCommon(MainWindow *p) :
-    QWidget(p)
+    SWidget(p)
 {
 #ifdef QT_DEBUG
-    queryLog = new SQueryLog();
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
     test_scheduler2 = new QTimer();
