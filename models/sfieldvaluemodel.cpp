@@ -150,7 +150,7 @@ QWidget *SFieldValueModel::createLineEdit(const QSqlRecord &record)
 
 QWidget *SFieldValueModel::createComboBox(const QSqlRecord &record)
 {
-    QComboBox *widget = new QComboBox();
+    SComboBox *widget = new SComboBox();
     QStandardItemModel* widgetModel = new QStandardItemModel();
     QStringList widgetItems = record.value(1).toString().split('\n');
     QStandardItem *newRow;

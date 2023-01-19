@@ -70,6 +70,10 @@ void tabRepairNew::initDataModels()
         prepayReason->value(0)->setData(i); // в UserRole+1 храним id типа предоплаты
         prepayReasonsModel->appendRow(*prepayReason);
     }
+    paymentSystemsProxyModel = new SSortFilterProxyModel();
+    paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
+    paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
+    paymentSystemsProxyModel->setFilterKeyColumn(1);
 }
 
 void tabRepairNew::initWidgets()
@@ -117,8 +121,8 @@ void tabRepairNew::initWidgets()
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxPresetPaymentAccount->setCurrentIndex(-1);
-    ui->comboBoxPrepayAccount->setModel(paymentSystemsModel);
-    ui->comboBoxPrepayAccount->setCurrentIndex(-1);
+    ui->comboBoxPrepayAccount->setModel(paymentSystemsProxyModel);
+    ui->comboBoxPrepayAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));
     ui->comboBoxPresetPlace->setModel(repairBoxesModel);
     ui->comboBoxPresetPlace->setCurrentIndex(-1);
     ui->comboBoxDeviceClass->setModel(deviceClassesModel);
@@ -207,7 +211,6 @@ void tabRepairNew::getPrepayment(double summ)
     int repair = repairModel->id();
     cashRegister = new SCashRegisterModel();
     cashRegister->setSystemId(paymentSystemsModel->databaseIDByRow(ui->comboBoxPrepayAccount->currentIndex(), "system_id"));
-    cashRegister->setId(0);
     cashRegister->setClient(clientModel->id());
     cashRegister->setOperationType(SCashRegisterModel::RecptPrepayRepair);
     cashRegister->setRepairId(repair);
@@ -215,6 +218,7 @@ void tabRepairNew::getPrepayment(double summ)
     cashRegister->setReason(QString("%1 (%2)").arg(cashRegister->constructReason(repair), ui->comboBoxPrepayReason->currentText()));
     cashRegister->setSkipLogRecording(true);
     nErr &= cashRegister->commit();
+    repairModel->setPrepaidOrder(cashRegister->id());
     delete cashRegister;
 
     // TODO: Признак предмета расчета
@@ -285,11 +289,6 @@ void tabRepairNew::setModelData()
         repairModel->setPrintCheck(1);
     if(ui->comboBoxPresetPlace->currentIndex() >= 0)
         repairModel->setBoxIndex(ui->comboBoxPresetPlace->currentIndex());
-    if(ui->checkBoxIsPrepay->isChecked())
-    {
-        prepaySumm = sysLocale.toDouble(ui->doubleSpinBoxPrepaySumm->text());
-        repairModel->addPrepay(prepaySumm, ui->comboBoxPrepayReason->currentText());
-    }
     if(ui->checkBoxWasInOtherWorkshop->isChecked())
         repairModel->setThirsPartySc(1);
     if(ui->lineEditPrevRepairFromOldDB->text().length())
@@ -806,7 +805,12 @@ bool tabRepairNew::createRepair()
             saveInternalComment();
 
         if (ui->checkBoxIsPrepay->isChecked())
+        {
+            double prepaySumm = sysLocale.toDouble(ui->doubleSpinBoxPrepaySumm->text());
+            repairModel->addPrepay(prepaySumm, ui->comboBoxPrepayReason->currentText());
             getPrepayment(sysLocale.toDouble(ui->doubleSpinBoxPrepaySumm->text()));
+            repairModel->commit();
+        }
 
 #ifdef QT_DEBUG
 //        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)

@@ -75,7 +75,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEditDevice">
+          <widget class="SLineEdit" name="lineEditDevice">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -104,7 +104,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QLineEdit" name="lineEditSN">
+          <widget class="SLineEdit" name="lineEditSN">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -133,7 +133,7 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QLineEdit" name="lineEditClient">
+          <widget class="SLineEdit" name="lineEditClient">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -162,7 +162,7 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QLineEdit" name="lineEditInDate">
+          <widget class="SLineEdit" name="lineEditInDate">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -191,7 +191,7 @@
           </widget>
          </item>
          <item row="5" column="1">
-          <widget class="QLineEdit" name="lineEditOutDate">
+          <widget class="SLineEdit" name="lineEditOutDate">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -307,7 +307,7 @@
           </widget>
          </item>
          <item row="10" column="1">
-          <widget class="QLineEdit" name="lineEditPreagreedAmount">
+          <widget class="SLineEdit" name="lineEditPreagreedAmount">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -581,7 +581,7 @@ QListView::item  {
           </layout>
          </item>
          <item row="6" column="1">
-          <widget class="QLineEdit" name="lineEditExtPrevRepair">
+          <widget class="SLineEdit" name="lineEditExtPrevRepair">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>

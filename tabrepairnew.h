@@ -16,6 +16,7 @@
 #include "models/srepairmodel.h"
 #include "models/scommentmodel.h"
 #include "models/srepairstatuslog.h"
+#include "models/ssortfilterproxymodel.h"
 #include "widgets/sphones.h"
 #include "widgets/ssetcombobox.h"
 #ifdef QT_DEBUG
@@ -46,6 +47,7 @@ private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
     SRepairModel *repairModel;
+    SSortFilterProxyModel *paymentSystemsProxyModel;
     SCashRegisterModel *cashRegister;
     SCommentModel *comment;
     SSqlQueryModel* deviceClassesModel;

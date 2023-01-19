@@ -4,6 +4,7 @@
 #include "scomrecord.h"
 #include <QObject>
 #include <QSqlRecord>
+#include "widgets/scombobox.h"
 
 class SFieldValueModel : public SComRecord
 {

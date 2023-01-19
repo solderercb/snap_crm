@@ -4,6 +4,7 @@ SLineEdit::SLineEdit(QWidget *parent)
     : QLineEdit(parent)
 {
     frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
+    fontMetrics = new QFontMetrics(this->font());
     signalMapper = new QSignalMapper(this);
     QObject::connect(signalMapper, SIGNAL(mappedInt(int)), this, SIGNAL(buttonClicked(int)));
 }
@@ -68,28 +69,33 @@ QString SLineEdit::buttons()
     return buttonsList->join(',');
 }
 
-void SLineEdit::tmp_set_buttons_style_sheet(const QString &styleSheet)
-{
-    int i = 0;
-
-    if (this->buttonsCount)
-    {
-        for (i = 0; i < this->buttonsCount; i++)
-        {
-            (this->lineEditButtons[i])->setStyleSheet(styleSheet);
-        }
-    }
-}
-
 void SLineEdit::enableExtKeyPressHandler(bool state)
 {
     m_extKeyPressHandler = state;
 }
 
+void SLineEdit::setText(const QString &text)
+{
+    QLineEdit::setText(text);
+    if(fontMetrics->size(Qt::TextSingleLine, text).width() > width())
+        setToolTip(text);
+    else
+        setToolTip(QString());
+    QLineEdit::setCursorPosition(0);
+}
+
+bool SLineEdit::isAutoSetCursorPositionToBegin() const
+{
+    return m_autoSetCursorPositionToBegin;
+}
+
+void SLineEdit::enableAutoSetCursorPositionToBegin(bool state)
+{
+    m_autoSetCursorPositionToBegin = state;
+}
+
 void SLineEdit::resize(const QSize &size)
 {
-    sz.setHeight(size.height());
-    sz.setWidth(sizeHint().width());
     buttonSize = {size.height() - frameWidth, size.height() - frameWidth};  // обновляем значение
     QLineEdit::resize( size );
 }
@@ -116,9 +122,10 @@ void SLineEdit::arrangeButtons()
     setTextMargins(0,0, (this->height() + frameWidth)*buttonsCount, 0) ; // лучше задавать отступ справа так, а не с пом. setStyleSheet, т. к. в вышестоящей функции может потребоваться изменить внешний вид
 }
 
-void SLineEdit::resizeEvent(QResizeEvent *)
+void SLineEdit::resizeEvent(QResizeEvent *e)
 {
     arrangeButtons();
+    QLineEdit::resizeEvent(e);
 }
 
 void SLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
@@ -134,6 +141,13 @@ void SLineEdit::keyPressEvent(QKeyEvent *event)
     QLineEdit::keyPressEvent(event);
 }
 
+void SLineEdit::focusOutEvent(QFocusEvent *e)
+{
+    if(m_autoSetCursorPositionToBegin)
+        QLineEdit::setCursorPosition(0);
+    QLineEdit::focusOutEvent(e);
+}
+
 SLineEdit::~SLineEdit()
 {
     for(int i = lineEditButtons.size() - 1; i>=0; i--)
@@ -146,4 +160,5 @@ SLineEdit::~SLineEdit()
     }
     QObject::disconnect(signalMapper, SIGNAL(mappedInt(int)), this, SIGNAL(buttonClicked(int)));
     delete signalMapper;
+    delete fontMetrics;
 }
