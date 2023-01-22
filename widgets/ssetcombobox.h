@@ -4,10 +4,11 @@
 //#define CUSTOM_COMPLETER
 #define MAJOR 0
 #define MINOR 3
-#define PATCH 0
-#define COMMIT 47
+#define PATCH 1
+#define COMMIT 48
 
 #include <QCoreApplication>
+#include <QApplication>
 #include <QWidget>
 #include <QLineEdit>
 #include <QCompleter>
@@ -98,6 +99,8 @@ public:
     QString version();
     void showPopup() override;
     void hidePopup() override;
+    bool ignorePopupHide() const;
+    void setIgnorePopupHide(bool state);
 #ifdef QT_DEBUG
     void addRandomItem();
 #endif
@@ -120,7 +123,7 @@ private:
     daughterLineEdit *dLineEdit;
     int eventTrigger = 0;
     QString semicolon_separated_text;
-    bool ignorePopupHide = 0;
+    bool m_ignorePopupHide = 0;
     QWidget *popupWidget = nullptr;
     QLineEdit *keyPressReceiver;
     int rearrangeDaughterLineEdits(int);

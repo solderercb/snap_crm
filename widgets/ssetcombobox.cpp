@@ -15,8 +15,6 @@ daughterLineEdit::daughterLineEdit(QWidget *parent)
     connect(this, SIGNAL(textChanged(QString)), this, SLOT(resizeToText(QString)));
     connect(this, &QLineEdit::editingFinished, this, &daughterLineEdit::home);
     this->installEventFilter(this);
-    setFocusPolicy(Qt::ClickFocus); // rev 38: Qt::NoFocus и Qt::ClickFocus дают одинаковое поведение  переключения по Tab: все дочерние элементы расположены в конце очереди
-                                    // Qt::TabFocus ничем по поведению не отличается от политики по умолчанию
 }
 
 void daughterLineEdit::enableDeleteButton(bool newState)
@@ -179,12 +177,24 @@ void SSetComboBox::setEditable(bool editable)
 
 bool SSetComboBox::eventFilter(QObject *watched, QEvent *event)
 {
-    if(watched == listViewWidget && event->type() == QEvent::Show)
-        updatePopupGeometry();
-    if(watched == listViewWidget && event->type() == QEvent::Enter)
-        ignorePopupHide = 1;
-    if(watched == listViewWidget && event->type() == QEvent::Leave)
-        ignorePopupHide = 0;
+    if(watched == listViewWidget)
+    {
+        if(event->type() == QEvent::Show)
+        {
+            updatePopupGeometry();
+            setIgnorePopupHide(1);
+        }
+        if(event->type() == QEvent::Enter)   //
+            setIgnorePopupHide(1);
+        if(event->type() == QEvent::Leave)
+            setIgnorePopupHide(0);
+        if(event->type() == QEvent::ShortcutOverride)
+        {
+            int key = static_cast<QKeyEvent*>(event)->key();
+            if( (key == Qt::Key_Enter || key == Qt::Key_Return) )
+                setIgnorePopupHide(1);
+        }
+    }
 
     if ( event->type() == QEvent::KeyPress )
     {
@@ -195,7 +205,7 @@ bool SSetComboBox::eventFilter(QObject *watched, QEvent *event)
 
         if( (key == Qt::Key_Enter || key == Qt::Key_Return) )
         {
-            ignorePopupHide = 1;
+            setIgnorePopupHide(1);
             if( lineEditWidget->text() != "" )
                 addItem(lineEditWidget->text());
         }
@@ -210,6 +220,16 @@ bool SSetComboBox::eventFilter(QObject *watched, QEvent *event)
     {
         if( lineEditWidget->text() != "" )
             addItem(lineEditWidget->text());
+    }
+
+    // после добавления дочернего эл-та курсор в родительском lineEdit перестаёт мигать
+    // чтобы это исправить эмулируется нажатие клавиши. Фильтрация этих событий проблему не решает.
+    // Событие KeyRelease происходит при выборе эл-та клавиатурой, а событие Timer при выборе мышью).
+    // Может позже найдётся решение проще.
+    if ( watched == listViewWidget && (event->type() == QEvent::KeyRelease || event->type() == QEvent::Timer) )
+    {
+        QKeyEvent *emu = new QKeyEvent(QEvent::KeyPress, Qt::Key_Control, Qt::NoModifier);
+        QCoreApplication::postEvent(listViewWidget, emu);
     }
 
     if(SComboBox::eventFilter(watched, event))
@@ -336,9 +356,16 @@ void SSetComboBox::showPopup()
 
 void SSetComboBox::hidePopup()
 {
-    if(!ignorePopupHide)
+    if(!ignorePopupHide())
+    {
+        // TODO: разобраться в глюке; Qt v5.15.4;
+        // В этом классе, в отличие от родительского SComboBox, при щелчке мышью в области lineEdit
+        // список скрывается, но последующих событий MouseButtonPress и MouseButtonRelease не происходит.
+        // Поэтому выключаем учет положения курсора, как буд-то произошел щелчёк за пределами comboBox.
+        setConsiderCursorPosOnHide(0);
         SComboBox::hidePopup();
-    ignorePopupHide = 0;
+    }
+    setIgnorePopupHide(0);
 }
 
 QString SSetComboBox::version()
@@ -392,7 +419,7 @@ void SSetComboBox::addItem(const QString &text)
             dLineEdit->setFocus();
             dLineEdit->setSelection(start, end - start + 1);
             keyPressReceiver = dLineEdit;
-            ignorePopupHide = 0;
+            setIgnorePopupHide(0);
             hidePopup();
         }
     }
@@ -404,20 +431,14 @@ void SSetComboBox::activatedHandler(int index)
     // После выбора элемента указателем раскрывающийся список прячется, а нужно чтобы он продолжал отображаться
     // Дополнительное условие: список не должен вновь отображаться, если была выбрана пустая строка;
     // это чтобы при нажатии Enter в пустой строке работало скрытие/отображение.
-    ignorePopupHide = 1;
     if (this->itemText(index) != "")
     {
+        setIgnorePopupHide(1);
         addItem(this->itemText(index));
-        /* TODO: какая-то ерунда... после добавления элемента перестаёт отображаться мигающий курсор в lineEdit
-           перепробовал кучу способов, устанавливать фокус принудительно на lineEdit, а затем обратно на listView,
-           эмулировать нажатие клавиши Ctrl, использовать вместо clear() setText(""), фильтровать события —
-           некоторые варианты частично работают, но курсор всё равно пропадает (после второго-третьего добавления).
-           Определить причину не смог.
-        */
     }
     else
     {
-        ignorePopupHide = 0;
+        setIgnorePopupHide(0);
         hidePopup();
     }
 }
@@ -453,7 +474,7 @@ void SSetComboBox::deleteDaughterLineEdit(daughterLineEdit *widget)
     widget->deleteLater();
     rearrangeDaughterLineEdits(this->width());
 
-    setIsPopupVisible(0);
+//    setIsPopupVisible(0);
     keyPressReceiver = lineEditWidget;
 }
 
@@ -535,7 +556,6 @@ void SSetComboBox::resize(int w, int h)
 
 void SSetComboBox::updateLineEditGeometry()
 {
-
     lineEditWidget->resize(this->geometry().width() - parentLineEditFrameSize * 2 - iconSize().width(),
                              this->geometry().height() - parentLineEditFrameSize * 2);
     //                                                                                          ^
@@ -618,6 +638,16 @@ void SSetComboBox::retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifi
     QFocusEvent* focusEvent = new QFocusEvent(QEvent::FocusIn, Qt::OtherFocusReason);
     QCoreApplication::postEvent(keyPressReceiver, focusEvent);
     QCoreApplication::postEvent(keyPressReceiver, newEvent);
+}
+
+bool SSetComboBox::ignorePopupHide() const
+{
+    return m_ignorePopupHide;
+}
+
+void SSetComboBox::setIgnorePopupHide(bool state)
+{
+    m_ignorePopupHide = state;
 }
 
 #ifdef QT_DEBUG

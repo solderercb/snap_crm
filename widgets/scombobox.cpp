@@ -39,18 +39,6 @@ void SComboBox::wheelEvent(QWheelEvent *event)
 
 bool SComboBox::eventFilter(QObject *watched, QEvent *e)
 {
-//    switch(e->type())
-//    {
-//        case QEvent::MouseMove:
-//        case QEvent::HoverMove:
-//        case QEvent::HoverEnter:
-//        case QEvent::HoverLeave:
-//        case QEvent::Leave:
-//        case QEvent::Enter:
-//        case QEvent::Paint: break;
-//    default: qDebug().nospace() << "[" << this << "] eventFilter() | " << watched->metaObject()->className() << "; event: " << e->type() << "; focused widget: " << QApplication::focusWidget();
-//    }
-
     if(watched == this)
         return eventFilterComboBox(e);
     else if(watched == lineEditWidget)
@@ -81,7 +69,6 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
             {
                 toggleIsPopupVisible();
             }
-
             return true;
         }
     }
@@ -96,7 +83,7 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
     if ( e->type() == QEvent::FocusIn )
     {
         Qt::FocusReason reason = static_cast<QFocusEvent*>(e)->reason();
-        if (reason == Qt::TabFocusReason || reason == Qt::BacktabFocusReason )    // генерируем только по Tab, Shift+Tab, по клику мышкой будет другое событие
+        if (reason == Qt::TabFocusReason || reason == Qt::BacktabFocusReason )    // генерируем только по Tab/Shift+Tab, по клику мышкой будет другое событие
         {
             showPopup();
         }
@@ -118,9 +105,9 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
 
     if( e->type() == QEvent::FocusOut )
     {
-        if(ignoreFocusOut)
+        if(ignoreFocusOut())
         {
-            ignoreFocusOut = 0; // однократный игнор только при показе списка
+            setIgnoreFocusOut(0); // однократный игнор только при показе списка
             return true;
         }
     }
@@ -130,10 +117,8 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
 
 bool SComboBox::eventFilterLineEdit(QEvent *e)
 {
-    // щелчек по LineEdit: событие происходит независимо от того, отображался ли выпадающий список или нет
-    if(e->type() == QEvent::MouseButtonPress)
+    if(e->type() == QEvent::MouseButtonPress)    // щелчек по LineEdit
     {
-       // нажатие на область виджета
         if(!isPopupVisible())
         {
             showPopup();
@@ -148,7 +133,6 @@ bool SComboBox::eventFilterLineEdit(QEvent *e)
         setIsPopupVisible(0);
         return true;
     }
-
     return false;
 }
 
@@ -163,6 +147,10 @@ bool SComboBox::eventFilterListView(QEvent *e)
     {
         int key = static_cast<QKeyEvent*>(e)->key();
         int modifiers = static_cast<QKeyEvent*>(e)->modifiers();
+
+        // при выборе элемента списка клавиатурой, нужно игнорировать позицию курсора, которая учитывается в событии скрытия списка
+        if( (key == Qt::Key_Return) || (key == Qt::Key_Enter) )
+            setConsiderCursorPosOnHide(0);
 
         // прячем раскрывающийся список при (ИЛИ):
         //      Tab/Shift+Tab
@@ -200,17 +188,20 @@ bool SComboBox::eventFilterListView(QEvent *e)
     // скрытие выпадающего списка
     if(e->type() == QEvent::Hide)
     {
-        // если событие вызвано щелчком за пределами виджета (учитывается только область до кнопки)
+        // Скрытие списка происходит (условно) при потере фокуса, например, при щелчке мышью за границами списка.
+        // Однако, если щелчек происходит по LineEdit этого виджета, то после скрытия списка возникают дполнительные
+        // события MouseButtonPress и MouseButtonRelease, список скрывается и тут же отображается вновь. Чтобы это
+        // исправить использована переменная-флаг и могут учитываться текущие координаты курсора (при выборе
+        // элемента списка мышью)
         QPoint topLeft = mapToGlobal(QPoint(0, 0));
         QSize widthHeight = QSize((frameGeometry().width() - iconSize().width()), frameGeometry().height());
         QPoint cursor = QCursor::pos();
-        if( !isPointInArea( cursor, QRect(topLeft, widthHeight)) )
+        if( (considerCursorPosOnHide() && !isPointInArea( cursor, QRect(topLeft, widthHeight))) || !considerCursorPosOnHide() )
         {
             setIsPopupVisible(0);
         }
-
+        setConsiderCursorPosOnHide(1);
     }
-
     return false;
 }
 
@@ -256,7 +247,7 @@ void SComboBox::setEditable(bool editable)
 
 void SComboBox::showPopup()
 {
-    ignoreFocusOut = 1; // при показе списка нужно оставить мигающий курсор в строке
+    setIgnoreFocusOut(1); // при показе списка нужно оставить мигающий курсор в строке
     QComboBox::showPopup();
 
     // инициализация указателя на объект выпадающего списка (чтобы не вызывать каждый раз метод view())
@@ -269,19 +260,44 @@ void SComboBox::showPopup()
     }
 }
 
+void SComboBox::hidePopup()
+{
+    QComboBox::hidePopup();
+}
+
 bool SComboBox::isPopupVisible() const
 {
     return m_isPopupVisible;
 }
 
-void SComboBox::setIsPopupVisible(bool isPopupVisible)
+void SComboBox::setIsPopupVisible(bool state)
 {
-    m_isPopupVisible = isPopupVisible;
+    m_isPopupVisible = state;
 }
 
 void SComboBox::toggleIsPopupVisible()
 {
     m_isPopupVisible ^= 1;
+}
+
+bool SComboBox::considerCursorPosOnHide() const
+{
+    return m_considerCursorPosOnHide;
+}
+
+void SComboBox::setConsiderCursorPosOnHide(bool state)
+{
+    m_considerCursorPosOnHide = state;
+}
+
+bool SComboBox::ignoreFocusOut() const
+{
+    return m_ignoreFocusOut;
+}
+
+void SComboBox::setIgnoreFocusOut(bool state)
+{
+    m_ignoreFocusOut = state;
 }
 
 void SComboBox::longTextHandler()

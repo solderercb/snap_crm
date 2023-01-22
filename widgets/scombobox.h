@@ -25,20 +25,26 @@ public:
     int currentDbId();
     void setEditable(bool editable);
     void showPopup() override;
-    bool isPopupVisible() const;
-    void setIsPopupVisible(bool isPopupVisible);
-    void toggleIsPopupVisible();
+    void hidePopup() override;
 protected:
     QAbstractItemView *listViewWidget = nullptr;
     QLineEdit *lineEditWidget = nullptr;
     QFontMetrics *fontMetrics;
-    bool ignoreFocusOut = 0;
     virtual void retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text = QString(), bool autorep = false, ushort count = 1);
+    bool ignoreFocusOut() const;
+    void setIgnoreFocusOut(bool state);
+    bool considerCursorPosOnHide() const;
+    void setConsiderCursorPosOnHide(bool state);
+    bool isPopupVisible() const;
+    void setIsPopupVisible(bool state);
+    void toggleIsPopupVisible();
 private:
     bool wheelEventOn = 1;
     bool m_isPopupVisible = 0;
     QSize szHint;
     QSize minSzHint;
+    bool m_ignoreFocusOut = 0;
+    bool m_considerCursorPosOnHide = 1;
     bool eventFilterComboBox(QEvent *e);
     bool eventFilterLineEdit(QEvent *e);
     bool eventFilterListView(QEvent *e);
