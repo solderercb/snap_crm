@@ -21,7 +21,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(repairModel, SIGNAL(modelUpdated()), this, SLOT(updateWidgets()));
     setLock(1);
     clientModel = new SClientModel();
-    repairStatusLog = new SRepairStatusLog(repair_id);
     if(permissions->contains("3"))  // Печатать ценники и стикеры
     {
         ui->lineEditRepairId->setButtons("Print");
@@ -644,7 +643,6 @@ bool tabRepair::commit(const QString &notificationCaption, const QString &notifi
         repairModel->updateLastSave();
         nErr = repairModel->commit();
         shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
-        repairStatusLog->commit();
         QUERY_COMMIT_ROLLBACK(query,nErr);
         QUERY_LOG_STOP;
     }
@@ -688,9 +686,6 @@ void tabRepair::saveState(int index)
         checkData(newStateId);
         doStateActions(newStateId);
         repairModel->setState(newStateId);
-        repairStatusLog->setStatus(newStateId);
-        repairStatusLog->setManager(repairModel->currentManager());
-        repairStatusLog->setEngineer(repairModel->engineer());
     }
     catch (int type)
     {

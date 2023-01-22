@@ -766,7 +766,6 @@ bool tabRepairNew::createRepair()
     int repair;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     repairModel = new SRepairModel(this);
-    SRepairStatusLog *repairStatusLog = new SRepairStatusLog(0);
 
     setDefaultStyleSheets();
 
@@ -791,11 +790,6 @@ bool tabRepairNew::createRepair()
         repairModel->commit();
         clientModel->updateRepairs(1);
         repair = repairModel->id();
-        repairStatusLog->setRepair(repair);
-        repairStatusLog->setStatus(0);
-        repairStatusLog->setManager(userDbData->value("id").toInt());
-        repairStatusLog->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
-        repairStatusLog->commit();
 
         // запись значений доп. полей
         additionalFields->setObjectId(repair);
@@ -842,7 +836,6 @@ bool tabRepairNew::createRepair()
 
     delete repairModel;
     delete query;
-    delete repairStatusLog;
     return nErr;
 }
 

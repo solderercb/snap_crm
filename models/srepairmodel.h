@@ -8,6 +8,7 @@
 #include "sdevmdlmodel.h"
 #include "sclientmodel.h"
 #include "ssaletablemodel.h"
+#include "srepairstatuslog.h"
 
 class SRepairModel : public SComRecord
 {
@@ -171,6 +172,7 @@ public:
 
 private:
     SClientModel *m_clientModel;
+    SRepairStatusLog *m_repairStatusLog;
     bool m_isHidden;
     QString m_title;
     int m_clientId;

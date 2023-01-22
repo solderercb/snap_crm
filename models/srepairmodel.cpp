@@ -5,6 +5,7 @@ SRepairModel::SRepairModel(QObject *parent) : SComRecord(parent)
     i_obligatoryFields << "client" << "type" << "maker" << "office" << "manager" << "diagnostic_result" << "in_date" << "fault" << "reject_reason" << "company" << "start_office" << "current_manager" << "master";
     i_tableName = "workshop";
     m_clientModel = new SClientModel();
+    m_repairStatusLog = new SRepairStatusLog(0);
     i_logRecord->setType(SLogRecordModel::Repair);
 }
 
@@ -16,6 +17,7 @@ SRepairModel::SRepairModel(const int repair, QObject *parent) : SRepairModel(par
 SRepairModel::~SRepairModel()
 {
     delete m_clientModel;
+    delete m_repairStatusLog;
 }
 
 int SRepairModel::id()
@@ -102,6 +104,9 @@ void SRepairModel::load(const int id)
     m_cartridge = repair->value("cartridge").toInt();
     m_vendorId = repair->value("vendor_id").toInt();
     m_termsControl = repair->value("termsControl").toBool();
+    m_repairStatusLog->setRepair(id);
+    m_repairStatusLog->setManager(m_currentManager);
+    m_repairStatusLog->setEngineer(m_master);
 
     delete repair;
     emit modelUpdated();
@@ -252,6 +257,7 @@ void SRepairModel::setManager(const int id)
 {
     i_valuesMap.insert("manager", id);
     // Запись в журнал не производится, т. к. значение в поле manager записывается только при приёме в ремонт и в дальнейшем не изменяется
+    m_repairStatusLog->setManager(id);
 }
 
 void SRepairModel::setManagerIndex(const int index)
@@ -275,6 +281,7 @@ void SRepairModel::setCurrentManager(const int id)
 {
     i_valuesMap.insert("current_manager", id);
     appendLogText(tr("Менеджером ремонта назначен %1").arg(usersModel->value(id, "id", "username").toString()));
+    m_repairStatusLog->setManager(id);
 }
 
 void SRepairModel::setCurrentManagerIndex(const int index)
@@ -303,6 +310,7 @@ void SRepairModel::setEngineer(const int id)
     }
     else
         i_valuesMap.insert("master", QVariant());
+    m_repairStatusLog->setEngineer(id);
 }
 
 void SRepairModel::setEngineerIndex(const int index)
@@ -372,6 +380,7 @@ void SRepairModel::setState(const int id)
     m_state = id;
     i_valuesMap.insert("state", m_state);
     appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
+    m_repairStatusLog->setStatus(m_state);
 }
 
 void SRepairModel::setStateIndex(const int index)
@@ -918,6 +927,7 @@ bool SRepairModel::commit()
     {
         if(!update())
             throw 1;
+
     }
     else
     {
@@ -927,7 +937,10 @@ bool SRepairModel::commit()
         if(!insert())
             throw 1;
         appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
+        m_repairStatusLog->setRepair(i_id);
+        m_repairStatusLog->setStatus(0);
     }
+    m_repairStatusLog->commit();
 
     i_logRecord->setRepairId(i_id);
     commitLogs();

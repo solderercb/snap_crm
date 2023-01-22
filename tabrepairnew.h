@@ -15,7 +15,6 @@
 #include "models/sdevmdlmodel.h"
 #include "models/srepairmodel.h"
 #include "models/scommentmodel.h"
-#include "models/srepairstatuslog.h"
 #include "models/ssortfilterproxymodel.h"
 #include "widgets/sphones.h"
 #include "widgets/ssetcombobox.h"
