@@ -2,12 +2,14 @@
 #define SCOMMENTS_H
 
 #include <QScrollArea>
-#include <QTest>
 #include "tabcommon.h"
 #include "widgets/swidget.h"
 #include "widgets/splaintextedit.h"
 #include "../models/scommentmodel.h"
 #include "../models/scommentsmodel.h"
+#ifdef QT_DEBUG
+#include <QTest>
+#endif
 
 namespace Ui {
 class SComments;

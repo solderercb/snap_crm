@@ -10,5 +10,7 @@ SWidget::SWidget(QWidget *parent, Qt::WindowFlags flags) :
 
 SWidget::~SWidget()
 {
+#ifdef QT_DEBUG
     delete i_queryLog;
+#endif
 }

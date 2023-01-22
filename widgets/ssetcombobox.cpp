@@ -5,8 +5,15 @@ daughterLineEdit::daughterLineEdit(QWidget *parent)
 {
     fm = new QFontMetrics(this->font());
     frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
+    setStyleSheet("QLineEdit { background-color: #E5E5E5; border: none }\
+                                         QToolButton { background-color: #E5E5E5; border: none }");     // серый
+    resize(parent->sizeHint().width(), fm->height());  // resize, похоже, принимает в качестве параметров размер с учётом окантовки, а size отдаёт размер без окантовки
+    enableDeleteButton();
+    setMaximumHeight(fm->height());
+    setMaximumWidth(parent->width());    // размер дочернего LineEdit не доложен превышать размер родительского
 
-    connect(this, SIGNAL(editingFinished()), this, SLOT(home()));
+    connect(this, SIGNAL(textChanged(QString)), this, SLOT(resizeToText(QString)));
+    connect(this, &QLineEdit::editingFinished, this, &daughterLineEdit::home);
     this->installEventFilter(this);
     setFocusPolicy(Qt::ClickFocus); // rev 38: Qt::NoFocus и Qt::ClickFocus дают одинаковое поведение  переключения по Tab: все дочерние элементы расположены в конце очереди
                                     // Qt::TabFocus ничем по поведению не отличается от политики по умолчанию
@@ -61,37 +68,24 @@ void daughterLineEdit::resize(int w, int h)
     resize(QSize(w, h));
 }
 
-QSize daughterLineEdit::sizeHint()
+QSize daughterLineEdit::sizeHint() const
 {
     return QSize(40, QLineEdit::sizeHint().height());
 }
 
-void SSetComboBox::clearEditText()
+void daughterLineEdit::setText(const QString &text)
 {
-//    qDebug() << "Deleting daughterlinedits...";
-    for(int i=daughterLineEdits.size()-1;i>=0;i--)
-    {
-        daughterLineEdits[i]->deleteLater();
-        this->daughterLineEdits.removeAt(i);
-        rearrangeDaughterLineEdits(this->width());
-    }
+    QLineEdit::setText(text);
+    home();
 }
 
 bool daughterLineEdit::eventFilter(QObject*, QEvent*)
 {
-//    if ( event->type() != QEvent::Paint && event->type() != QEvent::Paint && event->type() != QEvent::HoverMove &&
-//         event->type() != QEvent::HoverEnter && event->type() != QEvent::HoverLeave && event->type() != QEvent::MouseMove &&
-//         event->type() != QEvent::MetaCall && event->type() != QEvent::WindowDeactivate &&
-//         event->type() != QEvent::WindowActivate && event->type() != QEvent::InputMethodQuery )
-//        qDebug() << this->parent()->parent()->objectName() << ": daughterLineEdit::eventFilter(): " << event << "; object@" << this;
-
     return false;
 }
 
 void daughterLineEdit::resizeEvent(QResizeEvent *)
 {
-//    qDebug() << "daughterLineEdit::resizeEvent";
-
     if (deleteButtonEnabled)
         this->deleteButton->move( rect().right() - buttonSize.width(),
                                 (rect().height() - buttonSize.height())/2 );
@@ -104,9 +98,13 @@ void daughterLineEdit::deleteButtonClicked()
 
 void daughterLineEdit::resizeToText()
 {
-//    qDebug() << "daughterLineEdit::resizeToText: maximumWidth()=" << maximumWidth();
+    resizeToText(this->text());
+}
+
+void daughterLineEdit::resizeToText(const QString &text)
+{
     // размер LineEdit это: ширина_текста + стандартный_зазор + ширина_кнопки + стандартный_зазор
-    int pixelsWide = fm->size(Qt::TextSingleLine, this->text()).width() + frameWidth*2 + (deleteButtonEnabled?(buttonSize.width() + frameWidth):0);
+    int pixelsWide = fm->size(Qt::TextSingleLine, text).width() + frameWidth*2 + (deleteButtonEnabled?(buttonSize.width() + frameWidth):0);
     if (pixelsWide <= maximumWidth())
     {   // если длина текста не превышает максимальной длины
         setMinimumSize(pixelsWide, buttonSize.height() + frameWidth); // минимальный размер lineEdit изменяем в соотв. с размером кнопки (-ок) плюс зазоры
@@ -121,12 +119,11 @@ void daughterLineEdit::resizeToText()
     this->resize(sz);
     updateTextMargins();    // обновляем поле для текста
 
-//    emit textChanged();
+    emit textChanged();
 }
 
 void daughterLineEdit::home() // перемещаем курсор в начало текста
 {
-//    qDebug() << "daughterLineEdit::home()";
     QLineEdit::home(false);
 }
 
@@ -140,140 +137,23 @@ daughterLineEdit::~daughterLineEdit()
     delete fm;
     if (deleteButtonEnabled)
     {
-//        delete buttonIcon;
         delete deleteButton;
     }
-    // TODO: проверить не остаётся ли в памяти чего-то ненужного
-}
-
-CBLineEdit::CBLineEdit(QWidget *parent)
-    : QLineEdit(parent)
-{
-    installEventFilter(this);
-}
-
-CBLineEdit::~CBLineEdit()
-{
-
-}
-
-void CBLineEdit::mousePressEvent(QMouseEvent*)
-{
-//    qDebug() << this->objectName() << ": lineEditMousePressEvent(QMouseEvent *event))";
-    emit mouseButtonPress();
-}
-
-void CBLineEdit::mouseReleaseEvent(QMouseEvent*)
-{
-//    qDebug() << this->objectName() << ": lineEditMouseReleaseEvent(QMouseEvent *event))";
-    /* Ничего не делаем */
-}
-
-void CBLineEdit::resizeEvent(QResizeEvent*)
-{
-//    qDebug() << this->parent()->objectName() << ": lineEditResizeEvent(QResizeEvent *event): event: " << event;
-}
-
-bool CBLineEdit::eventFilter(QObject*, QEvent*)
-{
-//    if ( event->type() != QEvent::Paint && event->type() != QEvent::Paint && event->type() != QEvent::HoverMove &&
-//         event->type() != QEvent::HoverEnter && event->type() != QEvent::HoverLeave && event->type() != QEvent::MouseMove &&
-//         event->type() != QEvent::MetaCall && event->type() != QEvent::WindowDeactivate &&
-//         event->type() != QEvent::WindowActivate )
-//        qDebug() << this->parent()->objectName() << ": lineEditEventFilter: " << event;
-
-    return false;
-}
-
-viewEventFilter::viewEventFilter(QObject *parent) :
-    QObject(parent)
-{
-}
-
-bool viewEventFilter::eventFilter(QObject*, QEvent *event)
-{
-//    qDebug() << watched->objectName() << ": viewEventFilter: " << event;
-
-    SSetComboBox *cparent = static_cast<SSetComboBox*>(parent());   // я точно знаю, что родитель — это SSetComboBox
-
-//    if (event->type() == QEvent::Show)
-//    {
-//        qDebug() << watched->objectName() << ": viewEventFilter: Show: current index = " << cparent->currentIndex();
-//    }
-
-    if (event->type() == QEvent::ShortcutOverride)
-    {
-        QKeyEvent* shortcutEvent = static_cast<QKeyEvent*>(event);
-
-        // прячем раскрывающийся список при (ИЛИ):
-        //      Tab/Shift+Tab
-        //      Enter/Return при пустой строке
-        //      Escape
-        if( (shortcutEvent->key() == Qt::Key_Tab && shortcutEvent->modifiers() == Qt::Key_Shift) ||
-            (shortcutEvent->key() == Qt::Key_Tab && shortcutEvent->modifiers() == Qt::NoModifier) ||
-            ( ((shortcutEvent->key() == Qt::Key_Enter) || (shortcutEvent->key() == Qt::Key_Return)) && cparent->lineEdit()->text() == "" ) ||
-            (shortcutEvent->key() == Qt::Key_Escape && shortcutEvent->modifiers() == Qt::NoModifier) )
-        {
-//            qDebug() << watched->objectName() << ": viewEventFilter: Enter/Return on empty lineEdit pressed";
-            cparent->hidePopup();
-            cparent->isPopupShown = 0;
-        }
-//        qDebug() << watched->objectName() << ": viewEventFilter: ShortcutOverride: current index = " << cparent->currentIndex();
-    }
-
-    // чтобы при вводе текста в LineEdit не прятался popup
-    if (event->type() == QEvent::KeyPress)
-    {
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-
-        // ретранслируем в lineEdit нажатия клавиш (ИЛИ):
-        //      Enter/Return при НЕ пустой строке
-        //      всех кроме Enter/Return/Down/Up
-        if( ( ((keyEvent->key() == Qt::Key_Enter) || (keyEvent->key() == Qt::Key_Return)) && cparent->lineEdit()->text() != "" ) ||
-            ( (keyEvent->key() != Qt::Key_Down) && (keyEvent->key() != Qt::Key_Up) &&
-              (keyEvent->key() != Qt::Key_Enter) && (keyEvent->key() != Qt::Key_Return)) )
-        {   // Enter/Return не ретранслируем в родительский LineEdit
-            QKeyEvent* newEvent = new QKeyEvent(keyEvent->type(), keyEvent->key(), keyEvent->modifiers(),
-                                            keyEvent->text(), keyEvent->isAutoRepeat(), keyEvent->count());
-            QFocusEvent* focusEvent = new QFocusEvent(QEvent::FocusIn, Qt::OtherFocusReason);
-            QCoreApplication::postEvent(cparent->lineEdit(), focusEvent);
-            QCoreApplication::postEvent(cparent->lineEdit(), newEvent);
-        }
-
-        if( (keyEvent->key() == Qt::Key_Backspace || keyEvent->key() == Qt::Key_Escape) && cparent->daughterLineEdits.size() ) // если есть дочерние элементы и пользователь нажимает backspace или Esc
-        {
-            cparent->deleteDaughterLineEditOnKeyPress(keyEvent->key());
-        }
-    }
-
-//    qDebug() << watched->objectName() << ": viewEventFilter (return): " << event;
-    return false;
 }
 
 SSetComboBox::SSetComboBox(QWidget *parent) :
-    QComboBox(parent),
-    proxyModel(new QSortFilterProxyModel(this))    // при создании инициализируем прокси модель пустой моделью
+    SComboBox(parent)
 {
-//    qDebug() << this->objectName() << ": Object constructor";
-
     setEditable(true);
-    setInsertPolicy(QComboBox::NoInsert);    // введённые пользователем не нужно добавлять в выпадающий список.
+    setInsertPolicy(SComboBox::NoInsert);    // введённые пользователем не нужно добавлять в выпадающий список.
     setRowHeight(16);
-    fontMetrics = new QFontMetrics(this->font());
     daughterLineEditHeight = fontMetrics->height();     // высота дочерних lineEdit по умолчанию будет рассчитываться по размеру шрифта
     defaultComboBoxHeight = this->height();      // = 22; этот размер базовый, используется при перестановке дочерних LineEdit
 
-    viewEventFilterObj = new viewEventFilter(this);
-    view()->installEventFilter(viewEventFilterObj);
-
-    installEventFilter(this);
-
-    isPopupShown = 0;
-
+    proxyModel = new SSortFilterProxyModel(this);
     connect( this, SIGNAL(activated(int)), this, SLOT(activatedHandler(int)) );
-    connect( lineEdit(), SIGNAL(textEdited(const QString&)), this, SLOT(updateProxyModelFilter(const QString&)) );
-    connect( lineEdit(), SIGNAL(editingFinished()), this, SLOT(parentLineEditEditingFinished()) );
-    connect( lineEdit(), SIGNAL(mouseButtonPress()), this, SLOT(parentLineEditFocused()) );
+    connect( lineEditWidget, SIGNAL(textEdited(QString)), this, SLOT(updateProxyModelFilter(QString)) );
+    connect( lineEditWidget, SIGNAL(editingFinished()), this, SLOT(parentLineEditEditingFinished()) );
 
     field_separator = "; "; // разделитель по умолчанию
 }
@@ -281,10 +161,8 @@ SSetComboBox::SSetComboBox(QWidget *parent) :
 SSetComboBox::~SSetComboBox()
 {
     clearEditText();
-    delete lineEdit();
+    delete lineEditWidget;
     delete proxyModel;
-    delete fontMetrics;
-    delete viewEventFilterObj;
 
 #ifdef CUSTOM_COMPLETER     // если используется собственный compliter
     delete p_completer;
@@ -293,33 +171,57 @@ SSetComboBox::~SSetComboBox()
     // TODO: проверить не остаётся ли в памяти чего-то ненужного
 }
 
-// Event filter forwards view key events to the line edit.
-bool SSetComboBox::eventFilter(QObject*, QEvent *event)
+void SSetComboBox::setEditable(bool editable)
 {
-//    if ( event->type() != QEvent::Paint && event->type() != QEvent::Paint && event->type() != QEvent::HoverMove &&
-//         event->type() != QEvent::HoverEnter && event->type() != QEvent::HoverLeave && event->type() != QEvent::MouseMove &&
-//         event->type() != QEvent::MetaCall && event->type() != QEvent::WindowDeactivate &&
-//         event->type() != QEvent::WindowActivate && event->type() != QEvent::InputMethodQuery )
-//        qDebug() << this->objectName() << ": coboBoxEventFilter: (" << event << ")";
-    if ( event->type() == QEvent::FocusIn )
+    SComboBox::setEditable(editable);
+    keyPressReceiver = lineEditWidget;
+}
+
+bool SSetComboBox::eventFilter(QObject *watched, QEvent *event)
+{
+    if(watched == listViewWidget && event->type() == QEvent::Show)
+        updatePopupGeometry();
+    if(watched == listViewWidget && event->type() == QEvent::Enter)
+        ignorePopupHide = 1;
+    if(watched == listViewWidget && event->type() == QEvent::Leave)
+        ignorePopupHide = 0;
+
+    if ( event->type() == QEvent::KeyPress )
     {
-        QFocusEvent *fi = static_cast<QFocusEvent*>(event);
-        if (fi->reason() == Qt::TabFocusReason || fi->reason() == Qt::BacktabFocusReason )    // генерируем только по Tab, Shift+Tab, по клику мышкой будет другое событие
+        int key = static_cast<QKeyEvent*>(event)->key();
+        if( (key == Qt::Key_Backspace || key == Qt::Key_Escape) )
+            if( this->daughterLineEdits.size() && (watched == lineEditWidget || watched == this) ) // если есть дочерние элементы и пользователь нажимает backspace или Esc
+                this->deleteDaughterLineEditOnKeyPress(key);
+
+        if( (key == Qt::Key_Enter || key == Qt::Key_Return) )
         {
-//            qDebug() << objectName() << ": focusIn (event:" << event << ")";
-            parentLineEditFocused();
+            ignorePopupHide = 1;
+            if( lineEditWidget->text() != "" )
+                addItem(lineEditWidget->text());
         }
+
+        if( watched == this && (key == Qt::Key_Down || key == Qt::Key_Up) ) // игнор вверх/вниз при скрытом списке
+            return true;
+
+        // TODO: добавить возможность навигации по добавленным дочерним lineEdit'ам и их редактирования с помощью клавиатуры
     }
+
+    if( event->type() == QEvent::FocusOut )
+    {
+        if( lineEditWidget->text() != "" )
+            addItem(lineEditWidget->text());
+    }
+
+    if(SComboBox::eventFilter(watched, event))
+        return true;
 
     return false;
 }
 
 void SSetComboBox::setModel(QAbstractItemModel *model)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::setModel";
-
     proxyModel->setSourceModel(model);
-    QComboBox::setModel(proxyModel);
+    SComboBox::setModel(proxyModel);
 
     p_completer = completer();
 #ifdef CUSTOM_COMPLETER     // если я вдруг захочу заменить completer, созданный автоматически при установке модели
@@ -336,21 +238,6 @@ void SSetComboBox::setModel(QAbstractItemModel *model)
 #endif
 }
 
-void SSetComboBox::setEditable(bool editable)
-{
-    QComboBox::setEditable(editable);   // сначала вызываем функцию наследуемого класса
-    if (editable) {
-        CBLineEdit *le = new CBLineEdit(this);  // создаём свой LineEdit
-        lineEdit()->deleteLater();              // удаляем LineEdit, созданный функцией наследуемого класса (TODO: убедиться, что он удаляется)
-        setLineEdit(le);                        // устанавливаем свой LineEdit
-    }
-}
-
-int SSetComboBox::hasHeightForWidth()
-{
-    return 1;   // у SSetComboBox всегда включена опция hieght-for-width
-}
-
 /* перестановка дочерних элементов; порядок не изменяется; элементы передвигаются левее/выше,
  * если появилось достаточно места (например, был удалён элемент левее/выше), или правее/ниже,
  * если элемент левее/выше был изменён (увеличилось кол-во знаков)
@@ -361,7 +248,6 @@ int SSetComboBox::hasHeightForWidth()
  */
 int SSetComboBox::rearrangeDaughterLineEdits(int width)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::rearrangeDaughterLineEdits";
     int i;
     QMargins nextDaughterLineEditPosition = {0,0,0,0};
     int currParentLineEditHeight = minimumHeight();
@@ -372,10 +258,7 @@ int SSetComboBox::rearrangeDaughterLineEdits(int width)
 
     for (i=0; i < this->daughterLineEdits.size(); i++)
     {
-//        qDebug() << this->objectName() << ": SSetComboBox::rearrangeDaughterLineEdits: this->lineEdit()->width()=" <<  this->lineEdit()->width() << "; int width = " << width;
-        this->daughterLineEdits[i]->setMaximumWidth(this->lineEdit()->width());    // размер дочернего LineEdit не доложен превышать размер родительского
-        this->daughterLineEdits[i]->resizeToText();
-//        qDebug() << this->objectName() << ": SSetComboBox::rearrangeDaughterLineEdits: daughterLineEdits[i]->minimumWidth()=" <<  daughterLineEdits[i]->minimumWidth();
+        this->daughterLineEdits[i]->setMaximumWidth(lineEditWidget->width());    // размер дочернего LineEdit не доложен превышать размер родительского
         nextDaughterLineEditPosition.setLeft((currentDaughterLineEditPosition.left() + this->daughterLineEdits[i]->width() + daughterLineEditFrameSize));
         if ( nextDaughterLineEditPosition.left() > (width - iconSize().width()) ) // iconSize().width() - это ширина кнопки "v" ComboBox'а
         {   // если сумма ширин ранее размещённых дочерних LineEdit и текущего больше ширины ComboBox, то текущий LineEdit размещаем на новой строке
@@ -402,13 +285,11 @@ int SSetComboBox::rearrangeDaughterLineEdits(int width)
     }
     if (this->daughterLineEdits.size() == 0)
     {   // если был удалён последний дочерний эл-т, длина которого не позволяла разместить курсор за ним, то нужно принудительно обнулить параметры, чтобы comboBox "скукоржился" до нормального размера
-//        qDebug() << this->objectName() << ": SSetComboBox::rearrangeDaughterLineEdits: daughterLineEdits.size() == 0";
         currentDaughterLineEditPosition.setTop(0);
         currentDaughterLineEditPosition.setLeft(0);
     }
 
     currentDaughterLineEditPosition.setTop(currentDaughterLineEditPosition.top() - 1);  // нужно чуть-чуть "приподнять" строку ввода, чтобы она была в уровень с дочерними LineEdit
-//    qDebug() << this->objectName() << ": SSetComboBox::rearrangeDaughterLineEdits: currParentLineEditHeight = " << currParentLineEditHeight << "; newComboBoxHeight = " << newComboBoxHeight;
     if (currParentLineEditHeight != newComboBoxHeight)
     {   // если высота изменяется, то сработает resizeEvent, в котором мы пересчитаем размеры и отступы родит. lineEdit
         setMinimumHeight(newComboBoxHeight);
@@ -416,9 +297,6 @@ int SSetComboBox::rearrangeDaughterLineEdits(int width)
     // пересчитываем размеры и отступы родит. lineEdit
     updateLineEditGeometry();
 
-    emit textChanged(semicolon_separated_text);   // посылаем сигнал (не знаю понадобится ли, но пусть будет)
-//    qDebug() << this->objectName() << ": SSetComboBox::rearrangeDaughterLineEdits: lineEdit()->geometry()=" << lineEdit()->geometry() << "; lineEdit()->textMargins() = " << currentDaughterLineEditPosition;
-//    qDebug() << this->objectName() << ": SSetComboBox::rearrangeDaughterLineEdits (return)";
     return newComboBoxHeight;   // возвращаем значение необходимой высоты
 }
 
@@ -428,9 +306,8 @@ int SSetComboBox::rearrangeDaughterLineEdits(int width)
  */
 void SSetComboBox::deleteDaughterLineEditOnKeyPress(int key)
 {
-    if(key == Qt::Key_Backspace && lineEdit()->text() == "" )
+    if(key == Qt::Key_Backspace && lineEditWidget->text() == "" )
     {
-//        qDebug() << this->objectName() << ": styleSheet" << daughterLineEdits.last()->styleSheet();
         if (daughterLineEdits.last()->styleSheet().contains("background-color: #3399FF"))     // если последний элемент уже с синим бэкграундом, значит это второе нажатие
         {
             deleteDaughterLineEdit(daughterLineEdits.last());
@@ -447,6 +324,23 @@ void SSetComboBox::deleteDaughterLineEditOnKeyPress(int key)
     }
 }
 
+void SSetComboBox::showPopup()
+{
+    SComboBox::showPopup();
+    keyPressReceiver = lineEditWidget;
+    if(!popupWidget)
+    {
+        popupWidget = this->findChild<QFrame*>();
+    }
+}
+
+void SSetComboBox::hidePopup()
+{
+    if(!ignorePopupHide)
+        SComboBox::hidePopup();
+    ignorePopupHide = 0;
+}
+
 QString SSetComboBox::version()
 {
     return QString("%1.%2.%3.%4").arg(MAJOR).arg(MINOR).arg(PATCH).arg(COMMIT);
@@ -454,52 +348,34 @@ QString SSetComboBox::version()
 
 void SSetComboBox::comboBoxSetFocus()
 {
-    this->lineEdit()->setFocus();
-//    this->showPopup();
+    lineEditWidget->setFocus();
 }
 
 void SSetComboBox::addItem(const QString &text)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::addItem: text =" << text;
-//    qDebug() << this->objectName() << ": daughterLineEditHeight = " << daughterLineEditHeight;
-
     if (text == "")
     {
-//        qDebug() << this->objectName() << ": selected empty row";
         return;
     }
 
-    dLineEdit = new daughterLineEdit(this->lineEdit());
-    dLineEdit->setStyleSheet("QLineEdit { background-color: #E5E5E5; border: none }\
-                                     QToolButton { background-color: #E5E5E5; border: none }");     // серый
-
-    dLineEdit->resize(sizeHint().width(), daughterLineEditHeight);  // resize, похоже, принимает в качестве параметров размер с учётом окантовки, а size отдаёт размер без окантовки
-
-    dLineEdit->enableDeleteButton();
-    // размер дочернего LineEdit (в нём же устанавливается отступ текста от верхнего края)
-    dLineEdit->setMaximumHeight(daughterLineEditHeight);    // default contentsRect(): QRect(0,0 40x16), default lineEdit size: 40x16
-    dLineEdit->setMaximumWidth(this->lineEdit()->width());    // размер дочернего LineEdit не доложен превышать размер родительского
-    // потом текст
+    dLineEdit = new daughterLineEdit(lineEditWidget);
     dLineEdit->setText(text);
-    // TODO: по красоте, конечно, нужно сделать так, чтобы все эти настройки производились в конструкторе дочернего lineEdit, но пока я не умею :-(
 
     connect(dLineEdit, SIGNAL(buttonClicked(daughterLineEdit*)), this, SLOT(deleteDaughterLineEdit(daughterLineEdit*)));
-    connect(dLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(daughterLineEditTextChanged()));
+    connect(dLineEdit, &daughterLineEdit::textChanged, this, &SSetComboBox::daughterLineEditTextChanged);
     connect(dLineEdit, SIGNAL(editingFinished()), this, SLOT(comboBoxSetFocus()));
     this->daughterLineEdits.append(dLineEdit);
 
     dLineEdit->show();
     emit daughterLineEditAdded();
-    dLineEdit->home();
     // TODO: в АСЦ сделано так, что при выборе элемента из списка он в списке скрывается, при удалении дочернего LineEdit вновь отображается
     // а также при редактировании дочернего LineEdit, который прежде был добавлен из списка, но его текст изменился, он тоже вновь отображается
     // это можно сделать тоже через QSortFilterProxyModel, но потом...
 
     rearrangeDaughterLineEdits(this->width());
 
-    proxyModel->setFilterFixedString(""); // очищаем строку фильтра
-    this->lineEdit()->clear(); // если отключена вставка новых элементов, то нужно вручную очистить кастомный текст
-    isPopupShown = 0;   // очищаем флаг отображения выпадающего списка
+    proxyModel->setFilterFixedString("");
+    lineEditWidget->clear();
 
     // элементы в списке могут содержать спец. поле для уточнения выбранного свойства
     // например, если пользователь заполняет комплектность устройства и выбирает "адаптер питания <модель>",
@@ -515,54 +391,59 @@ void SSetComboBox::addItem(const QString &text)
 
             dLineEdit->setFocus();
             dLineEdit->setSelection(start, end - start + 1);
-            isPopupShown = 1;
-//            qDebug() << this->objectName() << ": SSetComboBox::addItem: selected sub-field in <>";
+            keyPressReceiver = dLineEdit;
+            ignorePopupHide = 0;
+            hidePopup();
         }
     }
 
-//    qDebug() << this->objectName() << ": SSetComboBox::addItem (return)";
 }
 
 void SSetComboBox::activatedHandler(int index)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::activatedHandler: index =" << index;
-    // После выбора элемента указателем раскрывающийся список прячется, а нужно чтобы он продолжал оторажаться
-    // список при этом, правда, успевает "мигнуть", но это мелочи, потом разберусь.
+    // После выбора элемента указателем раскрывающийся список прячется, а нужно чтобы он продолжал отображаться
     // Дополнительное условие: список не должен вновь отображаться, если была выбрана пустая строка;
     // это чтобы при нажатии Enter в пустой строке работало скрытие/отображение.
+    ignorePopupHide = 1;
     if (this->itemText(index) != "")
     {
-        isPopupShown = 0;   // важен порядок! сначала изменяем состояние флага
         addItem(this->itemText(index));
-        parentLineEditFocused(); // вызов функции-слота для повторного отображения списка
+        /* TODO: какая-то ерунда... после добавления элемента перестаёт отображаться мигающий курсор в lineEdit
+           перепробовал кучу способов, устанавливать фокус принудительно на lineEdit, а затем обратно на listView,
+           эмулировать нажатие клавиши Ctrl, использовать вместо clear() setText(""), фильтровать события —
+           некоторые варианты частично работают, но курсор всё равно пропадает (после второго-третьего добавления).
+           Определить причину не смог.
+        */
     }
-    emit activatedDerived(index);
+    else
+    {
+        ignorePopupHide = 0;
+        hidePopup();
+    }
 }
 
 /*
  * TODO: придумать как добавлять в отфильтрованный список пустую строку, чтобы в случае, когда пользователь хочет
  * добавить дочерний эл-т с текстом, частично совпадающим с элементом из списка, добавился только введённый текст,
- * а не предложенный в отфильтрованном списке или автодополненный. На данный момент чтобы это сделать нужно нажать Esc/Backspace.
+ * а не предложенный в отфильтрованном списке или автодополненный. На данный момент чтобы это сделать нужно нажать Esc
  */
 void SSetComboBox::updateProxyModelFilter(const QString &text)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::updateProxyModelFilter";
-
+    int cursorPos = lineEditWidget->cursorPosition();
     proxyModel->setFilterFixedString(text); // установка фильтра обновляет модель, и заменяет текущий текст
                                             // LineEdit на текст первого элемента в обновлённом выпадающем списке
 
-    lineEdit()->setText(text);              // поэтому перезаписываем текст обратно :-) дичь, а шо делать... не разобрался как (TODO) сделать это элегантнее
+    lineEditWidget->setText(text);              // поэтому перезаписываем текст обратно :-) дичь, а шо делать... не разобрался как (TODO) сделать это элегантнее
+    lineEditWidget->setCursorPosition(cursorPos); // восстановление позиции курсора
 }
 
 void SSetComboBox::daughterLineEditTextChanged()
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::daughterLineEditTextChanged()";
     rearrangeDaughterLineEdits(this->width());
 }
 
 void SSetComboBox::deleteDaughterLineEdit(daughterLineEdit *widget)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::deleteDaughterLineEdit";
     int i;
 
     for (i=0; this->daughterLineEdits[i] != widget; i++)
@@ -572,54 +453,19 @@ void SSetComboBox::deleteDaughterLineEdit(daughterLineEdit *widget)
     widget->deleteLater();
     rearrangeDaughterLineEdits(this->width());
 
-    isPopupShown = 0;
-    this->lineEdit()->setFocus();    // возвращаем фокус
+    setIsPopupVisible(0);
+    keyPressReceiver = lineEditWidget;
 }
 
 void SSetComboBox::parentLineEditEditingFinished()
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::parentLineEditEditingFinished: lineEdit()->text() =" << this->lineEdit()->text();
-    if (this->lineEdit()->text().length())
-        addItem(this->lineEdit()->text());
-}
-
-void SSetComboBox::parentLineEditFocused()
-{
-//    qDebug() << this->objectName() << ": SSetComboBox::parentLineEditFocused()" << ": isPopupShown = " << isPopupShown << ": view()->isVisible() = " << view()->isVisible() << "; lineEdit()->text() =" << this->lineEdit()->text();
-//    qDebug() << this->objectName() << ": SSetComboBox::parentLineEditFocused(): lineEdit()->geometry() = " << lineEdit()->geometry() << "lineEdit()->textMargins() = " << lineEdit()->textMargins();
-    if (isPopupShown == 0)
-    {   // Чтобы выпадающий список при первом щелчке оторажался, а при втором скрывался используем переменную-флаг
-//        setCurrentIndex(0);     // при отображении принудительно устанавливаем текущий индекс, иначе при многократном
-                                // нажатии Enter в список будет добавляться последний подсвеченный курсором элемент.
-        setCurrentIndex(-1);
-
-        // эмулируем нажатие на кнопку для отображения раскрывающегося списка (showPopup не работает как ожидается)
-        QMouseEvent *e = new QMouseEvent(QEvent::MouseButtonPress, QPointF((this->frameGeometry().width() - this->iconSize().width()/2), (this->frameGeometry().height() - this->iconSize().height()/2)), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-        QComboBox::mousePressEvent(e);
-        isPopupShown = 1;
-        lineEdit()->setFocus();
-        delete e;
-    }
-    else
-        isPopupShown = 0;
-}
-
-QSize SSetComboBox::sizeHint()
-{
-//    qDebug() << this->objectName() << ": SSetComboBox::sizeHint()";
-    return QSize(150, 22);
-}
-
-QSize SSetComboBox::minimumSizeHint()
-{
-//    qDebug() << this->objectName() << ": SSetComboBox::minimumSizeHint()";
-    return QSize(150, 22);
+    if (lineEditWidget->text().length())
+        addItem(lineEditWidget->text());
 }
 
 /* Это перегруженная функция setGeometry(const QRect &geometry) */
 void SSetComboBox::setGeometry(int x, int y, int w, int h)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::setGeometry(int x, int y, int w, int h)";
     setGeometry(QRect(x, y, w, h));
 }
 
@@ -628,17 +474,16 @@ void SSetComboBox::setGeometry(int x, int y, int w, int h)
  */
 void SSetComboBox::setGeometry(const QRect &geometry)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::setGeometry(const QRect &geometry)";
     int mh = rearrangeDaughterLineEdits(geometry.width());
 
     // высота комбобокса может быть больше чем сумма высот дочерних элементов, но меньше не может
     if (geometry.height() > mh)
     {
         setMinimumHeight(geometry.height());
-        QComboBox::setGeometry( geometry );
+        SComboBox::setGeometry( geometry );
     }
     else
-        QComboBox::setGeometry(geometry.left(), geometry.top(), geometry.width(), mh);
+        SComboBox::setGeometry(geometry.left(), geometry.top(), geometry.width(), mh);
 }
 
 /* Размер строки родительского LineEdit'а; по этому значению будет задаваться размер дочерного LineEdit'а
@@ -647,26 +492,23 @@ void SSetComboBox::setGeometry(const QRect &geometry)
  */
 void SSetComboBox::setRowHeight(int h)
 {
-    parentLineEditFrameSize = lineEdit()->geometry().left();   // = 3; до конца не разобрался, но это, вроде бы, статическая фигня и зависит от оконного менеджера ОС, поэтому посчитаем её сразу
-    daughterLineEditFrameSize = lineEdit()->style()->pixelMetric(QStyle::PM_DefaultFrameWidth) * 2; // DefaultFrameWidth lineEdit'a равен 1
+    parentLineEditFrameSize = lineEditWidget->geometry().left();   // = 3; до конца не разобрался, но это, вроде бы, статическая фигня и зависит от оконного менеджера ОС, поэтому посчитаем её сразу
+    daughterLineEditFrameSize = lineEditWidget->style()->pixelMetric(QStyle::PM_DefaultFrameWidth) * 2; // DefaultFrameWidth lineEdit'a равен 1
 //    daughterLineEditHeight = h - 2 * parentLineEditFrameSize;
     daughterLineEditHeight = h;
     daughterLineEditFrameHeight = daughterLineEditHeight + daughterLineEditFrameSize;
-//    qDebug() << this->objectName() << ": SSetComboBox::setRowHeight :  parentLineEditFrameSize = " << parentLineEditFrameSize << "; daughterLineEditHeight = " << daughterLineEditHeight << "; daughterLineEditFrameSize = " << daughterLineEditFrameSize;
 }
 
 void SSetComboBox::setMinimumSize(const QSize &size)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::setMinimumSize()";
     resize(qMax(this->size().width(),size.width()), qMax(this->size().height(),size.height()));
-    QComboBox::setMinimumSize(size);
+    SComboBox::setMinimumSize(size);
 }
 
 void SSetComboBox::setMinimumHeight(int h)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::setMinimumHeight(" << h << ")";
-    eventTrigger |= SSetComboBox::minimumHeightUpdated;
-    QComboBox::setMinimumHeight(h);
+    eventTrigger |= SSetComboBox::MinimumHeightUpdated;
+    SComboBox::setMinimumHeight(h);
 }
 
 /*  размер задаётся аналогично функции setGeometry()
@@ -674,43 +516,39 @@ void SSetComboBox::setMinimumHeight(int h)
  */
 void SSetComboBox::resize(const QSize &size)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::resize(QSize &)";
-//    qDebug() << this->objectName() << ": sizePolicy() = " << sizePolicy();
-//    qDebug() << this->objectName() << ": SSetComboBox::resize: size = " << size;
     int mh = rearrangeDaughterLineEdits(size.width());
 
     // высота комбобокса может быть больше чем сумма высот дочерних элементов, но меньше не может
     if (size.height() > mh)
     {
         setMinimumHeight(size.height());
-        QComboBox::resize( size );
+        SComboBox::resize( size );
     }
     else
-        QComboBox::resize(size.width(), mh);
+        SComboBox::resize(size.width(), mh);
 }
 
 void SSetComboBox::resize(int w, int h)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::resize(int w, int h)";
-
     resize(QSize(w, h));
 }
 
 void SSetComboBox::updateLineEditGeometry()
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::updateLineEditGeometry()";
 
-    this->lineEdit()->resize(this->geometry().width() - parentLineEditFrameSize * 2 - iconSize().width(),
+    lineEditWidget->resize(this->geometry().width() - parentLineEditFrameSize * 2 - iconSize().width(),
                              this->geometry().height() - parentLineEditFrameSize * 2);
     //                                                                                          ^
     //                                                                          это ширина кнопки "v" comboBox'а
+    updatePopupGeometry();
     currentDaughterLineEditPosition.setBottom(this->geometry().height() - currentDaughterLineEditPosition.top() - daughterLineEditFrameHeight - parentLineEditFrameSize - daughterLineEditFrameSize );
-    this->lineEdit()->setTextMargins(currentDaughterLineEditPosition);
+    lineEditWidget->setTextMargins(currentDaughterLineEditPosition);
 }
 
-QString SSetComboBox::separator()
+void SSetComboBox::updatePopupGeometry()
 {
-    return field_separator;
+    if(popupWidget)
+        popupWidget->move(popupWidget->x(), mapToGlobal(lineEditWidget->pos()).y() + lineEditWidget->height());
 }
 
 QString SSetComboBox::text()
@@ -721,6 +559,21 @@ QString SSetComboBox::text()
 QString SSetComboBox::currentText()
 {
     return semicolon_separated_text;
+}
+
+void SSetComboBox::clearEditText()
+{
+    for(int i=daughterLineEdits.size()-1;i>=0;i--)
+    {
+        daughterLineEdits[i]->deleteLater();
+        this->daughterLineEdits.removeAt(i);
+        rearrangeDaughterLineEdits(this->width());
+    }
+}
+
+QString SSetComboBox::separator()
+{
+    return field_separator;
 }
 
 void SSetComboBox::setSeparator(QString s)
@@ -735,11 +588,8 @@ void SSetComboBox::setSeparator(char c)
 
 void SSetComboBox::setSizePolicy(QSizePolicy sp)
 {
-    // Проверка соответствия политики размена комбобокса. Если будет не такой, то растягивание/сжатие по высоте не будет работать как задумано.
-//    QSizePolicy tsp(QSizePolicy::Preferred, QSizePolicy::Minimum);  // target sizePolicy
-//    if (sp != tsp)
-//        qDebug() << this->objectName() << "ACHTUNG! Политика размера не соответствует, должна быть QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum)";
-    QComboBox::setSizePolicy(sp);
+    // Проверка соответствия политики размера комбобокса. Если будет не такой, то растягивание/сжатие по высоте не будет работать как задумано.
+    SComboBox::setSizePolicy(sp);
 }
 
 void SSetComboBox::setSizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Policy vertical)
@@ -749,65 +599,25 @@ void SSetComboBox::setSizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Po
 
 void SSetComboBox::resizeEvent(QResizeEvent*)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent: event: " << event << "; eventTrigger = " << eventTrigger;
-//    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent: minimumHeight() = " << minimumHeight() << "; maximumHeight()" << maximumHeight();
-//    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent: minimumSizeHint() = " << minimumSizeHint() << "; sizeHint()" << sizeHint();
-//    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent: height() = " << height();
 
-    if ( !(eventTrigger & SSetComboBox::minimumHeightUpdated))   // если событие вызвано не установкой мин. высоты (а, например, изменением размера окна)
+    if ( !(eventTrigger & SSetComboBox::MinimumHeightUpdated))   // если событие вызвано не установкой мин. высоты (а, например, изменением размера окна)
     {
         setMinimumHeight( rearrangeDaughterLineEdits(this->width()) );  // пересчитываем минимальную требуемую высоту
     }
     // при изменении размера нужно изменить размер lineEdit'а
     updateLineEditGeometry();
 
-    eventTrigger &= ~(SSetComboBox::minimumHeightUpdated);   // всегда очищаем флаг; повторно вызывать rearrange не нужно
+    eventTrigger &= ~(SSetComboBox::MinimumHeightUpdated);   // всегда очищаем флаг; повторно вызывать rearrange не нужно
 
-//    qDebug() << this->objectName() << ": SSetComboBox::resizeEvent (return); eventTrigger = " << eventTrigger;
 }
 
-void SSetComboBox::mouseMoveEvent(QMouseEvent*)
+void SSetComboBox::retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text, bool autorep, ushort count)
 {
-//    qDebug() << this->objectName() << ": SSetComboBox::mouseMoveEvent(QMouseEvent *event): event =" <<event;
-}
-
-void SSetComboBox::wheelEvent(QWheelEvent*)
-{
-//    qDebug() << this->objectName() << ": SSetComboBox::wheelEvent(QWheelEvent *event): event =" <<event;
-    /* Ничего не делаем, чтобы при прокручивании колёсика мыши не добавлялись дочерние элементы */
-}
-
-void SSetComboBox::keyPressEvent(QKeyEvent *event)
-{
-//    qDebug() << this->objectName() << ": SSetComboBox::keyPressEvent(QKeyEvent *event): event =" <<event;
-    // когда фокус находится в LineEdit, нажатие клавиш вверх/вниз вызывает активацию элементов раскрывающегося списка (при этом список не отображается)
-    // и, соответственно добавление дочерних элементов;
-    if(event->key() == Qt::Key_Up || event->key() == Qt::Key_Down ) // подавляем нажатие этих клавиш
-        return;
-
-    if( (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Escape) && daughterLineEdits.size() ) // если есть дочерние элементы и пользователь нажимает backspace или Esc
-    {
-        deleteDaughterLineEditOnKeyPress(event->key());
-    }
-
-    // если поле пустое, то нажатие Enter вызовет отображение раскрывающегося списка. Это для удобства работы с клавиатурой
-    if ( (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) && lineEdit()->text() == "" )
-        parentLineEditFocused();
-    QComboBox::keyPressEvent(event);
-}
-
-void SSetComboBox::mousePressEvent(QMouseEvent *event)
-{
-    // это срабатывает только при нажатии на кнопку "v"; вызываем обработчик из наследуемого класса
-//    qDebug() << this->objectName() << ": SSetComboBox::mousePressEvent(QMouseEvent *event)";
-    QComboBox::mousePressEvent(event);
-}
-
-void SSetComboBox::mouseDoubleClickEvent(QMouseEvent*)
-{
-    // это срабатывает только при нажатии на кнопку "v"; двойной клик пока не нужен, поэтому ничего не делаем
-//    qDebug() << this->objectName() << ": SSetComboBox::mouseDoubleClickEvent(QMouseEvent *event)";
-    // TODO: добавить обработку двойного клика
+    QKeyEvent* newEvent = new QKeyEvent(type, key, modifiers,
+                                        text, autorep, count);
+    QFocusEvent* focusEvent = new QFocusEvent(QEvent::FocusIn, Qt::OtherFocusReason);
+    QCoreApplication::postEvent(keyPressReceiver, focusEvent);
+    QCoreApplication::postEvent(keyPressReceiver, newEvent);
 }
 
 #ifdef QT_DEBUG
@@ -842,7 +652,7 @@ void SSetComboBox::addRandomItem()
 //        {
 //            QTest::mouseClick(lw->viewport(), Qt::LeftButton, Qt::NoModifier, itemPt);
 //            QTest::qWait(200);
-//            if(isPopupShown)
+//            if(isPopupVisible())
 //            {
 //                QTest::keyPress(lw, Qt::Key_Return);
 //            }
@@ -852,7 +662,7 @@ void SSetComboBox::addRandomItem()
 //    if (daughterLineEdits.isEmpty())
 //    {
 //        setCurrentText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
-//        QTest::keyPress(lineEdit(), Qt::Key_Return);
+//        QTest::keyPress(lineEditWidget, Qt::Key_Return);
 //        QTest::qWait(200);
 //    }
 //    hidePopup();

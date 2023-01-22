@@ -3,21 +3,23 @@
 
 //#define CUSTOM_COMPLETER
 #define MAJOR 0
-#define MINOR 2
+#define MINOR 3
 #define PATCH 0
-#define COMMIT 46
+#define COMMIT 47
 
+#include <QCoreApplication>
 #include <QWidget>
 #include <QLineEdit>
-#include <QComboBox>
 #include <QCompleter>
-#include <QAbstractItemView>
+#include <QEvent>
+#include <QFocusEvent>
+#include <QRandomGenerator>
 #include <QMouseEvent>
-#include <QCoreApplication>
-#include <QSortFilterProxyModel>
-#include <QStyle>
 #include <QToolButton>
+#include <QKeyEvent>
 #include <QRegularExpression>
+#include "models/ssortfilterproxymodel.h"
+#include "widgets/scombobox.h"
 //#include <QDebug>
 //#include <QTest>
 //#include <QListView>
@@ -27,31 +29,33 @@ class daughterLineEdit : public QLineEdit
     Q_OBJECT
 
 public:
-    daughterLineEdit(QWidget *parent = nullptr);
+    explicit daughterLineEdit(QWidget *parent = nullptr);
+    ~daughterLineEdit();
     void enableDeleteButton(bool enable=true);
     void setMaximumHeight(int);
     void setMaximumWidth(int);
     void resize(const QSize &);
     void resize(int, int);
-    QSize sizeHint();
-    ~daughterLineEdit();
+    QSize sizeHint() const override;
+    void setText(const QString &);
 
 signals:
     void buttonClicked(daughterLineEdit*);
     void textChanged(); // это перегруженный сигнал. вызывается в конце функции изменения размера под текст для того, чтобы родительский LineEdit перестроил дочерние
 
 protected:
-    void resizeEvent(QResizeEvent *);
+    void resizeEvent(QResizeEvent *) override;
 
 public slots:
     void home();
+    void resizeToText(const QString &text);
     void resizeToText();
 
 private slots:
     void deleteButtonClicked();
 
 private:
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event) override;
     bool deleteButtonEnabled = 0;
     void updateTextMargins();
     QSize sz;
@@ -59,63 +63,20 @@ private:
     int frameWidth;
     QSize buttonSize;
     QToolButton *deleteButton;
-    QIcon *buttonIcon;
 };
 
-/* LineEdit для ComboBox'а. Не охота его выносить в отдельные файлы, т. к. единственная причина его переопределения заключается
- * в отображении выпадающего списка при щелчке мыши */
-class CBLineEdit : public QLineEdit
+class SSetComboBox : public SComboBox
 {
     Q_OBJECT
 
 signals:
-    void mouseButtonPress();
-
-public:
-    explicit CBLineEdit(QWidget *parent = nullptr);
-    ~CBLineEdit();
-
-private:
-    void resizeEvent(QResizeEvent *);
-
-//protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
-
-private slots:
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-
-};
-
-class viewEventFilter : public QObject
-{
-    Q_OBJECT
-signals:
-
-public:
-    viewEventFilter(QObject*);
-private:
-protected:
-    bool eventFilter(QObject*, QEvent*) override;
-};
-
-class SSetComboBox : public QComboBox
-{
-    Q_OBJECT
-
-signals:
-    void textChanged(QString);
-    void activatedDerived(int);
-    void daughterLineEditAdded();
+    void daughterLineEditAdded();   // для теста
 
 public:
     explicit SSetComboBox(QWidget *parent = nullptr);
     ~SSetComboBox();
     void setModel(QAbstractItemModel*);
     void setEditable(bool);
-    int hasHeightForWidth();
-    QSize sizeHint();
-    QSize minimumSizeHint();
     void setGeometry(int, int, int, int);
     void setGeometry(const QRect &);
     void setRowHeight(int);
@@ -127,42 +88,43 @@ public:
     QString separator();
     QString text();
     QString currentText();
+    void clearEditText();
     void setSeparator(QString);
     void setSeparator(char);
     void setSizePolicy(QSizePolicy);
     void setSizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Policy vertical);
-    int isPopupShown;
     QVector<daughterLineEdit*> daughterLineEdits;
     void deleteDaughterLineEditOnKeyPress(int);
     QString version();
-    void clearEditText();
+    void showPopup() override;
+    void hidePopup() override;
 #ifdef QT_DEBUG
     void addRandomItem();
 #endif
 
-public slots:
-
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+    void resizeEvent(QResizeEvent *) override;
+    void retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text = QString(), bool autorep = false, ushort count = 1) override;
 private:
-    enum resizeEventTrigger{
-        minimumHeightUpdated = 1
-    };
-
-    bool eventFilter(QObject *watched, QEvent *event);
-    int rearrangeDaughterLineEdits(int);
-    QSortFilterProxyModel *proxyModel;
+    enum resizeEventTrigger{MinimumHeightUpdated = 1};
+    SSortFilterProxyModel *proxyModel;
     QCompleter *p_completer;
-    QFontMetrics *fontMetrics;
     int daughterLineEditFrameSize;
     int daughterLineEditHeight;
     int daughterLineEditFrameHeight;
     int defaultComboBoxHeight;
-    viewEventFilter *viewEventFilterObj;
     int parentLineEditFrameSize;
     QMargins currentDaughterLineEditPosition;
     QString field_separator;
     daughterLineEdit *dLineEdit;
     int eventTrigger = 0;
     QString semicolon_separated_text;
+    bool ignorePopupHide = 0;
+    QWidget *popupWidget = nullptr;
+    QLineEdit *keyPressReceiver;
+    int rearrangeDaughterLineEdits(int);
+    void updatePopupGeometry();
 
 private slots:
     void comboBoxSetFocus();
@@ -172,13 +134,6 @@ private slots:
     void daughterLineEditTextChanged();
     void deleteDaughterLineEdit(daughterLineEdit *widget);
     void parentLineEditEditingFinished();
-    void parentLineEditFocused();
-    void resizeEvent(QResizeEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void wheelEvent(QWheelEvent *);
-    void keyPressEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseDoubleClickEvent(QMouseEvent *);
 };
 
 #endif // SSETCOMBOBOX_H
