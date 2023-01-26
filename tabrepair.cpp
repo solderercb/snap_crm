@@ -864,41 +864,131 @@ if( !p_instance.contains(rep_id) )
 return p_instance.value(rep_id);
 }
 
-// =====================================
+// ===============================================================================================================
 worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) :
     QTableView(parent)
 {
+    fontMetrics = new QFontMetrics(this->font());
+    horizontalHeader()->setMinimumSectionSize(15);
+
+    connect(this->horizontalHeader(),SIGNAL(sectionResized(int,int,int)), this, SLOT(columnResized(int,int,int)));
 }
 
 worksAndSparePartsTable::~worksAndSparePartsTable()
 {
+    delete fontMetrics;
 }
 
-void worksAndSparePartsTable::resizeEvent(QResizeEvent *event)
+void worksAndSparePartsTable::resizeEvent(QResizeEvent*)
 {
-    QTableView::resizeEvent(event);
-    int i, j;
+    int i, visibleColumn;
     int colNameWidth = 0;
-    int colWidths[] = {60,90,0,45,40,70,70,120,120,80,100};
 
     verticalHeader()->hide();
     colNameWidth = geometry().width();
 
-    for (i = 0, j = 0; i < model()->columnCount(); i++)
+    for (i = 0; i < model()->columnCount(); i++)
     {
-        if(static_cast<SSaleTableModel*>(model())->isColumnHidden(i))
-            hideColumn(i);
-        else
+        if(i == SStoreItemModel::SaleOpColumns::ColName)
+            continue;
+
+        visibleColumn = m_model->visibleColumnIndex(i);
+        colNameWidth -= colWidths[visibleColumn];
+    }
+    colNameWidth -= 2; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах (при 125% норм -15)
+    if (verticalScrollBar()->isVisible())
+        colNameWidth -= verticalScrollBar()->width();
+
+    setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
+}
+
+void worksAndSparePartsTable::setModel(QAbstractItemModel *model)
+{
+    m_model = static_cast<SSaleTableModel*>(model);
+    QTableView::setModel(model);
+}
+
+int worksAndSparePartsTable::sizeHintForColumn(int column) const
+{
+    int c = m_model->visibleColumnIndex(column);
+    if(!c)
+        return 0;
+
+    return colWidths[c];
+}
+
+void worksAndSparePartsTable::resizeColumnToContents(int column)
+{
+    int cellWidth = 0;
+    if(m_model->visibleColumnIndex(column))
+    {
+        for(int i = 0; i < m_model->rowCount(); i++)
+            cellWidth = qMax(cellWidth, fontMetrics->size(Qt::TextSingleLine, m_model->index(i, column).data().toString()).width() + 10);
+        cellWidth = qMax(cellWidth, fontMetrics->size(Qt::TextSingleLine, m_model->horizontalHeaderItem(column)->text()).width() + 10);
+    }
+
+    setColumnWidth(column, cellWidth);
+}
+
+void worksAndSparePartsTable::resizeColumnsToContents()
+{
+    for(int i = 0; i < m_model->columnCount(); i++)
+    {
+        switch (i)
         {
-            colNameWidth -= colWidths[j];
-            setColumnWidth(i, colWidths[j]);
-            j++;
+            case SStoreItemModel::SaleOpColumns::ColId: setColumnWidth(SStoreItemModel::SaleOpColumns::ColId, 60); break;
+            case SStoreItemModel::SaleOpColumns::ColName: break;
+            default: resizeColumnToContents(i); break;
         }
     }
-    colNameWidth -= 15; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах (при 125% норм -15)
-    if (verticalScrollBar()->isVisible())
-        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth - verticalScrollBar()->width());
-    else
-        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
-    resizeRowsToContents();
+}
+
+void worksAndSparePartsTable::columnResized(int column, int oldWidth, int newWidth)
+{
+    int visibleColumn = m_model->visibleColumnIndex(column);
+    if(visibleColumn)
+        switch (column)
+        {
+            case SStoreItemModel::SaleOpColumns::ColId: horizontalHeader()->resizeSection(column, colWidths[visibleColumn]); break;
+            case SStoreItemModel::SaleOpColumns::ColSN: colWidths[visibleColumn] = qMax(newWidth, 60); horizontalHeader()->resizeSection(column, colWidths[visibleColumn]); break;
+            default: colWidths[visibleColumn] = newWidth;
+        }
+
+    // TODO: сохранение ширин в файл настроек интерфейса. Подробнее см.  в методе reset()
+    QTableView::columnResized(column, oldWidth, colWidths[visibleColumn]);
+    verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
+}
+
+void worksAndSparePartsTable::reset()
+{
+    QTableView::reset();
+
+    if(m_modelRowCount == m_model->rowCount())
+        return;
+
+    m_modelRowCount = m_model->rowCount();
+    // TODO: подумать, нужно ли сохранять в файле настроек интерфейса заданные пользователем ширины, восстанавливать их в случае их наличия
+    // или всегда подгонять ширины под содержимое
+    resizeColumnsToContents();
+}
+
+#if QT_VERSION >= 0x060000
+void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+#else
+void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+#endif
+{
+    QTableView::dataChanged(topLeft, bottomRight, roles);
+    if(!roles.isEmpty() && !roles.contains(Qt::DisplayRole))
+        return;
+
+    for(int row = topLeft.row(); row <= bottomRight.row(); row++)
+        for(int col = topLeft.column(); col <= bottomRight.column(); col++)
+        {
+            switch(col)
+            {
+                case SStoreItemModel::SaleOpColumns::ColName: resizeRowToContents(row); break;
+                default: resizeColumnToContents(col);
+            }
+        }
 }

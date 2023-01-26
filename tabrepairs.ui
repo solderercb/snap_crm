@@ -246,7 +246,7 @@
    <sender>buttonRefreshTable</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairs</receiver>
-   <slot>updateTableWidget()</slot>
+   <slot>refreshTable()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>363</x>
@@ -273,6 +273,6 @@
   <slot>lineEditSearchTextChanged(QString)</slot>
   <slot>lineEditSearchReturnPressed()</slot>
   <slot>tableItemDoubleClick(QModelIndex)</slot>
-  <slot>updateTableWidget()</slot>
+  <slot>refreshTable()</slot>
  </slots>
 </ui>

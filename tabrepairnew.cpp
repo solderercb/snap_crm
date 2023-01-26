@@ -1,6 +1,7 @@
 #include "global.h"
 #include "appver.h"
 #include "tabrepairnew.h"
+#include "tabrepairs.h"
 #include "ui_tabrepairnew.h"
 #include "com_sql_queries.h"
 
@@ -764,6 +765,7 @@ bool tabRepairNew::createRepair()
 
     bool nErr = 1;
     int repair;
+    tabRepairs *repairsTab = nullptr;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     repairModel = new SRepairModel(this);
 
@@ -831,6 +833,9 @@ bool tabRepairNew::createRepair()
     {
         print(repair);
         clearWidgets();
+        repairsTab = parent()->findChild<tabRepairs*>();
+        if(repairsTab)
+            repairsTab->refreshTable();
         // TODO: обработка списка совпадений устройств (табл. tasks, type == 5)
     }
 

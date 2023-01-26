@@ -41,6 +41,13 @@ QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
         if(isRowMarkedRemove(index.row()))
             return QColor("light gray");
     }
+    if(role == Qt::ToolTipRole)
+    {
+        switch (index.column()) {
+            case SStoreItemModel::SaleOpColumns::ColId: break;
+            default: return data(index, Qt::DisplayRole);
+        }
+    }
 
     return QStandardItemModel::data(index, role);
 }
@@ -957,9 +964,22 @@ void SSaleTableModel::setTableMode(const TablesSet mode)
     }
 }
 
-bool SSaleTableModel::isColumnHidden(const int column)
+/*  Определение номера видимого столбца.
+ *  Возвращает номер столбца, начиная с 1, или 0 если запрошенный столбец скрыт.
+*/
+int SSaleTableModel::visibleColumnIndex(const int column)
 {
-    return (m_hiddenColumns >> column)&0x01;
+    int visibleColumn = 0;
+
+    if((m_hiddenColumns >> column)&0x01)
+        return visibleColumn;
+
+    for(int i = 0; i < columnCount() && i <= column; i++)
+    {
+        visibleColumn += !((m_hiddenColumns >> i)&0x01);
+    }
+
+    return visibleColumn;
 }
 
 int SSaleTableModel::editStrategy()

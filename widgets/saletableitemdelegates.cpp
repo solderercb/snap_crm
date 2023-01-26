@@ -162,6 +162,7 @@ bool SaleTableItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *mode
 #else
             int clickX = e->localPos().x();
 #endif
+            clickX -= option.rect.x();  // коррекция координаты X курсора для случая когда пиктограммы уходят зя левый край виджета
 
             //  0                     10                  20                  30                  40                  50
             //  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9

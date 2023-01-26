@@ -37,7 +37,28 @@ class worksAndSparePartsTable : public QTableView
 public:
     explicit worksAndSparePartsTable(QWidget *parent = nullptr);
     ~worksAndSparePartsTable();
-    void resizeEvent(QResizeEvent*);
+    void resizeEvent(QResizeEvent*) override;
+    void setModel(QAbstractItemModel *model) override;
+protected:
+    int sizeHintForColumn(int column) const override;
+private:
+    SSaleTableModel *m_model = nullptr;
+    int m_modelRowCount = 0;
+    int colWidths[12] = {0,60,90,0,45,40,70,70,120,120,80,100}; // 0-й эл-т — пустышка
+    QFontMetrics *fontMetrics;
+    void resizeColumnToContents(int column);
+    void resizeColumnsToContents();
+    void findWidthByContents(const int column);
+protected slots:
+    void columnResized(int column, int oldWidth, int newWidth);
+public slots:
+    void reset() override;
+private slots:
+#if QT_VERSION >= 0x060000
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>()) override;
+#else
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>()) override;
+#endif
 };
 
 class tabRepair : public tabCommon

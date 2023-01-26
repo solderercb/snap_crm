@@ -96,6 +96,14 @@ MainWindow::MainWindow(windowsDispatcher*) :
 // https://stackoverflow.com/a/17482796
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    for(int i = ui->tabWidget->count() - 1; i >= 0; i--)
+        if(!closeTab(i))
+        {
+            event->ignore();
+            ui->tabWidget->setCurrentIndex(i);
+            break;
+        }
+
 //    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "APP_NAME",
 //                                                                tr("Are you sure?\n"),
 //                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
@@ -469,21 +477,21 @@ void MainWindow::createTabClient(int id)
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 }
 
-void MainWindow::closeTab(int index)
+/*  Закрытие вкладки
+ *  Возвращает 0 если пользователь не подтвердил закрытие
+*/
+bool MainWindow::closeTab(int index)
 {
     QWidget *w = ui->tabWidget->widget(index);
     if (QString(w->metaObject()->className()).compare("QWidget", Qt::CaseSensitive) != 0)  // Временное: на момент первоначальной разработки могут использоваться обычные QWidget-вкладки и при их закрытии приложение будет падать
     {
         tabCommon &tab = *(static_cast<tabCommon*>(w)); // мои классы ОБЯЗАТЕЛЬНО должны наследовать tabCommon
-        if (tab.tabCloseRequest())   // Перед закрытием  вкладки нужно проверить нет ли несохранённых данных
-        {
-            delete w;
-//            ui->tabWidget->removeTab(index);
-        }
-        return;
+        if (!tab.tabCloseRequest())   // Перед закрытием  вкладки нужно проверить нет ли несохранённых данных
+            return 0;
     }
     delete w;
-    }
+    return 1;
+}
 
 void MainWindow::updateTabTitle(QWidget *w)
 {

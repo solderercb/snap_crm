@@ -40,7 +40,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 //    widgetAction->setComboBoxXModel(repairModel);
     widgetAction->setFilterSettings(filterSettings);
 
-    connect(widgetAction, SIGNAL(hidden()), this, SLOT(updateTableWidget()));
+    connect(widgetAction, SIGNAL(hidden()), this, SLOT(refreshTable()));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionMoved(int,int,int)), this, SLOT(tableSectionMoved(int,int,int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sectionResized(int,int,int)), this, SLOT(tableSectionResized(int,int,int)));
     connect(ui->tableView->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(tableSortingChanged(int,Qt::SortOrder)));
@@ -50,10 +50,10 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
 
     tableUpdateDelay = new QTimer();
-    QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(updateTableWidget()));
+    QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(refreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
-    updateTableWidget();
+    refreshTable();
 }
 
 tabRepairs::~tabRepairs()
@@ -85,11 +85,11 @@ tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleto
  * категориям из всплывающего меню) будут отображаться в том числе и
  * выданные ремонты
 */
-void tabRepairs::updateTableWidget()
+void tabRepairs::refreshTable()
 {
-//    qDebug() << "tabRepairs::updateTableWidget()";
     // TODO: нужно уйти от жестко заданных имён/алиасов таблиц
     // TODO: компания/офис
+    // TODO: сохранить текущую прокрутку и выделеные строки и попытаться восстановить после обновления
 
     query.clear();
     query_where.clear();
@@ -133,6 +133,7 @@ void tabRepairs::updateTableWidget()
     repairs_table->setQuery(query.join(' '), QSqlDatabase::database("connMain"));
 
     ui->tableView->horizontalHeader()->hideSection(12); // прячем столбец с кодом статуса
+    tableUpdateDelay->start(10000);
 //    ui->tableView->horizontalHeader()->moveSection(10,4);   // это просто эксперимент (работает)
 //    repairs_table->setHeaderData(0, Qt::Horizontal, tr("Name"));
 //    repairs_table->setHeaderData(1, Qt::Horizontal, tr("Salary"));

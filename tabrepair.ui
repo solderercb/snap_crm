@@ -1260,7 +1260,10 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
                 <item row="1" column="0">
                  <widget class="worksAndSparePartsTable" name="tableViewWorksAndSpareParts">
                   <property name="horizontalScrollBarPolicy">
-                   <enum>Qt::ScrollBarAlwaysOff</enum>
+                   <enum>Qt::ScrollBarAlwaysOn</enum>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
                   </property>
                   <property name="alternatingRowColors">
                    <bool>true</bool>

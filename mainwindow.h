@@ -62,7 +62,7 @@ signals:
 
 public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
-    ~MainWindow();	// Деструктор
+    ~MainWindow();
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2;
     uint test_scheduler_counter = 0;
@@ -109,7 +109,7 @@ private slots:
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void createTabWarehouseItems(int type = 0, QWidget *caller = nullptr);
-    void closeTab(int index);
+    bool closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);
 #ifdef QT_DEBUG

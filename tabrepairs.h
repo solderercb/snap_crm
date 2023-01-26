@@ -54,8 +54,9 @@ private:
     void randomFill(){};
 #endif
 
+public slots:
+    void refreshTable();
 private slots:
-    void updateTableWidget();
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();

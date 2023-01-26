@@ -1033,27 +1033,22 @@ void sparePartsTable::resizeEvent(QResizeEvent *event)
     QTableView::resizeEvent(event);
     int i, j;
     int colNameWidth = 0;
-    int colWidths[] = {60,100,0,45,45,70,70,120,120,80};
+    int colWidths[12] = {0,60,100,0,45,45,70,70,120,120,80}; // 0-й эл-т — пустышка
 
     verticalHeader()->hide();
     colNameWidth = geometry().width();
 
-    for (i = 0, j = 0; i < model()->columnCount(); i++)
+    for (i = 0; i < model()->columnCount(); i++)
     {
-        if(static_cast<SSaleTableModel*>(model())->isColumnHidden(i))
-            hideColumn(i);
-        else
-        {
-            colNameWidth -= colWidths[j];
-            setColumnWidth(i, colWidths[j]);
-            j++;
-        }
+        j = static_cast<SSaleTableModel*>(model())->visibleColumnIndex(i);
+        colNameWidth -= colWidths[j];
+        setColumnWidth(i, colWidths[j]);
     }
-    colNameWidth -= 11; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
+    colNameWidth -= 2; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
     if (verticalScrollBar()->isVisible())
-        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth - verticalScrollBar()->width());
-    else
-        setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
+        colNameWidth -= verticalScrollBar()->width();
+
+    setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
     resizeRowsToContents();
 }
 

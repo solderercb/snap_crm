@@ -91,7 +91,7 @@ public:
     SWorkModel* repair_work(const int);
     int tableMode();
     void setTableMode(const TablesSet mode = TablesSet::StoreSale);
-    bool isColumnHidden(const int);
+    int visibleColumnIndex(const int);
     int editStrategy();
     void setEditStrategy(const int);
     bool isWarranty();
