@@ -25,7 +25,7 @@ int SRepairStatusLog::repair()
 
 void SRepairStatusLog::setRepair(const int repair_id)
 {
-    i_valuesMap.insert("repair_id", repair_id);
+    m_repair = repair_id;
 }
 
 int SRepairStatusLog::status()
@@ -102,42 +102,17 @@ void SRepairStatusLog::setEngineerIndex(const int index)
         setEngineer(engineersModel->databaseIDByRow(index));
 }
 
-void SRepairStatusLog::load(const int id)
-{
-    if(!id)
-        return;
-
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    query->exec(QUERY_SEL_REPAIR_RPRT(id));
-    if(!query->first())
-        return;
-
-    i_id = id;
-    i_createdUtc = query->value("created_at").toDateTime();
-    m_repair = query->value("repair_id").toInt();
-    m_status = query->value("status_id").toInt();
-    m_user = query->value("user_id").toInt();
-    m_manager = query->value("manager_id").toInt();
-    m_master = query->value("master_id").toInt();
-}
-
 bool SRepairStatusLog::commit()
 {
     if(!m_changed)
         return 1;
 
-    if(i_id)
-    {
-        update();
-    }
-    else
-    {
-        if(m_repair)
-            setRepair(m_repair);
-        setUser(userDbData->value("id").toInt());
-        setCreated(QDateTime::currentDateTime());
-        insert();
-    }
+    i_valuesMap.insert("repair_id", m_repair);
+    setUser(userDbData->value("id").toInt());
+    setCreated(QDateTime::currentDateTime());
+    if(insert())
+        m_changed = 0;
+
     return i_nErr;
 }
 

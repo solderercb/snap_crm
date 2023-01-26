@@ -170,6 +170,7 @@ private slots:
     void saveSaleTableClicked();
     void setSaveSaleTableEnabled();
     void buttonWorksAdminEdit(bool state);
+    void addCustomWork();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

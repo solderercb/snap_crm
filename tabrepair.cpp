@@ -109,7 +109,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->tableViewWorksAndSpareParts->setItemDelegate(itemDelagates);
     ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 //    ui->tableViewWorksAndSpareParts->setReadOnly(true);
-    connect(ui->pushButtonAddWork, SIGNAL(clicked()), worksAndPartsModel, SLOT(addCustomWork()));
+    connect(ui->pushButtonAddWork, SIGNAL(clicked()), this, SLOT(addCustomWork()));
 
     ui->widgetComments->setParentTab(this);
     ui->widgetComments->setMode(SCommentModel::Repair);
@@ -841,6 +841,16 @@ void tabRepair::buttonWorksAdminEdit(bool state)
         ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
         ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO);
     }
+}
+
+void tabRepair::addCustomWork()
+{
+    int row = worksAndPartsModel->rowCount();
+    worksAndPartsModel->addCustomWork();
+
+    ui->tableViewWorksAndSpareParts->scrollToBottom();
+    ui->tableViewWorksAndSpareParts->setCurrentIndex(worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColName));
+    ui->tableViewWorksAndSpareParts->setFocus();
 }
 
 void tabRepair::comboBoxStateIndexChanged(int index)

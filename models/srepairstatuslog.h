@@ -23,7 +23,6 @@ public:
     int engineer();
     void setEngineer(const int);
     void setEngineerIndex(const int);
-    void load(const int id);
     bool commit();
 private:
     int m_repair;

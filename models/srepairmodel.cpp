@@ -104,9 +104,7 @@ void SRepairModel::load(const int id)
     m_cartridge = repair->value("cartridge").toInt();
     m_vendorId = repair->value("vendor_id").toInt();
     m_termsControl = repair->value("termsControl").toBool();
-    m_repairStatusLog->setRepair(id);
-    m_repairStatusLog->setManager(m_currentManager);
-    m_repairStatusLog->setEngineer(m_master);
+    m_repairStatusLog->setRepair(i_id);
 
     delete repair;
     emit modelUpdated();
@@ -381,6 +379,8 @@ void SRepairModel::setState(const int id)
     i_valuesMap.insert("state", m_state);
     appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
     m_repairStatusLog->setStatus(m_state);
+    m_repairStatusLog->setManager(m_currentManager); // менеджер и мастер могут быть изменены между сменами статуса
+    m_repairStatusLog->setEngineer(m_master);
 }
 
 void SRepairModel::setStateIndex(const int index)
@@ -927,7 +927,6 @@ bool SRepairModel::commit()
     {
         if(!update())
             throw 1;
-
     }
     else
     {
