@@ -58,8 +58,6 @@ class MainWindow : public QMainWindow
 signals:
 	void DBConnectErr(const QString &message);
 	void DBConnectOK();
-
-
 public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();
@@ -67,7 +65,6 @@ public:
     QTimer *test_scheduler, *test_scheduler2;
     uint test_scheduler_counter = 0;
 #endif
-
 private:
     explicit MainWindow(windowsDispatcher *parent = nullptr);
     Ui::MainWindow *ui;
@@ -109,6 +106,8 @@ private slots:
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void createTabWarehouseItems(int type = 0, QWidget *caller = nullptr);
+    void createTabSparePart(int);
+    void createTabSparePartReserve(int);
     bool closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);

@@ -106,6 +106,8 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
     ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
     connect(ui->tableViewWorksAndSpareParts, SIGNAL(pressed(QModelIndex)), worksAndPartsModel, SLOT(indexSelected(QModelIndex)));
+    connect(ui->tableViewWorksAndSpareParts, &worksAndSparePartsTable::createTabSparePart, this, &tabRepair::createTabSparePart);
+    connect(ui->tableViewWorksAndSpareParts, &worksAndSparePartsTable::createTabSparePartReserve, this, &tabRepair::createTabSparePartReserve);
     ui->tableViewWorksAndSpareParts->setItemDelegate(itemDelagates);
     ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 //    ui->tableViewWorksAndSpareParts->setReadOnly(true);
@@ -916,6 +918,22 @@ void worksAndSparePartsTable::setModel(QAbstractItemModel *model)
 {
     m_model = static_cast<SSaleTableModel*>(model);
     QTableView::setModel(model);
+}
+
+void worksAndSparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    int row = currentIndex().row();
+    if(m_model->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool())
+    {
+        if(event->modifiers() == Qt::ControlModifier)
+        {
+            clearSelection();
+            selectionModel()->select(currentIndex(), QItemSelectionModel::Select);
+            emit createTabSparePart(m_model->index(row, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
+        }
+        else
+            emit createTabSparePartReserve(m_model->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
+    }
 }
 
 int worksAndSparePartsTable::sizeHintForColumn(int column) const

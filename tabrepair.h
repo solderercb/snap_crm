@@ -34,11 +34,15 @@ class worksAndSparePartsTable : public QTableView
 {
     Q_OBJECT
 
+signals:
+    void createTabSparePart(int);
+    void createTabSparePartReserve(int);
 public:
     explicit worksAndSparePartsTable(QWidget *parent = nullptr);
     ~worksAndSparePartsTable();
     void resizeEvent(QResizeEvent*) override;
     void setModel(QAbstractItemModel *model) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 protected:
     int sizeHintForColumn(int column) const override;
 private:
@@ -73,6 +77,7 @@ signals:
     void generatePrintout(QMap<QString,QVariant>);
     void createTabClient(int);
     void createTabSparePart(int);
+    void createTabSparePartReserve(int);
     void createTabSelectItem(int, QWidget*);
 
 public:

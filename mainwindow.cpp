@@ -63,16 +63,15 @@ MainWindow::MainWindow(windowsDispatcher*) :
     ui->tabWidget->tabBar()->installEventFilter(tabBarEventFilterObj);
 
     this->move(0, 0);   // размер и положение окна по умолчанию
-    this->resize(1440, 960);
+    this->resize(1366, 768);
+
+    this->move(userLocalData->value("WorkspaceLeft").toInt(), userLocalData->value("WorkspaceTop").toInt());
+    this->resize(userLocalData->value("WorkspaceWidth").toInt(), userLocalData->value("WorkspaceHeight").toInt());
+
     if(userLocalData->value("WorkspaceState").toString() == "Maximized")
-    {
         setWindowState(Qt::WindowMaximized);
-    }
-    else
-    {
-        this->move(userLocalData->value("WorkspaceLeft").toInt(), userLocalData->value("WorkspaceTop").toInt());
-        this->resize(userLocalData->value("WorkspaceWidth").toInt(), userLocalData->value("WorkspaceHeight").toInt());
-    }
+    else if(userLocalData->value("WorkspaceState").toString() == "Minimized")
+        setWindowState(Qt::WindowMinimized);
 
     createMenu();
 #ifdef QT_DEBUG
@@ -96,6 +95,22 @@ MainWindow::MainWindow(windowsDispatcher*) :
 // https://stackoverflow.com/a/17482796
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    switch (window()->windowState())
+    {
+        case Qt::WindowMaximized: userLocalData->insert("WorkspaceState", "Maximized"); break;
+        case Qt::WindowMinimized: userLocalData->insert("WorkspaceState", "Minimized"); break;
+        case Qt::WindowNoState:
+            {
+                userLocalData->insert("WorkspaceState", "Normal");
+                userLocalData->insert("WorkspaceWidth", size().width());
+                userLocalData->insert("WorkspaceHeight", size().height());
+                userLocalData->insert("WorkspaceLeft", pos().x());
+                userLocalData->insert("WorkspaceTop", pos().y());
+                break;
+            }
+    }
+    userLocalData->saveSettings();
+
     for(int i = ui->tabWidget->count() - 1; i >= 0; i--)
         if(!closeTab(i))
         {
@@ -320,6 +335,8 @@ void MainWindow::createTabRepair(int repair_id)
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(updateTabTitle(QWidget*)), this, SLOT(updateTabTitle(QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectItem(int,QWidget*)), this, SLOT(createTabWarehouseItems(int,QWidget*)));
+    QObject::connect(subwindow,SIGNAL(createTabSparePart(int)), this, SLOT(createTabSparePart(int)));
+    QObject::connect(subwindow,SIGNAL(createTabSparePartReserve(int)), this, SLOT(createTabSparePartReserve(int)));
 }
 
 void MainWindow::createTabRepairNew()
@@ -407,6 +424,16 @@ void MainWindow::createTabInvoices(int type, QWidget *caller)
 void MainWindow::createTabWarehouseItems(int type, QWidget *caller)
 {
     qDebug().nospace() << "TODO: [MainWindow] createTabWarehouseItems()";
+}
+
+void MainWindow::createTabSparePart(int id)
+{
+    qDebug().nospace() << "TODO: [" << this << "] createTabSparePart() | id = " << id;
+}
+
+void MainWindow::createTabSparePartReserve(int id)
+{
+    qDebug().nospace() << "TODO: [" << this << "] createTabSparePartReserve() | id = " << id;
 }
 
 void MainWindow::reactivateCallerTab(QWidget *caller)

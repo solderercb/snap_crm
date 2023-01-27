@@ -59,6 +59,7 @@ SOURCES += \
     models/sfieldsmodel.cpp \
     models/sfieldvaluemodel.cpp \
     models/sinvoicemodel.cpp \
+    models/slocalsettings.cpp \
     models/spaymenttypemodel.cpp \
     models/spaymenttypesmodel.cpp \
     models/srepairmodel.cpp \
@@ -139,6 +140,7 @@ HEADERS  += \
     models/sfieldsmodel.h \
     models/sfieldvaluemodel.h \
     models/sinvoicemodel.h \
+    models/slocalsettings.h \
     models/spaymenttypemodel.h \
     models/spaymenttypesmodel.h \
     models/srepairmodel.h \
