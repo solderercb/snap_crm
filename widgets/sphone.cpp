@@ -25,6 +25,7 @@ SPhone::SPhone(QWidget *parent) :
     connect(ui->checkBoxViber,SIGNAL(clicked(bool)), this,SLOT(checkBoxViberClicked(bool)));
     connect(ui->checkBoxTelegram,SIGNAL(clicked(bool)), this,SLOT(checkBoxTelegramClicked(bool)));
     connect(ui->checkBoxWhatsapp,SIGNAL(clicked(bool)), this,SLOT(checkBoxWhatsappClicked(bool)));
+    connect(ui->checkBoxSMS,SIGNAL(clicked(bool)), this,SLOT(checkBoxSMSClicked(bool)));
 }
 
 SPhone::SPhone(SPhoneModel *model, QWidget *parent) :
@@ -57,6 +58,7 @@ void SPhone::setModel(SPhoneModel *model)
     ui->checkBoxViber->setChecked(m_messengers&SPhoneModel::Viber);
     ui->checkBoxTelegram->setChecked(m_messengers&SPhoneModel::Telegram);
     ui->checkBoxWhatsapp->setChecked(m_messengers&SPhoneModel::Whatsapp);
+    ui->checkBoxSMS->setChecked(model->receiveSMS());
     ui->lineEditNotes->setText(model->note());
 
     m_isPrimary = model->type();
@@ -77,6 +79,7 @@ void SPhone::setReadOnly(bool state)
     ui->checkBoxViber->setEnabled(!state);
     ui->checkBoxTelegram->setEnabled(!state);
     ui->checkBoxWhatsapp->setEnabled(!state);
+    ui->checkBoxSMS->setEnabled(!state);
 }
 
 void SPhone::clear()
@@ -254,6 +257,11 @@ void SPhone::checkBoxTelegramClicked(bool state)
 void SPhone::checkBoxWhatsappClicked(bool state)
 {
     m_phoneModel->setMessengers(SPhoneModel::Whatsapp, state);
+}
+
+void SPhone::checkBoxSMSClicked(bool state)
+{
+    m_phoneModel->setReceiveSMS(state);
 }
 
 SCheckBox::SCheckBox(QWidget *parent) :

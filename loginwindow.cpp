@@ -79,7 +79,7 @@ int LoginWindow::checkSchema()
 
     queryCheckSchema.exec(QUERY_SEL_ASC_SCHEMA_VER);
     queryCheckSchema.first();
-    if(queryCheckSchema.value(0).toString() != "ASC.Scripts.Script000307.sql")  // версия БД АСЦ должна соответствовать версии приложения 3.7.31.1123
+    if(queryCheckSchema.value(0).toString() != "ASC.Scripts.Script000326.sql")  // версия БД АСЦ должна соответствовать версии приложения 3.7.31.1123
         throw 3;    // Попытка подключения к старой версии БД ...
     queryCheckSchema.clear();
 

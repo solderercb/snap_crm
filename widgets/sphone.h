@@ -78,6 +78,7 @@ private slots:
     void checkBoxViberClicked(bool);
     void checkBoxTelegramClicked(bool);
     void checkBoxWhatsappClicked(bool);
+    void checkBoxSMSClicked(bool);
 };
 
 #endif // SPhone_H

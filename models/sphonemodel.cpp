@@ -24,6 +24,7 @@ SPhoneModel::SPhoneModel(const QSqlRecord &record, QObject *parent) : SPhoneMode
                    (record.value("telegram").toBool()?Messengers::Telegram:0) | \
                    (record.value("whatsapp").toBool()?Messengers::Whatsapp:0);
     m_initialMessengers = m_messengers;
+    m_receiveSMS = record.value("notify").toBool();
 }
 
 SPhoneModel::~SPhoneModel()
@@ -38,6 +39,8 @@ bool SPhoneModel::commit()
     }
     else
     {
+        if(!i_valuesMap.contains("notify"))
+            i_valuesMap.insert("notify", comSettings->value("newClientSmsEnabled", 0));    // TODO: добавить значение по умолчанию в общие настройки
         insert();
     }
     commitLogs();
@@ -199,6 +202,16 @@ bool SPhoneModel::delDBRecord()
     i_logRecord->setText(tr("Номер %1 удалён").arg(m_phone));
     i_logRecord->commit();
     return SComRecord::del();
+}
+
+bool SPhoneModel::receiveSMS()
+{
+    return m_receiveSMS;
+}
+
+void SPhoneModel::setReceiveSMS(bool state)
+{
+    i_valuesMap.insert("notify", state);
 }
 
 /*  SLOT: Установка основным номером через UI (т. е. включение checkBox'а мышкой)

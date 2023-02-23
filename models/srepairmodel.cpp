@@ -2,7 +2,7 @@
 
 SRepairModel::SRepairModel(QObject *parent) : SComRecord(parent)
 {
-    i_obligatoryFields << "client" << "type" << "maker" << "office" << "manager" << "diagnostic_result" << "in_date" << "fault" << "reject_reason" << "company" << "start_office" << "current_manager" << "master";
+    i_obligatoryFields << "client" << "type" << "maker" << "office" << "manager" << "diagnostic_result" << "in_date" << "ext_notes" << "fault" << "reject_reason" << "company" << "start_office" << "current_manager" << "master";
     i_tableName = "workshop";
     m_clientModel = new SClientModel();
     m_repairStatusLog = new SRepairStatusLog(0);

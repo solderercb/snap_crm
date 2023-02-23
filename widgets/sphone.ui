@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
+    <width>896</width>
     <height>22</height>
    </rect>
   </property>
@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,1,0,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,1,0,0,0,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
@@ -125,6 +125,16 @@
       <widget class="QCheckBox" name="checkBoxWhatsapp">
        <property name="text">
         <string>WhatsApp</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBoxSMS">
+       <property name="toolTip">
+        <string>Согласен получать SMS</string>
+       </property>
+       <property name="text">
+        <string>SMS</string>
        </property>
       </widget>
      </item>

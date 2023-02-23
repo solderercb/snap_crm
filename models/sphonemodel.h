@@ -38,6 +38,8 @@ public:
     bool isEmpty();
     void setPrimary(int primary = Primary);
     bool delDBRecord();
+    bool receiveSMS();
+    void setReceiveSMS(bool state);
 private:
     int m_client_id = 0;
     QString m_phone;
@@ -47,6 +49,7 @@ private:
     int m_mask;
     int m_messengers = 0;
     int m_initialMessengers = 0;
+    bool m_receiveSMS = 0;
     QString cleanPhone(const QString &);
     void setType(const int type);
 
