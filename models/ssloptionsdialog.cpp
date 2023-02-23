@@ -21,20 +21,20 @@ SSLOptionsDialog::SSLOptionsDialog(QWidget *p, Qt::WindowFlags f) :
     signalMapper->setMapping(ui->toolButtonSSLCAPath, 3);
     QObject::connect(ui->toolButtonSSLCAPath, SIGNAL(clicked()), signalMapper, SLOT(map()));
 
-    ui->lineEditSSLKey->setText(userLocalData->value("SSLKey").toString());
-    ui->lineEditSSLCert->setText(userLocalData->value("SSLCert").toString());
-    ui->lineEditSSLCA->setText(userLocalData->value("SSLCA").toString());
+    ui->lineEditSSLKey->setText(userLocalData->SSLKey.value);
+    ui->lineEditSSLCert->setText(userLocalData->SSLCert.value);
+    ui->lineEditSSLCA->setText(userLocalData->SSLCA.value);
 
     /* MySQL 5.7.38, похоже, не дружит с CAPATH, поэтому выключено (хотя я сильно не вникал)
      * если указать SSL_CAPATH вместо SSL_CA, то драйвер ругается:
      *      SSL connection error: error:00000001:lib(0):func(0):reason(1)
      */
-//    ui->lineEditSSLCAPath->setText(userLocalData->value("SSLCAPath").toString());
+//    ui->lineEditSSLCAPath->setText(userLocalData->SSLCAPath.value);
     ui->labelSSLCAPath->setEnabled(false);
     ui->lineEditSSLCAPath->setEnabled(false);
     ui->toolButtonSSLCAPath->setEnabled(false);
 
-    ui->lineEditSSLCipher->setText(userLocalData->value("SSLCipher").toString());
+    ui->lineEditSSLCipher->setText(userLocalData->SSLCipher.value);
 }
 
 SSLOptionsDialog::~SSLOptionsDialog()
@@ -69,11 +69,11 @@ void SSLOptionsDialog::cancel()
 
 void SSLOptionsDialog::ok()
 {
-    userLocalData->insert("SSLKey", ui->lineEditSSLKey->text());
-    userLocalData->insert("SSLCert", ui->lineEditSSLCert->text());
-    userLocalData->insert("SSLCA", ui->lineEditSSLCA->text());
-    userLocalData->insert("SSLCAPath", ui->lineEditSSLCAPath->text());
-    userLocalData->insert("SSLCipher", ui->lineEditSSLCipher->text());
+    userLocalData->SSLKey.value = ui->lineEditSSLKey->text();
+    userLocalData->SSLCert.value = ui->lineEditSSLCert->text();
+    userLocalData->SSLCA.value = ui->lineEditSSLCA->text();
+    userLocalData->SSLCAPath.value = ui->lineEditSSLCAPath->text();
+    userLocalData->SSLCipher.value = ui->lineEditSSLCipher->text();
     emit close();
 }
 

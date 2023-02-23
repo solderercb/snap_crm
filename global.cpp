@@ -6,10 +6,10 @@ QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 QMap<QString, QVariant> *userDbData = new QMap<QString, QVariant>;
 QSqlQueryModel *userDbDataModel = new QSqlQueryModel();
-SLocalSettings *userLocalData = nullptr;
+SLocalSettings *localSettings = new SLocalSettings();
+t_userSettings *userLocalData = nullptr;
 QMap<QString, bool> *permissions = new QMap<QString, bool>;
 QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
-//SStandardItemModel *clientPhoneTypesModel = new SStandardItemModel();
 SSqlQueryModel *clientPhoneTypesModel = new SSqlQueryModel();
 SSqlQueryModel *companiesModel = new SSqlQueryModel;
 SSqlQueryModel *officesModel = new SSqlQueryModel;

@@ -21,5 +21,7 @@
     <file>light/down-arrow.png</file>
     <file>light/toggle_sw_on.png</file>
     <file>light/toggle_sw_off.png</file>
+    <file>light/mode_sw_left.png</file>
+    <file>light/mode_sw_right.png</file>
   </qresource>
 </RCC>

@@ -34,13 +34,16 @@ public:
     static tabRepairs* getInstance(bool type, MainWindow *parent = nullptr);
     ~tabRepairs();
     QString tabTitle() override;
+    void updateWidgets();
 private:
+    enum TableMode{NoCartridges = 0, Cartridges = 1};
     Ui::tabRepairs *ui;
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
     bool _type;
     QTableView* tableView;
     QSqlQueryModel* repairs_table;
+    QSqlQueryModel* cartridges_table = nullptr;
     QString query_static;
     QString query_where_static;
     QString query_group_static;
@@ -63,6 +66,7 @@ private slots:
     void tableSectionMoved(int, int, int);
     void tableSectionResized(int, int, int);
     void tableSortingChanged(int, Qt::SortOrder);
+    void tableModeChanged(bool mode);
 #ifdef QT_DEBUG
     void test_scheduler_handler(){};
     void test_scheduler2_handler(){};

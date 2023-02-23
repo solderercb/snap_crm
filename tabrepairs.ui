@@ -57,10 +57,58 @@
         <item row="1" column="0">
          <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,0,1,0" columnminimumwidth="0,0,0,0,200">
           <item row="0" column="0">
-           <layout class="QGridLayout" name="LeftGridLayout_2" columnstretch="0">
+           <layout class="QGridLayout" name="LeftGridLayout_2" columnstretch="0,0">
             <property name="sizeConstraint">
              <enum>QLayout::SetFixedSize</enum>
             </property>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="switchTableMode">
+              <property name="toolTip">
+               <string>Сохранять список работ и деталей после каждого изменения</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton{ background-color: rgba(255, 255, 255, 0); border: none;}
+QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
+</string>
+              </property>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+              <property name="icon">
+               <iconset resource="styles/styles.qrc">
+                <normaloff>:/icons/light/mode_sw_left.png</normaloff>
+                <normalon>:/icons/light/mode_sw_right.png</normalon>:/icons/light/mode_sw_left.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>30</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="labelTableMode">
+              <property name="text">
+               <string>labelTableMode</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="indent">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="0" column="2">
@@ -192,7 +240,9 @@
   <tabstop>buttonShowParamsPopupMenu</tabstop>
   <tabstop>buttonRefreshTable</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="styles/styles.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>lineEditSearch</sender>
@@ -249,12 +299,28 @@
    <slot>refreshTable()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>363</x>
-     <y>733</y>
+     <x>469</x>
+     <y>742</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
      <y>713</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>switchTableMode</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tabRepairs</receiver>
+   <slot>tableModeChanged(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>31</x>
+     <y>735</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>752</y>
     </hint>
    </hints>
   </connection>
@@ -274,5 +340,6 @@
   <slot>lineEditSearchReturnPressed()</slot>
   <slot>tableItemDoubleClick(QModelIndex)</slot>
   <slot>refreshTable()</slot>
+  <slot>tableModeChanged(bool)</slot>
  </slots>
 </ui>

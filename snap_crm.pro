@@ -27,6 +27,8 @@ RC_FILE = resources.rc
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += LIMEREPORT_IMPORTS
+DEFINES += QS_HAS_JSON
+DEFINES += QS_HAS_XML
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -116,6 +118,7 @@ SOURCES += \
     windowsdispatcher.cpp
 
 HEADERS  += \
+    3rdparty/qserializer.h \
     amountToWords.h \
     applog.h \
     appver.h \
@@ -141,6 +144,7 @@ HEADERS  += \
     models/sfieldvaluemodel.h \
     models/sinvoicemodel.h \
     models/slocalsettings.h \
+    models/slocalsettingsstructs.h \
     models/spaymenttypemodel.h \
     models/spaymenttypesmodel.h \
     models/srepairmodel.h \
@@ -178,6 +182,7 @@ HEADERS  += \
     tabrepairnew.h \
     tabrepairs.h \
     tabsale.h \
+    widgets/stableviewgridlayout.h \
     widgets/getoutdialog.h \
     widgets/saletableitemdelegates.h \
     widgets/sclientmatch.h \

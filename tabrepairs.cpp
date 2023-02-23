@@ -24,6 +24,9 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     ui->tableView->horizontalHeader()->setSectionsMovable(true);  // возможность двигать столбцы (ну шоб как АСЦ было :-) )
     ui->tableView->verticalHeader()->hide();
     repairs_table = new repairsTableModel();
+    if(comSettings->value("cartridge_enable").toBool())
+        cartridges_table = new repairsTableModel();
+
     ui->tableView->setModel(repairs_table);
     if (type == 1)
     {
@@ -53,6 +56,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(refreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
+    updateWidgets();
     refreshTable();
 }
 
@@ -70,6 +74,23 @@ QString tabRepairs::tabTitle()
         return tr("Выбрать ремонт");
     else
         return tr("Ремонты");
+}
+
+void tabRepairs::updateWidgets()
+{
+    if(!comSettings->value("cartridge_enable").toBool())
+    {
+        ui->switchTableMode->hide();
+        ui->labelTableMode->hide();
+        tableModeChanged(NoCartridges);
+    }
+    else
+    {
+        ui->switchTableMode->show();
+        ui->labelTableMode->show();
+        tableModeChanged(NoCartridges);
+//        tableModeChanged(userLocalData-><TODO: defaultTableMode>.value);
+    }
 }
 
 tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
@@ -95,6 +116,10 @@ void tabRepairs::refreshTable()
     query_where.clear();
 
     /* Собираем условия для запроса */
+    if(ui->switchTableMode->isChecked())
+    {
+        query_where << QString("t2.`refill` = 1");
+    }
     if (ui->lineEditSearch->text().length() > 0)    // если строка поиска не пуста
     {
         query_where << QString("(t1.`id` LIKE '%%1%' OR LCASE(t1.`title`) REGEXP LCASE('%1') OR LCASE(t1.`serial_number`) REGEXP LCASE('%1') OR LCASE(CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic)) REGEXP LCASE('%1')) AND t1.`company` = 1").arg(ui->lineEditSearch->text());
@@ -192,5 +217,15 @@ void tabRepairs::tableSortingChanged(int column, Qt::SortOrder order)
 {
     qDebug() << "Slot tableSortingChanged(int, Qt::SortOrder)";
     repairs_table->sort(column, order);
+}
+
+void tabRepairs::tableModeChanged(bool mode)
+{
+    if(mode)
+        ui->labelTableMode->setText(tr("Картриджи"));
+    else
+        ui->labelTableMode->setText(tr("Ремонты"));
+
+    refreshTable();
 }
 

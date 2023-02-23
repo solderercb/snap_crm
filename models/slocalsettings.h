@@ -3,42 +3,43 @@
 
 #include <QApplication>
 #include <QObject>
-#include <QDomDocument>
-#include <QtXml>
 #include <QDir>
 #include <QFile>
 #include <QStandardPaths>
 #include <QResource>
 #include <QIODevice>
+#include <QCryptographicHash>
+#include <QCollator>
+#include <3rdparty/QSerializer>
+#define ASC_APP_PATH   "C:/Program Files (x86)/ASCApp"
 #define ASC_SETTINGS_PATH   "VLab/ASC.exe_Url_1ttwwpflaim4gbzvmtfpiarttwuebugu"    // путь к файлу настроек АЦС для пути к приложению "C:\Program Files (x86)\ASCApp\ASC.exe"
 
 class SLocalSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit SLocalSettings(QObject *parent = nullptr);
-    bool contains(const QString &setting);
-    QVariant value(const QString &setting);
-    void insert(const QString &setting, QVariant value);
-    bool saveSettings();
+    // Списки настроек (файлы в папке cfg АСЦ CRM); настройки, помеченные TODO, в АСЦ v3.7.37.1184 не реализованы
+    enum SettingsVariant {UserSettings = 1, RepairsGrid, CartridgesGrid, WorksGrid, PriceGrid, RepairMassEditorGrid, CommentsGrid,
+                      StoreItemsGrid, ProductsGrid, ArrivalGrid, SaleGrid/*, TODO: Товары->Документы*/, BuyRequestManagerGrid, StoreManagementGrid, PriceEditorGrid, XmlExportGrid, StockTakingGrid,
+                      MoveGrid/*, TODO: таблица Документы в карточке товара*/, HistoryGrid,
+                      CustomersGrid, SmsGrid,
+                      CustomerHistoryGrid, CustomerPurchasesGrid, CustomerRepairsGrid, DealerSalesGrid,
+                      KassaGrid, InvoicesGrid, AdditionalPaymentsGrid/*, TODO: таблицы в модуле Зарплата*/,
+                      EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
+                      TasksGrid};
+    Q_ENUM(SettingsVariant)
+    bool import(QSerializer *obj, SettingsVariant variant = UserSettings);
+    bool read(QSerializer *obj, QFile &file);
+    bool read(QSerializer *obj, SettingsVariant variant = UserSettings);
+    bool save(QSerializer *obj, QFile &file);
+    bool save(QSerializer *obj, SettingsVariant variant = UserSettings);
+protected:
 private:
-    QMap<QString, QVariant> m_localSettings;
-    QTimer *m_timeoutToSave;
-    bool m_changed;
-    bool selMostRecentSettingFile(QDir &);
-    bool genSettingsFilePath();
-    bool genAscSettingsFilePath();
-    bool readSettings(QFile &file);
-    bool readSettingsNode(QDomNode &n);
-    QDomDocument *settingsDOM = nullptr;
-    QDomElement docElem;
-    QFile settingsFile;
-    QFile settingsAscFile;
-    QDir settingsPath;
-    QDir settingsAscPath;
-    QFile prevAppVerSettingsFile;
-signals:
-
+    SettingsVariant m_settingsVariant;
+    bool selMostRecentSettingFile(const QString &fileName);
+    bool genSettingsFilePath(QFile &file);
+    bool genAscSettingsFilePath(QFile &file);
+    bool openFile(QFile &file, QIODevice::OpenModeFlag mode = QIODevice::ReadOnly);
 };
 
 #endif // SLOCALSETTINGS_H

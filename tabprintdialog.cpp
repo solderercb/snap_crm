@@ -39,30 +39,24 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv):
     QRegularExpressionValidator v(re);
     if(v.validate(report_type, pos) == QValidator::Acceptable)
     {
-        if(userLocalData->contains("StickersPrinter"))
-        {
-            rdpKeywordPos = userLocalData->value("StickersPrinter").toString().indexOf(rdpKeywordRegExp);    // вернёт -1 если не найдёт
-            if(rdpKeywordPos >= 0)  // если будет найден паттерн rdpKeywordRegExp, то и поиск индекса принтера будет происходить по рег. выражению
-                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(QRegularExpression(userLocalData->value("StickersPrinter").toString().left(rdpKeywordPos)+
-                                                                            rdpKeywordRegExp.pattern())) );
-            else                    // иначе по простой строке (чтобы в случае содержащихся в названии принтера спец. символов рег. выражений корректно определялся индекс)
-                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(userLocalData->value("StickersPrinter").toString()));
-        }
+        rdpKeywordPos = userLocalData->StickersPrinter.value.indexOf(rdpKeywordRegExp);    // вернёт -1 если не найдёт
+        if(rdpKeywordPos >= 0)  // если будет найден паттерн rdpKeywordRegExp, то и поиск индекса принтера будет происходить по рег. выражению
+            ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(QRegularExpression(userLocalData->StickersPrinter.value.left(rdpKeywordPos)+
+                                                                        rdpKeywordRegExp.pattern())) );
+        else                    // иначе по простой строке (чтобы в случае содержащихся в названии принтера спец. символов рег. выражений корректно определялся индекс)
+            ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(userLocalData->StickersPrinter.value));
     }
     pos = 0;
     re.setPattern("sticker1|sticker2|sticker3|rep_label|slip");  // принтер документов (слип-чек не знаю на каком принтере должен печататься, поэтому тоже исключен)
     v.setRegularExpression(re);
     if(v.validate(report_type, pos) == QValidator::Invalid)
     {
-        if (userLocalData->contains("DocsPrinter"))
-        {
-            rdpKeywordPos = userLocalData->value("DocsPrinter").toString().indexOf(rdpKeywordRegExp);
-            if(rdpKeywordPos >= 0)
-                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(QRegularExpression(userLocalData->value("DocsPrinter").toString().left(rdpKeywordPos)+
-                                                                            rdpKeywordRegExp.pattern())) );
-            else
-                ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(userLocalData->value("DocsPrinter").toString()));
-        }
+        rdpKeywordPos = userLocalData->DocsPrinter.value.indexOf(rdpKeywordRegExp);
+        if(rdpKeywordPos >= 0)
+            ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(QRegularExpression(userLocalData->DocsPrinter.value.left(rdpKeywordPos)+
+                                                                        rdpKeywordRegExp.pattern())) );
+        else
+            ui->comboBoxPrinters->setCurrentIndex( printersList.indexOf(userLocalData->DocsPrinter.value));
     }
     connect(ui->comboBoxPrinters, &QComboBox::currentTextChanged, this, &tabPrintDialog::setPrinter);   // подключение сигнал-слот именно здесь, чтобы избежать лишних вызовов слота при установке принтеров, сохранённых в настройках
     initPrinter(false);

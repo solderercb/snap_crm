@@ -65,12 +65,12 @@ MainWindow::MainWindow(windowsDispatcher*) :
     this->move(0, 0);   // размер и положение окна по умолчанию
     this->resize(1366, 768);
 
-    this->move(userLocalData->value("WorkspaceLeft").toInt(), userLocalData->value("WorkspaceTop").toInt());
-    this->resize(userLocalData->value("WorkspaceWidth").toInt(), userLocalData->value("WorkspaceHeight").toInt());
+    this->move(userLocalData->WorkspaceLeft.value, userLocalData->WorkspaceTop.value);
+    this->resize(userLocalData->WorkspaceWidth.value, userLocalData->WorkspaceHeight.value);
 
-    if(userLocalData->value("WorkspaceState").toString() == "Maximized")
+    if(userLocalData->WorkspaceState.value == "Maximized")
         setWindowState(Qt::WindowMaximized);
-    else if(userLocalData->value("WorkspaceState").toString() == "Minimized")
+    else if(userLocalData->WorkspaceState.value == "Minimized")
         setWindowState(Qt::WindowMinimized);
 
     createMenu();
@@ -97,19 +97,19 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     switch (window()->windowState())
     {
-        case Qt::WindowMaximized: userLocalData->insert("WorkspaceState", "Maximized"); break;
-        case Qt::WindowMinimized: userLocalData->insert("WorkspaceState", "Minimized"); break;
+        case Qt::WindowMaximized: userLocalData->WorkspaceState.value = "Maximized"; break;
+        case Qt::WindowMinimized: userLocalData->WorkspaceState.value = "Minimized"; break;
         case Qt::WindowNoState:
             {
-                userLocalData->insert("WorkspaceState", "Normal");
-                userLocalData->insert("WorkspaceWidth", size().width());
-                userLocalData->insert("WorkspaceHeight", size().height());
-                userLocalData->insert("WorkspaceLeft", pos().x());
-                userLocalData->insert("WorkspaceTop", pos().y());
+                userLocalData->WorkspaceState.value = "Normal";
+                userLocalData->WorkspaceWidth.value = size().width();
+                userLocalData->WorkspaceHeight.value = size().height();
+                userLocalData->WorkspaceLeft.value = pos().x();
+                userLocalData->WorkspaceTop.value = pos().y();
                 break;
             }
     }
-    userLocalData->saveSettings();
+    localSettings->save(userLocalData);
 
     for(int i = ui->tabWidget->count() - 1; i >= 0; i--)
         if(!closeTab(i))
@@ -682,24 +682,6 @@ void MainWindow::get_warehouses_list()
 
 void MainWindow::createTestTab()
 {
-
-    QPushButton* pushButton05 = new QPushButton();
-    pushButton05->setText("pushButton05");
-//    pushButton05->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
-    ui->gridLayout_4->addWidget(pushButton05, 0, 0, 1, 1);
-    QPushButton* pushButton04 = new QPushButton();
-    pushButton04->setText("pushButton04");
-    ui->gridLayout_4->addWidget(pushButton04, 1, 1, 1, 1);
-    QPushButton* pushButton03 = new QPushButton();
-    pushButton03->setText("pushButton03");
-    ui->gridLayout_4->addWidget(pushButton03, 2, 2, 1, 1);
-    QPushButton* pushButton02 = new QPushButton();
-    pushButton02->setText("pushButton02");
-    ui->gridLayout_4->addWidget(pushButton02, 3, 3, 1, 1);
-    QPushButton* pushButton01 = new QPushButton();
-    pushButton01->setText("pushButton01");
-    ui->gridLayout_4->addWidget(pushButton01, 4, 4, 1, 1);
-
     comboboxSourceModel = new QStandardItemModel();
     ui->comboBoxSourceWarehouse->setModel(comboboxSourceModel);
     comboboxDestModel = new QStandardItemModel();

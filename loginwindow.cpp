@@ -15,29 +15,15 @@ LoginWindow::LoginWindow(QObject*) :
     ui->labelAppVer->setText(QString(APP_VER));
 
     debugInitLoginOptions();
-    userLocalData = new SLocalSettings;
+    userLocalData = new t_userSettings;
 
-    if (userLocalData->contains("lastLogin"))
-    {
-        ui->editIPaddr->setText(userLocalData->value("dbHost").toString());
-    }
-    if (userLocalData->contains("lastLogin"))
-    {
-        ui->editPort->setText(userLocalData->value("dbPort").toString());
-    }
-    if (userLocalData->contains("lastLogin"))
-    {
-        ui->editDBName->setText(userLocalData->value("dbName").toString());
-    }
-    if (userLocalData->contains("lastLogin"))
-    {
-        ui->editLogin->setText(userLocalData->value("lastLogin").toString());
-        ui->editPassword->setFocus();
-    }
-    if (userLocalData->contains("SSLConnection"))
-    {
-        ui->checkBoxSSL->setChecked(userLocalData->value("SSLConnection").toBool());
-    }
+    localSettings->read(userLocalData);
+    ui->editIPaddr->setText(userLocalData->dbHost.value);
+    ui->editPort->setText(userLocalData->dbPort.value);
+    ui->editDBName->setText(userLocalData->dbName.value);
+    ui->editLogin->setText(userLocalData->lastLogin.value);
+    ui->editPassword->setFocus();
+    ui->checkBoxSSL->setChecked(userLocalData->SSLConnection.value);
 
 //  shortlivedNotification::setSize(385, 90);
     shortlivedNotification::setAppearance(this, shortlivedNotification::bottomRight);
@@ -290,16 +276,11 @@ void LoginWindow::btnLoginHandler()
     connOptions << ("MYSQL_OPT_RECONNECT=1");
     if(ui->checkBoxSSL->isChecked())
     {
-        if(userLocalData->contains("SSLKey") && userLocalData->value("SSLKey").toString() != "")
-            connOptions << QString("SSL_KEY=%1").arg(userLocalData->value("SSLKey").toString());
-        if(userLocalData->contains("SSLCert") && userLocalData->value("SSLCert").toString() != "")
-            connOptions << QString("SSL_CERT=%1").arg(userLocalData->value("SSLCert").toString());
-        if(userLocalData->contains("SSLCA") && userLocalData->value("SSLCA").toString() != "")
-            connOptions << QString("SSL_CA=%1").arg(userLocalData->value("SSLCA").toString());
-        if(userLocalData->contains("SSLCAPath") && userLocalData->value("SSLCAPath").toString() != "")
-            connOptions << QString("SSL_CAPATH=%1").arg(userLocalData->value("SSLCAPath").toString());
-        if(userLocalData->contains("SSLCipher") && userLocalData->value("SSLCipher").toString() != "")
-            connOptions << QString("SSL_CIPHER=%1").arg(userLocalData->value("SSLCipher").toString());
+        connOptions << QString("SSL_KEY=%1").arg(userLocalData->SSLKey.value);
+        connOptions << QString("SSL_CERT=%1").arg(userLocalData->SSLCert.value);
+        connOptions << QString("SSL_CA=%1").arg(userLocalData->SSLCA.value);
+        connOptions << QString("SSL_CAPATH=%1").arg(userLocalData->SSLCAPath.value);
+        connOptions << QString("SSL_CIPHER=%1").arg(userLocalData->SSLCipher.value);
     }
     for (int i=0; i<connections.size(); i++)
     {
@@ -348,12 +329,12 @@ void LoginWindow::btnLoginHandler()
 
                 if(ui->checkBoxSaveOnSuccess->isChecked())
                 {
-                    userLocalData->insert("dbHost", ui->editIPaddr->text());
-                    userLocalData->insert("dbPort", ui->editPort->text());
-                    userLocalData->insert("dbName", ui->editDBName->text());
-                    userLocalData->insert("lastLogin", ui->editLogin->text());
-                    userLocalData->insert("SSLConnection", ui->checkBoxSSL->isChecked());
-                    userLocalData->saveSettings();
+                    userLocalData->dbHost.value = ui->editIPaddr->text();
+                    userLocalData->dbPort.value = ui->editPort->text();
+                    userLocalData->dbName.value = ui->editDBName->text();
+                    userLocalData->lastLogin.value = ui->editLogin->text();
+                    userLocalData->SSLConnection.value =  ui->checkBoxSSL->isChecked();
+                    localSettings->save(userLocalData);
                 }
 
                 // TODO: SplashScreen с сообщениями об этапах инициализации
