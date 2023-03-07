@@ -28,18 +28,19 @@ public:
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
                       TasksGrid};
     Q_ENUM(SettingsVariant)
-    bool import(QSerializer *obj, SettingsVariant variant = UserSettings);
-    bool read(QSerializer *obj, QFile &file);
-    bool read(QSerializer *obj, SettingsVariant variant = UserSettings);
-    bool save(QSerializer *obj, QFile &file);
-    bool save(QSerializer *obj, SettingsVariant variant = UserSettings);
+    bool import(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
+    bool read(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
+    bool save(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
 protected:
 private:
     SettingsVariant m_settingsVariant;
+    void genSettingsFileName(QFile &file, const QString subVariant = "");
     bool selMostRecentSettingFile(const QString &fileName);
-    bool genSettingsFilePath(QFile &file);
-    bool genAscSettingsFilePath(QFile &file);
+    bool genSettingsFileFullPath(QFile &file);
+    bool genAscSettingsFileFullPath(QFile &file);
     bool openFile(QFile &file, QIODevice::OpenModeFlag mode = QIODevice::ReadOnly);
+    bool read(QSerializer *obj, QFile &file);
+    bool save(QSerializer *obj, QFile &file);
 };
 
 #endif // SLOCALSETTINGS_H

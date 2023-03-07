@@ -495,7 +495,7 @@ protected:                                                                      
             if( (isIdentifiedByTag()?1:(domElement.attribute("name").compare(#name) == 0)) )            \
             {                                                                                           \
                 if(QString::compare(#type, "bool") == 0)                                                \
-                    name = text.compare("true", Qt::CaseInsensitive)?0:1;                               \
+                    name = QVariant(text.compare("true", Qt::CaseInsensitive)?0:1).value<type>();       \
                 else                                                                                    \
                     name = QVariant(text).value<type>();                                                \
             }                                                                                           \

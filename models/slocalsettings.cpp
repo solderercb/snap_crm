@@ -34,7 +34,31 @@ bool SLocalSettings::selMostRecentSettingFile(const QString &fileName)
     return 0;
 }
 
-bool SLocalSettings::genSettingsFilePath(QFile &file)
+void SLocalSettings::genSettingsFileName(QFile &file, const QString subVariant)
+{
+    switch(m_settingsVariant)
+    {
+        case UserSettings:
+            file.setFileName("user.config");
+            break;
+        case StoreItemsGrid:
+        case ProductsGrid:
+            file.setFileName(QString(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant))
+                             + "-"
+                             + subVariant
+                             + "-"
+                             + userDbData->value("username").toString()
+                             + ".xml");
+            break;
+        default:
+            file.setFileName(QString(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant))
+                             + "-"
+                             + userDbData->value("username").toString()
+                             + ".xml");
+    }
+}
+
+bool SLocalSettings::genSettingsFileFullPath(QFile &file)
 {
     QDir settingsPath;
     QString appPath = QApplication::applicationDirPath();
@@ -49,15 +73,6 @@ bool SLocalSettings::genSettingsFilePath(QFile &file)
         settingsPath.mkpath(settingsPath.path());
     QDir::setCurrent(settingsPath.path() + "/..");
 
-    switch(m_settingsVariant)
-    {
-        case UserSettings:
-            file.setFileName("user.config");
-            break;
-        default:
-            file.setFileName(QString(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant)) + "-" + userDbData->value("username").toString() + ".xml");
-    }
-
     file.setFileName(settingsPath.path() + "/" + file.fileName());
     if(file.exists())
         return 1;
@@ -71,23 +86,20 @@ bool SLocalSettings::genSettingsFilePath(QFile &file)
     return 0;
 }
 
-bool SLocalSettings::genAscSettingsFilePath(QFile &file)
+bool SLocalSettings::genAscSettingsFileFullPath(QFile &file)
 {
     switch(m_settingsVariant)
     {
         case UserSettings:
             QDir::setCurrent(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/../" + ASC_SETTINGS_PATH);
-            file.setFileName("user.config");
             if (!selMostRecentSettingFile(file.fileName()))     // если найдутся файлы настроек АСЦ, то QDir::current будет обновлена
                 return 0;
             break;
-        case StoreItemsGrid:    // в АСЦ CRM до версии 3.7.37.1184 (включительно) файл имел имя "-0-<имя_пользователя>.xml"
-            QDir::setCurrent(ASC_APP_PATH + QString("/cfg"));
-            file.setFileName("-0-" + userDbData->value("username").toString() + ".xml");
-            break;
+        case StoreItemsGrid:
+            // в АСЦ CRM до версии 3.7.37.1184 (включительно) файл имел имя "-<категория>-<имя_пользователя>.xml", например, "-0-admin.xml"
+            file.setFileName(file.fileName().replace(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant), ""));
         default:
             QDir::setCurrent(ASC_APP_PATH + QString("/cfg"));
-            file.setFileName(QString(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant)) + "-" + userDbData->value("username").toString() + ".xml");
     }
 
     file.setFileName(QDir::current().absolutePath() + "/" + file.fileName()); // установка абсолютного пути к файлу
@@ -106,13 +118,14 @@ bool SLocalSettings::openFile(QFile &file, QIODevice::OpenModeFlag mode)
     return 1;
 }
 
-bool SLocalSettings::import(QSerializer *obj, SettingsVariant variant)
+bool SLocalSettings::import(QSerializer *obj, SettingsVariant variant, const QString subVariant)
 {
     QFile file;
     QByteArray data;
     m_settingsVariant = variant;
 
-    if(!genAscSettingsFilePath(file))
+    genSettingsFileName(file, subVariant);
+    if(!genAscSettingsFileFullPath(file))
         return 0;
 
     if(!openFile(file, QIODevice::ReadOnly))
@@ -150,15 +163,17 @@ bool SLocalSettings::read(QSerializer *obj, QFile &file)
     return 1;
 }
 
-bool SLocalSettings::read(QSerializer *obj, SettingsVariant variant)
+bool SLocalSettings::read(QSerializer *obj, SettingsVariant variant, const QString subVariant)
 {
     QFile file;
     bool ret = 1;
     m_settingsVariant = variant;
-    if (genSettingsFilePath(file))
+
+    genSettingsFileName(file, subVariant);
+    if (genSettingsFileFullPath(file))
         ret = read(obj, file);     // сначала пробуем прочитать свои настройки (соответствующий текущей версии или предыдущий)
     else
-        ret = import(obj, m_settingsVariant);  // если ни один файл не найден, пробуем прочитать настройки ASC
+        ret = import(obj, m_settingsVariant, subVariant);  // если ни один файл не найден, пробуем прочитать настройки ASC
 
     return ret;
 }
@@ -178,11 +193,13 @@ bool SLocalSettings::save(QSerializer *obj, QFile &file)
     return 1;
 }
 
-bool SLocalSettings::save(QSerializer *obj, SettingsVariant variant)
+bool SLocalSettings::save(QSerializer *obj, SettingsVariant variant, const QString subVariant)
 {
     QFile file;
     m_settingsVariant = variant;
-    genSettingsFilePath(file);
+
+    genSettingsFileName(file, subVariant);
+    genSettingsFileFullPath(file);
 
     return save(obj, file);
 }
