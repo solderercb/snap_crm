@@ -25,12 +25,15 @@
         <enum>QLayout::SetMaximumSize</enum>
        </property>
        <item row="0" column="0">
-        <widget class="QTableView" name="tableView">
+        <widget class="STableViewRepairs" name="tableView">
          <property name="selectionBehavior">
           <enum>QAbstractItemView::SelectRows</enum>
          </property>
          <property name="sortingEnabled">
           <bool>true</bool>
+         </property>
+         <property name="wordWrap">
+          <bool>false</bool>
          </property>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
@@ -236,6 +239,13 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>STableViewRepairs</class>
+   <extends>QTableView</extends>
+   <header location="global">widgets/stableviewrepairs.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>buttonShowParamsPopupMenu</tabstop>
   <tabstop>buttonRefreshTable</tabstop>

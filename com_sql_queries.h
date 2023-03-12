@@ -155,23 +155,25 @@
                                                 "   CONCAT_WS(' ', IF(`is_warranty`, 'Г', ''), IF(`is_repeat`, 'П', ''), IF(`express_repair`, 'С', ''), IF(`informed_status`, '*', '')) AS 'marks',\n"\
                                                 "   t1.`id`,\n"\
                                                 "   `Title`,\n"\
-                                                "   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\n"\
-                                                "   CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',\n"\
                                                 "   `serial_number`,\n"\
-                                                "   `office`,\n"\
-                                                "   `manager`,\n"\
+                                                "   `fault`,\n"\
                                                 "   `master`,\n"\
+                                                "   t1.`state` AS 'status',\n"\
+                                                "   `repair_cost`,\n"\
                                                 "   `in_date`,\n"\
                                                 "   `out_date`,\n"\
-                                                "   t1.`state` AS 'status',\n"\
+                                                "   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\n"\
+                                                "   t6.`phone`,\n"\
+                                                "   `box`,\n"\
+                                                "   `manager`,\n"\
+                                                "   '' AS 'Progress',\n"\
+                                                "   CONCAT_WS(' ', t2.`name`,  t3.`name`,  t4.`name`) AS 'device',\n"\
+                                                "   `office`,\n"\
                                                 "   t1.`state`,\n"\
                                                 "   `new_state`,\n"\
                                                 "   `user_lock`,\n"\
                                                 "   `lock_datetime`,\n"\
                                                 "   `quick_repair`,\n"\
-                                                "   `box`,\n"\
-                                                "   `repair_cost`,\n"\
-                                                "   `fault`,\n"\
                                                 "   `thirs_party_sc`,\n"\
                                                 "   `last_save`,\n"\
                                                 "   `last_status_changed`,\n"\
@@ -183,7 +185,8 @@
                                                 "   `vendor_id`,\n"\
                                                 "   `termsControl`,\n"\
                                                 "   `Hidden`,\n"\
-                                                "   `company`\n"\
+                                                "   `company`,\n"\
+                                                "   `informed_status`\n"\
                                                 "FROM `workshop` AS t1\n"\
                                                 "LEFT JOIN `devices` AS t2\n"\
                                                 "   ON t1.`type` = t2.`id`\n"\
@@ -192,7 +195,9 @@
                                                 "LEFT JOIN `device_models` AS t4\n"\
                                                 "   ON t1.model = t4.`id`\n"\
                                                 "LEFT JOIN `clients` AS t5\n"\
-                                                "   ON t1.`client` = t5.`id`")   // Здесь не должно быть точки с запятой!
+                                                "   ON t1.`client` = t5.`id`\n"\
+                                                "LEFT JOIN `tel` AS t6\n"\
+                                                "   ON t5.`id` = t6.`customer` AND t6.`type` = 1\n")   // Здесь не должно быть точки с запятой!
 
 #define QUERY_SEL_REPAIR_DATA(id)           QString(\
                                                 "SELECT\n"\

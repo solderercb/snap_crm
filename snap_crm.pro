@@ -47,7 +47,7 @@ SOURCES += \
     global.cpp \
     loginwindow.cpp \
     mainwindow.cpp \
-    models/repairstablemodel.cpp \
+    models/stablerepairsmodel.cpp \
     models/repairtablefiltermenu.cpp \
     models/stablebasemodel.cpp \
     models/sabstractitemmodel.cpp \
@@ -100,6 +100,9 @@ SOURCES += \
     tabrepairs.cpp \
     tabsale.cpp \
     widgets/stableviewbase.cpp \
+    widgets/stableviewbaseitemdelegates.cpp \
+    widgets/stableviewrepairsitemdelegates.cpp \
+    widgets/stableviewrepairs.cpp \
     widgets/getoutdialog.cpp \
     widgets/saletableitemdelegates.cpp \
     widgets/sclientmatch.cpp \
@@ -131,7 +134,7 @@ HEADERS  += \
     global.h \
     loginwindow.h \
     mainwindow.h \
-    models/repairstablemodel.h \
+    models/stablerepairsmodel.h \
     models/repairtablefiltermenu.h \
     models/stablebasemodel.h \
     models/sabstractitemmodel.h \
@@ -185,8 +188,11 @@ HEADERS  += \
     tabrepairnew.h \
     tabrepairs.h \
     tabsale.h \
+    widgets/stableviewbaseitemdelegates.h \
+    widgets/stableviewrepairsitemdelegates.h \
     widgets/stableviewgridlayout.h \
     widgets/stableviewbase.h \
+    widgets/stableviewrepairs.h \
     widgets/getoutdialog.h \
     widgets/saletableitemdelegates.h \
     widgets/sclientmatch.h \

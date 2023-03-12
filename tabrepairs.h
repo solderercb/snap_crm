@@ -14,7 +14,7 @@
 #include <QWidgetAction>
 #include <QTimer>
 #include "tabcommon.h"
-#include "models/repairstablemodel.h"
+#include "models/stablerepairsmodel.h"
 #include "models/repairtablefiltermenu.h"
 
 namespace Ui {
@@ -40,9 +40,9 @@ private:
     Ui::tabRepairs *ui;
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
-    bool _type;
+    bool m_type;
     QTableView* tableView;
-    QSqlQueryModel* repairs_table;
+    STableRepairsModel* repairs_table;
     QSqlQueryModel* cartridges_table = nullptr;
     QString query_static;
     QString query_where_static;
@@ -63,9 +63,6 @@ private slots:
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();
-    void tableSectionMoved(int, int, int);
-    void tableSectionResized(int, int, int);
-    void tableSortingChanged(int, Qt::SortOrder);
     void tableModeChanged(bool mode);
 #ifdef QT_DEBUG
     void test_scheduler_handler(){};

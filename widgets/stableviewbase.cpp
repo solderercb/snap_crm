@@ -14,6 +14,7 @@ STableViewBase::STableViewBase(QWidget *parent) :
     horizontalHeader()->setMinimumSectionSize(15);
     horizontalHeader()->setSectionsMovable(true);
     horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
+    horizontalHeader()->setHighlightSections(false);
     connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this, &STableViewBase::horizontalHeaderMenuRequest);
     connect(horizontalHeader(),&QHeaderView::sortIndicatorChanged, this, &STableViewBase::orderChanged);
 
@@ -26,11 +27,11 @@ STableViewBase::~STableViewBase()
     delete i_gridLayout;
     clearFilter();
     clearGrouping();
+    deleteHorizontalHeaderMenu();
 }
 
 void STableViewBase::resizeEvent(QResizeEvent *event)
 {
-//    qDebug().nospace() << "[" << this << "] resizeEvent() | event->size().width(): " << event->size().width();
     QTableView::resizeEvent(event);
     adoptAutosizedColumns();
 //    applyGridlayout();
@@ -38,14 +39,12 @@ void STableViewBase::resizeEvent(QResizeEvent *event)
 
 void STableViewBase::setModel(STableBaseModel *model)
 {
-//    qDebug().nospace() << "[" << this << "] setModel()";
     m_model = model;
     QTableView::setModel(m_model);
 }
 
 void STableViewBase::setStoreItemsCategory(const int category)
 {
-//    qDebug().nospace() << "[" << this << "] setStoreItemsCategory()";
     m_storeItemsCategory = category;
 }
 
@@ -55,7 +54,6 @@ bool STableViewBase::eventFilter(QObject *object, QEvent *event)
     {
         if(static_cast<QScrollBar *>(object)->orientation() == Qt::Vertical && event->type() == QEvent::Show)
         {
-//            qDebug().nospace() << "[" << this << "] eventFilter() | object: " << object << "; type: " << static_cast<QScrollBar *>(object)->orientation() << "; event: " << event;
             adoptAutosizedColumns();
         }
     }
@@ -64,14 +62,12 @@ bool STableViewBase::eventFilter(QObject *object, QEvent *event)
 
 int STableViewBase::sizeHintForColumn(int column) const
 {
-//    qDebug().nospace() << "[" << this << "] sizeHintForColumn()";
 
     return i_defaultColumnsWidths[column, 0];
 }
 
 QVariant STableViewBase::headerData(int section, Qt::Orientation orientation, int role) const
 {
-//    qDebug().nospace() << "[" << this << "] headerData()";
     return m_model->headerData(section, orientation, role);
 }
 
@@ -79,7 +75,6 @@ int STableViewBase::columnSizeByContents(int column)
 {
     if(!m_model)
         return 0;
-//    qDebug().nospace() << "[" << this << "] columnSizeByContents() | model rows: " << m_model->rowCount() << "; model coluns: " << m_model->columnCount() << "; column: " << column;
     if(m_model->rowCount() == 0 || column >= m_model->columnCount())
         return i_defaultColumnsWidths[column];
 
@@ -94,7 +89,6 @@ int STableViewBase::columnSizeByContents(int column)
 
 void STableViewBase::resizeColumnToContents(int column)
 {
-//    qDebug().nospace() << "[" << this << "] resizeColumnToContents() | column = " << column;
     int columnWidth = 0;
     if(i_gridLayout->$GridControl.Columns[column].Visible)
     {
@@ -106,7 +100,6 @@ void STableViewBase::resizeColumnToContents(int column)
 
 void STableViewBase::resizeColumnsToContents()
 {
-//    qDebug().nospace() << "[" << this << "] resizeColumnsToContents() [B] | " << i_fixedWidthColumns;
     for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
     {
         resizeColumnToContents(i);
@@ -115,7 +108,6 @@ void STableViewBase::resizeColumnsToContents()
 
 void STableViewBase::applyGridlayout()
 {
-//    qDebug().nospace() << "[" << this << "] applyGridlayout()";
     QMap<int, int> visualIndexes;
     int i;
 
@@ -149,7 +141,6 @@ void STableViewBase::applyGridlayout()
 
 void STableViewBase::applySorting()
 {
-//    qDebug().nospace() << "[" << this << "] applySorting()";
     if (i_gridLayout->$GridControl.SortInfo.size())
     {
         m_sortColumn = columnByName(i_gridLayout->$GridControl.SortInfo[0].FieldName);
@@ -160,7 +151,6 @@ void STableViewBase::applySorting()
         m_sortColumn = -1;
         m_sortOrder = Qt::AscendingOrder;
     }
-//    qDebug().nospace() << "[" << this << "] applySorting() | " << QString("m_sortColumn: %1, m_sortOrder: ").arg(m_sortColumn) << m_sortOrder;
     horizontalHeader()->blockSignals(true);
     horizontalHeader()->setSortIndicator(m_sortColumn, m_sortOrder);
     horizontalHeader()->blockSignals(false);
@@ -168,7 +158,6 @@ void STableViewBase::applySorting()
 
 void STableViewBase::initAutosizedColumns()
 {
-//    qDebug().nospace() << "[" << this << "] initAutosizedColumns()";
 
     m_autosizedColumnsSummaryActualWidth = 0;
     m_autosizedColumnsSummaryDefaultWidth = 0;
@@ -180,21 +169,17 @@ void STableViewBase::initAutosizedColumns()
             m_autosizedColumns.insert(i, i_gridLayout->$GridControl.Columns[i].ActualWidth);
             m_autosizedColumnsSummaryActualWidth += i_gridLayout->$GridControl.Columns[i].ActualWidth;
             m_autosizedColumnsSummaryDefaultWidth += i_gridLayout->$GridControl.Columns[i].Width;
-//            qDebug().nospace() << "[" << this << "] initAutosizedColumns() | " << QString("column: %1; actual width: %2; default width: %3").arg(i).arg(i_gridLayout->$GridControl.Columns[i].ActualWidth).arg(i_gridLayout->$GridControl.Columns[i].Width);
         }
     }
-//    qDebug().nospace() << "[" << this << "] initAutosizedColumns() | OUT";
 }
 
 // настройка ширин столбцов, помеченных *
 void STableViewBase::adoptAutosizedColumns()
 {
-//    qDebug().nospace() << "[" << this << "] adoptAutosizedColumns()";
     int spaceForVariableColumns = 0;    // доступное место для столбцов с автоподбором ширины
     if(m_autosizedColumns.size())
     {
         spaceForVariableColumns = visibleWidth();
-//        qDebug().nospace() << "[" << this << "] adoptAutosizedColumns() | " << QString("table visible width: %1").arg(spaceForVariableColumns);
 
         for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
         {
@@ -203,35 +188,29 @@ void STableViewBase::adoptAutosizedColumns()
                 spaceForVariableColumns -= columnWidth(i);
             }
         }
-//        qDebug().nospace() << "[" << this << "] adoptAutosizedColumns() | " << QString("spaceForVariableColumns: %1; autosizedColumnsSummaryActualWidth: %2; autosizedColumnsSummaryDefaultWidth: %3").arg(spaceForVariableColumns).arg(m_autosizedColumnsSummaryActualWidth).arg(m_autosizedColumnsSummaryDefaultWidth);
         for(int i : m_autosizedColumns.keys())
         {
             if(m_autosizedColumnsSummaryActualWidth <= spaceForVariableColumns)
             {
-//                qDebug().nospace() << "[" << this << "] adoptAutosizedColumns() | shrink columns";
                 // Если столбцы с автонастройкой ширины вписываются в доступное место, то их ширина рассчитывается пропорционально ширине текста
                 setColumnWidth(i, spaceForVariableColumns*m_autosizedColumns[i]/m_autosizedColumnsSummaryActualWidth);
             }
             else
             {
-//                qDebug().nospace() << "[" << this << "] adoptAutosizedColumns() | enlarge columns";
                 // Если столбцы с автонастройкой ширины требуют больше места, чем доступно, то их ширина рассчитывается пропорционально ширине, заданной в поле Width, но не меньше.
                 setColumnWidth(i, qMax(spaceForVariableColumns*i_gridLayout->$GridControl.Columns[i].Width/m_autosizedColumnsSummaryDefaultWidth, i_gridLayout->$GridControl.Columns[i].Width));
             }
         }
     }
-//    qDebug().nospace() << "[" << this << "] adoptAutosizedColumns() | OUT";
 }
 
 void STableViewBase::setColumnWidth(int column, int width)
 {
-//    qDebug().nospace() << "[" << this << "] setColumnWidth() | column = " << column << "; width = " << width;
     QTableView::setColumnWidth(column, width);
 }
 
 void STableViewBase::setDefaultLayoutParams()
 {
-    qDebug().nospace() << "[" << this << "] setDefaultLayoutParams()";
     int count = qMax(i_defaultColumnsWidths.size(), i_defaultHeaderLabels.size());
     i_gridLayout->$GridControl.Columns.resize(count);
 
@@ -243,7 +222,6 @@ void STableViewBase::setDefaultLayoutParams()
 
 void STableViewBase::setDefaultColumnParams(const int column, const QString &label, const int width)
 {
-//    qDebug().nospace() << "[" << this << "] setDefaultColumnParams()";
     i_gridLayout->$GridControl.Columns[column].Width = width;
     i_gridLayout->$GridControl.Columns[column].ActualWidth = width;
     i_gridLayout->$GridControl.Columns[column].Visible = 1;
@@ -253,7 +231,6 @@ void STableViewBase::setDefaultColumnParams(const int column, const QString &lab
 
 void STableViewBase::readLayout(SLocalSettings::SettingsVariant variant)
 {
-//    qDebug().nospace() << "[" << this << "] readLayout() | ";
     if( (!localSettings->read(i_gridLayout, variant))/* || (i_gridLayout->$GridControl.Columns.size() != i_defaultHeaderLabels.size())*/ )
     {
         setDefaultLayoutParams();
@@ -272,7 +249,6 @@ void STableViewBase::readLayout(SLocalSettings::SettingsVariant variant)
 
 void STableViewBase::saveLayout(SLocalSettings::SettingsVariant variant)
 {
-//    qDebug().nospace() << "[" << this << "] saveLayout()";
     for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
     {
         i_gridLayout->$GridControl.Columns[i].ActualWidth = columnWidth(i);
@@ -304,7 +280,6 @@ void STableViewBase::saveLayout(SLocalSettings::SettingsVariant variant)
 
 void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
 {
-//    qDebug().nospace() << "[" << this << "] columnResized() | column = " << column << "; newWidth: " << newWidth;
     if(column < i_gridLayout->$GridControl.Columns.size())
     {
         if(newWidth == 0)
@@ -325,8 +300,6 @@ void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
 
 void STableViewBase::reset()
 {
-//    qDebug().nospace() << "[" << this << "] reset()";
-//    qDebug().nospace() << "[" << this << "] reset() | column[0] width: " << columnWidth(0);
     int i;
     int modelColumnCount = m_model->columnCount();
     int layoutColumnCount = i_gridLayout->$GridControl.Columns.size();
@@ -355,7 +328,6 @@ void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &
 void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 #endif
 {
-//    qDebug().nospace() << "[" << this << "] dataChanged()";
     QTableView::dataChanged(topLeft, bottomRight, roles);
     if(!roles.isEmpty() && !roles.contains(Qt::DisplayRole))
         return;
@@ -373,7 +345,6 @@ void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &
 
 void STableViewBase::orderChanged(int logicalIndex, Qt::SortOrder order)
 {
-//    qDebug().nospace() << "[" << this << "] orderChanged() | logicalIndex: " << logicalIndex << ", order: " << order;
 
     if(m_sortColumn == -1 || m_sortColumn != logicalIndex)
         m_sortOrder = Qt::AscendingOrder;
@@ -445,6 +416,16 @@ void STableViewBase::initHorizontalHeaderMenu()
     columnChooser->setProperty("type", horizontalHeaderMenuActions::ColumnChooser);
     connect(columnChooser, SIGNAL(triggered()), this, SLOT(showColumnChooser()));
     horizontalHeaderMenu->addAction(columnChooser);
+}
+
+void STableViewBase::deleteHorizontalHeaderMenu()
+{
+    for(QAction *a : horizontalHeaderMenu->actions())
+    {
+        horizontalHeaderMenu->removeAction(a);
+        delete a;
+    }
+    delete horizontalHeaderMenu;
 }
 
 void STableViewBase::horizontalHeaderMenuRequest(const QPoint &pos) const
@@ -519,7 +500,6 @@ void STableViewBase::showColumnChooser()
 
 void STableViewBase::setQuery(const QString& query, const QSqlDatabase& db)
 {
-//    qDebug().nospace() << "[" << this << "] setQuery()";
     m_query = query;
     m_db = db;
 
@@ -529,7 +509,6 @@ void STableViewBase::setQuery(const QString& query, const QSqlDatabase& db)
 
 void STableViewBase::setFilter(const FilterList &filter)
 {
-//    qDebug().nospace() << "[" << this << "] setFilter()";
     if(m_filter)
         delete m_filter;
 
@@ -546,7 +525,6 @@ void STableViewBase::clearFilter()
 
 QString STableViewBase::formatFilterGroup(const FilterList &filter)
 {
-//    qDebug().nospace() << "[" << this << "] formatFilterGroup()";
 
     QString subCond;
     QStringList cond;
@@ -578,15 +556,14 @@ QString STableViewBase::formatFilterGroup(const FilterList &filter)
         }
     }
 
-//    qDebug().nospace() << "[" << this << "] formatFilterGroup() | " << cond.join(filter->op?" OR ":" AND ");
-//    qDebug().nospace() << "[" << this << "] formatFilterGroup() | OUT";
     return cond.join(filter.op?" OR ":" AND ");
 }
 
 QString STableViewBase::formatFilterField(const FilterField &field)
 {
-//    qDebug().nospace() << "[" << this << "] formatFilterField()";
-    if (field.value.toString().isEmpty() || field.column.isEmpty())
+    if (field.column.isEmpty())
+        return QString();
+    if (field.operation != FilterField::NoOp && field.operation != FilterField::Null && field.value.toString().isEmpty())
         return QString();
 
     QSqlDriver* driver = m_db.driver();
@@ -680,7 +657,6 @@ int STableViewBase::columnByName(const QString &name)
 
 void STableViewBase::refresh()
 {
-//    qDebug().nospace() << "[" << this << "] refresh()";
     if (m_query.isEmpty() || (!m_db.isValid()))
         return;
 
@@ -703,10 +679,9 @@ void STableViewBase::refresh()
     }
 
 #ifdef QT_DEBUG
-    query.append(" LIMIT 1000");
+//    query.append(" LIMIT 1000");
 #endif
 
-//    qDebug().noquote().nospace() << query;
     m_model->setQuery(query, QSqlDatabase::database("connMain"));
 }
 
@@ -731,7 +706,6 @@ FilterField STableViewBase::initFilterField(const QString &column, FilterField::
 
 void STableViewBase::setGrouping(const QStringList &grouping)
 {
-//    qDebug().nospace() << "[" << this << "] setGrouping()";
     clearGrouping();
     m_grouping = new QStringList(grouping);
 }
@@ -739,9 +713,7 @@ void STableViewBase::setGrouping(const QStringList &grouping)
 void STableViewBase::clearGrouping()
 {
     if(m_grouping)
-    {
         delete m_grouping;
-        m_grouping = nullptr;
-    }
+    m_grouping = nullptr;
 }
 

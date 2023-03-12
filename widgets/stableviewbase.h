@@ -47,10 +47,10 @@ public:
     enum horizontalHeaderMenuActions{ToggleAutoWidth = 1, FitContent, BestFitAll, SetDefault, Hide, ColumnChooser};
     explicit STableViewBase(QWidget *parent = nullptr);
     ~STableViewBase();
-    void resizeEvent(QResizeEvent*);
+    void resizeEvent(QResizeEvent*) override;
     void setModel(STableBaseModel *model);
     void setStoreItemsCategory(const int category);
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event) override;
 
     // Часть кода взята из примера https://wiki.qt.io/Sort_and_Filter_a_QSqlQueryModel и доработана
     void setQuery(const QString &query, const QSqlDatabase &db = QSqlDatabase::database() );
@@ -59,7 +59,7 @@ public:
     static FilterField initFilterField(const QString &column, FilterField::Op matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
     void setGrouping(const QStringList &grouping);
 protected:
-    int sizeHintForColumn(int column) const;
+    int sizeHintForColumn(int column) const override;
     STableBaseModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
     int m_modelRowCount = 0;
@@ -86,6 +86,7 @@ protected:
     void readLayout(SLocalSettings::SettingsVariant variant);
     void saveLayout(SLocalSettings::SettingsVariant variant);
     void initHorizontalHeaderMenu();
+    void deleteHorizontalHeaderMenu();
 private:
     int m_storeItemsCategory = 0;
     QFile m_layoutSettingsFileName;
@@ -110,9 +111,9 @@ protected slots:
     void columnResized(int column, int oldWidth, int newWidth);
 private slots:
 #if QT_VERSION >= 0x060000
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>()) override;
 #else
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>()) override;
 #endif
     void orderChanged(int logicalIndex, Qt::SortOrder order);
     void horizontalHeaderMenuRequest(const QPoint &pos) const;

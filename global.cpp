@@ -28,6 +28,7 @@ SPaymentTypesModel *expenditureTypesModel;
 QStandardItemModel* clientsTypesList = new QStandardItemModel;
 SSqlQueryModel* clientAdTypesList = new SSqlQueryModel;
 SStandardItemModel *statusesModel = new SStandardItemModel();
+qint64 repairTermSeconds;
 SStandardItemModel *notifyStatusesModel = new SStandardItemModel();
 SStandardItemModel *warrantyTermsModel = new SStandardItemModel();
 QMap<int, QString> *warrantyTermsMap = new QMap<int, QString>;
@@ -66,6 +67,7 @@ QMap<QString, QVariant> *debugLoginOptions = nullptr;
 bool readStatuses(QStandardItemModel &model, QJsonArray &jsonArray)
 {
     QList<QStandardItem*> *list;
+    repairTermSeconds = 0;
 
     if (!jsonArray.empty())
     {
@@ -74,18 +76,38 @@ bool readStatuses(QStandardItemModel &model, QJsonArray &jsonArray)
         {
             QJsonObject jsonObj = i->toObject();
             list = new QList<QStandardItem*>;
+            int statusTermDays = 0;
+            int statusTermSecons = 0;
+            QTime statusTermTime;
+
+            QString statusTermStr = jsonObj["Terms"].toString();  // термин полностью
+
             *list << new QStandardItem(jsonObj["Name"].toString())\
                   << new QStandardItem(QString::number(jsonObj["Id"].toInt()))\
                   << new QStandardItem(jsonObj["Color"].toString())\
-                  << new QStandardItem(jsonObj["Terms"].toString())\
+                  << new QStandardItem(statusTermStr)\
                   << new QStandardItem(jsonArrayJoin(jsonObj["Contains"],"|"))\
                   << new QStandardItem(jsonArrayJoin(jsonObj["Actions"],"|"))\
                   << new QStandardItem(jsonArrayJoin(jsonObj["Roles"],"|"));
+
+            QString statusTermDaysStr = statusTermStr;  // дни отдельно
+            statusTermDaysStr.chop(9);   // удаление части ".hh:mm:ss"; если дни не заданы, то результатом будет пустая строка
+            statusTermDays = statusTermDaysStr.toInt();
+            repairTermSeconds += statusTermDays;
+            statusTermStr = statusTermStr.right(8);    // оставить только часы:минуты:секунды
+            statusTermTime = QTime::fromString(statusTermStr, "hh:mm:ss");
+            statusTermSecons = QTime(0, 0, 0).secsTo(statusTermTime);
+            *list << new QStandardItem(QString::number(statusTermDays*24*3600 + statusTermSecons));
+
             model.appendRow(*list);
             i++;
         }
         while ( i != jsonArray.end());
     }
+    if(repairTermSeconds < 2)
+        repairTermSeconds = 0;  // на случай, если в таблице нет статусов с длительностью в несколько дней
+    else
+        repairTermSeconds = (repairTermSeconds*24 - 30)*3600;
     return 1;
 }
 
