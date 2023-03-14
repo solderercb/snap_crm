@@ -11,7 +11,7 @@ SCommentModel::SCommentModel(QList<QStandardItem *> &record, QObject *parent) :
 {
     i_id = record.at(SCommentModel::ColId)->data(Qt::DisplayRole).toInt();
 
-    m_created = record.at(SCommentModel::ColCreated)->data(Qt::DisplayRole).toDateTime();
+    i_createdUtc = record.at(SCommentModel::ColCreated)->data(Qt::DisplayRole).toDateTime();
     m_user = record.at(SCommentModel::ColUser)->data(Qt::DisplayRole).toInt();
     m_text = record.at(SCommentModel::ColText)->data(Qt::DisplayRole).toString();
 
@@ -41,16 +41,6 @@ QString SCommentModel::text()
 void SCommentModel::setText(QString text)
 {
     i_valuesMap.insert("text", text);
-}
-
-QDateTime SCommentModel::created()
-{
-    return m_created;
-}
-
-void SCommentModel::setCreated(const QDateTime created)
-{
-    i_valuesMap.insert("created", created);
 }
 
 int SCommentModel::user()

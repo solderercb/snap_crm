@@ -82,8 +82,8 @@ bool tabCashMoveExch::commit(bool repeatAfter)
     cashRegisterDst->setAmount(ui->doubleSpinBoxDstAmount->value());
     cashRegisterSrc->setOfficeIndex(ui->comboBoxSrcOffice->currentIndex());
     cashRegisterDst->setOfficeIndex(ui->comboBoxDstOffice->currentIndex());
-    cashRegisterSrc->setCreated(ui->dateEdit->dateTime());
-    cashRegisterDst->setCreated(ui->dateEdit->dateTime());
+    cashRegisterSrc->setCreatedDate(ui->dateEdit->date());
+    cashRegisterDst->setCreatedDate(ui->dateEdit->date());
     cashRegisterSrc->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSrcPaymentAccount->currentIndex(), "system_id"));
     cashRegisterDst->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxDstPaymentAccount->currentIndex(), "system_id"));
     cashRegisterSrc->setSkipLogRecording(m_skipAutoLogRecord);

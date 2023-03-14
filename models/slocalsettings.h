@@ -28,6 +28,7 @@ public:
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
                       TasksGrid};
     Q_ENUM(SettingsVariant)
+    static QString appSettingsPath();
     bool import(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
     bool read(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
     bool save(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");

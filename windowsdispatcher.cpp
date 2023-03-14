@@ -31,7 +31,7 @@ void windowsDispatcher::debugInitSettings()
 {
     QFile file;
     QDir appDataDir = QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));   // C:/Users/user/AppData/Local
-    file.setFileName(appDataDir.path()+"/debug.ini");
+    file.setFileName(SLocalSettings::appSettingsPath()+"/debug.ini");
 
     if (file.exists())
     {

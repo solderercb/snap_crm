@@ -1,4 +1,5 @@
 #include "srepairsaleitemmodel.h"
+#include "ssaletablemodel.h"
 
 SRepairSaleItemModel::SRepairSaleItemModel(QObject *parent) : SComRecord(parent)
 {
@@ -30,6 +31,7 @@ SRepairSaleItemModel::SRepairSaleItemModel(const QList<QStandardItem *> &record,
     m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toDouble();
     m_sn = record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString();
     m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
+    m_toUser = record.at(SStoreItemModel::SaleOpColumns::ColUser)->data(Qt::DisplayRole).toInt();
 
     i_logRecord->setRepairId(m_repairId);
 
@@ -90,7 +92,7 @@ void SRepairSaleItemModel::setCount(const int count, const QVariant oldValue)
     QString logText;
     if(oldValue.isValid())
     {
-        appendLogText(tr("[Админ. правка] Количество товара \"%1\" изменёно с %2 на %3").arg(m_name).arg(oldValue.toInt()).arg(count));
+        appendLogText(tr("[А] Количество товара \"%1\" изменёно с %2 на %3").arg(m_name).arg(oldValue.toInt()).arg(count));
     }
     if(i_id)
     {
@@ -104,16 +106,6 @@ void SRepairSaleItemModel::setCount(const int count, const QVariant oldValue)
     m_storeItem->reserve(logText);
 
     i_valuesMap.insert("count", count);
-}
-
-void SRepairSaleItemModel::setCreated(const QDateTime created)
-{
-    if(i_id)
-        i_createdUtc = created;
-    else
-        i_createdUtc = QDateTime::currentDateTimeUtc();
-
-    i_valuesMap.insert("created", i_createdUtc.toLocalTime());
 }
 
 int SRepairSaleItemModel::fromUser()
@@ -134,7 +126,7 @@ int SRepairSaleItemModel::toUser()
 void SRepairSaleItemModel::setToUser(const int id, const QVariant oldValue)
 {
     if(oldValue.isValid())
-        appendLogText(tr("Товар \"%1\" перемещён из корзины сотрудника %2 в корзину сотрудника %3").arg(m_name, usersModel->getDisplayRole(oldValue.toInt()), usersModel->getDisplayRole(id)));
+        appendLogText(tr("[A] Товар \"%1\" перемещён из корзины сотрудника %2 в корзину сотрудника %3").arg(m_name, usersModel->getDisplayRole(oldValue.toInt()), usersModel->getDisplayRole(id)));
 
     i_valuesMap.insert("to_user", id);
 }
@@ -169,9 +161,18 @@ void SRepairSaleItemModel::setRepairId(const int id)
     if(id)
     {
         int count = m_count;
+        SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
+        QString logText;
+
         if(m_savedCount > 0 && m_savedCount != m_count)
             count = m_savedCount;
-        appendLogText(tr("Добавлен товар \"%1\" стоимостью %2 в кол-ве %3ед").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(count), "!itemAdded");
+
+        logText = tr("Добавлен товар \"%1\" стоимостью %2 в кол-ве %3ед").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(count);
+
+        if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+            logText.prepend("[A] ");
+
+        appendLogText(logText, "!itemAdded");
         i_valuesMap.insert("repair_id", id);
         i_logRecord->setRepairId(id);
     }
@@ -201,8 +202,14 @@ double SRepairSaleItemModel::price()
 
 void SRepairSaleItemModel::setPrice(const double price, const QVariant oldValue)
 {
+    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
+    QString logText = tr("Стоимость товара \"%1\" изменена с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toDouble()), sysLocale.toCurrencyString(price));
+
+    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+        logText.prepend("[A] ");
+
     if(oldValue.isValid())  // возможность изменять цену товара должна быть доступна только при административной правке
-        appendLogText(tr("Стоимость товара \"%1\" изменена с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toDouble()), sysLocale.toCurrencyString(price)));
+        appendLogText(logText);
 
     i_valuesMap.insert("price", price);
 }
@@ -214,11 +221,18 @@ QString SRepairSaleItemModel::sn()
 
 void SRepairSaleItemModel::setSN(const QString sn, const QVariant oldValue)
 {
-    if(!oldValue.toString().isEmpty())
-        appendLogText(tr("Серийный номер товара \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, oldValue.toString(), sn));
-    else if (i_id && !sn.isEmpty())
-        appendLogText(tr("Серийный номер товара \"%1\" установлен \"%2\"").arg(m_name, sn));
+    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
+    QString logText;
 
+    if(!oldValue.toString().isEmpty())
+        logText = tr("Серийный номер товара \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, oldValue.toString(), sn);
+    else if (i_id && !sn.isEmpty())
+        logText = tr("Серийный номер товара \"%1\" установлен \"%2\"").arg(m_name, sn);
+
+    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+        logText.prepend("[A] ");
+
+    appendLogText(logText);
     i_valuesMap.insert("sn", sn.isEmpty()?QVariant():sn);
 }
 
@@ -229,13 +243,18 @@ int SRepairSaleItemModel::warranty()
 
 void SRepairSaleItemModel::setWarranty(const int warranty, const QVariant oldValue)
 {
-    QString text;
-    if(oldValue.isValid())
-        text = tr("Срок гарантии на товар \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1), warrantyTermsModel->getDisplayRole(warranty, 1));
-    else
-        text = tr("Срок гарантии на товар \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
+    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
+    QString logText;
 
-    appendLogText(text, QString::number(SStoreItemModel::SaleOpColumns::ColWarranty)); // disambiguation здесь нужен для установки порядка записей в журнал
+    if(oldValue.isValid())
+        logText = tr("Срок гарантии на товар \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1), warrantyTermsModel->getDisplayRole(warranty, 1));
+    else
+        logText = tr("Срок гарантии на товар \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
+
+    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+        logText.prepend("[A] ");
+
+    appendLogText(logText, QString::number(SStoreItemModel::SaleOpColumns::ColWarranty)); // disambiguation здесь нужен для установки порядка записей в журнал
     i_valuesMap.insert("warranty", warranty);
 }
 
@@ -294,11 +313,17 @@ bool SRepairSaleItemModel::unsale()
 
 bool SRepairSaleItemModel::unlinkRepair()
 {
+    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
+    QString logText = tr("Удален товар \"%1\" стоимостью %2 в кол-ве %3ед.").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_count);
+
+    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+        logText.prepend("[A] ");
+
     setState(State::EngineerBasket);
     setSN("");
     setRepairId(0);
     setWorkId(0);
-    appendLogText(tr("Удален товар \"%1\" стоимостью %2 в кол-ве %3ед.").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_count));
+    appendLogText(logText);
     commit();
     return i_nErr;
 }
@@ -324,6 +349,7 @@ void SRepairSaleItemModel::setQueryField(const int fieldNum, const QVariant valu
         case SStoreItemModel::ColState: setState((State)value.toInt()); break;
         case SStoreItemModel::ColSN: setSN(value.toString(), oldValue); break;
         case SStoreItemModel::ColWorkId: setWorkId(value.toInt()); break;
+        case SStoreItemModel::ColUser: setToUser(value.toInt(), oldValue); break;
     }
 }
 

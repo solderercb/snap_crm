@@ -87,7 +87,7 @@ bool SCashRegisterModel::commit()
         if(!i_valuesMap.contains("office"))
             i_valuesMap.insert("office", userDbData->value("current_office"));
         if(!i_valuesMap.contains("created"))
-            i_valuesMap.insert("created", QDateTime::currentDateTime());
+            setCreated(QDateTime::currentDateTime());
 
         fieldsVerifyFormatter();    // вызов этого метода должен быть до вызова метода insert()
 
@@ -207,11 +207,25 @@ void SCashRegisterModel::setCurrency(int id)
 /*  Для кассовых операций задним числом
  *  timestamp - локальное время (не UTC)
  */
-void SCashRegisterModel::setCreated(QDateTime timestamp)
+void SCashRegisterModel::setCreated(const QDateTime &timestamp)
 {
-    i_valuesMap.insert("created", timestamp);
+    SComRecord::setCreated(timestamp);
     if(timestamp.date() != QDate::currentDate())
         i_valuesMap.insert("is_backdate", 1);
+}
+
+void SCashRegisterModel::setCreatedDate(const QDate &date)
+{
+    QDateTime timestamp = i_valuesMap.value("created", QDateTime::currentDateTime()).toDateTime();
+    timestamp.setDate(date);
+    setCreated(timestamp);
+}
+
+void SCashRegisterModel::setCreatedTime(const QTime &time)
+{
+    QDateTime timestamp = i_valuesMap.value("created", QDateTime::currentDateTime()).toDateTime();
+    timestamp.setTime(time);
+    setCreated(timestamp);
 }
 
 int SCashRegisterModel::documentId()

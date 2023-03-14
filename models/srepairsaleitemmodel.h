@@ -23,7 +23,6 @@ public:
     void setName(const QString);
     int count();
     void setCount(const int, const QVariant oldValue = QVariant());
-    void setCreated(const QDateTime);
     int fromUser();
     void setFromUser(const int);
     int toUser();

@@ -158,7 +158,6 @@ public:
     void appendLogText(const QString&);
     bool commit();
     bool integrityStatus();
-    QString created();
 
 private:
     bool nIntegrityErr = 1;
@@ -182,13 +181,13 @@ private:
     QString m_notes;
     int     m_options = 0;
     QByteArray* m_photo;
-    int     m_photo_id = 0;
+    int     m_photoId = 0;
     int     m_visitSource = 0;
     QString m_INN;
     QString m_KPP;
     QString m_OGRN;
-    QString m_web_password;
-    QString m_ur_name;
+    QString m_webPassword;
+    QString m_urName;
     QString m_email;
     QString m_icq;
     QString m_skype;

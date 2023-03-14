@@ -130,7 +130,7 @@ private:
 
     // названия столбцов по-умолчанию; подробнее см. в комментарии к методу SaleTableModel::setHorizontalHeaderLabels
     QStringList m_fieldsDep = {"id", "UID", "name", "count", "avail", "price", "summ", "box", "sn", "warranty", "user", "is_realization", "return_percent", "state", "notes", "item_id", "in_price", "obj_id", "dealer", "buyer", "created", "work_id", "is_item"};
-    int m_hiddenColumns = 0x00000000;
+    int m_hiddenColumns = 0x000FF810;
     int getItemInsertionRow();
     int getParentWorkRow(const int itemRow);
     bool recordType(const int row);

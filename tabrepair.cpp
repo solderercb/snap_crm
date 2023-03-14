@@ -216,7 +216,7 @@ void tabRepair::updateWidgets()
     ui->lineEditInDate->setText(repairModel->created());
     setInfoWidgetVisible(ui->lineEditOutDate, m_outDateVisible);
     ui->lineEditOutDate->setText(repairModel->outDate());
-    ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->contains("Адм. правка работ и деталей")); // TODO: добавить разрешение
+    ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->contains("101")); // TODO: добавить разрешение Адм. правка работ и деталей
     ui->pushButtonAdmEditWorks->setChecked(false);
     ui->pushButtonGetout->setVisible(m_getOutButtonVisible && !modelRO);
     setInfoWidgetVisible(ui->lineEditExtPrevRepair, !repairModel->extEarly().isEmpty());
@@ -292,10 +292,11 @@ void tabRepair::updateWidgets()
     ui->textEditDiagResult->setReadOnly(m_diagRO || modelRO);
     ui->textEditDiagResult->blockSignals(false);
     ui->doubleSpinBoxAmount->blockSignals(true);
+    ui->doubleSpinBoxAmount->setDecimals(comSettings->value("classic_kassa").toBool()?2:0);
     ui->doubleSpinBoxAmount->setValue(repairModel->repairCost());
     ui->doubleSpinBoxAmount->setReadOnly(m_summRO || modelRO);
     ui->doubleSpinBoxAmount->blockSignals(false);
-//    ui->pushButtonSaveDiagAmount->setEnabled(!m_diagRO && !modelRO);
+    ui->pushButtonSaveDiagAmount->setEnabled(!m_summRO && !modelRO);
     ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO);
     ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
     ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO && worksAndPartsModel->isUnsaved());
@@ -461,27 +462,34 @@ bool tabRepair::checkStateAcl(const int stateId)
 }
 
 /* Проверка данных перед сменой статуса или выдачей
+ * Возвращает 1, если всё ОК
 */
 bool tabRepair::checkData(const int stateId)
 {
-    bool ret = 1;
+    int ret = 0;
 
     switch(stateId)
     {
         case Global::RepStateIds::DiagFinished:
         case Global::RepStateIds::OnApprovement:
-        case Global::RepStateIds::Negotiation: if( ui->textEditDiagResult->toPlainText().isEmpty() /*|| tableWorksParts->isEmpty()*/ ) ret = 0; break;
+        case Global::RepStateIds::Negotiation: if( ui->textEditDiagResult->toPlainText().isEmpty() /*|| tableWorksParts->isEmpty()*/ ) ret = 1; break;
         case Global::RepStateIds::IssueNotAppeared: break;
-        case Global::RepStateIds::Agreed: if(ui->doubleSpinBoxAmount->value() == 0) ret = 0; break;
+        case Global::RepStateIds::Agreed: if(ui->doubleSpinBoxAmount->value() == 0) ret = 2; break;
     }
 
-    if(!ret)
+    if(ret)
     {
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Не все обязательные поля заполнены"), QColor(255,164,119), QColor(255,199,173));
+        QString msg;
+        switch (ret)
+        {
+            case 1: msg = tr("Поле с результатом диагностики не может быть пустым"); break;
+            case 2: msg = tr("Не установлена согласованная сумма"); break;
+        }
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), msg, QColor(255,164,119), QColor(255,199,173));
         throw 2;
     }
 
-    return ret;
+    return !ret;
 }
 
 void tabRepair::updateTotalSumms(const double, const double, const double)
@@ -550,9 +558,17 @@ void tabRepair::changeManager(int)
 
 }
 
-void tabRepair::changeEngineer(int)
+void tabRepair::changeEngineer(int index)
 {
+    repairModel->setEngineerIndex(index);
+}
 
+void tabRepair::initEngineer()
+{
+    if(repairModel->engineer())
+        return;
+
+    repairModel->setEngineer(userDbData->value("id").toInt());
 }
 
 void tabRepair::openInvoice(int)
@@ -612,7 +628,7 @@ void tabRepair::updateStatesModel(const int stateId)
 
 void tabRepair::doStateActions(const int stateId)
 {
-    const QStringList stateActions = statusesProxyModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Actions).toString().split('|');
+    QStringList stateActions = statusesProxyModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Actions).toString().split('|');
     switch (stateId)
     {
         case Global::RepStateIds::Returned:
@@ -620,11 +636,22 @@ void tabRepair::doStateActions(const int stateId)
         case Global::RepStateIds::ReturnedInCredit: createGetOutDialog(); throw 2;
     }
 
-    for(const QString &action : stateActions)
+    // В АСЦ установка инженера происходит при переключении с "Приём в ремонт" на любой другой.
+    // Здесь реализация более гибкая — через действие "Назначить инициатора инженером" в настройках статусов; это позволит
+    // создать пользовательские статусы, при включении которых не нужно задавать инженера ремонта.
+    // Например, в мастерской разборкой занимается помощник мастеров.
+    // Для статуса "Проведение диагностики" действие включено принудительно и от настроек пользователя не зависит
+    if(stateId == Global::RepStateIds::Diag)
+    {
+        stateActions << QString::number(Global::RepStateActions::SetEngineer);
+    }
+
+    for(const QString &action : qAsConst(stateActions))
         switch (action.toInt())
         {
             case Global::RepStateActions::NoPayDiag: setPricesToZero(); break;
             case Global::RepStateActions::ResetInformedStatus: if(ui->comboBoxNotifyStatus->currentIndex()) setInformedStatus(0); break;
+            case Global::RepStateActions::SetEngineer: initEngineer(); break;
             case Global::RepStateActions::InformManager: /*TODO: notifications->create(caption, text);*/; break;
             case Global::RepStateActions::InformEngineer: /*TODO: notifications->create(caption, text);*/; break;
         }
@@ -682,6 +709,7 @@ void tabRepair::saveState(int index)
         saveSaleTableClicked();
 
     int newStateId = statusesProxyModel->databaseIDByRow(index);
+
     try
     {
         checkStateAcl(newStateId);
@@ -834,6 +862,7 @@ void tabRepair::buttonWorksAdminEdit(bool state)
         worksAndPartsModel->setModelState(SSaleTableModel::State::WorkshopAdm);
         ui->switchEditStrategy->setEnabled(true);
         ui->toolButtonSaveSaleTable->setEnabled(worksAndPartsModel->isUnsaved());
+        ui->pushButtonAddWork->setEnabled(true);
     }
     else
     {
@@ -842,6 +871,7 @@ void tabRepair::buttonWorksAdminEdit(bool state)
             saveSaleTableClicked();
         ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
         ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO);
+        ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO);
     }
 }
 
@@ -998,6 +1028,7 @@ void worksAndSparePartsTable::reset()
     // TODO: подумать, нужно ли сохранять в файле настроек интерфейса заданные пользователем ширины, восстанавливать их в случае их наличия
     // или всегда подгонять ширины под содержимое
     resizeColumnsToContents();
+    this->resize(this->width(), this->height());    // временно; принуд. вызов resizeEvent
 }
 
 #if QT_VERSION >= 0x060000

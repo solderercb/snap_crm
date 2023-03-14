@@ -35,7 +35,6 @@ public:
     void setCategory(const int);
     int store();
     void setStore(const int);
-    void setCreated(const QDateTime);
     QDateTime updated();
     void setUpdated(const QDateTime);
     int count();

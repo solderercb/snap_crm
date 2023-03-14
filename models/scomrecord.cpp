@@ -18,6 +18,9 @@ SComRecord::~SComRecord()
  */
 void SComRecord::appendLogText(const QString &text)
 {
+    if(text.isEmpty())
+        return;
+
     i_logTexts->insert(QString::number(i_logTexts->size()), text);
 }
 

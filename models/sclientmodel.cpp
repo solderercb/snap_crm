@@ -65,13 +65,13 @@ void SClientModel::load(int id)
         if(m_options&BinaryOption::BalanceEnabled)
             createBalanceObj();
 //        m_photo = ;
-        m_photo_id = clientModel->record(0).value("photo_id").toInt();
+        m_photoId = clientModel->record(0).value("photo_id").toInt();
         m_visitSource = clientModel->record(0).value("visit_source").toInt();
         m_INN = clientModel->record(0).value("INN").toString();
         m_KPP = clientModel->record(0).value("KPP").toString();
         m_OGRN = clientModel->record(0).value("OGRN").toString();
-        m_web_password = clientModel->record(0).value("web_password").toString();
-        m_ur_name = clientModel->record(0).value("ur_name").toString();
+        m_webPassword = clientModel->record(0).value("web_password").toString();
+        m_urName = clientModel->record(0).value("ur_name").toString();
         m_email = clientModel->record(0).value("email").toString();
         m_icq = clientModel->record(0).value("icq").toString();
         m_skype = clientModel->record(0).value("skype").toString();
@@ -173,22 +173,41 @@ void SClientModel::setPatronymicName(const QString &text)
 
 QString SClientModel::fullLongName()
 {
-    QString ret = m_lastName;
-    if(!m_firstName.isEmpty())
-        ret.append(" " + m_firstName);
-    if(!m_patronymicName.isEmpty())
-        ret.append(" " + m_patronymicName);
+    QString ret;
+    if(m_type)
+    {
+        if(m_firstName.isEmpty())
+            ret = m_urName;
+        else
+            ret = m_firstName;
+    }
+    else
+    {
+        ret = m_lastName;
+        if(!m_firstName.isEmpty())
+            ret.append(" " + m_firstName);
+        if(!m_patronymicName.isEmpty())
+            ret.append(" " + m_patronymicName);
+    }
 
     return ret;
 }
 
 QString SClientModel::fullShortName()
 {
-    QString ret = m_lastName;
-    if(!m_firstName.isEmpty())
-        ret.append(" ").append(m_firstName.front()).append(".");
-    if(!m_patronymicName.isEmpty())
-        ret.append(" ").append(m_patronymicName.front()).append(".");
+    QString ret;
+    if(m_type)
+    {
+        return fullLongName();
+    }
+    else
+    {
+        ret = m_lastName;
+        if(!m_firstName.isEmpty())
+            ret.append(" ").append(m_firstName.front()).append(".");
+        if(!m_patronymicName.isEmpty())
+            ret.append(" ").append(m_patronymicName.front()).append(".");
+    }
 
     return ret;
 }
@@ -369,12 +388,12 @@ QString SClientModel::OGRN()
 
 QString SClientModel::web_password()
 {
-    return m_web_password;
+    return m_webPassword;
 }
 
 QString SClientModel::ur_name()
 {
-    return m_ur_name;
+    return m_urName;
 }
 
 QString SClientModel::email()
@@ -756,14 +775,6 @@ bool SClientModel::balanceEnough(const QString summ)
 bool SClientModel::integrityStatus()
 {
     return nIntegrityErr;
-}
-
-QString SClientModel::created()
-{
-    QDateTime date = i_createdUtc;
-    date.setTimeZone(QTimeZone::utc());
-
-    return date.toLocalTime().toString("dd.MM.yyyy");
 }
 
 SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):

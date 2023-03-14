@@ -21,6 +21,7 @@ public:
     int lastInsertId();
     QDateTime createdUtc();
     QString created();
+    void setCreated(const QDateTime &timestamp);
 protected:
     int i_id = 0;
     bool i_nErr = 1;

@@ -39,7 +39,9 @@ public:
     void setSystemId(int);   // ID платёжной системы (`payment_systems`.`system_id`)
     void setReason(const QString &);
     void setCurrency(int);
-    void setCreated(QDateTime);
+    void setCreated(const QDateTime &timestamp);
+    void setCreatedDate(const QDate &date);
+    void setCreatedTime(const QTime &time);
     int documentId();
     void setDocumentId(int);
     int repairId();

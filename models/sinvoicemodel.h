@@ -16,8 +16,6 @@ public:
     void setId(int);
     QString num();
     void setNum(const QString);
-    QDateTime created();
-    void setCreated(const QDateTime);
     int user();
     void setUser(const int);
     int seller();
@@ -45,7 +43,6 @@ public:
     bool commit();
 private:
     QString m_num;
-    QDateTime m_created;
     int m_user;
     int m_seller;
     int m_covenantorId;

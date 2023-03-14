@@ -22,7 +22,7 @@ void SInvoiceModel::load(int id)
         i_valuesMap.clear();
         i_logRecord->setClient(id);
         m_num = invoiceModel->record(0).value("num").toString();
-        m_created = invoiceModel->record(0).value("created").toDateTime();
+        i_createdUtc = invoiceModel->record(0).value("created").toDateTime();
         m_user = invoiceModel->record(0).value("user").toInt();
         m_seller = invoiceModel->record(0).value("seller").toInt();
         m_covenantorId = invoiceModel->record(0).value("covenantor").toInt();
@@ -59,16 +59,6 @@ QString SInvoiceModel::num()
 void SInvoiceModel::setNum(const QString num)
 {
     i_valuesMap.insert("num", num);
-}
-
-QDateTime SInvoiceModel::created()
-{
-    return m_created;
-}
-
-void SInvoiceModel::setCreated(const QDateTime created)
-{
-    i_valuesMap.insert("created", created);
 }
 
 int SInvoiceModel::user()

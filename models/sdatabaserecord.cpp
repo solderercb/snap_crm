@@ -98,6 +98,15 @@ QString SDatabaseRecord::created()
     return date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 }
 
+/* Дефолтный метод установки метки времени для записи в таблице.
+ * В большинстве таблиц поле называется created.
+*/
+void SDatabaseRecord::setCreated(const QDateTime &timestamp)
+{
+    i_createdUtc = timestamp.toUTC();
+    i_valuesMap.insert("created", timestamp);
+}
+
 void SDatabaseRecord::fieldsInsFormatter()
 {
     QMap<QString, QVariant>::ConstIterator i;
@@ -133,14 +142,13 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
         str_value = "'" + value.toString().replace('\'',"\\\'") + "'";
     else if(value.typeName() == QString("QDateTime"))
     {
-
-        i_createdUtc = value.toDateTime();
-        if(i_createdUtc.timeZone() != QTimeZone::utc())
+        QDateTime dt = value.toDateTime();
+        if(dt.timeZone() != QTimeZone::utc())
         {
-            i_createdUtc.setTimeZone(QTimeZone::systemTimeZone());
-            i_createdUtc =  i_createdUtc.toUTC();
+            dt.setTimeZone(QTimeZone::systemTimeZone());
+            dt =  dt.toUTC();
         }
-        str_value =  i_createdUtc.toString("yyyy-MM-dd hh:mm:ss");
+        str_value =  dt.toString("yyyy-MM-dd hh:mm:ss");
         str_value =  "'" + str_value + "'";
     }
     else if(value.typeName() == QString("QDate"))

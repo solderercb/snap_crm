@@ -125,11 +125,6 @@ void SStoreItemModel::setStore(const int store)
     i_valuesMap.insert("store", store);
 }
 
-void SStoreItemModel::setCreated(const QDateTime created)
-{
-    i_valuesMap.insert("created", created);
-}
-
 QDateTime SStoreItemModel::updated()
 {
     return m_updated;

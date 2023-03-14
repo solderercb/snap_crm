@@ -137,6 +137,7 @@ private:
     void doStateActions(const int);
     void setPricesToZero();
     bool commit(const QString &notificationCaption = tr("Успешно"), const QString &notificationText = tr("Данные сохранены"));
+    void initEngineer();
 #ifdef QT_DEBUG
     void randomFill() override {};
 #endif

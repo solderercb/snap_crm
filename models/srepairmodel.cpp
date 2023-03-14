@@ -278,7 +278,7 @@ int SRepairModel::currentManagerIndex()
 void SRepairModel::setCurrentManager(const int id)
 {
     i_valuesMap.insert("current_manager", id);
-    appendLogText(tr("Менеджером ремонта назначен %1").arg(usersModel->value(id, "id", "username").toString()));
+    appendLogText(tr("Менеджером ремонта назначен %1").arg(allUsersModel->value(id, "id", "username").toString()));
     m_repairStatusLog->setManager(id);
 }
 
@@ -301,14 +301,15 @@ int SRepairModel::engineerIndex()
 
 void SRepairModel::setEngineer(const int id)
 {
+    m_master = id;
     if(id)
     {
-        i_valuesMap.insert("master", id);
-        appendLogText(tr("Инженером назначен %1").arg(engineersModel->value(id, "id", "username").toString()));
+        i_valuesMap.insert("master", m_master);
+        appendLogText(tr("Инженером назначен %1").arg(allUsersModel->value(m_master, "id", "username").toString()));
     }
     else
         i_valuesMap.insert("master", QVariant());
-    m_repairStatusLog->setEngineer(id);
+    m_repairStatusLog->setEngineer(m_master);
 }
 
 void SRepairModel::setEngineerIndex(const int index)
@@ -377,10 +378,13 @@ void SRepairModel::setState(const int id)
 {
     m_state = id;
     i_valuesMap.insert("state", m_state);
-    appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
+    if(id != Global::RepStateIds::GetIn)
+        appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
     m_repairStatusLog->setStatus(m_state);
     m_repairStatusLog->setManager(m_currentManager); // менеджер и мастер могут быть изменены между сменами статуса
     m_repairStatusLog->setEngineer(m_master);
+    updateLastSave();
+    updateLastStatusChanged();
 }
 
 void SRepairModel::setStateIndex(const int index)
@@ -779,6 +783,11 @@ void SRepairModel::setLastStatusChanged(const QDateTime timestamp)
     i_valuesMap.insert("last_status_changed", timestamp);
 }
 
+void SRepairModel::updateLastStatusChanged()
+{
+    setLastStatusChanged(QDateTime::currentDateTime());
+}
+
 int SRepairModel::warrantyDays()
 {
     return m_warrantyDays;
@@ -933,11 +942,11 @@ bool SRepairModel::commit()
         setDiagnosticResult(QVariant());
         setRejectReason("");
         setInDate(QDateTime::currentDateTime());
+        setState(Global::RepStateIds::GetIn);
         if(!insert())
             throw 1;
         appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
         m_repairStatusLog->setRepair(i_id);
-        m_repairStatusLog->setStatus(0);
     }
     m_repairStatusLog->commit();
 

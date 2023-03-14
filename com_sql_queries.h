@@ -13,7 +13,7 @@
 #define QUERY_SEL_ASC_SCHEMA_VER            QString("SELECT `scriptname` FROM schemaversions WHERE `scriptname` LIKE 'ASC%' ORDER BY LPAD(REPLACE(`scriptname`, 'ASC.Scripts.Script', ''), 6, '0') DESC;")
 #define QUERY_SEL_APP_VER                   QString("SELECT `version_snap` FROM `config` WHERE `id` = 1;")
 #define QUERY_SEL_SCHEMA_VER                QString("SELECT REPLACE(`scriptname`, 'SNAP.schema-updates.', '') FROM schemaversions WHERE `scriptname` LIKE 'SNAP%' ORDER BY LPAD(REPLACE(`scriptname`, 'SNAP.schema-updates.script', ''), 6, '0') ASC;")
-#define QUERY_SEL_ACTIVE_USERS(db, user)    QString("SELECT GROUP_CONCAT(DISTINCT `USER`) AS 'users' FROM `information_schema`.`PROCESSLIST` WHERE `DB` = '%1' AND `USER` NOT IN ('root', '%2') GROUP BY `DB`;")\
+#define QUERY_SEL_ACTIVE_USERS(db, user)    QString("SELECT GROUP_CONCAT(DISTINCT `USER`) AS 'users' FROM `information_schema`.`PROCESSLIST` WHERE `DB` = '%1' AND `USER` IN (SELECT `username` FROM `%1`.`users` WHERE `is_bot` <> 1) AND `USER` NOT IN ('root', SUBSTRING_INDEX(USER(), '@', 1)) GROUP BY `DB`;")\
                                                 .arg((db))\
                                                 .arg((user))
 #define QUERY_SEL_GLOB_WAIT_TIMEOUT         QString("SELECT `VARIABLE_VALUE` FROM performance_schema.global_variables WHERE `VARIABLE_NAME` LIKE 'wait_timeout';")

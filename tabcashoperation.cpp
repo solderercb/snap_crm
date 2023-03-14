@@ -198,7 +198,7 @@ bool tabCashOperation::commit(bool repeatAfter)
         return 0;
 
     cashRegister->setOperationType(m_orderType);
-    cashRegister->setCreated(ui->dateEdit->dateTime());
+    cashRegister->setCreatedDate(ui->dateEdit->date());
     cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
     cashRegister->setReason(ui->lineEditReason->text());    // если пользователь отредактировал автоматически сгенерированный комментарий
     cashRegister->setSkipLogRecording(m_skipAutoLogRecord);

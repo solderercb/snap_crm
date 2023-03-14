@@ -30,7 +30,7 @@ QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
     {
         switch (index.column()) {
         case SStoreItemModel::SaleOpColumns::ColPrice:
-        case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QStandardItemModel::data(index, role).toDouble(), 'f', 2);
+        case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QStandardItemModel::data(index, role).toDouble(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
         case SStoreItemModel::SaleOpColumns::ColBox: return itemBoxesModel->getDisplayRole(QStandardItemModel::data(index, role).toInt(), 1);
         case SStoreItemModel::SaleOpColumns::ColWarranty: return warrantyTermsModel->getDisplayRole(QStandardItemModel::data(index, role).toInt(), 1);
         case SStoreItemModel::SaleOpColumns::ColUser: return allUsersMap->value(QStandardItemModel::data(index, role).toInt());
@@ -209,6 +209,8 @@ void SSaleTableModel::addCustomWork()
         delete field;
     }
     insertRecord(m_currentIndex, *customWork);
+    if(m_currentIndex == 0) // При добавлении первой строки в таблицу нужно послать сигнал modelReset.
+        endResetModel();
     delete customWork;
 }
 
@@ -929,19 +931,19 @@ void SSaleTableModel::store_markAllItemsToRemove(StoreOpType type)
 
 SStoreSaleItemModel *SSaleTableModel::store_item(const int rownum)
 {
-    SStoreSaleItemModel *item = new SStoreSaleItemModel(row(rownum), parent());
+    SStoreSaleItemModel *item = new SStoreSaleItemModel(row(rownum), this);
     return item;
 }
 
 SRepairSaleItemModel *SSaleTableModel::repair_item(const int rownum)
 {
-    SRepairSaleItemModel *item = new SRepairSaleItemModel(row(rownum));
+    SRepairSaleItemModel *item = new SRepairSaleItemModel(row(rownum), this);
     return item;
 }
 
 SWorkModel *SSaleTableModel::repair_work(const int rownum)
 {
-    SWorkModel *item = new SWorkModel(row(rownum));
+    SWorkModel *item = new SWorkModel(row(rownum), this);
     return item;
 }
 
@@ -1150,7 +1152,7 @@ double SSaleTableModel::amountTotal()
 
 QString SSaleTableModel::amountTotalLocale()
 {
-    return sysLocale.toString(amountTotal(), 'f', 2);
+    return sysLocale.toString(amountTotal(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
 }
 
 double SSaleTableModel::amountItems()
@@ -1160,12 +1162,12 @@ double SSaleTableModel::amountItems()
 
 QString SSaleTableModel::amountItemsLocale()
 {
-    return sysLocale.toString(m_amountItems, 'f', 2);
+    return sysLocale.toString(m_amountItems, 'f', comSettings->value("classic_kassa").toBool()?2:0);
 }
 
 QString SSaleTableModel::amountWorksLocale()
 {
-    return sysLocale.toString(m_amountWorks, 'f', 2);
+    return sysLocale.toString(m_amountWorks, 'f', comSettings->value("classic_kassa").toBool()?2:0);
 }
 
 QVariant SSaleTableModel::value(const int row, const int column, const int role) const

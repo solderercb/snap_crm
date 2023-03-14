@@ -29,7 +29,8 @@ namespace Global
     Q_ENUM_NS(RepStateHeaders)
     enum RepStateIds{GetIn, Diag, Negotiation, Agreed, InWork, PartsRequested, Ready, ReadyNoRepair, Returned, IssueNotAppeared, OfficeChange, NotAgreed, ReturnedNoRepair, OnApprovement, Approved, DiagFinished, ReturnedInCredit};
     Q_ENUM_NS(RepStateIds)
-    enum RepStateActions{EditWorksParts = 1, ResetInformedStatus = 2, EditDiagSumm = 3, InformManager = 4, InformEngineer = 5, InformTimeout = 6, NoPayDiag = 7}; // значения больше 6 - мои доработки
+    // TODO: добавить модель данных действий для статуса (будет использоваться в редакторе статусов).
+    enum RepStateActions{EditWorksParts = 1, ResetInformedStatus = 2, EditDiagSumm = 3, InformManager = 4, InformEngineer = 5, InformTimeout = 6, NoPayDiag = 7, SetEngineer = 8}; // значения больше 6 - мои доработки
     Q_ENUM_NS(RepStateActions)
     enum ClientInformStateIds{NotSet, Informed, NotResponse, NotAbailable, NotInformedOther};
     Q_ENUM_NS(ClientInformStateIds)

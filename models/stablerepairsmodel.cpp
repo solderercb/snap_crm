@@ -27,11 +27,13 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
         QString fieldName = record(index.row()).fieldName(index.column());
         if(fieldName == QString("status"))
             return QVariant(statusesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
-        if(fieldName == QString("master") || fieldName == QString("manager"))
+        else if(fieldName == QString("repair_cost"))
+            return sysLocale.toString(QSqlQueryModel::data(index).toDouble(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
+        else if(fieldName == QString("master") || fieldName == QString("manager"))
             return usersModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt());
-        if(fieldName == QString("box"))
+        else if(fieldName == QString("box"))
             return QVariant(repairBoxesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
-        if(fieldName == QString("id"))
+        else if(fieldName == QString("id"))
             return QString("%1-%2").arg(record(index.row()).value("office").toString().rightJustified(3, '0')).arg(QSqlQueryModel::data(index).toString().rightJustified(6, '0'));
     }
     return QSqlQueryModel::data(index, role);

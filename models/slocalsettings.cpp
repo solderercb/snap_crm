@@ -58,7 +58,7 @@ void SLocalSettings::genSettingsFileName(QFile &file, const QString subVariant)
     }
 }
 
-bool SLocalSettings::genSettingsFileFullPath(QFile &file)
+QString SLocalSettings::appSettingsPath()
 {
     QDir settingsPath;
     QString appPath = QApplication::applicationDirPath();
@@ -71,9 +71,16 @@ bool SLocalSettings::genSettingsFileFullPath(QFile &file)
     settingsPath.setPath(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/" + appPathHash + "/" + APP_VER);  // путь, соответствующий текущей версии приложения
     if (!settingsPath.exists())                 // C:/Users/<user</AppData/Local/snap/<MD5-hash>/<APP_VER>
         settingsPath.mkpath(settingsPath.path());
-    QDir::setCurrent(settingsPath.path() + "/..");
 
-    file.setFileName(settingsPath.path() + "/" + file.fileName());
+    return settingsPath.path();
+}
+
+bool SLocalSettings::genSettingsFileFullPath(QFile &file)
+{
+    QString settingsPath = appSettingsPath();
+    QDir::setCurrent(settingsPath + "/..");
+
+    file.setFileName(settingsPath + "/" + file.fileName());
     if(file.exists())
         return 1;
 
