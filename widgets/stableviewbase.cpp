@@ -1,4 +1,5 @@
 #include "stableviewbase.h"
+#include "models/ssaletablemodel.h"
 
 STableViewBase::STableViewBase(QWidget *parent) :
     QTableView(parent)
@@ -325,10 +326,6 @@ void STableViewBase::reset()
     }
     QTableView::reset();
 
-//    if(m_modelRowCount == m_model->rowCount())
-//        return;
-
-//    m_modelRowCount = m_model->rowCount();
     applyGridlayout();  // при глобальном обновлении модели ширины столбцов устанавливаются по умолчанию, поэтому их нужно снова задать из файла
 }
 

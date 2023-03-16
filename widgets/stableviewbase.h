@@ -63,7 +63,6 @@ public:
 protected:
     STableBaseModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
-    int m_modelRowCount = 0;
     int m_layoutVariant = SLocalSettings::RepairsGrid;
     XtraSerializer *i_gridLayout;
     QMap<int, int> i_defaultColumnsWidths;
