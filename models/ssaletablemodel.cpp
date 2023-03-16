@@ -613,7 +613,6 @@ bool SSaleTableModel::repair_saveTables()
         }
         if(!index(i, SStoreItemModel::SaleOpColumns::ColId).data().toInt())
             QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), lastInsertId);
-
     }
 
     m_editStrategy = editStrategyBackup;
@@ -1341,4 +1340,5 @@ void SSaleTableModel::dbgAddRandomItemBasket()
     }
     delete query;
 }
+
 #endif

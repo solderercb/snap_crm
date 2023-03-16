@@ -41,6 +41,7 @@ public:
     bool event(QEvent *) override;
     bool eventFilter(QObject *, QEvent *) override;
     void setTableModel(STableBaseModel*);
+    void setFontMetrics(const QFont &font);
 protected:
     // for painting progressbar with stylesheet option, a dummy progress bar is required (ref qBittorent project)
     QProgressBar i_dummyGreenProgressBar;
@@ -48,6 +49,7 @@ protected:
     QProgressBar i_dummyOrangeProgressBar;
     QProgressBar i_dummyRedProgressBar;
     QString i_dummyProgressBarStyleSheet;
+    QFontMetrics *i_fontMetrics = nullptr;
 //    QStyle *i_style;
     void initProgressBarsStyles();
     void paintColorizedProgressBar(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget = nullptr) const;

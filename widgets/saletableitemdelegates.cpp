@@ -1,7 +1,6 @@
 #include "saletableitemdelegates.h"
 
-SaleTableItemDelegates::SaleTableItemDelegates(QObject *parent) :
-    QStyledItemDelegate(parent)
+SaleTableItemDelegates::SaleTableItemDelegates(QObject *parent) : STableViewBaseItemDelegates(parent)
 {
 
 }

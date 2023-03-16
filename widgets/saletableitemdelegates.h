@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QMouseEvent>
 #include <QAbstractItemView>
+#include "stableviewbaseitemdelegates.h"
 #include "../models/ssaletablemodel.h"
 #include "../global.h"
 
@@ -16,7 +17,7 @@
 #define PIXMAP_H 16
 #define PIXMAP_GAP 2
 
-class SaleTableItemDelegates : public QStyledItemDelegate
+class SaleTableItemDelegates : public STableViewBaseItemDelegates
 {
     Q_OBJECT
 public:

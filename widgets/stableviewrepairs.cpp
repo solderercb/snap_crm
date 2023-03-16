@@ -7,19 +7,10 @@ STableViewRepairs::STableViewRepairs(QWidget *parent) :
     i_defaultHeaderLabels << tr("i") << tr("Заказ") << tr("Оборудование") << tr("ФИО клиента") << tr("Оборудование") << tr("Серийный номер") << tr("Офис") << tr("Менеджер") << tr("Инженер") << tr("Дата поступления") << tr("Дата выдачи") << tr("Статус") << tr("Неисправность") << tr("Сумма") << tr("Контактный телефон") << tr("Ячейка") << tr("Срок");
     readLayout(SLocalSettings::RepairsGrid);
 
-    m_itemDelegates = new STableViewRepairsItemDelegates();
-    setItemDelegate(m_itemDelegates);
-    m_itemDelegates->setFontMetrics(this->font());
+    setItemDelegate(new STableViewRepairsItemDelegates());
 }
 
 STableViewRepairs::~STableViewRepairs()
 {
     saveLayout(SLocalSettings::RepairsGrid);
-    delete m_itemDelegates;
-}
-
-void STableViewRepairs::setModel(STableBaseModel *model)
-{
-    STableViewBase::setModel(model);
-    m_itemDelegates->setTableModel(model);
 }

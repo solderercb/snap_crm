@@ -19,6 +19,7 @@
 #include "tabcommon.h"
 #include "widgets/getoutdialog.h"
 #include "widgets/sgroupboxeventfilter.h"
+#include "widgets/stableviewbase.h"
 #include "models/srepairmodel.h"
 #include "models/srepairstatuslog.h"
 #include "models/sfieldsmodel.h"
@@ -30,7 +31,7 @@ namespace Ui {
 class tabRepair;
 }
 
-class worksAndSparePartsTable : public QTableView
+class worksAndSparePartsTable : public STableViewBase
 {
     Q_OBJECT
 
@@ -40,23 +41,10 @@ signals:
 public:
     explicit worksAndSparePartsTable(QWidget *parent = nullptr);
     ~worksAndSparePartsTable();
-    void resizeEvent(QResizeEvent*) override;
     void setModel(QAbstractItemModel *model) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
-protected:
-    int sizeHintForColumn(int column) const override;
 private:
     SSaleTableModel *m_model = nullptr;
-    int m_modelRowCount = 0;
-    int colWidths[12] = {0,60,90,0,45,40,70,70,120,120,80,100}; // 0-й эл-т — пустышка
-    QFontMetrics *fontMetrics;
-    void resizeColumnToContents(int column);
-    void resizeColumnsToContents();
-    void findWidthByContents(const int column);
-protected slots:
-    void columnResized(int column, int oldWidth, int newWidth);
-public slots:
-    void reset() override;
 private slots:
 #if QT_VERSION >= 0x060000
     void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>()) override;
@@ -97,7 +85,6 @@ private:
     SFieldsModel *additionalFieldsModel;
     SSortFilterProxyModel *statusesProxyModel;
     SSaleTableModel *worksAndPartsModel;
-    SaleTableItemDelegates *itemDelagates;
     bool m_statusUpdateInProgress = 0;
     double works_sum, parts_sum, total_sum;
     QString box_name;

@@ -12,19 +12,27 @@ int STableBaseModel::field(const QString &field)
     return i_fields[field];
 }
 
-void STableBaseModel::beginResetModel()
+QDateTime STableBaseModel::timestampUtc(const QModelIndex &index) const
 {
-    QSqlQueryModel::beginResetModel();
+    QDateTime date = QSqlQueryModel::data(index).toDateTime();
+    date.setTimeZone(QTimeZone::utc());
+    return date;
 }
 
-void STableBaseModel::endResetModel()
+QDateTime STableBaseModel::timestampLocal(const QModelIndex &index) const
 {
-    QSqlQueryModel::endResetModel();
+    QDateTime date = QSqlQueryModel::data(index).toDateTime();
+    date.setTimeZone(QTimeZone::utc());
+    return date.toLocalTime();
 }
 
 void STableBaseModel::cashFieldsNames()
 {
     i_fields.clear();
+
+    if(rowCount() == 0)
+        return;
+
     for(int i = 0; i < record(0).count(); i++)
     {
         i_fields.insert(record(0).fieldName(i), i);

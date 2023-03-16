@@ -28,6 +28,8 @@ STableViewBase::~STableViewBase()
     clearFilter();
     clearGrouping();
     deleteHorizontalHeaderMenu();
+    if(i_itemDelegates)
+        delete i_itemDelegates;
 }
 
 void STableViewBase::resizeEvent(QResizeEvent *event)
@@ -37,10 +39,13 @@ void STableViewBase::resizeEvent(QResizeEvent *event)
 //    applyGridlayout();
 }
 
-void STableViewBase::setModel(STableBaseModel *model)
+void STableViewBase::setModel(QAbstractItemModel *model)
 {
-    m_model = model;
-    QTableView::setModel(m_model);
+    m_model = static_cast<STableBaseModel*>(model);
+    QTableView::setModel(model);
+    if(i_itemDelegates)
+        i_itemDelegates->setTableModel(m_model);
+    applyGridlayout();
 }
 
 void STableViewBase::setStoreItemsCategory(const int category)
@@ -60,9 +65,15 @@ bool STableViewBase::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
+void STableViewBase::setItemDelegate(STableViewBaseItemDelegates *delegate)
+{
+    i_itemDelegates = delegate;
+    QTableView::setItemDelegate(i_itemDelegates);
+    i_itemDelegates->setFontMetrics(this->font());
+}
+
 int STableViewBase::sizeHintForColumn(int column) const
 {
-
     return i_defaultColumnsWidths[column, 0];
 }
 
@@ -158,7 +169,6 @@ void STableViewBase::applySorting()
 
 void STableViewBase::initAutosizedColumns()
 {
-
     m_autosizedColumnsSummaryActualWidth = 0;
     m_autosizedColumnsSummaryDefaultWidth = 0;
     m_autosizedColumns.clear();
@@ -315,10 +325,10 @@ void STableViewBase::reset()
     }
     QTableView::reset();
 
-    if(m_modelRowCount == m_model->rowCount())
-        return;
+//    if(m_modelRowCount == m_model->rowCount())
+//        return;
 
-    m_modelRowCount = m_model->rowCount();
+//    m_modelRowCount = m_model->rowCount();
     applyGridlayout();  // при глобальном обновлении модели ширины столбцов устанавливаются по умолчанию, поэтому их нужно снова задать из файла
 }
 

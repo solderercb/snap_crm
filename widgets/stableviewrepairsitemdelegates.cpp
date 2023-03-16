@@ -6,8 +6,6 @@ STableViewRepairsItemDelegates::STableViewRepairsItemDelegates(QObject *parent) 
 
 STableViewRepairsItemDelegates::~STableViewRepairsItemDelegates()
 {
-    if(m_fontMetrics)
-        delete m_fontMetrics;
 }
 
 void STableViewRepairsItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -101,8 +99,8 @@ void STableViewRepairsItemDelegates::paintRepairProgressBar(QPainter *painter, c
 
 void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if(!m_fontMetrics)
-        Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("m_fontMetrics not set").toLocal8Bit());
+    if(!i_fontMetrics)
+        Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("i_fontMetrics not set").toLocal8Bit());
 
     STableViewBaseItemDelegates::paint(painter, option, index);
     int status = i_tableModel->record(index.row()).value("informed_status").toInt();
@@ -119,7 +117,7 @@ void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, 
         case Global::ClientInformStateIds::NotInformedOther: color.setRgb(255,165,0); break;
         default: return;
     }
-    QSize sz = m_fontMetrics->size(Qt::TextSingleLine, index.data().toString());
+    QSize sz = i_fontMetrics->size(Qt::TextSingleLine, index.data().toString());
     QPoint pt = option.rect.center();
     pt.setX(option.rect.left() + sz.width() + 10);
     QRect rect(0, 0, 4, sz.height()+2);
@@ -131,7 +129,3 @@ void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, 
     painter->restore();
 }
 
-void STableViewRepairsItemDelegates::setFontMetrics(const QFont &font)
-{
-    m_fontMetrics = new QFontMetrics(font);
-}

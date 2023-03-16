@@ -21,7 +21,6 @@
 #include "models/sworkmodel.h"
 
 class SSaleTableModel : public QStandardItemModel
-
 {
     Q_OBJECT
 public:
@@ -108,7 +107,6 @@ signals:
     void amountChanged(double, double, double);
     void modelStateChanged(int);
     void addItem();
-
 private:
     QSqlQueryModel *m_queryData;
     int m_modelState = 0; // 0 - новая РН (всё редактируется, строки удаляются); 1 - проведённая РН (не редактируется, строки помечаются серым); 2 - резерв (всё редактируется, строки помечаются серым); 3 - распроведённая РН или снятый резерв (не редактируется, кнопок в первом столбце нет)

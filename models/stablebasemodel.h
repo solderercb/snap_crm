@@ -13,10 +13,10 @@ class STableBaseModel : public QSqlQueryModel
 public:
     explicit STableBaseModel(QObject *parent = nullptr);
     int field(const QString &field);
+    QDateTime timestampUtc(const QModelIndex &index) const;
+    QDateTime timestampLocal(const QModelIndex &index) const;
 protected:
     QMap<QString, int> i_fields;
-    void beginResetModel();
-    void endResetModel();
 private slots:
     void cashFieldsNames();
 };

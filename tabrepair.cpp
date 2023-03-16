@@ -91,7 +91,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
     connect(worksAndPartsModel, &SSaleTableModel::tableDataChanged, this, &tabRepair::setSaveSaleTableEnabled);
     connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &tabRepair::saveTotalSumms);
-    itemDelagates = new SaleTableItemDelegates(worksAndPartsModel, ui->tableViewWorksAndSpareParts);
 
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxState->blockSignals(true);
@@ -108,8 +107,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(ui->tableViewWorksAndSpareParts, SIGNAL(pressed(QModelIndex)), worksAndPartsModel, SLOT(indexSelected(QModelIndex)));
     connect(ui->tableViewWorksAndSpareParts, &worksAndSparePartsTable::createTabSparePart, this, &tabRepair::createTabSparePart);
     connect(ui->tableViewWorksAndSpareParts, &worksAndSparePartsTable::createTabSparePartReserve, this, &tabRepair::createTabSparePartReserve);
-    ui->tableViewWorksAndSpareParts->setItemDelegate(itemDelagates);
-    ui->tableViewWorksAndSpareParts->verticalHeader()->hide();
 //    ui->tableViewWorksAndSpareParts->setReadOnly(true);
     connect(ui->pushButtonAddWork, SIGNAL(clicked()), this, SLOT(addCustomWork()));
 
@@ -314,7 +311,7 @@ void tabRepair::updateWidgets()
     ui->toolButtonSaveState->setEnabled(!modelRO);
 
     worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
-    ui->tableViewWorksAndSpareParts->resizeRowsToContents();
+//    ui->tableViewWorksAndSpareParts->resizeRowsToContents();
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled);
 }
 
@@ -907,47 +904,25 @@ return p_instance.value(rep_id);
 }
 
 // ===============================================================================================================
-worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) :
-    QTableView(parent)
+worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) : STableViewBase(parent)
 {
-    fontMetrics = new QFontMetrics(this->font());
-    horizontalHeader()->setMinimumSectionSize(15);
-
-    connect(this->horizontalHeader(),SIGNAL(sectionResized(int,int,int)), this, SLOT(columnResized(int,int,int)));
+    // столбец "Доступно" (4) скрыт
+    i_defaultColumnsWidths = {{0, 60},{1, 90},{2, 270},{3, 45},{4, 0},{5, 70},{6, 70},{7, 120},{8, 120},{9, 80},{10, 100}};
+    i_defaultHeaderLabels << tr("") << tr("UID") << tr("Наименование") << tr("Кол-во") << tr("Доступно") << tr("Цена") << tr("Сумма") << tr("Место") << tr("Серийный номер") << tr("Гарантия") << tr("Сотрудник");
+    readLayout(SLocalSettings::WorksGrid);
 }
 
 worksAndSparePartsTable::~worksAndSparePartsTable()
 {
-    delete fontMetrics;
-}
-
-void worksAndSparePartsTable::resizeEvent(QResizeEvent*)
-{
-    int i, visibleColumn;
-    int colNameWidth = 0;
-
-    verticalHeader()->hide();
-    colNameWidth = geometry().width();
-
-    for (i = 0; i < model()->columnCount(); i++)
-    {
-        if(i == SStoreItemModel::SaleOpColumns::ColName)
-            continue;
-
-        visibleColumn = m_model->visibleColumnIndex(i);
-        colNameWidth -= colWidths[visibleColumn];
-    }
-    colNameWidth -= 2; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах (при 125% норм -15)
-    if (verticalScrollBar()->isVisible())
-        colNameWidth -= verticalScrollBar()->width();
-
-    setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
+    saveLayout(SLocalSettings::WorksGrid);
 }
 
 void worksAndSparePartsTable::setModel(QAbstractItemModel *model)
 {
     m_model = static_cast<SSaleTableModel*>(model);
-    QTableView::setModel(model);
+    STableViewBase::setModel(model);
+    SaleTableItemDelegates *itemDelagates = new SaleTableItemDelegates(m_model, this);
+    setItemDelegate(itemDelagates);
 }
 
 void worksAndSparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
@@ -966,78 +941,13 @@ void worksAndSparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
-int worksAndSparePartsTable::sizeHintForColumn(int column) const
-{
-    int c = m_model->visibleColumnIndex(column);
-    if(!c)
-        return 0;
-
-    return colWidths[c];
-}
-
-void worksAndSparePartsTable::resizeColumnToContents(int column)
-{
-    int cellWidth = 0;
-    if(m_model->visibleColumnIndex(column))
-    {
-        for(int i = 0; i < m_model->rowCount(); i++)
-            cellWidth = qMax(cellWidth, fontMetrics->size(Qt::TextSingleLine, m_model->index(i, column).data().toString()).width() + 10);
-        cellWidth = qMax(cellWidth, fontMetrics->size(Qt::TextSingleLine, m_model->horizontalHeaderItem(column)->text()).width() + 10);
-    }
-
-    setColumnWidth(column, cellWidth);
-}
-
-void worksAndSparePartsTable::resizeColumnsToContents()
-{
-    for(int i = 0; i < m_model->columnCount(); i++)
-    {
-        switch (i)
-        {
-            case SStoreItemModel::SaleOpColumns::ColId: setColumnWidth(SStoreItemModel::SaleOpColumns::ColId, 60); break;
-            case SStoreItemModel::SaleOpColumns::ColName: break;
-            default: resizeColumnToContents(i); break;
-        }
-    }
-}
-
-void worksAndSparePartsTable::columnResized(int column, int oldWidth, int newWidth)
-{
-    int visibleColumn = m_model->visibleColumnIndex(column);
-    if(visibleColumn)
-        switch (column)
-        {
-            case SStoreItemModel::SaleOpColumns::ColId: horizontalHeader()->resizeSection(column, colWidths[visibleColumn]); break;
-            case SStoreItemModel::SaleOpColumns::ColSN: colWidths[visibleColumn] = qMax(newWidth, 60); horizontalHeader()->resizeSection(column, colWidths[visibleColumn]); break;
-            default: colWidths[visibleColumn] = newWidth;
-        }
-
-    // TODO: сохранение ширин в файл настроек интерфейса. Подробнее см.  в методе reset()
-    QTableView::columnResized(column, oldWidth, colWidths[visibleColumn]);
-    verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
-}
-
-void worksAndSparePartsTable::reset()
-{
-    QTableView::reset();
-
-    if(m_modelRowCount == m_model->rowCount())
-        return;
-
-    m_modelRowCount = m_model->rowCount();
-    // TODO: подумать, нужно ли сохранять в файле настроек интерфейса заданные пользователем ширины, восстанавливать их в случае их наличия
-    // или всегда подгонять ширины под содержимое
-    resizeColumnsToContents();
-    this->resize(this->width(), this->height());    // временно; принуд. вызов resizeEvent
-}
-
 #if QT_VERSION >= 0x060000
 void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
 #else
 void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 #endif
 {
-    QTableView::dataChanged(topLeft, bottomRight, roles);
+    STableViewBase::dataChanged(topLeft, bottomRight, roles);
     if(!roles.isEmpty() && !roles.contains(Qt::DisplayRole))
         return;
 
@@ -1047,7 +957,7 @@ void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QMod
             switch(col)
             {
                 case SStoreItemModel::SaleOpColumns::ColName: resizeRowToContents(row); break;
-                default: resizeColumnToContents(col);
+                default: /*resizeColumnToContents(col)*/;
             }
         }
 }

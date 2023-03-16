@@ -15,9 +15,6 @@ public:
     void paintStatusProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void paintRepairProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void paintClientInformStatus(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setFontMetrics(const QFont &font);
-private:
-    QFontMetrics *m_fontMetrics = nullptr;
 };
 
 #endif // STABLEVIEWREPAIRSITEMDELEGATES_H

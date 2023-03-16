@@ -29,6 +29,10 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
             return QVariant(statusesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
         else if(fieldName == QString("repair_cost"))
             return sysLocale.toString(QSqlQueryModel::data(index).toDouble(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
+        else if(fieldName == QString("in_date"))
+            return timestampLocal(index);
+        else if(fieldName == QString("out_date"))
+            return timestampLocal(index);
         else if(fieldName == QString("master") || fieldName == QString("manager"))
             return usersModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt());
         else if(fieldName == QString("box"))

@@ -17,6 +17,7 @@
 #include <QDebug>
 #include "global.h"
 #include "widgets/stableviewgridlayout.h"
+#include "stableviewbaseitemdelegates.h"
 #include "models/stablebasemodel.h"
 
 typedef struct FilterList FilterList;
@@ -48,9 +49,10 @@ public:
     explicit STableViewBase(QWidget *parent = nullptr);
     ~STableViewBase();
     void resizeEvent(QResizeEvent*) override;
-    void setModel(STableBaseModel *model);
+    void setModel(QAbstractItemModel *model);
     void setStoreItemsCategory(const int category);
     bool eventFilter(QObject *object, QEvent *event) override;
+    void setItemDelegate(STableViewBaseItemDelegates *delegate);
 
     // Часть кода взята из примера https://wiki.qt.io/Sort_and_Filter_a_QSqlQueryModel и доработана
     void setQuery(const QString &query, const QSqlDatabase &db = QSqlDatabase::database() );
@@ -59,7 +61,6 @@ public:
     static FilterField initFilterField(const QString &column, FilterField::Op matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
     void setGrouping(const QStringList &grouping);
 protected:
-    int sizeHintForColumn(int column) const override;
     STableBaseModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
     int m_modelRowCount = 0;
@@ -72,6 +73,8 @@ protected:
     int m_autosizedColumnsSummaryActualWidth = 0;
     int m_autosizedColumnsSummaryDefaultWidth = 0;
     QMenu *horizontalHeaderMenu = nullptr;
+    STableViewBaseItemDelegates *i_itemDelegates = nullptr;
+    int sizeHintForColumn(int column) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     void resizeColumnToContents(int column);
     int columnSizeByContents(int column);
@@ -109,12 +112,12 @@ public slots:
     void refresh();
 protected slots:
     void columnResized(int column, int oldWidth, int newWidth);
-private slots:
 #if QT_VERSION >= 0x060000
     void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>()) override;
 #else
     void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>()) override;
 #endif
+private slots:
     void orderChanged(int logicalIndex, Qt::SortOrder order);
     void horizontalHeaderMenuRequest(const QPoint &pos) const;
     void toggleAutoWidth(bool state);

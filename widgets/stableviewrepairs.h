@@ -11,9 +11,6 @@ class STableViewRepairs : public STableViewBase
 public:
     explicit STableViewRepairs(QWidget *parent = nullptr);
     ~STableViewRepairs();
-    void setModel(STableBaseModel *model);
-private:
-    STableViewRepairsItemDelegates *m_itemDelegates;
 };
 
 #endif // STABLEVIEWREPAIRS_H

@@ -18,6 +18,8 @@ STableViewBaseItemDelegates::STableViewBaseItemDelegates(STableBaseModel *model,
 
 STableViewBaseItemDelegates::~STableViewBaseItemDelegates()
 {
+    if(i_fontMetrics)
+        delete i_fontMetrics;
 }
 
 
@@ -243,6 +245,11 @@ void STableViewBaseItemDelegates::setModelDataFromDoubleSpinBox(QWidget *editor,
 void STableViewBaseItemDelegates::setTableModel(STableBaseModel *model)
 {
     i_tableModel = model;
+}
+
+void STableViewBaseItemDelegates::setFontMetrics(const QFont &font)
+{
+    i_fontMetrics = new QFontMetrics(font);
 }
 
 
