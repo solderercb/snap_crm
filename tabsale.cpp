@@ -45,7 +45,6 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     userActivityLog->appendRecord("Navigation " + tabTitle());
 
     ui->tableView->setModel(tableModel);
-    ui->tableView->setItemDelegate(itemDelagates);
 
 //    connect(ui->lineEditAddByUID, SIGNAL(returnPressed()), this, SLOT(addItemByUID()));    // подключены в дизайнере
 //    connect(ui->buttonReserve, SIGNAL(clicked()), this, SLOT(reserveButtonClicked()));    // подключены в дизайнере
@@ -1019,47 +1018,36 @@ tabSale* tabSale::getInstance(int doc_id, MainWindow *parent)
 /******************************************************************************************************************************************************
  *
  */
-sparePartsTable::sparePartsTable(QWidget *parent) :
-    QTableView(parent)
+sparePartsTable::sparePartsTable(QWidget *parent) : STableViewBase(parent)
 {
+    i_defaultColumnsWidths = {{0, 60},{1, 90},{2, 270},{3, 45},{4, 60},{5, 70},{6, 70},{7, 120},{8, 120},{9, 80}};
+    i_defaultHeaderLabels << tr("") << tr("UID") << tr("Наименование") << tr("Кол-во") << tr("Доступно") << tr("Цена") << tr("Сумма") << tr("Место") << tr("Серийный номер") << tr("Гарантия");
+    readLayout(SLocalSettings::SaleGrid);
+    i_gridLayout->$GridControl.Columns[2].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
 }
 
 sparePartsTable::~sparePartsTable()
 {
+    saveLayout(SLocalSettings::SaleGrid);
 }
 
-void sparePartsTable::resizeEvent(QResizeEvent *event)
+void sparePartsTable::setModel(QAbstractItemModel *model)
 {
-    QTableView::resizeEvent(event);
-    int i, j;
-    int colNameWidth = 0;
-    int colWidths[12] = {0,60,100,0,45,45,70,70,120,120,80}; // 0-й эл-т — пустышка
+    m_model = static_cast<SSaleTableModel*>(model);
+    STableViewBase::setModel(model);
+    m_itemDelagates = new SaleTableItemDelegates(m_model, this);
+    setItemDelegate(m_itemDelagates);
+}
 
-    verticalHeader()->hide();
-    colNameWidth = geometry().width();
-
-    for (i = 0; i < model()->columnCount(); i++)
+void sparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    int row = currentIndex().row();
+    if(m_model->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool())
     {
-        j = static_cast<SSaleTableModel*>(model())->visibleColumnIndex(i);
-        colNameWidth -= colWidths[j];
-        setColumnWidth(i, colWidths[j]);
+        clearSelection();
+        selectionModel()->select(currentIndex(), QItemSelectionModel::Select);
+        emit createTabSparePart(m_model->index(row, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
     }
-    colNameWidth -= 2; // коррекция; TODO: проверить как это работает при разных разрешениях и масштабах
-    if (verticalScrollBar()->isVisible())
-        colNameWidth -= verticalScrollBar()->width();
-
-    setColumnWidth(SStoreItemModel::SaleOpColumns::ColName, colNameWidth);
-    resizeRowsToContents();
-}
-
-#if QT_VERSION >= 0x060000
-void sparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#else
-void sparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#endif
-{
-    QTableView::dataChanged(topLeft,bottomRight,roles);
-    resizeRowsToContents();
 }
 
 #ifdef QT_DEBUG

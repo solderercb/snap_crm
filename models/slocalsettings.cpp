@@ -149,6 +149,7 @@ bool SLocalSettings::import(QSerializer *obj, SettingsVariant variant, const QSt
             obj->fromXml(asc.userSettings.ascPropertiesSettings.toXml());
             break;
         }
+//        case WorksGrid: data.replace("TreeListControl", "GridControl"); // в АСЦ использована не таблица, а дерево и тэги элементов структуры данных имеют другие значения; но есть и другие косяки файла АСЦ, требующие "костылей", поэтому данные настройки не импортируются (изменено название файла)...
         default: obj->fromXml(data);
     }
     file.close();

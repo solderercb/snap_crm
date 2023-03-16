@@ -21,26 +21,26 @@
 #include "widgets/saletableitemdelegates.h"
 #include "widgets/tabsalesettingsmenu.h"
 #include "widgets/shortlivednotification.h"
+#include "widgets/stableviewbase.h"
+#include "widgets/saletableitemdelegates.h"
 
 namespace Ui {
 class tabSale;
 }
 
-class sparePartsTable : public QTableView
+class sparePartsTable : public STableViewBase
 {
     Q_OBJECT
-
+signals:
+    void createTabSparePart(int);
 public:
     explicit sparePartsTable(QWidget *parent = nullptr);
     ~sparePartsTable();
-    void resizeEvent(QResizeEvent*);
-#if QT_VERSION >= 0x060000
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>());
-#else
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>());
-#endif
+    void setModel(QAbstractItemModel *model) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
-
+    SSaleTableModel *m_model = nullptr;
+    SaleTableItemDelegates *m_itemDelagates = nullptr;
 };
 
 class tabSale : public tabCommon
