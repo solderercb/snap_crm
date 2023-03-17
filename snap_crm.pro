@@ -101,6 +101,8 @@ SOURCES += \
     tabsale.cpp \
     widgets/stableviewbase.cpp \
     widgets/stableviewbaseitemdelegates.cpp \
+    widgets/stableviewclients.cpp \
+    widgets/stableviewclientsitemdelegates.cpp \
     widgets/stableviewrepairsitemdelegates.cpp \
     widgets/stableviewrepairs.cpp \
     widgets/getoutdialog.cpp \
@@ -189,6 +191,8 @@ HEADERS  += \
     tabrepairs.h \
     tabsale.h \
     widgets/stableviewbaseitemdelegates.h \
+    widgets/stableviewclients.h \
+    widgets/stableviewclientsitemdelegates.h \
     widgets/stableviewrepairsitemdelegates.h \
     widgets/stableviewgridlayout.h \
     widgets/stableviewbase.h \

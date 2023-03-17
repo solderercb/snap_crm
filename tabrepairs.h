@@ -44,17 +44,10 @@ private:
     QTableView* tableView;
     STableRepairsModel* repairs_table;
     QSqlQueryModel* cartridges_table = nullptr;
-    QString query_static;
-    QString query_where_static;
-    QString query_group_static;
-    QString query_order_static;
-    QStringList query;
-    QStringList query_where;
     QStringList query_group;
-    QStringList query_order;
     QTimer *tableUpdateDelay;
 #ifdef QT_DEBUG
-    void randomFill(){};
+    void randomFill() override{};
 #endif
 
 public slots:
@@ -65,8 +58,8 @@ private slots:
     void lineEditSearchReturnPressed();
     void tableModeChanged(bool mode);
 #ifdef QT_DEBUG
-    void test_scheduler_handler(){};
-    void test_scheduler2_handler(){};
+    void test_scheduler_handler() override{};
+    void test_scheduler2_handler() override{};
 #endif
 };
 

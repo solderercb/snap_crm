@@ -144,7 +144,8 @@
                                                 "  t1.`repairs`,\n"\
                                                 "  t1.`purchases`,\n"\
                                                 "  IF(t1.`type` = 1, 'Ю', '') AS 'type',\n"\
-                                                "  IFNULL(t2.`phone`, '') AS 'phone'\n"\
+                                                "  IFNULL(t2.`phone`, '') AS 'phone',\n"\
+                                                "  IFNULL(t1.`email`, '') AS 'email'\n"\
                                                 "FROM `clients` AS t1\n"\
                                                 "LEFT JOIN `tel` AS t2\n"\
                                                 "ON t1.`id` = t2.`customer`\n"\

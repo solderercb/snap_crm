@@ -34,37 +34,26 @@ public:
 private:
     Ui::tabClients *ui;
     static tabClients* p_instance[2];
-    bool _type;
+    bool m_type;
     QTableView* tableView;
     QSqlQueryModel* clientsTable;
-    QSortFilterProxyModel* proxyModel;
-    QString query_static;
-    QString query_where_static;
-    QString query_group_static;
-    QString query_order_static;
-    QStringList query;
-    QStringList query_where;
     QStringList query_group;
-    QStringList query_order;
-    QTimer *tableUpdateDelay;
+    QTimer *m_tableUpdateDelay;
 #ifdef QT_DEBUG
-    void randomFill(){};
+    void randomFill() override{};
 #endif
 
 private slots:
-    void updateTableWidget();
+    void refreshTable();
     void clientTypeChanged(QModelIndex);
     void clientAdvertisingChanged(int);
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();
-    void tableSectionMoved(int, int, int);
-    void tableSectionResized(int, int, int);
-    void tableSortingChanged(int, Qt::SortOrder);
     void togglePropertiesPanel();
 #ifdef QT_DEBUG
-    void test_scheduler_handler(){};
-    void test_scheduler2_handler(){};
+    void test_scheduler_handler() override{};
+    void test_scheduler2_handler() override{};
 #endif
 };
 

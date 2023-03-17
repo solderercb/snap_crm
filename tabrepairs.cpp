@@ -21,6 +21,8 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     this->setAttribute(Qt::WA_DeleteOnClose);
     m_type = type;
+
+    tableUpdateDelay = new QTimer();
     repairs_table = new STableRepairsModel();
     if(comSettings->value("cartridge_enable").toBool())
         cartridges_table = new STableRepairsModel();
@@ -32,8 +34,6 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
         ui->buttonRepairNew->hide();
     }
 
-    QSqlQueryModel *clientsModel = new QSqlQueryModel();
-    clientsModel->setQuery("SELECT 1;", QSqlDatabase::database("connMain"));
     widgetAction->setComboBoxOfficeModel(officesModel);
     widgetAction->setComboBoxStatusModel(statusesModel);
     widgetAction->setComboBoxEmployeeModel(usersModel);
@@ -47,7 +47,6 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.
     connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
 
-    tableUpdateDelay = new QTimer();
     QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(refreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
@@ -61,6 +60,7 @@ tabRepairs::~tabRepairs()
 
     p_instance[this->m_type] = nullptr;   // Обязательно блять!
     delete ui;
+    delete tableUpdateDelay;
 }
 
 QString tabRepairs::tabTitle()

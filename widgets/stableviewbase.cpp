@@ -1,8 +1,7 @@
 #include "stableviewbase.h"
 #include "models/ssaletablemodel.h"
 
-STableViewBase::STableViewBase(QWidget *parent) :
-    QTableView(parent)
+STableViewBase::STableViewBase(QWidget *parent) : QTableView(parent)
 {
     m_fontMetrics = new QFontMetrics(this->font());
     i_gridLayout = new XtraSerializer();
@@ -690,6 +689,7 @@ void STableViewBase::refresh()
 #endif
 
     m_model->setQuery(query, QSqlDatabase::database("connMain"));
+//    qDebug().nospace().noquote() << "[" << this << "] () | \r\n" << query;
 }
 
 void STableViewBase::filter(const FilterList &filter)
