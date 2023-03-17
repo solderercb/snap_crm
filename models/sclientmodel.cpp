@@ -391,9 +391,14 @@ QString SClientModel::web_password()
     return m_webPassword;
 }
 
-QString SClientModel::ur_name()
+QString SClientModel::urName()
 {
     return m_urName;
+}
+
+void SClientModel::setUrName(const QString &name)
+{
+    i_valuesMap.insert("ur_name", name);
 }
 
 QString SClientModel::email()

@@ -96,8 +96,8 @@ public:
     void setOGRN(const QString&);
     QString web_password();
     void setWeb_Password(const QString&);
-    QString ur_name();
-    void setUr_Name(const QString&);
+    QString urName();
+    void setUrName(const QString&);
     QString email();
     void setEmail(const QString&);
     QString icq();

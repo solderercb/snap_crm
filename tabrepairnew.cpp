@@ -715,6 +715,8 @@ void tabRepairNew::createClient()
     clientModel->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
     clientModel->setAddress(ui->lineEditClientAddress->text());
     clientModel->setType(ui->checkBoxClientType->isChecked());
+    if(ui->checkBoxClientType->isChecked())
+        clientModel->setUrName(ui->lineEditClientFirstName->text());
     if(!clientModel->commit())
         throw 1;
 
