@@ -87,18 +87,19 @@ SOURCES += \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
+    widgets/spageclientsummary.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
     tabcashoperation.cpp \
     tabclient.cpp \
     tabclients.cpp \
-    tabclientsummary.cpp \
     tabcommon.cpp \
     tabprintdialog.cpp \
     tabrepair.cpp \
     tabrepairnew.cpp \
     tabrepairs.cpp \
     tabsale.cpp \
+    widgets/spagedinterface.cpp \
     widgets/stableviewbase.cpp \
     widgets/stableviewbaseitemdelegates.cpp \
     widgets/stableviewclients.cpp \
@@ -119,6 +120,7 @@ SOURCES += \
     widgets/sphones.cpp \
     widgets/splaintextedit.cpp \
     widgets/ssetcombobox.cpp \
+    widgets/stabpage.cpp \
     widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
     widgets/swidget.cpp \
@@ -177,19 +179,20 @@ HEADERS  += \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
     models/sphonesmodel.h \
+    widgets/spageclientsummary.h \
     squerylog.h \
     stable.h \
     tabcashmoveexch.h \
     tabcashoperation.h \
     tabclient.h \
     tabclients.h \
-    tabclientsummary.h \
     tabcommon.h \
     tabprintdialog.h \
     tabrepair.h \
     tabrepairnew.h \
     tabrepairs.h \
     tabsale.h \
+    widgets/spagedinterface.h \
     widgets/stableviewbaseitemdelegates.h \
     widgets/stableviewclients.h \
     widgets/stableviewclientsitemdelegates.h \
@@ -211,6 +214,7 @@ HEADERS  += \
     widgets/sphones.h \
     widgets/splaintextedit.h \
     widgets/ssetcombobox.h \
+    widgets/stabpage.h \
     widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
     widgets/swidget.h \
@@ -224,11 +228,11 @@ FORMS += \
     models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
+    widgets/spageclientsummary.ui \
     tabcashmoveexch.ui \
     tabcashoperation.ui \
     tabclient.ui \
     tabclients.ui \
-    tabclientsummary.ui \
     tabprintdialog.ui \
     tabrepair.ui \
     tabrepairnew.ui \

@@ -6,7 +6,7 @@
 #include <QSqlField>
 #include <QScrollBar>
 #include "tabcommon.h"
-#include "tabclientsummary.h"
+#include "widgets/spageclientsummary.h"
 
 namespace Ui {
 class tabClient;
@@ -18,6 +18,7 @@ class tabClient : public tabCommon
 
 signals:
     void generatePrintout(QMap<QString,QVariant>);
+    void pageInitFinished(QWidget* widget, const int page);
 
 public:
     enum Page{Summary, Edit, Repairs, Purchases, Sales, Calls, Finances, Balance, History};
@@ -35,13 +36,11 @@ private:
     bool m_buttonRefreshVisible = 0;
     bool m_lineEditFilterVisible = 0;
     bool m_editStrategy = SClientModel::EditStrategy::OnManualSubmit;
-    bool initPage(const int);
-    void delPages();
-    void updateWidgets();
 private slots:
-    void switchPage(const int);
     void buttonSaveClicked();
     void buttonPrintClicked();
+    void updateBotToolbar(const int page);
+    void initPage(const int page);
 #ifdef QT_DEBUG
     void randomFill() override;
     void test_scheduler_handler() override;

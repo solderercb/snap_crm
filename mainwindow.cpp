@@ -245,6 +245,7 @@ void MainWindow::createMenu()
     QAction *documents = new QAction(tr("Документы"), this);
     finances_menu->addAction(documents);
 
+    /* Меню Финансы->Документы */
     QMenu *documents_submenu = new QMenu();
     QAction *invoice = new QAction(tr("Счёт"), this);
     documents_submenu->addAction(invoice);
@@ -271,6 +272,31 @@ void MainWindow::createMenu()
     finances_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(finances_button);
     QObject::connect(finances_button, SIGNAL(clicked()), this, SLOT(createTabCashOperations()));
+    ui->toolBar->addSeparator();
+
+    /* Кнопка Настройки и меню */
+    QMenu *settingsMenu = new QMenu();
+    QAction *checkUpdates = new QAction(tr("Проверить обновления"), this);
+    settingsMenu->addAction(checkUpdates);
+//    QObject::connect(checkUpdates,SIGNAL(triggered()),this,SLOT(createUpdaterWidget()));
+    QAction *about = new QAction(tr("О программе"), this);
+    settingsMenu->addAction(about);
+//    QObject::connect(about,SIGNAL(triggered()),this,SLOT(createAboutWidget()));
+    QAction *logout = new QAction(tr("Сменить пользователя"), this);
+    settingsMenu->addAction(logout);
+//    QObject::connect(logout,SIGNAL(triggered()),this,SLOT(logoff()));
+    QAction *exit = new QAction(tr("Выход"), this);
+    settingsMenu->addAction(exit);
+//    QObject::connect(exit,SIGNAL(triggered()),this,SLOT(exit()));
+    QToolButton* settingsButton = new QToolButton();
+    settingsButton->setMenu(settingsMenu);
+    settingsButton->setPopupMode(QToolButton::MenuButtonPopup);
+    settingsButton->setText(tr("Настройки"));
+    settingsButton->setFixedSize(128,48);
+    settingsButton->setStyleSheet(toolButtonStyle);
+    ui->toolBar->addWidget(settingsButton);
+    QObject::connect(settingsButton, SIGNAL(clicked()), this, SLOT(createTabSettings()));
+    ui->toolBar->addSeparator();
 }
 
 MainWindow::~MainWindow()
@@ -434,6 +460,11 @@ void MainWindow::createTabSparePart(int id)
 void MainWindow::createTabSparePartReserve(int id)
 {
     qDebug().nospace() << "TODO: [" << this << "] createTabSparePartReserve() | id = " << id;
+}
+
+void MainWindow::createTabSettings()
+{
+    qDebug().nospace() << "TODO: [" << this << "] createTabSettings()";
 }
 
 void MainWindow::reactivateCallerTab(QWidget *caller)
@@ -818,12 +849,12 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabClient(143);
 //        createTabCashMoveExch();
 //        QMap<QString, QVariant> report_vars;
-//        report_vars.insert("repair_id", 24972);
-//        report_vars.insert("type", "new_rep");
+//        report_vars.insert("type", Global::Reports::new_rep);
+//        report_vars.insert("repair_id", 25098);
 //        createTabPrint(report_vars);
 //        QMap<QString, QVariant> report_vars2;
-//        report_vars2.insert("type", "rep_label");
-//        report_vars2.insert("repair_id", 24972);
+//        report_vars2.insert("type", Global::Reports::rep_label);
+//        report_vars2.insert("repair_id", 25098);
 //        createTabPrint(report_vars2);
 //    }
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки

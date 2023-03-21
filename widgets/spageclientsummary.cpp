@@ -1,15 +1,15 @@
-#include "tabclientsummary.h"
-#include "ui_tabclientsummary.h"
+#include "widgets/spageclientsummary.h"
+#include "ui_spageclientsummary.h"
 
-tabClientSummary::tabClientSummary(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::tabClientSummary)
+SPageClientSummary::SPageClientSummary(QWidget *parent) :
+    STabPage(parent),
+    ui(new Ui::SPageClientSummary)
 {
     ui->setupUi(this);
 }
 
-tabClientSummary::tabClientSummary(int id, QWidget *parent) :
-    tabClientSummary(parent)
+SPageClientSummary::SPageClientSummary(int id, QWidget *parent) :
+    SPageClientSummary(parent)
 {
     m_client = new SClientModel();
     m_client->load(id);
@@ -64,18 +64,18 @@ tabClientSummary::tabClientSummary(int id, QWidget *parent) :
     setCursorPositionsToZero();
 }
 
-tabClientSummary::~tabClientSummary()
+SPageClientSummary::~SPageClientSummary()
 {
     delete m_client;
     delete ui;
 }
 
-SClientModel *tabClientSummary::model()
+SClientModel *SPageClientSummary::model()
 {
     return m_client;
 }
 
-void tabClientSummary::fillBanks()
+void SPageClientSummary::fillBanks()
 {
     if(!m_client->INN().isEmpty())
         ui->lineEditTaxField1->setText(m_client->INN());
@@ -104,7 +104,7 @@ void tabClientSummary::fillBanks()
 
 }
 
-void tabClientSummary::fillBinaryProperties()
+void SPageClientSummary::fillBinaryProperties()
 {
     int properties = m_client->options();
     for(int i = 0; i < clientBinaryProperties->rowCount(); i++)
@@ -116,10 +116,10 @@ void tabClientSummary::fillBinaryProperties()
     }
 }
 
-void tabClientSummary::setCursorPositionsToZero()
-{
-    QLineEdit *le;
-    QList<QLineEdit*> list = this->findChildren<QLineEdit*>(QRegularExpression(".*"));
-    foreach(le, list)
-        le->setCursorPosition(0);
-}
+//void SPageClientSummary::setCursorPositionsToZero()
+//{
+//    QLineEdit *le;
+//    QList<QLineEdit*> list = this->findChildren<QLineEdit*>(QRegularExpression(".*"));
+//    foreach(le, list)
+//        le->setCursorPosition(0);
+//}

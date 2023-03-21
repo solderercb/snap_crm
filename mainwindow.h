@@ -108,6 +108,7 @@ private slots:
     void createTabWarehouseItems(int type = 0, QWidget *caller = nullptr);
     void createTabSparePart(int);
     void createTabSparePartReserve(int);
+    void createTabSettings();
     bool closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);

@@ -16,27 +16,17 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <layout class="QGridLayout" name="rootGridLayout" rowstretch="1,0" rowminimumheight="0,70">
+  <layout class="QGridLayout" name="rootGridLayout" rowstretch="1,0">
    <property name="sizeConstraint">
     <enum>QLayout::SetDefaultConstraint</enum>
    </property>
    <item row="0" column="0">
-    <layout class="QGridLayout" name="tabLayout" columnstretch="0,0">
+    <layout class="QGridLayout" name="tabLayout" columnstretch="0">
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item row="0" column="0">
-      <widget class="SToolboxSwitchPanel" name="toolboxSwitchPanel" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>200</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QStackedWidget" name="stackedWidget"/>
+      <widget class="SPagedInterface" name="pages" native="true"/>
      </item>
     </layout>
    </item>
@@ -252,9 +242,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SToolboxSwitchPanel</class>
+   <class>SPagedInterface</class>
    <extends>QWidget</extends>
-   <header location="global">widgets/stoolboxswitchpanel.h</header>
+   <header location="global">widgets/spagedinterface.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
