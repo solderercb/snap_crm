@@ -339,7 +339,7 @@ bool tabCashOperation::commitRevert()
 void tabCashOperation::print()
 {
     QMap<QString, QVariant> report_vars;
-    report_vars.insert("type", "pko");
+    report_vars.insert("type", Global::Reports::pko);
     report_vars.insert("record_id", m_orderId);
     emit generatePrintout(report_vars);
 }

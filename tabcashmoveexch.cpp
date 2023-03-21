@@ -150,7 +150,7 @@ bool tabCashMoveExch::commit(bool repeatAfter)
 void tabCashMoveExch::print()
 {
     QMap<QString, QVariant> report_vars;
-    report_vars.insert("type", "pko");
+    report_vars.insert("type", Global::Reports::pko);
     report_vars.insert("record_id", m_dstOrderId);
     emit generatePrintout(report_vars);
 }

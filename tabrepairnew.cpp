@@ -868,7 +868,7 @@ void tabRepairNew::print(int repair)
     // печать квитанции
     if(comSettings->value("print_new_repair_report").toBool())
     {
-        report_vars.insert("type", "new_rep");
+        report_vars.insert("type", Global::Reports::new_rep);
         report_vars.insert("repair_id", repair);
         emit generatePrintout(report_vars);
         report_vars.clear();
@@ -877,7 +877,7 @@ void tabRepairNew::print(int repair)
     // печать стикеров
     if(comSettings->value("print_rep_stickers").toBool())
     {
-        report_vars.insert("type", "rep_label");
+        report_vars.insert("type", Global::Reports::rep_label);
         report_vars.insert("repair_id", repair);
         report_vars.insert("copies", ui->spinBoxStickersCount->value());
         emit generatePrintout(report_vars);
@@ -886,7 +886,7 @@ void tabRepairNew::print(int repair)
     // печать ПКО
     if(ui->checkBoxIsCashReceiptDocNeeded->isChecked())
     {
-        report_vars.insert("type", "pko");
+        report_vars.insert("type", Global::Reports::pko);
         emit generatePrintout(report_vars);
         report_vars.clear();
     }

@@ -540,7 +540,7 @@ void tabRepair::openPrevRepair()
 void tabRepair::printStickers(int)
 {
     QMap<QString, QVariant> report_vars;
-    report_vars.insert("type", "rep_label");
+    report_vars.insert("type", Global::Reports::rep_label);
     report_vars.insert("repair_id", repair_id);
     emit generatePrintout(report_vars);
 }

@@ -32,19 +32,11 @@ class tabPrintDialog;
 class tabPrintDialog : public tabCommon
 {
     Q_OBJECT
-
-
 public:
+    enum BelongReportsList {NotInList, InList};
     explicit tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv = {{"type","dummy"}});
     ~tabPrintDialog();
-    virtual bool tabCloseRequest();
-    bool loadReportTemplate(QByteArray*);
-    bool loadTemplateFromFile();
-    bool loadTemplateFromDB();
-    bool initReportDataSources();
-    bool loadTmpReportTemplate(QString);
-    QMap<QString, QVariant> report_vars;
-    void setDefaultWidgetFocus();
+    virtual bool tabCloseRequest() override;
     QString tabTitle() override;
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
@@ -86,23 +78,52 @@ public:
         {QPrinter::A5, DMPAPER_A5}, {QPrinter::B4, DMPAPER_B4}, {QPrinter::B5, DMPAPER_B5}, {QPrinter::Folio, DMPAPER_FOLIO},
         {QPrinter::B6, DMPAPER_B5_TRANSVERSE}, {QPrinter::A6, DMPAPER_A6} };
 #endif
+protected:
+    void paintEvent(QPaintEvent *event) override;
 private:
+    QMap<QString, QVariant> m_reportVars;
     Ui::tabPrintDialog *ui;
-    QString report_type;
+    int m_reportType;
+    QString m_reportName;
     int client_id;
-    LimeReport::ReportEngine *report;
+    LimeReport::ReportEngine *m_report = nullptr;
     LimeReport::ReportDesignWindowInterface* designerWindow;
     QByteArray *DataFile;
     QFile CurrentFile;
     LimeReport::PreviewReportWidget *previewWindow;
-    QPrinter *printer;
+    QPrinter *m_printer = nullptr;
+    QStringList m_printersList;
+    bool m_isReportRendered = 0;
+    QLabel *m_progressWidget = nullptr;
+    QString m_progressWidgetStaticText;
+    LimeReport::PreviewReportWidget *m_previewWidget = nullptr;
+    QTimer *renderDelayTimer = 0, *progressUpdateTimer = 0, *previewDelayTimer = 0;
+    QTime start;
     QStandardItemModel* initDemoModel(QStringList &, QList<QVariant> &);
-    bool event(QEvent*);
+    bool event(QEvent*) override;
+    bool loadReportTemplate(QByteArray*);
+    bool loadTemplateFromFile();
+    bool loadTemplateFromDB();
+    bool loadTmpReportTemplate(QString);
+    void setDefaultWidgetFocus();
     void printerAdvSettings(QPrinter *printer = nullptr);
     void fillDebugData();
     void initPrinter(bool showSettings = false);
+    void errorHandler(const QString &msg);
+    void selectPrinter(const BelongReportsList belong, const QList<int> list);
+    void initDataSources();
+    void initRepairDataSources();
+    void initRepairStickerDataSources();
+    void initItemStickerDataSources();
+    void initPKODataSources();
+    void deletePreviewWidget();
+    void initReport();
+    void showPreview();
+    void initProgressWidget();
+    void setProgressText(const QString &text);
+    void updateProgressWidget();
 #ifdef QT_DEBUG
-    void randomFill(){};
+    void randomFill() override{};
 #endif
 #ifdef Q_OS_WINDOWS
     unsigned char *driverExtraData = nullptr;     // проприетарные данные драйвера
@@ -110,14 +131,15 @@ private:
 #endif
 
 private slots:
-    void some_func();
     void on_pushButtonPrint_clicked();
     void setPrinter(const QString &printerName);
     void on_labelPrinterSettings_linkActivated(const QString &link);
     void pageSetupAccepted();
+    void reportRenderStarted();
+    void reportRenderFinished();
 #ifdef QT_DEBUG
-    void test_scheduler_handler(){};
-    void test_scheduler2_handler(){};
+    void test_scheduler_handler() override{};
+    void test_scheduler2_handler() override{};
 #endif
 };
 

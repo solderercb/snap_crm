@@ -574,14 +574,14 @@ void tabSale::print()
     if(*params & tabSaleSettingsMenu::PrintDoc)     // печать РН
     {
         QMap<QString, QVariant> report_vars;
-        report_vars.insert("type", "rn");
+        report_vars.insert("type", Global::Reports::rn);
         report_vars.insert("doc_id", doc_id);
         emit generatePrintout(report_vars);
     }
     if(*params & tabSaleSettingsMenu::PrintCheck && cashRegister->lastInsertId())   // печать ПКО
     {
         QMap<QString, QVariant> report_vars;
-        report_vars.insert("type", "pko");
+        report_vars.insert("type", Global::Reports::pko);
         report_vars.insert("order_id", cashRegister->lastInsertId());
         emit generatePrintout(report_vars);
     }
