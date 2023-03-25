@@ -235,7 +235,31 @@ void tabPrintDialog::initDataSources()
             case Global::Reports::rep_label: initRepairStickerDataSources(); break;
             case Global::Reports::sticker1: initItemStickerDataSources(); break;
             case Global::Reports::pko: initPKODataSources(); break;
-            default: return;
+//            case Global::Reports::reject: ; break;
+//            case Global::Reports::rko: ; break;
+//            case Global::Reports::sticker2: ; break;
+//            case Global::Reports::sticker3: ; break;
+//            case Global::Reports::warranty: ; break;
+//            case Global::Reports::works: ; break;
+//            case Global::Reports::diag: ; break;
+//            case Global::Reports::pn: ; break;
+//            case Global::Reports::rn: ; break;
+//            case Global::Reports::lost: ; break;
+//            case Global::Reports::price1: ; break;
+//            case Global::Reports::invoice0: ; break;
+//            case Global::Reports::invoice1: ; break;
+//            case Global::Reports::invoice2: ; break;
+//            case Global::Reports::invoice3: ; break;
+//            case Global::Reports::vatinvoice0: ; break;
+//            case Global::Reports::p_list0: ; break;
+//            case Global::Reports::w_list0: ; break;
+//            case Global::Reports::new_cartridge: ; break;
+//            case Global::Reports::sticker_cartridge: ; break;
+//            case Global::Reports::issue_cartridge: ; break;
+//            case Global::Reports::slip: ; break;
+//            case Global::Reports::move: ; break;
+//            case Global::Reports::buyout: ; break;
+            default: qDebug().nospace() << "[" << this << "] initDataSources() | not implemented report type"; return;
         }
 
         m_printer->setDocName(m_reportName);

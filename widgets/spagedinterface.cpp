@@ -1,4 +1,5 @@
 #include "spagedinterface.h"
+#include "widgets/stabpage.h"
 
 SPagedInterface::SPagedInterface(QWidget *parent) : QWidget(parent)
 {
@@ -39,6 +40,33 @@ void SPagedInterface::addButton(const QString &caption, QIcon icon, const int id
 void SPagedInterface::redraw()
 {
     toolboxSwitchPanel->redraw();
+}
+
+void SPagedInterface::setButtonText(const int button, const QString &text)
+{
+    toolboxSwitchPanel->setButtonText(button, text);
+}
+
+void SPagedInterface::setButtonIcon(const int button, const QIcon icon)
+{
+    toolboxSwitchPanel->setIcon(button, icon);
+}
+
+bool SPagedInterface::closeRequest()
+{
+    STabPage *pg;
+    QMap<int, QWidget*>::ConstIterator i = i_pages.constBegin();
+    while(i != i_pages.constEnd())
+    {
+        pg = static_cast<STabPage*>(i.value());
+        if(!pg->pageCloseRequest())
+        {
+            switchPage(i.key());
+            return 0;
+        }
+        i++;
+    }
+    return 1;
 }
 
 void SPagedInterface::addPage(QWidget *widget, const int page)

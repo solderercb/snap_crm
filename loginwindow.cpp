@@ -109,7 +109,7 @@ QStringList LoginWindow::usersOnline()
     QSqlQuery queryCheckUsersOnline = QSqlQuery(QSqlDatabase::database("connMain"));
 
     // запрос активных соединений
-    queryCheckUsersOnline.exec(QUERY_SEL_ACTIVE_USERS(QSqlDatabase::database("connMain").databaseName(), QSqlDatabase::database("connMain").userName()));
+    queryCheckUsersOnline.exec(QUERY_SEL_ACTIVE_USERS(QSqlDatabase::database("connMain").databaseName()));
     queryCheckUsersOnline.first();
     if(queryCheckUsersOnline.size())
         return queryCheckUsersOnline.value(0).toString().split(',');

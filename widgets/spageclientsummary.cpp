@@ -116,10 +116,19 @@ void SPageClientSummary::fillBinaryProperties()
     }
 }
 
-//void SPageClientSummary::setCursorPositionsToZero()
-//{
-//    QLineEdit *le;
-//    QList<QLineEdit*> list = this->findChildren<QLineEdit*>(QRegularExpression(".*"));
-//    foreach(le, list)
-//        le->setCursorPosition(0);
-//}
+#ifdef QT_DEBUG
+void SPageClientSummary::randomFill()
+{
+
+}
+
+void SPageClientSummary::test_scheduler_handler()
+{
+
+}
+
+void SPageClientSummary::test_scheduler2_handler()
+{
+
+}
+#endif

@@ -16,6 +16,9 @@ public:
     ~SPagedInterface();
     void addButton(const QString &caption, QIcon icon, const int id);
     void redraw();
+    void setButtonText(const int button, const QString &text);
+    void setButtonIcon(const int button, const QIcon icon);
+    bool closeRequest();
 private:
     QGridLayout *rootGridLayout;
     QGridLayout *tabLayout;

@@ -87,6 +87,7 @@ SOURCES += \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
+    tabsettings.cpp \
     widgets/spageclientsummary.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
@@ -100,6 +101,7 @@ SOURCES += \
     tabrepairs.cpp \
     tabsale.cpp \
     widgets/spagedinterface.cpp \
+    widgets/spagesettingsdoctempateeditor.cpp \
     widgets/stableviewbase.cpp \
     widgets/stableviewbaseitemdelegates.cpp \
     widgets/stableviewclients.cpp \
@@ -179,6 +181,7 @@ HEADERS  += \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
     models/sphonesmodel.h \
+    tabsettings.h \
     widgets/spageclientsummary.h \
     squerylog.h \
     stable.h \
@@ -193,6 +196,7 @@ HEADERS  += \
     tabrepairs.h \
     tabsale.h \
     widgets/spagedinterface.h \
+    widgets/spagesettingsdoctempateeditor.h \
     widgets/stableviewbaseitemdelegates.h \
     widgets/stableviewclients.h \
     widgets/stableviewclientsitemdelegates.h \
@@ -228,6 +232,7 @@ FORMS += \
     models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
+    tabsettings.ui \
     widgets/spageclientsummary.ui \
     tabcashmoveexch.ui \
     tabcashoperation.ui \
@@ -242,6 +247,7 @@ FORMS += \
     widgets/sclientmatch.ui \
     widgets/scomments.ui \
     widgets/sdevicematch.ui \
+    widgets/spagesettingsdoctempateeditor.ui \
     widgets/sphone.ui \
     widgets/sphones.ui \
     widgets/stoolboxswitchpanel.ui

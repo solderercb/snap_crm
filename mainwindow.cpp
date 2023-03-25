@@ -13,6 +13,7 @@
 #include "tabprintdialog.h"
 #include "tabcashoperation.h"
 #include "tabcashmoveexch.h"
+#include "tabsettings.h"
 #include "widgets/slineedit.h"
 #include "com_sql_queries.h"
 
@@ -275,18 +276,23 @@ void MainWindow::createMenu()
     ui->toolBar->addSeparator();
 
     /* Кнопка Настройки и меню */
+#ifdef QT_DEBUG
     QMenu *settingsMenu = new QMenu();
     QAction *checkUpdates = new QAction(tr("Проверить обновления"), this);
     settingsMenu->addAction(checkUpdates);
+    checkUpdates->setEnabled(false);
 //    QObject::connect(checkUpdates,SIGNAL(triggered()),this,SLOT(createUpdaterWidget()));
     QAction *about = new QAction(tr("О программе"), this);
     settingsMenu->addAction(about);
+    about->setEnabled(false);
 //    QObject::connect(about,SIGNAL(triggered()),this,SLOT(createAboutWidget()));
     QAction *logout = new QAction(tr("Сменить пользователя"), this);
     settingsMenu->addAction(logout);
+    logout->setEnabled(false);
 //    QObject::connect(logout,SIGNAL(triggered()),this,SLOT(logoff()));
     QAction *exit = new QAction(tr("Выход"), this);
     settingsMenu->addAction(exit);
+    exit->setEnabled(false);
 //    QObject::connect(exit,SIGNAL(triggered()),this,SLOT(exit()));
     QToolButton* settingsButton = new QToolButton();
     settingsButton->setMenu(settingsMenu);
@@ -297,6 +303,7 @@ void MainWindow::createMenu()
     ui->toolBar->addWidget(settingsButton);
     QObject::connect(settingsButton, SIGNAL(clicked()), this, SLOT(createTabSettings()));
     ui->toolBar->addSeparator();
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -464,7 +471,12 @@ void MainWindow::createTabSparePartReserve(int id)
 
 void MainWindow::createTabSettings()
 {
-    qDebug().nospace() << "TODO: [" << this << "] createTabSettings()";
+    tabSettings *subwindow = tabSettings::getInstance(this);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+//    connect(...);
+
+    ui->tabWidget->setCurrentWidget(subwindow);
 }
 
 void MainWindow::reactivateCallerTab(QWidget *caller)
@@ -857,6 +869,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        report_vars2.insert("repair_id", 25098);
 //        createTabPrint(report_vars2);
 //    }
+        createTabSettings();
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 
 }
