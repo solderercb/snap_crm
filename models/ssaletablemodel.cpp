@@ -24,6 +24,32 @@ SSaleTableModel::~SSaleTableModel()
     delete m_queryData;
 }
 
+void SSaleTableModel::initDemo()
+{
+    setEditStrategy(OnManualSubmit);
+    addCustomWork();
+    setData(index(0, SStoreItemModel::SaleOpColumns::ColName), "<work>");
+    setData(index(0, SStoreItemModel::SaleOpColumns::ColCount), 5);
+    setData(index(0, SStoreItemModel::SaleOpColumns::ColPrice), 100);
+    setData(index(0, SStoreItemModel::SaleOpColumns::ColSumm), 500);
+    setData(index(0, SStoreItemModel::SaleOpColumns::ColSN), "SN123456");
+    addCustomWork();
+    setData(index(1, SStoreItemModel::SaleOpColumns::ColName), "<item 1>");
+    setData(index(1, SStoreItemModel::SaleOpColumns::ColCount), 10);
+    setData(index(1, SStoreItemModel::SaleOpColumns::ColPrice), 50);
+    setData(index(1, SStoreItemModel::SaleOpColumns::ColSumm), 500);
+    setData(index(1, SStoreItemModel::SaleOpColumns::ColSN), "SN654321");
+    setData(index(1, SStoreItemModel::SaleOpColumns::ColRecordType), SSaleTableModel::RecordType::Item);
+    addCustomWork();
+    setData(index(2, SStoreItemModel::SaleOpColumns::ColName), "<item 2>");
+    setData(index(2, SStoreItemModel::SaleOpColumns::ColCount), 20);
+    setData(index(2, SStoreItemModel::SaleOpColumns::ColPrice), 50);
+    setData(index(2, SStoreItemModel::SaleOpColumns::ColSumm), 1000);
+    setData(index(2, SStoreItemModel::SaleOpColumns::ColWarranty), warrantyTermsModel->index(4, 1).data().toInt());
+    setData(index(2, SStoreItemModel::SaleOpColumns::ColUser), engineersModel->index(0, 1).data().toInt());
+    setData(index(2, SStoreItemModel::SaleOpColumns::ColRecordType), SSaleTableModel::RecordType::Item);
+}
+
 QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole)
@@ -1279,6 +1305,7 @@ bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, i
         }
 
         ret = setDataAtomic(index, value);
+        dataChangedHook(index, index);
         if(ret)
             repair_autoSaveTables();
 
@@ -1307,6 +1334,87 @@ bool SSaleTableModel::setDataAtomic(const QModelIndex &index, const QVariant &va
 void SSaleTableModel::setQuery(const QString &query, const QSqlDatabase &db)
 {
     m_queryData->setQuery(query, db);
+}
+
+/* Метод получения данных для отчетов LimeReport
+ * Смотри описание метода с таким же названием в классе SComRecord
+ */
+void SSaleTableModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackData() | info.dataType = " << info.dataType << "; info.index = " << info.index << "; info.columnName = " << info.columnName;
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = 0; break;
+        case LimeReport::CallbackInfo::HasNext: data = 0; break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = metaObject()->property(info.index + 1).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = metaObject()->property( metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(this); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = metaObject()->propertyCount() - 1; break;
+        case LimeReport::CallbackInfo::RowCount: data = rowCount(); break;
+    }
+}
+
+/* "Навигация" по модели данных
+*/
+void SSaleTableModel::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackDataChangePos() | type = " << type;
+    if(type == LimeReport::CallbackInfo::First)
+        m_reportRowNum = 0;
+    else
+    {
+        if(m_reportRowNum+1 >= rowCount())
+        {
+            result = 0;
+            return;
+        }
+        m_reportRowNum++;
+    }
+    result = 1;
+}
+
+QString SSaleTableModel::reportUID()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColUID).data().toString();
+}
+
+QString SSaleTableModel::reportId()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColId).data().toString();
+}
+
+QString SSaleTableModel::reportItem()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColName).data().toString();
+}
+
+QString SSaleTableModel::reportQty()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColCount).data().toString();
+}
+
+QString SSaleTableModel::reportPrice()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColPrice).data().toString();
+}
+
+QString SSaleTableModel::reportSumm()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColSumm).data().toString();
+}
+
+QString SSaleTableModel::reportSN()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColSN).data().toString();
+}
+
+QString SSaleTableModel::reportWarranty()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColWarranty).data().toString();
+}
+
+QString SSaleTableModel::reportPerformer()
+{
+    return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColUser).data().toString();
 }
 
 #ifdef QT_DEBUG

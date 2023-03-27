@@ -13,6 +13,64 @@
 class SRepairModel : public SComRecord
 {
     Q_OBJECT
+    Q_PROPERTY(int id READ id)
+    Q_PROPERTY(QString title READ title)
+    Q_PROPERTY(int clientId READ clientId)
+    Q_PROPERTY(QString class READ devClass)
+    Q_PROPERTY(QString vendor READ vendor)
+    Q_PROPERTY(QString device READ device)
+    Q_PROPERTY(QString serialNumber READ serialNumber)
+    Q_PROPERTY(QString company READ company)
+    Q_PROPERTY(QString office READ officeStr)
+    Q_PROPERTY(QString startOffice READ startOfficeStr)
+    Q_PROPERTY(QString manager READ managerFioShort)
+    Q_PROPERTY(QString currentManager READ currentManagerFioShort)
+    Q_PROPERTY(QString engineer READ engineerFioShort)
+    Q_PROPERTY(QString diagnosticResult READ diagnosticResult)
+    Q_PROPERTY(QString inDateTime READ created)
+    Q_PROPERTY(QString inDate READ inDate)
+    Q_PROPERTY(QString outDate READ outDate)
+    Q_PROPERTY(QString outDateTime READ outDateTime)
+    Q_PROPERTY(int state READ state)
+    Q_PROPERTY(bool isExpressRepair READ expressRepair)
+    Q_PROPERTY(bool isQuickRepair READ quickRepair)
+    Q_PROPERTY(bool isWarranty READ isWarranty)
+    Q_PROPERTY(bool isRepeat READ isRepeat)
+    Q_PROPERTY(int paymentSystem READ paymentSystem)
+    Q_PROPERTY(bool isCardPayment READ isCardPayment)
+    Q_PROPERTY(bool canFormat READ canFormat)
+    Q_PROPERTY(bool printCheck READ printCheck)
+    Q_PROPERTY(QString box READ box)
+    Q_PROPERTY(QString warrantyLabel READ warrantyLabel)
+    Q_PROPERTY(QString extNotes READ extNotes)
+    Q_PROPERTY(bool isPrepaid READ isPrepaid)
+    Q_PROPERTY(QString prepaidType READ prepaidTypeStr)
+    Q_PROPERTY(QString prepaidSumm READ prepaidSummStr)
+    Q_PROPERTY(QString realPrepaidSumm READ realPrepaidSummStr)
+    Q_PROPERTY(int prepaidOrder READ prepaidOrder)
+    Q_PROPERTY(bool isPreAgreed READ isPreAgreed)
+    Q_PROPERTY(bool isDebt READ isDebt)
+    Q_PROPERTY(QString preAgreedAmount READ preAgreedAmountStr)
+    Q_PROPERTY(QString repairCost READ repairCostStr)
+    Q_PROPERTY(QString realRepairCost READ realRepairCostStr)
+    Q_PROPERTY(QString partsCost READ partsCostStr)
+    Q_PROPERTY(QString realWorksCost READ realWorksCostStr)
+    Q_PROPERTY(QString realPartsCost READ realPartsCostStr)
+    Q_PROPERTY(QString fault READ fault)
+    Q_PROPERTY(QString complect READ complect)
+    Q_PROPERTY(QString look READ look)
+    Q_PROPERTY(bool thirsPartySc READ thirsPartySc)
+    Q_PROPERTY(QString warranty READ warranty)
+    Q_PROPERTY(QString barcode READ barcode)
+    Q_PROPERTY(QString rejectReason READ rejectReason)
+    Q_PROPERTY(QString color READ color)
+    Q_PROPERTY(int early READ early)
+    Q_PROPERTY(QString extEarly READ extEarly)
+    Q_PROPERTY(QString issuedMsg READ issuedMsg)
+    Q_PROPERTY(bool smsInform READ smsInform)
+    Q_PROPERTY(int invoice READ invoice)
+    Q_PROPERTY(int isCartridge READ cartridge)
+    Q_PROPERTY(bool termsControl READ termsControl)
 signals:
     void modelUpdated();
 public:
@@ -62,10 +120,10 @@ public:
     QString diagnosticResult();
     void setDiagnosticResult(const QVariant);
     void setDiagnosticResult(const QString);
-    QDateTime inDate();
+    QString inDate();
     void setInDate(const QDateTime);
-    QDateTime outDateUtc();
     QString outDate();
+    QString outDateTime();
     void setOutDate(const QDateTime);
     int state();
     int stateIndex();
@@ -170,7 +228,7 @@ public:
     bool commit();
     bool lock(bool state = 1);
     bool isLock();
-
+    void initDemo() override;
 private:
     SClientModel *m_clientModel;
     SRepairStatusLog *m_repairStatusLog;
@@ -236,6 +294,26 @@ private:
     int m_cartridge = 0;
     int m_vendorId = 0;
     bool m_termsControl = 0;
+    QString devClass();
+    QString vendor();
+    QString device();
+    QString company();
+    QString officeStr();
+    QString startOfficeStr();
+    QString managerFioShort();
+    QString currentManagerFioShort();
+    QString engineerFioShort();
+    QString box();
+    QString prepaidTypeStr();
+    QString prepaidSummStr();
+    QString realPrepaidSummStr();
+    QString preAgreedAmountStr();
+    QString repairCostStr();
+    QString realRepairCostStr();
+    QString partsCostStr();
+    QString realWorksCostStr();
+    QString realPartsCostStr();
+    QString warranty();
 };
 
 #endif // SREPAIRMODEL_H

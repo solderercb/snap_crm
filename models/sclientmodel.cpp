@@ -112,6 +112,38 @@ void SClientModel::initBinaryOptions(QSqlQueryModel *clientModel)
     m_options |= clientModel->record(0).value("state").toBool()?0:1;
 }
 
+void SClientModel::initDemo()
+{
+    i_id = 123;
+    m_firstName = "Андрей";
+    m_lastName = "Андреев";
+    m_patronymicName = "Андреевич";
+    m_address = "пр. Дружбы народов, д. 5";
+    m_postIndex = "123000";
+    m_passportNum = "111111";
+    m_passportIssuedDate = QDate::currentDate().toString("dd.MM.yyyy");
+    m_passportIssuedBy = "АБ ВГД Центрального района";
+    m_state = 1;
+    m_type = 0;
+    m_birthday = QDate::currentDate().toString("dd.MM.yyyy");
+    m_notes = "делать скидки на ремонт";
+    m_options = BinaryOption::Regular;
+    m_visitSource = clientAdTypesList->index(0, 1).data().toInt();
+    m_INN = "1234567890";
+    m_KPP = "4567";
+    m_OGRN = "123789";
+    m_webPassword = "FC9Y76U3";
+    m_urName = "";
+    m_email = "admin@example.com";
+    m_skype = "user_skype";
+    m_site = "example.com";
+    m_balance = 999999;
+    m_priceColumn = priceColModel->index(0, 1).data().toInt();
+    m_repairs = 10;
+    m_purchases = 20;
+    i_createdUtc = QDateTime::currentDateTimeUtc();
+}
+
 void SClientModel::clear()
 {
     i_id = 0;
@@ -319,7 +351,7 @@ int SClientModel::options()
 }
 
 /*  Список свойств клиента, которые необходимо отображать в карточке ремонта
- *  или в графе с данными клиента при приёме в ремонт
+ *  или в графе с данными клиента при приёме в ремонт (в QListWidget)
 */
 QStringList SClientModel::optionsList(bool shortForm)
 {
@@ -332,11 +364,11 @@ QStringList SClientModel::optionsList(bool shortForm)
     {
         switch(m_options & (1<<i))
         {
-//            case BinaryOption::Company:
-//            case BinaryOption::Supplier:
-//            case BinaryOption::SaleOrReturn:
-//            case BinaryOption::BalanceEnabled:
-//            case BinaryOption::Archived:
+//            case BinaryOption::Company:   // type()
+//            case BinaryOption::BalanceEnabled:    // balanceEnabled()
+//            case BinaryOption::Archived:  //  state()
+            case BinaryOption::Supplier:
+            case BinaryOption::SaleOrReturn:
             case BinaryOption::Regular:
             case BinaryOption::Broker:
             case BinaryOption::IgnoreCalls:
@@ -349,6 +381,51 @@ QStringList SClientModel::optionsList(bool shortForm)
             list << clientBinaryProperties->index(i, col).data().toString();
     }
     return list;
+}
+
+bool SClientModel::isSupplier()
+{
+    return m_options & BinaryOption::Supplier;
+}
+
+bool SClientModel::isGivesItemsForSale()
+{
+    return m_options & BinaryOption::SaleOrReturn;
+}
+
+bool SClientModel::isArchived()
+{
+    return !state();
+}
+
+bool SClientModel::isRegular()
+{
+    return m_options & BinaryOption::Regular;
+}
+
+bool SClientModel::isBroker()
+{
+    return m_options & BinaryOption::Broker;
+}
+
+bool SClientModel::isIgnoreCalls()
+{
+    return m_options & BinaryOption::IgnoreCalls;
+}
+
+bool SClientModel::isPreferCashless()
+{
+    return m_options & BinaryOption::PreferCashless;
+}
+
+bool SClientModel::isTakeLong()
+{
+    return m_options & BinaryOption::TakeLong;
+}
+
+bool SClientModel::isBad()
+{
+    return m_options & BinaryOption::Bad;
 }
 
 int SClientModel::adType()
@@ -364,6 +441,11 @@ void SClientModel::setAdType(const int id)
 int SClientModel::adTypeIndex()
 {
     return clientAdTypesList->rowByDatabaseID(m_visitSource, 1);
+}
+
+QString SClientModel::adTypeStr()
+{
+    return clientAdTypesList->getDisplayRole(adType(), "id");
 }
 
 QByteArray* SClientModel::photo()
@@ -543,6 +625,11 @@ double SClientModel::balance()
     return m_balance;
 }
 
+QString SClientModel::balanceStr()
+{
+    return sysLocale.toCurrencyString(balance());   // TODO: код валюты для мультивалютных балансов/касс
+}
+
 void SClientModel::createBalanceObj()
 {
     balanceLog = new SBalanceLogRecordModel(i_id);
@@ -626,6 +713,11 @@ int SClientModel::priceColumnIndex()
         return priceColModel->rowByDatabaseID(2, 1);
 
     return priceColModel->rowByDatabaseID(m_priceColumn, 1);
+}
+
+QString SClientModel::priceColumnStr()
+{
+    return priceColModel->getDisplayRole(priceColumn(), "id");
 }
 
 int SClientModel::repairs()

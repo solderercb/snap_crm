@@ -110,6 +110,68 @@ void SRepairModel::load(const int id)
     emit modelUpdated();
 }
 
+// демо-данные (например, для отчетов)
+void SRepairModel::initDemo()
+{
+    i_id = 123456;
+    m_isHidden = 0;
+    m_title = "Моноблок (All-in-One PC) Apple iMac12,1  Mid 2011  A1311 (EMC 2428)";
+    m_clientId = 6325;
+    m_type = 12345;
+    m_maker = 12345;
+    m_model = 12345;
+    m_serialNumber = "C02POIWERUJD";
+    m_company = 1;
+    m_office = 1;
+    m_startOffice = 1;
+    m_manager = managersModel->index(0, 1).data().toInt();
+    m_currentManager = managersModel->index(0, 1).data().toInt();
+    m_master = engineersModel->index(0, 1).data().toInt();
+    m_diagnosticResult = "Не включается";
+    i_createdUtc = QDateTime::currentDateTimeUtc();
+    m_outDate =  QDateTime::currentDateTimeUtc();
+    m_state = 0;
+    m_newState = 0;
+    m_expressRepair = 0;
+    m_quickRepair = 0;
+    m_isWarranty = 1;
+    m_isRepeat = 1;
+    m_paymentSystem = paymentSystemsModel->index(0, 1).data().toInt();
+    m_isCardPayment = 0;
+    m_canFormat = 0;
+    m_printCheck = 0;
+    m_box = repairBoxesModel->index(0, 1).data().toInt();
+    m_warrantyLabel = "YHD092JG";
+    m_extNotes = "текст примечания для клиента";
+    m_isPrepaid = 1;
+    m_prepaidType = 0;
+    m_prepaidSumm =  1000;
+    m_prepaidOrder = 12345;
+    m_isPreAgreed = 1;
+    m_isDebt = 0;
+    m_preAgreedAmount =  1000;
+    m_repairCost =  1000;
+    m_realRepairCost =  1000;
+    m_partsCost =  1000;
+    m_fault = "не включается";
+    m_complect = "компьютер-моноблок";
+    m_look = "хорошее состояние";
+    m_thirsPartySc = 0;
+    m_warrantyDays = warrantyTermsModel->index(0, 1).data().toInt();
+    m_barcode = "012000123452";
+    m_rejectReason = "- причина отказа от ремонта -";
+    m_informedStatus = notifyStatusesModel->index(0, 1).data().toInt();
+    m_color = "";
+    m_early = 1234;
+    m_extEarly = "oldDB 123";
+    m_issuedMsg = "issuedMsg";
+    m_smsInform = 0;
+    m_invoice = 12345;
+    m_cartridge = 0;
+    m_vendorId = 0;
+    m_termsControl = 0;
+}
+
 void SRepairModel::reload()
 {
     load(i_id);
@@ -336,9 +398,9 @@ void SRepairModel::setDiagnosticResult(const QString str)
     appendLogText(tr("Результат диагностики изменён на \"%1\"").arg(m_diagnosticResult));
 }
 
-QDateTime SRepairModel::inDate()
+QString SRepairModel::inDate()
 {
-    return m_inDate;
+    return created().left(10);  // dd.MM.yyyy
 }
 
 void SRepairModel::setInDate(const QDateTime timestamp)
@@ -346,17 +408,14 @@ void SRepairModel::setInDate(const QDateTime timestamp)
     i_valuesMap.insert("in_date", timestamp);
 }
 
-QDateTime SRepairModel::outDateUtc()
-{
-    return m_outDate;
-}
-
 QString SRepairModel::outDate()
 {
-    QDateTime date = m_outDate;
-    date.setTimeZone(QTimeZone::utc());
+    return utcToLocal(m_outDate).toString("dd.MM.yyyy");
+}
 
-    return date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+QString SRepairModel::outDateTime()
+{
+    return utcToLocal(m_outDate).toString("dd.MM.yyyy hh:mm:ss");
 }
 
 void SRepairModel::setOutDate(const QDateTime timestamp)
@@ -978,5 +1037,105 @@ bool SRepairModel::isLock()
     if(i_query->value(0).toInt() == 0 || i_query->value(0).toInt() == userDbData->value("id").toInt())
         return 0;
     return 1;
+}
+
+QString SRepairModel::devClass()
+{
+    return "TODO: implement this";  // нужна модель данных; такая используется в классе tabRepairNew
+}
+
+QString SRepairModel::vendor()
+{
+    return "TODO: implement this";  // нужна модель данных; такая используется в классе tabRepairNew
+}
+
+QString SRepairModel::device()
+{
+    return "TODO: implement this";  // нужна модель данных; такая используется в классе tabRepairNew
+}
+
+QString SRepairModel::company()
+{
+    return companiesModel->getDisplayRole(m_company);
+}
+
+QString SRepairModel::officeStr()
+{
+    return officesModel->getDisplayRole(m_office);
+}
+
+QString SRepairModel::startOfficeStr()
+{
+    return officesModel->getDisplayRole(m_startOffice);
+}
+
+QString SRepairModel::managerFioShort()
+{
+    return "TODO: implement this";  // нужна модель данных
+}
+
+QString SRepairModel::currentManagerFioShort()
+{
+    return "TODO: implement this";  // нужна модель данных
+}
+
+QString SRepairModel::engineerFioShort()
+{
+    return "TODO: implement this";  // нужна модель данных
+}
+
+QString SRepairModel::box()
+{
+    return repairBoxesModel->getDisplayRole(m_box);
+}
+
+QString SRepairModel::prepaidTypeStr()
+{
+    return "TODO: implement this";  // нужна модель данных; такая используется в классе tabRepairNew
+}
+
+QString SRepairModel::prepaidSummStr()
+{
+    return sysLocale.toCurrencyString(prepaidSumm());
+}
+
+QString SRepairModel::realPrepaidSummStr()
+{
+    return sysLocale.toCurrencyString(realPrepaidSumm());
+}
+
+QString SRepairModel::preAgreedAmountStr()
+{
+    return sysLocale.toCurrencyString(preAgreedAmount());
+}
+
+QString SRepairModel::repairCostStr()
+{
+    return sysLocale.toCurrencyString(repairCost());
+}
+
+QString SRepairModel::realRepairCostStr()
+{
+    return sysLocale.toCurrencyString(realRepairCost());
+}
+
+QString SRepairModel::partsCostStr()
+{
+    return sysLocale.toCurrencyString(partsCost());
+}
+
+QString SRepairModel::realWorksCostStr()
+{
+    return sysLocale.toCurrencyString(realWorksCost());
+}
+
+QString SRepairModel::realPartsCostStr()
+{
+    return sysLocale.toCurrencyString(realPartsCost());
+}
+
+QString SRepairModel::warranty()
+{
+    return warrantyTermsMap->value(m_warrantyDays);
 }
 

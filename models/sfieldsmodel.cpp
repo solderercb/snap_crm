@@ -72,6 +72,30 @@ bool SFieldsModel::load(int id)
     return 1;
 }
 
+void SFieldsModel::initDemo()
+{
+    if( !m_fieldsList.isEmpty() )
+    {
+        clear();
+    }
+
+    SFieldValueModel *field;
+
+    query->exec("SELECT 1 AS 'id', '<extra field 1>' AS 'name', '<value 1>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 1 AS `printable` \n"\
+                "UNION ALL\n"\
+                "SELECT 2 AS 'id', '<extra field 2>' AS 'name', '<value 2>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 1 AS `printable` \n"\
+                "UNION ALL\n"\
+                "SELECT 3 AS 'id', '<extra field 3>' AS 'name', '<value 3>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 0 AS `printable` \n"\
+                "UNION ALL\n"\
+                "SELECT 4 AS 'id', '<extra field 4>' AS 'name', '<value 4>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 1 AS `printable`;");
+    while(query->next())
+    {
+        field = new SFieldValueModel();
+        field->load(query->record());
+        add(field);
+    }
+}
+
 void SFieldsModel::add(SFieldValueModel *item)
 {
     m_fieldsList.append(item);
@@ -160,12 +184,76 @@ void SFieldsModel::enableEdit()
     }
 }
 
+int SFieldsModel::printableFieldsCount()
+{
+    int count = 0;
+    for( SFieldValueModel *i : qAsConst(m_fieldsList) )
+        if(i->isPrintable())
+            count++;
+
+    return count;
+}
+
+QString SFieldsModel::reportFieldName()
+{
+    return m_fieldsList.at(m_reportFieldIndex)->name();
+}
+
+QString SFieldsModel::reportFieldValue()
+{
+    return m_fieldsList.at(m_reportFieldIndex)->value();
+}
+
 SFieldValueModel *SFieldsModel::itemHandler(const QSqlRecord &record)
 {
     SFieldValueModel *item = new SFieldValueModel(this);
     item->load(record);
     add(item);
     return item;
+}
+
+/* Метод получения данных для отчетов LimeReport
+ * Смотри описание метода с таким же названием в классе SComRecord
+ */
+void SFieldsModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackData() | info.dataType = " << info.dataType << "; info.index = " << info.index << "; info.columnName = " << info.columnName;
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = 0; break;
+        case LimeReport::CallbackInfo::HasNext: data = 0; break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = metaObject()->property(info.index + 1).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = metaObject()->property( metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(this); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = metaObject()->propertyCount() - 1; break;
+        case LimeReport::CallbackInfo::RowCount: data = printableFieldsCount(); break;
+    }
+}
+
+/* "Навигация" по модели данных
+ * Непечатаемые поля будут пропущены.
+*/
+void SFieldsModel::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackDataChangePos() | type = " << type;
+    if(type == LimeReport::CallbackInfo::First)
+        m_reportFieldIndex = 0;
+    else
+    {
+        if(m_reportFieldIndex+1 >= m_fieldsList.count())
+        {
+            result = 0;
+            return;
+        }
+        while(!m_fieldsList.at(++m_reportFieldIndex)->isPrintable())
+        {
+            if(m_reportFieldIndex+1 >= m_fieldsList.count())
+            {
+                result = 0;
+                return;
+            }
+        }
+    }
+    result = 1;
 }
 
 #ifdef QT_DEBUG

@@ -23,6 +23,18 @@
 class SSaleTableModel : public QStandardItemModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString UID READ reportUID)
+    Q_PROPERTY(QString id READ reportId)
+    Q_PROPERTY(QString item READ reportItem)
+    Q_PROPERTY(QString qty READ reportQty)
+    Q_PROPERTY(QString price READ reportPrice)
+    Q_PROPERTY(QString summ READ reportSumm)
+    Q_PROPERTY(QString serialNumber READ reportSN)
+    Q_PROPERTY(QString warranty READ reportWarranty)
+    Q_PROPERTY(QString performer READ reportPerformer)
+    Q_PROPERTY(QString worksAmount READ amountWorksLocale)
+    Q_PROPERTY(QString itemsAmount READ amountItemsLocale)
+    Q_PROPERTY(QString amount READ amountTotalLocale)
 public:
     enum State {StoreNew = 0, StoreSold = 1, StoreReserved = 2, StoreCancelled = 3, WorkshopRW = 4, WorkshopRO = 5, WorkshopAdm = 6};
     enum class StoreOpType {Reserve = 0, Sale, Unsale, FreeReserved};
@@ -97,6 +109,16 @@ public:
     bool isWarranty();
     void setIsWarranty(const bool);
     bool isUnsaved();
+    void initDemo();
+    QString reportUID();
+    QString reportId();
+    QString reportItem();
+    QString reportQty();
+    QString reportPrice();
+    QString reportSumm();
+    QString reportSN();
+    QString reportWarranty();
+    QString reportPerformer();
 #ifdef QT_DEBUG
     void dbgAddRandomItem();
     void dbgAddRandomItemBasket();
@@ -125,6 +147,7 @@ private:
     int m_currentIndex = -1;
     bool m_isWarranty = 0;
     bool m_unsaved = 0;
+    qsizetype m_reportRowNum = 0;
     QList<QStandardItem *> row(int) const;
 
     // названия столбцов по-умолчанию; подробнее см. в комментарии к методу SaleTableModel::setHorizontalHeaderLabels
@@ -139,7 +162,8 @@ private:
 public slots:
     void addCustomWork();
     void indexSelected(const QModelIndex &index);
-
+    void reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+    void reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
 private slots:
     void sqlDataChanged();
 #if QT_VERSION >= 0x060000

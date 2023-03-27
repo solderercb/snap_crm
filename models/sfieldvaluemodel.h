@@ -38,6 +38,7 @@ public:
     bool delDBRecord();
     bool isValid();
     bool deviceMatch();
+    bool isPrintable();
 #ifdef QT_DEBUG
     void randomFill();
 #endif
@@ -61,6 +62,7 @@ private:
     int m_itemId;
     QString m_value;
     bool m_isValid = 0;
+    bool m_printable = 1;
     QWidget *m_widget = nullptr;
 public slots:
     void setValue(const QString &);

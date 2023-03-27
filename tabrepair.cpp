@@ -212,7 +212,7 @@ void tabRepair::updateWidgets()
     ui->lineEditClient->setText(clientModel->fullLongName());
     ui->lineEditInDate->setText(repairModel->created());
     setInfoWidgetVisible(ui->lineEditOutDate, m_outDateVisible);
-    ui->lineEditOutDate->setText(repairModel->outDate());
+    ui->lineEditOutDate->setText(repairModel->outDateTime());
     ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->contains("101")); // TODO: добавить разрешение Адм. правка работ и деталей
     ui->pushButtonAdmEditWorks->setChecked(false);
     ui->pushButtonGetout->setVisible(m_getOutButtonVisible && !modelRO);

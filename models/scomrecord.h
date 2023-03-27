@@ -11,6 +11,7 @@
 #include <QList>
 #include <QStandardItem>
 #include <QVariant>
+#include <LimeReport>
 #include "models/slogrecordmodel.h"
 
 class SComRecord : public SDatabaseRecord
@@ -23,13 +24,16 @@ public:
     void appendLogText(const QString&);
     void appendLogText(const QString&, const QString &disambiguation);
     void removeLogText(const QString &disambiguation);
+    virtual void initDemo(){};
 protected:
     bool commitLogs();
     void initQueryFields(const QList<QStandardItem *> &record);
     virtual void setQueryField(const int, const QVariant, const QVariant){};
     QMap<QString, QString> *i_logTexts;
     SLogRecordModel *i_logRecord;
-
+public slots:
+    void reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+    void reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
 };
 
 #endif // SCOMRECORD_H

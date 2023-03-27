@@ -19,6 +19,7 @@ public:
     explicit SDatabaseRecord(QObject *parent = nullptr);
     ~SDatabaseRecord();
     int lastInsertId();
+    QDateTime utcToLocal(QDateTime timestamp);
     QDateTime createdUtc();
     QString created();
     void setCreated(const QDateTime &timestamp);

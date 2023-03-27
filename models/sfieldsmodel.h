@@ -9,6 +9,8 @@
 class SFieldsModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ reportFieldName)
+    Q_PROPERTY(QString value READ reportFieldValue)
 signals:
 public:
     enum Type {Item = 0, Repair = 1};
@@ -28,6 +30,10 @@ public:
     bool validate();
     void resetIds();
     void enableEdit();
+    int printableFieldsCount();
+    QString reportFieldName();
+    QString reportFieldValue();
+    void initDemo();
 #ifdef QT_DEBUG
     void randomFill();
 #endif
@@ -39,10 +45,13 @@ private:
     SLogRecordModel *logRecord = nullptr;
     bool m_type = 0;
     bool m_nErr = 1;
+    qsizetype m_reportFieldIndex = 0;
     void deleteWidgets();
     void deleteFields();
 public slots:
     void remove(SFieldValueModel *field);
+    void reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+    void reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
 };
 
 #endif // SFIELDSMODEL_H

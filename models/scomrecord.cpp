@@ -71,3 +71,33 @@ void SComRecord::initQueryFields(const QList<QStandardItem *> &record)
     }
 }
 
+/* Метод получения данных для отчетов LimeReport
+ * Для получения данных используется мета-система объектов; при вызове слота происходит вызов метода класса, указанный в параметре Q_PROPERTY READ.
+ * Любой Q_OBJECT класс в свойстве с индексом 0 содержит название объекта, поэтому он пропускается.
+ * При инициализации такого источника данных сначала происходит сбор сведений о всех полях (info.dataType = 2; info.index = <индекс Q_PROREPTY>); а при рендеринге
+ * данные забираются по имени свойства, а info.index соответсвует строке (применимо для табличных данных, например список работ и деталей).
+ * IsEmpty и HasNext, похоже, уже не используются и оставлены для совместимости
+ */
+void SComRecord::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackData() | info.dataType = " << info.dataType << "; info.index = " << info.index << "; info.columnName = " << info.columnName;
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = 0; break;
+        case LimeReport::CallbackInfo::HasNext: data = 0; break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = metaObject()->property(info.index + 1).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = metaObject()->property( metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(this); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = metaObject()->propertyCount() - 1; break;
+        case LimeReport::CallbackInfo::RowCount: data = 1; break;   // данные клиента — это одна запись из таблицы clients, поэтому всегда одна строка
+    }
+}
+
+/* "Навигация" по модели данных
+ * В данном случае не имеет никакого смысла, т. к. строка единственная
+*/
+void SComRecord::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackDataChangePos() | type = " << type;
+    result = 1;
+}
+

@@ -36,6 +36,46 @@ private:
 class SClientModel : public SComRecord
 {
     Q_OBJECT
+    Q_PROPERTY(int id READ id)
+    Q_PROPERTY(QString firstName READ firstName)
+    Q_PROPERTY(QString lastName READ lastName)
+    Q_PROPERTY(QString patronymicName READ patronymicName)
+    Q_PROPERTY(QString fullLongName READ fullLongName)
+    Q_PROPERTY(QString fullShortName READ fullShortName)
+    Q_PROPERTY(QString address READ address)
+    Q_PROPERTY(QString postIndex READ postIndex)
+    Q_PROPERTY(QString passportNum READ passportNum)
+    Q_PROPERTY(QString passportIssuedDate READ passportIssuedDate)
+    Q_PROPERTY(QString passportIssuedBy READ passportIssuedBy)
+    Q_PROPERTY(bool state READ state)
+    Q_PROPERTY(QString birthday READ birthday)
+    Q_PROPERTY(QString memorial READ memorial)
+    Q_PROPERTY(QString notes READ notes)
+    Q_PROPERTY(bool isCompany READ type)
+    Q_PROPERTY(bool isSupplier READ isSupplier)
+    Q_PROPERTY(bool isGivesItemsForSale READ isGivesItemsForSale)
+    Q_PROPERTY(bool isBalanceEnabled READ balanceEnabled)
+    Q_PROPERTY(bool isArchived READ isArchived)
+    Q_PROPERTY(bool isRegular READ isRegular)
+    Q_PROPERTY(bool isBroker READ isBroker)
+    Q_PROPERTY(bool isIgnoreCalls READ isIgnoreCalls)
+    Q_PROPERTY(bool isPreferCashless READ isPreferCashless)
+    Q_PROPERTY(bool isTakeLong READ isTakeLong)
+    Q_PROPERTY(bool isBad READ isBad)
+    Q_PROPERTY(QString adTypeStr READ adTypeStr)
+    Q_PROPERTY(QByteArray* photo READ photo)
+    Q_PROPERTY(QString INN READ INN)
+    Q_PROPERTY(QString KPP READ KPP)
+    Q_PROPERTY(QString OGRN READ OGRN)
+    Q_PROPERTY(QString web_password READ web_password)
+    Q_PROPERTY(QString urName READ urName)
+    Q_PROPERTY(QString email READ email)
+    Q_PROPERTY(QString site READ site)
+    Q_PROPERTY(QString balance READ balanceStr)
+    Q_PROPERTY(QString priceColumn READ priceColumnStr)
+    Q_PROPERTY(int repairs READ repairs)
+    Q_PROPERTY(int purchases READ purchases)
+
 public:
     enum BinaryOption{Company = 1, Regular = 2, Broker = 4, IgnoreCalls = 8, PreferCashless = 16, TakeLong = 32, Supplier = 64, SaleOrReturn = 128, BalanceEnabled = 256, Bad = 512, Archived = 1024};
     enum EditStrategy { OnFieldChange, OnManualSubmit };
@@ -82,10 +122,20 @@ public:
     void setNotes(const QString&);
     int options();
     QStringList optionsList(bool shortForm = 0);
+    bool isSupplier();
+    bool isGivesItemsForSale();
+    bool isArchived();
+    bool isRegular();
+    bool isBroker();
+    bool isIgnoreCalls();
+    bool isPreferCashless();
+    bool isTakeLong();
+    bool isBad();
     void setOptions(int);
     int adType();
     void setAdType(const int);
     int adTypeIndex();
+    QString adTypeStr();
     QByteArray* photo();
     void setPhoto(QByteArray*);
     QString INN();
@@ -135,6 +185,7 @@ public:
     bool balanceEnabled();
     bool setBalanceEnabled(bool state = 1);
     double balance();
+    QString balanceStr();
     void createBalanceObj();
     void deleteBalanceObj();
     bool updateBalance(const double amount, const QString &text);
@@ -145,6 +196,7 @@ public:
     int priceColumn();
     void setPriceColumn(int);
     int priceColumnIndex();
+    QString priceColumnStr();
     int repairs();
     void setRepairs(const int val);
     bool updateRepairs(const int val);
@@ -158,7 +210,7 @@ public:
     void appendLogText(const QString&);
     bool commit();
     bool integrityStatus();
-
+    void initDemo() override;
 private:
     bool nIntegrityErr = 1;
     bool m_standAlone = 0;

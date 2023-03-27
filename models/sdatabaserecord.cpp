@@ -85,6 +85,12 @@ bool SDatabaseRecord::checkTableName()
     return i_nErr;
 }
 
+QDateTime SDatabaseRecord::utcToLocal(QDateTime timestamp)
+{
+    timestamp.setTimeZone(QTimeZone::utc());
+    return timestamp.toLocalTime();
+}
+
 QDateTime SDatabaseRecord::createdUtc()
 {
     return i_createdUtc;
@@ -92,10 +98,7 @@ QDateTime SDatabaseRecord::createdUtc()
 
 QString SDatabaseRecord::created()
 {
-    QDateTime date = i_createdUtc;
-    date.setTimeZone(QTimeZone::utc());
-
-    return date.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+    return utcToLocal(i_createdUtc).toString("dd.MM.yyyy hh:mm:ss");
 }
 
 /* Дефолтный метод установки метки времени для записи в таблице.

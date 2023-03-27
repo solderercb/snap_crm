@@ -20,7 +20,7 @@ void SFieldValueModel::load(const int id)
 {
     SSqlQueryModel *fieldModel = new SSqlQueryModel(this);
     fieldModel->setQuery(QUERY_SEL_ADD_FIELD(id));
-    if(fieldModel->lastError().isValid())
+    if(!fieldModel->lastError().isValid())
     {
         m_isValid = 1;
         load(fieldModel->record(0));
@@ -38,6 +38,7 @@ void SFieldValueModel::load(QSqlRecord record)
     m_repairId = record.value("repair_id").toInt();
     m_itemId = record.value("item_id").toInt();
     m_value = record.value("value").toString();
+    m_printable = record.value("printable").toBool();
 }
 
 QWidget *SFieldValueModel::widget()
@@ -344,6 +345,11 @@ bool SFieldValueModel::isValid()
 bool SFieldValueModel::deviceMatch()
 {
     return property("fieldDevMatch").toBool();
+}
+
+bool SFieldValueModel::isPrintable()
+{
+    return m_printable;
 }
 
 #ifdef QT_DEBUG

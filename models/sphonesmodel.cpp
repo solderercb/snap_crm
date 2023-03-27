@@ -140,6 +140,70 @@ void SPhonesModel::markUpdated(bool state)
     m_updated = state;
 }
 
+QString SPhonesModel::primaryStr()
+{
+    if(m_phonesList.count())
+        return primary()->phone();
+
+    return "";
+}
+
+QString SPhonesModel::phone2()
+{
+    if(m_phonesList.count() < 2)
+        return "";
+
+    QList<SPhoneModel*>::const_iterator i = m_phonesList.constBegin();
+    i++;    // первый всегда основной, поэтому сразу к следующему
+    if(i != m_phonesList.constEnd())
+        return (*i)->phone();
+
+    return "";
+}
+
+QString SPhonesModel::phone3()
+{
+    if(m_phonesList.count() < 3)
+        return "";
+
+    QList<SPhoneModel*>::const_iterator i = m_phonesList.constBegin();
+    i++;    // первый всегда основной, поэтому сразу к следующему
+    i++;
+    if(i != m_phonesList.constEnd())
+        return (*i)->phone();
+
+    return "";
+}
+
+QString SPhonesModel::allPhones()
+{
+    QStringList list;
+    QList<SPhoneModel*>::const_iterator i = m_phonesList.constBegin();
+    while(i != m_phonesList.constEnd())
+    {
+        list << (*i)->phone();
+        i++;
+    }
+    return list.join(", ");
+}
+
+QString SPhonesModel::iterativePhone()
+{
+    return m_phonesList.at(m_reportPhoneIndex)->phone();
+}
+
+void SPhonesModel::initDemo()
+{
+    SPhoneModel *primary = new SPhoneModel();
+    primary->setMask(clientPhoneTypesModel->index(0, 1).data().toInt());
+    primary->setPhone("123-45-67");
+    SPhoneModel *secondary = new SPhoneModel();
+    secondary->setMask(clientPhoneTypesModel->index(0, 1).data().toInt());
+    secondary->setPhone("765-43-21");
+    add(primary);
+    add(secondary);
+}
+
 SPhoneModel *SPhonesModel::sqlRecordHandler(const QSqlRecord &record)
 {
     SPhoneModel *item = new SPhoneModel(record, this);
@@ -165,3 +229,39 @@ void SPhonesModel::switchPrimaryPhone(SPhoneModel *newPrimaryPhone)
 
 }
 
+/* Метод получения данных для отчетов LimeReport
+ * Смотри описание метода с таким же названием в классе SComRecord
+ */
+void SPhonesModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackData() | info.dataType = " << info.dataType << "; info.index = " << info.index << "; info.columnName = " << info.columnName;
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = 0; break;
+        case LimeReport::CallbackInfo::HasNext: data = 0; break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = metaObject()->property(info.index + 1).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = metaObject()->property( metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(this); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = metaObject()->propertyCount() - 1; break;
+        case LimeReport::CallbackInfo::RowCount: data = m_phonesList.count(); break;
+    }
+}
+
+/* "Навигация" по модели данных
+ * В данном случае не имеет никакого смысла, т. к. использование модели данных в качестве
+*/
+void SPhonesModel::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
+{
+//    qDebug().nospace() << "[" << this << "] reportCallbackDataChangePos() | type = " << type;
+    if(type == LimeReport::CallbackInfo::First)
+        m_reportPhoneIndex = 0;
+    else
+    {
+        if(m_reportPhoneIndex+1 >= m_phonesList.count())
+        {
+            result = 0;
+            return;
+        }
+        m_reportPhoneIndex++;
+    }
+    result = 1;
+}
