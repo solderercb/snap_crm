@@ -338,7 +338,7 @@ void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &
     if(!roles.isEmpty() && !roles.contains(Qt::DisplayRole))
         return;
 
-    for(int col = topLeft.column(); col <= bottomRight.column(); col++)
+    for(int col = topLeft.column(); col <= bottomRight.column() && col < i_gridLayout->$GridControl.Columns.size(); col++)
     {
         if(i_gridLayout->$GridControl.Columns[col].Width_marked)
             continue;

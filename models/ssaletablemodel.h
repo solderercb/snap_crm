@@ -51,7 +51,6 @@ public:
     void setQuery(const QString&, const QSqlDatabase &db = QSqlDatabase());
     QVariant data(const QModelIndex&, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex&, const QVariant&, int role = Qt::EditRole) override;
-    bool setDataAtomic(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex&) const override;
     bool insertRecord(int, const QSqlRecord &, const int recType = RecordType::Item);
     bool appendRecord(const QSqlRecord&);

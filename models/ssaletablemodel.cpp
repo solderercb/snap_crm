@@ -466,7 +466,7 @@ int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
     {
         pendingRemoveList->insert(row, db_id);
     }
-    setDataAtomic(index(row, SStoreItemModel::SaleOpColumns::ColState), newState);
+    QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColState), newState);
     return row + 1;
 }
 
@@ -638,7 +638,7 @@ bool SSaleTableModel::repair_saveTables()
             delete itm;
         }
         if(!index(i, SStoreItemModel::SaleOpColumns::ColId).data().toInt())
-            setDataAtomic(index(i, SStoreItemModel::SaleOpColumns::ColId), lastInsertId);
+            QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), lastInsertId);
     }
 
     m_editStrategy = editStrategyBackup;
@@ -1106,11 +1106,11 @@ void SSaleTableModel::clearChangedFlagForAllField()
             {
                 if(index(i, j).data(DataRoles::Changed).toBool())
                 {
-                    setDataAtomic(index(i, j), 0, DataRoles::Changed);   // снятие флага о наличии изменений в поле
-                    setDataAtomic(index(i, j), QVariant(), DataRoles::OldValue);   // очистка старого значения
+                    QStandardItemModel::setData(index(i, j), 0, DataRoles::Changed);   // снятие флага о наличии изменений в поле
+                    QStandardItemModel::setData(index(i, j), QVariant(), DataRoles::OldValue);   // очистка старого значения
                 }
             }
-            setDataAtomic(index(i, SStoreItemModel::SaleOpColumns::ColId), 0, DataRoles::Changed);   // снятие флага о наличии изменений в строке
+            QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), 0, DataRoles::Changed);   // снятие флага о наличии изменений в строке
         }
     }
     m_unsaved = 0;
@@ -1230,13 +1230,13 @@ void SSaleTableModel::sqlDataChanged()
     {
         for(int j = 0; j < m_queryData->columnCount(); j++)
         {
-            setDataAtomic(index(i, j), m_queryData->index(i, j).data());
+            QStandardItemModel::setData(index(i, j), m_queryData->index(i, j).data());
         }
         // Чтобы лишний раз не лезть в другие индексы объекта, в UserRole записываем значение is_cancellation (state);
         // оно будет использовано для отрисовки кнопки: товары, возврат которых был оформлен при предыдущем
         // администрировании документа, придётся продать в новом документе.
-        setDataAtomic(index(i, 0), isRowMarkedRemove(i), DataRoles::State);
-        setDataAtomic(index(i, 0), m_queryData->index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data(), DataRoles::RecordType);
+        QStandardItemModel::setData(index(i, 0), isRowMarkedRemove(i), DataRoles::State);
+        QStandardItemModel::setData(index(i, 0), m_queryData->index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data(), DataRoles::RecordType);
     }
     this->blockSignals(false);
     m_queryData->blockSignals(true);
@@ -1259,7 +1259,7 @@ void SSaleTableModel::dataChangedHook(const QModelIndex &topLeft, const QModelIn
     int column = topLeft.column();
     if( (column == SStoreItemModel::SaleOpColumns::ColCount || column == SStoreItemModel::SaleOpColumns::ColPrice) )
     {
-        setDataAtomic(index(row, SStoreItemModel::SaleOpColumns::ColSumm), value(row, SStoreItemModel::SaleOpColumns::ColCount).toInt() * value(row, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() );
+        QStandardItemModel::setData(index(row, SStoreItemModel::SaleOpColumns::ColSumm), value(row, SStoreItemModel::SaleOpColumns::ColCount).toInt() * value(row, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() );
         emit amountChanged(amountTotal(), m_amountItems, m_amountWorks);
     }
 }
@@ -1277,8 +1277,8 @@ bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, i
         {
             if(index.data(Qt::BackgroundRole) == QColor(255,209,209) )
             {
-                setDataAtomic(index, QVariant(), Qt::BackgroundRole);
-                setDataAtomic(this->index(index.row(), SStoreItemModel::SaleOpColumns::ColAvail), QVariant(), Qt::BackgroundRole);
+                QStandardItemModel::setData(index, QVariant(), Qt::BackgroundRole);
+                QStandardItemModel::setData(this->index(index.row(), SStoreItemModel::SaleOpColumns::ColAvail), QVariant(), Qt::BackgroundRole);
             }
         }
 
@@ -1287,47 +1287,31 @@ bool SSaleTableModel::setData(const QModelIndex &index, const QVariant &value, i
         {
             if(index.data(Qt::BackgroundRole) == QColor(255,209,209) )
             {
-                setDataAtomic(index, QVariant(), Qt::BackgroundRole);
+                QStandardItemModel::setData(index, QVariant(), Qt::BackgroundRole);
             }
         }
 
         if(index.data(Qt::DisplayRole) != value)
         {
-            setDataAtomic(index, 1, Changed); // пометка поля изменённым
+            QStandardItemModel::setData(index, 1, Changed); // пометка поля изменённым
             if( !index.data(DataRoles::OldValue).isValid() && \
                 (   this->index(index.row(), SStoreItemModel::SaleOpColumns::ColObjId).data().toInt() || \
                     (   this->index(index.row(), SStoreItemModel::SaleOpColumns::ColId).data().toInt() &&\
                         !this->index(index.row(), SStoreItemModel::SaleOpColumns::ColObjId).data().toInt()
                     ))) {
-                setDataAtomic(index, QStandardItemModel::data(index), DataRoles::OldValue); // сохраняем старое значение (для записи в журнал)
+                QStandardItemModel::setData(index, QStandardItemModel::data(index), DataRoles::OldValue); // сохраняем старое значение (для записи в журнал)
             }
-            setDataAtomic(this->index(index.row(), SStoreItemModel::SaleOpColumns::ColId), 1, Changed); // пометка строки изменённой
+            QStandardItemModel::setData(this->index(index.row(), SStoreItemModel::SaleOpColumns::ColId), 1, Changed); // пометка строки изменённой
         }
 
-        ret = setDataAtomic(index, value);
-        dataChangedHook(index, index);
+        ret = QStandardItemModel::setData(index, value);
         if(ret)
             repair_autoSaveTables();
 
         return ret;
     }
 
-    ret = setDataAtomic(index, value, role);
-    return ret;
-}
-
-/*  Специальный метод, блокинующий сигналы при записи
- *  Если index.column() > 10, при вызове setDataAtomic программа падает.
- *  Не разобрался почему.
-*/
-bool SSaleTableModel::setDataAtomic(const QModelIndex &index, const QVariant &value, int role)
-{
-    bool ret;
-
-    QStandardItemModel::blockSignals(true);
     ret = QStandardItemModel::setData(index, value, role);
-    QStandardItemModel::blockSignals(false);
-
     return ret;
 }
 
