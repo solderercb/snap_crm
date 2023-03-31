@@ -102,6 +102,7 @@ SOURCES += \
     tabsale.cpp \
     widgets/spagedinterface.cpp \
     widgets/spagesettingsdoctempateeditor.cpp \
+    widgets/sreportscommonfunctions.cpp \
     widgets/stableviewbase.cpp \
     widgets/stableviewbaseitemdelegates.cpp \
     widgets/stableviewclients.cpp \
@@ -197,6 +198,7 @@ HEADERS  += \
     tabsale.h \
     widgets/spagedinterface.h \
     widgets/spagesettingsdoctempateeditor.h \
+    widgets/sreportscommonfunctions.h \
     widgets/stableviewbaseitemdelegates.h \
     widgets/stableviewclients.h \
     widgets/stableviewclientsitemdelegates.h \
@@ -270,10 +272,10 @@ UI_SOURCES_DIR = $${OUT_PWD}/ui
 RCC_DIR        = $${OUT_PWD}/$${BUILD_TYPE}/rcc
 
 equals(QT_MAJOR_VERSION, 6){
-    LIB_DIR = $$PWD/lib6
+    LIB_DIR = $$PWD/libQt6
 }
 else {
-    LIB_DIR = $$PWD/lib5
+    LIB_DIR = $$PWD/libQt5
 }
 INCLUDEPATH += $$LIB_DIR/include
 DEPENDPATH += $$LIB_DIR/include

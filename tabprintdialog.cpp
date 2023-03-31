@@ -5,11 +5,12 @@
 
 tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> report_vars):
     tabCommon(parent),
-    m_reportVars(report_vars),
     ui(new Ui::tabPrintDialog)
 {
     ui->setupUi(this);
+    m_reportVars = report_vars;
     initProgressWidget();
+    logRecord = new SLogRecordModel();
 
     renderDelayTimer = new QTimer();
     renderDelayTimer->setSingleShot(true);
@@ -55,36 +56,11 @@ tabPrintDialog::~tabPrintDialog()
         delete previewDelayTimer;
         previewDelayTimer = 0;
     }
+    delete logRecord;
 }
 
 bool tabPrintDialog::tabCloseRequest()
 {
-    return 1;
-}
-
-bool tabPrintDialog::loadReportTemplate(QByteArray *data)
-{
-    if (!m_report->loadFromByteArray(data))
-        return 1;
-
-    // Вкладка предпросмотра  на подобие MS Office: слева в столбик параметры печати, а справа непосредсвтенно превью
-    ui->gridLayoutTab->addWidget(previewWindow, 0, 1);
-    ui->gridLayoutTab->setColumnStretch(1, 1);
-    ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
-    return 0;
-}
-
-bool tabPrintDialog::loadTmpReportTemplate(QString filename)
-{
-    if (!m_report->loadFromFile(filename))
-        qDebug() << "Can't open file";
-    previewWindow->refreshPages();
-
-    // Вкладка предпросмотра  на подобие MS Office: слева в столбик параметры печати, а справа непосредсвтенно превью
-    ui->gridLayoutTab->addWidget(previewWindow, 0, 1);
-    ui->gridLayoutTab->setColumnStretch(1, 1);
-    ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
-
     return 1;
 }
 
@@ -129,146 +105,10 @@ bool tabPrintDialog::event(QEvent *ev)
     return ret;
 }
 
-QStandardItemModel* tabPrintDialog::initDemoModel(QStringList &demoHeaders, QList<QVariant> &demoValues)
-{
-    QStandardItemModel *model = new QStandardItemModel();
-
-    model->setHorizontalHeaderLabels(demoHeaders);
-    foreach(QString item, demoHeaders)
-    {
-        QStandardItem *it = new QStandardItem(demoValues.at(demoHeaders.indexOf(item)).toString());
-        model->setItem(0, demoHeaders.indexOf(item), it);
-    }
-
-    return model;
-}
-
-/* Загрузка ранее кэшированного файла отчета
- * Возвращает 1 в случае успеха
- */
-bool tabPrintDialog::loadTemplateFromFile()
-{
-    QString fileName;
-    QFile file;
-    QByteArray fileContent;
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
-
-    if(!QFile::exists(fileName = QApplication::applicationDirPath() + "/reports/" + m_reportName + ".lrxml"))
-    {
-        if(!loadTemplateFromDB())
-            return 0;
-    }
-    else    // если файл отчета кэширован ранее, нужно сравнить контрольные суммы
-    {
-        query.exec(QUERY_SEL_DOC_TEMPL_CHECKSUM(m_reportName));
-        query.first();
-        if(query.isValid())
-        {
-            file.setFileName(fileName);
-            file.open(QIODevice::ReadOnly);
-            fileContent = file.readAll();
-            file.close();
-            QCryptographicHash hash(QCryptographicHash::Sha1);
-            hash.addData(fileContent);
-            if(hash.result().toHex().toUpper() != query.value(0).toString())
-            {
-                if(!loadTemplateFromDB())
-                    return 0;
-            }
-            else
-            {
-                if(!m_report->loadFromFile(fileName))
-                {
-                    return 0;
-                }
-            }
-        }
-    }
-    return 1;
-}
-
-/* Загрузка бланка отчета из БД и кэширование
- * Возвращает 1 в случае успеха
- */
-bool tabPrintDialog::loadTemplateFromDB()
-{
-    QString filePath = QApplication::applicationDirPath() + "/reports/";
-    QString fileName = filePath + m_reportName + ".lrxml";
-    QDir path;
-    QFile file;
-    QByteArray fileContent;
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
-
-    query.exec(QUERY_SEL_DOC_TEMPL_DATA(m_reportName));
-    query.first();
-    if(query.isValid())
-    {
-        fileContent = query.value(0).toByteArray();
-        path.setPath(filePath);
-        if (!path.exists())
-            path.mkpath(filePath);
-        file.setFileName(fileName);
-        if (!file.open(QIODevice::ReadWrite))
-        {
-            qDebug() << "Не удалось сохранить файл бланка отчета на диск";
-            return 0;
-        }
-        file.resize(fileContent.size());
-        file.write(fileContent);
-        file.close();
-        if(!m_report->loadFromFile(fileName))
-        {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
 void tabPrintDialog::initDataSources()
 {
-    try
-    {
-        switch(m_reportType)
-        {
-            case Global::Reports::new_rep: initRepairDataSources(); break;
-            case Global::Reports::rep_label: initRepairStickerDataSources(); break;
-            case Global::Reports::sticker1: initItemStickerDataSources(); break;
-            case Global::Reports::pko: initPKODataSources(); break;
-//            case Global::Reports::reject: ; break;
-//            case Global::Reports::rko: ; break;
-//            case Global::Reports::sticker2: ; break;
-//            case Global::Reports::sticker3: ; break;
-//            case Global::Reports::warranty: ; break;
-//            case Global::Reports::works: ; break;
-//            case Global::Reports::diag: ; break;
-//            case Global::Reports::pn: ; break;
-//            case Global::Reports::rn: ; break;
-//            case Global::Reports::lost: ; break;
-//            case Global::Reports::price1: ; break;
-//            case Global::Reports::invoice0: ; break;
-//            case Global::Reports::invoice1: ; break;
-//            case Global::Reports::invoice2: ; break;
-//            case Global::Reports::invoice3: ; break;
-//            case Global::Reports::vatinvoice0: ; break;
-//            case Global::Reports::p_list0: ; break;
-//            case Global::Reports::w_list0: ; break;
-//            case Global::Reports::new_cartridge: ; break;
-//            case Global::Reports::sticker_cartridge: ; break;
-//            case Global::Reports::issue_cartridge: ; break;
-//            case Global::Reports::slip: ; break;
-//            case Global::Reports::move: ; break;
-//            case Global::Reports::buyout: ; break;
-            default: qDebug().nospace() << "[" << this << "] initDataSources() | not implemented report type"; return;
-        }
-
-        m_printer->setDocName(m_reportName);
-    }
-    catch (const QString &err)
-    {
-        errorHandler(err);
-//        errorHandler(tr("Не удалось иницициализировать модели данных отчета"));
-    }
+    SReportsCommonFunctions::initDataSources();
+    m_printer->setDocName(m_reportName);
 
 #ifdef PRINT_DEBUG_PAGE_INFO
     qDebug() << "";
@@ -282,123 +122,14 @@ void tabPrintDialog::initDataSources()
 
 void tabPrintDialog::initRepairDataSources()
 {
-    // TODO: реализовать дэмо-данные, как для sticker1
-    // TODO: подумать над вариантом модели данных ремонта в виде списка полей со столбцами "название поля", "значение";
-    // в этом случае шаблон отчета будет построен полностью на dataBand, а строки dataBand'а могут автоматичеки увеличиваться по высоте и,
-    // в случае большого кол-ва данных, не придётся уменьшать размерт шрифта
-    QSqlQueryModel *repairModel = new QSqlQueryModel();
-    repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(m_reportVars.value("repair_id").toString()), QSqlDatabase::database("connMain"));
-    if(repairModel->lastError().isValid())
-        throw tr("Не удалось иницициализировать модель данных ремонта");
-    m_report->dataManager()->addModel("repair", repairModel, true);
-    client_id = repairModel->record(0).value("client").toInt();
-
-    QSqlQueryModel *customerModel = new QSqlQueryModel();
-    customerModel->setQuery(QUERY_SEL_CLIENT_RPRT(repairModel->record(0).value("client").toInt()));
-    if(customerModel->lastError().isValid())
-        throw tr("Не удалось иницициализировать модель данных клиента");
-    m_report->dataManager()->addModel("customer", customerModel, true);
-
-    // из всех параметров для отёта пригодится только валюта
-    // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
-    QStandardItemModel *configModel = new QStandardItemModel();
-    QStringList headers = {"currency"};
-    configModel->setHorizontalHeaderLabels(headers);
-//        qDebug() << "sysLocale.currencySymbol: " << sysLocale.currencySymbol(QLocale::CurrencySymbol);  // QLocale::CurrencyDisplayName почему-то возвращает "рубль": язык интерф. Win 10 Русский (Россия), ден. ед. в настройках ОС - "грн.", Qt v6.2.1
-    configModel->appendRow(new QStandardItem(sysLocale.currencySymbol(QLocale::CurrencySymbol)));
-    m_report->dataManager()->addModel("config", configModel, true);
-
-    QSqlQueryModel *fieldsModel = new QSqlQueryModel();
-    fieldsModel->setQuery(QUERY_SEL_REP_FIELDS_RPRT(m_reportVars.value("repair_id").toString()));
-    if(fieldsModel->lastError().isValid())
-        throw tr("Не удалось иницициализировать модель данных дополнительных полей");
-    m_report->dataManager()->addModel("additionalFields", fieldsModel, true);
-
-    m_report->dataManager()->addModel("user", userDbDataModel, false);
-    m_report->dataManager()->addModel("company", companiesModel, false);
-    m_report->dataManager()->addModel("office", officesModel, false);
+    SReportsCommonFunctions::initRepairDataSources();
 }
 
 void tabPrintDialog::initRepairStickerDataSources()
 {
-    if (m_reportVars.contains("repair_id"))
-    {
-        QSqlQueryModel *repairModel = new QSqlQueryModel();
-        repairModel->setQuery(QUERY_SEL_REPAIR_RPRT(m_reportVars.value("repair_id").toString()), QSqlDatabase::database("connMain"));
-        if(repairModel->lastError().isValid())
-            throw tr("Не удалось иницициализировать модель данных ремонта");
-        m_report->dataManager()->addModel("repair", repairModel, true);
-        client_id = repairModel->record(0).value("client").toInt();
-
-        QSqlQueryModel *customerModel = new QSqlQueryModel();
-        customerModel->setQuery(QUERY_SEL_CLIENT_RPRT(client_id));
-        if(customerModel->lastError().isValid())
-            throw tr("Не удалось иницициализировать модель данных клиента");
-        m_report->dataManager()->addModel("customer", customerModel, true);
-
-        m_report->dataManager()->addModel("user", userDbDataModel, false);
-        m_report->dataManager()->addModel("company", companiesModel, false);
-        m_report->dataManager()->addModel("office", officesModel, false);
-    }
-    else
-    {   // Дэмо значения для стикера (если не задано значение repair_id)
-        QStringList demoHeaders = {"id", "Title", "client", "serial_number", "company", "office", "start_office", "manager", "master", "in_date", "express_repair", "is_warranty", "is_repeat", "box", "box_name", "barcode", "early", "ext_early"};
-        QList<QVariant> demoValues = {12345, "Моноблок (All-in-One PC) Apple iMac12,1  Mid 2011  A1311 (EMC 2428)", 6325, "C02POIWERUJD", 1, 1, 1, 33, 33, "2022-01-25 10:26:32", 0, 0, 0, "NULL", "NULL", "012000123452", "NULL", "NULL"};
-        m_report->dataManager()->addModel("repair", initDemoModel(demoHeaders, demoValues), true);
-        client_id = 6325;
-        demoHeaders = QStringList{"id", "name", "surname", "patronymic", "type", "is_regular", "is_dealer"};
-        demoValues = {6325, "Андрей", "Андреев", "Андреевич", 0, 0, 0};
-        m_report->dataManager()->addModel("customer", initDemoModel(demoHeaders, demoValues), true);
-        demoHeaders = QStringList{"id", "username", "name", "surname", "patronymic", "phone", "phone2", "email"};
-        demoValues = {32, "manager", "Менеджер", "", "", "", "", ""};
-        m_report->dataManager()->addModel("user", initDemoModel(demoHeaders, demoValues), true);
-        demoHeaders = QStringList{"id", "type", "name", "inn", "kpp", "ogrn", "ur_address", "site", "email", "logo"};
-        demoValues = {1, 1, "ЧП Рога и копыта", "1234567890", "1234", "5678", "туманность Андромеды, 1", "rik.com", "pr@rik.com", "NULL"};
-        m_report->dataManager()->addModel("company", initDemoModel(demoHeaders, demoValues), true);
-        demoHeaders = QStringList{"id", "name", "address", "phone", "phone2", "logo"};
-        demoValues = {1, "Главный", "туманность Андромеды, 1", "123 456-78-90", "", "NULL"};
-        m_report->dataManager()->addModel("office", initDemoModel(demoHeaders, demoValues), true);
-    }
-
-    if (m_reportVars.contains("copies"))
-    {
-        ui->spinBoxCopies->setValue(m_reportVars.value("copies").toInt());
-    }
-    else
-    {
-        ui->spinBoxCopies->setValue(comSettings->value("rep_stickers_copy").toInt());
-    }
-}
-
-void tabPrintDialog::initItemStickerDataSources()
-{
-    if (m_reportVars.contains("ids_list"))
-    {
-        QSqlQueryModel *itemsModel = new QSqlQueryModel();
-        itemsModel->setQuery(QString("SELECT CONCAT(LPAD(store_items.`id`, 6, '0'), '-', LPAD(store_items.`articul`, 6, '0')) AS 'UID', store_items.* FROM store_items WHERE `id` IN (%1);").arg(m_reportVars.value("ids_list").toString()), QSqlDatabase::database("connMain"));
-        if(itemsModel->lastError().isValid())
-            throw tr("Не удалось иницициализировать модель данных");
-        m_report->dataManager()->addModel("items", itemsModel, true);
-    }
-    else
-    {   // Дэмо значения для стикера (если не задано значение ids_list)
-        QStringList demoHeaders = {"UID", "id", "Hidden", "articul", "dealer", "is_realization", "dealer_lock", "name", "state", "category", "store", "created", "updated", "count", "reserved", "units", "box", "box_name", "price_option", "custom_price_option", "currency_rate", "in_price", "in_price_base", "price", "price_base", "price2", "price2_base", "price3", "price3_base", "price4", "price4_base", "price5", "price5_base", "document", "part_request", "shop_title", "shop_description", "SN", "PN", "description", "shop_enable", "int_barcode", "ext_barcode", "in_count", "in_summ", "notes", "img1", "img2", "img3", "img4", "img5", "minimum_in_stock", "sold", "return_percent", "warranty", "warranty_dealer", "not_for_sale", "st_state", "st_notes", "ge_highlight", "last_stocktaking_date"};
-        QList<QVariant> demoValues = {"016466-003790", 16466, 0, 3790, 1, 0, 0, "Гнездо micro USB, 2.0, на плату, Арт. 3790", 1, 82, 1, "2018-06-28 09:23:06", "NULL", 1, 0, 0, "NULL", "NULL", 1, 2, 26.19, 10.7629, 9.95, 22, 19.9, 22, 19.9, 22, 19.9, 22, 19.9, 22, 19.9, 2535, "NULL", "", "", "", "Бахчев: тип 45", "Прежняя ПН: 2535\r\n", "NULL", "011000164662", "NULL", 2, 20, "Похож на Бахчев P/N тип 47\r\nарт. 3392 (без \"юбки\").\r\nПохож на Бахчев P/N тип 54 (без \"юбки\").\r\nПохож на Бахчев P/N тип 106\r\nарт. 4922 (без \"юбки\").\r\nПохож на Бахчев P/N тип 124 (без \"юбки\").\r\nВозможна замена на:", "NULL", "NULL", "NULL", "NULL", "NULL", 0, 1, 0, 0, 0, 0, 0, "NULL", 0, "NULL"};
-        m_report->dataManager()->addModel("items", initDemoModel(demoHeaders, demoValues), true);
-    }
-}
-
-void tabPrintDialog::initPKODataSources()
-{
-    QMessageBox msgBox;
-
-//    if(->lastError().isValid())
-//        throw tr("Не удалось иницициализировать модель данных ");
-    msgBox.setWindowTitle(tr("Печать"));
-    msgBox.setText(tr("Печать ПКО еще не реализована"));
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.exec();
-    deleteLater();
+    SReportsCommonFunctions::initRepairStickerDataSources();
+    logRecord->setType(SLogRecordModel::Repair);
+    logRecord->setRepairId(m_reportVars.value("repair_id").toInt());
 }
 
 void tabPrintDialog::initReport()
@@ -408,17 +139,17 @@ void tabPrintDialog::initReport()
     progressUpdateTimer->start(250);
 
     m_printer = new QPrinter(QPrinter::HighResolution);
-    m_report = new LimeReport::ReportEngine();
+    m_report = new LimeReport::ReportEngine(this);
     connect(m_report, &LimeReport::ReportEngine::renderStarted, this, &tabPrintDialog::reportRenderStarted);
     connect(m_report, &LimeReport::ReportEngine::renderFinished, this, &tabPrintDialog::reportRenderFinished);
     m_reportType = m_reportVars.value("type").toInt();
     m_reportName = Global::staticMetaObject.enumerator(Global::staticMetaObject.indexOfEnumerator("Reports")).valueToKey(m_reportType);
 
-    setProgressText("Loading file");
-    if (!loadTemplateFromFile())
-        errorHandler(tr("Не удалось найти файл отчета"));
+    setTemplateName(m_reportName);
     setProgressText("Initializing datasources");
     initDataSources();
+    setProgressText("Loading file");
+    loadTemplateFromFile();
 
     ui->gridLayoutTab->setColumnStretch(1, 1);
     ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
@@ -485,9 +216,6 @@ void tabPrintDialog::updateProgressWidget()
 
 void tabPrintDialog::on_pushButtonPrint_clicked()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    bool nDBErr = 1;
-
     if (!ui->lineEditPagesToPrint->text().isEmpty())
     {
         m_printer->setPrintRange(QPrinter::PrintRange(2));
@@ -513,17 +241,13 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
     }
 
     m_printer->setCopyCount(ui->spinBoxCopies->value());
-    previewWindow->print(m_printer);
-    if (m_reportType == Global::Reports::new_rep)
+    m_previewWidget->print(m_printer);
+    switch(m_reportType)
     {
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),client_id,m_reportVars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать квитанции к ремонту №%1").arg(m_reportVars.value("repair_id").toInt())));
+        case Global::Reports::new_rep: logRecord->setText(tr("Печать квитанции к ремонту №%1").arg(m_reportVars.value("repair_id").toInt())); logRecord->commit(); break;
+        case Global::Reports::rep_label: logRecord->setText(tr("Печать стикеров к ремонту №%1 в кол-ве %2шт.").arg(m_reportVars.value("repair_id").toInt()).arg(ui->spinBoxCopies->value())); logRecord->commit(); break;
+        default: ;
     }
-    else if (m_reportType == Global::Reports::rep_label)
-    {
-        QUERY_EXEC(query,nDBErr)(QUERY_INS_LOG("NULL",3,userDbData->value("id").toInt(),userDbData->value("current_office").toInt(),client_id,m_reportVars.value("repair_id").toInt(),"NULL","NULL","NULL",tr("Печать стикеров к ремонту №%1 в кол-ве %2шт.").arg(m_reportVars.value("repair_id").toInt()).arg(ui->spinBoxCopies->value())));
-    }
-
-    delete query;
 }
 
 void tabPrintDialog::setPrinter(const QString &)

@@ -4,7 +4,8 @@ syntax: glob
 .cmake/*
 CMakeFiles/*
 debug/*
-lib6/*
+libQt5/*
+libQt6/*
 MinSizeRel/*
 release/*
 RelWithDebInfo/*
@@ -73,5 +74,4 @@ compile-run-emulate_user_activity.ahk
 Descript.ion
 snap.png
 SNAP_CRM_ru_RU.ts
-lib5/*
 build/*

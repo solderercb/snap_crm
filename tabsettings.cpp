@@ -36,7 +36,9 @@ tabSettings::tabSettings(MainWindow *parent) :
     }
     ui->pages->redraw();
     // эмуляция задержки
+#ifdef QT_DEBUG
     test_scheduler->start(500);
+#endif
 }
 
 tabSettings::~tabSettings()
@@ -79,19 +81,19 @@ void tabSettings::initPage(const int page)
     QWidget *widget;
     switch (page)
     {
-        case Page::User: widget = new QWidget(); break;
-        case Page::Global: widget = new QWidget(); break;
-    case Page::Company: widget = new QWidget(); break;
-    case Page::Employees: widget = new QWidget(); break;
-    case Page::UserRoles: widget = new QWidget(); break;
-    case Page::Warehouses: widget = new QWidget(); break;
-    case Page::Finances: widget = new QWidget(); break;
-    case Page::Devices: widget = new QWidget(); break;
-    case Page::RepairStatuses: widget = new QWidget(); break;
-    case Page::AdditionalFieldsAndAdSources: widget = new QWidget(); break;
-    case Page::DocTemplates: widget = new SPageSettingsDocTempateEditor(); break;
-    case Page::Notifications: widget = new QWidget(); break;
-    case Page::Backup: widget = new QWidget(); break;
+//        case Page::User: widget = new QWidget(); break;
+//        case Page::Global: widget = new QWidget(); break;
+//        case Page::Company: widget = new QWidget(); break;
+//        case Page::Employees: widget = new QWidget(); break;
+//        case Page::UserRoles: widget = new QWidget(); break;
+//        case Page::Warehouses: widget = new QWidget(); break;
+//        case Page::Finances: widget = new QWidget(); break;
+//        case Page::Devices: widget = new QWidget(); break;
+//        case Page::RepairStatuses: widget = new QWidget(); break;
+//        case Page::AdditionalFieldsAndAdSources: widget = new QWidget(); break;
+        case Page::DocTemplates: widget = new SPageSettingsDocTempateEditor(); break;
+//        case Page::Notifications: widget = new QWidget(); break;
+//        case Page::Backup: widget = new QWidget(); break;
         default: return;
     }
     emit pageInitFinished(widget, page);

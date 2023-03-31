@@ -196,11 +196,17 @@ int SFieldsModel::printableFieldsCount()
 
 QString SFieldsModel::reportFieldName()
 {
+    if(m_reportFieldIndex == -1)
+        return QString();
+
     return m_fieldsList.at(m_reportFieldIndex)->name();
 }
 
 QString SFieldsModel::reportFieldValue()
 {
+    if(m_reportFieldIndex == -1)
+        return QString();
+
     return m_fieldsList.at(m_reportFieldIndex)->value();
 }
 
@@ -220,7 +226,7 @@ void SFieldsModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVar
 //    qDebug().nospace() << "[" << this << "] reportCallbackData() | info.dataType = " << info.dataType << "; info.index = " << info.index << "; info.columnName = " << info.columnName;
     switch (info.dataType)
     {
-        case LimeReport::CallbackInfo::IsEmpty: data = 0; break;
+        case LimeReport::CallbackInfo::IsEmpty: data = (printableFieldsCount() > 0)?0:1; break;
         case LimeReport::CallbackInfo::HasNext: data = 0; break;
         case LimeReport::CallbackInfo::ColumnHeaderData: data = metaObject()->property(info.index + 1).name(); break;
         case LimeReport::CallbackInfo::ColumnData: data = metaObject()->property( metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(this); break;
@@ -235,22 +241,25 @@ void SFieldsModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVar
 void SFieldsModel::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
 {
 //    qDebug().nospace() << "[" << this << "] reportCallbackDataChangePos() | type = " << type;
+
+    result = 0;
+
+    if(!printableFieldsCount())
+    {
+        m_reportFieldIndex = -1;
+        return;
+    }
+
     if(type == LimeReport::CallbackInfo::First)
         m_reportFieldIndex = 0;
     else
     {
         if(m_reportFieldIndex+1 >= m_fieldsList.count())
-        {
-            result = 0;
             return;
-        }
         while(!m_fieldsList.at(++m_reportFieldIndex)->isPrintable())
         {
             if(m_reportFieldIndex+1 >= m_fieldsList.count())
-            {
-                result = 0;
                 return;
-            }
         }
     }
     result = 1;

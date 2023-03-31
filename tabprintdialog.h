@@ -2,34 +2,23 @@
 #define TABPRINTDIALOG_H
 
 #include <QWidget>
-#include <LimeReport>
-#include <QStringList>
-#include <QStringListModel>
-#include <QStandardItemModel>
 #include <QPrinter>
 #include <QPrinterInfo>
 #include <QPageSetupDialog>
-#include <QByteArray>
-#include <QDir>
-#include <QFile>
-#include <QMap>
-#include <QString>
-#include <QVariant>
-#include <QSqlQueryModel>
-#include <QSqlRecord>
 #include "tabcommon.h"
 #include "mainwindow.h"
 #include <Windows.h>
 #include <QMessageBox>
 #include <QMetaEnum>
-#include <QCryptographicHash>
+#include "models/slogrecordmodel.h"
+#include "widgets/sreportscommonfunctions.h"
 //#define PRINT_DEBUG_PAGE_INFO
 
 namespace Ui {
 class tabPrintDialog;
 }
 
-class tabPrintDialog : public tabCommon
+class tabPrintDialog : public tabCommon, public SReportsCommonFunctions
 {
     Q_OBJECT
 public:
@@ -81,16 +70,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
-    QMap<QString, QVariant> m_reportVars;
     Ui::tabPrintDialog *ui;
-    int m_reportType;
-    QString m_reportName;
-    int client_id;
-    LimeReport::ReportEngine *m_report = nullptr;
-    LimeReport::ReportDesignWindowInterface* designerWindow;
-    QByteArray *DataFile;
-    QFile CurrentFile;
-    LimeReport::PreviewReportWidget *previewWindow;
     QPrinter *m_printer = nullptr;
     QStringList m_printersList;
     bool m_isReportRendered = 0;
@@ -98,13 +78,8 @@ private:
     QString m_progressWidgetStaticText;
     LimeReport::PreviewReportWidget *m_previewWidget = nullptr;
     QTimer *renderDelayTimer = 0, *progressUpdateTimer = 0, *previewDelayTimer = 0;
-    QTime start;
-    QStandardItemModel* initDemoModel(QStringList &, QList<QVariant> &);
+    SLogRecordModel *logRecord;
     bool event(QEvent*) override;
-    bool loadReportTemplate(QByteArray*);
-    bool loadTemplateFromFile();
-    bool loadTemplateFromDB();
-    bool loadTmpReportTemplate(QString);
     void setDefaultWidgetFocus();
     void printerAdvSettings(QPrinter *printer = nullptr);
     void fillDebugData();
@@ -112,10 +87,8 @@ private:
     void errorHandler(const QString &msg);
     void selectPrinter(const BelongReportsList belong, const QList<int> list);
     void initDataSources();
-    void initRepairDataSources();
-    void initRepairStickerDataSources();
-    void initItemStickerDataSources();
-    void initPKODataSources();
+    void initRepairDataSources() override;
+    void initRepairStickerDataSources() override;
     void deletePreviewWidget();
     void initReport();
     void showPreview();

@@ -189,6 +189,9 @@ QString SPhonesModel::allPhones()
 
 QString SPhonesModel::iterativePhone()
 {
+    if(m_reportPhoneIndex == -1)
+        return QString();
+
     return m_phonesList.at(m_reportPhoneIndex)->phone();
 }
 
@@ -252,13 +255,20 @@ void SPhonesModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVar
 void SPhonesModel::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
 {
 //    qDebug().nospace() << "[" << this << "] reportCallbackDataChangePos() | type = " << type;
+    result = 0;
+
+    if(!m_phonesList.count())
+    {
+        m_reportPhoneIndex = -1;
+        return;
+    }
+
     if(type == LimeReport::CallbackInfo::First)
         m_reportPhoneIndex = 0;
     else
     {
         if(m_reportPhoneIndex+1 >= m_phonesList.count())
         {
-            result = 0;
             return;
         }
         m_reportPhoneIndex++;

@@ -45,7 +45,7 @@ private:
     SLogRecordModel *logRecord = nullptr;
     int m_client = 0;
     bool m_updated = false;
-    qsizetype m_reportPhoneIndex = 0;
+    qsizetype m_reportPhoneIndex = -1;
     void clear();
 public slots:
     void reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);

@@ -45,7 +45,7 @@ private:
     SLogRecordModel *logRecord = nullptr;
     bool m_type = 0;
     bool m_nErr = 1;
-    qsizetype m_reportFieldIndex = 0;
+    qsizetype m_reportFieldIndex = -1;
     void deleteWidgets();
     void deleteFields();
 public slots:
