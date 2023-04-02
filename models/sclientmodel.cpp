@@ -438,6 +438,14 @@ void SClientModel::setAdType(const int id)
     i_valuesMap.insert("visit_source", id);
 }
 
+void SClientModel::setAdTypeIndex(const int index)
+{
+    if(index == -1)
+        i_valuesMap.insert("visit_source", QVariant());
+    else
+        setAdType(clientAdTypesList->databaseIDByRow(index));
+}
+
 int SClientModel::adTypeIndex()
 {
     return clientAdTypesList->rowByDatabaseID(m_visitSource, 1);

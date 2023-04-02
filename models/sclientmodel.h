@@ -133,7 +133,8 @@ public:
     bool isBad();
     void setOptions(int);
     int adType();
-    void setAdType(const int);
+    void setAdType(const int id);
+    void setAdTypeIndex(const int index);
     int adTypeIndex();
     QString adTypeStr();
     QByteArray* photo();

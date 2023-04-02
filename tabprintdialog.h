@@ -89,6 +89,7 @@ private:
     void initDataSources();
     void initRepairDataSources() override;
     void initRepairStickerDataSources() override;
+    void notImplementedReport() override;
     void deletePreviewWidget();
     void initReport();
     void showPreview();

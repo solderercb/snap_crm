@@ -712,7 +712,7 @@ void tabRepairNew::createClient()
     clientModel->setLastName(ui->lineEditClientLastName->text());
     clientModel->setPatronymicName(ui->lineEditClientPatronymic->text());
     clientModel->appendLogText(tr("Быстрое создание клиента из формы приёма в ремонт"));
-    clientModel->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
+    clientModel->setAdTypeIndex(ui->comboBoxClientAdType->currentIndex());
     clientModel->setAddress(ui->lineEditClientAddress->text());
     clientModel->setType(ui->checkBoxClientType->isChecked());
     if(ui->checkBoxClientType->isChecked())

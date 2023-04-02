@@ -408,7 +408,7 @@ bool tabRepair::setWidgetsParams(const int stateId)
     m_comboBoxStateEnabled = 1;
     m_worksRO = 1;
     m_diagRO = 1;
-    m_summRO = 1;
+    m_summRO = 0;   // При наличии пользовательского статуса "Ожидание решения" логика данной опции не работает
 
     if( stateId == Global::RepStateIds::Ready || stateId == Global::RepStateIds::ReadyNoRepair )
     {
@@ -471,7 +471,7 @@ bool tabRepair::checkData(const int stateId)
         case Global::RepStateIds::OnApprovement:
         case Global::RepStateIds::Negotiation: if( ui->textEditDiagResult->toPlainText().isEmpty() /*|| tableWorksParts->isEmpty()*/ ) ret = 1; break;
         case Global::RepStateIds::IssueNotAppeared: break;
-        case Global::RepStateIds::Agreed: if(ui->doubleSpinBoxAmount->value() == 0) ret = 2; break;
+        case Global::RepStateIds::Agreed: if(ui->doubleSpinBoxAmount->value() == 0 && !repairModel->isRepeat() && !repairModel->isWarranty()) ret = 2; break;
     }
 
     if(ret)

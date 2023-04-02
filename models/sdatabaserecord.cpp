@@ -175,6 +175,7 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
  */
 bool SDatabaseRecord::  insert(bool flushValues)
 {
+    i_nErr = 1;
     QString q;
 
 #ifdef QT_DEBUG
@@ -201,6 +202,7 @@ bool SDatabaseRecord::  insert(bool flushValues)
 
 bool SDatabaseRecord::update()
 {
+    i_nErr = 1;
     if(i_valuesMap.isEmpty())
         return 1;
 
@@ -227,8 +229,11 @@ bool SDatabaseRecord::update()
 bool SDatabaseRecord::del()
 {
     QString q;
+    i_nErr = 1;
 
+#ifdef QT_DEBUG
     checkTableName();
+#endif
     q = QString("DELETE FROM `%1` WHERE `id` = %2;")\
                                          .arg(i_tableName)\
                                          .arg(i_id);

@@ -132,6 +132,18 @@ void tabPrintDialog::initRepairStickerDataSources()
     logRecord->setRepairId(m_reportVars.value("repair_id").toInt());
 }
 
+void tabPrintDialog::notImplementedReport()
+{
+    QMessageBox msgBox;
+
+    qDebug().nospace() << "[" << this << "] initDataSources() | not implemented report type: " << m_reportName;
+    msgBox.setWindowTitle(tr("Печать"));
+    msgBox.setText(tr("Печать <%1> еще не реализована").arg(m_reportName));
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
+    deleteLater();
+}
+
 void tabPrintDialog::initReport()
 {
     m_isReportRendered = 1;

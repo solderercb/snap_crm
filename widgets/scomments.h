@@ -41,16 +41,15 @@ public:
     void setParentTab(tabCommon*);
     void setMode(const int);
     void load(const int);
-    private:
+private:
     Ui::SComments *ui;
     SCommentsModel *commentsModel;
     QSqlQuery *m_query;
     tabCommon *m_parentTab = nullptr;
+    QMenu *tableMenu = nullptr;
     bool isEditable(const int row);
     tabCommon *findParentTab();
     void checkParentTab();
-private:
-    QMenu *tableMenu = nullptr;
     void initTableMenu();
     void appendLineTermination();
     void clearInputField();

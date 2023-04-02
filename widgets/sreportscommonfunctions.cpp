@@ -172,7 +172,7 @@ void SReportsCommonFunctions::initDataSources()
 //        case Global::Reports::slip: ; break;
 //        case Global::Reports::move: ; break;
 //        case Global::Reports::buyout: ; break;
-        default: qDebug().nospace() << "[" << this << "] initDataSources() | not implemented report type"; return;
+        default: notImplementedReport(); return;
     }
 }
 
@@ -231,10 +231,15 @@ void SReportsCommonFunctions::initWorksDataSources()
 
     m_reportDatasouces << "works";
     SSaleTableModel *worksModel = new SSaleTableModel();
-//    if(m_reportVars.isEmpty())
+    if(m_reportVars.isEmpty())
         worksModel->initDemo();
-//    else
-//        worksModel->load(m_reportVars.value("").toInt());
+    else
+    {
+        if(m_reportVars.value("tableMode").toInt() == SSaleTableModel::TablesSet::WorkshopSale)
+            worksModel->repair_loadTable(m_reportVars.value("repair_id").toInt());
+        else
+            worksModel->store_loadTable(m_reportVars.value("doc_id").toInt());
+    }
     LimeReport::ICallbackDatasource *worksDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
     QObject::connect(worksDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), worksModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
     QObject::connect(worksDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), worksModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
@@ -253,5 +258,9 @@ void SReportsCommonFunctions::initItemStickerDataSources()
     itemsModel = new QSqlQueryModel();
     itemsModel->setQuery("SELECT CONCAT(LPAD(store_items.`id`, 6, '0'), '-', LPAD(store_items.`articul`, 6, '0')) AS 'UID', store_items.* FROM store_items WHERE `id` IN (16466,23452);", QSqlDatabase::database("connMain"));
     m_report->dataManager()->addModel(m_reportDatasouces.last(), itemsModel, true);
+}
+
+void SReportsCommonFunctions::initPKODataSources()
+{
 }
 

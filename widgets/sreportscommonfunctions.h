@@ -43,6 +43,8 @@ protected:
     virtual void initRepairStickerDataSources();
     virtual void initWorksDataSources();
     virtual void initItemStickerDataSources();
+    virtual void initPKODataSources();
+    virtual void notImplementedReport(){};
 private:
     QStandardItemModel* initDemoModel(const QStringList &demoHeaders, const QList<QVariant> &demoValues);
 };

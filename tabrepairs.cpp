@@ -113,7 +113,7 @@ void tabRepairs::refreshTable()
 
     l1.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, ui->switchTableMode->isChecked()));
     l1.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, 1));
-    if ( !userDbData->value("display_out").toBool() )
+    if ( !userDbData->value("display_out").toBool() && ui->lineEditSearch->text().isEmpty() )
         l1.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
     if(filterSettings->contains("status") && filterSettings->value("status") >= 0)
         l1.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, statusesModel->item(filterSettings->value("status"), 1)->text()));
