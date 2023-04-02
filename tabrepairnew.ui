@@ -133,7 +133,7 @@
           </widget>
          </item>
          <item row="11" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBoxPresetPlace">
+          <widget class="SComboBox" name="comboBoxPresetPlace">
            <property name="editable">
             <bool>false</bool>
            </property>
@@ -229,7 +229,7 @@
           </widget>
          </item>
          <item row="10" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBoxPresetEngineer">
+          <widget class="SComboBox" name="comboBoxPresetEngineer">
            <property name="editable">
             <bool>false</bool>
            </property>
@@ -614,10 +614,10 @@
                  </sizepolicy>
                 </property>
                 <property name="editable">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="currentText">
-                 <string extracomment="Ист"/>
+                 <string/>
                 </property>
                 <property name="placeholderText">
                  <string extracomment="dfgdasf">Источник обращения</string>
@@ -1035,10 +1035,9 @@ QListView::item  {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SClientMatch</class>
-   <extends>QWidget</extends>
-   <header>widgets/sclientmatch.h</header>
-   <container>1</container>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
@@ -1048,6 +1047,12 @@ QListView::item  {
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>SClientMatch</class>
+   <extends>QWidget</extends>
+   <header>widgets/sclientmatch.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>SSetComboBox</class>
@@ -1065,11 +1070,6 @@ QListView::item  {
    <extends>QWidget</extends>
    <header>widgets/sdevicematch.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

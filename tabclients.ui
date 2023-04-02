@@ -236,7 +236,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_7">
           <item row="0" column="0">
-           <widget class="QComboBox" name="comboBoxClientAdType">
+           <widget class="SComboBox" name="comboBoxClientAdType">
             <property name="insertPolicy">
              <enum>QComboBox::NoInsert</enum>
             </property>
@@ -310,6 +310,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
+  </customwidget>
   <customwidget>
    <class>STableViewClients</class>
    <extends>QTableView</extends>

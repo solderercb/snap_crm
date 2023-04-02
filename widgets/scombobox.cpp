@@ -7,6 +7,13 @@ SComboBox::SComboBox(QWidget *parent) :
     installEventFilter(this);
     szHint = QComboBox::sizeHint();
     minSzHint = QComboBox::minimumSizeHint();
+    lineEditWidget = new SLineEdit();
+    lineEditWidget->setReadOnly(true);
+    lineEditWidget->installEventFilter(this);
+    resize(size().width(), lineEditWidget->minimumSizeHint().height()+1);
+    connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::clearButtonPress);
+    connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::buttonClicked);
+    setLineEdit(lineEditWidget);
 }
 
 SComboBox::~SComboBox()
@@ -53,6 +60,9 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
 {
     if(e->type() == QEvent::MouseButtonPress )
     {
+        if(!isEnabled())
+            return true;
+
         // это событие происходит только когда список не отображается
         QMouseEvent *me = static_cast<QMouseEvent*>(e);
         // щелчек в области виджета
@@ -119,6 +129,9 @@ bool SComboBox::eventFilterLineEdit(QEvent *e)
 {
     if(e->type() == QEvent::MouseButtonPress)    // щелчек по LineEdit
     {
+        if(!isEnabled())
+            return true;
+
         if(!isPopupVisible())
         {
             showPopup();
@@ -222,6 +235,7 @@ void SComboBox::retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers
 
 void SComboBox::resizeEvent(QResizeEvent *event)
 {
+    lineEditWidget->setMinimumSize(event->size().width() - iconSize().width() - 6, lineEditWidget->minimumHeight());
     QComboBox::resizeEvent(event);
 }
 
@@ -234,15 +248,11 @@ int SComboBox::currentDbId()
 
 void SComboBox::setEditable(bool editable)
 {
-    QComboBox::setEditable(editable);
-    if(!lineEditWidget)
-    {
-        lineEditWidget = QComboBox::lineEdit();
-        lineEditWidget->installEventFilter(this);
-        szHint = lineEditWidget->sizeHint();
-        minSzHint = lineEditWidget->minimumSizeHint();
-        connect(lineEditWidget, &QLineEdit::editingFinished, this, &SComboBox::longTextHandler);
-    }
+    lineEditWidget->setReadOnly(!editable);
+    lineEditWidget->installEventFilter(this);
+    szHint = lineEditWidget->sizeHint();
+    minSzHint = lineEditWidget->minimumSizeHint();
+    connect(lineEditWidget, &SLineEdit::editingFinished, this, &SComboBox::longTextHandler);
 }
 
 void SComboBox::showPopup()
@@ -263,6 +273,17 @@ void SComboBox::showPopup()
 void SComboBox::hidePopup()
 {
     QComboBox::hidePopup();
+}
+
+QString SComboBox::buttons()
+{
+    return lineEditWidget->buttons();
+}
+
+void SComboBox::setButtons(const QString &buttons)
+{
+    lineEditWidget->setButtons(buttons);
+    emit buttonsChanged();
 }
 
 bool SComboBox::isPopupVisible() const
@@ -307,5 +328,11 @@ void SComboBox::longTextHandler()
         setToolTip(lineEditWidget->text());
     else
         setToolTip(QString());
+}
+
+void SComboBox::clearButtonPress(int)
+{
+    lineEditWidget->clear();
+    setCurrentIndex(-1);
 }
 

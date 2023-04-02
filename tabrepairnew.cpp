@@ -92,11 +92,14 @@ void tabRepairNew::initWidgets()
     ui->comboBoxIncomingSet->lineEdit()->setPlaceholderText(tr("комплектность"));
     ui->comboBoxExterior->lineEdit()->setPlaceholderText(tr("внешний вид"));
     ui->comboBoxClientAdType->lineEdit()->setPlaceholderText(tr("источник обращения"));
+    ui->comboBoxClientAdType->setButtons("Clear");
     ui->comboBoxDeviceClass->setPlaceholderText(tr("устройство"));
     ui->comboBoxDeviceVendor->setPlaceholderText(tr("производитель"));
     ui->comboBoxDevice->lineEdit()->setPlaceholderText(tr("модель"));
     ui->comboBoxPresetEngineer->setPlaceholderText(tr("назначить инженером"));
+    ui->comboBoxPresetEngineer->setButtons("Clear");
     ui->comboBoxPresetPlace->setPlaceholderText(tr("ячейка"));
+    ui->comboBoxPresetPlace->setButtons("Clear");
     ui->comboBoxOffice->setPlaceholderText(tr("офис"));
     ui->comboBoxOffice->setEnabled(false);  // TODO: назначение этого эл-та в АСЦ остаётся загадкой; выбор офиса нужно реализовать на глобальном уровне, если пользователь обаладает таким правом (например, пункт в меню)
     ui->comboBoxCompany->setPlaceholderText(tr("организация"));
@@ -107,11 +110,6 @@ void tabRepairNew::initWidgets()
     ui->lineEditSN->setButtons("Clear");
 
     setDefaultStyleSheets();
-
-    if(QLineEdit *le = ui->comboBoxPresetEngineer->lineEdit())    // Рисуем кнопку очистки в комбобоксе (это работает)
-    {
-        le->setClearButtonEnabled(true);
-    }
 
     // установка моделей данных
     ui->phones->setModel(clientModel->phones());

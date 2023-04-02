@@ -35,9 +35,10 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     else
         ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
 
+    ui->comboBoxClientAdType->lineEdit()->setPlaceholderText(tr("источник обращения"));
+    ui->comboBoxClientAdType->setButtons("Clear");
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
-    ui->comboBoxClientAdType->setModelColumn(0);
 
     QObject::connect(m_tableUpdateDelay, SIGNAL(timeout()), this, SLOT(refreshTable()));
     m_tableUpdateDelay->setSingleShot(true);

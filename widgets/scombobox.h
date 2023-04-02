@@ -9,10 +9,15 @@
 #include <QMouseEvent>
 #include <QFocusEvent>
 #include <QDebug>
+#include "slineedit.h"
 
 class SComboBox : public QComboBox
 {
     Q_OBJECT
+    Q_PROPERTY(QString Buttons READ buttons WRITE setButtons NOTIFY buttonsChanged)
+signals:
+    void buttonClicked(int buttonId = 0);
+    void buttonsChanged();
 public:
     explicit SComboBox(QWidget *parent = nullptr);
     ~SComboBox();
@@ -26,10 +31,12 @@ public:
     void setEditable(bool editable);
     void showPopup() override;
     void hidePopup() override;
+    QString buttons();
+    void setButtons(const QString &buttons);
 protected:
     QAbstractItemView *listViewWidget = nullptr;
-    QLineEdit *lineEditWidget = nullptr;
     QFontMetrics *fontMetrics;
+    SLineEdit *lineEditWidget;
     virtual void retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text = QString(), bool autorep = false, ushort count = 1);
     bool ignoreFocusOut() const;
     void setIgnoreFocusOut(bool state);
@@ -50,9 +57,9 @@ private:
     bool eventFilterListView(QEvent *e);
     bool isPointInArea(const QPoint &point,  const QRect &area) const;
 
-signals:
 private slots:
     void longTextHandler();
+    void clearButtonPress(int);
 };
 
 #endif // SCOMBOBOX_H
