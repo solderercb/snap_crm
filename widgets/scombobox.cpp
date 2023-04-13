@@ -286,6 +286,11 @@ void SComboBox::setButtons(const QString &buttons)
     emit buttonsChanged();
 }
 
+void SComboBox::setPlaceholderText(const QString &placeholderText)
+{
+    lineEditWidget->setPlaceholderText(placeholderText);
+}
+
 bool SComboBox::isPopupVisible() const
 {
     return m_isPopupVisible;

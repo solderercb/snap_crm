@@ -20,17 +20,7 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> repor
         m_printersList = QPrinterInfo::availablePrinterNames();
     ui->comboBoxPrinters->addItems(m_printersList);
 
-    QList<int> l;
-    // список типов отчетов, печатаемых на принтере стикеров:
-    l << Global::Reports::sticker1 << Global::Reports::sticker2 << Global::Reports::sticker3 << Global::Reports::rep_label;
-    selectPrinter(InList, l);
-
-    // список типов отчетов, НЕ печатаемых на принтере документов (слип-чек не знаю на каком принтере должен печататься, поэтому тоже исключен):
-    l << Global::Reports::slip;
-    selectPrinter(NotInList, l);
-
     connect(ui->comboBoxPrinters, &QComboBox::currentTextChanged, this, &tabPrintDialog::setPrinter);   // подключение сигнал-слот именно здесь, чтобы избежать лишних вызовов слота при установке принтеров, сохранённых в настройках
-    initPrinter(false);
 
     renderDelayTimer->start(100);
 }
@@ -89,7 +79,7 @@ void tabPrintDialog::paintEvent(QPaintEvent *event)
     // При отображении вкладки предпросмотра событие PainEvent вызывается не менее трёх раз, но т. к. достоверно неизвестно
     // точное ли это число вызовов, таймер кажется более надёжным; при каждом вызове этого метода таймер перезапускается
     // а спустя заданную задержку после последнего вызова будет произведён запуск рендеринга.
-    if(!m_isReportRendered)
+    if(!m_isReportInitialized)
     {
         renderDelayTimer->start(20);
     }
@@ -108,7 +98,6 @@ bool tabPrintDialog::event(QEvent *ev)
 void tabPrintDialog::initDataSources()
 {
     SReportsCommonFunctions::initDataSources();
-    m_printer->setDocName(m_reportName);
 
 #ifdef PRINT_DEBUG_PAGE_INFO
     qDebug() << "";
@@ -146,11 +135,10 @@ void tabPrintDialog::notImplementedReport()
 
 void tabPrintDialog::initReport()
 {
-    m_isReportRendered = 1;
+    m_isReportInitialized = 1;
     QObject::connect(progressUpdateTimer, &QTimer::timeout, this, &tabPrintDialog::updateProgressWidget);
     progressUpdateTimer->start(250);
 
-    m_printer = new QPrinter(QPrinter::HighResolution);
     m_report = new LimeReport::ReportEngine(this);
     connect(m_report, &LimeReport::ReportEngine::renderStarted, this, &tabPrintDialog::reportRenderStarted);
     connect(m_report, &LimeReport::ReportEngine::renderFinished, this, &tabPrintDialog::reportRenderFinished);
@@ -170,14 +158,12 @@ void tabPrintDialog::initReport()
 
     setProgressText("Renderind report");
     m_report->prepareReportPages();
+    initPrinter(false);
 }
 
 void tabPrintDialog::showPreview()
 {
-    // Проверяется размер страницы сгенерированного отчета (при отсутствующих страницах будет возвращён 0).
-    // Выглядит так себе, но вроде ничего не падает.
-    // TODO: доработать LimeReport: сделать метод count публичным или придумать еще какой-то способ
-    if(m_report->preparedPages()->pageProperties(0).geometry.width())
+    if(isPagesPrepared())
     {
         previewDelayTimer->stop();
         m_previewWidget = m_report->createPreviewWidget(1);
@@ -224,6 +210,17 @@ void tabPrintDialog::updateProgressWidget()
 
     QString newText = m_progressWidgetStaticText + QString(".").repeated(i+1).leftJustified(3, ' ');
     m_progressWidget->setText(newText);
+}
+
+bool tabPrintDialog::isPagesPrepared()
+{
+    // Проверяется размер страницы сгенерированного отчета (при отсутствующих страницах будет возвращён 0).
+    // Выглядит так себе, но вроде ничего не падает.
+    // TODO: доработать LimeReport: сделать метод count публичным или придумать еще какой-то способ
+    if(m_report->preparedPages()->pageProperties(0).geometry.width())
+        return 1;
+
+    return 0;
 }
 
 void tabPrintDialog::on_pushButtonPrint_clicked()
@@ -274,11 +271,17 @@ void tabPrintDialog::setPrinter(const QString &)
 /* https://stackoverflow.com/questions/40043507/qt-5-8-windows-printer-api-invalid-handle-error */
 void tabPrintDialog::initPrinter(bool showSettings)
 {
+    setProgressText("Initializing printer");
     QString printerName;
     QPrinterInfo pi;
     bool pageSetResult;
 
+    if(m_printer)
+        delete m_printer;
+
+    m_printer = new QPrinter(QPrinter::HighResolution);
     printerName = ui->comboBoxPrinters->currentText();
+    m_printer->setDocName(m_reportName);
     pi = QPrinterInfo::printerInfo(printerName);
     if(pi.isNull())
         return;
@@ -353,7 +356,7 @@ void tabPrintDialog::initPrinter(bool showSettings)
                                         pDevMode,
                                         pDevMode);
     }
-    else
+    else if(isPagesPrepared())
     {
         pDevMode->dmOrientation = (m_report->preparedPages()->pageProperties().orientation == QPageLayout::Portrait)?DMORIENT_PORTRAIT:DMORIENT_LANDSCAPE;   // ориентация по умолчанию в соответствии с параметрами страницы отчета
     }
@@ -431,6 +434,21 @@ void tabPrintDialog::errorHandler(const QString &msg)
     msgBox.exec();
 }
 
+/* Установка принтеров по умолчанию (заданных в настройках пользователя)
+*/
+void tabPrintDialog::selectPrinter()
+{
+    QList<int> l;
+    // список типов отчетов, печатаемых на принтере стикеров:
+    l << Global::Reports::sticker1 << Global::Reports::sticker2 << Global::Reports::sticker3 << Global::Reports::rep_label;
+    selectPrinter(InList, l);
+
+    // список типов отчетов, НЕ печатаемых на принтере документов (слип-чек не знаю на каком принтере должен печататься, поэтому тоже исключен):
+    l << Global::Reports::slip;
+    selectPrinter(NotInList, l);
+
+}
+
 void tabPrintDialog::selectPrinter(const BelongReportsList belong, const QList<int> list)
 {
     if(list.contains(m_reportType) == belong)
@@ -449,7 +467,7 @@ void tabPrintDialog::selectPrinter(const BelongReportsList belong, const QList<i
 
 void tabPrintDialog::on_labelPrinterSettings_linkActivated(const QString&)
 {
-    initPrinter(true);
+//    initPrinter(true);
 }
 
 void tabPrintDialog::fillDebugData()
@@ -498,14 +516,18 @@ void tabPrintDialog::pageSetupAccepted()
 
 void tabPrintDialog::reportRenderStarted()
 {
+    m_isReportRendered = 0;
 }
 
 void tabPrintDialog::reportRenderFinished()
 {
+    m_isReportRendered = 1;
     // эмуляция задержки
 //    QTime dieTime= QTime::currentTime().addSecs(2);
 //    while (QTime::currentTime() < dieTime)
 //        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+
+    selectPrinter();
 
     progressUpdateTimer->stop();
 

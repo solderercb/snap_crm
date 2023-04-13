@@ -63,7 +63,6 @@ void tabRepairNew::initDataModels()
     prepayReasonsModel = new QStandardItemModel();
     QList<QStandardItem*> *prepayReason;
     QStringList prepayReasonsList = {tr("полная предоплата"), tr("за детали"), tr("за часть стоимости деталей"), tr("за часть стоимости работ"), tr("за диагностику")};
-    prepayReasonsModel = new QStandardItemModel();
     for (int i=0; i<prepayReasonsList.size(); i++)
     {
         prepayReason = new QList<QStandardItem*>();

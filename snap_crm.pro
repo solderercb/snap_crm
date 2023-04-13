@@ -281,12 +281,8 @@ INCLUDEPATH += $$LIB_DIR/include
 DEPENDPATH += $$LIB_DIR/include
 PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
 
-CONFIG(release, debug|release) {
-    LIBS += -L$$LIB_DIR -llimereport
-}else{
-    LIBS += -L$$LIB_DIR -llimereportd
-}
 LIBS += -lwinspool -lKernel32
+LIBS += -L$$LIB_DIR -llimereport
 
 BIN_DIR ~= s,/,\\,g
 LIB_DIR ~= s,/,\\,g

@@ -33,6 +33,7 @@ public:
     void hidePopup() override;
     QString buttons();
     void setButtons(const QString &buttons);
+    void setPlaceholderText(const QString &placeholderText);
 protected:
     QAbstractItemView *listViewWidget = nullptr;
     QFontMetrics *fontMetrics;

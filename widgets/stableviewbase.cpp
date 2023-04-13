@@ -48,11 +48,6 @@ void STableViewBase::setModel(QAbstractItemModel *model)
     applyGridlayout();
 }
 
-void STableViewBase::setStoreItemsCategory(const int category)
-{
-    m_storeItemsCategory = category;
-}
-
 bool STableViewBase::eventFilter(QObject *object, QEvent *event)
 {
     if(QString("QScrollBar").compare(object->metaObject()->className()) == 0)
@@ -259,6 +254,9 @@ void STableViewBase::readLayout(SLocalSettings::SettingsVariant variant)
 
 void STableViewBase::saveLayout(SLocalSettings::SettingsVariant variant)
 {
+    if(m_modelColumnsCount == 0)
+        return;
+
     for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
     {
         i_gridLayout->$GridControl.Columns[i].ActualWidth = columnWidth(i);
@@ -311,15 +309,15 @@ void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
 void STableViewBase::reset()
 {
     int i;
-    int modelColumnCount = m_model->columnCount();
+    m_modelColumnsCount = m_model->columnCount();
     int layoutColumnCount = i_gridLayout->$GridControl.Columns.size();
 
-    for(i = 0; i < layoutColumnCount && i < modelColumnCount; i++)
+    for(i = 0; i < layoutColumnCount && i < m_modelColumnsCount; i++)
     {
         if(i_gridLayout->$GridControl.Columns[i].Visible)
             m_model->setHeaderData(i, Qt::Horizontal, i_gridLayout->$GridControl.Columns[i].FieldName);
     }
-    for(i = layoutColumnCount; i < modelColumnCount; i++)
+    for(i = layoutColumnCount; i < m_modelColumnsCount; i++)
     {   // столбцы, не описанные в файле настроек, — служебные; их необходимо скрыть
         horizontalHeader()->hideSection(i);
     }

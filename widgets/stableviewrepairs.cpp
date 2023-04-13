@@ -14,3 +14,5 @@ STableViewRepairs::~STableViewRepairs()
 {
     saveLayout(SLocalSettings::RepairsGrid);
 }
+
+

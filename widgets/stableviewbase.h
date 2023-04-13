@@ -50,7 +50,6 @@ public:
     ~STableViewBase();
     void resizeEvent(QResizeEvent*) override;
     void setModel(QAbstractItemModel *model);
-    void setStoreItemsCategory(const int category);
     bool eventFilter(QObject *object, QEvent *event) override;
     void setItemDelegate(STableViewBaseItemDelegates *delegate);
 
@@ -90,7 +89,6 @@ protected:
     void initHorizontalHeaderMenu();
     void deleteHorizontalHeaderMenu();
 private:
-    int m_storeItemsCategory = 0;
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
     QString m_query;
@@ -98,6 +96,7 @@ private:
     Qt::SortOrder m_sortOrder;
     FilterList *m_filter = nullptr;
     QStringList *m_grouping = nullptr;
+    int m_modelColumnsCount = 0;
     void clearFilter();
     void clearGrouping();
     QString formatFilterGroup(const FilterList &filter);
@@ -110,7 +109,7 @@ public slots:
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс
     void refresh();
 protected slots:
-    void columnResized(int column, int oldWidth, int newWidth);
+    virtual void columnResized(int column, int oldWidth, int newWidth);
 #if QT_VERSION >= 0x060000
     void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>()) override;
 #else

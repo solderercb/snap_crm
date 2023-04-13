@@ -1,0 +1,1 @@
+INSERT IGNORE INTO `settings` (`name`, `value`) VALUES ('classic_salary', '1');

@@ -74,6 +74,7 @@ private:
     QPrinter *m_printer = nullptr;
     QStringList m_printersList;
     bool m_isReportRendered = 0;
+    bool m_isReportInitialized = 0;
     QLabel *m_progressWidget = nullptr;
     QString m_progressWidgetStaticText;
     LimeReport::PreviewReportWidget *m_previewWidget = nullptr;
@@ -85,6 +86,7 @@ private:
     void fillDebugData();
     void initPrinter(bool showSettings = false);
     void errorHandler(const QString &msg);
+    void selectPrinter();
     void selectPrinter(const BelongReportsList belong, const QList<int> list);
     void initDataSources();
     void initRepairDataSources() override;
@@ -96,6 +98,7 @@ private:
     void initProgressWidget();
     void setProgressText(const QString &text);
     void updateProgressWidget();
+    bool isPagesPrepared();
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif

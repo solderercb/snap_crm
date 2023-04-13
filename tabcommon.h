@@ -22,21 +22,21 @@ public:
     ~tabCommon();
     virtual bool tabCloseRequest();
     void setCallerPtr(QWidget *ptr){callerPtr = ptr;};
-    virtual QString tabTitle() = 0;
+    virtual QString tabTitle(){return "tabCommon";};
     virtual QIcon* tabIcon();
 protected:
     QWidget *callerPtr = nullptr;
     QString i_tabTitle = "Untitled";
     QIcon *i_tabIcon = nullptr;
 #ifdef QT_DEBUG
-    virtual void randomFill() = 0;
+    virtual void randomFill(){};
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
 #endif
 protected slots:
 #ifdef QT_DEBUG
-    virtual void test_scheduler_handler() = 0;
-    virtual void test_scheduler2_handler() = 0;
+    virtual void test_scheduler_handler(){};
+    virtual void test_scheduler2_handler(){};
 #endif
 };
 

@@ -35,7 +35,6 @@ private:
     Ui::tabClients *ui;
     static tabClients* p_instance[2];
     bool m_type;
-    QTableView* tableView;
     QSqlQueryModel* clientsTable;
     QStringList query_group;
     QTimer *m_tableUpdateDelay;
