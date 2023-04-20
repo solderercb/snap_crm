@@ -47,6 +47,10 @@ SOURCES += \
     global.cpp \
     loginwindow.cpp \
     mainwindow.cpp \
+    models/salarytabmodels/stablesalaryrepairpartsmodel.cpp \
+    models/salarytabmodels/stablesalaryrepairworksmodel.cpp \
+    models/salarytabmodels/stablesalaryrepairsmodel.cpp \
+    models/salarytabmodels/stablesalaryreceptedissued.cpp \
     models/stablerepairsmodel.cpp \
     models/repairtablefiltermenu.cpp \
     models/stablebasemodel.cpp \
@@ -76,6 +80,7 @@ SOURCES += \
     models/sstoreitemmodel.cpp \
     models/sstoresaleitemmodel.cpp \
     models/suseractivitymodel.cpp \
+    models/susermodel.cpp \
     models/sworkmodel.cpp \
     models/sworkshopissuedmodel.cpp \
     models/tabsalesettingsmenu.cpp \
@@ -87,7 +92,17 @@ SOURCES += \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
+    tabsalary.cpp \
     tabsettings.cpp \
+    widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp \
+    widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp \
+    widgets/salarytabwidgets/spagesalarybase.cpp \
+    widgets/salarytabwidgets/spagesalaryreceptedissued.cpp \
+    widgets/salarytabwidgets/spagesalaryrepairs.cpp \
+    widgets/salarytabwidgets/spagesalarysummary.cpp \
+    widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp \
+    widgets/salarytabwidgets/stableviewsalaryrepairs.cpp \
+    widgets/sdoublespinbox.cpp \
     widgets/spageclientsummary.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
@@ -141,6 +156,10 @@ HEADERS  += \
     global.h \
     loginwindow.h \
     mainwindow.h \
+    models/salarytabmodels/stablesalaryrepairpartsmodel.h \
+    models/salarytabmodels/stablesalaryrepairworksmodel.h \
+    models/salarytabmodels/stablesalaryreceptedissued.h \
+    models/salarytabmodels/stablesalaryrepairsmodel.h \
     models/stablerepairsmodel.h \
     models/repairtablefiltermenu.h \
     models/stablebasemodel.h \
@@ -171,6 +190,7 @@ HEADERS  += \
     models/sstoreitemmodel.h \
     models/sstoresaleitemmodel.h \
     models/suseractivitymodel.h \
+    models/susermodel.h \
     models/sworkmodel.h \
     models/sworkshopissuedmodel.h \
     models/tabsalesettingsmenu.h \
@@ -182,7 +202,17 @@ HEADERS  += \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
     models/sphonesmodel.h \
+    tabsalary.h \
     tabsettings.h \
+    widgets/salarytabwidgets/stableviewsalaryrepairparts.h \
+    widgets/salarytabwidgets/stableviewsalaryrepairworks.h \
+    widgets/salarytabwidgets/spagesalarybase.h \
+    widgets/salarytabwidgets/spagesalaryreceptedissued.h \
+    widgets/salarytabwidgets/spagesalaryrepairs.h \
+    widgets/salarytabwidgets/spagesalarysummary.h \
+    widgets/salarytabwidgets/stableviewsalaryreceptedissued.h \
+    widgets/salarytabwidgets/stableviewsalaryrepairs.h \
+    widgets/sdoublespinbox.h \
     widgets/spageclientsummary.h \
     squerylog.h \
     stable.h \
@@ -234,7 +264,11 @@ FORMS += \
     models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
+    tabsalary.ui \
     tabsettings.ui \
+    widgets/salarytabwidgets/spagesalaryreceptedissued.ui \
+    widgets/salarytabwidgets/spagesalaryrepairs.ui \
+    widgets/salarytabwidgets/spagesalarysummary.ui \
     widgets/spageclientsummary.ui \
     tabcashmoveexch.ui \
     tabcashoperation.ui \

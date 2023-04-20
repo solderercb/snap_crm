@@ -89,10 +89,10 @@ private:
 public slots:
     void createTabRepairs(int type = 0, QWidget *caller = nullptr);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
     void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
+    void createTabRepair(int);
 
 private slots:
     void reactivateCallerTab(QWidget *);
-    void createTabRepair(int);
     void reactivateTabRepairNew(int);
     void createTabSale(int doc_id = 0);
     void createTabClients(int type = 0, QWidget *caller = nullptr);
@@ -109,6 +109,7 @@ private slots:
     void createTabSparePart(int);
     void createTabSparePartReserve(int);
     void createTabSettings();
+    void createTabSalary();
     bool closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);

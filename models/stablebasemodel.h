@@ -15,6 +15,7 @@ public:
     int field(const QString &field);
     QDateTime timestampUtc(const QModelIndex &index) const;
     QDateTime timestampLocal(const QModelIndex &index) const;
+    double total(int column, int sign = 0);
 protected:
     QMap<QString, int> i_fields;
 private slots:

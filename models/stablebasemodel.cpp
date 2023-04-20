@@ -1,3 +1,4 @@
+#include "global.h"
 #include "stablebasemodel.h"
 #include <QtSql>
 #include <QString>
@@ -24,6 +25,28 @@ QDateTime STableBaseModel::timestampLocal(const QModelIndex &index) const
     QDateTime date = QSqlQueryModel::data(index).toDateTime();
     date.setTimeZone(QTimeZone::utc());
     return date.toLocalTime();
+}
+
+double STableBaseModel::total(int column, int sign)
+{
+    double totalPositive = 0, totalNegative = 0;
+    double current;
+    for(int i = 0; i < rowCount(); i++)
+    {
+        current = sysLocale.toDouble(data(index(i, column)).toString());
+        if(sign != 0)
+        {
+            totalPositive += (current>0)?current:0;
+            totalNegative += (current<0)?current:0;
+        }
+        else
+            totalPositive += current;
+    }
+
+    if(sign >= 0)
+        return totalPositive;
+    else
+        return totalNegative;
 }
 
 void STableBaseModel::cashFieldsNames()

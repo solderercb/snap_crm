@@ -14,6 +14,7 @@
 #include "tabcashoperation.h"
 #include "tabcashmoveexch.h"
 #include "tabsettings.h"
+#include "tabsalary.h"
 #include "widgets/slineedit.h"
 #include "com_sql_queries.h"
 
@@ -264,7 +265,10 @@ void MainWindow::createMenu()
 
     QAction *salary = new QAction(tr("Заработная плата"), this);
     finances_menu->addAction(salary);
+    QObject::connect(salary,SIGNAL(triggered()),this,SLOT(createTabSalary()));
+#ifndef QT_DEBUG
     salary->setEnabled(false);
+#endif
     QToolButton* finances_button = new QToolButton();
     finances_button->setMenu(finances_menu);
     finances_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -472,6 +476,16 @@ void MainWindow::createTabSparePartReserve(int id)
 void MainWindow::createTabSettings()
 {
     tabSettings *subwindow = tabSettings::getInstance(this);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+//    connect(...);
+
+    ui->tabWidget->setCurrentWidget(subwindow);
+}
+
+void MainWindow::createTabSalary()
+{
+    tabSalary *subwindow = tabSalary::getInstance(this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
 //    connect(...);
@@ -869,7 +883,8 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        report_vars2.insert("repair_id", 25098);
 //        createTabPrint(report_vars2);
 //    }
-        createTabSettings();
+//        createTabSettings();
+    createTabSalary();
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 
 }
