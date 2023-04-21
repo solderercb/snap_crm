@@ -9,6 +9,7 @@
 #include "models/salarytabmodels/stablesalaryreceptedissued.h"
 #include "models/salarytabmodels/stablesalaryrepairworksmodel.h"
 #include "models/salarytabmodels/stablesalaryrepairpartsmodel.h"
+#include "models/salarytabmodels/stablesalarypaymentsmodel.h"
 
 namespace Ui {
 class tabSalary;
@@ -20,6 +21,7 @@ class tabSalary : public tabCommon
     friend class SPageSalarySummary;
     friend class SPageSalaryRepairs;
     friend class SPageSalaryReceptedIssued;
+    friend class SPageSalaryPayments;
 signals:
     void updateDaughterTabsModels();
     void updateDaughterTabsWidgets();
@@ -46,7 +48,7 @@ private:
     QSqlQueryModel *m_sales = nullptr;
     QSqlQueryModel *m_addtitional = nullptr;
     QSqlQueryModel *m_reservedParts = nullptr;
-    QSqlQueryModel *m_payments = nullptr;
+    STableSalaryPaymentsModel *m_payments = nullptr;
     STableSalaryRecepted *m_recepted = nullptr;
     STableSalaryIssued *m_issued = nullptr;
     int m_modelUpdatedFlags = 0;

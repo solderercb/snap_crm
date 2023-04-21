@@ -179,9 +179,9 @@
          <string>Товары на руках</string>
         </attribute>
        </widget>
-       <widget class="QWidget" name="payments">
+       <widget class="SPageSalaryPayments" name="payments">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="autoFillBackground">
          <bool>true</bool>
@@ -365,6 +365,12 @@
    <class>SPageSalaryReceptedIssued</class>
    <extends>QWidget</extends>
    <header>widgets/salarytabwidgets/spagesalaryreceptedissued.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SPageSalaryPayments</class>
+   <extends>QWidget</extends>
+   <header>widgets/salarytabwidgets/spagesalarypayments.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

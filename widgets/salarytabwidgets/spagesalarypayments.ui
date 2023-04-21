@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SPageSalaryPayments</class>
+ <widget class="QWidget" name="SPageSalaryPayments">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="STableViewSalaryPayments" name="tableViewPayments"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="STableViewSalaryPaymentsSummary" name="tableViewPaymentsSummary">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>21</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>STableViewSalaryPaymentsSummary</class>
+   <extends>QTableView</extends>
+   <header>widgets/salarytabwidgets/spagesalarypayments.h</header>
+  </customwidget>
+  <customwidget>
+   <class>STableViewSalaryPayments</class>
+   <extends>QTableView</extends>
+   <header>widgets/salarytabwidgets/stableviewsalarypayments.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

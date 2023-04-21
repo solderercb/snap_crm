@@ -24,7 +24,8 @@ public:
                       MoveGrid/*, TODO: таблица Документы в карточке товара*/, HistoryGrid,
                       CustomersGrid, SmsGrid,
                       CustomerHistoryGrid, CustomerPurchasesGrid, CustomerRepairsGrid, DealerSalesGrid,
-                      KassaGrid, InvoicesGrid, AdditionalPaymentsGrid, SalaryRepairsGrid, SalaryRepairWorksGrid, SalaryRepairPartsGrid, SalaryReceptedGrid, SalaryIssuedGrid/*, TODO: таблицы в модуле Зарплата*/,
+                      KassaGrid, InvoicesGrid, AdditionalPaymentsGrid, SalaryRepairsGrid, SalaryRepairWorksGrid, SalaryRepairPartsGrid, SalaryReceptedGrid, SalaryIssuedGrid,
+                      SalaryPaymentsGrid /*, TODO: таблицы в модуле Зарплата*/,
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
                       TasksGrid};
     Q_ENUM(SettingsVariant)

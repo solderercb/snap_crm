@@ -16,7 +16,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     m_sales = new QSqlQueryModel();
     m_addtitional = new QSqlQueryModel();
     m_reservedParts = new QSqlQueryModel();
-    m_payments = new QSqlQueryModel();
+    m_payments = new STableSalaryPaymentsModel();
     m_recepted = new STableSalaryRecepted();
     m_issued = new STableSalaryIssued();
 
@@ -130,7 +130,7 @@ void tabSalary::updateWidgets()
 void tabSalary::setModelUpdatedFlag(const int pos)
 {
     m_modelUpdatedFlags |= 1<<pos;
-    if(m_modelUpdatedFlags == 0x303)
+    if(m_modelUpdatedFlags == 0x383)
     {
         modelsUpdated();
         emit updateDaughterTabsWidgets();

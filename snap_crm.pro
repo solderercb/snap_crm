@@ -47,6 +47,8 @@ SOURCES += \
     global.cpp \
     loginwindow.cpp \
     mainwindow.cpp \
+    models/salarytabmodels/ssalarymodel.cpp \
+    models/salarytabmodels/stablesalarypaymentsmodel.cpp \
     models/salarytabmodels/stablesalaryrepairpartsmodel.cpp \
     models/salarytabmodels/stablesalaryrepairworksmodel.cpp \
     models/salarytabmodels/stablesalaryrepairsmodel.cpp \
@@ -94,6 +96,8 @@ SOURCES += \
     models/sphonesmodel.cpp \
     tabsalary.cpp \
     tabsettings.cpp \
+    widgets/salarytabwidgets/spagesalarypayments.cpp \
+    widgets/salarytabwidgets/stableviewsalarypayments.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp \
     widgets/salarytabwidgets/spagesalarybase.cpp \
@@ -156,6 +160,8 @@ HEADERS  += \
     global.h \
     loginwindow.h \
     mainwindow.h \
+    models/salarytabmodels/ssalarymodel.h \
+    models/salarytabmodels/stablesalarypaymentsmodel.h \
     models/salarytabmodels/stablesalaryrepairpartsmodel.h \
     models/salarytabmodels/stablesalaryrepairworksmodel.h \
     models/salarytabmodels/stablesalaryreceptedissued.h \
@@ -204,6 +210,8 @@ HEADERS  += \
     models/sphonesmodel.h \
     tabsalary.h \
     tabsettings.h \
+    widgets/salarytabwidgets/spagesalarypayments.h \
+    widgets/salarytabwidgets/stableviewsalarypayments.h \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.h \
     widgets/salarytabwidgets/stableviewsalaryrepairworks.h \
     widgets/salarytabwidgets/spagesalarybase.h \
@@ -266,6 +274,7 @@ FORMS += \
     models/tabsalesettingsmenu.ui \
     tabsalary.ui \
     tabsettings.ui \
+    widgets/salarytabwidgets/spagesalarypayments.ui \
     widgets/salarytabwidgets/spagesalaryreceptedissued.ui \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
