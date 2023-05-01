@@ -212,6 +212,7 @@ public:
     void setAnimation(const QString);//animation
     double salaryRate(QDate startFrom);
     void setSalaryRate(double rate);
+    double balance(const QDateTime &beforeDate);
 private:
     int m_sipId;
     QString m_username;

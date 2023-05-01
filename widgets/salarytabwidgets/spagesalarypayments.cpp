@@ -42,7 +42,7 @@ void SPageSalaryPayments::updateModels()
                                     , QSqlDatabase::database("connMain"));
 
     ui->tableViewPayments->refresh();
-    parentTab->setModelUpdatedFlag(7);
+    parentTab->setModelUpdatedFlag(PaymentsModel);
 }
 
 void SPageSalaryPayments::updateWidgets()

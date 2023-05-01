@@ -349,6 +349,8 @@ void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &
 
 void STableViewBase::orderChanged(int logicalIndex, Qt::SortOrder order)
 {
+    if(!isSortingEnabled())
+        return;
 
     if(m_sortColumn == -1 || m_sortColumn != logicalIndex)
         m_sortOrder = Qt::AscendingOrder;
@@ -665,6 +667,10 @@ void STableViewBase::refresh()
         return;
 
     QString query = m_query;
+
+    QRegularExpression re("( +\n)|((;?) +$)");  // удаление пробелов-заполнителей в конце строк, а также точки с запятой в конце запроса (при наличии ; не будет работать сортировка)
+    query.replace(re, "\n");
+
     QString filter = formatFilterGroup(*m_filter);
 
     if(!filter.isEmpty())

@@ -4,18 +4,14 @@
 #include "../stablebasemodel.h"
 #include <QObject>
 
-class STableSalaryRecepted : public STableBaseModel
+class STableSalaryReceptedIssued : public STableBaseModel
 {
     Q_OBJECT
 public:
-    explicit STableSalaryRecepted(QObject *parent = nullptr);
+    enum IncludePayedInTotal {IncludePayed = 0, ExcludePayed = 1};
+    explicit STableSalaryReceptedIssued(QObject *parent = nullptr);
+    QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
+    double total(bool excludePayed = ExcludePayed);
 };
 
-
-class STableSalaryIssued : public STableBaseModel
-{
-    Q_OBJECT
-public:
-    explicit STableSalaryIssued(QObject *parent = nullptr);
-};
 #endif // STABLESALARYRECEPTEDISSUED_H

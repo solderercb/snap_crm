@@ -283,7 +283,7 @@
        <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
        <number>0</number>
@@ -347,7 +347,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../styles/styles.qrc">
+             <iconset resource="../../styles/styles.qrc">
               <normaloff>:/icons/light/1F5F8_32.png</normaloff>:/icons/light/1F5F8_32.png</iconset>
             </property>
             <property name="iconSize">
@@ -625,7 +625,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../styles/styles.qrc"/>
+  <include location="../../styles/styles.qrc"/>
  </resources>
  <connections/>
 </ui>

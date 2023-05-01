@@ -53,6 +53,8 @@ SOURCES += \
     models/salarytabmodels/stablesalaryrepairworksmodel.cpp \
     models/salarytabmodels/stablesalaryrepairsmodel.cpp \
     models/salarytabmodels/stablesalaryreceptedissued.cpp \
+    models/salarytabmodels/stablesalarysalepartsmodel.cpp \
+    models/salarytabmodels/stablesalarysalesmodel.cpp \
     models/stablerepairsmodel.cpp \
     models/repairtablefiltermenu.cpp \
     models/stablebasemodel.cpp \
@@ -97,6 +99,7 @@ SOURCES += \
     tabsalary.cpp \
     tabsettings.cpp \
     widgets/salarytabwidgets/spagesalarypayments.cpp \
+    widgets/salarytabwidgets/spagesalarysales.cpp \
     widgets/salarytabwidgets/stableviewsalarypayments.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp \
@@ -106,6 +109,8 @@ SOURCES += \
     widgets/salarytabwidgets/spagesalarysummary.cpp \
     widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairs.cpp \
+    widgets/salarytabwidgets/stableviewsalarysaleparts.cpp \
+    widgets/salarytabwidgets/stableviewsalarysales.cpp \
     widgets/sdoublespinbox.cpp \
     widgets/spageclientsummary.cpp \
     squerylog.cpp \
@@ -166,6 +171,8 @@ HEADERS  += \
     models/salarytabmodels/stablesalaryrepairworksmodel.h \
     models/salarytabmodels/stablesalaryreceptedissued.h \
     models/salarytabmodels/stablesalaryrepairsmodel.h \
+    models/salarytabmodels/stablesalarysalepartsmodel.h \
+    models/salarytabmodels/stablesalarysalesmodel.h \
     models/stablerepairsmodel.h \
     models/repairtablefiltermenu.h \
     models/stablebasemodel.h \
@@ -211,6 +218,7 @@ HEADERS  += \
     tabsalary.h \
     tabsettings.h \
     widgets/salarytabwidgets/spagesalarypayments.h \
+    widgets/salarytabwidgets/spagesalarysales.h \
     widgets/salarytabwidgets/stableviewsalarypayments.h \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.h \
     widgets/salarytabwidgets/stableviewsalaryrepairworks.h \
@@ -220,6 +228,8 @@ HEADERS  += \
     widgets/salarytabwidgets/spagesalarysummary.h \
     widgets/salarytabwidgets/stableviewsalaryreceptedissued.h \
     widgets/salarytabwidgets/stableviewsalaryrepairs.h \
+    widgets/salarytabwidgets/stableviewsalarysaleparts.h \
+    widgets/salarytabwidgets/stableviewsalarysales.h \
     widgets/sdoublespinbox.h \
     widgets/spageclientsummary.h \
     squerylog.h \
@@ -277,6 +287,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalarypayments.ui \
     widgets/salarytabwidgets/spagesalaryreceptedissued.ui \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
+    widgets/salarytabwidgets/spagesalarysales.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
     widgets/spageclientsummary.ui \
     tabcashmoveexch.ui \

@@ -59,8 +59,11 @@
           </property>
           <item row="0" column="0">
            <widget class="QLabel" name="labelPercentWorks">
+            <property name="toolTip">
+             <string>Процент по умолчанию, заданный в настройках сотрудника; может отличаться от процента, заданного для конкретной работы в прайс-листе</string>
+            </property>
             <property name="text">
-             <string>% от выполненных работ</string>
+             <string>% от выполненных работ (?)</string>
             </property>
            </widget>
           </item>
@@ -83,8 +86,11 @@
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="labelPercentWorksQuick">
+            <property name="toolTip">
+             <string>Процент по умолчанию, заданный в настройках сотрудника; может отличаться от процента, заданного для конкретной работы в прайс-листе</string>
+            </property>
             <property name="text">
-             <string>% с работ быстрый ремонт</string>
+             <string>% с работ быстрый ремонт (?)</string>
             </property>
            </widget>
           </item>
@@ -156,7 +162,7 @@
           <item row="4" column="0">
            <widget class="QLabel" name="labelSalary">
             <property name="text">
-             <string>К выплате</string>
+             <string>Сумма за период</string>
             </property>
            </widget>
           </item>
@@ -177,14 +183,14 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="labelNotUssued">
             <property name="text">
              <string>Готово, но не выдано</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="6" column="1">
            <widget class="QLabel" name="labelNotUssuedValue">
             <property name="font">
              <font>
@@ -201,17 +207,55 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="labelIncludeNotUssued">
             <property name="text">
              <string>Готово, но не выдано</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="7" column="1">
            <widget class="QCheckBox" name="checkBoxIncludeNotIssued">
             <property name="text">
              <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="labelShowPayed">
+            <property name="text">
+             <string>Показывать оплаченные</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QCheckBox" name="checkBoxShowPayed">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="labelSalaryToPay">
+            <property name="text">
+             <string>Сумма к выплате</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="labelSalaryToPayValue">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;value&gt;</string>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
@@ -235,12 +279,25 @@
      </item>
     </layout>
    </item>
-   <item row="0" column="1">
-    <layout class="QGridLayout" name="gridLayout_3">
-     <property name="verticalSpacing">
+   <item row="1" column="1">
+    <layout class="QGridLayout" name="gridLayoutWorksAndParts">
+     <property name="horizontalSpacing">
       <number>0</number>
      </property>
-     <item row="0" column="0" colspan="3">
+     <item row="0" column="1">
+      <widget class="STableViewSalaryRepairParts" name="tableViewRepairParts"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="STableViewSalaryRepairWorks" name="tableViewRepairWorks"/>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <layout class="QGridLayout" name="gridLayoutRepairs" columnminimumwidth="0,15">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item row="0" column="0" colspan="2">
       <widget class="STableViewSalaryRepairs" name="tableViewRepairs">
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectRows</enum>
@@ -262,7 +319,7 @@
        </attribute>
       </widget>
      </item>
-     <item row="1" column="0" colspan="3">
+     <item row="1" column="0">
       <widget class="STableViewSalaryRepairsSummary" name="tableViewRepairsSummary">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -319,19 +376,6 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="1">
-    <layout class="QGridLayout" name="gridLayout_2">
-     <property name="horizontalSpacing">
-      <number>0</number>
-     </property>
-     <item row="0" column="0">
-      <widget class="STableViewSalaryRepairWorks" name="tableViewRepairWorks"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="STableViewSalaryRepairParts" name="tableViewRepairParts"/>
-     </item>
-    </layout>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -357,72 +401,7 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>tableViewRepairs</sender>
-   <signal>clicked(QModelIndex)</signal>
-   <receiver>SPageSalaryRepairs</receiver>
-   <slot>tableRepairsRowActivated(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>344</x>
-     <y>191</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>282</x>
-     <y>174</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableViewRepairs</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>SPageSalaryRepairs</receiver>
-   <slot>tableRepairsRowDoubleClicked(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>312</x>
-     <y>216</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>282</x>
-     <y>215</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableViewRepairs</sender>
-   <signal>activated(QModelIndex)</signal>
-   <receiver>SPageSalaryRepairs</receiver>
-   <slot>tableRepairsRowActivated(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>337</x>
-     <y>143</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>282</x>
-     <y>147</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableViewRepairs</sender>
-   <signal>pressed(QModelIndex)</signal>
-   <receiver>SPageSalaryRepairs</receiver>
-   <slot>tableRepairsRowActivated(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>310</x>
-     <y>119</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>282</x>
-     <y>128</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>tableRepairsRowActivated(QModelIndex)</slot>
   <slot>tableRepairsRowDoubleClicked(QModelIndex)</slot>

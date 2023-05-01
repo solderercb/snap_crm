@@ -12,7 +12,8 @@ QVariant STableSalaryPaymentsModel::data(const QModelIndex &item, int role) cons
     {
         switch (item.column())
         {
-            case 2: return sysLocale.toString(STableBaseModel::data(item, role).toDouble(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
+            case 1: return timestampLocal(item);
+            case 2: return dataLocalizedFromDouble(item);
             default: return STableBaseModel::data(item, role);
         }
     }

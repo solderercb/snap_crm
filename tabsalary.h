@@ -10,6 +10,8 @@
 #include "models/salarytabmodels/stablesalaryrepairworksmodel.h"
 #include "models/salarytabmodels/stablesalaryrepairpartsmodel.h"
 #include "models/salarytabmodels/stablesalarypaymentsmodel.h"
+#include "models/salarytabmodels/stablesalarysalesmodel.h"
+#include "models/salarytabmodels/stablesalarysalepartsmodel.h"
 
 namespace Ui {
 class tabSalary;
@@ -20,6 +22,7 @@ class tabSalary : public tabCommon
     Q_OBJECT
     friend class SPageSalarySummary;
     friend class SPageSalaryRepairs;
+    friend class SPageSalarySales;
     friend class SPageSalaryReceptedIssued;
     friend class SPageSalaryPayments;
 signals:
@@ -45,20 +48,22 @@ private:
     STableSalaryRepairsModel *m_repairs = nullptr;
     STableSalaryRepairWorksModel *m_repairWorks = nullptr;
     STableSalaryRepairPartsModel *m_repairParts = nullptr;
-    QSqlQueryModel *m_sales = nullptr;
+    STableSalarySalesModel *m_sales = nullptr;
+    STableSalarySalePartsModel *m_saleParts = nullptr;
     QSqlQueryModel *m_addtitional = nullptr;
     QSqlQueryModel *m_reservedParts = nullptr;
     STableSalaryPaymentsModel *m_payments = nullptr;
-    STableSalaryRecepted *m_recepted = nullptr;
-    STableSalaryIssued *m_issued = nullptr;
+    STableSalaryReceptedIssued *m_recepted = nullptr;
+    STableSalaryReceptedIssued *m_issued = nullptr;
     int m_modelUpdatedFlags = 0;
     double m_summReceped = 0;
+    double m_summRecepedToPay = 0;
     double m_summIssued = 0;
+    double m_summIssuedToPay = 0;
     void updateModels();
     void modelsUpdated();
     void updateWidgets();
     void setModelUpdatedFlag(const int pos);
-    double summRecepedIssued();
 public slots:
     void loadButtonPressed();
     void periodDateChanged(const QDate date);

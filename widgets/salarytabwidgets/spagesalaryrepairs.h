@@ -36,8 +36,8 @@ public:
     ~SPageSalaryRepairs();
 private:
     Ui::SPageSalaryRepairs *ui;
-    SUserModel *m_userModel;
     void loadRepairData(const int id);
+    void enableVScrollbarPadding(const bool state = 1);
 public slots:
     void updateModels();
     void updateWidgets();
@@ -45,6 +45,7 @@ public slots:
     void tableRepairsRowActivated(const QModelIndex &index);
     void tableRepairsRowSelected(const QModelIndex &current, const QModelIndex &prev);
     void tableRepairsRowDoubleClicked(const QModelIndex &index);
+    void tableRepairPartsRowDoubleClicked(const QModelIndex &index);
 private slots:
     void repairsTableColumnResized(int column, int newWidth);
 };

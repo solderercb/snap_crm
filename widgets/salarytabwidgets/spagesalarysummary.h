@@ -18,10 +18,13 @@ public:
 private:
     Ui::SPageSalarySummary *ui;
     SSortFilterProxyModel *paymentSystemsProxyModel;
+    double m_monthCharge = 0;
 public slots:
     void updateModels();
     void userModelReset();
     void updateWidgets();
+private slots:
+    void setMonthCharge();
 };
 
 #endif // SPAGESALARYSUMMARY_H

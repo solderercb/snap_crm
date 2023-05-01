@@ -136,6 +136,27 @@ void SUserModel::setSalaryRate(double rate)
 
 }
 
+double SUserModel::balance(const QDateTime &beforeDate)
+{
+    QSqlQuery record(QSqlDatabase::database("connMain"));
+    record.exec(QString(
+                 "SELECT                          \n"\
+                 "    `balance`                   \n"\
+                 "FROM `salary`                   \n"\
+                 "WHERE                           \n"\
+                 "    `user_id` = %1              \n"\
+                 "    AND `type` = 0              \n"\
+                 "    AND `period_from` < '%2'    \n"\
+                 "ORDER BY                        \n"\
+                 "    `id` DESC                   \n"\
+                 "LIMIT 1;                        \n"
+                 )
+                 .arg(i_id)\
+                 .arg(beforeDate.toUTC().toString("yyyy-MM-dd hh:mm:ss")));
+    record.first();
+    return record.value(0).toDouble();
+}
+
 int SUserModel::id()
 {
     return i_id;

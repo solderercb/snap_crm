@@ -90,11 +90,12 @@ public slots:
     void createTabRepairs(int type = 0, QWidget *caller = nullptr);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
     void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
     void createTabRepair(int);
+    void createTabSale(int doc_id = 0);
+    void createTabSparePart(int);
 
 private slots:
     void reactivateCallerTab(QWidget *);
     void reactivateTabRepairNew(int);
-    void createTabSale(int doc_id = 0);
     void createTabClients(int type = 0, QWidget *caller = nullptr);
     void createTabClient(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
@@ -106,7 +107,6 @@ private slots:
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void createTabWarehouseItems(int type = 0, QWidget *caller = nullptr);
-    void createTabSparePart(int);
     void createTabSparePartReserve(int);
     void createTabSettings();
     void createTabSalary();

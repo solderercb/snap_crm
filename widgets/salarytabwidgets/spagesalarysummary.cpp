@@ -19,6 +19,8 @@ SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
     ui->comboBoxSalaryPaymentSystem->setCurrentIndex(-1);
     ui->comboBoxSubsistencePaymentSystem->setModel(paymentSystemsProxyModel);
     ui->comboBoxSubsistencePaymentSystem->setCurrentIndex(-1);
+
+    connect(ui->toolButtonApplySummaryMonthCharge, &QToolButton::clicked, this, &SPageSalarySummary::setMonthCharge);
 }
 
 SPageSalarySummary::~SPageSalarySummary()
@@ -33,18 +35,33 @@ void SPageSalarySummary::updateModels()
 
 void SPageSalarySummary::userModelReset()
 {
-    parentTab->setModelUpdatedFlag(0);
+    m_monthCharge = parentTab->m_userModel->salaryRate(parentTab->m_periodBegin.date());
+    parentTab->setModelUpdatedFlag(UserModel);
 }
 
 void SPageSalarySummary::updateWidgets()
 {
+    double earningWorksAndParts = parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7);   // в АСЦ в поле "Заработок с ремонтов" только сумма за работы; сумма за детали в ремонтах прибавляется к сумме за проданные и отображается в поле "Заработок с продаж"
+    double earningReceptedIssued = parentTab->m_recepted->total() + parentTab->m_issued->total();
+    double earningSales = parentTab->m_sales->total(5);
     double earning = 0;
     ui->groupBoxSubsistence->setVisible(parentTab->m_showSubsistanceGroup);
-    ui->doubleSpinBoxSummaryEarningsRepairs->setValue(parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7));
-    earning += parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7);
+    ui->doubleSpinBoxSummaryEarningsRepairs->setValue(earningWorksAndParts);
+    earning += earningWorksAndParts;
     ui->doubleSpinBoxSummaryMonthRate->setValue(parentTab->m_userModel->salaryRate(parentTab->m_periodBegin.date()));
-    ui->doubleSpinBoxSummaryMonthCharge->setValue(parentTab->m_userModel->salaryRate(parentTab->m_periodBegin.date()));
-    ui->doubleSpinBoxSummaryEarningsReceiptIssue->setValue(parentTab->summRecepedIssued());
-    earning += parentTab->summRecepedIssued();
+    ui->doubleSpinBoxSummaryMonthCharge->setValue(m_monthCharge);
+    ui->doubleSpinBoxSummaryEarningsSales->setValue(earningSales);
+    ui->doubleSpinBoxSummaryEarningsReceiptIssue->setValue(earningReceptedIssued);
+    earning += earningSales;
+    earning += earningReceptedIssued;
+    earning += ui->doubleSpinBoxSummaryMonthCharge->value();
     ui->doubleSpinBoxEarning->setValue(earning);
+    ui->doubleSpinBoxPayed->setValue(parentTab->m_payments->total(2));
+    ui->doubleSpinBoxBalance->setValue(parentTab->m_userModel->balance(parentTab->m_periodBegin));
+}
+
+void SPageSalarySummary::setMonthCharge()
+{
+    m_monthCharge = ui->doubleSpinBoxSummaryMonthCharge->value();
+    updateWidgets();
 }

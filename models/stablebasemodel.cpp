@@ -49,6 +49,11 @@ double STableBaseModel::total(int column, int sign)
         return totalNegative;
 }
 
+QString STableBaseModel::dataLocalizedFromDouble(const QModelIndex &item) const
+{
+    return sysLocale.toString(STableBaseModel::data(item).toDouble(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
+}
+
 void STableBaseModel::cashFieldsNames()
 {
     i_fields.clear();

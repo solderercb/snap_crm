@@ -25,7 +25,7 @@ public:
                       CustomersGrid, SmsGrid,
                       CustomerHistoryGrid, CustomerPurchasesGrid, CustomerRepairsGrid, DealerSalesGrid,
                       KassaGrid, InvoicesGrid, AdditionalPaymentsGrid, SalaryRepairsGrid, SalaryRepairWorksGrid, SalaryRepairPartsGrid, SalaryReceptedGrid, SalaryIssuedGrid,
-                      SalaryPaymentsGrid /*, TODO: таблицы в модуле Зарплата*/,
+                      SalarySalesGrid, SalarySalePartsGrid, SalaryPaymentsGrid /*, TODO: таблицы в модуле Зарплата*/,
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
                       TasksGrid};
     Q_ENUM(SettingsVariant)

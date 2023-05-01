@@ -13,12 +13,13 @@ tabSalary::tabSalary(MainWindow *parent) :
     m_repairs = new STableSalaryRepairsModel();
     m_repairWorks = new STableSalaryRepairWorksModel();
     m_repairParts = new STableSalaryRepairPartsModel();
-    m_sales = new QSqlQueryModel();
+    m_sales = new STableSalarySalesModel();
+    m_saleParts = new STableSalarySalePartsModel();
     m_addtitional = new QSqlQueryModel();
     m_reservedParts = new QSqlQueryModel();
     m_payments = new STableSalaryPaymentsModel();
-    m_recepted = new STableSalaryRecepted();
-    m_issued = new STableSalaryIssued();
+    m_recepted = new STableSalaryReceptedIssued();
+    m_issued = new STableSalaryReceptedIssued();
 
     ui->setupUi(this);
     usersModelF = new SSortFilterProxyModel();
@@ -32,8 +33,9 @@ tabSalary::tabSalary(MainWindow *parent) :
 
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
-    m_periodBegin.setDate(QDate(2022,9,01));
-    m_periodEnd.setDate(QDate(2022,10,01));
+    m_periodBegin.setDate(QDate(2022,8,01));
+    m_periodEnd.setDate(QDate(2022,9,1));
+    loadButtonPressed();
 #endif
     updateWidgets();
 }
@@ -52,6 +54,7 @@ tabSalary::~tabSalary()
     delete m_repairWorks;
     delete m_repairParts;
     delete m_sales;
+    delete m_saleParts;
     delete m_addtitional;
     delete m_reservedParts;
     delete m_payments;
@@ -85,8 +88,7 @@ void tabSalary::updateModels()
 
 void tabSalary::modelsUpdated()
 {
-    m_summReceped = m_recepted->rowCount()*m_userModel->payDeviceIn();
-    m_summIssued = m_issued->rowCount()*m_userModel->payDeviceOut();
+    qDebug().nospace() << "[" << this << "] modelsUpdated()";
 }
 
 void tabSalary::loadButtonPressed()
@@ -130,14 +132,17 @@ void tabSalary::updateWidgets()
 void tabSalary::setModelUpdatedFlag(const int pos)
 {
     m_modelUpdatedFlags |= 1<<pos;
-    if(m_modelUpdatedFlags == 0x383)
+    if(m_modelUpdatedFlags == (
+        1 << SPageSalaryBase::UserModel |
+        1 << SPageSalaryBase::RepairsModel |
+//        1 << SPageSalaryBase::ExtraChargesModel |
+        1 << SPageSalaryBase::SalesModel |
+//        1 << SPageSalaryBase::ItemsModel |
+        1 << SPageSalaryBase::PaymentsModel |
+        1 << SPageSalaryBase::ReceptedModel |
+        1 << SPageSalaryBase::IssuedModel))
     {
         modelsUpdated();
         emit updateDaughterTabsWidgets();
     }
-}
-
-double tabSalary::summRecepedIssued()
-{
-    return m_summReceped + m_summIssued;
 }

@@ -1,12 +1,12 @@
 #include "global.h"
-#include "stablesalaryrepairpartsmodel.h"
+#include "stablesalarysalepartsmodel.h"
 
-STableSalaryRepairPartsModel::STableSalaryRepairPartsModel(QObject *parent) : STableBaseModel(parent)
+STableSalarySalePartsModel::STableSalarySalePartsModel(QObject *parent) : STableBaseModel(parent)
 {
 
 }
 
-QVariant STableSalaryRepairPartsModel::data(const QModelIndex &item, int role) const
+QVariant STableSalarySalePartsModel::data(const QModelIndex &item, int role) const
 {
     if(role == Qt::DisplayRole)
     {

@@ -148,7 +148,7 @@
        </widget>
        <widget class="QWidget" name="extra">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="autoFillBackground">
          <bool>true</bool>
@@ -157,9 +157,9 @@
          <string>Дополнительно</string>
         </attribute>
        </widget>
-       <widget class="QWidget" name="sales">
+       <widget class="SPageSalarySales" name="sales">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="autoFillBackground">
          <bool>true</bool>
@@ -170,7 +170,7 @@
        </widget>
        <widget class="QWidget" name="items">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="autoFillBackground">
          <bool>true</bool>
@@ -371,6 +371,12 @@
    <class>SPageSalaryPayments</class>
    <extends>QWidget</extends>
    <header>widgets/salarytabwidgets/spagesalarypayments.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SPageSalarySales</class>
+   <extends>QWidget</extends>
+   <header>widgets/salarytabwidgets/spagesalarysales.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

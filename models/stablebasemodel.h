@@ -16,6 +16,7 @@ public:
     QDateTime timestampUtc(const QModelIndex &index) const;
     QDateTime timestampLocal(const QModelIndex &index) const;
     double total(int column, int sign = 0);
+    QString dataLocalizedFromDouble(const QModelIndex &item) const;
 protected:
     QMap<QString, int> i_fields;
 private slots:
