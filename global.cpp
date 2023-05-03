@@ -61,6 +61,7 @@ SUserActivityModel *userActivityLog;
 SStandardItemModel *clientBinaryProperties;
 QSettings *debugOptions = nullptr;
 QMap<QString, QVariant> *debugLoginOptions = nullptr;
+SStandardItemModel* storeItemsIntReserveStatesModel = new SStandardItemModel;
 
 //QWidget *modalWidget = nullptr;
 
@@ -309,6 +310,16 @@ void initGlobalModels()
     }
     itemUnitsModel->setObjectName("itemUnitsModel");
     itemUnitsModel->setHorizontalHeaderLabels({"name", "id"});
+
+    QVector<QString> storeItemsIntReserveStatesList = {QObject::tr("Ожидание"), QObject::tr("Товар выдан инженеру"), QObject::tr("Товар установлен"), QObject::tr("Товар установлен, устройство выдано"), QObject::tr("Архив"), QObject::tr("Отклонена")};
+    for (int i=0; i<storeItemsIntReserveStatesList.size(); i++)
+    {
+        QList<QStandardItem*> *storeItemsIntReserveStateSelector = new QList<QStandardItem*>();
+        *storeItemsIntReserveStateSelector << new QStandardItem(storeItemsIntReserveStatesList.at(i)) << new QStandardItem(QString::number(i));
+        storeItemsIntReserveStatesModel->appendRow(*storeItemsIntReserveStateSelector);
+    }
+    storeItemsIntReserveStatesModel->setObjectName("storeItemsIntReserveStatesModel");
+    storeItemsIntReserveStatesModel->setHorizontalHeaderLabels({"name", "id"});
 
 #ifdef QT_DEBUG
     initClients4Test();

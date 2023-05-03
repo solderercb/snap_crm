@@ -45,6 +45,8 @@ void SPageSalarySummary::updateWidgets()
     double earningReceptedIssued = parentTab->m_recepted->total() + parentTab->m_issued->total();
     double earningSales = parentTab->m_sales->total(5);
     double earning = 0;
+    double paymentsSumm = parentTab->m_payments->total(2);
+    double employeeBalance = parentTab->m_userModel->balance(parentTab->m_periodBegin);
     ui->groupBoxSubsistence->setVisible(parentTab->m_showSubsistanceGroup);
     ui->doubleSpinBoxSummaryEarningsRepairs->setValue(earningWorksAndParts);
     earning += earningWorksAndParts;
@@ -52,12 +54,14 @@ void SPageSalarySummary::updateWidgets()
     ui->doubleSpinBoxSummaryMonthCharge->setValue(m_monthCharge);
     ui->doubleSpinBoxSummaryEarningsSales->setValue(earningSales);
     ui->doubleSpinBoxSummaryEarningsReceiptIssue->setValue(earningReceptedIssued);
+    ui->doubleSpinBoxSummaryItemsCost->setValue(parentTab->m_items->totalUnusedItemsCost());
     earning += earningSales;
     earning += earningReceptedIssued;
     earning += ui->doubleSpinBoxSummaryMonthCharge->value();
     ui->doubleSpinBoxEarning->setValue(earning);
-    ui->doubleSpinBoxPayed->setValue(parentTab->m_payments->total(2));
-    ui->doubleSpinBoxBalance->setValue(parentTab->m_userModel->balance(parentTab->m_periodBegin));
+    ui->doubleSpinBoxPayed->setValue(paymentsSumm);
+    ui->doubleSpinBoxBalance->setValue(employeeBalance);
+    ui->doubleSpinBoxSummaryAmountToPay->setValue(employeeBalance + earning - paymentsSumm);
 }
 
 void SPageSalarySummary::setMonthCharge()

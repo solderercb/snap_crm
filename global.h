@@ -91,6 +91,7 @@ extern SUserActivityModel *userActivityLog;
 extern SStandardItemModel *clientBinaryProperties;
 extern QSettings *debugOptions;
 extern QMap<QString, QVariant> *debugLoginOptions;
+extern SStandardItemModel* storeItemsIntReserveStatesModel;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

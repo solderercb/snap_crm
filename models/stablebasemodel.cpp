@@ -33,7 +33,7 @@ double STableBaseModel::total(int column, int sign)
     double current;
     for(int i = 0; i < rowCount(); i++)
     {
-        current = sysLocale.toDouble(data(index(i, column)).toString());
+        current = STableBaseModel::data(index(i, column)).toDouble();
         if(sign != 0)
         {
             totalPositive += (current>0)?current:0;

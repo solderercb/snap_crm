@@ -168,7 +168,7 @@
          <string>Продажи</string>
         </attribute>
        </widget>
-       <widget class="QWidget" name="items">
+       <widget class="SPageSalaryItems" name="items">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -377,6 +377,12 @@
    <class>SPageSalarySales</class>
    <extends>QWidget</extends>
    <header>widgets/salarytabwidgets/spagesalarysales.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SPageSalaryItems</class>
+   <extends>QWidget</extends>
+   <header>widgets/salarytabwidgets/spagesalaryitems.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -16,7 +16,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     m_sales = new STableSalarySalesModel();
     m_saleParts = new STableSalarySalePartsModel();
     m_addtitional = new QSqlQueryModel();
-    m_reservedParts = new QSqlQueryModel();
+    m_items = new STableSalaryItemsModel();
     m_payments = new STableSalaryPaymentsModel();
     m_recepted = new STableSalaryReceptedIssued();
     m_issued = new STableSalaryReceptedIssued();
@@ -56,7 +56,7 @@ tabSalary::~tabSalary()
     delete m_sales;
     delete m_saleParts;
     delete m_addtitional;
-    delete m_reservedParts;
+    delete m_items;
     delete m_payments;
     delete m_recepted;
     delete m_issued;
@@ -137,7 +137,7 @@ void tabSalary::setModelUpdatedFlag(const int pos)
         1 << SPageSalaryBase::RepairsModel |
 //        1 << SPageSalaryBase::ExtraChargesModel |
         1 << SPageSalaryBase::SalesModel |
-//        1 << SPageSalaryBase::ItemsModel |
+        1 << SPageSalaryBase::ItemsModel |
         1 << SPageSalaryBase::PaymentsModel |
         1 << SPageSalaryBase::ReceptedModel |
         1 << SPageSalaryBase::IssuedModel))

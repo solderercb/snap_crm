@@ -48,6 +48,7 @@ SOURCES += \
     loginwindow.cpp \
     mainwindow.cpp \
     models/salarytabmodels/ssalarymodel.cpp \
+    models/salarytabmodels/stablesalaryitemsmodel.cpp \
     models/salarytabmodels/stablesalarypaymentsmodel.cpp \
     models/salarytabmodels/stablesalaryrepairpartsmodel.cpp \
     models/salarytabmodels/stablesalaryrepairworksmodel.cpp \
@@ -98,8 +99,10 @@ SOURCES += \
     models/sphonesmodel.cpp \
     tabsalary.cpp \
     tabsettings.cpp \
+    widgets/salarytabwidgets/spagesalaryitems.cpp \
     widgets/salarytabwidgets/spagesalarypayments.cpp \
     widgets/salarytabwidgets/spagesalarysales.cpp \
+    widgets/salarytabwidgets/stableviewsalaryitems.cpp \
     widgets/salarytabwidgets/stableviewsalarypayments.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp \
@@ -166,6 +169,7 @@ HEADERS  += \
     loginwindow.h \
     mainwindow.h \
     models/salarytabmodels/ssalarymodel.h \
+    models/salarytabmodels/stablesalaryitemsmodel.h \
     models/salarytabmodels/stablesalarypaymentsmodel.h \
     models/salarytabmodels/stablesalaryrepairpartsmodel.h \
     models/salarytabmodels/stablesalaryrepairworksmodel.h \
@@ -217,8 +221,10 @@ HEADERS  += \
     models/sphonesmodel.h \
     tabsalary.h \
     tabsettings.h \
+    widgets/salarytabwidgets/spagesalaryitems.h \
     widgets/salarytabwidgets/spagesalarypayments.h \
     widgets/salarytabwidgets/spagesalarysales.h \
+    widgets/salarytabwidgets/stableviewsalaryitems.h \
     widgets/salarytabwidgets/stableviewsalarypayments.h \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.h \
     widgets/salarytabwidgets/stableviewsalaryrepairworks.h \
@@ -284,6 +290,7 @@ FORMS += \
     models/tabsalesettingsmenu.ui \
     tabsalary.ui \
     tabsettings.ui \
+    widgets/salarytabwidgets/spagesalaryitems.ui \
     widgets/salarytabwidgets/spagesalarypayments.ui \
     widgets/salarytabwidgets/spagesalaryreceptedissued.ui \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
