@@ -13,6 +13,7 @@
 #include "models/salarytabmodels/stablesalarysalesmodel.h"
 #include "models/salarytabmodels/stablesalaryitemsmodel.h"
 #include "models/salarytabmodels/stablesalarysalepartsmodel.h"
+#include "models/salarytabmodels/stablesalaryextramodel.h"
 
 namespace Ui {
 class tabSalary;
@@ -23,6 +24,7 @@ class tabSalary : public tabCommon
     Q_OBJECT
     friend class SPageSalarySummary;
     friend class SPageSalaryRepairs;
+    friend class SPageSalaryExtra;
     friend class SPageSalarySales;
     friend class SPageSalaryItems;
     friend class SPageSalaryReceptedIssued;
@@ -52,7 +54,7 @@ private:
     STableSalaryRepairPartsModel *m_repairParts = nullptr;
     STableSalarySalesModel *m_sales = nullptr;
     STableSalarySalePartsModel *m_saleParts = nullptr;
-    QSqlQueryModel *m_addtitional = nullptr;
+    STableSalaryExtraModel *m_extraCharges = nullptr;
     STableSalaryItemsModel *m_items = nullptr;
     STableSalaryPaymentsModel *m_payments = nullptr;
     STableSalaryReceptedIssued *m_recepted = nullptr;
@@ -69,6 +71,7 @@ private:
 public slots:
     void loadButtonPressed();
     void periodDateChanged(const QDate date);
+    void tabChanged(const int index);
 };
 
 #endif // TABSALARY_H

@@ -15,7 +15,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     m_repairParts = new STableSalaryRepairPartsModel();
     m_sales = new STableSalarySalesModel();
     m_saleParts = new STableSalarySalePartsModel();
-    m_addtitional = new QSqlQueryModel();
+    m_extraCharges = new STableSalaryExtraModel();
     m_items = new STableSalaryItemsModel();
     m_payments = new STableSalaryPaymentsModel();
     m_recepted = new STableSalaryReceptedIssued();
@@ -30,6 +30,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     ui->comboBoxEmployee->setCurrentIndex(-1);
 
     ui->dateEditPeriod->setDate(QDate::currentDate());
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &tabSalary::tabChanged);
 
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
@@ -55,7 +56,7 @@ tabSalary::~tabSalary()
     delete m_repairParts;
     delete m_sales;
     delete m_saleParts;
-    delete m_addtitional;
+    delete m_extraCharges;
     delete m_items;
     delete m_payments;
     delete m_recepted;
@@ -124,6 +125,13 @@ void tabSalary::periodDateChanged(const QDate date)
     updateWidgets();
 }
 
+void tabSalary::tabChanged(const int index)
+{
+    bool state = index==2;
+    ui->buttonAddExtraCharge->setVisible(state);
+    ui->buttonSaveExtraChargesList->setVisible(state);
+}
+
 void tabSalary::updateWidgets()
 {
     ui->labelPeriod->setText(m_periodBegin.toString("dd.MM.yyyy") + " − " + m_periodEnd.addDays(-1).toString("dd.MM.yyyy"));
@@ -135,7 +143,7 @@ void tabSalary::setModelUpdatedFlag(const int pos)
     if(m_modelUpdatedFlags == (
         1 << SPageSalaryBase::UserModel |
         1 << SPageSalaryBase::RepairsModel |
-//        1 << SPageSalaryBase::ExtraChargesModel |
+        1 << SPageSalaryBase::ExtraChargesModel |
         1 << SPageSalaryBase::SalesModel |
         1 << SPageSalaryBase::ItemsModel |
         1 << SPageSalaryBase::PaymentsModel |

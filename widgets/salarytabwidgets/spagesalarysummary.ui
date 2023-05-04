@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>967</width>
-    <height>583</height>
+    <width>1196</width>
+    <height>633</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0">
+  <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0,0" columnminimumwidth="0,600,0,0">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -29,7 +29,457 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <item row="0" column="2">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBoxSummary">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Сводка</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <layout class="QFormLayout" name="formLayout">
+        <property name="horizontalSpacing">
+         <number>10</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>6</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="labelSummaryMonthRate">
+          <property name="text">
+           <string>Ставка за месяц</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryMonthRate">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="labelSummaryMonthCharge">
+          <property name="text">
+           <string>По ставке начислить</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryMonthCharge">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::NoButtons</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButtonApplySummaryMonthCharge">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../../styles/styles.qrc">
+              <normaloff>:/icons/light/1F5F8_32.png</normaloff>:/icons/light/1F5F8_32.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="labelSummaryEarningsRepairs">
+          <property name="text">
+           <string>Заработок с ремонтов</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsRepairs">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="labelSummaryEarningsSales">
+          <property name="text">
+           <string>Заработок с продаж</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsSales">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="labelSummaryEarningsReceiptIssue">
+          <property name="text">
+           <string>Принятые/выданные устройства</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsReceiptIssue">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="labelSummaryItemsCost">
+          <property name="text">
+           <string>Запчасти на руках</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryItemsCost">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="labelExtraCharges">
+          <property name="text">
+           <string>Дополнительные начиления</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxExtraCharges">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="labelExtraChargesOff">
+          <property name="text">
+           <string>Дополнительные списания</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxExtraChargesOff">
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="labelEarning">
+          <property name="text">
+           <string>Заработок</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxEarning">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(4, 78, 255);</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QLabel" name="labelSubsistence">
+          <property name="text">
+           <string>Аванс</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxSubsistence">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 4, 37);</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QLabel" name="labelPayed">
+          <property name="text">
+           <string>Было выплачено</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxPayed">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 4, 37);</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="labelBalance">
+          <property name="text">
+           <string>Баланс</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxBalance">
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0">
+         <widget class="QLabel" name="labelSummaryAmountToPay">
+          <property name="text">
+           <string>Итого к оплате</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryAmountToPay">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(94, 131, 0);</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox {border: 0px; border-color: rgba(0, 0, 0, 0);}</string>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,1">
+      <item row="1" column="0" colspan="2">
+       <widget class="QTextEdit" name="textEditDisclaimer">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;В АСЦ (v3.7.37.1184) баланс сделан достаточно странно: в рассчете текущей задолженности перед сотрудником используется значение последней записи о зарплате за период предшествующий выбранному (авансы не учитываются). При этом тип выплаты &amp;quot;Заработная плата&amp;quot; не ограничен количеством. Для случаев, когда в организации соблюдается порядок &amp;quot;аванс/зарплата&amp;quot; и выплаты производятся своевременно, а не задним числом, это не вызывает никаких проблем. Но если выплаты производятся чаще двух раз в месяц (например, еженедельный рассчет или рассчет по требованию) или оформляются &amp;quot;потом&amp;quot; (задним числом) очень просто запутаться в числах.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;В этой программе данная проблема устранена, отображается значение баланса самой последней записи без учета периода. Т. о. значения баланса здесь НЕ СООТВЕТСТВУЮТ значению в АСЦ за налогичный период, а следовательно и значения сумм задолженности перед сотрудником (&amp;quot;Итого к выплате&amp;quot;).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;ОДИН ИЗ СЦЕНАРИЕВ ВОЗНИКНОВЕНИЯ ПУТАНИЦЫ&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;На рисунке ниже отображена правильная последовательность выплат.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/help/asc_salary_bug_example_01.png&quot; /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Если кто либо уполномоченный решит, что задолженностей по месяцам не должно быть и будет их &amp;quot;закрывать&amp;quot; в обратном порядке (т. е. загружать отчет за Апрель и закрывать долг, потом загружать отчет за Март ... , потом за Февраль ...), то сразу же после проводки каждой выплаты значение задолженности будет равно нулю (на рисунке шаг №№6..9)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/help/asc_salary_bug_example_02.png&quot; /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Но при следующей загрузке отчетов за Февраль..Май в поле &amp;quot;К выплате&amp;quot; будут отрицательные значения, как будто сотрудник должен организации (на рисунке шаги №№10..13, последовательность выбора месяца не важна).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/help/asc_salary_bug_example_03.png&quot; /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QToolButton" name="toolButtonDisclaimer">
+        <property name="text">
+         <string>+</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::DownArrow</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>ВНИМАНИЕ!</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::MinimumExpanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>50</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="3">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QGroupBox" name="groupBoxSalary">
@@ -264,352 +714,6 @@
      </item>
     </layout>
    </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBoxSummary">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Сводка</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <property name="leftMargin">
-       <number>6</number>
-      </property>
-      <property name="topMargin">
-       <number>6</number>
-      </property>
-      <property name="rightMargin">
-       <number>6</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <item row="0" column="0">
-       <layout class="QFormLayout" name="formLayout">
-        <property name="horizontalSpacing">
-         <number>10</number>
-        </property>
-        <property name="verticalSpacing">
-         <number>6</number>
-        </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="labelSummaryMonthRate">
-          <property name="text">
-           <string>Ставка за месяц</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryMonthRate">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="labelSummaryMonthCharge">
-          <property name="text">
-           <string>По ставке начислить</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryMonthCharge">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="buttonSymbols">
-             <enum>QAbstractSpinBox::NoButtons</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="toolButtonApplySummaryMonthCharge">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../../styles/styles.qrc">
-              <normaloff>:/icons/light/1F5F8_32.png</normaloff>:/icons/light/1F5F8_32.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>17</width>
-              <height>17</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="labelSummaryEarningsRepairs">
-          <property name="text">
-           <string>Заработок с ремонтов</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsRepairs">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="labelSummaryEarningsSales">
-          <property name="text">
-           <string>Заработок с продаж</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsSales">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="labelSummaryEarningsReceiptIssue">
-          <property name="text">
-           <string>Принятые/выданные устройства</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsReceiptIssue">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="labelSummaryItemsCost">
-          <property name="text">
-           <string>Запчасти на руках</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryItemsCost">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="labelExtraCharges">
-          <property name="text">
-           <string>Дополнительные начиления</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxExtraCharges">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QLabel" name="labelSummaryChargesOff">
-          <property name="text">
-           <string>Дополнительные списания</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryChargesOff">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0">
-         <widget class="QLabel" name="labelEarning">
-          <property name="text">
-           <string>Заработок</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxEarning">
-          <property name="styleSheet">
-           <string notr="true">color: rgb(4, 78, 255);</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <widget class="QLabel" name="labelSubsistence">
-          <property name="text">
-           <string>Аванс</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSubsistence">
-          <property name="styleSheet">
-           <string notr="true">color: rgb(255, 4, 37);</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0">
-         <widget class="QLabel" name="labelPayed">
-          <property name="text">
-           <string>Было выплачено</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxPayed">
-          <property name="styleSheet">
-           <string notr="true">color: rgb(255, 4, 37);</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="0">
-         <widget class="QLabel" name="labelBalance">
-          <property name="text">
-           <string>Баланс</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxBalance">
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="0">
-         <widget class="QLabel" name="labelSummaryAmountToPay">
-          <property name="text">
-           <string>Итого к оплате</string>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="1">
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryAmountToPay">
-          <property name="styleSheet">
-           <string notr="true">color: rgb(94, 131, 0);</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>300</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -627,5 +731,22 @@
  <resources>
   <include location="../../styles/styles.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>toolButtonDisclaimer</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>textEditDisclaimer</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>272</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>321</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

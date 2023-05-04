@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="help">
+    <file>asc_salary_bug_example_01.png</file>
+    <file>asc_salary_bug_example_02.png</file>
+    <file>asc_salary_bug_example_03.png</file>
+  </qresource>
+</RCC>

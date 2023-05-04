@@ -19,3 +19,15 @@ QVariant STableSalaryPaymentsModel::data(const QModelIndex &item, int role) cons
     }
     return STableBaseModel::data(item, role);
 }
+
+double STableSalaryPaymentsModel::total(const PaymentType type)
+{
+    double total = 0;
+    for(int i=0; i < rowCount(); i++)
+    {
+        if(STableBaseModel::data(index(i, 6)).toInt() == type)
+            total += STableBaseModel::data(index(i, 2)).toDouble();
+    }
+
+    return total;
+}

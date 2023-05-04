@@ -48,6 +48,7 @@ SOURCES += \
     loginwindow.cpp \
     mainwindow.cpp \
     models/salarytabmodels/ssalarymodel.cpp \
+    models/salarytabmodels/stablesalaryextramodel.cpp \
     models/salarytabmodels/stablesalaryitemsmodel.cpp \
     models/salarytabmodels/stablesalarypaymentsmodel.cpp \
     models/salarytabmodels/stablesalaryrepairpartsmodel.cpp \
@@ -99,9 +100,11 @@ SOURCES += \
     models/sphonesmodel.cpp \
     tabsalary.cpp \
     tabsettings.cpp \
+    widgets/salarytabwidgets/spagesalaryextra.cpp \
     widgets/salarytabwidgets/spagesalaryitems.cpp \
     widgets/salarytabwidgets/spagesalarypayments.cpp \
     widgets/salarytabwidgets/spagesalarysales.cpp \
+    widgets/salarytabwidgets/stableviewsalaryextra.cpp \
     widgets/salarytabwidgets/stableviewsalaryitems.cpp \
     widgets/salarytabwidgets/stableviewsalarypayments.cpp \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp \
@@ -169,6 +172,7 @@ HEADERS  += \
     loginwindow.h \
     mainwindow.h \
     models/salarytabmodels/ssalarymodel.h \
+    models/salarytabmodels/stablesalaryextramodel.h \
     models/salarytabmodels/stablesalaryitemsmodel.h \
     models/salarytabmodels/stablesalarypaymentsmodel.h \
     models/salarytabmodels/stablesalaryrepairpartsmodel.h \
@@ -221,9 +225,11 @@ HEADERS  += \
     models/sphonesmodel.h \
     tabsalary.h \
     tabsettings.h \
+    widgets/salarytabwidgets/spagesalaryextra.h \
     widgets/salarytabwidgets/spagesalaryitems.h \
     widgets/salarytabwidgets/spagesalarypayments.h \
     widgets/salarytabwidgets/spagesalarysales.h \
+    widgets/salarytabwidgets/stableviewsalaryextra.h \
     widgets/salarytabwidgets/stableviewsalaryitems.h \
     widgets/salarytabwidgets/stableviewsalarypayments.h \
     widgets/salarytabwidgets/stableviewsalaryrepairparts.h \
@@ -290,6 +296,7 @@ FORMS += \
     models/tabsalesettingsmenu.ui \
     tabsalary.ui \
     tabsettings.ui \
+    widgets/salarytabwidgets/spagesalaryextra.ui \
     widgets/salarytabwidgets/spagesalaryitems.ui \
     widgets/salarytabwidgets/spagesalarypayments.ui \
     widgets/salarytabwidgets/spagesalaryreceptedissued.ui \
@@ -316,6 +323,7 @@ FORMS += \
     widgets/stoolboxswitchpanel.ui
 
 RESOURCES += styles/styles.qrc
+RESOURCES += help/help.qrc
 
 QMAKE_MKLINK = mklink /H
 

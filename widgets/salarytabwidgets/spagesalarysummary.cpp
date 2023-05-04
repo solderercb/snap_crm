@@ -6,10 +6,13 @@ SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
     ui(new Ui::SPageSalarySummary)
 {
     ui->setupUi(this);
+    ui->textEditDisclaimer->setVisible(ui->toolButtonDisclaimer->isChecked());
     connect(parentTab->m_userModel, &SUserModel::sigModelReset, this, &SPageSalarySummary::userModelReset);
     ui->toolButtonApplySummaryMonthCharge->resize(ui->doubleSpinBoxSummaryMonthCharge->height(), ui->doubleSpinBoxSummaryMonthCharge->height());
     ui->dateEditSubsistenceDate->setDate(QDate::currentDate());
     ui->dateEditSalaryDate->setDate(QDate::currentDate());
+    ui->doubleSpinBoxBalance->setMinimum(-ui->doubleSpinBoxBalance->maximum());
+    ui->doubleSpinBoxSummaryAmountToPay->setMinimum(-ui->doubleSpinBoxSummaryAmountToPay->maximum());
 
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
@@ -44,8 +47,11 @@ void SPageSalarySummary::updateWidgets()
     double earningWorksAndParts = parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7);   // в АСЦ в поле "Заработок с ремонтов" только сумма за работы; сумма за детали в ремонтах прибавляется к сумме за проданные и отображается в поле "Заработок с продаж"
     double earningReceptedIssued = parentTab->m_recepted->total() + parentTab->m_issued->total();
     double earningSales = parentTab->m_sales->total(5);
+    double extraCharges = parentTab->m_extraCharges->total(2, 1);
+    double extraChargesOff = parentTab->m_extraCharges->total(2, -1);
     double earning = 0;
-    double paymentsSumm = parentTab->m_payments->total(2);
+    double paymentsSubsistanceSumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Subsistance);
+    double paymentsSalarySumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Salary);
     double employeeBalance = parentTab->m_userModel->balance(parentTab->m_periodBegin);
     ui->groupBoxSubsistence->setVisible(parentTab->m_showSubsistanceGroup);
     ui->doubleSpinBoxSummaryEarningsRepairs->setValue(earningWorksAndParts);
@@ -55,13 +61,25 @@ void SPageSalarySummary::updateWidgets()
     ui->doubleSpinBoxSummaryEarningsSales->setValue(earningSales);
     ui->doubleSpinBoxSummaryEarningsReceiptIssue->setValue(earningReceptedIssued);
     ui->doubleSpinBoxSummaryItemsCost->setValue(parentTab->m_items->totalUnusedItemsCost());
+    ui->doubleSpinBoxExtraCharges->setValue(extraCharges);
+    if(extraCharges)
+        ui->doubleSpinBoxExtraCharges->setStyleSheet("background-color: rgb(144,238,144);");
+    else
+        ui->doubleSpinBoxExtraCharges->setStyleSheet("");
+    ui->doubleSpinBoxExtraChargesOff->setValue(-extraChargesOff);
+    if(extraChargesOff)
+        ui->doubleSpinBoxExtraChargesOff->setStyleSheet("background-color: rgb(234,73,73);");
+    else
+        ui->doubleSpinBoxExtraChargesOff->setStyleSheet("");
     earning += earningSales;
     earning += earningReceptedIssued;
-    earning += ui->doubleSpinBoxSummaryMonthCharge->value();
+    earning += m_monthCharge;
+    earning += extraCharges + extraChargesOff;
     ui->doubleSpinBoxEarning->setValue(earning);
-    ui->doubleSpinBoxPayed->setValue(paymentsSumm);
+    ui->doubleSpinBoxSubsistence->setValue(paymentsSubsistanceSumm);
+    ui->doubleSpinBoxPayed->setValue(paymentsSalarySumm);
     ui->doubleSpinBoxBalance->setValue(employeeBalance);
-    ui->doubleSpinBoxSummaryAmountToPay->setValue(employeeBalance + earning - paymentsSumm);
+    ui->doubleSpinBoxSummaryAmountToPay->setValue(employeeBalance + earning - paymentsSubsistanceSumm - paymentsSalarySumm);
 }
 
 void SPageSalarySummary::setMonthCharge()

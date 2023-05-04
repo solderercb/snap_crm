@@ -25,7 +25,8 @@ void SPageSalaryPayments::updateModels()
                                         "    t1.`summ`,                                      \n"\
                                         "    t2.`username` AS 'employee',                    \n"\
                                         "    t3.`username` AS 'issuer',                      \n"\
-                                        "    t1.`notes`                                      \n"\
+                                        "    t1.`notes`,                                     \n"\
+                                        "    t1.`type`                                       \n"\
                                         "FROM `salary` AS t1                                 \n"\
                                         "INNER JOIN `users` AS t2                            \n"\
                                         "    ON t1.`user_id` = t2.`id`                       \n"\
@@ -47,7 +48,7 @@ void SPageSalaryPayments::updateModels()
 
 void SPageSalaryPayments::updateWidgets()
 {
-    ui->tableViewPaymentsSummary->setTotal(2, parentTab->m_payments->total(2));
+    ui->tableViewPaymentsSummary->setTotal(2, parentTab->m_payments->STableBaseModel::total(2));
 
 }
 

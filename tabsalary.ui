@@ -146,7 +146,7 @@
          <string>Ремонты</string>
         </attribute>
        </widget>
-       <widget class="QWidget" name="extra">
+       <widget class="SPageSalaryExtra" name="extra">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -295,6 +295,50 @@
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
+          <item row="0" column="3">
+           <widget class="QWidget" name="dummyWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>1</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="buttonAddExtraCharge">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Добавить</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QPushButton" name="buttonRefresh">
             <property name="enabled">
@@ -317,25 +361,25 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QWidget" name="dummyWidget" native="true">
+          <item row="0" column="2">
+           <widget class="QPushButton" name="buttonSaveExtraChargesList">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>1</width>
-              <height>0</height>
+              <width>0</width>
+              <height>23</height>
              </size>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>22</height>
-             </size>
+            <property name="text">
+             <string>Сохранить</string>
             </property>
            </widget>
           </item>
@@ -385,6 +429,12 @@
    <header>widgets/salarytabwidgets/spagesalaryitems.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>SPageSalaryExtra</class>
+   <extends>QWidget</extends>
+   <header>widgets/salarytabwidgets/spagesalaryextra.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -395,8 +445,8 @@
    <slot>loadButtonPressed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>567</x>
-     <y>520</y>
+     <x>518</x>
+     <y>529</y>
     </hint>
     <hint type="destinationlabel">
      <x>568</x>
