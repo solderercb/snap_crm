@@ -406,9 +406,10 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;В АСЦ (v3.7.37.1184) баланс сделан достаточно странно: в рассчете текущей задолженности перед сотрудником используется значение последней записи о зарплате за период предшествующий выбранному (авансы не учитываются). При этом тип выплаты &amp;quot;Заработная плата&amp;quot; не ограничен количеством. Для случаев, когда в организации соблюдается порядок &amp;quot;аванс/зарплата&amp;quot; и выплаты производятся своевременно, а не задним числом, это не вызывает никаких проблем. Но если выплаты производятся чаще двух раз в месяц (например, еженедельный рассчет или рассчет по требованию) или оформляются &amp;quot;потом&amp;quot; (задним числом) очень просто запутаться в числах.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;В этой программе данная проблема устранена, отображается значение баланса самой последней записи без учета периода. Т. о. значения баланса здесь НЕ СООТВЕТСТВУЮТ значению в АСЦ за налогичный период, а следовательно и значения сумм задолженности перед сотрудником (&amp;quot;Итого к выплате&amp;quot;).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;В этой программе данная проблема устранена — отображается значение баланса самой последней записи без учета периода. Т. о. значения баланса здесь &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; font-style:italic;&quot;&gt;не соответствуют&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; значению в АСЦ за налогичный период, а следовательно и значения сумм задолженности перед сотрудником (&amp;quot;Итого к выплате&amp;quot;).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Также в АСЦ неправильно рассчитывается процент от прибыли с продажи товаров в ремонтах — не учитывается кол-во товаров. Поэтому сумма значений в полях &amp;quot;Заработок с ремонтов&amp;quot; и &amp;quot;Заработок с продаж&amp;quot; &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; font-style:italic;&quot;&gt;может быть больше&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;, чем в АСЦ; подсчет значений для этих полей изменён на более логичный — заработок от продажи товаров в ремонтах прибавляется к сумме за выполненые работы (в АСЦ прибавлялся к сумме заработка за проданные товары).&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;ОДИН ИЗ СЦЕНАРИЕВ ВОЗНИКНОВЕНИЯ ПУТАНИЦЫ&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;ОДИН ИЗ СЦЕНАРИЕВ ВОЗНИКНОВЕНИЯ ПУТАНИЦЫ С БАЛАНСОМ&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;На рисунке ниже отображена правильная последовательность выплат.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/help/asc_salary_bug_example_01.png&quot; /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -484,7 +485,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QGroupBox" name="groupBoxSalary">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -566,7 +567,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxSalarySumm">
+           <widget class="SDoubleSpinBox" name="doubleSpinBoxSalarySumm">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -583,7 +584,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QGroupBox" name="groupBoxSubsistence">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -683,11 +684,23 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="4" column="1">
            <widget class="SPlainTextEdit" name="textEditSubsistenceReason">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>0</height>
+              <height>50</height>
              </size>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QAbstractScrollArea::AdjustToContents</enum>
+            </property>
+            <property name="plainText">
+             <string>Выплата аванса сотруднику</string>
             </property>
            </widget>
           </item>

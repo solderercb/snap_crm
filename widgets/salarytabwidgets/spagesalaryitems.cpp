@@ -42,7 +42,7 @@ void SPageSalaryItems::updateModels()
                                  "    ON t1.`item_id` = t2.`id`                                                                \n"\
                                  " WHERE (t1.`to_user` = %1) AND ((1 = t1.`state`) OR (2 = t1.`state`))                          "\
                                  )
-                                .arg(parentTab->m_employeeId)\
+                                .arg(parentTab->employeeId())\
                                 , QSqlDatabase::database("connMain"));
 
         ui->tableViewItems->refresh();

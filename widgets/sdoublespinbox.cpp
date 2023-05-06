@@ -14,4 +14,5 @@ SDoubleSpinBox::SDoubleSpinBox(QWidget *parent) :
         setDecimals(0);
     }
     setMaximum(9999999);
+    setGroupSeparatorShown(true);
 }

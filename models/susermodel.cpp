@@ -53,7 +53,7 @@ void SUserModel::load(const int id)
     m_email = record->value("email").toString();
     m_sex = record->value("sex").toInt();
     m_photo = record->value("photo").toByteArray();
-    m_salaryRate = record->value("salary_rate").toInt();
+//    m_salaryRate = record->value("salary_rate").toInt();
     m_payDay = record->value("pay_day").toInt();
     m_payDayOff = record->value("pay_day_off").toInt();
     m_payRepair = record->value("pay_repair").toInt();
@@ -113,22 +113,38 @@ void SUserModel::load(const int id)
     m_animation = record->value("animation").toString();
 
     delete record;
+
+    loadSalaryRate();
+
     emit sigModelReset();
 }
 
-double SUserModel::salaryRate(QDate startFrom)
+void SUserModel::setSalaryRateStartDate(const QDate date)
 {
-    double value = 0;
-    QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
-    record->exec(QString("SELECT * FROM `salary_rates` WHERE `user_id` = %1 AND `start_from` <= '%2' ORDER BY `created_at` DESC LIMIT 1;").arg(i_id).arg(startFrom.toString("yyyy-MM-dd")));
-    if(!record->first())
-        return value;
+    m_salaryRateStartDate = date;
+}
 
-    value = record->value("value").toDouble();
+int SUserModel::salaryRate()
+{
+    return m_salaryRate;
+}
+
+void SUserModel::loadSalaryRate()
+{
+    m_salaryRate = 0;
+
+    if(m_salaryRateStartDate.isNull())
+        return;
+
+    QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
+    record->exec(QString("SELECT * FROM `salary_rates` WHERE `user_id` = %1 AND `start_from` <= '%2' ORDER BY `created_at` DESC LIMIT 1;").arg(i_id).arg(m_salaryRateStartDate.toString("yyyy-MM-dd")));
+    if(!record->first())
+        return;
+
+    m_salaryRate = record->value("value").toDouble();
+    m_salaryRateStartDate = QDate();
 
     delete record;
-
-    return value;
 }
 
 void SUserModel::setSalaryRate(double rate)
@@ -145,14 +161,11 @@ double SUserModel::balance(const QDateTime &beforeDate)
                  "FROM `salary`                   \n"\
                  "WHERE                           \n"\
                  "    `user_id` = %1              \n"\
-                 "    AND `type` = 0              \n"\
-                 "    AND `period_from` < '%2'    \n"\
                  "ORDER BY                        \n"\
                  "    `id` DESC                   \n"\
                  "LIMIT 1;                        \n"
                  )
-                 .arg(i_id)\
-                 .arg(beforeDate.toUTC().toString("yyyy-MM-dd hh:mm:ss")));
+                 .arg(i_id));
     record.first();
     return record.value(0).toDouble();
 }
@@ -484,11 +497,6 @@ QByteArray SUserModel::photo()
 void SUserModel::setPhoto(const QByteArray photo)
 {
     i_valuesMap.insert("photo", photo);
-}
-
-int SUserModel::salaryRate()
-{
-    return m_salaryRate;
 }
 
 void SUserModel::setSalaryRate(const int salary_rate)

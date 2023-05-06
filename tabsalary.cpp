@@ -28,14 +28,14 @@ tabSalary::tabSalary(MainWindow *parent) :
     usersModelF->setFilterKeyColumn(0);
     ui->comboBoxEmployee->setModel(usersModelF);
     ui->comboBoxEmployee->setCurrentIndex(-1);
+    tabChanged(ui->tabWidget->currentIndex());
 
     ui->dateEditPeriod->setDate(QDate::currentDate());
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &tabSalary::tabChanged);
 
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
-    m_periodBegin.setDate(QDate(2022,8,01));
-    m_periodEnd.setDate(QDate(2022,9,1));
+    periodDateChanged(QDate(2022,8,01));
     loadButtonPressed();
 #endif
     updateWidgets();
@@ -80,10 +80,17 @@ QString tabSalary::periodEnd()
     return m_periodEnd.toUTC().toString("yyyy-MM-dd hh:mm:ss");
 }
 
+int tabSalary::employeeId()
+{
+    return m_userModel->id();
+}
+
 void tabSalary::updateModels()
 {
     m_modelUpdatedFlags = 0;
-    m_userModel->load(m_employeeId);
+    m_userModel->setSalaryRateStartDate(m_periodBegin.date());
+    m_userModel->load(usersModelF->databaseIDByRow(ui->comboBoxEmployee->currentIndex()));
+    setModelUpdatedFlag(SPageSalaryBase::UserModel);
     emit updateDaughterTabsModels();
 }
 
@@ -94,24 +101,16 @@ void tabSalary::modelsUpdated()
 
 void tabSalary::loadButtonPressed()
 {
-    if(ui->comboBoxEmployee->currentIndex() == -1)
-    {
-        ui->comboBoxEmployee->setStyleSheet(commonComboBoxStyleSheetRed);
+    if(checkInput())
         return;
-    }
-
-    ui->comboBoxEmployee->setStyleSheet(commonComboBoxStyleSheet);
-
-    m_employeeId = usersModelF->databaseIDByRow(ui->comboBoxEmployee->currentIndex());
-
+    emit setFillMonthChargeOnUpdate(1);
     updateModels();
 }
 
 void tabSalary::periodDateChanged(const QDate date)
 {
-    m_showSubsistanceGroup = 1;
-    if(date.month() != QDate::currentDate().month())
-        m_showSubsistanceGroup = 0;
+    emit showSubsistanceGroup(date.month() == QDate::currentDate().month());
+
     if(comSettings->value("classic_salary").toBool())
     {
         m_periodBegin.setDate(date.addDays(-date.day() + 1));
@@ -153,4 +152,19 @@ void tabSalary::setModelUpdatedFlag(const int pos)
         modelsUpdated();
         emit updateDaughterTabsWidgets();
     }
+}
+
+/* Проверка данных перед загрузкой сведений о заработках сотрудника
+ * Возвращает 1 в случае ошибки
+*/
+bool tabSalary::checkInput()
+{
+    if(ui->comboBoxEmployee->currentIndex() == -1)
+    {
+        ui->comboBoxEmployee->setStyleSheet(commonComboBoxStyleSheetRed);
+        return 1;
+    }
+    ui->comboBoxEmployee->setStyleSheet(commonComboBoxStyleSheet);
+
+    return 0;
 }

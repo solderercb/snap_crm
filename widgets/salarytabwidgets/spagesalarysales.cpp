@@ -89,7 +89,7 @@ void SPageSalarySales::updateModels()
                                    )\
                                    .arg(parentTab->periodBegin())\
                                    .arg(parentTab->periodEnd())\
-                                   .arg(parentTab->m_employeeId)\
+                                   .arg(parentTab->employeeId())\
                                  , QSqlDatabase::database("connMain"));
 
     ui->tableViewSales->refresh();

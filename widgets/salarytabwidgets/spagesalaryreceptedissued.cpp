@@ -34,7 +34,7 @@ void SPageSalaryReceptedIssued::updateModels()
                                     )                                                                                                            \
                                     .arg(parentTab->periodBegin())                                                                               \
                                     .arg(parentTab->periodEnd())                                                                                 \
-                                    .arg(parentTab->m_employeeId)                                                                                \
+                                    .arg(parentTab->employeeId())                                                                                \
                                     .arg(ui->checkBoxShowPayed->isChecked())                                                                     \
                                     , QSqlDatabase::database("connMain"));
     ui->tableViewRecepted->refresh();
@@ -58,7 +58,7 @@ void SPageSalaryReceptedIssued::updateModels()
                                   )                                                                                                             \
                                   .arg(parentTab->periodBegin())                                                                                \
                                   .arg(parentTab->periodEnd())                                                                                  \
-                                  .arg(parentTab->m_employeeId)                                                                                 \
+                                  .arg(parentTab->employeeId())                                                                                 \
                                   .arg(ui->checkBoxShowPayed->isChecked())                                                                      \
                                   , QSqlDatabase::database("connMain"));
     ui->tableViewIssued->refresh();

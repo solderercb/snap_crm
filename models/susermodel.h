@@ -210,8 +210,9 @@ public:
     void setRowHeight(const int);//rowheight
     QString animation();
     void setAnimation(const QString);//animation
-    double salaryRate(QDate startFrom);
+    void loadSalaryRate();
     void setSalaryRate(double rate);
+    void setSalaryRateStartDate(const QDate date);
     double balance(const QDateTime &beforeDate);
 private:
     int m_sipId;
@@ -303,6 +304,7 @@ private:
     int m_fontSize;
     int m_rowHeight;
     QString m_animation;
+    QDate m_salaryRateStartDate;
 };
 
 #endif // SUSERMODEL_H

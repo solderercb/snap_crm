@@ -32,6 +32,8 @@ class tabSalary : public tabCommon
 signals:
     void updateDaughterTabsModels();
     void updateDaughterTabsWidgets();
+    void showSubsistanceGroup(bool);
+    void setFillMonthChargeOnUpdate(bool);
 public:
     explicit tabSalary(MainWindow *parent = nullptr);
     static tabSalary* getInstance(MainWindow *parent = nullptr);
@@ -39,6 +41,7 @@ public:
     QString tabTitle() override;
     QString periodBegin();
     QString periodEnd();
+    int employeeId();
 private:
     Ui::tabSalary *ui;
     static tabSalary* p_instance;
@@ -48,7 +51,6 @@ private:
     QDateTime m_periodEnd;
     bool m_showSubsistanceGroup = 1;
     bool m_showSalaryGroup = 1;
-    int m_employeeId = 0;
     STableSalaryRepairsModel *m_repairs = nullptr;
     STableSalaryRepairWorksModel *m_repairWorks = nullptr;
     STableSalaryRepairPartsModel *m_repairParts = nullptr;
@@ -68,6 +70,7 @@ private:
     void modelsUpdated();
     void updateWidgets();
     void setModelUpdatedFlag(const int pos);
+    bool checkInput();
 public slots:
     void loadButtonPressed();
     void periodDateChanged(const QDate date);

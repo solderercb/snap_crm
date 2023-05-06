@@ -7,7 +7,8 @@ SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->textEditDisclaimer->setVisible(ui->toolButtonDisclaimer->isChecked());
-    connect(parentTab->m_userModel, &SUserModel::sigModelReset, this, &SPageSalarySummary::userModelReset);
+    connect(parentTab, &tabSalary::showSubsistanceGroup, this, &SPageSalarySummary::setGroupBoxSubsistanceVisible);
+    connect(parentTab, &tabSalary::setFillMonthChargeOnUpdate, this, &SPageSalarySummary::setFillMonthChargeOnUpdate);
     ui->toolButtonApplySummaryMonthCharge->resize(ui->doubleSpinBoxSummaryMonthCharge->height(), ui->doubleSpinBoxSummaryMonthCharge->height());
     ui->dateEditSubsistenceDate->setDate(QDate::currentDate());
     ui->dateEditSalaryDate->setDate(QDate::currentDate());
@@ -31,19 +32,24 @@ SPageSalarySummary::~SPageSalarySummary()
     delete ui;
 }
 
-void SPageSalarySummary::updateModels()
+void SPageSalarySummary::setFillMonthChargeOnUpdate(const bool state)
 {
-    updateWidgets();
+    m_fillMonthChargeOnUpdate = state;
 }
 
-void SPageSalarySummary::userModelReset()
+void SPageSalarySummary::setGroupBoxSubsistanceVisible(bool visible)
 {
-    m_monthCharge = parentTab->m_userModel->salaryRate(parentTab->m_periodBegin.date());
-    parentTab->setModelUpdatedFlag(UserModel);
+    ui->groupBoxSubsistence->setVisible(visible);
+}
+
+void SPageSalarySummary::updateModels()
+{
 }
 
 void SPageSalarySummary::updateWidgets()
 {
+    double monthRate = parentTab->m_userModel->salaryRate();
+    double monthCharge = 0;
     double earningWorksAndParts = parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7);   // в АСЦ в поле "Заработок с ремонтов" только сумма за работы; сумма за детали в ремонтах прибавляется к сумме за проданные и отображается в поле "Заработок с продаж"
     double earningReceptedIssued = parentTab->m_recepted->total() + parentTab->m_issued->total();
     double earningSales = parentTab->m_sales->total(5);
@@ -53,11 +59,16 @@ void SPageSalarySummary::updateWidgets()
     double paymentsSubsistanceSumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Subsistance);
     double paymentsSalarySumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Salary);
     double employeeBalance = parentTab->m_userModel->balance(parentTab->m_periodBegin);
-    ui->groupBoxSubsistence->setVisible(parentTab->m_showSubsistanceGroup);
+    if(m_fillMonthChargeOnUpdate)
+    {
+        monthCharge = monthRate;
+        m_fillMonthChargeOnUpdate = 0;
+    }
+
     ui->doubleSpinBoxSummaryEarningsRepairs->setValue(earningWorksAndParts);
     earning += earningWorksAndParts;
-    ui->doubleSpinBoxSummaryMonthRate->setValue(parentTab->m_userModel->salaryRate(parentTab->m_periodBegin.date()));
-    ui->doubleSpinBoxSummaryMonthCharge->setValue(m_monthCharge);
+    ui->doubleSpinBoxSummaryMonthRate->setValue(monthRate);
+    ui->doubleSpinBoxSummaryMonthCharge->setValue(monthCharge);
     ui->doubleSpinBoxSummaryEarningsSales->setValue(earningSales);
     ui->doubleSpinBoxSummaryEarningsReceiptIssue->setValue(earningReceptedIssued);
     ui->doubleSpinBoxSummaryItemsCost->setValue(parentTab->m_items->totalUnusedItemsCost());
@@ -73,17 +84,23 @@ void SPageSalarySummary::updateWidgets()
         ui->doubleSpinBoxExtraChargesOff->setStyleSheet("");
     earning += earningSales;
     earning += earningReceptedIssued;
-    earning += m_monthCharge;
+    earning += monthCharge;
     earning += extraCharges + extraChargesOff;
     ui->doubleSpinBoxEarning->setValue(earning);
     ui->doubleSpinBoxSubsistence->setValue(paymentsSubsistanceSumm);
     ui->doubleSpinBoxPayed->setValue(paymentsSalarySumm);
     ui->doubleSpinBoxBalance->setValue(employeeBalance);
     ui->doubleSpinBoxSummaryAmountToPay->setValue(employeeBalance + earning - paymentsSubsistanceSumm - paymentsSalarySumm);
+    ui->doubleSpinBoxSalarySumm->setValue(employeeBalance + earning - paymentsSubsistanceSumm - paymentsSalarySumm);
 }
 
+/*  Кнопка справа от поля "По ставке начислить" должна выполнять те же действия, что и кнопка "Загрузить" на нижней панели,
+ *  кроме автозаполнения поля (поведение аналогично АСЦ).
+*/
 void SPageSalarySummary::setMonthCharge()
 {
-    m_monthCharge = ui->doubleSpinBoxSummaryMonthCharge->value();
+    if(parentTab->checkInput())
+        return;
+    parentTab->updateModels();
     updateWidgets();
 }

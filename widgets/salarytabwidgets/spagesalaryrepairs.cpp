@@ -149,7 +149,7 @@ void SPageSalaryRepairs::updateModels()
                                    .arg(parentTab->periodBegin())\
                                    .arg(parentTab->periodEnd())\
                                    .arg((ui->checkBoxIncludeNotIssued->isChecked())?"8,12,16,6,7":"8,12,16")\
-                                   .arg(parentTab->m_employeeId)\
+                                   .arg(parentTab->employeeId())\
                                    .arg(ui->checkBoxShowPayed->isChecked())\
                                    , QSqlDatabase::database("connMain"));
 

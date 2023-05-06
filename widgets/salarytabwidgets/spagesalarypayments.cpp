@@ -39,7 +39,7 @@ void SPageSalaryPayments::updateModels()
                                         )                                                       \
                                         .arg(parentTab->periodBegin())                          \
                                         .arg(parentTab->m_periodEnd.addSecs(-1).toString("yyyy-MM-dd hh:mm:ss"))    \
-                                        .arg(parentTab->m_employeeId)
+                                        .arg(parentTab->employeeId())
                                     , QSqlDatabase::database("connMain"));
 
     ui->tableViewPayments->refresh();
