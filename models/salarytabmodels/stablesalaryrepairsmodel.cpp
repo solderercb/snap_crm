@@ -55,9 +55,8 @@ QVariant STableSalaryRepairsModel::data(const QModelIndex &item, int role) const
             case 6:
             case 7: return dataLocalizedFromDouble(item);
             case 8: return timestampLocal(item);
+            default: ;
         }
-
-        return STableBaseModel::data(item, role);
     }
     else if(role == Qt::BackgroundColorRole) // ранее оплаченные сотруднику ремонты выделены зелёным
     {

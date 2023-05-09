@@ -33,6 +33,9 @@ tabSalary::tabSalary(MainWindow *parent) :
     ui->dateEditPeriod->setDate(QDate::currentDate());
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &tabSalary::tabChanged);
 
+    connect(ui->buttonAddExtraCharge, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::addNewRow);
+    connect(ui->buttonSaveExtraChargesList, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::saveTable);
+
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
     periodDateChanged(QDate(2022,8,01));
@@ -85,18 +88,39 @@ int tabSalary::employeeId()
     return m_userModel->id();
 }
 
+bool tabSalary::tabCloseRequest()
+{
+    if(m_extraCharges->isDirty())
+    {
+        auto result = QMessageBox::question(this, tr("Данные не сохранены"), tr("Список дополнительных начислений и списаний не сохранён!\nСохранить перед закрытием?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
+        if (result == QMessageBox::Cancel)
+        {
+            return 0;
+        }
+        else if (result == QMessageBox::No)
+        {
+            return 1;
+        }
+        else
+        {
+            ui->buttonSaveExtraChargesList->clicked();
+        }
+    }
+    return 1;
+}
+
 void tabSalary::updateModels()
 {
     m_modelUpdatedFlags = 0;
     m_userModel->setSalaryRateStartDate(m_periodBegin.date());
     m_userModel->load(usersModelF->databaseIDByRow(ui->comboBoxEmployee->currentIndex()));
+    m_extraCharges->setEmployeeId(m_userModel->id());
     setModelUpdatedFlag(SPageSalaryBase::UserModel);
     emit updateDaughterTabsModels();
 }
 
 void tabSalary::modelsUpdated()
 {
-    qDebug().nospace() << "[" << this << "] modelsUpdated()";
 }
 
 void tabSalary::loadButtonPressed()
@@ -127,13 +151,20 @@ void tabSalary::periodDateChanged(const QDate date)
 void tabSalary::tabChanged(const int index)
 {
     bool state = index==2;
-    ui->buttonAddExtraCharge->setVisible(state);
-    ui->buttonSaveExtraChargesList->setVisible(state);
+    setExtraChargesButtonsVisible(state);
+}
+
+void tabSalary::setExtraChargesButtonsVisible(bool state)
+{
+    bool stateForPeriod = m_periodBegin.date().month() == QDate::currentDate().month();
+    ui->buttonAddExtraCharge->setVisible(state && stateForPeriod);
+    ui->buttonSaveExtraChargesList->setVisible(state && stateForPeriod);
 }
 
 void tabSalary::updateWidgets()
 {
     ui->labelPeriod->setText(m_periodBegin.toString("dd.MM.yyyy") + " − " + m_periodEnd.addDays(-1).toString("dd.MM.yyyy"));
+    setExtraChargesButtonsVisible();
 }
 
 void tabSalary::setModelUpdatedFlag(const int pos)

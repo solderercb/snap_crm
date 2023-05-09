@@ -14,7 +14,7 @@ QVariant STableSalaryPaymentsModel::data(const QModelIndex &item, int role) cons
         {
             case 1: return timestampLocal(item);
             case 2: return dataLocalizedFromDouble(item);
-            default: return STableBaseModel::data(item, role);
+            default: ;
         }
     }
     return STableBaseModel::data(item, role);

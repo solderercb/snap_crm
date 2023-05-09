@@ -47,6 +47,7 @@ SOURCES += \
     global.cpp \
     loginwindow.cpp \
     mainwindow.cpp \
+    models/salarytabmodels/sadditionalpaymentmodel.cpp \
     models/salarytabmodels/ssalarymodel.cpp \
     models/salarytabmodels/stablesalaryextramodel.cpp \
     models/salarytabmodels/stablesalaryitemsmodel.cpp \
@@ -57,6 +58,8 @@ SOURCES += \
     models/salarytabmodels/stablesalaryreceptedissued.cpp \
     models/salarytabmodels/stablesalarysalepartsmodel.cpp \
     models/salarytabmodels/stablesalarysalesmodel.cpp \
+    models/seditablebasemodel.cpp \
+    models/stablemodelscommonmethods.cpp \
     models/stablerepairsmodel.cpp \
     models/repairtablefiltermenu.cpp \
     models/stablebasemodel.cpp \
@@ -171,6 +174,7 @@ HEADERS  += \
     global.h \
     loginwindow.h \
     mainwindow.h \
+    models/salarytabmodels/sadditionalpaymentmodel.h \
     models/salarytabmodels/ssalarymodel.h \
     models/salarytabmodels/stablesalaryextramodel.h \
     models/salarytabmodels/stablesalaryitemsmodel.h \
@@ -181,6 +185,8 @@ HEADERS  += \
     models/salarytabmodels/stablesalaryrepairsmodel.h \
     models/salarytabmodels/stablesalarysalepartsmodel.h \
     models/salarytabmodels/stablesalarysalesmodel.h \
+    models/seditablebasemodel.h \
+    models/stablemodelscommonmethods.h \
     models/stablerepairsmodel.h \
     models/repairtablefiltermenu.h \
     models/stablebasemodel.h \

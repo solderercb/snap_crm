@@ -16,8 +16,8 @@ QVariant STableSalarySalePartsModel::data(const QModelIndex &item, int role) con
             case 4:
             case 7:
             case 8: return dataLocalizedFromDouble(item);
-            case 6: return warrantyTermsModel->getDisplayRole(STableBaseModel::data(item).toInt(), 1);
-            default: return STableBaseModel::data(item);
+            case 6: return warrantyFromId(item);
+            default: ;
         }
     }
     return STableBaseModel::data(item, role);

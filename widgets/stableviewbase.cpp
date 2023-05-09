@@ -668,6 +668,8 @@ void STableViewBase::refresh()
 
     QString query = m_query;
 
+    m_model->STableModelsCommonMethods::clear();
+
     QRegularExpression re("( +\n)|((;?) +$)");  // удаление пробелов-заполнителей в конце строк, а также точки с запятой в конце запроса (при наличии ; не будет работать сортировка)
     query.replace(re, "\n");
 

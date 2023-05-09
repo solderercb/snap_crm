@@ -9,6 +9,7 @@ SPageSalaryExtra::SPageSalaryExtra(QWidget *parent) :
 
     ui->tableViewExtraChargesSummary->setGridLayout(ui->tableViewExtraCharges->gridLayout());
     connect(ui->tableViewExtraCharges, &STableViewSalaryExtra::signalColumnResized, this, &SPageSalaryExtra::repairsTableColumnResized);
+    connect(parentTab->m_extraCharges, &STableSalaryExtraModel::repopulate, this, &SPageSalaryExtra::updateModels);
 
     ui->tableViewExtraCharges->setModel(parentTab->m_extraCharges);
 }

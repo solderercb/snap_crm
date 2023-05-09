@@ -1,4 +1,5 @@
 #include "stableviewsalaryextra.h"
+#include "models/salarytabmodels/stablesalaryextramodel.h"
 
 STableViewSalaryExtra::STableViewSalaryExtra(QWidget *parent)
 {
@@ -16,6 +17,11 @@ STableViewSalaryExtra::~STableViewSalaryExtra()
 XtraSerializer *STableViewSalaryExtra::gridLayout()
 {
     return i_gridLayout;
+}
+
+void STableViewSalaryExtra::setModel(QAbstractItemModel *model)
+{
+    STableViewBase::setModel(model);
 }
 
 void STableViewSalaryExtra::columnResized(int column, int oldWidth, int newWidth)

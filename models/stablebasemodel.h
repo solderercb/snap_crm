@@ -4,23 +4,18 @@
 #define STABLEBASEMODEL_H
 
 #include <QSqlQueryModel>
+#include "stablemodelscommonmethods.h"
 #include <QObject>
 #include <QDebug>
 
-class STableBaseModel : public QSqlQueryModel
+class STableBaseModel : public QSqlQueryModel, public STableModelsCommonMethods
 {
     Q_OBJECT
 public:
     explicit STableBaseModel(QObject *parent = nullptr);
-    int field(const QString &field);
-    QDateTime timestampUtc(const QModelIndex &index) const;
-    QDateTime timestampLocal(const QModelIndex &index) const;
-    double total(int column, int sign = 0);
-    QString dataLocalizedFromDouble(const QModelIndex &item) const;
-protected:
-    QMap<QString, int> i_fields;
+    QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
 private slots:
-    void cashFieldsNames();
+    void slotModelReset();
 };
 
 #endif // STABLEBASEMODEL_H

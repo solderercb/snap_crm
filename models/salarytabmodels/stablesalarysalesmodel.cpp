@@ -15,6 +15,7 @@ QVariant STableSalarySalesModel::data(const QModelIndex &item, int role) const
             case 3:
             case 4:
             case 5: return dataLocalizedFromDouble(item);
+            default: ;
         }
     }
 

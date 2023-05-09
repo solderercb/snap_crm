@@ -13,6 +13,7 @@ public:
     explicit STableViewSalaryExtra(QWidget *parent = nullptr);
     ~STableViewSalaryExtra();
     XtraSerializer *gridLayout();
+    void setModel(QAbstractItemModel *model);
 protected slots:
     void columnResized(int column, int oldWidth, int newWidth);
 };

@@ -42,6 +42,7 @@ public:
     QString periodBegin();
     QString periodEnd();
     int employeeId();
+    bool tabCloseRequest() override;
 private:
     Ui::tabSalary *ui;
     static tabSalary* p_instance;
@@ -75,6 +76,7 @@ public slots:
     void loadButtonPressed();
     void periodDateChanged(const QDate date);
     void tabChanged(const int index);
+    void setExtraChargesButtonsVisible(bool state = true);
 };
 
 #endif // TABSALARY_H
