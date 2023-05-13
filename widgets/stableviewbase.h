@@ -107,7 +107,7 @@ private:
 public slots:
     void reset() override;
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс
-    void refresh();
+    virtual void refresh();
 protected slots:
     virtual void columnResized(int column, int oldWidth, int newWidth);
 #if QT_VERSION >= 0x060000

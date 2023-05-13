@@ -9,7 +9,8 @@ SLogRecordModel::SLogRecordModel(QObject *parent) :
 
 bool SLogRecordModel::commit()
 {
-    i_valuesMap.insert("user", userDbData->value("id"));
+    if(!i_valuesMap.contains("user"))
+        i_valuesMap.insert("user", userDbData->value("id"));
     i_valuesMap.insert("office", userDbData->value("current_office"));
     i_valuesMap.insert("values", QVariant());
     i_valuesMap.insert("values_after", QVariant());
@@ -72,6 +73,11 @@ void SLogRecordModel::setValueBefore(const QString &text)
 void SLogRecordModel::setValueAfter(const QString &text)
 {
     i_valuesMap.insert("values_after", text);
+}
+
+void SLogRecordModel::setUser(const int id)
+{
+    i_valuesMap.insert("user", id);
 }
 
 void SLogRecordModel::clear()

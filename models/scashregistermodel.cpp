@@ -23,7 +23,7 @@ int SCashRegisterModel::id()
     return i_id;
 }
 
-void SCashRegisterModel::setId(int id)
+void SCashRegisterModel::setId(const int id)
 {
     i_id = id;
 }
@@ -49,7 +49,7 @@ void SCashRegisterModel::load()
     m_reason = order->record(0).value("notes").toString();
     m_repair = order->record(0).value("repair").toInt();
     m_document = order->record(0).value("document").toInt();
-    m_img = order->record(0).value("img").toByteArray();
+    m_img = order->record(0).value("img").toInt();
     m_systemId = order->record(0).value("payment_system").toInt();
     m_cardFee = order->record(0).value("card_fee").toDouble();
     m_isBackdate = order->record(0).value("is_backdate").toBool();
@@ -65,6 +65,33 @@ void SCashRegisterModel::load(int id)
 {
     setId(id);
     load();
+}
+
+// демо-данные (например, для отчетов)
+void SCashRegisterModel::initDemo()
+{
+    i_id = 123456;
+    i_createdUtc = QDateTime::currentDateTimeUtc();
+    m_type = RecptSimple;
+    m_amount = 1024;
+    m_amount_str = sysLocale.toCurrencyString(m_amount);
+    m_amount_words = amountToWords(m_amount);
+    m_invoice = 0;
+    m_client = 0;
+    m_toUser = usersModel->index(0, 1).data().toInt();
+    m_user = usersModel->index(0, 1).data().toInt();
+    m_company = 1;
+    m_office = 1;
+    m_reason = tr("Поступление денег в размере %1").arg(m_amount_str);
+    m_repair = 0;
+    m_document = 0;
+    m_img = 0;
+    m_systemId = paymentSystemsModel->index(0, 1).data().toInt();
+    m_cardFee = 0;
+    m_isBackdate = 0;
+    m_cardInfo = 0;
+    m_fdn = 0;
+    m_paymentItemAttribute = 0;
 }
 
 /*  Создание новой записи о кассовой операции в БД
@@ -135,6 +162,16 @@ void SCashRegisterModel::fieldsVerifyFormatter()
         fields_verify.append("IFNULL(`" + i.key() + "`,'NULL') = IFNULL(" + fieldValueHandler(i.value()) + ",'NULL')");
     }
 
+}
+
+QString SCashRegisterModel::customerEmail()
+{
+    return m_customerEmail;
+}
+
+void SCashRegisterModel::setCustomerEmail(const QString &email)
+{
+    i_valuesMap.insert("customer_email", email);
 }
 
 int SCashRegisterModel::client()
@@ -366,14 +403,125 @@ double SCashRegisterModel::amountAbs()
 
 void SCashRegisterModel::setAmount(double amount)
 {
-    double l_amount = amount;
-    if(l_amount < 0)
-        l_amount = -l_amount;
+    double l_amount = 0;
 
     m_amount = amount;
+    l_amount = amountAbs();
     m_amount_str = sysLocale.toCurrencyString(l_amount);
     m_amount_words = amountToWords(l_amount);
     i_valuesMap.insert("summa", amount);
-    i_valuesMap.insert("summa_str", m_amount_words);
+    setAmountStr(m_amount_words);
+}
+
+QString SCashRegisterModel::amountStr()
+{
+    return m_amount_str;
+}
+
+void SCashRegisterModel::setAmountStr(const QString amount)
+{
+    i_valuesMap.insert("summa_str", amount);
+}
+
+/*  Id сотрудника, которому выданы деньги (зарплата)
+*/
+int SCashRegisterModel::employee()
+{
+    return m_toUser;
+}
+
+void SCashRegisterModel::setEmployee(const int id)
+{
+    m_toUser = id;
+    i_logRecord->setType(SLogRecordModel::User);
+    i_logRecord->setUser(id);
+    i_valuesMap.insert("to_user", id);
+}
+
+/*  Id сотрудника, который выдал деньги (зарплата)
+*/
+int SCashRegisterModel::user()
+{
+    return m_user;
+}
+
+void SCashRegisterModel::setUser(const int user)
+{
+    i_valuesMap.insert("user", user);
+}
+
+int SCashRegisterModel::company()
+{
+    return m_company;
+}
+
+void SCashRegisterModel::setCompany(const int company)
+{
+    i_valuesMap.insert("company", company);
+}
+
+int SCashRegisterModel::office()
+{
+    return m_office;
+}
+
+int SCashRegisterModel::img()
+{
+    return m_img;
+}
+
+void SCashRegisterModel::setImg(const int img)
+{
+    i_valuesMap.insert("img", img);
+}
+
+double SCashRegisterModel::cardFee()
+{
+    return m_cardFee;
+}
+
+void SCashRegisterModel::setCardFee(const double fee)
+{
+    i_valuesMap.insert("card_fee", fee);
+}
+
+bool SCashRegisterModel::isBackdate()
+{
+    return m_isBackdate;
+}
+
+void SCashRegisterModel::setIsBackdate(const bool status)
+{
+    i_valuesMap.insert("is_backdate", status);
+}
+
+int SCashRegisterModel::cardInfo()
+{
+    return m_cardInfo;
+}
+
+void SCashRegisterModel::setCardInfo(const int info)
+{
+    i_valuesMap.insert("card_info", info);
+}
+
+int SCashRegisterModel::fdn()
+{
+    return m_fdn;
+}
+
+void SCashRegisterModel::setFdn(const int fdn)
+{
+    i_valuesMap.insert("fdn", fdn);
+}
+
+int SCashRegisterModel::paymentItemSign()
+{
+    return m_paymentItemAttribute;
+}
+
+void SCashRegisterModel::setPaymentItemSign(const int attr)
+{
+    i_valuesMap.insert("payment_item_sign", attr);
 }
 

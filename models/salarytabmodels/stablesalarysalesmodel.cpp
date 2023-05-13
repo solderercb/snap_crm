@@ -5,6 +5,9 @@ STableSalarySalesModel::STableSalarySalesModel(QObject *parent) : STableBaseMode
 
 }
 
+/* Форматирование данных модели
+ * Смотри описание к методу STableSalaryRepairsModel::data(QModelIndex&, int)
+*/
 QVariant STableSalarySalesModel::data(const QModelIndex &item, int role) const
 {
     if(role == Qt::DisplayRole)

@@ -12,6 +12,8 @@ public:
     double total(int column, bool excludePayed = ExcludePayed);
     double notIssuedTotal(int column);
     QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
+    int id(const int row);
+    int payedSumm(const int row);
 };
 
 #endif // STABLESALARYREPAIRSMODEL_H

@@ -19,6 +19,9 @@ public:
     void clear();
     QString userFromId(const QModelIndex &item) const;
     QString warrantyFromId(const QModelIndex &item) const;
+    QVariant data(const int row, const int column, int role = Qt::DisplayRole) const;
+    QVariant unformattedData(const QModelIndex &item, int role = Qt::DisplayRole) const;
+    QVariant unformattedData(const int row, const int column, int role = Qt::DisplayRole) const;
 private:
 protected:
     QMap<QString, int> i_fields;

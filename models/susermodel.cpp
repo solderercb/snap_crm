@@ -152,7 +152,7 @@ void SUserModel::setSalaryRate(double rate)
 
 }
 
-double SUserModel::balance(const QDateTime &beforeDate)
+double SUserModel::balance()
 {
     QSqlQuery record(QSqlDatabase::database("connMain"));
     record.exec(QString(

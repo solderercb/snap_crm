@@ -6,6 +6,9 @@ STableSalaryRepairPartsModel::STableSalaryRepairPartsModel(QObject *parent) : ST
 
 }
 
+/* Форматирование данных модели
+ * Смотри описание к методу STableSalaryRepairsModel::data(QModelIndex&, int)
+*/
 QVariant STableSalaryRepairPartsModel::data(const QModelIndex &item, int role) const
 {
     if(role == Qt::DisplayRole)

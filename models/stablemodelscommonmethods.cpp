@@ -66,6 +66,21 @@ QString STableModelsCommonMethods::warrantyFromId(const QModelIndex &item) const
     return warrantyTermsModel->getDisplayRole(derivedModel->data(item, Qt::DisplayRole | 0x0100).toInt(), 1);
 }
 
+QVariant STableModelsCommonMethods::data(const int row, const int column, int role) const
+{
+    return derivedModel->data(derivedModel->index(row, column), role);
+}
+
+QVariant STableModelsCommonMethods::unformattedData(const QModelIndex &item, int role) const
+{
+    return derivedModel->data(item, role | 0x0100);
+}
+
+QVariant STableModelsCommonMethods::unformattedData(const int row, const int column, int role) const
+{
+    return derivedModel->data(derivedModel->index(row, column), role | 0x0100);
+}
+
 void STableModelsCommonMethods::cashFieldsNames()
 {
     i_fields.clear();

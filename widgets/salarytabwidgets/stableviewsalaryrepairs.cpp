@@ -1,4 +1,5 @@
 #include "stableviewsalaryrepairs.h"
+#include "models/salarytabmodels/stablesalaryrepairsmodel.h"
 
 STableViewSalaryRepairs::STableViewSalaryRepairs(QWidget *parent) : STableViewBase(parent)
 {
@@ -18,8 +19,28 @@ XtraSerializer* STableViewSalaryRepairs::gridLayout()
     return i_gridLayout;
 }
 
+void STableViewSalaryRepairs::showRowsEarlyPayed(bool state)
+{
+    for(int i = 0; i < m_model->rowCount(); i++)
+    {
+        if(state)
+            showRow(i);
+        else
+        {
+            if(static_cast<STableSalaryRepairsModel*>(m_model)->payedSumm(i))
+                hideRow(i);
+        }
+    }
+}
+
 void STableViewSalaryRepairs::columnResized(int column, int oldWidth, int newWidth)
 {
     STableViewBase::columnResized(column, oldWidth, newWidth);
     emit signalColumnResized(column, newWidth);
+}
+
+void STableViewSalaryRepairs::refresh(const bool showPayed)
+{
+    STableViewBase::refresh();
+    showRowsEarlyPayed(showPayed);
 }

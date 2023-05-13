@@ -213,7 +213,7 @@ public:
     void loadSalaryRate();
     void setSalaryRate(double rate);
     void setSalaryRateStartDate(const QDate date);
-    double balance(const QDateTime &beforeDate);
+    double balance();
 private:
     int m_sipId;
     QString m_username;

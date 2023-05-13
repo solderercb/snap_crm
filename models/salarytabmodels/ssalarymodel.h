@@ -8,12 +8,13 @@ class SSalaryModel : public SDatabaseRecord
 {
     Q_OBJECT
 public:
+    enum Type{Salary = 0, Subsistence = 1};
     explicit SSalaryModel(QObject *parent = nullptr);
     void load(const int id);
     void load(const QSqlRecord &record);
     int id();
-    int userId();
-    void setUserId(const int);
+    int employee();
+    void setEmployee(const int);
     double summ();
     void setSumm(const double);
     double balance();
@@ -23,22 +24,23 @@ public:
     QString notes();
     void setNotes(const QString&);
     QDate periodFrom();
-    void setPeriodFrom(const QDate);
+    void setPeriodFrom(const QDateTime);
     QDate periodTo();
-    void setPeriodTo(const QDate);
-    int fromUser();
-    void setFromUser(const int);
+    void setPeriodTo(const QDateTime);
+    int user();
+    void setUser(const int);
     bool type();
     void setType(const bool);
+    bool commit();
 private:
-    int m_userId;
+    int m_employee;
     double m_summ;
     double m_balance;
     QDateTime m_paymentDate;
     QString m_notes;
     QDate m_periodFrom;
     QDate m_periodTo;
-    int m_fromUser;
+    int m_user;
     bool m_type;
 };
 

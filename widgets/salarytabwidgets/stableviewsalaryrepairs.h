@@ -13,8 +13,11 @@ public:
     explicit STableViewSalaryRepairs(QWidget *parent = nullptr);
     ~STableViewSalaryRepairs();
     XtraSerializer *gridLayout();
+    void showRowsEarlyPayed(bool state = false);
 protected slots:
-    void columnResized(int column, int oldWidth, int newWidth);
+    void columnResized(int column, int oldWidth, int newWidth) override;
+public slots:
+    void refresh(const bool showPayed = false);
 };
 
 class STableViewSalaryRepairsItemDelegates : public STableViewBaseItemDelegates

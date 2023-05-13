@@ -9,6 +9,9 @@ STableSalaryExtraModel::STableSalaryExtraModel(QObject *parent) : SEditableBaseM
     connect(this, &STableSalaryExtraModel::primeInsert, this, &STableSalaryExtraModel::slotPrimeInsert);
 }
 
+/* Форматирование данных модели
+ * Смотри описание к методу STableSalaryRepairsModel::data(QModelIndex&, int)
+*/
 QVariant STableSalaryExtraModel::data(const QModelIndex &item, int role) const
 {
     if(role == Qt::DisplayRole)
@@ -57,7 +60,6 @@ void STableSalaryExtraModel::saveTable()
     bool nErr = 1;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     m_queryLog = new SQueryLog();
-    QString reloadQuery = QSqlQueryModel::query().lastQuery();
 
     try
     {

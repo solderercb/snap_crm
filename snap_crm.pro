@@ -49,6 +49,7 @@ SOURCES += \
     mainwindow.cpp \
     models/salarytabmodels/sadditionalpaymentmodel.cpp \
     models/salarytabmodels/ssalarymodel.cpp \
+    models/salarytabmodels/ssalaryrepairsmodel.cpp \
     models/salarytabmodels/stablesalaryextramodel.cpp \
     models/salarytabmodels/stablesalaryitemsmodel.cpp \
     models/salarytabmodels/stablesalarypaymentsmodel.cpp \
@@ -176,6 +177,7 @@ HEADERS  += \
     mainwindow.h \
     models/salarytabmodels/sadditionalpaymentmodel.h \
     models/salarytabmodels/ssalarymodel.h \
+    models/salarytabmodels/ssalaryrepairsmodel.h \
     models/salarytabmodels/stablesalaryextramodel.h \
     models/salarytabmodels/stablesalaryitemsmodel.h \
     models/salarytabmodels/stablesalarypaymentsmodel.h \

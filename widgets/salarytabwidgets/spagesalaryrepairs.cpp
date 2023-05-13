@@ -1,5 +1,6 @@
 #include "spagesalaryrepairs.h"
 #include "ui_spagesalaryrepairs.h"
+#include "widgets/salarytabwidgets/stableviewsalaryrepairs.h"
 
 SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     SPageSalaryBase(parent),
@@ -20,6 +21,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     connect(ui->tableViewRepairs, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairsRowDoubleClicked);
     connect(ui->tableViewRepairParts, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairPartsRowDoubleClicked);
     connect(ui->tableViewRepairs->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SPageSalaryRepairs::tableRepairsRowSelected);
+    connect(ui->checkBoxShowPayed, &QCheckBox::toggled, ui->tableViewRepairs, &STableViewSalaryRepairs::showRowsEarlyPayed);
 }
 
 SPageSalaryRepairs::~SPageSalaryRepairs()
@@ -88,7 +90,7 @@ void SPageSalaryRepairs::updateModels()
     QStringList query_group;
     query_group << "`id`";    // default GROUP part of query
 
-    ui->tableViewRepairs->setQuery(QString(                                                                                                                                                                \
+    ui->tableViewRepairs->setQuery(QString(                                                                                                                                                                  \
                                    "SELECT                                                                                                                                                                \n"\
                                    "    `id`,                                                                                                                                                             \n"\
                                    "    `Title`,                                                                                                                                                          \n"\
@@ -100,9 +102,10 @@ void SPageSalaryRepairs::updateModels()
                                    "    SUM(`employee_salary_for_parts`) AS 'employee_salary_for_parts',                                                                                                  \n"\
                                    "    `out_date`,                                                                                                                                                       \n"\
                                    "    `state`,                                                                                                                                                          \n"\
-                                   "    `summ_repair`,                                                                                                                                                    \n"\
+                                   "    `summ`,                                                                                                                                                           \n"\
                                    "    `status_id`,                                                                                                                                                      \n"\
-                                   "    `filter1`                                                                                                                                                         \n"\
+                                   "    `filter1`,                                                                                                                                                        \n"\
+                                   "    `cartridge`                                                                                                                                                       \n"\
                                    "FROM (                                                                                                                                                                \n"\
                                    "    SELECT                                                                                                                                                            \n"\
                                    "        g1t1.*,                                                                                                                                                       \n"\
@@ -111,7 +114,7 @@ void SPageSalaryRepairs::updateModels()
                                    "        (g1t3.`price`*g1t3.`count`*g1t3.`pay_repair`/100) AS 'employee_salary_for_work',                                                                              \n"\
                                    "        IFNULL(SUM(g1t4.`price`*g1t4.`count`), 0) AS 'employee_parts',                                                                                                \n"\
                                    "        IF(g1t5.`pay_4_sale_in_repair`, IFNULL(SUM((g1t4.`price` - g1t6.`in_price`)*g1t4.`count`*IF(g1t1.quick_repair, g1t5.`pay_repair_q_sale`, g1t5.`pay_sale`)/100), 0), 0) AS 'employee_salary_for_parts',\n"\
-                                   "        g1t7.`summ_repair`,                                                                                                                                           \n"\
+                                   "        g1t7.`summ`,                                                                                                                                                  \n"\
                                    "        g1t2.`status_id`,                                                                                                                                             \n"\
                                    "        g1t2.`filter1`                                                                                                                                                \n"\
                                    "    FROM workshop AS g1t1                                                                                                                                             \n"\
@@ -135,12 +138,16 @@ void SPageSalaryRepairs::updateModels()
                                    "    LEFT JOIN store_items AS g1t6                                                                                                                                     \n"\
                                    "        ON g1t4.`item_id` = g1t6.`id`                                                                                                                                 \n"\
                                    "    LEFT JOIN salary_repairs AS g1t7                                                                                                                                  \n"\
-                                   "        ON g1t1.`id` = g1t7.`repair` AND g1t7.`user` = %4 AND g1t7.`summ_repair` IS NOT NULL                                                                          \n"\
+                                   "        ON g1t1.`id` = g1t7.`repair` AND g1t7.`user` = %4                                                                                                             \n"\
                                    "    WHERE                                                                                                                                                             \n"\
-                                   "        IF(%5, 1, g1t7.`id` IS NULL)                                                                                                                                  \n"\
-                                   "        AND g1t2.`filter1`  = 1                                                                                                                                       \n"\
-                                   "        AND `created_at` > '%1'                                                                                                                                       \n"\
-                                   "        AND `created_at` < '%2'                                                                                                                                       \n"\
+                                   "        g1t2.`filter1`  = 1                                                                                                                                           \n"\
+                                   "        AND ( (   g1t7.`id` IS NULL                                                                                                                                   \n"\
+                                   "                  AND `created_at` > '%1'                                                                                                                             \n"\
+                                   "                  AND `created_at` < '%2')                                                                                                                            \n"\
+                                   "              OR                                                                                                                                                      \n"\
+                                   "              (   g1t7.`id` IS NOT NULL                                                                                                                               \n"\
+                                   "                  AND g1t7.`accounting_date` > '%1'                                                                                                                   \n"\
+                                   "                  AND g1t7.`accounting_date` < '%2'))                                                                                                                 \n"\
                                    "        AND g1t1.`state` IN (%3)                                                                                                                                      \n"\
                                    "        AND g1t3.`user` = %4                                                                                                                                          \n"\
                                    "    GROUP BY g1t3.id                                                                                                                                                  \n"\
@@ -150,11 +157,10 @@ void SPageSalaryRepairs::updateModels()
                                    .arg(parentTab->periodEnd())\
                                    .arg((ui->checkBoxIncludeNotIssued->isChecked())?"8,12,16,6,7":"8,12,16")\
                                    .arg(parentTab->employeeId())\
-                                   .arg(ui->checkBoxShowPayed->isChecked())\
                                    , QSqlDatabase::database("connMain"));
 
     ui->tableViewRepairs->setGrouping(query_group);
-    ui->tableViewRepairs->refresh();
+    ui->tableViewRepairs->refresh(ui->checkBoxShowPayed->isChecked());
 
     parentTab->setModelUpdatedFlag(RepairsModel);
 }

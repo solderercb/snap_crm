@@ -30,6 +30,7 @@ public:
     void setPartRequestId(int);
     void setValueBefore(const QString &);
     void setValueAfter(const QString &);   // `logs`.`values_after`
+    void setUser(const int id);
     void clear();
 private:
 };

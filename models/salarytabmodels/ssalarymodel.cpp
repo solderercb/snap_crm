@@ -23,14 +23,14 @@ void SSalaryModel::load(const int id)
 
 void SSalaryModel::load(const QSqlRecord &record)
 {
-    m_userId = record.value("user_id").toInt();
+    m_employee = record.value("user_id").toInt();
     m_summ = record.value("summ").toDouble();
     m_balance = record.value("balance").toDouble();
     i_createdUtc = record.value("payment_date").toDateTime();
     m_notes = record.value("notes").toString();
     m_periodFrom = record.value("period_from").toDate();
     m_periodTo = record.value("period_to").toDate();
-    m_fromUser = record.value("from_user").toInt();
+    m_user = record.value("from_user").toInt();
     m_type = record.value("type").toBool();
 }
 
@@ -39,12 +39,12 @@ int SSalaryModel::id()
     return i_id;
 }
 
-int SSalaryModel::userId()
+int SSalaryModel::employee()
 {
-    return m_userId;
+    return m_employee;
 }
 
-void SSalaryModel::setUserId(const int user_id)
+void SSalaryModel::setEmployee(const int user_id)
 {
     i_valuesMap.insert("user_id", user_id);
 }
@@ -94,7 +94,7 @@ QDate SSalaryModel::periodFrom()
     return m_periodFrom;
 }
 
-void SSalaryModel::setPeriodFrom(const QDate period_from)
+void SSalaryModel::setPeriodFrom(const QDateTime period_from)
 {
     i_valuesMap.insert("period_from", period_from);
 }
@@ -104,17 +104,17 @@ QDate SSalaryModel::periodTo()
     return m_periodTo;
 }
 
-void SSalaryModel::setPeriodTo(const QDate period_to)
+void SSalaryModel::setPeriodTo(const QDateTime period_to)
 {
     i_valuesMap.insert("period_to", period_to);
 }
 
-int SSalaryModel::fromUser()
+int SSalaryModel::user()
 {
-    return m_fromUser;
+    return m_user;
 }
 
-void SSalaryModel::setFromUser(const int from_user)
+void SSalaryModel::setUser(const int from_user)
 {
     i_valuesMap.insert("from_user", from_user);
 }
@@ -127,5 +127,22 @@ bool SSalaryModel::type()
 void SSalaryModel::setType(const bool type)
 {
     i_valuesMap.insert("type", type);
+}
+
+bool SSalaryModel::commit()
+{
+    if(i_id)
+    {
+        update();
+    }
+    else
+    {
+        insert();
+    }
+
+    if(!i_nErr)
+        throw 1;
+
+    return i_nErr;
 }
 

@@ -17,3 +17,11 @@ CREATE TABLE `salary_repairs` (
 COMMENT='Список ремонтов, за которые была выплачена заработная плата'
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
+
+ALTER TABLE `salary_repairs`
+	ADD COLUMN `accounting_date` DATETIME NOT NULL COMMENT 'дата учета (соответствует одному из дней в выбранном периоде, например, первому)' AFTER `id`;
+
+ALTER TABLE `salary_repairs`
+	CHANGE COLUMN `summ_repair` `summ` DECIMAL(11,5) NULL DEFAULT NULL COMMENT 'сумма, выплаченная сотруднику за работы и детали' AFTER `user`,
+	DROP COLUMN `summ_recept`,
+	DROP COLUMN `summ_issue`;

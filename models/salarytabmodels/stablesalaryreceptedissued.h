@@ -11,7 +11,6 @@ public:
     enum IncludePayedInTotal {IncludePayed = 0, ExcludePayed = 1};
     explicit STableSalaryReceptedIssued(QObject *parent = nullptr);
     QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
-    double total(bool excludePayed = ExcludePayed);
 };
 
 #endif // STABLESALARYRECEPTEDISSUED_H
