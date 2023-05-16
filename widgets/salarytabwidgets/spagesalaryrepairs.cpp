@@ -7,6 +7,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     ui(new Ui::SPageSalaryRepairs)
 {
     ui->setupUi(this);
+    ui->checkBoxIncludeNotIssued->setChecked(comSettings->value("salary_include_not_issued_by_default").toBool());
 
     ui->tableViewRepairsSummary->setGridLayout(ui->tableViewRepairs->gridLayout());
     connect(ui->tableViewRepairs, &STableViewSalaryRepairs::signalColumnResized, this, &SPageSalaryRepairs::repairsTableColumnResized);

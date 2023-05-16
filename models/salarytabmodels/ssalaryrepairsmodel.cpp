@@ -51,6 +51,11 @@ void SSalaryRepairsModel::setSumm(const double summ)
     i_valuesMap.insert("summ", summ);
 }
 
+void SSalaryRepairsModel::setAccountingDate(const QDateTime date)
+{
+    i_valuesMap.insert("accounting_date", date);
+}
+
 bool SSalaryRepairsModel::commit()
 {
     if(i_id)

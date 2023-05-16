@@ -32,6 +32,7 @@ public:
     bool type();
     void setType(const bool);
     bool commit();
+    void setBalanceRecord(const int id);
 private:
     int m_employee;
     double m_summ;

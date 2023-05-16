@@ -56,6 +56,7 @@ double SSalaryModel::summ()
 
 void SSalaryModel::setSumm(const double summ)
 {
+    m_summ = summ;
     i_valuesMap.insert("summ", summ);
 }
 
@@ -126,6 +127,7 @@ bool SSalaryModel::type()
 
 void SSalaryModel::setType(const bool type)
 {
+    m_type = type;
     i_valuesMap.insert("type", type);
 }
 
@@ -144,5 +146,13 @@ bool SSalaryModel::commit()
         throw 1;
 
     return i_nErr;
+}
+
+void SSalaryModel::setBalanceRecord(const int id)
+{
+    if(!id)
+        return;
+
+    i_valuesMap.insert("balance_record", id);
 }
 

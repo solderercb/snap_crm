@@ -26,6 +26,10 @@ private:
     SSalaryRepairsModel *salaryRepairsModel = nullptr;
     SQueryLog *m_queryLog;
     SCashRegisterModel *cashRegister;
+    SClientModel *m_userClient = nullptr;
+    double m_earningSinceLastPay = 0;
+    void createUserClientCard();
+    void setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date = QDate::currentDate());
 public slots:
     void updateModels();
     void updateWidgets();
@@ -33,7 +37,6 @@ private slots:
     void setMonthCharge();
     void setGroupBoxSubsistanceVisible(bool visible);
     void setFillMonthChargeOnUpdate(const bool state);
-    void setDbRecordModelsData();
     void pay();
     void paySubsistence();
     void markRepairsPayed();

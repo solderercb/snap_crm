@@ -9,7 +9,8 @@ SUserModel::SUserModel(QObject *parent) : SComRecord(parent)
 
 SUserModel::~SUserModel()
 {
-
+    if(m_clientModel)
+        delete m_clientModel;
 }
 
 void SUserModel::load(const int id)
@@ -25,6 +26,9 @@ void SUserModel::load(const int id)
     i_id = id;
 
     m_sipId = record->value("sip_user_id").toInt();
+    m_clientUserId = record->value("client_user_id").toInt();
+    if(m_clientUserId)
+        m_clientModel = new SClientModel(m_clientUserId, this);
     m_username = record->value("username").toString();
     m_firstName = record->value("name").toString();
     m_lastName = record->value("surname").toString();
@@ -149,25 +153,30 @@ void SUserModel::loadSalaryRate()
 
 void SUserModel::setSalaryRate(double rate)
 {
-
+    i_valuesMap.insert("salary_rate", rate);
 }
 
 double SUserModel::balance()
 {
-    QSqlQuery record(QSqlDatabase::database("connMain"));
-    record.exec(QString(
-                 "SELECT                          \n"\
-                 "    `balance`                   \n"\
-                 "FROM `salary`                   \n"\
-                 "WHERE                           \n"\
-                 "    `user_id` = %1              \n"\
-                 "ORDER BY                        \n"\
-                 "    `id` DESC                   \n"\
-                 "LIMIT 1;                        \n"
-                 )
-                 .arg(i_id));
-    record.first();
-    return record.value(0).toDouble();
+    if(!m_clientModel)
+        return NAN;
+
+    return m_clientModel->balance();
+}
+
+int SUserModel::clientUserId()
+{
+    return m_clientUserId;
+}
+
+void SUserModel::setClientUserId(const int id)
+{
+    i_valuesMap.insert("client_user_id", id);
+}
+
+SClientModel *SUserModel::clientModel()
+{
+    return m_clientModel;
 }
 
 int SUserModel::id()

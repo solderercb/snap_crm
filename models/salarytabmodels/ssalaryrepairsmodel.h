@@ -18,6 +18,7 @@ public:
     void setUser(const int);
     double summ();
     void setSumm(const double);
+    void setAccountingDate(const QDateTime date);
     bool commit();
 private:
     int m_id;

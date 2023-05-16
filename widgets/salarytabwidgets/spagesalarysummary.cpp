@@ -34,28 +34,58 @@ SPageSalarySummary::~SPageSalarySummary()
     delete ui;
 }
 
+void SPageSalarySummary::createUserClientCard()
+{
+    m_userClient = new SClientModel(0, this);
+    SUserModel *user = parentTab->m_userModel;
+
+    m_userClient->setFirstName(user->name());
+    m_userClient->setLastName(user->surname());
+    m_userClient->setPatronymicName(user->patronymic());
+    m_userClient->appendLogText(tr("Быстрое создание клиента при выплате заработной платы"));
+    m_userClient->setEmployeeId(user->id());
+}
+
 void SPageSalarySummary::setFillMonthChargeOnUpdate(const bool state)
 {
     m_fillMonthChargeOnUpdate = state;
 }
 
-void SPageSalarySummary::setDbRecordModelsData()
+void SPageSalarySummary::setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date)
 {
+    int employee = parentTab->m_userModel->id();
+    int user = userDbData->value("id").toInt();
     QDateTime periodBegin = parentTab->m_periodBegin;
     QDateTime periodEnd = parentTab->m_periodEnd;
+    QDateTime created = QDateTime::currentDateTime();
 
+    created.setDate(date);  //  в случае проводки "задним числом" изменяем дату
     periodBegin.setTimeZone(QTimeZone::utc());  // в АСЦ период за который была сдалеана выплата не учитывает часовой пояс и считается с 00:00:00 до 23:59:59
     periodEnd.setTimeZone(QTimeZone::utc());
     periodEnd = periodEnd.addSecs(-1);
 
-    salaryModel->setPaymentDate(QDateTime::currentDateTime());
-    salaryModel->setEmployee(parentTab->m_userModel->id());
-    salaryModel->setUser(userDbData->value("id").toInt());
+    salaryModel->setType(type);
+    qDebug().nospace() << "[" << this << "] setDbRecordModelsData() | amount = " << amount;
+    qDebug().nospace() << "[" << this << "] setDbRecordModelsData() | m_earningSinceLastPay = " << m_earningSinceLastPay;
+    salaryModel->setSumm((amount > m_earningSinceLastPay)?m_earningSinceLastPay:amount);
+    salaryModel->setNotes(reason);
+    salaryModel->setPaymentDate(created);
     salaryModel->setPeriodFrom(periodBegin);
     salaryModel->setPeriodTo(periodEnd);
+    salaryModel->setEmployee(employee);
+    salaryModel->setUser(user);
+    salaryModel->setBalance(0);
 
-    cashRegister->setEmployee(parentTab->m_userModel->id());
-    cashRegister->setUser(userDbData->value("id").toInt());
+    if(type == SSalaryModel::Salary)
+        cashRegister->setOperationType(SCashRegisterModel::ExpSalary);
+    else
+        cashRegister->setOperationType(SCashRegisterModel::ExpSubsist);
+    cashRegister->setSystemId(system);
+    cashRegister->setAmount(-amount);
+    cashRegister->setReason(reason);
+    cashRegister->setCreated(created);
+    cashRegister->setEmployee(employee);
+    cashRegister->setUser(user);
 //    cashRegister->setSkipLogRecording(true);
 }
 
@@ -63,6 +93,9 @@ void SPageSalarySummary::markRepairsPayed()
 {
     try
     {
+        QDateTime periodEnd = parentTab->m_periodEnd;
+        periodEnd = periodEnd.addSecs(-1);
+
         for(int i = 0; i < parentTab->m_repairs->rowCount(); i++)
         {
             if(parentTab->m_repairs->index(i, 10).data().toInt())   // пропуск ранее оплаченных, если они отображаются
@@ -75,6 +108,7 @@ void SPageSalarySummary::markRepairsPayed()
                 salaryRepairsModel->setRepair(parentTab->m_repairs->id(i));
             salaryRepairsModel->setUser(parentTab->m_userModel->id());
             salaryRepairsModel->setSumm(parentTab->m_repairs->unformattedData(i, 6).toDouble() + parentTab->m_repairs->unformattedData(i, 7).toDouble());
+            salaryRepairsModel->setAccountingDate(periodEnd);
             salaryRepairsModel->commit();
 
             delete salaryRepairsModel;
@@ -93,20 +127,14 @@ void SPageSalarySummary::paySubsistence()
     if(!ui->checkBoxSubsistenceOK->isChecked())
         return;
 
-    double amount = ui->doubleSpinBoxSalarySumm->value();
-    QString reason = ui->textEditSubsistenceReason->toPlainText();
     salaryModel = new SSalaryModel();
     cashRegister = new SCashRegisterModel();
 
-    salaryModel->setType(SSalaryModel::Subsistence);
-    salaryModel->setNotes(reason);
-    salaryModel->setSumm(amount);
-    salaryModel->setBalance(parentTab->m_userModel->balance());
-    cashRegister->setAmount(-amount);
-    cashRegister->setReason(reason);
-    cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSubsistencePaymentSystem->currentIndex(), "system_id"));
-    cashRegister->setOperationType(SCashRegisterModel::ExpSubsist);
-    setDbRecordModelsData();
+    setDbRecordModelsData(SSalaryModel::Subsistence,
+                          paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSubsistencePaymentSystem->currentIndex(), "system_id"),
+                          ui->doubleSpinBoxSubsistenceSumm->value(),
+                          ui->textEditSubsistenceReason->toPlainText(),
+                          ui->dateEditSubsistenceDate->date());
 
     pay();
 }
@@ -116,30 +144,44 @@ void SPageSalarySummary::paySalary()
     if(!ui->checkBoxSalaryOK->isChecked())
         return;
 
-    double amount = ui->doubleSpinBoxSalarySumm->value();
-    if(amount != ui->doubleSpinBoxSummaryAmountToPay->value())
+    double currentAmount = ui->doubleSpinBoxSalarySumm->value();
+    if(currentAmount != m_earningSinceLastPay)
     {
-        QMessageBox msgBox;
-        msgBox.setText(QString("Сумма выплаты не соответствует значению в поле \"Итого к оплате\".\r\n"\
-                               "В данной версии работа с балансом сотрудника не реализована"));
-        msgBox.exec();
-        return;
+        if(!parentTab->m_userModel->clientUserId())
+        {
+            auto result = QMessageBox::question(this, tr("Баланс сотрудника не включен"), tr("Для зачисления разницы на баланс сотрудника необходимо указать или создать карточку клиента-сотрудника. Создать автоматически?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
+            if (result == QMessageBox::Cancel)
+            {
+                return;
+            }
+            else if(result == QMessageBox::Yes)
+            {
+                if(!permissions->contains("1"))  // Изменять служебные настройки
+                {
+                    // TODO: сообщение о недостаточности прав
+                    return;
+                }
+
+                createUserClientCard();
+            }
+            else
+            {
+                // TODO: сообщение о несоответствии значения суммы заработка выплачиваемой сумме
+                return;
+            }
+        }
+        m_userClient = parentTab->m_userModel->clientModel();
     }
 
     QString reason = tr("Выплата заработной платы за период с %1 по %2").arg(parentTab->m_periodBegin.date().toString("dd.MM.yyyy"), parentTab->m_periodEnd.addDays(-1).toString("dd.MM.yyyy"));
     salaryModel = new SSalaryModel();
     cashRegister = new SCashRegisterModel();
 
-    salaryModel->setType(SSalaryModel::Salary);
-    salaryModel->setNotes(reason);
-    salaryModel->setSumm(amount);
-//    salaryModel->setBalance(ui->doubleSpinBoxSummaryAmountToPay->value() - amount);
-    salaryModel->setBalance(0);
-    cashRegister->setAmount(-amount);
-    cashRegister->setReason(reason);
-    cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSalaryPaymentSystem->currentIndex(), "system_id"));
-    cashRegister->setOperationType(SCashRegisterModel::ExpSalary);
-    setDbRecordModelsData();
+    setDbRecordModelsData(SSalaryModel::Salary,
+                          paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSalaryPaymentSystem->currentIndex(), "system_id"),
+                          currentAmount,
+                          reason,
+                          ui->dateEditSalaryDate->date());
 
     pay();
     parentTab->updateModels();
@@ -154,12 +196,37 @@ void SPageSalarySummary::pay()
     try
     {
         m_queryLog->start(parentTab->metaObject()->className());
+
+        if(m_userClient && m_userClient->isNew())
+        {
+            QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+            m_userClient->commit();
+            QUERY_COMMIT_ROLLBACK(query,nErr);
+            m_userClient->setBalanceEnabled();
+        }
+
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
         salaryModel->commit();
-        if(salaryModel->type() == SSalaryModel::Salary)
-            markRepairsPayed();
         cashRegister->commit();
+        if(salaryModel->type() == SSalaryModel::Salary)
+        {
+            markRepairsPayed();
+
+            if(cashRegister->amountAbs() != m_earningSinceLastPay && m_userClient)
+            {
+                QString reason;
+                qDebug().nospace() << "[" << this << "] pay() | cashRegister->amountAbs() = " << cashRegister->amountAbs();
+                qDebug().nospace() << "[" << this << "] pay() | m_earningSinceLastPay = " << m_earningSinceLastPay;
+                if(cashRegister->amountAbs() > m_earningSinceLastPay)
+                    reason = tr("Списание средств с баланса сотрудника-клиента при выплате заработной платы");
+                else
+                    reason = tr("Зачисление разницы заработка и выплаченной суммы на баланс сотрудника-клиента");
+                m_userClient->updateBalance(m_earningSinceLastPay - ui->doubleSpinBoxSalarySumm->value(), reason);
+                salaryModel->setBalanceRecord(m_userClient->balanceObj()->id());
+                salaryModel->commit();
+            }
+        }
 
 
 #ifdef QT_DEBUG
@@ -212,7 +279,7 @@ void SPageSalarySummary::updateWidgets()
     double earning = 0;
     double paymentsSubsistanceSumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Subsistance);
     double paymentsSalarySumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Salary);
-//    double employeeBalance = parentTab->m_userModel->balance();
+    double employeeBalance = parentTab->m_userModel->balance();
     if(m_fillMonthChargeOnUpdate)
     {
         monthCharge = monthRate;
@@ -240,12 +307,16 @@ void SPageSalarySummary::updateWidgets()
     earning += earningReceptedIssued;
     earning += monthCharge;
     earning += extraCharges + extraChargesOff;
+    m_earningSinceLastPay = earning - paymentsSubsistanceSumm - paymentsSalarySumm;
+    m_earningSinceLastPay = round(m_earningSinceLastPay*100)/100;
     ui->doubleSpinBoxEarning->setValue(earning);
     ui->doubleSpinBoxSubsistence->setValue(paymentsSubsistanceSumm);
     ui->doubleSpinBoxPayed->setValue(paymentsSalarySumm);
-//    ui->doubleSpinBoxBalance->setValue(employeeBalance);
-    ui->doubleSpinBoxSummaryAmountToPay->setValue(/*employeeBalance +*/ earning - paymentsSubsistanceSumm - paymentsSalarySumm);
-    ui->doubleSpinBoxSalarySumm->setValue(/*employeeBalance +*/ earning - paymentsSubsistanceSumm - paymentsSalarySumm);
+    ui->doubleSpinBoxBalance->setValue(employeeBalance);
+    ui->doubleSpinBoxSummaryAmountToPay->setValue(employeeBalance + earning - paymentsSubsistanceSumm - paymentsSalarySumm);
+    ui->doubleSpinBoxSalarySumm->setValue(employeeBalance + earning - paymentsSubsistanceSumm - paymentsSalarySumm);
+    ui->checkBoxSubsistenceOK->setChecked(false);
+    ui->checkBoxSalaryOK->setChecked(false);
 }
 
 /*  Кнопка справа от поля "По ставке начислить" должна выполнять те же действия, что и кнопка "Загрузить" на нижней панели,

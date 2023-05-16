@@ -89,7 +89,6 @@ void SClientModel::load(int id)
         m_agent2Patronymic = clientModel->record(0).value("agent2_patronymic").toString();
         m_agent2Phone = clientModel->record(0).value("agent2_phone").toString();
         m_agent2PhoneClean = clientModel->record(0).value("agent2_phone_clean").toString();
-        m_balance = clientModel->record(0).value("balance").toDouble();
         m_priceColumn = clientModel->record(0).value("price_col").toInt();
         m_repairs = clientModel->record(0).value("repairs").toInt();
         m_purchases = clientModel->record(0).value("purchases").toInt();
@@ -142,6 +141,11 @@ void SClientModel::initDemo()
     m_repairs = 10;
     m_purchases = 20;
     i_createdUtc = QDateTime::currentDateTimeUtc();
+}
+
+void SClientModel::setEmployeeId(const int id)
+{
+    i_valuesMap.insert("employee", id);
 }
 
 void SClientModel::clear()
@@ -649,6 +653,11 @@ void SClientModel::createBalanceObj()
     delete query;
 }
 
+SBalanceLogRecordModel *SClientModel::balanceObj()
+{
+    return balanceLog;
+}
+
 void SClientModel::deleteBalanceObj()
 {
     if(balanceLog)
@@ -657,6 +666,9 @@ void SClientModel::deleteBalanceObj()
 
 bool SClientModel::updateBalance(const double amount, const QString &text)
 {
+    if(amount == 0)
+        return 1;
+
     if(isNew())   // TODO: проверка включен ли баланс у клиента
         throw 3;
 
@@ -676,8 +688,9 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
     balanceLog->setText(text);
     balanceLog->setClient(i_id);
     i_nErr = balanceLog->commit(amount);
+    double newAmount = m_balance + amount;
 
-    QUERY_EXEC(i_query,i_nErr)(QUERY_UPDATE_BALANCE(i_id, amount));
+    QUERY_EXEC(i_query,i_nErr)(QUERY_UPDATE_BALANCE(i_id, newAmount));
     QUERY_EXEC(i_query,i_nErr)(QUERY_VRFY_BALANCE(i_id));
 
     if(!i_nErr)
@@ -901,6 +914,11 @@ SBalanceLogRecordModel::~SBalanceLogRecordModel()
 
 }
 
+int SBalanceLogRecordModel::id()
+{
+    return i_id;
+}
+
 void SBalanceLogRecordModel::setClient(int id)
 {
     m_client = id;
@@ -943,7 +961,8 @@ bool SBalanceLogRecordModel::commit(const double amount)
     i_valuesMap.insert("uid", userDbData->value("id"));
     i_valuesMap.insert("office", userDbData->value("current_office"));
     i_valuesMap.insert("summ", amount);
-    i_valuesMap.insert("created", QDateTime::currentDateTime());
+    if(!i_valuesMap.contains("created"))
+        i_valuesMap.insert("created", QDateTime::currentDateTime());
 
     insert();
 

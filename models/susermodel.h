@@ -3,6 +3,7 @@
 
 #include "scomrecord.h"
 #include <QObject>
+#include "models/sclientmodel.h"
 
 class SUserModel : public SComRecord
 {
@@ -214,6 +215,10 @@ public:
     void setSalaryRate(double rate);
     void setSalaryRateStartDate(const QDate date);
     double balance();
+    int clientUserId();
+    void setClientUserId(const int id);
+    int m_clientUserId;
+    SClientModel* clientModel();
 private:
     int m_sipId;
     QString m_username;
@@ -305,6 +310,7 @@ private:
     int m_rowHeight;
     QString m_animation;
     QDate m_salaryRateStartDate;
+    SClientModel* m_clientModel = nullptr;
 };
 
 #endif // SUSERMODEL_H

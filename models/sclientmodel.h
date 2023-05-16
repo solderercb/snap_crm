@@ -18,8 +18,9 @@ class SBalanceLogRecordModel : public SComRecord
 public:
     enum RoyaltyReason {Repair = 0, Document, CashOrder};
     explicit SBalanceLogRecordModel(QObject *parent = nullptr);
-    explicit SBalanceLogRecordModel(int, QObject *parent = nullptr);
+    explicit SBalanceLogRecordModel(int client, QObject *parent = nullptr);
     ~SBalanceLogRecordModel();
+    int id();
     void setClient(int);
     void setText(const QString &);
     void setDirection(double);
@@ -188,6 +189,7 @@ public:
     double balance();
     QString balanceStr();
     void createBalanceObj();
+    SBalanceLogRecordModel *balanceObj();
     void deleteBalanceObj();
     bool updateBalance(const double amount, const QString &text);
     bool updateBalance(const double amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason, const int doc_id);
@@ -212,6 +214,8 @@ public:
     bool commit();
     bool integrityStatus();
     void initDemo() override;
+    int employeeId();
+    void setEmployeeId(const int id);
 private:
     bool nIntegrityErr = 1;
     bool m_standAlone = 0;

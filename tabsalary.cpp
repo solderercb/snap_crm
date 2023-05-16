@@ -38,7 +38,7 @@ tabSalary::tabSalary(MainWindow *parent) :
 
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
-    periodDateChanged(QDate(2022,8,01));
+    ui->dateEditPeriod->setDate(QDate(2022,8,01));
     loadButtonPressed();
 #endif
     updateWidgets();
