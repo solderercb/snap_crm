@@ -35,6 +35,9 @@ tabSalary::tabSalary(MainWindow *parent) :
 
     connect(ui->buttonAddExtraCharge, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::addNewRow);
     connect(ui->buttonSaveExtraChargesList, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::saveTable);
+    connect(ui->toolButtonPrevPeriod, &QToolButton::clicked, this, &tabSalary::prevPeriod);
+    connect(ui->toolButtonNextPeriod, &QToolButton::clicked, this, &tabSalary::nextPeriod);
+    connect(ui->toolButtonLoad, &QToolButton::clicked, this, &tabSalary::loadButtonPressed);
 
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
@@ -161,10 +164,52 @@ void tabSalary::setExtraChargesButtonsVisible(bool state)
     ui->buttonSaveExtraChargesList->setVisible(state && stateForPeriod);
 }
 
+void tabSalary::createTabSelectExistingClient()
+{
+    emit createTabSelectExistingClient(1, this);
+}
+
+void tabSalary::fillClientCreds(int id)
+{
+    emit fwdFillClientCreds(id);
+}
+
+void tabSalary::prevPeriod()
+{
+    QDate current = ui->dateEditPeriod->date();
+
+    if(comSettings->value("classic_salary").toBool())
+    {
+        current = current.addMonths(-1);
+    }
+    else
+    {
+        current = current.addDays(-7);
+    }
+
+    ui->dateEditPeriod->setDate(current);
+}
+
+void tabSalary::nextPeriod()
+{
+    QDate current = ui->dateEditPeriod->date();
+
+    if(comSettings->value("classic_salary").toBool())
+    {
+        current = current.addMonths(1);
+    }
+    else
+    {
+        current = current.addDays(7);
+    }
+
+    ui->dateEditPeriod->setDate(current);
+}
+
 void tabSalary::updateWidgets()
 {
     ui->labelPeriod->setText(m_periodBegin.toString("dd.MM.yyyy") + " − " + m_periodEnd.addDays(-1).toString("dd.MM.yyyy"));
-    setExtraChargesButtonsVisible();
+    setExtraChargesButtonsVisible(ui->tabWidget->currentIndex() == 2);
 }
 
 void tabSalary::setModelUpdatedFlag(const int pos)

@@ -19,6 +19,7 @@ public:
     explicit SPageSalarySummary(QWidget *parent = nullptr);
     ~SPageSalarySummary();
 private:
+    enum CreateUserClientCard{CancelOperation = 0, CreateAutomaticaly, SelectExist, DontCreate, ClientExists};
     Ui::SPageSalarySummary *ui;
     SSortFilterProxyModel *paymentSystemsProxyModel;
     bool m_fillMonthChargeOnUpdate = 0;
@@ -28,11 +29,14 @@ private:
     SCashRegisterModel *cashRegister;
     SClientModel *m_userClient = nullptr;
     double m_earningSinceLastPay = 0;
+    bool m_commitUserClientModelsPending = 0;
+    int createUserClientCardMsgBox();
     void createUserClientCard();
     void setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date = QDate::currentDate());
 public slots:
     void updateModels();
     void updateWidgets();
+    void fillClientCreds(int id);
 private slots:
     void setMonthCharge();
     void setGroupBoxSubsistanceVisible(bool visible);

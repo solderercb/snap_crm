@@ -217,8 +217,10 @@ public:
     double balance();
     int clientUserId();
     void setClientUserId(const int id);
-    int m_clientUserId;
+    int m_clientUserId = 0;
     SClientModel* clientModel();
+    void setClientModel(SClientModel *model);
+    bool commit();
 private:
     int m_sipId;
     QString m_username;

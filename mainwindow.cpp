@@ -488,6 +488,7 @@ void MainWindow::createTabSalary()
     tabSalary *subwindow = tabSalary::getInstance(this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
 //    connect(...);
 
     ui->tabWidget->setCurrentWidget(subwindow);

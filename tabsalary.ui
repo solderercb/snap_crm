@@ -82,6 +82,31 @@
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="toolButtonPrevPeriod">
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonNextPeriod">
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonLoad">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="styles/styles.qrc">
+           <normaloff>:/icons/light/1F5D8_32.png</normaloff>:/icons/light/1F5D8_32.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="labelPeriod">
          <property name="font">
           <font>
@@ -125,7 +150,7 @@
         <bool>true</bool>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="SPageSalarySummary" name="summary">
         <property name="autoFillBackground">
@@ -436,7 +461,9 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="styles/styles.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonRefresh</sender>

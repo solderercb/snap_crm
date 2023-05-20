@@ -29,6 +29,8 @@ void SUserModel::load(const int id)
     m_clientUserId = record->value("client_user_id").toInt();
     if(m_clientUserId)
         m_clientModel = new SClientModel(m_clientUserId, this);
+    else
+        m_clientModel = nullptr;
     m_username = record->value("username").toString();
     m_firstName = record->value("name").toString();
     m_lastName = record->value("surname").toString();
@@ -159,7 +161,7 @@ void SUserModel::setSalaryRate(double rate)
 double SUserModel::balance()
 {
     if(!m_clientModel)
-        return NAN;
+        return 0;
 
     return m_clientModel->balance();
 }
@@ -171,12 +173,41 @@ int SUserModel::clientUserId()
 
 void SUserModel::setClientUserId(const int id)
 {
+    m_clientUserId = id;
     i_valuesMap.insert("client_user_id", id);
 }
 
 SClientModel *SUserModel::clientModel()
 {
     return m_clientModel;
+}
+
+void SUserModel::setClientModel(SClientModel *model)
+{
+    m_clientModel = model;
+}
+
+bool SUserModel::commit()
+{
+    if(i_id)
+    {
+        if(!update())
+            throw 1;
+    }
+    else
+    {
+        if(!i_valuesMap.contains("created"))
+            i_valuesMap.insert("created", QDateTime::currentDateTime());
+
+        if(!insert())
+            throw 1;
+    }
+
+    i_logRecord->setClient(i_id);
+    if(!commitLogs())
+        throw 1;
+
+    return i_nErr;
 }
 
 int SUserModel::id()

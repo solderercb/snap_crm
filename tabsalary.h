@@ -34,6 +34,8 @@ signals:
     void updateDaughterTabsWidgets();
     void showSubsistanceGroup(bool);
     void setFillMonthChargeOnUpdate(bool);
+    void createTabSelectExistingClient(int,QWidget*);
+    void fwdFillClientCreds(int);
 public:
     explicit tabSalary(MainWindow *parent = nullptr);
     static tabSalary* getInstance(MainWindow *parent = nullptr);
@@ -72,11 +74,15 @@ private:
     void updateWidgets();
     void setModelUpdatedFlag(const int pos);
     bool checkInput();
+    void createTabSelectExistingClient();
 public slots:
     void loadButtonPressed();
     void periodDateChanged(const QDate date);
     void tabChanged(const int index);
     void setExtraChargesButtonsVisible(bool state = true);
+    void fillClientCreds(int);
+    void prevPeriod();
+    void nextPeriod();
 };
 
 #endif // TABSALARY_H
