@@ -44,7 +44,7 @@ int SPageSalarySummary::createUserClientCardMsgBox()
         msgBox->setWindowTitle(tr("Баланс сотрудника не включен"));
         msgBox->setText(tr("Для зачисления разницы на баланс сотрудника необходимо указать или создать карточку клиента-сотрудника. Создать автоматически?"));
         auto btnY = msgBox->addButton(QMessageBox::Yes);
-        auto btnN = msgBox->addButton(QMessageBox::No);
+        msgBox->addButton(QMessageBox::No);
         msgBox->addButton(btnSel, QMessageBox::ActionRole);
         auto btnC = msgBox->addButton(QMessageBox::Cancel);
         msgBox->exec();
@@ -96,6 +96,7 @@ void SPageSalarySummary::createUserClientCard()
     m_userClient->setEmployeeId(user->id());
     m_userClient->setAdTypeIndex(-1);
     parentTab->m_userModel->setClientModel(m_userClient);
+    addOldBalanceValue();
     m_commitUserClientModelsPending = 1;
 }
 
@@ -137,7 +138,32 @@ void SPageSalarySummary::setDbRecordModelsData(const int type, const int system,
     cashRegister->setCreated(created);
     cashRegister->setEmployee(employee);
     cashRegister->setUser(user);
-//    cashRegister->setSkipLogRecording(true);
+    //    cashRegister->setSkipLogRecording(true);
+}
+
+void SPageSalarySummary::addOldBalanceValue()
+{
+    auto msgBox = new QMessageBox(this);
+    msgBox->setWindowTitle(tr("Баланс сотрудника"));
+    msgBox->setText(tr("Записать старое значение баланса в новом формате?\n"\
+                       "Сумма будет прибавлена или вычтена если была выбрана карточка существующего клиента (не рекомендуется, см. справку)."));
+    msgBox->addButton(QMessageBox::Yes);
+    auto btnN = msgBox->addButton(QMessageBox::No);
+    msgBox->setDefaultButton(btnN);
+
+    msgBox->exec();
+    auto clickedButton = msgBox->clickedButton();
+    if (clickedButton == btnN)
+    {
+        return;
+    }
+
+    QSqlQuery query(QSqlDatabase::database("connMain"));
+    query.exec(QString(
+               "SELECT `balance` FROM salary WHERE `user_id` = %1 AND `type` = 0 ORDER BY `period_from` DESC LIMIT 1")
+               .arg(parentTab->m_userModel->id()));
+    query.first();
+    m_employeeBalanceToConvert = query.value(0).toDouble();
 }
 
 void SPageSalarySummary::markRepairsPayed()
@@ -244,6 +270,13 @@ void SPageSalarySummary::pay()
             QUERY_COMMIT_ROLLBACK(query,nErr);
             shortlivedNotification *newPopup = new shortlivedNotification(this, parentTab->tabTitle(), tr("Карточка сотрудника-клиента успешно создана или связана"), QColor(214,239,220), QColor(229,245,234));
             m_userClient->setBalanceEnabled();  // TODO: изменить методы в классе SClientModel, связанные с включением, выключением и пополнением баланса; произвести соотв. изменения в этом классе.
+            if(m_employeeBalanceToConvert)
+            {
+                QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+                m_userClient->updateBalance(m_employeeBalanceToConvert, tr("Преобразование данных о сумме на балансе сотрудника из формата программы АСЦ"));
+                QUERY_COMMIT_ROLLBACK(query,nErr);
+            }
+
             m_commitUserClientModelsPending = 0;
         }
 
@@ -371,6 +404,7 @@ void SPageSalarySummary::fillClientCreds(int id)
     m_userClient = new SClientModel(id, this);
     m_userClient->setEmployeeId(parentTab->m_userModel->id());
     parentTab->m_userModel->setClientModel(m_userClient);
+    addOldBalanceValue();
     m_commitUserClientModelsPending = 1;
     paySalary();
 }

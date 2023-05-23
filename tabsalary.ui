@@ -150,7 +150,7 @@
         <bool>true</bool>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="SPageSalarySummary" name="summary">
         <property name="autoFillBackground">

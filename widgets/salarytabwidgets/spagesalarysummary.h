@@ -30,9 +30,11 @@ private:
     SClientModel *m_userClient = nullptr;
     double m_earningSinceLastPay = 0;
     bool m_commitUserClientModelsPending = 0;
+    double m_employeeBalanceToConvert = 0;
     int createUserClientCardMsgBox();
     void createUserClientCard();
     void setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date = QDate::currentDate());
+    void addOldBalanceValue();
 public slots:
     void updateModels();
     void updateWidgets();
