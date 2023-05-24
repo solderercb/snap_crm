@@ -24,7 +24,10 @@ tabSalary::tabSalary(MainWindow *parent) :
     ui->setupUi(this);
     usersModelF = new SSortFilterProxyModel();
     usersModelF->setSourceModel(usersModel);
-    usersModelF->setFilterRegularExpression(QRegularExpression("^(?!(admin)).*$")); // без админа
+    if(permissions->value("CanViewSalaryOfOthers")) // TODO: Видеть зарплату других сорудников
+        usersModelF->setFilterRegularExpression(QRegularExpression("^(?!(admin)).*$")); // без админа
+    else
+        usersModelF->setFilterRegularExpression(QRegularExpression(userDbData->value("username").toString())); // только своя ЗП
     usersModelF->setFilterKeyColumn(0);
     ui->comboBoxEmployee->setModel(usersModelF);
     ui->comboBoxEmployee->setCurrentIndex(-1);

@@ -24,6 +24,8 @@ SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
     ui->comboBoxSalaryPaymentSystem->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(0, "system_id"));
     ui->comboBoxSubsistencePaymentSystem->setModel(paymentSystemsProxyModel);
     ui->comboBoxSubsistencePaymentSystem->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(0, "system_id"));
+    ui->pushButtonPaySubsistence->setEnabled(permissions->value("16")); // Создавать ПКО/РКО
+    ui->pushButtonPaySubsistence->setEnabled(permissions->value("48")); // Выдавать аванс сотрудникам
 
     connect(ui->toolButtonApplySummaryMonthCharge, &QToolButton::clicked, this, &SPageSalarySummary::setMonthCharge);
     connect(ui->pushButtonPaySubsistence, &QPushButton::clicked, this, &SPageSalarySummary::paySubsistence);
