@@ -4,6 +4,7 @@ SDevMdlModel::SDevMdlModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "maker";
     i_tableName = "device_models";
+    i_idColumnName = "id";
     i_logRecord->setGroup(1);
 //    i_logRecord->setType(1);
 }

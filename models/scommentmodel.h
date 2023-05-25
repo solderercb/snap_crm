@@ -33,6 +33,7 @@ public:
     void setObjId(const int mode, const int id);
     void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue) override;
     bool remove();
+    void findNewId() override{};    // после создания новой записи id не используется
 private:
     int m_id;
     QString m_text;

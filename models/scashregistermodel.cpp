@@ -4,6 +4,7 @@ SCashRegisterModel::SCashRegisterModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "created" << "type" << "summa" << "user" << "company" << "office" << "notes";
     i_tableName = "cash_orders";
+    i_idColumnName = "id";
     m_amount_str = sysLocale.toCurrencyString(m_amount);
     m_amount_words = amountToWords(m_amount);
 }

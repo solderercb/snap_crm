@@ -32,6 +32,7 @@ public:
     void setValueAfter(const QString &);   // `logs`.`values_after`
     void setUser(const int id);
     void clear();
+    void findNewId() override {};    // после создания новой записи id не используется
 private:
 };
 

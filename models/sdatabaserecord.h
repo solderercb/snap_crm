@@ -23,6 +23,7 @@ public:
     QDateTime createdUtc();
     QString created();
     void setCreated(const QDateTime &timestamp);
+
 protected:
     int i_id = 0;
     bool i_nErr = 1;
@@ -31,12 +32,16 @@ protected:
     QDateTime i_createdUtc;
     QSqlQuery *i_query;
     QString fieldValueHandler(const QVariant&);
+    virtual void findNewId();
     bool insert(bool flush = true);
     bool update();
     bool del();
     QMap<QString, QVariant> i_valuesMap;   // ключ — название столбца (поля) таблицы БД
+    QString i_idColumnName;
 private:
     QStringList fields, field_values;
+    int m_newId = 0;
+    bool m_isIdColumnNameSet = 0;
     bool checkSystemTime();
     bool checkObligatoryFields();
     bool checkTableName();

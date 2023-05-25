@@ -4,6 +4,7 @@ SSalaryRepairsModel::SSalaryRepairsModel(QObject *parent) : SDatabaseRecord(pare
 {
     i_tableName = "salary_repairs";
     i_obligatoryFields << "user";
+    i_idColumnName = "id";
 }
 
 int SSalaryRepairsModel::id()

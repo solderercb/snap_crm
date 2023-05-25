@@ -4,6 +4,7 @@ SPhoneModel::SPhoneModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "mask" << "customer";
     i_tableName = "tel";
+    i_idColumnName = "id";
 
     i_logRecord->setType(SLogRecordModel::Client);
 

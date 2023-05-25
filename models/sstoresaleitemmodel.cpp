@@ -4,6 +4,7 @@ SStoreSaleItemModel::SStoreSaleItemModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "store_sales";
     i_obligatoryFields << "dealer" << "item_id" << "document_id" << "user";
+    i_idColumnName = "id";
 }
 
 SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, QObject *parent) :

@@ -5,6 +5,7 @@ SRepairSaleItemModel::SRepairSaleItemModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "store_int_reserve";
     i_obligatoryFields << "item_id" << "count" << "from_user" << "to_user" << "notes" << "state" << "price";
+    i_idColumnName = "id";
     i_logRecord->setType(SLogRecordModel::Repair);
 }
 

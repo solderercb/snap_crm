@@ -4,6 +4,7 @@ SUserModel::SUserModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "users";
     i_obligatoryFields << "username" << "name" << "office" << "photo" << "fields_cfg" << "notes" << "signature";
+    i_idColumnName = "id";
     i_logRecord->setType(SLogRecordModel::User);
 }
 

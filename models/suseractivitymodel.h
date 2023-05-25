@@ -37,6 +37,7 @@ private:
     QString machineName();
     void setMachineName(const QString);
     bool commit();
+    void findNewId() override {};    // после создания новой записи id не используется
 };
 
 #endif // SUSERACTIVITYMODEL_H

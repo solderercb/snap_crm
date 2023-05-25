@@ -4,6 +4,7 @@ SDocumentModel::SDocumentModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "company" << "user" << "total" << "created" << "office" << "img1" << "img2" << "img3";
     i_tableName = "docs";
+    i_idColumnName = "id";
     i_logRecord->setType(SLogRecordModel::Doc);
 }
 

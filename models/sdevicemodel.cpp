@@ -4,7 +4,7 @@ SDeviceModel::SDeviceModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "fault_list" << "look_list" << "complect_list" << "company_list";
     i_tableName = "devices";
-
+    i_idColumnName = "id";
 }
 
 SDeviceModel::~SDeviceModel()

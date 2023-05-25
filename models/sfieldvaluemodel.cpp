@@ -4,6 +4,7 @@ SFieldValueModel::SFieldValueModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "field_id" << "value";
     i_tableName = "field_values";
+    i_idColumnName = "id";
 }
 
 SFieldValueModel::SFieldValueModel(const int id, QObject *) : SFieldValueModel()

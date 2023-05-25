@@ -4,6 +4,7 @@ SSalaryModel::SSalaryModel(QObject *parent) : SDatabaseRecord(parent)
 {
     i_tableName = "salary";
     i_obligatoryFields << "user_id" << "summ" << "balance" << "payment_date" << "notes" << "period_from" << "period_to" << "from_user" << "type";
+    i_idColumnName = "id";
 }
 
 void SSalaryModel::load(const int id)

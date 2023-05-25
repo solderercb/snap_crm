@@ -6,6 +6,7 @@ SRepairStatusLog::SRepairStatusLog(const int repair, QObject *parent):
 {
     i_obligatoryFields << "created_at" << "repair_id" << "status_id" << "user_id";
     i_tableName = "repair_status_logs";
+    i_idColumnName = "id";
 }
 
 int SRepairStatusLog::id()

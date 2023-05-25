@@ -169,6 +169,32 @@ QString SDatabaseRecord::fieldValueHandler(const QVariant &value)
     return str_value;
 }
 
+/* Получение id для новой записи в таблице
+*/
+void SDatabaseRecord::findNewId()
+{
+    if(!m_isIdColumnNameSet)
+    {
+        if(i_idColumnName.isEmpty())
+            return;
+        else
+            m_isIdColumnNameSet = 1;
+    }
+
+    m_newId = 0;
+
+    QUERY_NEW_ID(i_idColumnName, i_tableName, i_query, i_nErr, m_newId);
+
+    if(!m_newId && i_nErr)
+    {
+        if(i_query->value(1).toInt() == 0)
+            m_newId = 1;
+    }
+
+    if(m_newId)
+        i_valuesMap.insert(i_idColumnName, m_newId);
+}
+
 /*  Формирует и отправляет запрос INSERT
  *  Передварительно производится проверка системного времени и обязательных полей
  *  Возвращает 0 в случае какой-либо ошибки
@@ -187,6 +213,8 @@ bool SDatabaseRecord::  insert(bool flushValues)
     if(!checkObligatoryFields())
         return 0;
 
+    findNewId();
+
     fieldsInsFormatter();
     q = QString("INSERT INTO `%1` (\n  %2\n) VALUES (\n  %3\n);")\
                                          .arg(i_tableName)\
@@ -194,7 +222,12 @@ bool SDatabaseRecord::  insert(bool flushValues)
                                          .arg(field_values.join(','));
 //    qDebug().noquote() << q;
     QUERY_EXEC(i_query,i_nErr)(q);
-    QUERY_LAST_INS_ID(i_query,i_nErr,i_id);
+
+    if(m_newId && i_nErr)
+        i_id = m_newId;
+    else
+        QUERY_LAST_INS_ID(i_query,i_nErr,i_id);
+
     dbErrFlagHandler(flushValues);
 
     return i_nErr;

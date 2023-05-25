@@ -4,6 +4,7 @@ SCommentModel::SCommentModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "text" << "user";
     i_tableName = "comments";
+    i_idColumnName = "id";
 }
 
 SCommentModel::SCommentModel(QList<QStandardItem *> &record, QObject *parent) :

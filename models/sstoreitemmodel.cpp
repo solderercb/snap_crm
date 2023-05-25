@@ -4,6 +4,7 @@ SStoreItemModel::SStoreItemModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "store_items";
     i_obligatoryFields << "" << "articul" << "dealer" << "name" << "state" << "category" << "store" << "shop_description" << "description";
+    i_idColumnName = "id";
     i_logRecord->setType(SLogRecordModel::Part);
 }
 

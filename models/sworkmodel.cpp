@@ -5,6 +5,7 @@ SWorkModel::SWorkModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "works";
     i_obligatoryFields << "user" << "name" << "warranty";
+    i_idColumnName = "id";
     i_logRecord->setType(SLogRecordModel::Repair);
 }
 

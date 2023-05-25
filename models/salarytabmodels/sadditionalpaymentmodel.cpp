@@ -4,6 +4,7 @@ SAdditionalPaymentModel::SAdditionalPaymentModel(QObject *parent) : SComRecord(p
 {
     i_tableName = "additional_payments";
     i_obligatoryFields << "name" << "payment_date" << "user" << "to_user" << "price";
+    i_idColumnName = "id";
 }
 
 int SAdditionalPaymentModel::id()

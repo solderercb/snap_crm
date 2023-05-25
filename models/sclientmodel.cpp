@@ -5,6 +5,8 @@ SClientModel::SClientModel(int id, QObject *parent) :
 {
     i_obligatoryFields << "name" << "notes";
     i_tableName = "clients";
+    i_idColumnName = "id";
+
     m_phones = new SPhonesModel();
 
     i_logRecord->setType(SLogRecordModel::Client);
@@ -900,6 +902,7 @@ SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):
 {
     i_obligatoryFields << "client" << "summ" << "direction" << "reason" << "created" << "office" << "uid";
     i_tableName = "balance";
+    i_idColumnName = "id";
     i_logRecord->setType(SLogRecordModel::Client);
 }
 

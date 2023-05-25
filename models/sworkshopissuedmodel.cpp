@@ -4,6 +4,7 @@ SWorkshopIssuedModel::SWorkshopIssuedModel(QObject *parent) : SComRecord(parent)
 {
     i_obligatoryFields << "repair_id" << "employee_id" << "created_at";
     i_tableName = "workshop_issued";
+    i_idColumnName = "id";
 }
 
 int SWorkshopIssuedModel::id()

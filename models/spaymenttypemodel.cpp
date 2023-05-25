@@ -4,6 +4,7 @@ SPaymentTypeModel::SPaymentTypeModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "payment_types";
     i_obligatoryFields << "client" << "reason" << "payment_system";
+    i_idColumnName = "id";
     i_logRecord->setGroup(SLogRecordModel::ACP);
 //    i_logRecord->setType(SLogRecordModel::PaymentOperation);  // TODO: В АСЦ v3.7.31.1123 записи в журнал не производятся
 }

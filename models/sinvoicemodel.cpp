@@ -4,6 +4,7 @@ SInvoiceModel::SInvoiceModel(QObject *parent) : SComRecord(parent)
 {
     i_tableName = "invoice";
     i_obligatoryFields << "num" << "created" << "user" << "seller" << "customer" << "office";
+    i_idColumnName = "id";
 }
 
 SInvoiceModel::~SInvoiceModel()
