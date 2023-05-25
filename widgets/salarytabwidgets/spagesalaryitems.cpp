@@ -27,23 +27,7 @@ void SPageSalaryItems::enableVScrollbarPadding(const bool state)
 
 void SPageSalaryItems::updateModels()
 {
-    ui->tableViewItems->setQuery(QString(
-                                 "SELECT                                                                                       \n"\
-                                 "    CONCAT(t2.`articul`, '-', t1.`item_id`) AS 'UID',                                        \n"\
-                                 "    t1.`name`,                                                                               \n"\
-                                 "    t1.`created`,                                                                            \n"\
-                                 "    t1.`count`,                                                                              \n"\
-                                 "    t1.`price`,                                                                              \n"\
-                                 "    t1.`count` * t1.`price` AS 'summ',                                                       \n"\
-                                 "    t1.`state`,                                                                              \n"\
-                                 "    t1.`item_id`                                                                             \n"\
-                                 "FROM `store_int_reserve` AS t1                                                               \n"\
-                                 "LEFT JOIN store_items AS t2                                                                  \n"\
-                                 "    ON t1.`item_id` = t2.`id`                                                                \n"\
-                                 " WHERE (t1.`to_user` = %1) AND ((1 = t1.`state`) OR (2 = t1.`state`))                          "\
-                                 )
-                                .arg(parentTab->employeeId())\
-                                , QSqlDatabase::database("connMain"));
+    ui->tableViewItems->setQuery(QUERY_SEL_SALARY_PARTS(parentTab->employeeId()));
 
         ui->tableViewItems->refresh();
 

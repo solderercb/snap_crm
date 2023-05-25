@@ -13,12 +13,12 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->setupUi(this);
     docModel = new SDocumentModel();
     tableModel = new SSaleTableModel(this);
-    itemDelagates = new SaleTableItemDelegates(ui->tableView);
+//    itemDelagates = new SaleTableItemDelegates(ui->tableView);
     clientModel = new SClientModel();
     cashRegister = new SCashRegisterModel();
 
     tableModel->setTableMode(SSaleTableModel::TablesSet::StoreSale);
-    itemDelagates->setTableModel(tableModel);
+//    itemDelagates->setTableModel(tableModel);
     params = new int;
     *params = 0;
     *params |= comSettings->value("qs_print_rn").toBool()?tabSaleSettingsMenu::PrintDoc:0;
@@ -70,7 +70,7 @@ tabSale::~tabSale()
     delete params;
     delete widgetAction;
     delete tableModel;
-    delete itemDelagates;
+//    delete itemDelagates;
     delete clientModel;
     delete cashRegister;
     delete docModel;
@@ -1022,13 +1022,13 @@ sparePartsTable::sparePartsTable(QWidget *parent) : STableViewBase(parent)
 {
     i_defaultColumnsWidths = {{0, 60},{1, 90},{2, 270},{3, 45},{4, 60},{5, 70},{6, 70},{7, 120},{8, 120},{9, 80}};
     i_defaultHeaderLabels << tr("") << tr("UID") << tr("Наименование") << tr("Кол-во") << tr("Доступно") << tr("Цена") << tr("Сумма") << tr("Место") << tr("Серийный номер") << tr("Гарантия");
-    readLayout(SLocalSettings::SaleGrid);
+    readLayout(SLocalSettings::SaleItemsGrid);
     i_gridLayout->$GridControl.Columns[2].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
 }
 
 sparePartsTable::~sparePartsTable()
 {
-    saveLayout(SLocalSettings::SaleGrid);
+    saveLayout(SLocalSettings::SaleItemsGrid);
 }
 
 void sparePartsTable::setModel(QAbstractItemModel *model)

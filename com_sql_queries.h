@@ -569,16 +569,22 @@
 // верификация записанных в БД данных; производится примитивно, путём сравнения записанных данных с данными, которые были переданы в запросе;
 // если данные совпадают, то сервер должен вернуть 55AAh (21930d), иначе 00h
 // далее, если контрольное число совпадает, flag устанавливаем в 1, иначе — 0.
-#define QUERY_EXEC_VRFY(obj,flag)           /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Checking integrity...";*/ if ((flag)){\
+#define QUERY_EXEC_VRFY(obj,flag)           if ((flag)){\
                                                 (obj)->first();\
                                                 /*qDebug() << "Integrity magic number: " << (obj)->value(0).toInt();*/\
                                                 (flag) = ((obj)->value(0).toInt() == 21930)?1:0;}
+
+#define QUERY_NEW_ID(col,tbl,obj,flag,id)   if ((flag)){\
+                                                (flag) = (obj)->exec("SELECT (MAX(`" + (col) + "`)) + 1 AS 'id', COUNT(1) FROM `" + (tbl) + "`;");\
+                                                (obj)->first();\
+                                                (id) = (obj)->value(0).toInt();}
 
 // QSqlQuery::lastInsertId() почему-то не работает, поэтому так:
 #define QUERY_LAST_INS_ID(obj,flag,id)      /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Executing SELECT LAST_INSERT_ID() query...";*/ if ((flag)){\
                                                 (obj)->exec("SELECT LAST_INSERT_ID();");\
                                                 (obj)->first();\
                                                 (id) = (obj)->value(0).toInt();}
+
 #define QUERY_BEGIN                         QString("BEGIN;")
 #define QUERY_COMMIT                        QString("COMMIT;")
 #define QUERY_ROLLBACK                      QString("ROLLBACK;")
@@ -608,62 +614,10 @@
                                                 obj->exec(QUERY_COMMIT);\
                                             }
 
-#define QUERY_INS_DEVICE_MODEL              QString("INSERT INTO `device_models` (`name`, `position`, `maker`, `device`) VALUES ('%1', %2, %3, %4);")
-#define QUERY_INS_CLIENT                    QString("INSERT INTO `clients` (`creator`, `name`, `surname`, `patronymic`, `agent_phone_mask`, `agent2_phone_mask`, `address`, `post_index`, `passport_num`, `passport_date`, `passport_organ`, `state`, `type`, `birthday`, `memorial`, `notes`, `is_regular`, `is_dealer`, `balance_enable`, `prefer_cashless`, `take_long`, `ignore_calls`, `is_bad`, `is_realizator`, `is_agent`, `visit_source`, `photo_id`, `INN`, `KPP`, `OGRN`, `web_password`, `ur_name`, `email`, `icq`, `skype`, `viber`, `telegram`, `site`, `whatsapp`, `agent_name`, `agent_surname`, `agent_patronymic`, `agent_phone`, `agent_phone_clean`, `agent2_name`, `agent2_surname`, `agent2_patronymic`, `agent2_phone`, `agent2_phone_clean`, `created`, `balance`, `price_col`, `repairs`, `purchases`, `token`) VALUES \n"\
-                                                                            "(%1, '%2', '%3', '%4', 1, 1, '%5', NULL, NULL, NULL, NULL, 1, %6, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, %7, NULL, NULL, NULL, NULL, '%8', '', '%9', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, UTC_TIMESTAMP(), 0, 0, 0, 0, NULL);")
-#define QUERY_INS_PHONE(P,p,M,C,T,t)        QString(\
-                                                "INSERT INTO `tel` ("\
-                                                "`phone`, `phone_clean`, `mask`, `customer`, `type`, `note`"\
-                                                ") VALUES ("\
-                                                "'%1','%2',%3,%4,%5,'%6');")\
-                                                .arg(P).arg(p).arg(M).arg(C).arg(T).arg(t)
-#define QUERY_INS_USER_ACTIVITY(action)     QString("INSERT INTO `users_activity` (`user_id`, `datetime_`, `address`, `notes`, `app_version`, `machine_name`) VALUES (%1, UTC_TIMESTAMP(), SUBSTRING_INDEX(USER(), '@', -1), '%2', '%3', '%4');").arg(userDbData->value("id").toInt()).arg((action)).arg(APP_VER).arg("TODO:hostname")
+
 #define QUERY_UPD_LAST_USER_LOGIN(id)       QString("UPDATE `users` SET `last_login`=UTC_TIMESTAMP() WHERE `id` = %1;").arg((id))
 #define QUERY_UPD_LAST_USER_ACTIVITY(id)    QString("UPDATE `users` SET `last_activity`=UTC_TIMESTAMP() WHERE `id` = %1;").arg((id))
-#define QUERY_INS_WORKSHOP                  QString(\
-                                                "INSERT INTO `workshop` (\n"\
-                                                "`Hidden`, `Title`, `client`, `type`, `maker`, `model`, `serial_number`, `company`, `office`, `start_office`, `manager`, `current_manager`, `master`, `diagnostic_result`, `in_date`, `out_date`, `state`, `new_state`, `user_lock`, `lock_datetime`, `express_repair`, `quick_repair`, `is_warranty`, `is_repeat`, `payment_system`, `is_card_payment`, `can_format`, `print_check`, `box`, `warranty_label`, `ext_notes`, `is_prepaid`, `prepaid_type`, `prepaid_summ`, `prepaid_order`, `is_pre_agreed`, `is_debt`, `pre_agreed_amount`, `repair_cost`, `real_repair_cost`, `parts_cost`, `fault`, `complect`, `look`, `thirs_party_sc`, `last_save`, `last_status_changed`, `warranty_days`, `barcode`, `reject_reason`, `informed_status`, `image_ids`, `color`, `order_moving`, `early`, `ext_early`, `issued_msg`, `sms_inform`, `invoice`, `cartridge`, `vendor_id`, `termsControl`\n"\
-                                                ") VALUES (\n"\
-                                                "0, '%1', %2, %3, %4, %5, '%6', %7, %8, %8, %9, %9, %10, '', UTC_TIMESTAMP(), NULL, 0, 0, NULL, NULL, %11, %12, %13, %14, %15, %16, %17, %18, %19, NULL, '%20', %21, %22, %23, NULL, %24, 0, %25, 0, 0, 0, '%26', '%27', '%28', %29, UTC_TIMESTAMP(), NULL, 0, '%30', '', 0, '', NULL, NULL, %31, %32, NULL, 1, NULL, NULL, NULL, 1\n);")
-#define QUERY_INS_REPAIR_COMMENT            QString(\
-                                                "INSERT INTO `comments` (\n"\
-                                                "`text`, `created`, `user`, `remont`, `client`, `task_id`, `part_request`\n"\
-                                                ") VALUES (\n"\
-                                                "'%1', UTC_TIMESTAMP(), %2, %3, NULL, NULL, NULL);")
 
-// запись в журнал действий: Устройство принято в ремонт, Деталь добавлена в ремонт, Деталь продана в ремонте; UOCRI = user,office,client,repair,item, т. е. связанные ключи других таблиц
-#define QUERY_INS_LOG(G,T,U,O,C,R,I,D,B,t)  QString(\
-                                                "INSERT INTO `logs` ("\
-                                                "`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`"\
-                                                ") VALUES (\n"\
-                                                "%1, %2, 0, %3, UTC_TIMESTAMP(), NULL, NULL, %4, %5, %6, %7, %8, NULL, %9, '%10'"\
-                                                ");")\
-                                                .arg(G)\
-                                                .arg(T)\
-                                                .arg(U)\
-                                                .arg(O)\
-                                                .arg(C)\
-                                                .arg(R)\
-                                                .arg(I)\
-                                                .arg(D)\
-                                                .arg(B)\
-                                                .arg(t)
-#define QUERY_INS_CASH(T,S,s,C,U,O,t,R,D,A)   QString(\
-                                                "INSERT INTO `cash_orders` ("\
-                                                "`created`, `type`, `summa`, `summa_str`, `invoice`, `client`, `to_user`, `user`, `company`, `office`, `notes`, `repair`, `document`, `img`, `payment_system`, `card_fee`, `is_backdate`, `card_info`, `customer_email`, `fdn`, `payment_item_sign`"\
-                                                ") VALUES (\n"\
-                                                "UTC_TIMESTAMP(), %1, %2, '%3', NULL, %4, NULL, %5, 1, %6, '%7', %8, %9, NULL, %10, 0, 0, NULL, '', NULL, NULL"\
-                                                ");")\
-                                                .arg(T)\
-                                                .arg(S)\
-                                                .arg(s)\
-                                                .arg(C)\
-                                                .arg(U)\
-                                                .arg(O)\
-                                                .arg(t)\
-                                                .arg(R)\
-                                                .arg(D)\
-                                                .arg(A)
 #define QUERY_VRFY_CASH(T,S,s,C,U,O,t,R,D,A)  QString(\
                                                 "SELECT IF(`type` = %1 AND `summa` = %2 /*AND `summa_str` = '%3'*/ AND IFNULL(`client`,'NULL') = %4 AND `user` = %5 AND `office` = %6 /*AND `notes` = '%7'*/ AND IFNULL(`repair`,'NULL') = IFNULL(%8,'NULL') AND IFNULL(`document`,'NULL') = IFNULL(%9,'NULL') AND `payment_system` = %10, 21930, 0)\n"\
                                                 "FROM `cash_orders`\n"\
@@ -679,13 +633,6 @@
                                                 .arg(D)\
                                                 .arg(A)
 
-#define QUERY_INS_FIELDS(T, R, I, t)        QString(\
-                                                "INSERT INTO `field_values` (`field_id`, `repair_id`, `item_id`, `value`) VALUES (%1, %2, %3, '%4');")\
-                                                .arg(T)\
-                                                .arg(R)\
-                                                .arg(I)\
-                                                .arg(t)
-
 #define QUERY_LOCK_REPAIR(R,U)              QString("UPDATE `workshop` SET `user_lock`=%1, `lock_datetime`=UTC_TIMESTAMP() WHERE `id` = %2;").arg((U)).arg((R))
 #define QUERY_UNLOCK_REPAIR(R)              QString("UPDATE `workshop` SET `user_lock`=NULL, `lock_datetime`=NULL WHERE `id` = %1;").arg((R))
 
@@ -693,40 +640,6 @@
                                                 .arg(R)
 
 #define QUERY_SET_REJ_REASON(R, t)          QString("UPDATE `workshop` SET `reject_reason` = '%2' WHERE `id` = %1;").arg((R)).arg((t))
-
-#define QUERY_INS_WRKSHP_ISSUED(R, U)       QString("INSERT INTO `workshop_issued`(`repair_id`, `employee_id`, `created_at`) VALUES (%1, %2, UTC_TIMESTAMP());").arg((R))\
-                                                .arg((U))
-
-#define QUERY_INS_REPAIR_STATUS_LOG(R,S,U,Mngr,Mstr)  QString("INSERT INTO `repair_status_logs`(`created_at`, `repair_id`, `status_id`, `user_id`, `manager_id`, `master_id`) VALUES (UTC_TIMESTAMP(), %1, %2, %3, %4, %5);").arg((R)).arg((S)).arg((U)).arg((Mngr)).arg((Mstr))
-
-#define QUERY_INS_BALANCE_LOG(C,S,D,t,O,U)  QString(\
-                                                "INSERT INTO\n"\
-                                                "  `balance` (\n"\
-                                                "    `client`,\n"\
-                                                "    `summ`,\n"\
-                                                "    `direction`,\n"\
-                                                "    `reason`,\n"\
-                                                "    `created`,\n"\
-                                                "    `office`,\n"\
-                                                "    `uid`,\n"\
-                                                "    `dealer_payment`\n"\
-                                                "  )\n"\
-                                                "VALUES (\n"\
-                                                "    %1,\n"\
-                                                "    %2,\n"\
-                                                "    %3,\n"\
-                                                "    '%4',\n"\
-                                                "    UTC_TIMESTAMP(),\n"\
-                                                "    %5,\n"\
-                                                "    %6,\n"\
-                                                "    NULL\n"\
-                                                ");")\
-                                                .arg((C))\
-                                                .arg((S))\
-                                                .arg((D))\
-                                                .arg((t))\
-                                                .arg((O))\
-                                                .arg((U))
 
 #define QUERY_UPDATE_BALANCE(C,S)           QString(\
                                                 "UPDATE\n"\
@@ -736,7 +649,7 @@
                                                 "WHERE\n"\
                                                 "  `id`=%1;")\
                                                 .arg((C))\
-                                                .arg((S))
+                                                .arg((S), 0, 'f', 4)
 
 #define QUERY_VRFY_BALANCE(C)               QString(\
                                                 "SELECT\n"\
@@ -753,325 +666,288 @@
                                                 "  AND t1.`id` = %1;")\
                                                 .arg((C))
 
-// Зачисления за товары на реализации, использованные в ремонте: запись в журнал балансов
-#define QUERY_INS_BALANCE_LOG2(O,U,R) QString(\
-                                                "INSERT INTO\n"\
-                                                "  `balance` (\n"\
-                                                "    `client`,\n"\
-                                                "    `summ`,\n"\
-                                                "    `direction`,\n"\
-                                                "    `reason`,\n"\
-                                                "    `created`,\n"\
-                                                "    `office`,\n"\
-                                                "    `uid`,\n"\
-                                                "    `dealer_payment`\n"\
-                                                "  )\n"\
-                                                "  SELECT\n"\
-                                                "    `parts`.dealer,\n"\
-                                                "    `parts`.`summ`,\n"\
-                                                "    IF(`parts`.`summ` >= 0, 1, 0),\n"\
-                                                "    CONCAT('Зачисление средств на баланса клиента №', `parts`.dealer, ' на сумму ', `parts`.`summ`, ' за проданные товары, находившиеся на реализации'),\n"\
-                                                "    UTC_TIMESTAMP(),\n"\
-                                                "    %1,\n"\
-                                                "    %2,\n"\
-                                                "    NULL\n"\
-                                                "  FROM (\n"\
-                                                "    SELECT \n"\
-                                                "      t2.`dealer`,\n"\
-                                                "      ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
-                                                "    FROM\n"\
-                                                "      `store_items` AS t2\n"\
-                                                "    LEFT JOIN\n"\
-                                                "      `store_int_reserve` AS t3\n"\
-                                                "    ON\n"\
-                                                "      t2.id = t3.item_id\n"\
-                                                "    WHERE\n"\
-                                                "      t3.repair_id = %3\n"\
-                                                "      AND t2.is_realization = 1\n"\
-                                                "      AND t3.state = 2\n"\
-                                                "    GROUP BY\n"\
-                                                "      t3.repair_id,\n"\
-                                                "      t2.dealer\n"\
-                                                "  ) AS `parts`;")\
-                                                .arg((O))\
-                                                .arg((U))\
-                                                .arg((R))
-
-// Зачисления за товары на реализации, использованные в ремонте: обновление балансов клиентов
-#define QUERY_UPDATE_BALANCE2(R)            QString(\
-                                                "UPDATE\n"\
-                                                "  `clients` AS t1\n"\
-                                                "CROSS JOIN (\n"\
-                                                "  SELECT\n"\
-                                                "    t2.`dealer`,\n"\
-                                                "    ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
-                                                "  FROM\n"\
-                                                "    `store_items` AS t2\n"\
-                                                "  LEFT JOIN\n"\
-                                                "    `store_int_reserve` AS t3\n"\
-                                                "  ON\n"\
-                                                "    t2.id = t3.item_id\n"\
-                                                "  WHERE\n"\
-                                                "    t3.repair_id = %1\n"\
-                                                "    AND t2.is_realization = 1\n"\
-                                                "    AND t3.state = 2\n"\
-                                                "  GROUP BY\n"\
-                                                "    t3.repair_id,\n"\
-                                                "    t2.dealer\n"\
-                                                "  ) AS `parts`\n"\
-                                                "ON\n"\
-                                                "  t1.id = `parts`.dealer\n"\
-                                                "SET\n"\
-                                                "  t1.balance = t1.balance + `parts`.`summ`\n"\
-                                                "WHERE\n"\
-                                                "  t1.balance_enable = 1;")\
-                                                .arg((R))
-
-// Зачисления за товары на реализации, использованные в ремонте: верификация балансов
-#define QUERY_VRFY_BALANCE2(R)              QString(\
-                                                "SELECT\n"\
-                                                "  IF(t1.`balance` = SUM(t2.`summ`), 21930, 0)\n"\
-                                                "FROM\n"\
-                                                "  `clients` AS t1\n"\
-                                                "LEFT JOIN\n"\
-                                                "  `balance` AS t2\n"\
-                                                "ON\n"\
-                                                "  t1.id = t2.`client`\n"\
-                                                "WHERE\n"\
-                                                "  t1.`id` IN (\n"\
-                                                "    SELECT \n"\
-                                                "      t2.`dealer`\n"\
-                                                "    FROM\n"\
-                                                "      `store_items` AS t2\n"\
-                                                "    LEFT JOIN\n"\
-                                                "      `store_int_reserve` AS t3\n"\
-                                                "    ON\n"\
-                                                "      t2.id = t3.item_id\n"\
-                                                "    WHERE\n"\
-                                                "      t3.repair_id = %1\n"\
-                                                "      AND t2.is_realization = 1\n"\
-                                                "      AND t3.state = 2\n"\
-                                                "    GROUP BY\n"\
-                                                "      t3.repair_id,\n"\
-                                                "      t2.dealer\n"\
-                                                "  )\n"\
-                                                "GROUP BY\n"\
-                                                "  t1.`id`;")\
-                                                .arg((R))
-
-// Зачисления за товары на реализации (обычная продажа): запись в журнал балансов
-#define QUERY_INS_BALANCE_LOG3(O,U,D) QString(\
-                                                "INSERT INTO\n"\
-                                                "  `balance` (\n"\
-                                                "    `client`,\n"\
-                                                "    `summ`,\n"\
-                                                "    `direction`,\n"\
-                                                "    `reason`,\n"\
-                                                "    `created`,\n"\
-                                                "    `office`,\n"\
-                                                "    `uid`,\n"\
-                                                "    `dealer_payment`\n"\
-                                                "  )\n"\
-                                                "  SELECT\n"\
-                                                "    `parts`.dealer,\n"\
-                                                "    `parts`.`summ`,\n"\
-                                                "    IF(`parts`.`summ` >= 0, 1, 0),\n"\
-                                                "    CONCAT('Зачисление средств на баланса клиента №', `parts`.dealer, ' на сумму ', `parts`.`summ`, ' за проданные товары, находившиеся на реализации'),\n"\
-                                                "    UTC_TIMESTAMP(),\n"\
-                                                "    %1,\n"\
-                                                "    %2,\n"\
-                                                "    NULL\n"\
-                                                "  FROM (\n"\
-                                                "    SELECT\n"\
-                                                "      t2.`dealer`,\n"\
-                                                "      ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
-                                                "    FROM\n"\
-                                                "      `store_items` AS t2\n"\
-                                                "    LEFT JOIN\n"\
-                                                "      `store_sales` AS t3\n"\
-                                                "    ON\n"\
-                                                "      t2.id = t3.item_id\n"\
-                                                "    WHERE\n"\
-                                                "      t3.document_id = %3\n"\
-                                                "      AND t2.is_realization = 1\n"\
-                                                "      AND t3.is_cancellation = 0\n"\
-                                                "    GROUP BY\n"\
-                                                "      t3.document_id,\n"\
-                                                "      t2.dealer\n"\
-                                                "  ) AS `parts`;")\
-                                                .arg((O))\
-                                                .arg((U))\
-                                                .arg((D))
-
-// Зачисления за товары на реализации (обычная продажа): обновление балансов клиентов
-#define QUERY_UPDATE_BALANCE3(D)            QString(\
-                                                "UPDATE\n"\
-                                                "  `clients` AS t1\n"\
-                                                "CROSS JOIN (\n"\
-                                                "  SELECT\n"\
-                                                "    t2.`dealer`,\n"\
-                                                "    ROUND(SUM(t3.`count`*(t2.in_price + (t3.price - t2.in_price)*t2.return_percent/100)), 2) AS summ\n"\
-                                                "  FROM\n"\
-                                                "    `store_items` AS t2\n"\
-                                                "  LEFT JOIN\n"\
-                                                "    `store_sales` AS t3\n"\
-                                                "  ON\n"\
-                                                "    t2.id = t3.item_id\n"\
-                                                "  WHERE\n"\
-                                                "    t3.document_id = %1\n"\
-                                                "    AND t2.is_realization = 1\n"\
-                                                "    AND t3.is_cancellation = 0\n"\
-                                                "  GROUP BY\n"\
-                                                "    t3.document_id,\n"\
-                                                "    t2.dealer\n"\
-                                                "  ) AS `parts`\n"\
-                                                "ON\n"\
-                                                "  t1.id = `parts`.dealer\n"\
-                                                "SET\n"\
-                                                "  t1.balance = t1.balance + `parts`.`summ`\n"\
-                                                "WHERE\n"\
-                                                "  t1.balance_enable = 1;")\
-                                                .arg((D))
-
-// Зачисления за товары на реализации (обычная продажа): верификация балансов
-#define QUERY_VRFY_BALANCE3(D)              QString(\
-                                                "SELECT\n"\
-                                                "  IF(t1.`balance` = SUM(t2.`summ`), 21930, 0)\n"\
-                                                "FROM\n"\
-                                                "  `clients` AS t1\n"\
-                                                "LEFT JOIN\n"\
-                                                "  `balance` AS t2\n"\
-                                                "ON\n"\
-                                                "  t1.id = t2.`client`\n"\
-                                                "WHERE\n"\
-                                                "  t1.`id` IN (\n"\
-                                                "    SELECT\n"\
-                                                "      t2.`dealer`\n"\
-                                                "    FROM\n"\
-                                                "      `store_items` AS t2\n"\
-                                                "    LEFT JOIN\n"\
-                                                "      `store_sales` AS t3\n"\
-                                                "    ON\n"\
-                                                "      t2.id = t3.item_id\n"\
-                                                "    WHERE\n"\
-                                                "      t3.document_id = %1\n"\
-                                                "      AND t2.is_realization = 1\n"\
-                                                "      AND t3.is_cancellation = 0\n"\
-                                                "    GROUP BY\n"\
-                                                "      t3.document_id,\n"\
-                                                "      t2.dealer\n"\
-                                                "  )\n"\
-                                                "GROUP BY\n"\
-                                                "  t1.`id`;")\
-                                                .arg((D))
-
-#define QUERY_UPDATE_STORE_INT_RSRV(S,R)    QString("UPDATE `store_int_reserve` SET `state`=%1 WHERE `repair_id` = %2;").arg((S)).arg((R))
-
-// выдача ремонта:
-#define QUERY_SEL_PRE_UPD_STORE_ITEMS(R)    QString(\
-                                                        "SELECT\n"\
-                                                        "  t1.`count`-t2.`count` AS 'count',\n"\
-                                                        "  t1.`reserved`-t2.`count` AS 'reserved',\n"\
-                                                        "  t1.`sold`+t2.`count` AS 'sold'\n"\
-                                                        "FROM\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN store_int_reserve AS t2\n"\
-                                                        "  ON t2.item_id = t1.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t2.`repair_id` = %1;")\
-                                                        .arg((R))
-#define QUERY_UPD_STORE_ITEMS(R)            QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN store_int_reserve AS t2\n"\
-                                                        "  ON t2.item_id = t1.`id`\n"\
-                                                        "SET\n"\
-                                                        "  t1.`count`=t1.`count` - t2.`count`,\n"\
-                                                        "  t1.`reserved`=t1.`reserved`-t2.`count`,\n"\
-                                                        "  t1.`sold`=t1.`sold`+t2.`count`,\n"\
-                                                        "  t1.`updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  t2.`repair_id` = %1;")\
-                                                        .arg((R))
-#define QUERY_SEL_PST_UPD_STORE_ITEMS(R)    QString(\
-                                                        "SELECT\n"\
-                                                        "  t1.`count`,\n"\
-                                                        "  t1.`reserved`,\n"\
-                                                        "  t1.`sold`\n"\
-                                                        "FROM\n"\
-                                                        "  `store_items` AS t1\n"\
-                                                        "LEFT JOIN store_int_reserve AS t2\n"\
-                                                        "  ON t2.item_id = t1.`id`\n"\
-                                                        "WHERE\n"\
-                                                        "  t2.`repair_id` = %1;")\
-                                                        .arg((R))
-
 // для интерактивного обновления цен уже добавленных в список товаров используется prepaired statement
 #define QUERY_SEL_STORE_ITEMS_ITEM_PRICE(column)    QString("SELECT %1 FROM store_items WHERE `id` = :id;").arg(column)
 
-#define QUERY_UPD_STORE_ITEMS_RESERVE(qty, id)     QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items`\n"\
-                                                        "SET\n"\
-                                                        "  `reserved`=`reserved` + %1,\n"\
-                                                        "  `updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  `id` = %2;")\
-                                                        .arg((qty))\
-                                                        .arg((id))
+#define QUERY_SEL_SALARY_REPAIRS(date1, date2, statuses, user)    QString(                                                                                                                                                \
+                                                "SELECT                                                                                                                                                                \n"\
+                                                "    `id`,                                                                                                                                                             \n"\
+                                                "    `Title`,                                                                                                                                                          \n"\
+                                                "    `real_repair_cost`,                                                                                                                                               \n"\
+                                                "    SUM(`work_by_employee`) AS 'works_by_employee',                                                                                                                   \n"\
+                                                "    `parts_cost`,                                                                                                                                                     \n"\
+                                                "    SUM(`employee_parts`) AS 'employee_parts',                                                                                                                        \n"\
+                                                "    SUM(`employee_salary_for_work`) AS 'employee_salary_for_works',                                                                                                   \n"\
+                                                "    SUM(`employee_salary_for_parts`) AS 'employee_salary_for_parts',                                                                                                  \n"\
+                                                "    `out_date`,                                                                                                                                                       \n"\
+                                                "    `state`,                                                                                                                                                          \n"\
+                                                "    `summ`,                                                                                                                                                           \n"\
+                                                "    `status_id`,                                                                                                                                                      \n"\
+                                                "    `filter1`,                                                                                                                                                        \n"\
+                                                "    `cartridge`                                                                                                                                                       \n"\
+                                                "FROM (                                                                                                                                                                \n"\
+                                                "    SELECT                                                                                                                                                            \n"\
+                                                "        g1t1.*,                                                                                                                                                       \n"\
+                                                "        g1t2.`created_at`,                                                                                                                                            \n"\
+                                                "        (g1t3.`price`*g1t3.`count`) AS 'work_by_employee',                                                                                                            \n"\
+                                                "        (g1t3.`price`*g1t3.`count`*(IF(g1t1.quick_repair, IFNULL(g1t3.`pay_repair_quick`, g1t5.`pay_repair_quick`), IFNULL(g1t3.`pay_repair`, g1t5.`pay_repair`)))/100) AS 'employee_salary_for_work', \n"\
+                                                "        IFNULL(SUM(g1t4.`price`*g1t4.`count`), 0) AS 'employee_parts',                                                                                                \n"\
+                                                "        IF(g1t5.`pay_4_sale_in_repair`, IFNULL(SUM((g1t4.`price` - g1t6.`in_price`)*g1t4.`count`*g1t5.`pay_sale`/100), 0), 0) AS 'employee_salary_for_parts',         \n"\
+                                                "        g1t7.`summ`,                                                                                                                                                  \n"\
+                                                "        g1t2.`status_id`,                                                                                                                                             \n"\
+                                                "        g1t2.`filter1`                                                                                                                                                \n"\
+                                                "    FROM workshop AS g1t1                                                                                                                                             \n"\
+                                                "    LEFT JOIN (                                                                                                                                                       \n"\
+                                                "        SELECT                                                                                                                                                        \n"\
+                                                "            `repair_id`                                                                                                                                               \n"\
+                                                "            , `created_at`                                                                                                                                            \n"\
+                                                "            , `status_id`                                                                                                                                             \n"\
+                                                "            , IF(@id<>`repair_id`, @cnt:=1, @cnt:=@cnt+1) AS `filter1`                                                                                                \n"\
+                                                "            , @id:=`repair_id`                                                                                                                                        \n"\
+                                                "        FROM repair_status_logs CROSS JOIN (SELECT @cnt:=1, @id:=0) AS dummy                                                                                          \n"\
+                                                "        ORDER BY `repair_id` ASC, `id` DESC                                                                                                                           \n"\
+                                                "    ) AS g1t2                                                                                                                                                         \n"\
+                                                "        ON g1t1.`id` = g1t2.`repair_id`                                                                                                                               \n"\
+                                                "    LEFT JOIN works AS g1t3                                                                                                                                           \n"\
+                                                "        ON g1t1.`id` = g1t3.`repair`                                                                                                                                  \n"\
+                                                "    LEFT JOIN store_int_reserve AS g1t4                                                                                                                               \n"\
+                                                "        ON g1t3.`id` = g1t4.`work_id` AND g1t4.`to_user` = %4                                                                                                         \n"\
+                                                "    LEFT JOIN users AS g1t5                                                                                                                                           \n"\
+                                                "        ON g1t3.`user` = g1t5.`id`                                                                                                                                    \n"\
+                                                "    LEFT JOIN store_items AS g1t6                                                                                                                                     \n"\
+                                                "        ON g1t4.`item_id` = g1t6.`id`                                                                                                                                 \n"\
+                                                "    LEFT JOIN salary_repairs AS g1t7                                                                                                                                  \n"\
+                                                "        ON g1t1.`id` = g1t7.`repair` AND g1t7.`user` = %4                                                                                                             \n"\
+                                                "    WHERE                                                                                                                                                             \n"\
+                                                "        (                                                                                                                                                             \n"\
+                                                "          ( g1t2.`filter1`  = 1                                                                                                                                       \n"\
+                                                "                AND (                                                                                                                                                 \n"\
+                                                "              ( g1t7.`id` IS NULL                                                                                                                                     \n"\
+                                                "                AND `created_at` > '%1'                                                                                                                               \n"\
+                                                "                AND `created_at` < '%2' )                                                                                                                             \n"\
+                                                "                  OR                                                                                                                                                  \n"\
+                                                "                  ( g1t7.`id` IS NOT NULL                                                                                                                             \n"\
+                                                "                AND g1t7.`accounting_date` > '%1'                                                                                                                     \n"\
+                                                "                AND g1t7.`accounting_date` < '%2' ))                                                                                                                  \n"\
+                                                "          )                                                                                                                                                           \n"\
+                                                "          OR                                                                                                                                                          \n"\
+                                                "          ( g1t2.`filter1` IS NULL                                                                                                                                    \n"\
+                                                "            AND g1t1.`out_date` > '%1'                                                                                                                                \n"\
+                                                "            AND g1t1.`out_date` < '%2' )                                                                                                                              \n"\
+                                                "        )                                                                                                                                                             \n"\
+                                                "        AND g1t1.`state` IN (%3)                                                                                                                                      \n"\
+                                                "        AND g1t3.`user` = %4                                                                                                                                          \n"\
+                                                "    GROUP BY g1t3.id                                                                                                                                                  \n"\
+                                                ") AS t1                                                                                                                                                               \n"\
+                                                )\
+                                                .arg(date1)\
+                                                .arg(date2)\
+                                                .arg(statuses)\
+                                                .arg(user),\
+                                                QSqlDatabase::database("connMain")
 
-#define QUERY_UPD_STORE_ITEMS_SALE(qty, id)     QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items`\n"\
-                                                        "SET\n"\
-                                                        "  `count`=`count` - %1,\n"\
-                                                        "  `sold`=`sold` + %1,\n"\
-                                                        "  `updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  `id` = %2;")\
-                                                        .arg((qty))\
-                                                        .arg((id))
+#define QUERY_SEL_SALARY_REPAIR_WORKS(id, user)    QString(                                                                                      \
+                                                "SELECT                                                                                       \n"\
+                                                "    t1.`price_id`,                                                                           \n"\
+                                                "    t1.`name`,                                                                               \n"\
+                                                "    t1.`count`,                                                                              \n"\
+                                                "    t1.`price`,                                                                              \n"\
+                                                "    t1.`count`*t1.`price` AS 'summ',                                                         \n"\
+                                                "    t1.`warranty`,                                                                           \n"\
+                                                "    @percent := IF(t2.quick_repair, t1.`pay_repair_quick`, t1.`pay_repair`) AS 'percent',    \n"\
+                                                "    t1.`count`*t1.`price`*@percent/100 AS 'salary_part'                                      \n"\
+                                                "FROM works AS t1                                                                             \n"\
+                                                "LEFT JOIN workshop AS t2                                                                     \n"\
+                                                "    ON t1.`repair` = t2.`id`                                                                 \n"\
+                                                "WHERE                                                                                        \n"\
+                                                "    t1.`repair` = %1                                                                         \n"\
+                                                "    AND USER = %2                                                                            \n"\
+                                                )\
+                                                .arg(id)\
+                                                .arg(user),\
+                                                QSqlDatabase::database("connMain")
 
-#define QUERY_UPD_STORE_ITEMS_SALE_RESERVED(item, new_qty, old_qty)     QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items`\n"\
-                                                        "SET\n"\
-                                                        "  `count` = `count` - %2,\n"\
-                                                        "  `sold` = `sold` + %2,\n"\
-                                                        "  `reserved` = `reserved` - %3,\n"\
-                                                        "  `updated` = UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  `id` = %1;\n")\
-                                                        .arg((item))\
-                                                        .arg((new_qty))\
-                                                        .arg((old_qty))
+#define QUERY_SEL_SALARY_REPAIR_PARTS(id, user)    QString(                                                                                      \
+                                                "SELECT                                                                                       \n"\
+                                                "    CONCAT(t2.`articul`, '-', t1.`item_id`) AS 'UID',                                        \n"\
+                                                "    t1.`name`,                                                                               \n"\
+                                                "    t1.`count`,                                                                              \n"\
+                                                "    t1.`price`,                                                                              \n"\
+                                                "    @summ:=t1.`count` * t1.`price` AS 'summ',                                                \n"\
+                                                "    t1.`sn`,                                                                                 \n"\
+                                                "    t1.`warranty`,                                                                           \n"\
+                                                "    @profit:=t1.`count`*(t1.`price`-t2.`in_price`) AS 'profit',                              \n"\
+                                                "    @profit*IF(t3.`pay_4_sale_in_repair`, t3.`pay_sale`, 0)/100 AS 'salary_part'             \n"\
+                                                "FROM store_int_reserve AS t1                                                                 \n"\
+                                                "LEFT JOIN store_items AS t2                                                                  \n"\
+                                                "    ON t1.`item_id` = t2.`id`                                                                \n"\
+                                                "LEFT JOIN `users` AS t3                                                                      \n"\
+                                                "     ON t1.`to_user` = t3.`id`                                                               \n"\
+                                                "WHERE                                                                                        \n"\
+                                                "    `repair_id` = %1                                                                         \n"\
+                                                "    AND `to_user` = %2                                                                       \n"\
+                                                )\
+                                                .arg(id)\
+                                                .arg(user),\
+                                                QSqlDatabase::database("connMain")
 
-#define QUERY_UPD_STORE_ITEMS_RESERVE_CANCELLATION(item, qty)  QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items`\n"\
-                                                        "SET\n"\
-                                                        "  `reserved` = `reserved` - %2,\n"\
-                                                        "  `updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  `id` = %1;\n")\
-                                                        .arg((item))\
-                                                        .arg((qty))
+#define QUERY_SEL_SALARY_EXTRA_CHARGES(date1, date2, user)    QString(                                             \
+                                                "SELECT                                                         \n"\
+                                                "  `id`,                                                        \n"\
+                                                "  `name`,                                                      \n"\
+                                                "  `price`,                                                     \n"\
+                                                "  `payment_date`,                                              \n"\
+                                                "  `user`                                                       \n"\
+                                                "FROM `additional_payments`                                     \n"\
+                                                "WHERE                                                          \n"\
+                                                "  `payment_date` >= '%1'                                       \n"\
+                                                "  AND `payment_date` <= '%2'                                   \n"\
+                                                "  AND `to_user` = %3                                             "\
+                                                )\
+                                                .arg(date1)\
+                                                .arg(date2)\
+                                                .arg(user),\
+                                                QSqlDatabase::database("connMain")
 
-#define QUERY_UPD_STORE_ITEMS_UNSALE(item, qty)  QString(\
-                                                        "UPDATE\n"\
-                                                        "  `store_items`\n"\
-                                                        "SET\n"\
-                                                        "  `count` = `count` + %2,\n"\
-                                                        "  `sold` = `sold` - %2,\n"\
-                                                        "  `updated`=UTC_TIMESTAMP()\n"\
-                                                        "WHERE\n"\
-                                                        "  `id` = %1;\n")\
-                                                        .arg((item))\
-                                                        .arg((qty))
+#define QUERY_SEL_SALARY_SALE_DOCS(date1, date2, user)    QString(                                                                   \
+                                                "SELECT                                                                           \n"\
+                                                "  `salary`.`id`,                                                                 \n"\
+                                                "  `salary`.`created`,                                                            \n"\
+                                                "  `salary`.`client`,                                                             \n"\
+                                                "  `salary`.`total`,                                                              \n"\
+                                                "  `salary`.`profit`,                                                             \n"\
+                                                "  `salary`.`profit`*`users`.`pay_sale`/100 AS 'salary_part'                      \n"\
+                                                "FROM (                                                                           \n"\
+                                                "  SELECT                                                                         \n"\
+                                                "    t1.`id`,                                                                     \n"\
+                                                "    t1.`created`,                                                                \n"\
+                                                "    CONCAT_WS(' ', t2.surname, t2.`name`, t2.patronymic) AS 'client',            \n"\
+                                                "    t1.`total`,                                                                  \n"\
+                                                "    SUM(t3.`count`*(t3.`price`-t3.`in_price`)) AS 'profit',                      \n"\
+                                                "    t1.`user`                                                                    \n"\
+                                                "  FROM `docs` AS `t1`                                                            \n"\
+                                                "  LEFT JOIN `clients` AS t2                                                      \n"\
+                                                "    ON t1.`dealer` = t2.`id`                                                     \n"\
+                                                "  LEFT JOIN `store_sales` AS t3                                                  \n"\
+                                                "    ON t1.id = t3.`document_id`                                                  \n"\
+                                                "  LEFT JOIN `store_items` AS t4                                                  \n"\
+                                                "    ON t3.`item_id` = t4.`id`                                                    \n"\
+                                                "  WHERE                                                                          \n"\
+                                                "    t1.`type` = 2                                                                \n"\
+                                                "    AND t1.`state` = 5                                                           \n"\
+                                                "    AND t1.`created` >= '%1'                                                     \n"\
+                                                "    AND t1.`created` <= '%2'                                                     \n"\
+                                                "    AND t1.`user` = %3                                                           \n"\
+                                                "  GROUP BY t1.`id`                                                               \n"\
+                                                ") AS `salary`                                                                    \n"\
+                                                "LEFT JOIN `users`                                                                \n"\
+                                                "  ON `salary`.`user` = `users`.`id`                                              "\
+                                                )\
+                                                .arg(parentTab->periodBegin())\
+                                                .arg(parentTab->periodEnd())\
+                                                .arg(parentTab->employeeId()),\
+                                                QSqlDatabase::database("connMain")
 
+#define QUERY_SEL_SALARY_SALE_PARTS(doc)    QString(                                                                                 \
+                                                "SELECT                                                                           \n"\
+                                                "  CONCAT(t2.`articul`, '-', t1.`item_id`) AS 'UID',                              \n"\
+                                                "  t2.`name`,                                                                     \n"\
+                                                "  t1.`count`,                                                                    \n"\
+                                                "  t1.`price`,                                                                    \n"\
+                                                "  @summ:=t1.`count` * t1.`price` AS 'summ',                                      \n"\
+                                                "  t1.`sn`,                                                                       \n"\
+                                                "  t1.`warranty`,                                                                 \n"\
+                                                "  @profit:=t1.`count`*(t1.`price`-t2.`in_price`) AS 'profit',                    \n"\
+                                                "  CAST(@profit*t3.`pay_sale`/100 AS DECIMAL(11,4)) AS 'salary_part'              \n"\
+                                                "FROM `store_sales` AS t1                                                         \n"\
+                                                "LEFT JOIN `store_items` AS t2                                                    \n"\
+                                                "  ON t1.`item_id` = t2.`id`                                                      \n"\
+                                                "LEFT JOIN `users` AS t3                                                          \n"\
+                                                "  ON t1.`user` = t3.`id`                                                         \n"\
+                                                "WHERE                                                                            \n"\
+                                                "  t1.`document_id` = %1"                                                            \
+                                                )\
+                                                .arg(doc),\
+                                                QSqlDatabase::database("connMain")
 
-#define QUERY_INS_LOG_PARTS_IN_REPAIR(U,O,C,R) QString("INSERT INTO `logs`(`group`, `type`, `arh`, `user`, `created`, `values`, `values_after`, `office`, `client`, `repair`, `item`, `document`, `cash_order`, `part_request`, `notes`) SELECT \n"\
-                                                    "NULL, 6, 0, %1, UTC_TIMESTAMP(), NULL, NULL, %2, %3, `repair_id`, `item_id`, NULL, NULL, NULL, CONCAT('Товар установленный в ремонт №', `repair_id`, ' продан. Ремонт выдан') FROM `store_int_reserve` WHERE `repair_id` = %4;").arg((U)).arg((O)).arg((C)).arg((R))
+#define QUERY_SEL_SALARY_PARTS(user)    QString(                                                                                 \
+                                                "SELECT                                                                          \n"\
+                                                "    CONCAT(t2.`articul`, '-', t1.`item_id`) AS 'UID',                           \n"\
+                                                "    t1.`name`,                                                                  \n"\
+                                                "    t1.`created`,                                                               \n"\
+                                                "    t1.`count`,                                                                 \n"\
+                                                "    t1.`price`,                                                                 \n"\
+                                                "    t1.`count` * t1.`price` AS 'summ',                                          \n"\
+                                                "    t1.`state`,                                                                 \n"\
+                                                "    t1.`item_id`                                                                \n"\
+                                                "FROM `store_int_reserve` AS t1                                                  \n"\
+                                                "LEFT JOIN store_items AS t2                                                     \n"\
+                                                "    ON t1.`item_id` = t2.`id`                                                   \n"\
+                                                " WHERE (t1.`to_user` = %1) AND ((1 = t1.`state`) OR (2 = t1.`state`))             "\
+                                                )\
+                                                .arg(parentTab->employeeId()),\
+                                                QSqlDatabase::database("connMain")
+
+#define QUERY_SEL_SALARY_PAYMENTS(date1, date2, user)    QString(                                                                   \
+                                                "SELECT                                                                          \n"\
+                                                "    t1.`id`,                                                                    \n"\
+                                                "    t1.`payment_date`,                                                          \n"\
+                                                "    t1.`summ`,                                                                  \n"\
+                                                "    t4.`summ` AS 'toBalance',                                                   \n"\
+                                                "    t2.`username` AS 'employee',                                                \n"\
+                                                "    t3.`username` AS 'issuer',                                                  \n"\
+                                                "    t1.`notes`,                                                                 \n"\
+                                                "    t1.`type`                                                                   \n"\
+                                                "FROM `salary` AS t1                                                             \n"\
+                                                "LEFT JOIN `balance` AS t4                                                       \n"\
+                                                "    ON t1.`balance_record` = t4.`id`                                            \n"\
+                                                "INNER JOIN `users` AS t2                                                        \n"\
+                                                "    ON t1.`user_id` = t2.`id`                                                   \n"\
+                                                "INNER JOIN `users` AS t3                                                        \n"\
+                                                "    ON t1.`from_user` = t3.`id`                                                 \n"\
+                                                "WHERE                                                                           \n"\
+                                                "    t1.`period_from` >= '%1'                                                    \n"\
+                                                "    AND t1.`period_to` <= '%2'                                                  \n"\
+                                                "    AND t1.`user_id` = %3;                                                      \n"\
+                                                )\
+                                                .arg(date1)\
+                                                .arg(date2)\
+                                                .arg(user),\
+                                                QSqlDatabase::database("connMain")
+
+#define QUERY_SEL_SALARY_RECEPTED_DEVICES(date1, date2, user)    QString(                                                             \
+                                                "SELECT                                                                            \n"\
+                                                "    t1.`id`, t1.`Title`, t1.`real_repair_cost`, t1.`in_date`, t3.`pay_device_in`  \n"\
+                                                "FROM `workshop` AS t1                                                             \n"\
+                                                "LEFT JOIN `users` AS t3                                                           \n"\
+                                                "    ON t1.`manager` = t3.`id`                                                     \n"\
+                                                "WHERE                                                                             \n"\
+                                                "    `in_date` >= '%1'                                                             \n"\
+                                                "    AND `in_date` <= '%2'                                                         \n"\
+                                                "    AND `manager` = %3                                                              "\
+                                                )\
+                                                .arg(date1)\
+                                                .arg(date2)\
+                                                .arg(user),\
+                                                QSqlDatabase::database("connMain")
+
+#define QUERY_SEL_SALARY_ISSUED_DEVICES(date1, date2, user)    QString(                                                               \
+                                                "SELECT                                                                            \n"\
+                                                "    t2.`id`, t2.`Title`, t2.`real_repair_cost`, t2.`out_date`, t4.`pay_device_out`\n"\
+                                                "FROM `workshop_issued` AS `t1`                                                    \n"\
+                                                "INNER JOIN `workshop` AS `t2`                                                     \n"\
+                                                "    ON `t1`.`repair_id` = `t2`.`id`                                               \n"\
+                                                "LEFT JOIN `users` AS t4                                                           \n"\
+                                                "    ON t1.`employee_id` = t4.`id`                                                 \n"\
+                                                "WHERE                                                                             \n"\
+                                                "    t1.`created_at` >= '%1'                                                       \n"\
+                                                "    AND t1.`created_at` <= '%2'                                                   \n"\
+                                                "    AND t1.`employee_id` = %3                                                     \n"\
+                                                )\
+                                                .arg(date1)\
+                                                .arg(date2)\
+                                                .arg(user),\
+                                                QSqlDatabase::database("connMain")
 
 #define QUERY_UPD_CLIENT_PURCHASES(id, num)      QString("UPDATE `clients` SET `purchases`=`purchases`+(%2) WHERE `id` = %1;").arg((id)).arg((num))
 #define QUERY_UPD_CLIENT_REPAIRS(id)      QString("UPDATE `clients` SET `repairs`=`repairs`+1 WHERE `id` = %1;").arg((id))

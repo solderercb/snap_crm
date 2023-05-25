@@ -18,41 +18,17 @@ SPageSalaryReceptedIssued::~SPageSalaryReceptedIssued()
 
 void SPageSalaryReceptedIssued::updateModels()
 {
-    ui->tableViewRecepted->setQuery(QString(                                                                                                     \
-                                    "SELECT                                                                                                   \n"\
-                                    "    t1.`id`, t1.`Title`, t1.`real_repair_cost`, t1.`in_date`, t3.`pay_device_in`                         \n"\
-                                    "FROM `workshop` AS t1                                                                                    \n"\
-                                    "LEFT JOIN `users` AS t3                                                                                  \n"\
-                                    "    ON t1.`manager` = t3.`id`                                                                            \n"\
-                                    "WHERE                                                                                                    \n"\
-                                    "    `in_date` >= '%1'                                                                                    \n"\
-                                    "    AND `in_date` <= '%2'                                                                                \n"\
-                                    "    AND `manager` = %3                                                                                     "\
-                                    )                                                                                                            \
-                                    .arg(parentTab->periodBegin())                                                                               \
-                                    .arg(parentTab->periodEnd())                                                                                 \
-                                    .arg(parentTab->employeeId())                                                                                \
-                                    , QSqlDatabase::database("connMain"));
+    ui->tableViewRecepted->setQuery(QUERY_SEL_SALARY_RECEPTED_DEVICES(
+                                        parentTab->periodBegin(),
+                                        parentTab->periodEnd(),
+                                        parentTab->employeeId()));
     ui->tableViewRecepted->refresh();
     parentTab->setModelUpdatedFlag(ReceptedModel);
 
-    ui->tableViewIssued->setQuery(QString(                                                                                                      \
-                                  "SELECT                                                                                                    \n"\
-                                  "    t2.`id`, t2.`Title`, t2.`real_repair_cost`, t2.`out_date`, t4.`pay_device_out`                        \n"\
-                                  "FROM `workshop_issued` AS `t1`                                                                            \n"\
-                                  "INNER JOIN `workshop` AS `t2`                                                                             \n"\
-                                  "    ON `t1`.`repair_id` = `t2`.`id`                                                                       \n"\
-                                  "LEFT JOIN `users` AS t4                                                                                   \n"\
-                                  "    ON t1.`employee_id` = t4.`id`                                                                         \n"\
-                                  "WHERE                                                                                                     \n"\
-                                  "    t1.`created_at` >= '%1'                                                                               \n"\
-                                  "    AND t1.`created_at` <= '%2'                                                                           \n"\
-                                  "    AND t1.`employee_id` = %3                                                                             \n"\
-                                  )                                                                                                             \
-                                  .arg(parentTab->periodBegin())                                                                                \
-                                  .arg(parentTab->periodEnd())                                                                                  \
-                                  .arg(parentTab->employeeId())                                                                                 \
-                                  , QSqlDatabase::database("connMain"));
+    ui->tableViewIssued->setQuery(QUERY_SEL_SALARY_ISSUED_DEVICES(
+                                      parentTab->periodBegin(),
+                                      parentTab->periodEnd(),
+                                      parentTab->employeeId()));
     ui->tableViewIssued->refresh();
     parentTab->setModelUpdatedFlag(IssuedModel);
 

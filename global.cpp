@@ -228,7 +228,7 @@ void initGlobalModels()
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     clientAdTypesList->setObjectName("clientAdTypesList");
 
-    QVector<QString> clientTypesList = {"Все клиенты", "Организации", "Посредники", "Поставщики", "Постоянные клиенты", "Проблемные клиенты", "Реализаторы"};
+    QVector<QString> clientTypesList = {QObject::tr("Все клиенты"), QObject::tr("Организации"), QObject::tr("Посредники"), QObject::tr("Поставщики"), QObject::tr("Постоянные клиенты"), QObject::tr("Проблемные клиенты"), QObject::tr("Реализаторы")};
     QVector<QString> clientTypesQueryFilterList = {"`type` IN (0, 1)", "`type` = 1", "`is_agent` = 1", "`is_dealer` = 1", "`is_regular` = 1", "`is_bad` = 1", "`is_realizator` = 1"};
     for (int i=0; i<clientTypesList.size(); i++)
     {
@@ -236,6 +236,7 @@ void initGlobalModels()
         *clientTypeSelector << new QStandardItem(clientTypesList.at(i)) << new QStandardItem(QString::number(i)) << new QStandardItem(clientTypesQueryFilterList.at(i));
         clientsTypesList->appendRow(*clientTypeSelector);
     }
+    clientsTypesList->setObjectName("clientsTypesList");
 
     QJsonDocument jsonDoc(QJsonDocument::fromJson(comSettings->value("statuses").toByteArray()));
     if (jsonDoc.isArray())
@@ -250,7 +251,7 @@ void initGlobalModels()
     }
     statusesModel->setHorizontalHeaderLabels({"name","id","color","terms","contains","actions","roles"});
 
-    QVector<QString> notifyStatusesList = {"---", "Клиент оповещён", "Клиент не отвечает", "Клиент не доступен", "Не оповещён прочее"};
+    QVector<QString> notifyStatusesList = {"---", QObject::tr("Клиент оповещён"), QObject::tr("Клиент не отвечает"), QObject::tr("Клиент не доступен"), QObject::tr("Не оповещён прочее")};
     for (int i=0; i<notifyStatusesList.size(); i++)
     {
         QList<QStandardItem*> *notifyStatusSelector = new QList<QStandardItem*>();
@@ -260,7 +261,7 @@ void initGlobalModels()
     notifyStatusesModel->setHorizontalHeaderLabels({"name","id"});
 
     // TODO: В АСЦ в списке сроков гарантии также присутствуют "Согласно гарантии производителя", "Согласно ЗоЗПП" и "Согласно ФГТ", но, похоже, их выбор не реализован
-    QVector<QString> warrantyTermsList = {"нет", "7 дней", "14 дней", "1 мес", "2 мес", "3 мес", "4 мес", "6 мес", "1 год", "2 года", "3 года"};
+    QVector<QString> warrantyTermsList = {QObject::tr("нет"), QObject::tr("7 дней"), QObject::tr("14 дней"), QObject::tr("1 мес"), QObject::tr("2 мес"), QObject::tr("3 мес"), QObject::tr("4 мес"), QObject::tr("6 мес"), QObject::tr("1 год"), QObject::tr("2 года"), QObject::tr("3 года")};
     int warrantyTerms[] = {0, 7, 14, 31, 62, 93, 124, 186, 365, 730, 1095};
     // Модель для комбобоксов при редактировании, а QMap для отображения
     for (int i=0; i<warrantyTermsList.size(); i++)
@@ -274,7 +275,7 @@ void initGlobalModels()
     warrantyTermsModel->setHorizontalHeaderLabels({"name","days"});
 
 
-    QVector<QString> rejectReasonList = {"отказ от ремонта", "ремонт не возможен", "ремонт не возможен из-за отсутствия запчастей", "ремонт не рентабелен", "неисправносте не проявилась", "другие причины"};
+    QVector<QString> rejectReasonList = {QObject::tr("отказ от ремонта"), QObject::tr("ремонт не возможен"), QObject::tr("ремонт не возможен из-за отсутствия запчастей"), QObject::tr("ремонт не рентабелен"), QObject::tr("неисправносте не проявилась"), QObject::tr("другие причины")};
     rejectReasonModel->setProperty("other_reject_reason", 5); // более элегантный способ не придумал (такой, чтобы задавать id причины отказа в "одном месте" и чтобы это не поломалось при переводе)
     QList<QStandardItem*> *rejectReasonSelector;
     for (int i=0; i<rejectReasonList.size(); i++)
@@ -286,7 +287,7 @@ void initGlobalModels()
     rejectReasonModel->setObjectName("rejectReasonModel");
     rejectReasonModel->setHorizontalHeaderLabels({"name","id"});
 
-    QVector<QString> priceColNamesList = {"Цена для сервиса", "Цена розница", "Цена опт", "Цена опт2", "Цена опт3"};
+    QVector<QString> priceColNamesList = {QObject::tr("Цена для сервиса"), QObject::tr("Цена розница"), QObject::tr("Цена опт"), QObject::tr("Цена опт2"), QObject::tr("Цена опт3")};
     QVector<QString> priceColIdsList = {"1", "2", "3", "4", "5"};
     QVector<QString> priceColDBFieldsList = {"price", "price2", "price3", "price4", "price5"};
     QList<QStandardItem*> *priceColSelector;
@@ -299,7 +300,7 @@ void initGlobalModels()
     priceColModel->setObjectName("priceColModel");
     priceColModel->setHorizontalHeaderLabels({"name", "id", "dbColumn"});
 
-    QVector<QString> itemUnitsList = {"шт", "г", "м", "см", "л"};
+    QVector<QString> itemUnitsList = {QObject::tr("шт"), QObject::tr("г"), QObject::tr("м"), QObject::tr("см"), QObject::tr("л")};
     QVector<QString> itemUnitsIdsList = {"1", "2", "3", "4", "5"};
     QList<QStandardItem*> *itemUnitsSelector;
     for (int i=0; i<itemUnitsList.size(); i++)

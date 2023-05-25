@@ -675,10 +675,16 @@ bool tabRepairNew::checkInput()
     if ( ui->checkBoxIsPrepay->isChecked() )       // если установлен флаг "Клиент вносит предоплату"
     {
         if (ui->comboBoxPrepayReason->currentIndex() < 0)       // обязательно должно быть указано основание
+        {
             ui->comboBoxPrepayReason->setStyleSheet(commonComboBoxStyleSheetRed);
+            error = 18;
+        }
         if (ui->comboBoxPrepayAccount->currentIndex() < 0)      // опязательно должен быть выбран счёт
+        {
             ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheetRed);
-        if ( ui->doubleSpinBoxPrepaySumm->text().toInt() == 0 )   // соответствует ли норме введённая сумма
+            error = 18;
+        }
+        if ( ui->doubleSpinBoxPrepaySumm->value() == 0 )   // соответствует ли норме введённая сумма
         {
             ui->doubleSpinBoxPrepaySumm->setStyleSheet(commonLineEditStyleSheetRed);
             error = 18;

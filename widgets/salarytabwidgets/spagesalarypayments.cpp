@@ -18,32 +18,10 @@ SPageSalaryPayments::~SPageSalaryPayments()
 
 void SPageSalaryPayments::updateModels()
 {
-    ui->tableViewPayments->setQuery(QString(
-                                        "SELECT                                              \n"\
-                                        "    t1.`id`,                                        \n"\
-                                        "    t1.`payment_date`,                              \n"\
-                                        "    t1.`summ`,                                      \n"\
-                                        "    t4.`summ` AS 'toBalance',                       \n"\
-                                        "    t2.`username` AS 'employee',                    \n"\
-                                        "    t3.`username` AS 'issuer',                      \n"\
-                                        "    t1.`notes`,                                     \n"\
-                                        "    t1.`type`                                       \n"\
-                                        "FROM `salary` AS t1                                 \n"\
-                                        "LEFT JOIN `balance` AS t4                           \n"\
-                                        "    ON t1.`balance_record` = t4.`id`                \n"\
-                                        "INNER JOIN `users` AS t2                            \n"\
-                                        "    ON t1.`user_id` = t2.`id`                       \n"\
-                                        "INNER JOIN `users` AS t3                            \n"\
-                                        "    ON t1.`from_user` = t3.`id`                     \n"\
-                                        "WHERE                                               \n"\
-                                        "    t1.`period_from` >= '%1'                        \n"\
-                                        "    AND t1.`period_to` <= '%2'                      \n"\
-                                        "    AND t1.`user_id` = %3;                          \n"\
-                                        )                                                       \
-                                        .arg(parentTab->periodBegin())                          \
-                                        .arg(parentTab->m_periodEnd.addSecs(-1).toString("yyyy-MM-dd hh:mm:ss"))    \
-                                        .arg(parentTab->employeeId())
-                                    , QSqlDatabase::database("connMain"));
+    ui->tableViewPayments->setQuery(QUERY_SEL_SALARY_PAYMENTS(
+                                        parentTab->periodBegin(),
+                                        parentTab->m_periodEnd.addSecs(-1).toString("yyyy-MM-dd hh:mm:ss"),
+                                        parentTab->employeeId()));
 
     ui->tableViewPayments->refresh();
     parentTab->setModelUpdatedFlag(PaymentsModel);

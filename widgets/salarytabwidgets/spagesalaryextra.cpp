@@ -26,23 +26,10 @@ void SPageSalaryExtra::enableVScrollbarPadding(const bool state)
 
 void SPageSalaryExtra::updateModels()
 {
-    ui->tableViewExtraCharges->setQuery(QString(
-                                        "SELECT                                                           \n"\
-                                        "    `id`,                                                        \n"\
-                                        "    `name`,                                                      \n"\
-                                        "    `price`,                                                     \n"\
-                                        "    `payment_date`,                                              \n"\
-                                        "    `user`                                                       \n"\
-                                        "  FROM `additional_payments`                                     \n"\
-                                        "  WHERE                                                          \n"\
-                                        "    `payment_date` >= '%1'                                       \n"\
-                                        "    AND `payment_date` <= '%2'                                   \n"\
-                                        "    AND `to_user` = %3                                             "\
-                                        )
-                                        .arg(parentTab->periodBegin())\
-                                        .arg(parentTab->periodEnd())\
-                                        .arg(parentTab->employeeId())\
-                                        , QSqlDatabase::database("connMain"));
+    ui->tableViewExtraCharges->setQuery(QUERY_SEL_SALARY_EXTRA_CHARGES(\
+                                            parentTab->periodBegin(),\
+                                            parentTab->periodEnd(),\
+                                            parentTab->employeeId()));
 
     ui->tableViewExtraCharges->refresh();
     parentTab->setModelUpdatedFlag(ExtraChargesModel);

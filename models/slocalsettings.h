@@ -20,12 +20,12 @@ class SLocalSettings : public QObject
 public:
     // Списки настроек (файлы в папке cfg АСЦ CRM); настройки, помеченные TODO, в АСЦ v3.7.37.1184 не реализованы
     enum SettingsVariant {UserSettings = 1, RepairsGrid, CartridgesGrid, RepairWorksGrid, PriceGrid, RepairMassEditorGrid, CommentsGrid,
-                      StoreItemsGrid, ProductsGrid, ArrivalGrid, SaleGrid/*, TODO: Товары->Документы*/, BuyRequestManagerGrid, StoreManagementGrid, PriceEditorGrid, XmlExportGrid, StockTakingGrid,
+                      StoreItemsGrid, ProductsGrid, ArrivalGrid, SaleItemsGrid/*, TODO: Товары->Документы*/, BuyRequestManagerGrid, StoreManagementGrid, PriceEditorGrid, XmlExportGrid, StockTakingGrid,
                       MoveGrid/*, TODO: таблица Документы в карточке товара*/, HistoryGrid,
                       CustomersGrid, SmsGrid,
                       CustomerHistoryGrid, CustomerPurchasesGrid, CustomerRepairsGrid, DealerSalesGrid,
                       KassaGrid, InvoicesGrid, AdditionalPaymentsGrid, SalaryExtraChargesGrid, SalaryRepairsGrid, SalaryRepairWorksGrid, SalaryRepairPartsGrid, SalaryReceptedGrid, SalaryIssuedGrid,
-                      SalarySalesGrid, SalaryItemsGrid, SalarySalePartsGrid, SalaryPaymentsGrid /*, TODO: таблицы в модуле Зарплата*/,
+                      SalarySalesGrid, SalaryItemsGrid, SalarySalePartsGrid, SalaryPaymentsGrid,
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
                       TasksGrid};
     Q_ENUM(SettingsVariant)

@@ -32,51 +32,14 @@ SPageSalaryRepairs::~SPageSalaryRepairs()
 
 void SPageSalaryRepairs::loadRepairData(const int id)
 {
-    ui->tableViewRepairWorks->setQuery(QString(
-                                       "SELECT                                                                                       \n"\
-                                       "    t1.`price_id`,                                                                           \n"\
-                                       "    t1.`name`,                                                                               \n"\
-                                       "    t1.`count`,                                                                              \n"\
-                                       "    t1.`price`,                                                                              \n"\
-                                       "    t1.`count`*t1.`price` AS 'summ',                                                         \n"\
-                                       "    t1.`warranty`,                                                                           \n"\
-                                       "    @percent := IF(t2.quick_repair, t1.`pay_repair_quick`, t1.`pay_repair`) AS 'percent',    \n"\
-                                       "    t1.`count`*t1.`price`*@percent/100 AS 'salary_part'                                      \n"\
-                                       "FROM works AS t1                                                                             \n"\
-                                       "LEFT JOIN workshop AS t2                                                                     \n"\
-                                       "    ON t1.`repair` = t2.`id`                                                                 \n"\
-                                       "WHERE                                                                                        \n"\
-                                       "    t1.`repair` = %1                                                                         \n"\
-                                       "    AND USER = %2                                                                            \n"\
-                                       )
-                                       .arg(id)\
-                                       .arg(m_userModel->id())\
-                                       , QSqlDatabase::database("connMain"));
+    ui->tableViewRepairWorks->setQuery(QUERY_SEL_SALARY_REPAIR_WORKS(
+                                           id,
+                                           m_userModel->id()));
     ui->tableViewRepairWorks->refresh();
 
-    ui->tableViewRepairParts->setQuery(QString(
-                                       "SELECT                                                                                       \n"\
-                                       "    CONCAT(t2.`articul`, '-', t1.`item_id`) AS 'UID',                                        \n"\
-                                       "    t1.`name`,                                                                               \n"\
-                                       "    t1.`count`,                                                                              \n"\
-                                       "    t1.`price`,                                                                              \n"\
-                                       "    @summ:=t1.`count` * t1.`price` AS 'summ',                                                \n"\
-                                       "    t1.`sn`,                                                                                 \n"\
-                                       "    t1.`warranty`,                                                                           \n"\
-                                       "    @profit:=t1.`count`*(t1.`price`-t2.`in_price`) AS 'profit',                              \n"\
-                                       "    @profit*IF(t3.`pay_4_sale_in_repair`, t3.`pay_sale`, 0)/100 AS 'salary_part'             \n"\
-                                       "FROM store_int_reserve AS t1                                                                 \n"\
-                                       "LEFT JOIN store_items AS t2                                                                  \n"\
-                                       "    ON t1.`item_id` = t2.`id`                                                                \n"\
-                                       "LEFT JOIN `users` AS t3                                                                      \n"\
-                                       "     ON t1.`to_user` = t3.`id`                                                               \n"\
-                                       "WHERE                                                                                        \n"\
-                                       "    `repair_id` = %1                                                                         \n"\
-                                       "    AND `to_user` = %2                                                                       \n"\
-                                       )
-                                       .arg(id)\
-                                       .arg(m_userModel->id())\
-                                       , QSqlDatabase::database("connMain"));
+    ui->tableViewRepairParts->setQuery(QUERY_SEL_SALARY_REPAIR_PARTS(
+                                           id,
+                                           m_userModel->id()));
     ui->tableViewRepairParts->refresh();
 
 }
@@ -91,82 +54,11 @@ void SPageSalaryRepairs::updateModels()
     QStringList query_group;
     query_group << "`id`";    // default GROUP part of query
 
-    ui->tableViewRepairs->setQuery(QString(                                                                                                                                                                  \
-                                   "SELECT                                                                                                                                                                \n"\
-                                   "    `id`,                                                                                                                                                             \n"\
-                                   "    `Title`,                                                                                                                                                          \n"\
-                                   "    `real_repair_cost`,                                                                                                                                               \n"\
-                                   "    SUM(`work_by_employee`) AS 'works_by_employee',                                                                                                                   \n"\
-                                   "    `parts_cost`,                                                                                                                                                     \n"\
-                                   "    SUM(`employee_parts`) AS 'employee_parts',                                                                                                                        \n"\
-                                   "    SUM(`employee_salary_for_work`) AS 'employee_salary_for_works',                                                                                                   \n"\
-                                   "    SUM(`employee_salary_for_parts`) AS 'employee_salary_for_parts',                                                                                                  \n"\
-                                   "    `out_date`,                                                                                                                                                       \n"\
-                                   "    `state`,                                                                                                                                                          \n"\
-                                   "    `summ`,                                                                                                                                                           \n"\
-                                   "    `status_id`,                                                                                                                                                      \n"\
-                                   "    `filter1`,                                                                                                                                                        \n"\
-                                   "    `cartridge`                                                                                                                                                       \n"\
-                                   "FROM (                                                                                                                                                                \n"\
-                                   "    SELECT                                                                                                                                                            \n"\
-                                   "        g1t1.*,                                                                                                                                                       \n"\
-                                   "        g1t2.`created_at`,                                                                                                                                            \n"\
-                                   "        (g1t3.`price`*g1t3.`count`) AS 'work_by_employee',                                                                                                            \n"\
-                                   "        (g1t3.`price`*g1t3.`count`*(IF(g1t1.quick_repair, IFNULL(g1t3.`pay_repair_quick`, g1t5.`pay_repair_quick`), IFNULL(g1t3.`pay_repair`, g1t5.`pay_repair`)))/100) AS 'employee_salary_for_work', \n"\
-                                   "        IFNULL(SUM(g1t4.`price`*g1t4.`count`), 0) AS 'employee_parts',                                                                                                \n"\
-                                   "        IF(g1t5.`pay_4_sale_in_repair`, IFNULL(SUM((g1t4.`price` - g1t6.`in_price`)*g1t4.`count`*g1t5.`pay_sale`/100), 0), 0) AS 'employee_salary_for_parts',         \n"\
-                                   "        g1t7.`summ`,                                                                                                                                                  \n"\
-                                   "        g1t2.`status_id`,                                                                                                                                             \n"\
-                                   "        g1t2.`filter1`                                                                                                                                                \n"\
-                                   "    FROM workshop AS g1t1                                                                                                                                             \n"\
-                                   "    LEFT JOIN (                                                                                                                                                       \n"\
-                                   "        SELECT                                                                                                                                                        \n"\
-                                   "            `repair_id`                                                                                                                                               \n"\
-                                   "            , `created_at`                                                                                                                                            \n"\
-                                   "            , `status_id`                                                                                                                                             \n"\
-                                   "            , IF(@id<>`repair_id`, @cnt:=1, @cnt:=@cnt+1) AS `filter1`                                                                                                \n"\
-                                   "            , @id:=`repair_id`                                                                                                                                        \n"\
-                                   "        FROM repair_status_logs CROSS JOIN (SELECT @cnt:=1, @id:=0) AS dummy                                                                                          \n"\
-                                   "        ORDER BY `repair_id` ASC, `id` DESC                                                                                                                           \n"\
-                                   "    ) AS g1t2                                                                                                                                                         \n"\
-                                   "        ON g1t1.`id` = g1t2.`repair_id`                                                                                                                               \n"\
-                                   "    LEFT JOIN works AS g1t3                                                                                                                                           \n"\
-                                   "        ON g1t1.`id` = g1t3.`repair`                                                                                                                                  \n"\
-                                   "    LEFT JOIN store_int_reserve AS g1t4                                                                                                                               \n"\
-                                   "        ON g1t3.`id` = g1t4.`work_id` AND g1t4.`to_user` = %4                                                                                                         \n"\
-                                   "    LEFT JOIN users AS g1t5                                                                                                                                           \n"\
-                                   "        ON g1t3.`user` = g1t5.`id`                                                                                                                                    \n"\
-                                   "    LEFT JOIN store_items AS g1t6                                                                                                                                     \n"\
-                                   "        ON g1t4.`item_id` = g1t6.`id`                                                                                                                                 \n"\
-                                   "    LEFT JOIN salary_repairs AS g1t7                                                                                                                                  \n"\
-                                   "        ON g1t1.`id` = g1t7.`repair` AND g1t7.`user` = %4                                                                                                             \n"\
-                                   "    WHERE                                                                                                                                                             \n"\
-                                   "        (                                                                                                                                                             \n"\
-                                   "          ( g1t2.`filter1`  = 1                                                                                                                                       \n"\
-                                   "                AND (                                                                                                                                                 \n"\
-                                   "              ( g1t7.`id` IS NULL                                                                                                                                     \n"\
-                                   "                AND `created_at` > '%1'                                                                                                                               \n"\
-                                   "                AND `created_at` < '%2' )                                                                                                                             \n"\
-                                   "                  OR                                                                                                                                                  \n"\
-                                   "                  ( g1t7.`id` IS NOT NULL                                                                                                                             \n"\
-                                   "                AND g1t7.`accounting_date` > '%1'                                                                                                                     \n"\
-                                   "                AND g1t7.`accounting_date` < '%2' ))                                                                                                                  \n"\
-                                   "          )                                                                                                                                                           \n"\
-                                   "          OR                                                                                                                                                          \n"\
-                                   "          ( g1t2.`filter1` IS NULL                                                                                                                                    \n"\
-                                   "            AND g1t1.`out_date` > '%1'                                                                                                                                \n"\
-                                   "            AND g1t1.`out_date` < '%2' )                                                                                                                              \n"\
-                                   "        )                                                                                                                                                             \n"\
-                                   "        AND g1t1.`state` IN (%3)                                                                                                                                      \n"\
-                                   "        AND g1t3.`user` = %4                                                                                                                                          \n"\
-                                   "    GROUP BY g1t3.id                                                                                                                                                  \n"\
-                                   ") AS t1                                                                                                                                                               \n"\
-                                   )\
-                                   .arg(parentTab->periodBegin())\
-                                   .arg(parentTab->periodEnd())\
-                                   .arg((ui->checkBoxIncludeNotIssued->isChecked())?"8,12,16,6,7":"8,12,16")\
-                                   .arg(parentTab->employeeId())\
-                                   , QSqlDatabase::database("connMain"));
+    ui->tableViewRepairs->setQuery(QUERY_SEL_SALARY_REPAIRS(
+                                       parentTab->periodBegin(),
+                                       parentTab->periodEnd(),
+                                       (ui->checkBoxIncludeNotIssued->isChecked())?"8,12,16,6,7":"8,12,16",
+                                       parentTab->employeeId()));
 
     ui->tableViewRepairs->setGrouping(query_group);
     ui->tableViewRepairs->refresh(ui->checkBoxShowPayed->isChecked());

@@ -68,7 +68,7 @@ private:
     SClientModel *clientModel;
     QSqlQueryModel* clientPhonesModel;
     SSaleTableModel *tableModel;
-    SaleTableItemDelegates *itemDelagates;
+//    SaleTableItemDelegates *itemDelagates;
     tabSaleSettingsMenu *widgetAction;
     SCashRegisterModel *cashRegister;
     int client = 0;
