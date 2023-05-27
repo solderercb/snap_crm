@@ -12,6 +12,7 @@ RelWithDebInfo/*
 snap_autogen/*
 Testing/*
 tmp/*
+lang/*.qm
 .qmake.stash
 CMakeCache.txt
 CMakeCache.txt.prev

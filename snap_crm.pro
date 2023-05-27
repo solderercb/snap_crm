@@ -361,13 +361,57 @@ PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
 LIBS += -lwinspool -lKernel32
 LIBS += -L$$LIB_DIR -llimereport
 
-BIN_DIR ~= s,/,\\,g
-LIB_DIR ~= s,/,\\,g
+win32:BIN_DIR ~= s,/,\\,g
+win32:LIB_DIR ~= s,/,\\,g
 QMAKE_PRE_LINK  += rcc -binary $${PWD}\\schema-updates\\schema-updates.qrc -o $${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc $$escape_expand(\\n\\t)
 #QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
+
+TRANSLATIONS_PATH = $$PWD/lang
+LANGUAGES = ru_RU #uk_UA be_BY kk_KZ uz_UZ en_US en_GB az_AZ bg_BG cs_CZ de_AT de_DE et_EE fi_FI hu_HU hy_AM ka_GE ku_TR lt_LT lv_LV pl_PL ro_RO tr_TR
+
+defineReplace(prependAll) {
+    for(a,$$1):result += $$2$${a}$$3
+    return($$result)
+}
+
+TRANSLATIONS = $$prependAll(LANGUAGES, \"$$TRANSLATIONS_PATH/$${TARGET}_,.ts\")
+
+qtPrepareTool(LUPDATE, lupdate)
+ts.commands = $$LUPDATE \"$$PWD/snap_crm.pro\" -ts $$TRANSLATIONS
+TRANSLATIONS_FILES =
+qtPrepareTool(LRELEASE, lrelease)
+for(tsfile, TRANSLATIONS) {
+    qmfile = $$tsfile
+    qmfile ~= s,".ts\"$",".qm\"",
+    qm.commands += $$LRELEASE -removeidentical $$tsfile -qm $$qmfile $$escape_expand(\\n\\t)
+    TRANSLATIONS_FILES += $$qmfile
+}
+qm.depends = ts
+OTHER_FILES += $$TRANSLATIONS
+QMAKE_EXTRA_TARGETS += qm ts
+POST_TARGETDEPS +=  qm
+
+DEST = $$OUT_PWD/$${BUILD_TYPE}/lang
+DEST2 = $${PROGRAM_FILES_DIR}/lang
+win32:TRANSLATIONS_PATH ~= s,/,\\,g
+win32:DEST ~= s,/,\\,g
+
+QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
+!exists($${DEST}){
+   QMAKE_POST_LINK += mkdir \"$${DEST}\" $$escape_expand(\\n\\t)
+}
+for(qmfile, TRANSLATIONS_FILES) {
+    win32:qmfile ~= s,/,\\,g
+    QMAKE_POST_LINK += $$QMAKE_COPY $$qmfile \"$$DEST\" $$escape_expand(\\n\\t)
+}
+
 equals(QT_MAJOR_VERSION, 5){
     CONFIG(release, debug|release) {
         QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)
         QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc\" \"$${PROGRAM_FILES_DIR}\\\" $$escape_expand(\\n\\t)
+        for(qmfile, TRANSLATIONS_FILES) {
+            win32:qmfile ~= s,/,\\,g
+            QMAKE_POST_LINK += $$QMAKE_COPY $$qmfile \"$$DEST\" $$escape_expand(\\n\\t)
+        }
     }
 }
