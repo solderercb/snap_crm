@@ -111,6 +111,7 @@
    <header>widgets/slineedit.h</header>
    <slots>
     <signal>buttonClicked(int)</signal>
+    <signal>mouseDoubleClick()</signal>
    </slots>
   </customwidget>
  </customwidgets>

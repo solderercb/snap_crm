@@ -2,6 +2,7 @@
 #include "ui_tabsettings.h"
 #include "global.h"
 #include "widgets/spagesettingsdoctempateeditor.h"
+#include "widgets/settingstabwidgets/ssettingspagerolesandpermissions.h"
 
 tabSettings* tabSettings::p_instance = nullptr;
 
@@ -14,7 +15,7 @@ tabSettings::tabSettings(MainWindow *parent) :
     connect(ui->pages, &SPagedInterface::initPage, this, &tabSettings::initPage);
     connect(this, &tabSettings::pageInitFinished, ui->pages, &SPagedInterface::addPage);
 
-    ui->buttonSave->setEnabled(0);
+//    ui->buttonSave->setEnabled(0);
     ui->buttonRefresh->setEnabled(0);
 
     ui->pages->setButtonText(0, "Персональные настройки");
@@ -85,13 +86,13 @@ void tabSettings::initPage(const int page)
 //        case Page::Global: widget = new QWidget(); break;
 //        case Page::Company: widget = new QWidget(); break;
 //        case Page::Employees: widget = new QWidget(); break;
-//        case Page::UserRoles: widget = new QWidget(); break;
+        case Page::UserRoles: widget = new SSettingsPageRolesAndPermissions(this); break;
 //        case Page::Warehouses: widget = new QWidget(); break;
 //        case Page::Finances: widget = new QWidget(); break;
 //        case Page::Devices: widget = new QWidget(); break;
 //        case Page::RepairStatuses: widget = new QWidget(); break;
 //        case Page::AdditionalFieldsAndAdSources: widget = new QWidget(); break;
-        case Page::DocTemplates: widget = new SPageSettingsDocTempateEditor(); break;
+        case Page::DocTemplates: widget = new SPageSettingsDocTempateEditor(this); break;
 //        case Page::Notifications: widget = new QWidget(); break;
 //        case Page::Backup: widget = new QWidget(); break;
         default: return;
@@ -101,7 +102,44 @@ void tabSettings::initPage(const int page)
 
 void tabSettings::buttonSaveClicked()
 {
+    bool nErr = 1;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    m_queryLog = new SQueryLog();
 
+    try
+    {
+        m_queryLog->start(metaObject()->className());
+        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+
+        emit saveSettings();
+
+#ifdef QT_DEBUG
+//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+#endif
+        QUERY_COMMIT_ROLLBACK(query,nErr);
+    }
+    catch (int type)
+    {
+        nErr = 0;
+        // TODO всплывающее сообщение
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+//            nErr = 1; // это чтобы проверить работу дальше
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query, nErr);
+    }
+
+    m_queryLog->stop();
+    if(nErr)
+        ;
+
+    emit updateDaughterPagesModels();
+
+    delete query;
+    delete m_queryLog;
 }
 
 tabSettings* tabSettings::getInstance(MainWindow *parent)
@@ -119,7 +157,8 @@ void tabSettings::randomFill()
 
 void tabSettings::test_scheduler_handler()
 {
-    ui->pages->switchPage(Page::DocTemplates);
+    ui->pages->switchPage(Page::UserRoles);
+//    ui->pages->switchPage(Page::DocTemplates);
 //    test_scheduler2->start(3000);
 
 }

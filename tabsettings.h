@@ -6,6 +6,7 @@
 #include <QSqlField>
 #include <QScrollBar>
 #include "tabcommon.h"
+#include "squerylog.h"
 
 namespace Ui {
 class tabSettings;
@@ -16,8 +17,9 @@ class tabSettings : public tabCommon
     Q_OBJECT
 
 signals:
-    void generatePrintout(QMap<QString,QVariant>);
+    void saveSettings();
     void pageInitFinished(QWidget* widget, const int page);
+    void updateDaughterPagesModels();
 
 public:
     enum Page{User, Global, Company, Employees, UserRoles, Warehouses, Finances, Devices, RepairStatuses, AdditionalFieldsAndAdSources, DocTemplates, Notifications, Backup};
@@ -34,6 +36,7 @@ private:
     bool m_buttonRefreshVisible = 0;
     bool m_lineEditSearchVisible = 0;
     bool m_editStrategy = 0;
+    SQueryLog *m_queryLog;
 private slots:
     void buttonSaveClicked();
     void updateBotToolbar(const int page);

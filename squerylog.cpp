@@ -58,12 +58,12 @@ bool SQueryLog::saveLog()
                                 "WHERE "\
                                 " `thread_id` IN (CONNECTION_ID())"
                                 "  AND `user_host` LIKE '%%1%'"\
+                                "  AND `argument` NOT IN ('')"\
                                 "  AND `argument` NOT LIKE '%mysql.general_log%';")\
                         .arg(QSqlDatabase::database("connThird").userName()));
 
             while(query->next())
             {
-
                 fileBuf.append(query->record().value(0).toByteArray());
                 fileBuf.append(QString(";\n\n").toUtf8());
             }

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(codec);
 
     QTranslator translator;
-    translator.load(QLocale(), "snap", "_", "lang/");
+    translator.load(QLocale(), "snap", "_", QCoreApplication::applicationDirPath()+"/lang/");
     app.installTranslator(&translator);
 
     windowsDispatcher *windowsDispatcherObj = new windowsDispatcher(nullptr);   // в main.cpp не может быть слотов, приходится создавать лишний объект

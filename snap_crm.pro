@@ -122,6 +122,9 @@ SOURCES += \
     widgets/salarytabwidgets/stableviewsalarysaleparts.cpp \
     widgets/salarytabwidgets/stableviewsalarysales.cpp \
     widgets/sdoublespinbox.cpp \
+    widgets/settingstabwidgets/ssettingspagebase.cpp \
+    widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp \
+    widgets/settingstabwidgets/stableviewpermissions.cpp \
     widgets/spageclientsummary.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
@@ -175,6 +178,7 @@ HEADERS  += \
     global.h \
     loginwindow.h \
     mainwindow.h \
+    models/propstruct.h \
     models/salarytabmodels/sadditionalpaymentmodel.h \
     models/salarytabmodels/ssalarymodel.h \
     models/salarytabmodels/ssalaryrepairsmodel.h \
@@ -188,6 +192,7 @@ HEADERS  += \
     models/salarytabmodels/stablesalarysalepartsmodel.h \
     models/salarytabmodels/stablesalarysalesmodel.h \
     models/seditablebasemodel.h \
+    models/spermissions.h \
     models/stablemodelscommonmethods.h \
     models/stablerepairsmodel.h \
     models/repairtablefiltermenu.h \
@@ -251,6 +256,9 @@ HEADERS  += \
     widgets/salarytabwidgets/stableviewsalarysaleparts.h \
     widgets/salarytabwidgets/stableviewsalarysales.h \
     widgets/sdoublespinbox.h \
+    widgets/settingstabwidgets/ssettingspagebase.h \
+    widgets/settingstabwidgets/ssettingspagerolesandpermissions.h \
+    widgets/settingstabwidgets/stableviewpermissions.h \
     widgets/spageclientsummary.h \
     squerylog.h \
     stable.h \
@@ -311,6 +319,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
     widgets/salarytabwidgets/spagesalarysales.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
+    widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \
     widgets/spageclientsummary.ui \
     tabcashmoveexch.ui \
     tabcashoperation.ui \

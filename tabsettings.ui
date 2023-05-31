@@ -232,14 +232,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonRefresh</sender>
+   <sender>buttonSave</sender>
    <signal>clicked()</signal>
    <receiver>tabSettings</receiver>
    <slot>buttonSaveClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>625</x>
-     <y>666</y>
+     <x>501</x>
+     <y>655</y>
     </hint>
     <hint type="destinationlabel">
      <x>700</x>
