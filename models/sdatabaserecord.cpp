@@ -279,20 +279,25 @@ bool SDatabaseRecord::del()
 
 void SDatabaseRecord::dbErrFlagHandler(bool flushValues)
 {
-    QString error;
-
     if(!i_nErr)
     {
-        error = QString("Query error in %1: \"%2\"").arg(this->metaObject()->className()).arg(i_query->lastError().text());
-        appLog->appendRecord(error);
-        errorMsg(error);
+        errorToLog(metaObject()->className(), i_query->lastError().text());
     }
 
     if(i_nErr && flushValues)
         i_valuesMap.clear();
 }
 
-void SDatabaseRecord::errorMsg(const QString &text)
+void SDatabaseErrorLogger::errorToLog(const QString &className, const QString &errorText)
+{
+    QString error;
+
+    error = QString("Query error in %1: \"%2\"").arg(className, errorText);
+    appLog->appendRecord(error);
+    errorMsg(error);
+}
+
+void SDatabaseErrorLogger::errorMsg(const QString &text)
 {
     QMessageBox msgBox;
     msgBox.setText(text);

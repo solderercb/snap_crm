@@ -11,7 +11,14 @@
 #include "com_sql_queries.h"
 #include "models/ssqlquerymodel.h"
 
-class SDatabaseRecord : public SSqlQueryModel
+class SDatabaseErrorLogger
+{
+protected:
+    void errorToLog(const QString &className, const QString &errorText);
+    void errorMsg(const QString&);
+};
+
+class SDatabaseRecord : public SSqlQueryModel, public SDatabaseErrorLogger
 {
     Q_OBJECT
     friend class SComRecord;
@@ -48,7 +55,6 @@ private:
     void fieldsInsFormatter();
     void fieldsUpdFormatter();
     void dbErrFlagHandler(bool);
-    void errorMsg(const QString&);
 signals:
 
 };
