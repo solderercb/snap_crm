@@ -148,7 +148,7 @@ void tabCashOperation::updateLineEditButtons(int state)
 {
     if(state == ClientFieldsAccess::Denied)
     {
-        if(permissions->value("Х")) // TODO: разрешение на просмотр карточки клиента
+        if(permissions->viewClients)
             ui->lineEditClientLastName->setButtons("Open");
         else
             ui->lineEditClientLastName->clearButtons();
@@ -412,15 +412,13 @@ void tabCashOperation::updateWidgets()
         ui->comboBoxCompany->setEnabled(false);
         setAmountReadOnly();
         m_clientRO = ClientFieldsAccess::Denied;
-        // TODO: разрешение редактировать платёжную систему в проведённом кассовом ордере
-//        if(!permissions->value("Х"))
-//            ui->comboBoxPaymentAccount->setEnabled(false);
+        ui->comboBoxPaymentAccount->setEnabled(permissions->editPaymentSystemInCommittedCashRegisters);
     }
     else
     {
         ui->toolButtonApplyPaymentSystem->hide();
         ui->lineEditDate->setVisible(false);
-        ui->dateEdit->setVisible(permissions->value("71"));    // Проводить документы задним числом
+        ui->dateEdit->setVisible(permissions->createBackdatedDocuments);    // Проводить документы задним числом
         ui->dateEdit->setDate(QDate::currentDate());
         ui->buttonSave->show();
         ui->buttonSaveMore->show();
@@ -431,11 +429,11 @@ void tabCashOperation::updateWidgets()
         m_reason = cashRegister->constructReason(m_linkedObjIdStr);
         ui->lineEditReason->setText(m_reason);
         setAmountReadOnly(m_amountRO);
+        ui->comboBoxPaymentAccount->setEnabled(!m_paymentAccountRO);
     }
 
     ui->checkBoxPrintCheck->setVisible(m_showCheckBoxPrint);
     ui->comboBoxOrderType->setEnabled(!m_orderTypeRO);
-    ui->comboBoxPaymentAccount->setEnabled(!m_paymentAccountRO);
 
     if(m_showBalance)
         ui->lineEditBalance->setText(sysLocale.toString(clientModel->balance(), 'f', 2));
@@ -489,7 +487,7 @@ bool tabCashOperation::checkInput()
     {
         if(!clientModel->balanceEnabled())
         {
-            bool tmp = permissions->value("11");    // Редактировать существующих клиентов
+            bool tmp = permissions->editClients;    // Редактировать существующих клиентов
             if(tmp)
             {
                 QMessageBox msgBox;

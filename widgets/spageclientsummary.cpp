@@ -52,14 +52,10 @@ SPageClientSummary::SPageClientSummary(int id, QWidget *parent) :
     }
     ui->lineEditPassword->setText(m_client->web_password());
     fillBinaryProperties();
-//    if(!permissions->value("X"))    // TODO: разрешение видеть реквизиты налогоплательщика и банковские
-//    {
-//        ui->groupBoxBanks->hide();
-//    }
-//    else
+    if(!permissions->viewClientBankData)
+        ui->groupBoxBanks->hide();
+    else
         fillBanks();
-
-//    ui->lineEdi->setText();
 
     setCursorPositionsToZero();
 }

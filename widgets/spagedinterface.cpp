@@ -1,5 +1,6 @@
 #include "spagedinterface.h"
 #include "widgets/stabpage.h"
+#include "tabsettings.h"
 
 SPagedInterface::SPagedInterface(QWidget *parent) : QWidget(parent)
 {
@@ -76,9 +77,11 @@ void SPagedInterface::addPage(QWidget *widget, const int page)
     switchPage(page);
 }
 
-void SPagedInterface::switchPage(const int page)
+void SPagedInterface::switchPage(int page)
 {
     int pageIndex = 0;
+    if(!permissions->editGlobalSettings)
+        page = tabSettings::Page::User;
     if(!i_pages.contains(page))
     {
         emit initPage(page);

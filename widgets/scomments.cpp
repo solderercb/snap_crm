@@ -80,11 +80,10 @@ bool SComments::isEditable(const int row)
 {
     int timeDiff = commentsModel->created(row).secsTo(QDateTime::currentDateTimeUtc());
     int authorId = commentsModel->userId(row);
-    bool editAllowed = permissions->contains("Редактировать чужие комментарии");    // TODO: добавить разрешение
 
     // Удаление и редактирование доступно только в течение некоторого времени после создания (подсмотрено в Telegram).
     // Удалять и редактировать можно только свои комментарии или при наличии особого разрешения
-    if((timeDiff < 3600 && authorId == userDbData->value("id").toInt()) || editAllowed )
+    if((timeDiff < 3600 && authorId == userDbData->value("id").toInt()) || permissions->editAnyComment )
         return 1;
 
     return 0;

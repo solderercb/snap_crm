@@ -24,8 +24,8 @@ SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
     ui->comboBoxSalaryPaymentSystem->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(0, "system_id"));
     ui->comboBoxSubsistencePaymentSystem->setModel(paymentSystemsProxyModel);
     ui->comboBoxSubsistencePaymentSystem->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(0, "system_id"));
-    ui->pushButtonPaySubsistence->setEnabled(permissions->value("16")); // Создавать ПКО/РКО
-    ui->pushButtonPaySubsistence->setEnabled(permissions->value("48")); // Выдавать аванс сотрудникам
+    ui->pushButtonPaySubsistence->setEnabled(permissions->createCashRegisters);
+    ui->pushButtonPaySubsistence->setEnabled(permissions->createCashRegisters && permissions->paySubsistence);
 
     connect(ui->toolButtonApplySummaryMonthCharge, &QToolButton::clicked, this, &SPageSalarySummary::setMonthCharge);
     connect(ui->pushButtonPaySubsistence, &QPushButton::clicked, this, &SPageSalarySummary::paySubsistence);
@@ -57,7 +57,7 @@ int SPageSalarySummary::createUserClientCardMsgBox()
         }
         else if(clickedButton == btnY)
         {
-            if(!permissions->contains("1"))  // Изменять служебные настройки
+            if(!permissions->editGlobalSettings)  // Изменять служебные настройки
             {
                 shortlivedNotification *newPopup = new shortlivedNotification(this,
                                                                               tr("Информация"),

@@ -106,7 +106,7 @@ Qt::ItemFlags SSaleTableModel::flags(const QModelIndex &index) const
                 if(m_modelState == State::WorkshopAdm)
                     return Qt::ItemIsEnabled | Qt::ItemIsEditable;
             case SSaleTableModel::RecordType::Item << 7 | SSaleTableModel::WorkshopSale << 6 | SStoreItemModel::SaleOpColumns::ColCount:
-                if(m_modelState == State::WorkshopAdm && permissions->contains("69"))   // Устанавливать детали со склада
+                if(m_modelState == State::WorkshopAdm && permissions->addGoodsFromWarehouse)   // Устанавливать детали со склада
                     return Qt::ItemIsEnabled | Qt::ItemIsEditable;
             default:
                 return Qt::ItemIsEnabled | Qt::ItemIsSelectable;

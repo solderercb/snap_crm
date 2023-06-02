@@ -228,8 +228,8 @@ void tabSale::updateWidgets()
             ui->buttonReserveCancel->hide();
             ui->buttonSaleMore->hide();
             ui->buttonSale->hide();
-            if(permissions->value("56"))
-            {   // удаление строк в проведённой РН будет доступно только для привелегированных пользователей (частичное рапроведение)
+            if(permissions->undoOutInvoice)
+            {
                 ui->groupBoxAdm->show();
             }
             else
@@ -499,10 +499,8 @@ void tabSale::fillClientCreds(int id)
     ui->lineEditClientPhone->setReadOnly(true);
     ui->comboBoxClientPhoneType->setEnabled(false);
 
-//    if(!permissions->value("Х"))     // TODO: в АСЦ чот не нашел разрешения на просмотр карточки клиента, может плохо смотрел
-//        ui->pushButtonCreateTabClient->setEnabled(false);
-//    else
-        ui->pushButtonCreateTabClient->setEnabled(true);
+        ui->pushButtonCreateTabClient->setEnabled(permissions->viewClients);
+        ui->pushButtonCreateTabClient->setEnabled(permissions->createNewClient);
     ui->comboBoxClientAdType->setEnabled(false);
     ui->checkBoxAnonymous->setChecked(false);
 

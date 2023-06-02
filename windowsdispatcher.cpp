@@ -52,7 +52,7 @@ void windowsDispatcher::connectOK()
     userActivityLog->appendRecord(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
 
     // TODO: добавить разрешение выбора компании при входе
-    if (permissions->contains("59"))  // Менять офис при входе
+    if (permissions->changeOffice)
     {
         createChooseOfficeWindow();
     }
@@ -88,7 +88,7 @@ void windowsDispatcher::createMainWindow()
 {
     MainWindow *windowMain = MainWindow::getInstance(this); // указатель должен объявляться именно здесь, по другому компилятор ругается
     windowMain->show();
-//    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
+    windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
 //    windowMain->createTabRepairNew(); // по-умолчанию создаём вкладку Ремонты
 }
 

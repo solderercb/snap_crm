@@ -1,4 +1,5 @@
 #include "sclientmodel.h"
+#include "global.h"
 
 SClientModel::SClientModel(int id, QObject *parent) :
     SComRecord(parent)
@@ -53,9 +54,24 @@ void SClientModel::load(int id)
         m_patronymicName = clientModel->record(0).value("patronymic").toString();
         m_address = clientModel->record(0).value("address").toString();
         m_postIndex = clientModel->record(0).value("post_index").toString();
-        m_passportNum = clientModel->record(0).value("passport_num").toString();
-        m_passportIssuedDate = clientModel->record(0).value("passport_date").toString();
-        m_passportIssuedBy = clientModel->record(0).value("passport_organ").toString();
+        if(permissions->viewClientPassportData)
+        {
+            m_passportNum = clientModel->record(0).value("passport_num").toString();
+            m_passportIssuedDate = clientModel->record(0).value("passport_date").toString();
+            m_passportIssuedBy = clientModel->record(0).value("passport_organ").toString();
+            m_INN = clientModel->record(0).value("INN").toString();
+            m_KPP = clientModel->record(0).value("KPP").toString();
+            m_OGRN = clientModel->record(0).value("OGRN").toString();
+        }
+        else
+        {
+            m_passportNum = tr("недостаточно прав");
+            m_passportIssuedDate = tr("недостаточно прав");
+            m_passportIssuedBy = tr("недостаточно прав");
+            m_INN = tr("недостаточно прав");
+            m_KPP = tr("недостаточно прав");
+            m_OGRN = tr("недостаточно прав");
+        }
         m_state = clientModel->record(0).value("state").toBool();
         m_type = clientModel->record(0).value("type").toBool();
         m_birthday = clientModel->record(0).value("birthday").toString();
@@ -69,9 +85,6 @@ void SClientModel::load(int id)
 //        m_photo = ;
         m_photoId = clientModel->record(0).value("photo_id").toInt();
         m_visitSource = clientModel->record(0).value("visit_source").toInt();
-        m_INN = clientModel->record(0).value("INN").toString();
-        m_KPP = clientModel->record(0).value("KPP").toString();
-        m_OGRN = clientModel->record(0).value("OGRN").toString();
         m_webPassword = clientModel->record(0).value("web_password").toString();
         m_urName = clientModel->record(0).value("ur_name").toString();
         m_email = clientModel->record(0).value("email").toString();
@@ -288,6 +301,7 @@ void SClientModel::setPostIndex(const QString &text)
 
 QString SClientModel::passportNum()
 {
+
     return m_passportNum;
 }
 

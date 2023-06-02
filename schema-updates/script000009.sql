@@ -39,4 +39,4 @@ ALTER TABLE `clients`
 	ADD COLUMN `employee` INT(11) NULL DEFAULT NULL COMMENT 'id карточки сотрудника-клиента' AFTER `token`,
 	ADD CONSTRAINT `fk_clients_users2` FOREIGN KEY (`employee`) REFERENCES `users` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-INSERT INTO `latestbackup`.`settings` (`name`, `value`) VALUES ('salary_include_not_issued_by_default', '1');
+INSERT INTO `settings` (`name`, `value`) VALUES ('salary_include_not_issued_by_default', '1');

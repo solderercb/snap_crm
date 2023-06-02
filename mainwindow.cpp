@@ -152,16 +152,22 @@ void MainWindow::createMenu()
     QMenu *workshop_menu = new QMenu();
     QAction *workshop_new = new QAction(tr("Принять"), this);
     workshop_menu->addAction(workshop_new);
+    workshop_new->setVisible(permissions->receptDevices);
     QObject::connect(workshop_new,SIGNAL(triggered()),this,SLOT(createTabRepairNew()));
+
     QAction *workshop_refill = new QAction(tr("Заправка"), this);
     workshop_menu->addAction(workshop_refill);
     workshop_refill->setEnabled(false);
+
     QAction *workshop_price = new QAction(tr("Прайс-лист"), this);
     workshop_menu->addAction(workshop_price);
     workshop_price->setEnabled(false);
+
     QAction *workshop_editor = new QAction(tr("Групповой редактор ремонтов"), this);
     workshop_menu->addAction(workshop_editor);
     workshop_editor->setEnabled(false);
+//    workshop_editor->setVisible(permissions->)   // TODO
+
     QToolButton* workshop_button = new QToolButton();
     workshop_button->setMenu(workshop_menu);
     workshop_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -174,33 +180,52 @@ void MainWindow::createMenu()
 
     /* Кнопка Товары и меню */
     QMenu *goods_menu = new QMenu();
+
     QAction *goods_arrival = new QAction(tr("Приход"), this);
     goods_menu->addAction(goods_arrival);
     goods_arrival->setEnabled(false);
+    goods_arrival->setVisible(permissions->incomeGoods);
+
     QAction *goods_sale = new QAction(tr("Продажа"), this);
     goods_menu->addAction(goods_sale);
+    goods_sale->setVisible(permissions->saleGoods);
     QObject::connect(goods_sale,SIGNAL(triggered()),this,SLOT(createTabSale()));
+
     QAction *store_docs = new QAction(tr("Документы"), this);
     goods_menu->addAction(store_docs);
     store_docs->setEnabled(false);
+//    store_docs->setVisible(permissions->);   // TODO
+
     QAction *purchase_manager = new QAction(tr("Менеджер закупок"), this);
     goods_menu->addAction(purchase_manager);
     purchase_manager->setEnabled(false);
+    purchase_manager->setVisible(permissions->enableSparepartRequestManager);
+
     QAction *store_manager = new QAction(tr("Управление складом"), this);
     goods_menu->addAction(store_manager);
     store_manager->setEnabled(false);
+    store_manager->setVisible(permissions->manageWarehouse);
+
     QAction *goods_editor = new QAction(tr("Групповой редактор товаров"), this);
     goods_menu->addAction(goods_editor);
     goods_editor->setEnabled(false);
+    goods_editor->setVisible(permissions->editGoods);
+
     QAction *goods_uploader = new QAction(tr("Выгрузка товаров"), this);
     goods_menu->addAction(goods_uploader);
     goods_uploader->setEnabled(false);
+    goods_uploader->setVisible(permissions->syncGoodsWithShop);
+
     QAction *device_buyout = new QAction(tr("Выкуп техники"), this);
     goods_menu->addAction(device_buyout);
     device_buyout->setEnabled(false);
+//    device_buyout->setVisible(permissions->);    // TODO
+
     QAction *stocktaking = new QAction(tr("Переучет"), this);
     goods_menu->addAction(stocktaking);
     stocktaking->setEnabled(false);
+    stocktaking->setVisible(permissions->manageWarehouse);
+
     QToolButton* goods_button = new QToolButton();
     goods_button->setMenu(goods_menu);
     goods_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -212,17 +237,25 @@ void MainWindow::createMenu()
 
     /* Кнопка Клиенты и меню */
     QMenu *clients_menu = new QMenu();
+
     QAction *client_new = new QAction(tr("Новый клиент"), this);
     clients_menu->addAction(client_new);
     client_new->setEnabled(false);
+    client_new->setVisible(permissions->createNewClient);
+
     QAction *clients_calls = new QAction(tr("Вызовы"), this);
     clients_menu->addAction(clients_calls);
     clients_calls->setEnabled(false);
+    clients_calls->setVisible(permissions->useTelephony);
+
     QAction *clients_sms = new QAction(tr("SMS"), this);
     clients_menu->addAction(clients_sms);
     clients_sms->setEnabled(false);
+    clients_sms->setVisible(permissions->readSMS);
+
 //    QAction *clients_editor = new QAction(tr("Групповой редактор клиентов"), this);
 //    clients_menu->addAction(clients_editor);
+
     QToolButton* clients_button = new QToolButton();
     clients_button->setMenu(clients_menu);
     clients_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -230,6 +263,10 @@ void MainWindow::createMenu()
     clients_button->setFixedSize(128,48);
     clients_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(clients_button);
+    if(!permissions->viewClients)
+    {
+        // TODO: кнопка должна быть неактивной, но меню должно работать
+    }
     QObject::connect(clients_button, SIGNAL(clicked()), this, SLOT(createTabClients()));
     ui->toolBar->addSeparator();
 
@@ -237,15 +274,22 @@ void MainWindow::createMenu()
     QMenu *finances_menu = new QMenu();
     QAction *pko_new = new QAction(tr("Приходный кассовый ордер"), this);
     finances_menu->addAction(pko_new);
+    pko_new->setVisible(permissions->createCashRegisters);
     QObject::connect(pko_new,SIGNAL(triggered()),this,SLOT(createTabNewPKO()));
+
     QAction *rko_new = new QAction(tr("Расходный кассовый ордер"), this);
     finances_menu->addAction(rko_new);
+    rko_new->setVisible(permissions->createCashRegisters);
     QObject::connect(rko_new,SIGNAL(triggered()),this,SLOT(createTabNewRKO()));
+
     QAction *move_new = new QAction(tr("Перемещение/обмен"), this);
     finances_menu->addAction(move_new);
+    move_new->setVisible(permissions->createCashRegisters);
     QObject::connect(move_new,SIGNAL(triggered()),this,SLOT(createTabCashMoveExch()));
+
     QAction *documents = new QAction(tr("Документы"), this);
     finances_menu->addAction(documents);
+    documents->setVisible(permissions->viewFinancialDocuments);
 
     /* Меню Финансы->Документы */
     QMenu *documents_submenu = new QMenu();
@@ -282,22 +326,28 @@ void MainWindow::createMenu()
     /* Кнопка Настройки и меню */
 #ifdef QT_DEBUG
     QMenu *settingsMenu = new QMenu();
+
     QAction *checkUpdates = new QAction(tr("Проверить обновления"), this);
     settingsMenu->addAction(checkUpdates);
     checkUpdates->setEnabled(false);
+    checkUpdates->setVisible(permissions->editGlobalSettings);
 //    QObject::connect(checkUpdates,SIGNAL(triggered()),this,SLOT(createUpdaterWidget()));
+
     QAction *about = new QAction(tr("О программе"), this);
     settingsMenu->addAction(about);
     about->setEnabled(false);
 //    QObject::connect(about,SIGNAL(triggered()),this,SLOT(createAboutWidget()));
+
     QAction *logout = new QAction(tr("Сменить пользователя"), this);
     settingsMenu->addAction(logout);
     logout->setEnabled(false);
 //    QObject::connect(logout,SIGNAL(triggered()),this,SLOT(logoff()));
+
     QAction *exit = new QAction(tr("Выход"), this);
     settingsMenu->addAction(exit);
     exit->setEnabled(false);
 //    QObject::connect(exit,SIGNAL(triggered()),this,SLOT(exit()));
+
     QToolButton* settingsButton = new QToolButton();
     settingsButton->setMenu(settingsMenu);
     settingsButton->setPopupMode(QToolButton::MenuButtonPopup);
@@ -362,6 +412,9 @@ void MainWindow::createTabRepairs(int type, QWidget* caller)
 
 void MainWindow::createTabRepair(int repair_id)
 {
+//    if(!permissions->viewAnyRepair /*&& repair->engineer != userId*/)   // TODO: если пользователю не разрешено открытие чужих ремонтов
+//        return;
+
     tabRepair *subwindow = tabRepair::getInstance(repair_id, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
@@ -378,6 +431,9 @@ void MainWindow::createTabRepair(int repair_id)
 
 void MainWindow::createTabRepairNew()
 {
+    if(!permissions->receptDevices)
+        return;
+
     tabRepairNew *subwindow = tabRepairNew::getInstance(this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
@@ -411,6 +467,11 @@ void MainWindow::createTabCashOperations()
  */
 void MainWindow::createTabCashOperation(int orderId, QMap<int, QVariant> data)
 {
+    if( (    (orderId == tabCashOperation::PKO || orderId == tabCashOperation::RKO) &&
+            !permissions->createCashRegisters) ||
+        !permissions->viewCashOrders)
+        return;
+
     tabCashOperation *subwindow = tabCashOperation::getInstance(orderId, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
@@ -440,6 +501,9 @@ void MainWindow::createTabNewRKO()
  */
 void MainWindow::createTabCashMoveExch()
 {
+    if(!permissions->createCashRegisters)
+        return;
+
     tabCashMoveExch *subwindow = tabCashMoveExch::getInstance(this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
@@ -450,11 +514,17 @@ void MainWindow::createTabCashMoveExch()
 }
 void MainWindow::createTabDocuments(int type, QWidget *caller)
 {
+//    if(!permissions->viewDocuments) // TODO
+//        return;
+
     qDebug().nospace() << "[MainWindow] createTabDocuments()";
 }
 
 void MainWindow::createTabInvoices(int type, QWidget *caller)
 {
+    //    if(!permissions->viewInvoices) // TODO
+    //        return;
+
     qDebug().nospace() << "[MainWindow] createTabInvoices()";
 }
 
@@ -501,11 +571,17 @@ void MainWindow::reactivateCallerTab(QWidget *caller)
 
 void MainWindow::reactivateTabRepairNew(int)
 {
+    if(!permissions->receptDevices)
+        return;
+
     ui->tabWidget->setCurrentWidget(tabRepairNew::getInstance());
 }
 
 void MainWindow::createTabSale(int doc_id)
 {
+    if(!permissions->saleGoods)
+        return;
+
     tabSale *subwindow = tabSale::getInstance(doc_id, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
@@ -523,6 +599,9 @@ void MainWindow::createTabSale(int doc_id)
 */
 void MainWindow::createTabClients(int type, QWidget *caller)
 {
+    if(!permissions->viewClients)
+        return;
+
     tabClients *subwindow = tabClients::getInstance(type, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет
     {
@@ -553,8 +632,9 @@ void MainWindow::createTabClients(int type, QWidget *caller)
 
 void MainWindow::createTabClient(int id)
 {
-//    if(!permissions->value("X"))    // TODO: разрешение на просмотр карты клиента
-//        return;
+    if(!permissions->viewClients)
+        return;
+
     tabClient *subwindow = tabClient::getInstance(id, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
@@ -865,14 +945,14 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
 //    createTabSale(0);
-    createTabRepair(25129);
+    createTabRepair(25541);
 //    createTabSale(16316);
 //    if (test_scheduler_counter < 375)
 //    {
 //        createTabRepairNew();
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
-//        createTabCashOperation(42019);
+//        createTabCashOperation(42268);
 //        createTabClient(143);
 //        createTabCashMoveExch();
 //        QMap<QString, QVariant> report_vars;
@@ -884,8 +964,8 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        report_vars2.insert("repair_id", 25098);
 //        createTabPrint(report_vars2);
 //    }
-//        createTabSettings();
-    createTabSalary();
+//    createTabSettings();
+//    createTabSalary();
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
 
 }

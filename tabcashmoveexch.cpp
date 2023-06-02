@@ -214,7 +214,7 @@ void tabCashMoveExch::updateWidgets()
     ui->radioButtonMove->setDisabled(m_widgetsRO);
     ui->radioButtonExchange->setDisabled(m_widgetsRO);
     ui->lineEditDate->setVisible(m_widgetsRO);
-    ui->dateEdit->setVisible(!m_widgetsRO && permissions->value("71"));    // Проводить документы задним числом
+    ui->dateEdit->setVisible(!m_widgetsRO && permissions->createBackdatedDocuments);    // Проводить документы задним числом
     ui->comboBoxSrcOffice->setEnabled(!m_widgetsRO);
     ui->comboBoxDstOffice->setEnabled(!m_widgetsRO);
     ui->comboBoxSrcPaymentAccount->setEnabled(!m_widgetsRO);

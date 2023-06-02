@@ -18,7 +18,7 @@ tabClient::tabClient(int id, MainWindow *parent) :
     ui->buttonRefresh->setEnabled(0);
 
     ui->pages->switchPage(0);  // по-умолчанию страница 0 ("Сводка")
-    if(permissions->value("11"))
+    if(permissions->editClients)
         ui->pages->addButton(tr("Редактировать"), QIcon(), Page::Edit);
     ui->pages->addButton(tr("История"), QIcon(), Page::History);
     ui->pages->redraw();
@@ -37,7 +37,6 @@ QString tabClient::tabTitle()
 
 void tabClient::updateBotToolbar(const int page)
 {
-    qDebug().nospace() << "[" << this << "] updateBotToolbar()";
     m_buttonPrintVisible = 0;
     m_buttonSaveVisible = 1;
     m_buttonRefreshVisible = 0;

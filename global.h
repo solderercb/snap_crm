@@ -18,6 +18,7 @@
 #include "models/sstandarditemmodel.h"
 #include "models/ssqlquerymodel.h"
 #include "models/spaymenttypesmodel.h"
+#include "models/spermissions.h"
 #ifdef QT_DEBUG
 #include "clients4test.h"
 #endif
@@ -49,7 +50,7 @@ extern QMap<QString, QVariant> *userDbData;
 extern QSqlQueryModel *userDbDataModel;
 extern SLocalSettings *localSettings;
 extern t_userSettings *userLocalData;
-extern QMap<QString, bool> *permissions;
+extern SPermissions *permissions;
 extern QMap<QString, QVariant> *comSettings;
 extern SSqlQueryModel *clientPhoneTypesModel;
 extern SSqlQueryModel *companiesModel;

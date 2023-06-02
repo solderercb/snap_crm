@@ -21,37 +21,37 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(repairModel, SIGNAL(modelUpdated()), this, SLOT(updateWidgets()));
     setLock(1);
     clientModel = new SClientModel();
-    if(permissions->contains("3"))  // Печатать ценники и стикеры
+    if(permissions->printStickers)
     {
         ui->lineEditRepairId->setButtons("Print");
         connect(ui->lineEditRepairId, &SLineEdit::buttonClicked, this, &tabRepair::printStickers);
     }
-    if(permissions->contains("72"))  // Изменять офис ремонта
+    if(permissions->moveRepairToOffice)
     {
         ui->lineEditOffice->setButtons("Edit");
         connect(ui->lineEditOffice, &SLineEdit::buttonClicked, this, &tabRepair::changeOffice);
     }
-    if(permissions->contains("76"))  // Назначать ответственного менеджера
+    if(permissions->setRepairManager)
     {
         ui->lineEditManager->setButtons("Edit");
         connect(ui->lineEditManager, &SLineEdit::buttonClicked, this, &tabRepair::changeManager);
     }
-    if(permissions->contains("60"))  // Назначать ответственного инженера
+    if(permissions->setRepairEngineer)
     {
         ui->lineEditEngineer->setButtons("Edit");
         connect(ui->lineEditEngineer, &SLineEdit::buttonClicked, this, &tabRepair::changeEngineer);
     }
-    if(permissions->contains("65"))  // Работать с безналичными счетами
+    if(permissions->handleCashlessOrders)
     {
         ui->lineEditInvoice->setButtons("Open");
         connect(ui->lineEditInvoice, &SLineEdit::buttonClicked, this, &tabRepair::openInvoice);
     }
-//    if(permissions->contains("X"))  // TODO: разрешение Редактировать комплектность
+    if(permissions->editRepairIncomingSet)
     {
         ui->lineEditIncomingSet->setButtons("Edit");
         connect(ui->lineEditIncomingSet, &SLineEdit::buttonClicked, this, &tabRepair::editIncomingSet);
     }
-    if(permissions->contains("69"))  // Устанавливать детали со склада
+    if(permissions->addGoodsFromWarehouse)  // Устанавливать детали со склада
     {
         ui->lineEditQuickAddPart->setButtons("Apply");
         connect(ui->lineEditQuickAddPart, &SLineEdit::buttonClicked, this, &tabRepair::onReturnQuickAddPart);
@@ -125,7 +125,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     reloadRepairData();
 
 #ifdef QT_DEBUG
-    if(repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair )
+    if( m_getOutButtonVisible && (repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair) )
         createGetOutDialog();
     connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(reloadRepairData()));
     connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItem);
@@ -213,7 +213,7 @@ void tabRepair::updateWidgets()
     ui->lineEditInDate->setText(repairModel->created());
     setInfoWidgetVisible(ui->lineEditOutDate, m_outDateVisible);
     ui->lineEditOutDate->setText(repairModel->outDateTime());
-    ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->contains("101")); // TODO: добавить разрешение Адм. правка работ и деталей
+    ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->advEditWorkList); // TODO: добавить разрешение Адм. правка работ и деталей
     ui->pushButtonAdmEditWorks->setChecked(false);
     ui->pushButtonGetout->setVisible(m_getOutButtonVisible && !modelRO);
     setInfoWidgetVisible(ui->lineEditExtPrevRepair, !repairModel->extEarly().isEmpty());
@@ -234,7 +234,7 @@ void tabRepair::updateWidgets()
         ui->lineEditPrevRepair->setText(QString::number(repairModel->early()));
 
     fillExtraInfo();
-    if( repairModel->paymentSystem() == 1 && permissions->contains("65") )    // указана Безналичная оплата и есть разрешение Работать с безналичными счетами
+    if( repairModel->paymentSystem() == 1 && permissions->handleCashlessOrders )    // указана Безналичная оплата и есть разрешение Работать с безналичными счетами
     { // TODO: нужен более гибкий способ определения безналичного рассчета
 
         ui->groupBoxCashless->setHidden(false);
@@ -404,7 +404,7 @@ void tabRepair::setInfoWidgetVisible(QWidget *field, bool state)
 
 bool tabRepair::setWidgetsParams(const int stateId)
 {
-    m_getOutButtonVisible = 0;
+    m_getOutButtonVisible = permissions->issueDevices;
     m_comboBoxStateEnabled = 1;
     m_worksRO = 1;
     m_diagRO = 1;
@@ -419,7 +419,7 @@ bool tabRepair::setWidgetsParams(const int stateId)
             {
                 case Global::RepStateIds::Returned:
                 case Global::RepStateIds::ReturnedNoRepair:
-                case Global::RepStateIds::ReturnedInCredit: m_getOutButtonVisible |= checkStateAcl(nextState.toInt());
+                case Global::RepStateIds::ReturnedInCredit: m_getOutButtonVisible &= checkStateAcl(nextState.toInt());
             }
         }
     }
@@ -454,8 +454,7 @@ bool tabRepair::checkStateAcl(const int stateId)
     {
         return 1;
     }
-    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
-    throw 2;
+    return 0;
 }
 
 /* Проверка данных перед сменой статуса или выдачей
@@ -709,7 +708,11 @@ void tabRepair::saveState(int index)
 
     try
     {
-        checkStateAcl(newStateId);
+        if(!checkStateAcl(newStateId))
+        {
+            shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
+            throw 2;
+        }
         checkData(newStateId);
         doStateActions(newStateId);
         repairModel->setState(newStateId);

@@ -4,8 +4,9 @@
 #include <QAbstractItemModel>
 #include "propstruct.h"
 #include "com_sql_queries.h"
+#include "sdatabaserecord.h"
 
-class SPermissions : public QStandardItemModel
+class SPermissions : public QStandardItemModel, public SDatabaseErrorLogger
 {
     Q_OBJECT
 public:
@@ -112,6 +113,10 @@ public:
     PROPSTRUCT_FIELD(int, editRepairIncomingSet)
     PROPSTRUCT_FIELD(int, editAnyComment)
     PROPSTRUCT_FIELD(int, advEditWorkList)
+    PROPSTRUCT_FIELD(int, viewClientPassportData)
+    PROPSTRUCT_FIELD(int, viewClientBankData)
+    PROPSTRUCT_FIELD(int, editPaymentSystemInCommittedCashRegisters)
+    PROPSTRUCT_FIELD(int, viewEmployeesSalary)
 public:
     explicit SPermissions();
     QStringList list();
@@ -125,11 +130,17 @@ public:
     bool isModelChanged();
     int currentRole();
 protected:
+    int rowToPropertyId(const QModelIndex &index) const;
+    int rowToPermissionId(const QModelIndex &index) const;
+    int permissionIdToRow(const int) const;
+    int permissionIdToPropertyId(const int) const;
     void translateNames();
 private:
     bool m_modelEdited = 0;
     int m_currentRole = 0;
 };
+
+#include "global.h" // Это должно быть именно здесь
 
 inline SPermissions::SPermissions()
 {
@@ -159,7 +170,13 @@ inline void SPermissions::load(const QString &roles)
     query->exec(QUERY_SEL_PERMISSIONS(roles));
     while (query->next())
     {
-        setData(index(query->value(0).toInt() - metaObject()->propertyOffset() + 1, 0), 2, Qt::CheckStateRole);
+        if( query->value(0).toInt() > (metaObject()->propertyCount() - metaObject()->propertyOffset()) )
+        {
+            QString error = tr("Разрешение %1 не объявлено в классе %2!").arg(query->value(0).toInt()).arg(metaObject()->className());
+            errorToLog(metaObject()->className(), error);
+            continue;
+        }
+        setData(index(permissionIdToRow(query->value(0).toInt()), 0), 2, Qt::CheckStateRole);
     }
     m_modelEdited = 0;
 
@@ -190,18 +207,24 @@ inline void SPermissions::save(const QString &name, const QString &description)
         if(metaObject()->property(i).read(this).toInt() == 0)
             continue;
 
-        query->bindValue(":perm", i - metaObject()->propertyOffset() + 1);
+        query->bindValue(":perm", permissionIdToRow(i));
         nErr = query->exec();
 
         if(!nErr)
+        {
+            errorToLog(metaObject()->className(), query->lastError().text());
             throw 1;
+        }
     }
 
     if(!name.isEmpty() || !description.isEmpty())
         nErr = query->exec(QString("UPDATE `roles` SET `name` = '%1', `description` = '%2' WHERE `id` = %3").arg(name, description).arg(m_currentRole));
 
     if(!nErr)
+    {
+        errorToLog(metaObject()->className(), query->lastError().text());
         throw 1;
+    }
 
     // TODO Запись в журнал?
 
@@ -214,11 +237,11 @@ inline QVariant SPermissions::data(const QModelIndex &index, int role) const
     if(role == Qt::DisplayRole)
     {
         if(index.column() == 1)
-            return tr(metaObject()->property(index.row() + metaObject()->propertyOffset()).name());
+            return tr(metaObject()->property(rowToPropertyId(index)).name());
     }
     else if (role == Qt::CheckStateRole)
         if(index.column() == 0)
-            return metaObject()->property(index.row() + metaObject()->propertyOffset()).readOnGadget(this);
+            return metaObject()->property(rowToPropertyId(index)).readOnGadget(this);
 
     return QVariant();
 }
@@ -228,7 +251,7 @@ inline bool SPermissions::setData(const QModelIndex &index, const QVariant &valu
     if(role == Qt::CheckStateRole)
     {
         m_modelEdited = 1;
-        return metaObject()->property(index.row() + metaObject()->propertyOffset()).writeOnGadget(this, value);
+        return metaObject()->property(rowToPropertyId(index)).writeOnGadget(this, value);
     }
 
     return true;
@@ -256,6 +279,26 @@ inline bool SPermissions::isModelChanged()
 inline int SPermissions::currentRole()
 {
     return m_currentRole;
+}
+
+inline int SPermissions::rowToPropertyId(const QModelIndex &index) const
+{
+    return index.row() + metaObject()->propertyOffset();
+}
+
+inline int SPermissions::rowToPermissionId(const QModelIndex &index) const
+{
+    return index.row() + 1;
+}
+
+inline int SPermissions::permissionIdToRow(const int id) const
+{
+    return id - 1;
+}
+
+inline int SPermissions::permissionIdToPropertyId(const int permissionId) const
+{
+    return permissionIdToRow(permissionId) + metaObject()->propertyOffset();
 }
 
 /* Перевод названий разрешений
@@ -343,6 +386,10 @@ inline void SPermissions::translateNames()
     tr("editRepairIncomingSet");
     tr("editAnyComment");
     tr("advEditWorkList");
+    tr("viewClientPassportData");
+    tr("viewClientBankData");
+    tr("editPaymentSystemInCommittedCashRegisters");
+    tr("viewEmployeesSalary");
 }
 
 #endif // SPERMISSIONS_H

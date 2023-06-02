@@ -29,10 +29,10 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     ui->tableView->setModel(repairs_table);
     if (type == 1)
-    {
         ui->buttonPrint->hide();
+
+    if(!permissions->receptDevices || type == 1)
         ui->buttonRepairNew->hide();
-    }
 
     widgetAction->setComboBoxOfficeModel(officesModel);
     widgetAction->setComboBoxStatusModel(statusesModel);

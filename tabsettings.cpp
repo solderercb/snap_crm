@@ -20,7 +20,7 @@ tabSettings::tabSettings(MainWindow *parent) :
 
     ui->pages->setButtonText(0, "Персональные настройки");
 //    ui->pages->switchPage(0);  // по-умолчанию страница 0
-    if(permissions->value("1")) // Администратор
+    if(permissions->editGlobalSettings)
     {
         ui->pages->addButton(tr("Основные"), QIcon(), Page::Global);
         ui->pages->addButton(tr("Организация"), QIcon(), Page::Company);
@@ -121,7 +121,6 @@ void tabSettings::buttonSaveClicked()
     catch (int type)
     {
         nErr = 0;
-        // TODO всплывающее сообщение
         if(type == 0)
         {
             QString err = "DEBUG ROLLBACK";
@@ -129,12 +128,19 @@ void tabSettings::buttonSaveClicked()
 //            nErr = 1; // это чтобы проверить работу дальше
         }
         else
+        {
             QUERY_COMMIT_ROLLBACK(query, nErr);
+            shortlivedNotification *newPopup = new shortlivedNotification(this,
+                                                                          tr("Информация"),
+                                                                          tr("Не удалось сохранить настройки (ошибка запроса к БД)."),
+                                                                          QColor(255,164,119),
+                                                                          QColor(255,199,173));
+        }
     }
 
     m_queryLog->stop();
     if(nErr)
-        ;
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tabTitle(), tr("Настройки успешно сохранены"), QColor(214,239,220), QColor(229,245,234));
 
     emit updateDaughterPagesModels();
 

@@ -8,7 +8,7 @@ QMap<QString, QVariant> *userDbData = new QMap<QString, QVariant>;
 QSqlQueryModel *userDbDataModel = new QSqlQueryModel();
 SLocalSettings *localSettings = new SLocalSettings();
 t_userSettings *userLocalData = nullptr;
-QMap<QString, bool> *permissions = new QMap<QString, bool>;
+SPermissions *permissions = new SPermissions;
 QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
 SSqlQueryModel *clientPhoneTypesModel = new SSqlQueryModel();
 SSqlQueryModel *companiesModel = new SSqlQueryModel;
@@ -343,15 +343,7 @@ void initUserDbData()
 
 void initPermissions()
 {
-    QSqlQuery *queryPermissions = new QSqlQuery(QSqlDatabase::database("connMain"));
-
-    queryPermissions->exec(QUERY_SEL_PERMISSIONS(userDbData->value("roles").toString()));
-    while (queryPermissions->next())
-    {
-        permissions->insert(queryPermissions->value(0).toString(), 1);    // разрешённые пользователю действия хранятся в объекте QMap, не перечисленные действия не разрешены
-    }
-
-    delete queryPermissions;
+    permissions->load(userDbData->value("roles").toString());
 }
 
 void initCompanies()    // Список компаний.

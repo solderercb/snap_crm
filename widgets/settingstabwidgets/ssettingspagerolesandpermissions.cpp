@@ -44,6 +44,8 @@ void SSettingsPageRolesAndPermissions::saveSettings()
         m_permissionsModel->save(ui->lineEditRoleName->text(), ui->lineEditRoleDescription->text());
     else
         m_permissionsModel->save();
+
+    m_roleNameOrDescrChanged = 0;
 }
 
 void SSettingsPageRolesAndPermissions::setRoleNameOrDescrChanged()

@@ -7,6 +7,7 @@
 #include <QStackedWidget>
 #include <QLine>
 #include <widgets/stoolboxswitchpanel.h>
+#include "global.h"
 
 class SPagedInterface : public QWidget
 {
@@ -33,7 +34,7 @@ signals:
 
 public slots:
     void addPage(QWidget *widget, const int page);
-    void switchPage(const int);
+    void switchPage(int);
 };
 
 #endif // SPAGEDINTERFACE_H

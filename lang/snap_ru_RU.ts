@@ -189,163 +189,163 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="156"/>
+        <location filename="../mainwindow.cpp" line="158"/>
         <source>Заправка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="159"/>
+        <location filename="../mainwindow.cpp" line="162"/>
         <source>Прайс-лист</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="162"/>
+        <location filename="../mainwindow.cpp" line="166"/>
         <source>Групповой редактор ремонтов</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="168"/>
+        <location filename="../mainwindow.cpp" line="174"/>
         <source>Ремонты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="177"/>
+        <location filename="../mainwindow.cpp" line="184"/>
         <source>Приход</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="180"/>
+        <location filename="../mainwindow.cpp" line="189"/>
         <source>Продажа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="183"/>
-        <location filename="../mainwindow.cpp" line="247"/>
+        <location filename="../mainwindow.cpp" line="194"/>
+        <location filename="../mainwindow.cpp" line="290"/>
         <source>Документы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="186"/>
+        <location filename="../mainwindow.cpp" line="199"/>
         <source>Менеджер закупок</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="189"/>
+        <location filename="../mainwindow.cpp" line="204"/>
         <source>Управление складом</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="192"/>
+        <location filename="../mainwindow.cpp" line="209"/>
         <source>Групповой редактор товаров</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="195"/>
+        <location filename="../mainwindow.cpp" line="214"/>
         <source>Выгрузка товаров</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="198"/>
+        <location filename="../mainwindow.cpp" line="219"/>
         <source>Выкуп техники</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="201"/>
+        <location filename="../mainwindow.cpp" line="224"/>
         <source>Переучет</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="207"/>
+        <location filename="../mainwindow.cpp" line="232"/>
         <source>Товары</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="215"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>Новый клиент</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="218"/>
+        <location filename="../mainwindow.cpp" line="246"/>
         <source>Вызовы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="221"/>
+        <location filename="../mainwindow.cpp" line="251"/>
         <source>SMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="229"/>
+        <location filename="../mainwindow.cpp" line="262"/>
         <source>Клиенты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="238"/>
+        <location filename="../mainwindow.cpp" line="275"/>
         <source>Приходный кассовый ордер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="241"/>
+        <location filename="../mainwindow.cpp" line="280"/>
         <source>Расходный кассовый ордер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="244"/>
+        <location filename="../mainwindow.cpp" line="285"/>
         <source>Перемещение/обмен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="252"/>
+        <location filename="../mainwindow.cpp" line="296"/>
         <source>Счёт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="255"/>
+        <location filename="../mainwindow.cpp" line="299"/>
         <source>Счёт-фактура</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="302"/>
         <source>Товарная накладная</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="261"/>
+        <location filename="../mainwindow.cpp" line="305"/>
         <source>Акт выполненных работ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="266"/>
+        <location filename="../mainwindow.cpp" line="310"/>
         <source>Заработная плата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="275"/>
+        <location filename="../mainwindow.cpp" line="319"/>
         <source>Финансы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="285"/>
+        <location filename="../mainwindow.cpp" line="330"/>
         <source>Проверить обновления</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="289"/>
+        <location filename="../mainwindow.cpp" line="336"/>
         <source>О программе</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="341"/>
         <source>Сменить пользователя</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="297"/>
+        <location filename="../mainwindow.cpp" line="346"/>
         <source>Выход</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="304"/>
+        <location filename="../mainwindow.cpp" line="354"/>
         <source>Настройки</source>
         <translation type="unfinished"></translation>
     </message>
@@ -573,133 +573,133 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="374"/>
+        <location filename="../global.cpp" line="366"/>
         <source>Юридическое лицо</source>
         <comment>company</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="374"/>
+        <location filename="../global.cpp" line="366"/>
         <source>Постоянный клиент</source>
         <comment>regular</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="375"/>
+        <location filename="../global.cpp" line="367"/>
         <source>Посредник</source>
         <comment>broker (middleman)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="375"/>
+        <location filename="../global.cpp" line="367"/>
         <source>Игнорирует звонки</source>
         <comment>ignores calls</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="376"/>
+        <location filename="../global.cpp" line="368"/>
         <source>Предпочитает безнал</source>
         <comment>prefer cashless</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="376"/>
+        <location filename="../global.cpp" line="368"/>
         <source>Не забирает технику в срок</source>
         <comment>take out not in time</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="377"/>
+        <location filename="../global.cpp" line="369"/>
         <source>Является поставщиком</source>
         <comment>supplier</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="377"/>
+        <location filename="../global.cpp" line="369"/>
         <source>Даёт товар под реализацию</source>
         <comment>sale or return</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="378"/>
+        <location filename="../global.cpp" line="370"/>
         <source>Баланс</source>
         <comment>client balance</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="378"/>
+        <location filename="../global.cpp" line="370"/>
         <source>Проблемный</source>
         <comment>problematic client</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="378"/>
+        <location filename="../global.cpp" line="370"/>
         <source>Архивный</source>
         <comment>archived</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="379"/>
+        <location filename="../global.cpp" line="371"/>
         <source>юр.</source>
         <comment>company (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="379"/>
+        <location filename="../global.cpp" line="371"/>
         <source>пост.</source>
         <comment>regular (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="380"/>
+        <location filename="../global.cpp" line="372"/>
         <source>поср.</source>
         <comment>broker (middleman) (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="380"/>
+        <location filename="../global.cpp" line="372"/>
         <source>игн. зв.</source>
         <comment>ignores calls (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="381"/>
+        <location filename="../global.cpp" line="373"/>
         <source>безнал</source>
         <comment>prefer cashless (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="381"/>
+        <location filename="../global.cpp" line="373"/>
         <source>долго забир.</source>
         <comment>take out not in time (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="382"/>
+        <location filename="../global.cpp" line="374"/>
         <source>поставщ.</source>
         <comment>supplier (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="382"/>
+        <location filename="../global.cpp" line="374"/>
         <source>реализ.</source>
         <comment>sale or return (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="383"/>
+        <location filename="../global.cpp" line="375"/>
         <source>бал.</source>
         <comment>client balance (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="383"/>
+        <location filename="../global.cpp" line="375"/>
         <source>проблемный</source>
         <comment>problematic client (short)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../global.cpp" line="383"/>
+        <location filename="../global.cpp" line="375"/>
         <source>арх.</source>
         <comment>archived (short)</comment>
         <translation type="unfinished"></translation>
@@ -860,37 +860,47 @@
 <context>
     <name>SClientModel</name>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="602"/>
+        <location filename="../models/sclientmodel.cpp" line="68"/>
+        <location filename="../models/sclientmodel.cpp" line="69"/>
+        <location filename="../models/sclientmodel.cpp" line="70"/>
+        <location filename="../models/sclientmodel.cpp" line="71"/>
+        <location filename="../models/sclientmodel.cpp" line="72"/>
+        <location filename="../models/sclientmodel.cpp" line="73"/>
+        <source>недостаточно прав</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../models/sclientmodel.cpp" line="616"/>
         <source>Включен баланс клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="613"/>
+        <location filename="../models/sclientmodel.cpp" line="627"/>
         <source>Отключение баланса</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="614"/>
+        <location filename="../models/sclientmodel.cpp" line="628"/>
         <source>Баланс клиента не равен нулю!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="621"/>
+        <location filename="../models/sclientmodel.cpp" line="635"/>
         <source>Баланс клиента отключен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="680"/>
+        <location filename="../models/sclientmodel.cpp" line="694"/>
         <source>На балансе недостаточно средств, продолжить?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="707"/>
+        <location filename="../models/sclientmodel.cpp" line="721"/>
         <source>Ошибка целостности данных баланса (id = %1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="880"/>
+        <location filename="../models/sclientmodel.cpp" line="894"/>
         <source>На балансе клиента недостаточно средств</source>
         <translation type="unfinished"></translation>
     </message>
@@ -928,12 +938,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scomments.cpp" line="189"/>
+        <location filename="../widgets/scomments.cpp" line="188"/>
         <source>Удаление записи</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scomments.cpp" line="190"/>
+        <location filename="../widgets/scomments.cpp" line="189"/>
         <source>Вы уверены, что хотите удалить эту запись?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1743,404 +1753,429 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SPermissions</name>
     <message>
-        <location filename="../models/spermissions.h" line="266"/>
+        <location filename="../models/spermissions.h" line="175"/>
+        <source>Разрешение %1 не объявлено в классе %2!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../models/spermissions.h" line="309"/>
         <source>editGlobalSettings</source>
         <translation>Изменять служебные настройки</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="267"/>
+        <location filename="../models/spermissions.h" line="310"/>
         <source>receptDevices</source>
         <translation>Принимать устройства в ремонт</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="268"/>
+        <location filename="../models/spermissions.h" line="311"/>
         <source>printStickers</source>
         <translation>Печатать ценники и стикеры</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="269"/>
+        <location filename="../models/spermissions.h" line="312"/>
         <source>issueDevices</source>
         <translation>Выдавать устройство из ремонта</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="270"/>
+        <location filename="../models/spermissions.h" line="313"/>
         <source>saleGoods</source>
         <translation>Быстрая продажа</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="271"/>
+        <location filename="../models/spermissions.h" line="314"/>
         <source>incomeGoods</source>
         <translation>Заносить товар на склад (Приход товара)</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="272"/>
+        <location filename="../models/spermissions.h" line="315"/>
         <source>viewClients</source>
         <translation>Видеть список клиентов и их данные</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="273"/>
+        <location filename="../models/spermissions.h" line="316"/>
         <source>createNewClient</source>
         <translation>Создавать новых  клиентов</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="274"/>
+        <location filename="../models/spermissions.h" line="317"/>
         <source>writeOffGoods</source>
         <translation>Списывать товар со склада</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="275"/>
+        <location filename="../models/spermissions.h" line="318"/>
         <source>editGoodsPrices</source>
         <translation>Редактировать цены на товары</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="276"/>
+        <location filename="../models/spermissions.h" line="319"/>
         <source>editClients</source>
         <translation>Редактировать существующих клиентов</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="277"/>
+        <location filename="../models/spermissions.h" line="320"/>
         <source>createReports</source>
         <translation>Генерировать и смотреть отчёты</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="278"/>
+        <location filename="../models/spermissions.h" line="321"/>
         <source>viewFinancialDocuments</source>
         <translation>Просмотр финансовых документов</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="279"/>
+        <location filename="../models/spermissions.h" line="322"/>
         <source>createCashRegisters</source>
         <translation>Создавать ПКО/РКО</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="280"/>
+        <location filename="../models/spermissions.h" line="323"/>
         <source>createZReport</source>
         <translation>Создавать Z отчёт (выемка средств с кассы)</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="281"/>
+        <location filename="../models/spermissions.h" line="324"/>
         <source>viewCashOrders</source>
         <translation>Просмотр кассы</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="282"/>
+        <location filename="../models/spermissions.h" line="325"/>
         <source>editGoods</source>
         <translation>Редактировать товары (наименование ячейки, etc)</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="283"/>
+        <location filename="../models/spermissions.h" line="326"/>
         <source>readSMS</source>
         <translation>Читать SMS</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="284"/>
+        <location filename="../models/spermissions.h" line="327"/>
         <source>viewAnyRepair</source>
         <translation>Открывать карточки ремонта других пользователей</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="285"/>
+        <location filename="../models/spermissions.h" line="328"/>
         <source>useTelephony</source>
         <translation>Использовать телефонию</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="286"/>
+        <location filename="../models/spermissions.h" line="329"/>
         <source>advEditRepair</source>
         <translation>Администрирование карточки ремонта </translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="287"/>
+        <location filename="../models/spermissions.h" line="330"/>
         <source>repairRecepted</source>
         <translation>Статус: Приём в ремонт</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="288"/>
+        <location filename="../models/spermissions.h" line="331"/>
         <source>repairDiagnostics</source>
         <translation>Статус: Проведение диагностики</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="289"/>
+        <location filename="../models/spermissions.h" line="332"/>
         <source>repairNegotiation</source>
         <translation>Статус: Ожидание решения клиента</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="290"/>
+        <location filename="../models/spermissions.h" line="333"/>
         <source>repairConformed</source>
         <translation>Статус: Согласовано с клиентом</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="291"/>
+        <location filename="../models/spermissions.h" line="334"/>
         <source>repairInProgress</source>
         <translation>Статус: Выполнение работ</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="292"/>
+        <location filename="../models/spermissions.h" line="335"/>
         <source>repairWaitingParts</source>
         <translation>Статус: Ожидание комплектующих</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="293"/>
+        <location filename="../models/spermissions.h" line="336"/>
         <source>repairReady</source>
         <translation>Статус: Готово к выдаче</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="294"/>
+        <location filename="../models/spermissions.h" line="337"/>
         <source>repairReadyWithoutRepair</source>
         <translation>Статус: Готово к выдаче без ремонта</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="295"/>
+        <location filename="../models/spermissions.h" line="338"/>
         <source>repairIssued</source>
         <translation>Статус: Выдано клиенту</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="296"/>
+        <location filename="../models/spermissions.h" line="339"/>
         <source>repairFaultNotDetected</source>
         <translation>Статус: Неисправность не проявилась</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="297"/>
+        <location filename="../models/spermissions.h" line="340"/>
         <source>repairOfficeChange</source>
         <translation>Статус: Смена офиса</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="298"/>
+        <location filename="../models/spermissions.h" line="341"/>
         <source>repairRefused</source>
         <translation>Статус: Клиент отказался от ремонта</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="299"/>
+        <location filename="../models/spermissions.h" line="342"/>
         <source>editWorksPriceList</source>
         <translation>Редактировать прайс лист услуг</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="300"/>
+        <location filename="../models/spermissions.h" line="343"/>
         <source>editGoodsCatalog</source>
         <translation>Редактировать каталог товаров</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="301"/>
+        <location filename="../models/spermissions.h" line="344"/>
         <source>syncGoodsWithShop</source>
         <translation>Выгружать товары в интернет магазины</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="302"/>
+        <location filename="../models/spermissions.h" line="345"/>
         <source>viewPrice1</source>
         <translation>Видеть цены для СЦ</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="303"/>
+        <location filename="../models/spermissions.h" line="346"/>
         <source>viewPrice2</source>
         <translation>Видеть розничные цены</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="304"/>
+        <location filename="../models/spermissions.h" line="347"/>
         <source>viewPrice3</source>
         <translation>Видеть оптовые цены</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="305"/>
+        <location filename="../models/spermissions.h" line="348"/>
         <source>takeGoodsForRepair</source>
         <translation>Брать товары со склада</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="306"/>
+        <location filename="../models/spermissions.h" line="349"/>
         <source>giveGoodsForRepair</source>
         <translation>Выдавать товары сотрудникам</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="307"/>
+        <location filename="../models/spermissions.h" line="350"/>
         <source>manageWarehouse</source>
         <translation>Управление складом</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="308"/>
+        <location filename="../models/spermissions.h" line="351"/>
         <source>removeGoodsFromUnissuedRepair</source>
         <translation>Исключать товар из не выданного ремонта</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="309"/>
+        <location filename="../models/spermissions.h" line="352"/>
         <source>paySubsistence</source>
         <translation>Выдавать аванс сотрудникам</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="310"/>
+        <location filename="../models/spermissions.h" line="353"/>
         <source>remoteLogin</source>
         <translation>Удаленный вход</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="311"/>
+        <location filename="../models/spermissions.h" line="354"/>
         <source>addCustomWork</source>
         <translation>Добавлять работы не из прайс листа</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="312"/>
+        <location filename="../models/spermissions.h" line="355"/>
         <source>undoOutInvoice</source>
         <translation>Распроводить расходные накладные</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="313"/>
+        <location filename="../models/spermissions.h" line="356"/>
         <source>makeSalaryExtraCharge</source>
         <translation>Делать дополнительные начисления сотрудникам</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="314"/>
+        <location filename="../models/spermissions.h" line="357"/>
         <source>repairDiagnosisConfirmation</source>
         <translation>Статус: Подтверждение диагностики</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="315"/>
+        <location filename="../models/spermissions.h" line="358"/>
         <source>viewForeignOfficeCashOrders</source>
         <translation>Открывать кассу чужого офиса</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="316"/>
+        <location filename="../models/spermissions.h" line="359"/>
         <source>setNotificationState</source>
         <translation>Менять статус информирования клиента</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="317"/>
+        <location filename="../models/spermissions.h" line="360"/>
         <source>undoInInvoice</source>
         <translation>Распроводить приходные накладные</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="318"/>
+        <location filename="../models/spermissions.h" line="361"/>
         <source>beginUnengagedRepair</source>
         <translation>Мастер может брать свободный ремонт</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="319"/>
+        <location filename="../models/spermissions.h" line="362"/>
         <source>handleOnlineOrders</source>
         <translation>Принимать заявки из интернет магазинов</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="320"/>
+        <location filename="../models/spermissions.h" line="363"/>
         <source>changeOffice</source>
         <translation>Менять офис при входе</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="321"/>
+        <location filename="../models/spermissions.h" line="364"/>
         <source>setRepairEngineer</source>
         <translation>Назначать ответственного инженера</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="322"/>
+        <location filename="../models/spermissions.h" line="365"/>
         <source>setRepairColor</source>
         <translation>Менять цвет ремонта</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="323"/>
+        <location filename="../models/spermissions.h" line="366"/>
         <source>startVideoRecording</source>
         <translation>Включать видео запись если она не активна</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="324"/>
+        <location filename="../models/spermissions.h" line="367"/>
         <source>sendSMS</source>
         <translation>Отправлять SMS</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="325"/>
+        <location filename="../models/spermissions.h" line="368"/>
         <source>repairIssuedInCredit</source>
         <translation>Статус: Выдано в долг</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="326"/>
+        <location filename="../models/spermissions.h" line="369"/>
         <source>handleCashlessOrders</source>
         <translation>Работать с безналичными счетами</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="327"/>
+        <location filename="../models/spermissions.h" line="370"/>
         <source>createDatabaseBackups</source>
         <translation>Создавать резервные копии БД</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="328"/>
+        <location filename="../models/spermissions.h" line="371"/>
         <source>createTasks</source>
         <translation>Создавать задания</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="329"/>
+        <location filename="../models/spermissions.h" line="372"/>
         <source>veiwAllTasks</source>
         <translation>Видеть задания других пользователей</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="330"/>
+        <location filename="../models/spermissions.h" line="373"/>
         <source>addGoodsFromWarehouse</source>
         <translation>Устанавливать детали со склада</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="331"/>
+        <location filename="../models/spermissions.h" line="374"/>
         <source>enableSparepartRequestManager</source>
         <translation>Использовать менеджер закупок</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="332"/>
+        <location filename="../models/spermissions.h" line="375"/>
         <source>createBackdatedDocuments</source>
         <translation>Проводить документы задним числом</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="333"/>
+        <location filename="../models/spermissions.h" line="376"/>
         <source>moveRepairToOffice</source>
         <translation>Изменять офис ремонта</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="334"/>
+        <location filename="../models/spermissions.h" line="377"/>
         <source>createQuickRepair</source>
         <translation>Проводить быстрый ремонт</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="335"/>
+        <location filename="../models/spermissions.h" line="378"/>
         <source>viewForeignOfficeRepair</source>
         <translation>Редактировать ремонты другого офиса</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="336"/>
+        <location filename="../models/spermissions.h" line="379"/>
         <source>useCashRegisterEquipment</source>
         <translation>Работать с ККТ</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="337"/>
+        <location filename="../models/spermissions.h" line="380"/>
         <source>setRepairManager</source>
         <translation>Назначать ответственного менеджера</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="338"/>
+        <location filename="../models/spermissions.h" line="381"/>
         <source>viewAnyWorkList</source>
         <translation>Видеть работы/детали других сотрудников</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="339"/>
+        <location filename="../models/spermissions.h" line="382"/>
         <source>viewRepairLog</source>
         <translation>Видеть историю в карте ремонта</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="340"/>
+        <location filename="../models/spermissions.h" line="383"/>
         <source>editCashRegisterEquipmentSettings</source>
         <translation>Изменять параметры ККТ</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="341"/>
+        <location filename="../models/spermissions.h" line="384"/>
         <source>editCartridgeCards</source>
         <translation>Редактировать карты картриджей</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="342"/>
+        <location filename="../models/spermissions.h" line="385"/>
         <source>sentEmail</source>
         <translation>Отправлять Email</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="343"/>
+        <location filename="../models/spermissions.h" line="386"/>
         <source>editRepairIncomingSet</source>
         <translation>Уточнять комплектацию устройства в ремонте</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="344"/>
+        <location filename="../models/spermissions.h" line="387"/>
         <source>editAnyComment</source>
         <translation>Редактировать комментарии других пользователей</translation>
     </message>
     <message>
-        <location filename="../models/spermissions.h" line="345"/>
+        <location filename="../models/spermissions.h" line="388"/>
         <source>advEditWorkList</source>
         <translation>Административная правка списка работ и деталей</translation>
+    </message>
+    <message>
+        <location filename="../models/spermissions.h" line="389"/>
+        <source>viewClientPassportData</source>
+        <translation>Клиент: видеть паспортные данные</translation>
+    </message>
+    <message>
+        <location filename="../models/spermissions.h" line="390"/>
+        <source>viewClientBankData</source>
+        <translation>Клиент: видеть банковские реквизиты</translation>
+    </message>
+    <message>
+        <location filename="../models/spermissions.h" line="391"/>
+        <source>editPaymentSystemInCommittedCashRegisters</source>
+        <translation>Изменять платёжную систему в проведённых кассовых ордерах</translation>
+    </message>
+    <message>
+        <location filename="../models/spermissions.h" line="392"/>
+        <source>viewEmployeesSalary</source>
+        <translation>Просматривать заработки других пользователей</translation>
     </message>
 </context>
 <context>
@@ -2575,12 +2610,12 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp" line="58"/>
+        <location filename="../widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp" line="60"/>
         <source>Данные не сохранены</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp" line="58"/>
+        <location filename="../widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp" line="60"/>
         <source>Разрешения роли изменены!
 Сохранить перед загрузкой другой роли?</source>
         <translation type="unfinished"></translation>
@@ -3435,47 +3470,47 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>sparePartsTable</name>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>UID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Наименование</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Кол-во</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Доступно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Цена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Место</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Серийный номер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1024"/>
+        <location filename="../tabsale.cpp" line="1022"/>
         <source>Гарантия</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3732,17 +3767,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="496"/>
+        <location filename="../tabcashoperation.cpp" line="494"/>
         <source>Баланс клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="497"/>
+        <location filename="../tabcashoperation.cpp" line="495"/>
         <source>Баланс клиента не включен. Включить?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="768"/>
+        <location filename="../tabcashoperation.cpp" line="766"/>
         <source>Проведён</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4249,34 +4284,34 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="457"/>
-        <location filename="../tabrepair.cpp" line="485"/>
+        <location filename="../tabrepair.cpp" line="484"/>
+        <location filename="../tabrepair.cpp" line="713"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="457"/>
+        <location filename="../tabrepair.cpp" line="713"/>
         <source>Проверьте права доступа или обратитесь к администратору</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="482"/>
+        <location filename="../tabrepair.cpp" line="481"/>
         <source>Поле с результатом диагностики не может быть пустым</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="483"/>
+        <location filename="../tabrepair.cpp" line="482"/>
         <source>Не установлена согласованная сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="751"/>
+        <location filename="../tabrepair.cpp" line="754"/>
         <location filename="../tabrepair.h" line="126"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="751"/>
+        <location filename="../tabrepair.cpp" line="754"/>
         <source>Статус информирования клиента обновлён</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5008,18 +5043,18 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="624"/>
+        <location filename="../tabsale.cpp" line="622"/>
         <source>Расходная накладная №%1 распроведена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="627"/>
+        <location filename="../tabsale.cpp" line="625"/>
         <source>основание: </source>
         <comment>основание распроведения РН</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="955"/>
+        <location filename="../tabsale.cpp" line="953"/>
         <source>Резерв товара по РН №%1 снят</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5134,6 +5169,21 @@ p, li { white-space: pre-wrap; }
         <source>Настройки</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../tabsettings.cpp" line="134"/>
+        <source>Информация</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabsettings.cpp" line="135"/>
+        <source>Не удалось сохранить настройки (ошибка запроса к БД).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabsettings.cpp" line="143"/>
+        <source>Настройки успешно сохранены</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>windowsDispatcher</name>
@@ -5146,52 +5196,52 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>worksAndSparePartsTable</name>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>UID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Наименование</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Кол-во</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Доступно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Цена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Место</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Серийный номер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Гарантия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="911"/>
+        <location filename="../tabrepair.cpp" line="914"/>
         <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>
