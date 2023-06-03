@@ -51,9 +51,12 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 //    connect(ui->buttonSale, SIGNAL(clicked()), this, SLOT(saleButtonClicked()));    // подключены в дизайнере
     connect(ui->comboBoxPriceCol, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPriceCol(int)));    // нужно подключать здесь, иначе возникает глюк с доступом к QMap<> fields
     connect(tableModel, SIGNAL(amountChanged(double, double, double)), this, SLOT(updateTotalSumms(double, double, double)));
-    connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
-    connect(ui->comboBoxClientPhoneType,SIGNAL(currentIndexChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
-    connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(phoneNumberEdited(QString)));
+    if(permissions->viewClients)
+    {
+        connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
+        connect(ui->comboBoxClientPhoneType,SIGNAL(currentIndexChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
+        connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(phoneNumberEdited(QString)));
+    }
 
 
 #ifdef QT_DEBUG
@@ -282,7 +285,7 @@ void tabSale::updateWidgets()
         ui->buttonSale->show();
         ui->lineEditComment->setReadOnly(false);
         ui->pushButtonClientCredsClearAll->setEnabled(true);
-        ui->pushButtonClientFromDB->setEnabled(true);
+        ui->pushButtonClientFromDB->setEnabled(permissions->viewClients);
 
         tableModel->setModelState(SSaleTableModel::StoreNew);
 
@@ -447,7 +450,8 @@ void tabSale::updateTotalSumms(const double amountTotal, const double, const dou
 
 void tabSale::phoneNumberEdited(QString)
 {
-    ui->widgetClientMatch->findByPhone(ui->lineEditClientPhone->displayText(), ui->comboBoxClientPhoneType->currentIndex());
+    if(permissions->viewClients)
+        ui->widgetClientMatch->findByPhone(ui->lineEditClientPhone->displayText(), ui->comboBoxClientPhoneType->currentIndex());
 }
 
 void tabSale::clearClientCreds(bool hideCoincidence)
@@ -487,20 +491,19 @@ void tabSale::fillClientCreds(int id)
     clientModel->load(client);
     tableModel->setClient(client);
     cashRegister->setClient(client);
-    ui->lineEditClientFirstName->setText(clientModel->firstName());
-    ui->lineEditClientLastName->setText(clientModel->lastName());
-    ui->lineEditClientPatronymic->setText(clientModel->patronymicName());
+    ui->lineEditClientFirstName->setText(permissions->viewClients?clientModel->firstName():tr("no permissions"));
+    ui->lineEditClientLastName->setText(permissions->viewClients?clientModel->lastName():tr("no permissions"));
+    ui->lineEditClientPatronymic->setText(permissions->viewClients?clientModel->patronymicName():tr("no permissions"));
     ui->lineEditClientFirstName->setReadOnly(true);
     ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
     ui->lineEditClientPatronymic->setReadOnly(true);
 
-    ui->comboBoxClientPhoneType->setCurrentIndex(clientModel->phones()->primary()->maskIndex());
-    ui->lineEditClientPhone->setText(clientModel->phones()->primary()->phone());
+    ui->comboBoxClientPhoneType->setCurrentIndex(permissions->viewClients?clientModel->phones()->primary()->maskIndex():-1);
+    ui->lineEditClientPhone->setText(permissions->viewClients?clientModel->phones()->primary()->phone():tr("no permissions"));
     ui->lineEditClientPhone->setReadOnly(true);
     ui->comboBoxClientPhoneType->setEnabled(false);
 
-        ui->pushButtonCreateTabClient->setEnabled(permissions->viewClients);
-        ui->pushButtonCreateTabClient->setEnabled(permissions->createNewClient);
+    ui->pushButtonCreateTabClient->setEnabled(permissions->viewClients);
     ui->comboBoxClientAdType->setEnabled(false);
     ui->checkBoxAnonymous->setChecked(false);
 

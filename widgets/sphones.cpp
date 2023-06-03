@@ -87,6 +87,8 @@ void SPhones::slotModelUpdated()
     foreach(phoneModel, m_phoneModelsList)
     {
         addForm(phoneModel);
+        if(!permissions->viewClients)   // при ограниченных правах номер не отображается и достаточно только одной формы с надписью "no permissions"
+            return;
     }
     if(m_phoneModelsList.isEmpty() & !m_notEditable)
         addForm(m_phonesModel->primary());
@@ -116,6 +118,8 @@ bool SPhones::isValid()
     {
         ret &= (*i)->isValid();
         i++;
+        if(!permissions->viewClients)   // при ограниченных правах отображается только одна форма и проверять остальные не нужно
+            return ret;
     }
     return ret;
 }

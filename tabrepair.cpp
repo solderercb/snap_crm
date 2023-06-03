@@ -209,13 +209,16 @@ void tabRepair::updateWidgets()
     ui->lineEditRepairId->setText(QString::number(repair_id));
     ui->lineEditDevice->setText(repairModel->title());
     ui->lineEditSN->setText(repairModel->serialNumber());
-    ui->lineEditClient->setText(clientModel->fullLongName());
+    ui->lineEditClient->setText(permissions->viewClients?clientModel->fullLongName():tr("no permissions"));
     ui->lineEditInDate->setText(repairModel->created());
     setInfoWidgetVisible(ui->lineEditOutDate, m_outDateVisible);
     ui->lineEditOutDate->setText(repairModel->outDateTime());
     ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->advEditWorkList); // TODO: добавить разрешение Адм. правка работ и деталей
     ui->pushButtonAdmEditWorks->setChecked(false);
     ui->pushButtonGetout->setVisible(m_getOutButtonVisible && !modelRO);
+    ui->buttonClientCard->setVisible(permissions->viewClients);
+    ui->buttonCall->setVisible(permissions->useTelephony);
+    ui->buttonAdm->setVisible(permissions->advEditRepair);
     setInfoWidgetVisible(ui->lineEditExtPrevRepair, !repairModel->extEarly().isEmpty());
     ui->lineEditExtPrevRepair->setText(repairModel->extEarly());
     ui->lineEditOffice->setText(officesModel->getDisplayRole(repairModel->office()));

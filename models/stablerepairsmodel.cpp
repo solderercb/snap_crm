@@ -39,6 +39,10 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
             return QVariant(repairBoxesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
         else if(fieldName == QString("id"))
             return QString("%1-%2").arg(record(index.row()).value("office").toString().rightJustified(3, '0')).arg(QSqlQueryModel::data(index).toString().rightJustified(6, '0'));
+        else if(!permissions->viewClients && fieldName == QString("client"))
+            return tr("no permissions");
+        else if(!permissions->viewClients &&fieldName == QString("phone"))
+            return tr("no permissions");
     }
     return STableBaseModel::data(index, role);
 }

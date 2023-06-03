@@ -137,11 +137,14 @@ void tabRepairNew::initWidgets()
     ui->comboBoxPrepayReason->setCurrentIndex(-1);
     ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
 
-    connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
-    connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
+    if(permissions->viewClients)
+    {
+        connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
+        connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
+        connect(ui->phones,SIGNAL(primaryPhoneEdited(QString)),this,SLOT(primaryPhoneEdited(QString)));
+    }
     connect(ui->lineEditSN,SIGNAL(textEdited(QString)),ui->widgetDeviceMatch,SLOT(findBySN(QString)));
     connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
-    connect(ui->phones,SIGNAL(primaryPhoneEdited(QString)),this,SLOT(primaryPhoneEdited(QString)));
 
     if(comSettings->value("classic_kassa").toBool())
     {
@@ -168,6 +171,7 @@ void tabRepairNew::initWidgets()
         ui->doubleSpinBoxPrepaySumm->setMaximum(9999999);
     }
 
+    ui->pushButtonSelectExistingClient->setVisible(permissions->viewClients);
 }
 
 void tabRepairNew::clearWidgets()
@@ -496,13 +500,16 @@ void tabRepairNew::fillClientCreds(int id)
     ui->lineEditClientEmail->setReadOnly(true);
 
     ui->pushButtonCreateTabClient->setEnabled(true);
-    ui->lineEditClientFirstName->setText(clientModel->firstName());
-    ui->lineEditClientLastName->setText(clientModel->lastName());
-    ui->lineEditClientPatronymic->setText(clientModel->patronymicName());
-    ui->phones->setModel(clientModel->phones());
-    ui->lineEditClientAddress->setText(clientModel->address());
-    ui->lineEditClientEmail->setText(clientModel->email());
-    ui->pushButtonCreateTabClient->show();
+    ui->lineEditClientFirstName->setText(permissions->viewClients?clientModel->firstName():tr("no permissions"));
+    ui->lineEditClientLastName->setText(permissions->viewClients?clientModel->lastName():tr("no permissions"));
+    ui->lineEditClientPatronymic->setText(permissions->viewClients?clientModel->patronymicName():tr("no permissions"));
+//    if(permissions->viewClients)
+        ui->phones->setModel(clientModel->phones());
+//    else
+//        ui->phones->setEnabled(false);
+    ui->lineEditClientAddress->setText(permissions->viewClients?clientModel->address():tr("no permissions"));
+    ui->lineEditClientEmail->setText(permissions->viewClients?clientModel->email():tr("no permissions"));
+    ui->pushButtonCreateTabClient->setVisible(permissions->viewClients);
     ui->listWidgetClientOptions->addItems(clientModel->optionsList(1));
 
     ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
@@ -544,7 +551,7 @@ void tabRepairNew::fillDeviceCreds(int id)
     delete queryDevice;
 }
 
-void tabRepairNew::buttonSelectExistingClientHandler()
+void tabRepairNew::buttonSelectExistingClientClicked()
 {
     emit createTabSelectExistingClient(1, this);
 }
@@ -851,13 +858,20 @@ bool tabRepairNew::createRepair()
 
 void tabRepairNew::createRepairClose()
 {
-    if (createRepair())
-        this->deleteLater();    // TODO: программа падает при двойном клике по кнопке.
+    if(!m_closePending)    // TODO: программа падает при двойном клике по кнопке.
+    {
+        m_closePending = 1;
+        if (createRepair())
+            this->deleteLater();
+        else
+            m_closePending = 0;
+    }
 }
 
 void tabRepairNew::primaryPhoneEdited(QString number)
 {
-    ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
+    if(permissions->viewClients)
+        ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
 }
 
 void tabRepairNew::preferredPaymentSystemChanged(int)
@@ -895,7 +909,7 @@ void tabRepairNew::print(int repair)
     }
 }
 
-void tabRepairNew::buttonCreateTabClientHandler()
+void tabRepairNew::buttonCreateTabClientClicked()
 {
     emit createTabClient(m_client);
 }

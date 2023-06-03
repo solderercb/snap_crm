@@ -672,7 +672,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButtonClientFromDB">
+                 <widget class="QPushButton" name="pushButtonSelectExistingClient">
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
@@ -1035,11 +1035,6 @@ QListView::item  {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets/slineedit.h</header>
@@ -1047,6 +1042,17 @@ QListView::item  {
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>SPhones</class>
+   <extends>QWidget</extends>
+   <header>widgets/sphones.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
    <class>SClientMatch</class>
@@ -1058,12 +1064,6 @@ QListView::item  {
    <class>SSetComboBox</class>
    <extends>QComboBox</extends>
    <header>widgets/ssetcombobox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SPhones</class>
-   <extends>QWidget</extends>
-   <header>widgets/sphones.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>SDeviceMatch</class>
@@ -1115,7 +1115,7 @@ QListView::item  {
   <tabstop>pushButtonCashReceipt</tabstop>
   <tabstop>lineEditClientAddress</tabstop>
   <tabstop>checkBoxClientType</tabstop>
-  <tabstop>pushButtonClientFromDB</tabstop>
+  <tabstop>pushButtonSelectExistingClient</tabstop>
   <tabstop>pushButtonClientCredsClearAll</tabstop>
   <tabstop>pushButtonCreateTabClient</tabstop>
   <tabstop>lineEditClientEmail</tabstop>
@@ -1174,10 +1174,10 @@ QListView::item  {
    </hints>
   </connection>
   <connection>
-   <sender>pushButtonClientFromDB</sender>
+   <sender>pushButtonSelectExistingClient</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>buttonSelectExistingClientHandler()</slot>
+   <slot>buttonSelectExistingClientClicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>492</x>
@@ -1321,7 +1321,7 @@ QListView::item  {
    <sender>pushButtonCreateTabClient</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairNew</receiver>
-   <slot>buttonCreateTabClientHandler()</slot>
+   <slot>buttonCreateTabClientClicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>560</x>
@@ -1387,7 +1387,7 @@ QListView::item  {
   <slot>enableLineEditPrevRepair()</slot>
   <slot>changeDeviceClass(int)</slot>
   <slot>changeDeviceVendor(int)</slot>
-  <slot>buttonSelectExistingClientHandler()</slot>
+  <slot>buttonSelectExistingClientClicked()</slot>
   <slot>clearClientCreds()</slot>
   <slot>showLineEditPrevRepair()</slot>
   <slot>lineEditPrevRepairButtonsHandler(int)</slot>
@@ -1399,7 +1399,7 @@ QListView::item  {
   <slot>createRepairClose()</slot>
   <slot>deviceMatchTableDoubleClicked(QModelIndex)</slot>
   <slot>enablePrepayWidgets(bool)</slot>
-  <slot>buttonCreateTabClientHandler()</slot>
+  <slot>buttonCreateTabClientClicked()</slot>
   <slot>preferredPaymentSystemChanged(int)</slot>
  </slots>
 </ui>

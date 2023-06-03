@@ -53,13 +53,13 @@ void SPhone::setModel(SPhoneModel *model)
 
     m_phoneModel = model;
     m_messengers = model->messengers();
-    ui->comboBoxPhoneMask->setCurrentIndex(model->maskIndex());
-    ui->lineEditPhone->setText(model->phone());
+    ui->comboBoxPhoneMask->setCurrentIndex((permissions->viewClients || !m_isReadOnly)?model->maskIndex():-1);
+    ui->lineEditPhone->setText((permissions->viewClients || !m_isReadOnly)?model->phone():tr("no permissions"));
     ui->checkBoxViber->setChecked(m_messengers&SPhoneModel::Viber);
     ui->checkBoxTelegram->setChecked(m_messengers&SPhoneModel::Telegram);
     ui->checkBoxWhatsapp->setChecked(m_messengers&SPhoneModel::Whatsapp);
     ui->checkBoxSMS->setChecked(model->receiveSMS());
-    ui->lineEditNotes->setText(model->note());
+    ui->lineEditNotes->setText((permissions->viewClients || !m_isReadOnly)?model->note():tr("no permissions"));
 
     m_isPrimary = model->type();
     if(m_isPrimary)
@@ -94,13 +94,6 @@ void SPhone::clear()
     }
 }
 
-void SPhone::fillPhone(const QSqlRecord &record)
-{
-    // TODO: придумать механизм сокрытия части номера, если у пользователя недостаточно прав
-    ui->comboBoxPhoneMask->setCurrentText(clientPhoneTypesModel->getDisplayRole(record.value(1).toInt(), 1));    // сначала устанавливаем тип в комбобоксе, чтобы применилась маска к полю
-    ui->lineEditPhone->setText(record.value(0).toString());    // теперь устанавливаем номер телефона
-}
-
 #ifdef QT_DEBUG
 void SPhone::testFill(const int mask, const QString &number)
 {
@@ -129,12 +122,17 @@ void SPhone::setPrimary()
 
 bool SPhone::isValid()
 {
+    m_isValid = 1;
+
+    if(!permissions->viewClients && m_isReadOnly)  // если не разрешён просмотр клиентов, но модель содержит номер
+        return m_isValid;
+
     if (!ui->lineEditPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool() && !m_isReadOnly)
     {
         ui->lineEditPhone->setStyleSheet(commonLineEditStyleSheetRed);
         m_isValid = 0;
-        return m_isValid;
     }
+
     return m_isValid;
 }
 
@@ -152,7 +150,7 @@ void SPhone::updateButtons()
 {
     ui->pushButtonAddPhone->setVisible(!m_isReadOnly);
     ui->pushButtonDelPhone->setVisible(!m_isPrimary & !m_isReadOnly);
-    ui->pushButtonEditPhone->setVisible(m_isReadOnly & !m_notEditable);
+    ui->pushButtonEditPhone->setVisible(m_isReadOnly & !m_notEditable & permissions->editClients);
 }
 
 int SPhone::maskIndex()
@@ -172,12 +170,16 @@ void SPhone::setEditable(const int state)
 
 void SPhone::phoneMaskChanged(int index)
 {
-    QString mask = clientPhoneTypesModel->index(index, 2).data().toString();
+    QString mask;
+    if(index >= 0 || (index == -1 && !m_isReadOnly))
+        mask = clientPhoneTypesModel->index(index, 2).data().toString() + ";_";  // Here ";_" for filling blank characters with underscore
+    else
+        mask = "";
 
     if(m_isReadOnly)
         ui->lineEditPhone->setReadOnly(false);  // маска не устанавливается в режиме RO, поэтому временно его выключаю
     ui->lineEditPhone->setInputMask("");
-    ui->lineEditPhone->setInputMask(mask + ";_");  // Here ";_" for filling blank characters with underscore
+    ui->lineEditPhone->setInputMask(mask);
     if(m_isReadOnly)
         ui->lineEditPhone->setReadOnly(true);
 

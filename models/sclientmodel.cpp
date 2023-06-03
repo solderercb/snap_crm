@@ -77,7 +77,7 @@ void SClientModel::load(int id)
         m_birthday = clientModel->record(0).value("birthday").toString();
         m_memorial = clientModel->record(0).value("memorial").toString();
         m_notes = clientModel->record(0).value("notes").toString();
-        if(!m_notes.isEmpty())
+        if(permissions->viewClients && !m_notes.isEmpty())
             showNotification(m_notes, QMessageBox::Information);
         initBinaryOptions(clientModel);
         if(m_options&BinaryOption::BalanceEnabled)

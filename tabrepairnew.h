@@ -60,6 +60,7 @@ private:
     QStandardItemModel* prepayReasonsModel;
     int m_client = 0;
     int m_prevRepair = 0;
+    bool m_closePending = 0;
     void setDefaultStyleSheets();
     void getDevices();
     bool checkInput();
@@ -87,8 +88,8 @@ private slots:
     void clearClientCreds(bool hideCoincidence = true);
     void lineEditPrevRepairButtonsHandler(int);
     void fillClientCreds(int);
-    void buttonSelectExistingClientHandler();
-    void buttonCreateTabClientHandler();
+    void buttonSelectExistingClientClicked();
+    void buttonCreateTabClientClicked();
     void lineEditSNClearHandler(int);
     bool createRepair();
     void createRepairClose();

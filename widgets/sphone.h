@@ -43,7 +43,6 @@ public:
     void setModel(SPhoneModel*);
     void setReadOnly(bool stat = true);
     void clear();
-    void fillPhone(const QSqlRecord&);
 #ifdef QT_DEBUG
     void testFill(const int, const QString&);
 #endif
