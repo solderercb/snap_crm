@@ -466,7 +466,7 @@ void tabSale::clearClientCreds(bool hideCoincidence)
     ui->lineEditClientPatronymic->setReadOnly(false);
     ui->lineEditClientPhone->setReadOnly(false);
     ui->pushButtonCreateTabClient->setEnabled(false);
-    ui->pushButtonClientFromDB->setEnabled(true);
+    ui->pushButtonClientFromDB->setEnabled(permissions->viewClients);
     ui->pushButtonClientCredsClearAll->setEnabled(true);
     ui->lineEditClientLastName->clear();
     ui->lineEditClientFirstName->clear();

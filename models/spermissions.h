@@ -4,9 +4,9 @@
 #include <QAbstractItemModel>
 #include "propstruct.h"
 #include "com_sql_queries.h"
-#include "sdatabaserecord.h"
+#include "sdatabaseauxiliary.h"
 
-class SPermissions : public QStandardItemModel, public SDatabaseErrorLogger
+class SPermissions : public QStandardItemModel, public SDatabaseAuxiliary
 {
     Q_OBJECT
 public:
@@ -241,7 +241,7 @@ inline QVariant SPermissions::data(const QModelIndex &index, int role) const
     }
     else if (role == Qt::CheckStateRole)
         if(index.column() == 0)
-            return metaObject()->property(rowToPropertyId(index)).readOnGadget(this);
+            return metaObject()->property(rowToPropertyId(index)).read(this);
 
     return QVariant();
 }
@@ -251,7 +251,7 @@ inline bool SPermissions::setData(const QModelIndex &index, const QVariant &valu
     if(role == Qt::CheckStateRole)
     {
         m_modelEdited = 1;
-        return metaObject()->property(rowToPropertyId(index)).writeOnGadget(this, value);
+        return metaObject()->property(rowToPropertyId(index)).write(this, value);
     }
 
     return true;

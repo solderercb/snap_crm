@@ -674,7 +674,7 @@ bool tabRepairNew::checkInput()
         error = 16;
     }
     if ( ui->checkBoxIsEstPrice->isChecked() )   // если установлен флаг "Клиент ознакомлен с возможной стоимостью"
-        if (ui->doubleSpinBoxEstPrice->text() == "" || ui->doubleSpinBoxEstPrice->text().toInt() == 0)   // соответствует ли норме введённая сумма
+        if (ui->doubleSpinBoxEstPrice->value() == ui->doubleSpinBoxEstPrice->minimum())   // соответствует ли норме введённая сумма
         {
             ui->doubleSpinBoxEstPrice->setStyleSheet(commonLineEditStyleSheetRed);
             error = 17;
@@ -1097,6 +1097,7 @@ void tabRepairNew::test_scheduler2_handler()  // обработик таймер
 void tabRepairNew::dbgRandomFillClicked()
 {
     test_scheduler_counter = 0;
+    clearClientCreds();
     clearWidgets();
     randomFill();
 }

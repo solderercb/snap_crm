@@ -3,6 +3,7 @@
 #include "global.h"
 #include "widgets/spagesettingsdoctempateeditor.h"
 #include "widgets/settingstabwidgets/ssettingspagerolesandpermissions.h"
+#include "widgets/settingstabwidgets/ssettingspageglobal.h"
 
 tabSettings* tabSettings::p_instance = nullptr;
 
@@ -83,7 +84,7 @@ void tabSettings::initPage(const int page)
     switch (page)
     {
 //        case Page::User: widget = new QWidget(); break;
-//        case Page::Global: widget = new QWidget(); break;
+        case Page::Global: widget = new SSettingsPageGlobal(this); break;
 //        case Page::Company: widget = new QWidget(); break;
 //        case Page::Employees: widget = new QWidget(); break;
         case Page::UserRoles: widget = new SSettingsPageRolesAndPermissions(this); break;
@@ -163,7 +164,7 @@ void tabSettings::randomFill()
 
 void tabSettings::test_scheduler_handler()
 {
-    ui->pages->switchPage(Page::UserRoles);
+    ui->pages->switchPage(Page::Global);
 //    ui->pages->switchPage(Page::DocTemplates);
 //    test_scheduler2->start(3000);
 

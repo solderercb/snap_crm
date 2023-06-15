@@ -59,6 +59,8 @@ SOURCES += \
     models/salarytabmodels/stablesalaryreceptedissued.cpp \
     models/salarytabmodels/stablesalarysalepartsmodel.cpp \
     models/salarytabmodels/stablesalarysalesmodel.cpp \
+    models/scomsettings.cpp \
+    models/sdatabaseauxiliary.cpp \
     models/seditablebasemodel.cpp \
     models/stablemodelscommonmethods.cpp \
     models/stablerepairsmodel.cpp \
@@ -123,6 +125,7 @@ SOURCES += \
     widgets/salarytabwidgets/stableviewsalarysales.cpp \
     widgets/sdoublespinbox.cpp \
     widgets/settingstabwidgets/ssettingspagebase.cpp \
+    widgets/settingstabwidgets/ssettingspageglobal.cpp \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp \
     widgets/settingstabwidgets/stableviewpermissions.cpp \
     widgets/spageclientsummary.cpp \
@@ -191,6 +194,9 @@ HEADERS  += \
     models/salarytabmodels/stablesalaryrepairsmodel.h \
     models/salarytabmodels/stablesalarysalepartsmodel.h \
     models/salarytabmodels/stablesalarysalesmodel.h \
+    models/scomsettings.h \
+    models/scomsettingstypes.h \
+    models/sdatabaseauxiliary.h \
     models/seditablebasemodel.h \
     models/spermissions.h \
     models/stablemodelscommonmethods.h \
@@ -257,6 +263,7 @@ HEADERS  += \
     widgets/salarytabwidgets/stableviewsalarysales.h \
     widgets/sdoublespinbox.h \
     widgets/settingstabwidgets/ssettingspagebase.h \
+    widgets/settingstabwidgets/ssettingspageglobal.h \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.h \
     widgets/settingstabwidgets/stableviewpermissions.h \
     widgets/spageclientsummary.h \
@@ -319,6 +326,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
     widgets/salarytabwidgets/spagesalarysales.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
+    widgets/settingstabwidgets/ssettingspageglobal.ui \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \
     widgets/spageclientsummary.ui \
     tabcashmoveexch.ui \

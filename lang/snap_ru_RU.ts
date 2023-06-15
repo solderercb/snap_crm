@@ -906,6 +906,14 @@
     </message>
 </context>
 <context>
+    <name>SComSettings</name>
+    <message>
+        <location filename="../models/scomsettings.cpp" line="297"/>
+        <source>editGlobalSettings</source>
+        <translation type="unfinished">Изменять служебные настройки</translation>
+    </message>
+</context>
+<context>
     <name>SComments</name>
     <message>
         <location filename="../widgets/scomments.ui" line="20"/>
@@ -2595,6 +2603,94 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../models/ssaletablemodel.cpp" line="1145"/>
         <source>Сотрудник</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SSettingsPageGlobal</name>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="83"/>
+        <source>Региональные настроки</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="108"/>
+        <source>Колонки прайс-листа</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="130"/>
+        <source>Расширения</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="152"/>
+        <source>Телефония</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="170"/>
+        <source>Интернет магазин</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="188"/>
+        <source>Ремонты</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="210"/>
+        <source>Автоматическое распределение заказов между мастерами</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="232"/>
+        <source>Клиенты</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="261"/>
+        <source>Сроки выполенния заданий (в часах)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="283"/>
+        <source>Товары</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="305"/>
+        <source>Гарантия</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="327"/>
+        <source>Параметры оповещений</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="345"/>
+        <source>Настройка печати документов по умолчанию</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.ui" line="367"/>
+        <source>Дополнительные настроки</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.cpp" line="152"/>
+        <source>Тест</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settingstabwidgets/ssettingspageglobal.cpp" line="152"/>
+        <source>Баланс</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5142,82 +5238,82 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="25"/>
+        <location filename="../tabsettings.cpp" line="26"/>
         <source>Основные</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="26"/>
+        <location filename="../tabsettings.cpp" line="27"/>
         <source>Организация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="27"/>
+        <location filename="../tabsettings.cpp" line="28"/>
         <source>Сотрудники</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="28"/>
+        <location filename="../tabsettings.cpp" line="29"/>
         <source>Роли</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="29"/>
+        <location filename="../tabsettings.cpp" line="30"/>
         <source>Склады и ячейки</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="30"/>
+        <location filename="../tabsettings.cpp" line="31"/>
         <source>Финансы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="31"/>
+        <location filename="../tabsettings.cpp" line="32"/>
         <source>Каталог устройств</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="32"/>
+        <location filename="../tabsettings.cpp" line="33"/>
         <source>Статусы ремонта</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="33"/>
+        <location filename="../tabsettings.cpp" line="34"/>
         <source>Поля и источники обращения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="34"/>
+        <location filename="../tabsettings.cpp" line="35"/>
         <source>Шаблоны документов</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="35"/>
+        <location filename="../tabsettings.cpp" line="36"/>
         <source>Оповещения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="36"/>
+        <location filename="../tabsettings.cpp" line="37"/>
         <source>Резервное копирование</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="53"/>
+        <location filename="../tabsettings.cpp" line="54"/>
         <source>Настройки</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="134"/>
+        <location filename="../tabsettings.cpp" line="135"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="135"/>
+        <location filename="../tabsettings.cpp" line="136"/>
         <source>Не удалось сохранить настройки (ошибка запроса к БД).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="143"/>
+        <location filename="../tabsettings.cpp" line="144"/>
         <source>Настройки успешно сохранены</source>
         <translation type="unfinished"></translation>
     </message>

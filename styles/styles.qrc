@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>light/1F441_32.png</file>
     <file>light/1F4BE_32.png</file>
     <file>light/1F4C2_32.png</file>
     <file>light/1F4E6_32.png</file>

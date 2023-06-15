@@ -102,7 +102,11 @@ public:
     /*! \brief  Convert QJsonValue in QJsonDocument as QByteArray. */
     static QByteArray toByteArray(const QJsonValue & value)
     {
-        return QJsonDocument(value.toObject()).toJson();
+        if(value.isObject())
+            return QJsonDocument(value.toObject()).toJson();
+
+        if(value.isArray())
+            return value.toVariant().toStringList().join(',').toLocal8Bit();
     }
 #endif
 
@@ -149,13 +153,25 @@ public:
         return json;
     }
 
+    /*! \brief  Returns JsonValue of single element (property) object. */
+    QByteArray toRawJsonArray() const
+    {
+#ifdef QS_HAS_XML
+        Q_ASSERT_X(metaObject()->propertyCount() == 2, metaObject()->className(), "Property count more than one");
+#else
+        Q_ASSERT_X(metaObject()->propertyCount() == 1, metaObject()->className(), "Property count more than one");
+#endif
+
+        return toByteArray(metaObject()->property(0).readOnGadget(this).toJsonValue());//.toString().toLocal8Bit();
+    }
+
     /*! \brief  Returns QByteArray representation this object using json-serialization. */
     QByteArray toRawJson() const
     {
         return toByteArray(toJson());
     }
 
-    /*! \brief  Deserialize all accessed XML propertyes for this object. */
+    /*! \brief  Deserialize all accessed propertyes for this object. */
     void fromJson(const QJsonValue & val)
     {
         if(val.isObject())
@@ -187,6 +203,34 @@ public:
                 }
             }
         }
+    }
+
+    /*! \brief  Deserialize array of values for objects containing single element (property) */
+    void fromJsonArray(const QByteArray &data)
+    {
+#ifdef QS_HAS_XML
+        Q_ASSERT_X(metaObject()->propertyCount() == 2, metaObject()->className(), "Property count more than one");
+#else
+        Q_ASSERT_X(metaObject()->propertyCount() == 1, metaObject()->className(), "Property count more than one");
+#endif
+
+        int i = 0;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                if(QString(metaObject()->property(i).typeName()) != QMetaType::typeName(qMetaTypeId<QJsonValue>()))
+                {
+                    i++;
+                }
+#else
+                if(metaObject()->property(i).metaType().id() != QMetaType::QJsonValue)
+                {
+                    i++;
+                }
+#endif
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        if(!doc.isArray() || doc.isEmpty())
+            return;
+
+        metaObject()->property(i).writeOnGadget(this, QJsonValue(doc.array()));
     }
 
     /*! \brief  Deserialize all accessed JSON propertyes for this object. */
