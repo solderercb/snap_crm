@@ -29,7 +29,6 @@ public slots:
 #endif
 private:
     Ui::SSettingsPageGlobal *ui;
-    SComSettings *comSettings;
     QMap<int, QWidget*> m_extraWidgets;
     QPushButton *voipTestButton = nullptr;
     void saveSettings() override;

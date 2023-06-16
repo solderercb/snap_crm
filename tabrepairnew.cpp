@@ -135,7 +135,7 @@ void tabRepairNew::initWidgets()
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->comboBoxPrepayReason->setModel(prepayReasonsModel);
     ui->comboBoxPrepayReason->setCurrentIndex(-1);
-    ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
+    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
 
     if(permissions->viewClients)
     {
@@ -146,29 +146,16 @@ void tabRepairNew::initWidgets()
     connect(ui->lineEditSN,SIGNAL(textEdited(QString)),ui->widgetDeviceMatch,SLOT(findBySN(QString)));
     connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
 
-    if(comSettings->value("classic_kassa").toBool())
+    // TODO: настройка минимальных сумм в параметрах программы
+    if(comSettings->classicKassa)
     {
-        ui->doubleSpinBoxEstPrice->setDecimals(2);
         ui->doubleSpinBoxEstPrice->setMinimum(0.01);
-        ui->doubleSpinBoxEstPrice->setMaximum(9999999.99);
+        ui->doubleSpinBoxPrepaySumm->setMinimum(0.01);
     }
     else
     {
-        ui->doubleSpinBoxEstPrice->setDecimals(0);
         ui->doubleSpinBoxEstPrice->setMinimum(1.00);
-        ui->doubleSpinBoxEstPrice->setMaximum(9999999);
-    }
-    if(comSettings->value("classic_kassa").toBool())
-    {
-        ui->doubleSpinBoxPrepaySumm->setDecimals(2);
-        ui->doubleSpinBoxPrepaySumm->setMinimum(comSettings->value("minimal_prepay_summ", 0.01).toDouble()); // TODO: добавить в настройки
-        ui->doubleSpinBoxPrepaySumm->setMaximum(9999999.99);
-    }
-    else
-    {
-        ui->doubleSpinBoxPrepaySumm->setDecimals(0);
-        ui->doubleSpinBoxPrepaySumm->setMinimum(comSettings->value("minimal_prepay_summ", 1.00).toDouble());
-        ui->doubleSpinBoxPrepaySumm->setMaximum(9999999);
+        ui->doubleSpinBoxPrepaySumm->setMinimum(1.00);
     }
 
     ui->pushButtonSelectExistingClient->setVisible(permissions->viewClients);
@@ -193,7 +180,7 @@ void tabRepairNew::clearWidgets()
     ui->checkBoxIsCheckNeeded->setCheckState(Qt::Unchecked);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPlace->setCurrentIndex(-1);
-    ui->spinBoxStickersCount->setValue(comSettings->value("rep_stickers_copy").toInt());
+    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
     ui->lineEditExtNotes->setText("");
     ui->lineEditInsideComment->setText("");
     ui->checkBoxIsEstPrice->setCheckState(Qt::Unchecked);
@@ -612,7 +599,7 @@ bool tabRepairNew::checkInput()
         ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 3;
     }
-    if (ui->lineEditSN->text() == "" && comSettings->value("is_sn_req").toBool())   // если не записан серийный номер, а он обязателен
+    if (ui->lineEditSN->text() == "" && comSettings->isSerialNumberRequired)   // если не записан серийный номер, а он обязателен
     {
         ui->lineEditSN->setStyleSheet(commonLineEditStyleSheetRed);
         error = 4;
@@ -627,22 +614,22 @@ bool tabRepairNew::checkInput()
         ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
         error = 6;
     }
-    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->value("is_patronymic_required").toBool() && !m_client)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
+    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->isClientPatronymicRequired && !m_client)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
     {
         ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
         error = 7;
     }
-    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->value("visit_source_force").toBool() && !m_client)        // если не указан источник обращения, а он обязателен и клиент новый
+    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->isVisitSourceRequired && !m_client)        // если не указан источник обращения, а он обязателен и клиент новый
     {
         ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 8;
     }
-    if (ui->lineEditClientAddress->text() == "" && comSettings->value("address_required").toBool() && !m_client)   // если не указан адрес, а он обязателен и клиент новый
+    if (ui->lineEditClientAddress->text() == "" && comSettings->isClientAddressRequired && !m_client)   // если не указан адрес, а он обязателен и клиент новый
     {
         ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheetRed);
         error = 9;
     }
-    if (ui->lineEditClientEmail->text() == "" && comSettings->value("email_required").toBool() && !m_client)   // если не указан email, а он обязателен и клиент новый
+    if (ui->lineEditClientEmail->text() == "" && comSettings->isClientEmailRequired && !m_client)   // если не указан email, а он обязателен и клиент новый
     {
         ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheetRed);
         error = 10;
@@ -664,7 +651,7 @@ bool tabRepairNew::checkInput()
         ui->comboBoxExterior->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 14;
     }
-    if (ui->comboBoxPresetEngineer->currentIndex() < 0 && comSettings->value("is_master_set_on_new").toBool())        // если не выбран инженер, а он обязателен
+    if (ui->comboBoxPresetEngineer->currentIndex() < 0 && comSettings->isEngineerRequiredOnDeviceRecept)        // если не выбран инженер, а он обязателен
     {
         ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 15;
@@ -883,7 +870,7 @@ void tabRepairNew::print(int repair)
 {
     QMap<QString, QVariant> report_vars;
     // печать квитанции
-    if(comSettings->value("print_new_repair_report").toBool())
+    if(comSettings->printRepairReceptDoc)
     {
         report_vars.insert("type", Global::Reports::new_rep);
         report_vars.insert("repair_id", repair);
@@ -892,7 +879,7 @@ void tabRepairNew::print(int repair)
     }
 
     // печать стикеров
-    if(comSettings->value("print_rep_stickers").toBool())
+    if(comSettings->printRepairStickers)
     {
         report_vars.insert("type", Global::Reports::rep_label);
         report_vars.insert("repair_id", repair);

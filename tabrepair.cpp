@@ -83,9 +83,9 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
     worksAndPartsModel->setPriceColumn(0);
-    if(comSettings->value("autosave_part_list").toInt() == SSaleTableModel::EditStrategy::OnManualSubmit)
-        ui->switchEditStrategy->setChecked(false);
-    else
+//    if(comSettings->auto == SSaleTableModel::EditStrategy::OnManualSubmit)
+//        ui->switchEditStrategy->setChecked(false);
+//    else
         ui->switchEditStrategy->setChecked(true);
     connect(worksAndPartsModel, SIGNAL(amountChanged(double,double,double)), this, SLOT(updateTotalSumms(double,double,double)));
     connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
@@ -292,7 +292,7 @@ void tabRepair::updateWidgets()
     ui->textEditDiagResult->setReadOnly(m_diagRO || modelRO);
     ui->textEditDiagResult->blockSignals(false);
     ui->doubleSpinBoxAmount->blockSignals(true);
-    ui->doubleSpinBoxAmount->setDecimals(comSettings->value("classic_kassa").toBool()?2:0);
+    ui->doubleSpinBoxAmount->setDecimals(comSettings->classicKassa?2:0);
     ui->doubleSpinBoxAmount->setValue(repairModel->repairCost());
     ui->doubleSpinBoxAmount->setReadOnly(m_summRO || modelRO);
     ui->doubleSpinBoxAmount->blockSignals(false);

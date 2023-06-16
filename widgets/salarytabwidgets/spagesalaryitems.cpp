@@ -42,7 +42,7 @@ void SPageSalaryItems::updateWidgets()
 
     ui->labelTotalItemsByArticulValue->setText(QString::number(parentTab->m_items->rowCount()));
     ui->labelTotalItemsPeacesValue->setText(QString::number(totalItemsPeaces));
-    ui->labelTotalItemsCostValue->setText(sysLocale.toString(totalItemsCost, 'f', comSettings->value("classic_kassa").toBool()?2:0));
+    ui->labelTotalItemsCostValue->setText(sysLocale.toString(totalItemsCost, 'f', comSettings->classicKassa?2:0));
 
     ui->tableViewItemsSummary->setTotal(0, parentTab->m_items->rowCount());
     ui->tableViewItemsSummary->setTotal(3, totalItemsPeaces);
@@ -50,11 +50,11 @@ void SPageSalaryItems::updateWidgets()
 
     ui->labelUsedItemsByArticulValue->setText(QString::number(parentTab->m_items->totalUsedItemsByArticul()));
     ui->labelUsedItemsPeacesValue->setText(QString::number(parentTab->m_items->totalUsedItemsPeaces()));
-    ui->labelUsedItemsCostValue->setText(sysLocale.toString(parentTab->m_items->totalUsedItemsCost(), 'f', comSettings->value("classic_kassa").toBool()?2:0));
+    ui->labelUsedItemsCostValue->setText(sysLocale.toString(parentTab->m_items->totalUsedItemsCost(), 'f', comSettings->classicKassa?2:0));
 
     ui->labelUnusedItemsByArticulValue->setText(QString::number(parentTab->m_items->totalUnusedItemsByArticul()));
     ui->labelUnusedItemsPeacesValue->setText(QString::number(parentTab->m_items->totalUnusedItemsPeaces()));
-    ui->labelUnusedItemsCostValue->setText(sysLocale.toString(parentTab->m_items->totalUnusedItemsCost(), 'f', comSettings->value("classic_kassa").toBool()?2:0));
+    ui->labelUnusedItemsCostValue->setText(sysLocale.toString(parentTab->m_items->totalUnusedItemsCost(), 'f', comSettings->classicKassa?2:0));
 }
 
 void SPageSalaryItems::tableItemsRowDoubleClicked(const QModelIndex &index)

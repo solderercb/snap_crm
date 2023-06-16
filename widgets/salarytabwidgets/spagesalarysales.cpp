@@ -48,7 +48,7 @@ void SPageSalarySales::updateWidgets()
     m_userModel = parentTab->m_userModel;
 
     ui->labelPercentPartsValue->setText(QString::number(m_userModel->paySale()));
-    ui->labelSalesSummValue->setText(sysLocale.toString(parentTab->m_sales->total(5), 'f', comSettings->value("classic_kassa").toBool()?2:0));
+    ui->labelSalesSummValue->setText(sysLocale.toString(parentTab->m_sales->total(5), 'f', comSettings->classicKassa?2:0));
 }
 
 void SPageSalarySales::tableSalesRowSelected(const QModelIndex &current, const QModelIndex &prev)

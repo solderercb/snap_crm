@@ -41,7 +41,7 @@ bool SPhoneModel::commit()
     else
     {
         if(!i_valuesMap.contains("notify"))
-            i_valuesMap.insert("notify", comSettings->value("newClientSmsEnabled", 0));    // TODO: добавить значение по умолчанию в общие настройки
+            i_valuesMap.insert("notify", comSettings->newClientSmsEnabled);
         insert();
     }
     commitLogs();

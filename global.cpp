@@ -9,7 +9,7 @@ QSqlQueryModel *userDbDataModel = new QSqlQueryModel();
 SLocalSettings *localSettings = new SLocalSettings();
 t_userSettings *userLocalData = nullptr;
 SPermissions *permissions = new SPermissions;
-QMap<QString, QVariant> *comSettings = new QMap<QString, QVariant>;
+SComSettings *comSettings = new SComSettings;
 SSqlQueryModel *clientPhoneTypesModel = new SSqlQueryModel();
 SSqlQueryModel *companiesModel = new SSqlQueryModel;
 SSqlQueryModel *officesModel = new SSqlQueryModel;
@@ -141,51 +141,22 @@ QString jsonArrayJoin(QJsonValue value, const QString)
 
 void initGlobalModels()
 {
-    QString query;
-
-    QSqlQuery *queryCommonSettings = new QSqlQuery(QSqlDatabase::database("connMain"));
-
-    queryCommonSettings->exec(QUERY_SEL_COMMON_SETTINGS);
-    comSettings = new QMap<QString, QVariant>;
-    queryCommonSettings->first();
-    // Переписываем результаты запроса в специальный массив
-    // это необходимо, т. к. данные общих настроек могут быть дополнены.
-    // Кроме того, есть параметры, хранящиеся в AppData и эти настройки превалируют над настройками, сохранёнными в БД.
-    // TODO: чтение файла настроек в AppData
-    // TODO: чтение файлов настроек пользователя из каталога приложения (например, program files): RepairsGrid-user.xml, SaleGrid-user.xml и многие другие
-    for (int i = 0; i < queryCommonSettings->record().count(); i++)
-    {
-        comSettings->insert(queryCommonSettings->record().fieldName(i), queryCommonSettings->value(i));
-    }
-    queryCommonSettings->exec(QUERY_SEL_COMMON_SETTINGS2);  // вторая "порция" общих настроек ( в ASC CRM настроки из табил. config начиная с v3.7.18.969 schemaversion 258 постепенно "переезжают" в табл. settings; нова ятаблица имеет приоритет
-    while(queryCommonSettings->next())
-    {
-        comSettings->insert(queryCommonSettings->value(0).toString(), queryCommonSettings->value(1));
-    }
-
-    for (int i=0; i < comSettings->value("phone_mask1").toString().size(); i++)     // В ASC CRM (а точнее в DevExpress) маски ввода в lineEdit работают не так, как в Qt
-        if (comSettings->value("phone_mask1").toString().at(i) == '0')              // В Qt: 0 - это необязательная цифра, а 9 — обязательная цифра. Чтобы работала проверка
+    comSettings->load();
+    for (int i=0; i < comSettings->ascPhoneMask1.size(); i++)     // В ASC CRM (а точнее в DevExpress) маски ввода в lineEdit работают не так, как в Qt
+        if (comSettings->ascPhoneMask1.at(i) == '0')              // В Qt: 0 - это необязательная цифра, а 9 — обязательная цифра. Чтобы работала проверка
         {                                                                           // введённого номера телефона (если в настройках установлен флаг обязательности), нужно изменить маску.
             qDebug() << "МАСКА ТЕЛЕФОНА 1!!!";                                      // (это заглушка для отладки)
             break;                                                                  // TODO: добавить хитрую подсказку для полей ввода номера, если обнаруживается такое несовпадение
         }
-    for (int i=0; i < comSettings->value("phone_mask2").toString().size(); i++)
-        if (comSettings->value("phone_mask2").toString().at(i) == '0')
+    for (int i=0; i < comSettings->ascPhoneMask2.size(); i++)
+        if (comSettings->ascPhoneMask2.at(i) == '0')
         {
             qDebug() << "МАСКА ТЕЛЕФОНА 2!!!";
             break;
         }
-    comSettings->insert("phone_mask1", comSettings->value("phone_mask1").toString().replace('0', '9')); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
-    comSettings->insert("phone_mask2", comSettings->value("phone_mask2").toString().replace('0', '9'));
+    comSettings->ascPhoneMask1 =  comSettings->ascPhoneMask1.replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
+    comSettings->ascPhoneMask2 =  comSettings->ascPhoneMask2.replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
 
-
-//    QList<QStandardItem*> *clientPhoneTypesSelector;
-//    clientPhoneTypesSelector = new QList<QStandardItem*>();
-//    *clientPhoneTypesSelector << new QStandardItem("мобильный") << new QStandardItem("1") << new QStandardItem(comSettings->value("phone_mask1").toString()); // в ASC формат задаётся нулями, но в поиске совпадающих клиентов  это предусмотрено
-//    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
-//    clientPhoneTypesSelector = new QList<QStandardItem*>();;
-//    *clientPhoneTypesSelector << new QStandardItem("городской") << new QStandardItem("2") << new QStandardItem(comSettings->value("phone_mask2").toString());
-//    clientPhoneTypesModel->appendRow( *clientPhoneTypesSelector );
     clientPhoneTypesModel->setQuery(QUERY_SEL_PHONE_TYPES, QSqlDatabase::database("connMain"));
     clientPhoneTypesModel->setObjectName("clientPhoneTypesModel");
 //    clientPhoneTypesModel->setHorizontalHeaderLabels({"name", "id", "mask"});
@@ -238,7 +209,7 @@ void initGlobalModels()
     }
     clientsTypesList->setObjectName("clientsTypesList");
 
-    QJsonDocument jsonDoc(QJsonDocument::fromJson(comSettings->value("statuses").toByteArray()));
+    QJsonDocument jsonDoc(QJsonDocument::fromJson(comSettings->statusesJson.toRawJsonArray()));
     if (jsonDoc.isArray())
     {
         QJsonArray jsonArray(jsonDoc.array());

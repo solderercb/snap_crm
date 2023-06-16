@@ -45,7 +45,7 @@ void SPageSalaryReceptedIssued::updateWidgets()
     ui->labelReceptedSummaryValue->setText(QString::number(recepted));
     ui->labelIssuedSummaryValue->setText(QString::number(issued));
     ui->labelRepairsSummaryValue->setText(QString::number(recepted + issued));
-    ui->labelSummValue->setText(sysLocale.toString(summReceptedIssued, 'f', comSettings->value("classic_kassa").toBool()?2:0));
+    ui->labelSummValue->setText(sysLocale.toString(summReceptedIssued, 'f', comSettings->classicKassa?2:0));
 }
 
 void SPageSalaryReceptedIssued::tableRepairsRowDoubleClicked(const QModelIndex &index)

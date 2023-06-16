@@ -106,7 +106,17 @@ public:
             return QJsonDocument(value.toObject()).toJson();
 
         if(value.isArray())
-            return value.toVariant().toStringList().join(',').toLocal8Bit();
+        {
+            QStringList l;
+            for(int i = 0; i < value.toArray().count(); i++)
+            {
+                l.append(toByteArray(value.toArray().at(i)));
+            }
+            return l.join(',').append(']').prepend('[').toLocal8Bit();
+        }
+
+        if(value.isString())
+            return value.toString().toLocal8Bit();
     }
 #endif
 
@@ -162,7 +172,19 @@ public:
         Q_ASSERT_X(metaObject()->propertyCount() == 1, metaObject()->className(), "Property count more than one");
 #endif
 
-        return toByteArray(metaObject()->property(0).readOnGadget(this).toJsonValue());//.toString().toLocal8Bit();
+        int i = 0;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        if(QString(metaObject()->property(i).typeName()) != QMetaType::typeName(qMetaTypeId<QJsonValue>()))
+        {
+            i++;
+        }
+#else
+        if(metaObject()->property(i).metaType().id() != QMetaType::QJsonValue)
+        {
+            i++;
+        }
+#endif
+        return toByteArray(metaObject()->property(i).readOnGadget(this).toJsonValue());
     }
 
     /*! \brief  Returns QByteArray representation this object using json-serialization. */
@@ -216,15 +238,15 @@ public:
 
         int i = 0;
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-                if(QString(metaObject()->property(i).typeName()) != QMetaType::typeName(qMetaTypeId<QJsonValue>()))
-                {
-                    i++;
-                }
+        if(QString(metaObject()->property(i).typeName()) != QMetaType::typeName(qMetaTypeId<QJsonValue>()))
+        {
+            i++;
+        }
 #else
-                if(metaObject()->property(i).metaType().id() != QMetaType::QJsonValue)
-                {
-                    i++;
-                }
+        if(metaObject()->property(i).metaType().id() != QMetaType::QJsonValue)
+        {
+            i++;
+        }
 #endif
         QJsonDocument doc = QJsonDocument::fromJson(data);
         if(!doc.isArray() || doc.isEmpty())

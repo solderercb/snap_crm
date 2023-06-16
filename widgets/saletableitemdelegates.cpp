@@ -311,7 +311,7 @@ void SaleTableItemDelegates::setModelDataFromSpinBox(QWidget *editor, QAbstractI
 QDoubleSpinBox *SaleTableItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
 {
     QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
-    if(comSettings->value("classic_kassa").toBool())
+    if(comSettings->classicKassa)
     {
         sb->setDecimals(2);
         sb->setMinimum(0.01);   // TODO: в гарантийном ремонте минимальная цена должна быть равна нулю

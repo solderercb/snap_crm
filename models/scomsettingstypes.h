@@ -8,9 +8,9 @@ class t_status : public QSerializer
     QS_SERIALIZABLE
     QS_FIELD(int, Id)
     QS_FIELD(QString, Name)
-    QS_FIELD(QString, Contains)
-    QS_FIELD(QString, Actions)
-    QS_FIELD(QString, Roles)
+    QS_COLLECTION(QList, int, Contains)
+    QS_COLLECTION(QList, int, Actions)
+    QS_COLLECTION(QList, int, Roles)
     QS_FIELD(QString, Color)
     QS_FIELD(QString, Terms)
 };

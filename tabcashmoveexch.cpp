@@ -10,7 +10,7 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
 {
     ui->setupUi(this);
     i_tabTitle = tr("Перемещение денег");
-    ui->checkBoxPrintCheck->setChecked(comSettings->value("print_check").toBool());
+    ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
 
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);

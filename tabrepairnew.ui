@@ -532,7 +532,7 @@
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxEstPrice">
+               <widget class="SDoubleSpinBox" name="doubleSpinBoxEstPrice">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -548,7 +548,7 @@
                </widget>
               </item>
               <item row="1" column="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxPrepaySumm">
+               <widget class="SDoubleSpinBox" name="doubleSpinBoxPrepaySumm">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -1070,6 +1070,11 @@ QListView::item  {
    <extends>QWidget</extends>
    <header>widgets/sdevicematch.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">widgets/sdoublespinbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

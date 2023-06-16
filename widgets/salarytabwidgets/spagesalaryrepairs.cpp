@@ -7,7 +7,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     ui(new Ui::SPageSalaryRepairs)
 {
     ui->setupUi(this);
-    ui->checkBoxIncludeNotIssued->setChecked(comSettings->value("salary_include_not_issued_by_default").toBool());
+    ui->checkBoxIncludeNotIssued->setChecked(comSettings->salaryIncludeNotIssuedByDefault);
 
     ui->tableViewRepairsSummary->setGridLayout(ui->tableViewRepairs->gridLayout());
     connect(ui->tableViewRepairs, &STableViewSalaryRepairs::signalColumnResized, this, &SPageSalaryRepairs::repairsTableColumnResized);
@@ -85,9 +85,9 @@ void SPageSalaryRepairs::updateWidgets()
     if(ui->checkBoxIncludeNotIssued->isChecked())
         notUssuedValue = parentTab->m_repairs->notIssuedTotal(6) + parentTab->m_repairs->notIssuedTotal(7);
 
-    ui->labelSalaryValue->setText(sysLocale.toString(parentTab->m_repairs->total(6, STableSalaryReceptedIssued::IncludePayed) + parentTab->m_repairs->total(7, STableSalaryReceptedIssued::IncludePayed), 'f', comSettings->value("classic_kassa").toBool()?2:0));
-    ui->labelSalaryToPayValue->setText(sysLocale.toString(parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7), 'f', comSettings->value("classic_kassa").toBool()?2:0));
-    ui->labelNotUssuedValue->setText(sysLocale.toString(notUssuedValue, 'f', comSettings->value("classic_kassa").toBool()?2:0));
+    ui->labelSalaryValue->setText(sysLocale.toString(parentTab->m_repairs->total(6, STableSalaryReceptedIssued::IncludePayed) + parentTab->m_repairs->total(7, STableSalaryReceptedIssued::IncludePayed), 'f', comSettings->classicKassa?2:0));
+    ui->labelSalaryToPayValue->setText(sysLocale.toString(parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7), 'f', comSettings->classicKassa?2:0));
+    ui->labelNotUssuedValue->setText(sysLocale.toString(notUssuedValue, 'f', comSettings->classicKassa?2:0));
 }
 
 void SPageSalaryRepairs::repairsModelReset()

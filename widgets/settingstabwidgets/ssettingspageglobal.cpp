@@ -1,5 +1,6 @@
 #include "ssettingspageglobal.h"
 #include "ui_ssettingspageglobal.h"
+#include "global.h"
 
 SSettingsPageGlobal::SSettingsPageGlobal(QWidget *parent) :
     SSettingsPageBase(parent),
@@ -8,7 +9,6 @@ SSettingsPageGlobal::SSettingsPageGlobal(QWidget *parent) :
     ui->setupUi(this);
     ui->groupBoxTasksTerms->setBaseSize(200, 51);
 
-    comSettings = new SComSettings();
     comSettings->initWidgets();
 
     updateWidgets();
@@ -16,6 +16,7 @@ SSettingsPageGlobal::SSettingsPageGlobal(QWidget *parent) :
 
 SSettingsPageGlobal::~SSettingsPageGlobal()
 {
+    comSettings->deleteWidgets();
     delete ui;
 }
 

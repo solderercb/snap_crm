@@ -183,7 +183,6 @@ void SComSettings::sortFieldsByTable(Table table)
 
 void SComSettings::save()
 {
-    qDebug().nospace() << "[" << this << "] save()";
     bool nErr = 1;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     QString q;
@@ -192,6 +191,7 @@ void SComSettings::save()
     {
         metaObject()->property(i).read(this);
     }
+
     updateJson();
 
     i_valuesMap.clear();
@@ -241,13 +241,11 @@ void SComSettings::saveToTableSettings()
 
 // json объекты нужно обработать отдельно.
 // И АСЦ и QSerializer нормально обрабатывают список значений из строк (каждое в кавычках) и из чисел (без кавычек)
-// но QSerializer требует название элемента, а АСЦ при указании этого названия сбоит.
 void SComSettings::updateJson()
 {
     QString dbValue = repairDispatcherUsersJson.Users.join(',');   // старое значение
     if(dbValue.compare(repairDispatcherUsers) != 0) // сравнение старого значения и нового из виджета
     {
-//        repairDispatcherUsersJson.fromJsonArray(QString("[%1]").arg(repairDispatcherUsers).toLocal8Bit());
         repairDispatcherUsersJson.Users = repairDispatcherUsers.split(',');
         i_jsonFieldModified.insert("repairDispatcherUsersJson", QString("[%1]").arg(repairDispatcherUsers));
     }
@@ -260,7 +258,6 @@ void SComSettings::updateJson()
         i_jsonFieldModified.insert("repairDispatcherAssignCriteriaJson", repairDispatcherAssignCriteriaJson.toRawJson());
     }
 
-/*DBG*/ emailServer = "127.0.0.1";
     if( emailConfigJson.Host != emailServer || emailConfigJson.Port != emailPort ||
         emailConfigJson.Login != emailLogin || emailConfigJson.Password != emailPassword ||
         emailConfigJson.Timeout != emailTimeout || emailConfigJson.EnableSsl != emailEnableSsl ||
@@ -277,7 +274,6 @@ void SComSettings::updateJson()
         i_jsonFieldModified.insert("emailConfigJson", emailConfigJson.toRawJson());
     }
 
-/*DBG*/ smsLogin = "user";
     if( smsConfigJson.Provider != smsProvider || smsConfigJson.AuthType != smsAuthType ||
         smsConfigJson.ApiId != smsApiId || smsConfigJson.Login != smsLogin ||
         smsConfigJson.Password != smsPassword || smsConfigJson.Sender != smsSender )
@@ -290,6 +286,24 @@ void SComSettings::updateJson()
         smsConfigJson.Sender = smsSender;
         i_jsonFieldModified.insert("smsConfigJson", smsConfigJson.toRawJson());
     }
+}
+
+QStringList SComSettings::keys()
+{
+    QStringList list;
+    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
+        list.append(metaObject()->property(i).name());
+
+    return list;
+}
+
+QList<QVariant> SComSettings::values()
+{
+    QList<QVariant> list;
+    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
+        list.append(metaObject()->property(i).read(this));
+
+    return list;
 }
 
 void SComSettings::translate()

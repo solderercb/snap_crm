@@ -13,8 +13,8 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_COMBOBOX(int, currencyId, 0, currency)
     PROPSTRUCT_CHECKBOX(int, classicKassa, 0, classic_kassa)
     PROPSTRUCT_COMBOBOX(int, timeZoneId, 0, time_zone)
-    PROPSTRUCT_LINEEDIT(QString, ascPhoneMask1Id, 0, phone_mask1)
-    PROPSTRUCT_LINEEDIT(QString, ascPhoneMask2Id, 0, phone_mask2)
+    PROPSTRUCT_LINEEDIT(QString, ascPhoneMask1, 0, phone_mask1)
+    PROPSTRUCT_LINEEDIT(QString, ascPhoneMask2, 0, phone_mask2)
 
     PROPSTRUCT_CHECKBOX(int, isPriceColOptVisible, 1, it_vis_opt)
     PROPSTRUCT_CHECKBOX(int, isPriceColOpt2Visible, 1, it_vis_opt2)
@@ -123,6 +123,7 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
 //    PROPSTRUCT_CHECKBOX(int, autosave_part_list, , autosave_part_list) // это должно быть в персональных настройка пользователя
     PROPSTRUCT_CHECKBOX(int, salaryClassic, 14, settings.classic_salary)
     PROPSTRUCT_CHECKBOX(int, salaryIncludeNotIssuedByDefault, 14, settings.salary_include_not_issued_by_default)
+    PROPSTRUCT_CHECKBOX(int, newClientSmsEnabled, 14, settings.new_client_sms_enabled)
 
     PROPSTRUCT_JSON_ARRAY(t_repairStatuses, statusesJson, statuses)
 
@@ -188,6 +189,8 @@ public:
     void saveToTableSettings();
     void updateJson();
     bool isDirty();
+    QStringList keys();
+    QList<QVariant> values();
 private:
     int fieldToPropertyId(const QString &fieldName);
     void sortFieldsByTable(Table table);

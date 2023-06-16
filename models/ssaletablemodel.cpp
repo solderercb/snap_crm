@@ -56,7 +56,7 @@ QVariant SSaleTableModel::data(const QModelIndex &index, int role) const
     {
         switch (index.column()) {
         case SStoreItemModel::SaleOpColumns::ColPrice:
-        case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QStandardItemModel::data(index, role).toDouble(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
+        case SStoreItemModel::SaleOpColumns::ColSumm: return sysLocale.toString(QStandardItemModel::data(index, role).toDouble(), 'f', comSettings->classicKassa?2:0);
         case SStoreItemModel::SaleOpColumns::ColBox: return itemBoxesModel->getDisplayRole(QStandardItemModel::data(index, role).toInt(), 1);
         case SStoreItemModel::SaleOpColumns::ColWarranty: return warrantyTermsModel->getDisplayRole(QStandardItemModel::data(index, role).toInt(), 1);
         case SStoreItemModel::SaleOpColumns::ColUser: return allUsersMap->value(QStandardItemModel::data(index, role).toInt());
@@ -1177,7 +1177,7 @@ double SSaleTableModel::amountTotal()
 
 QString SSaleTableModel::amountTotalLocale()
 {
-    return sysLocale.toString(amountTotal(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
+    return sysLocale.toString(amountTotal(), 'f', comSettings->classicKassa?2:0);
 }
 
 double SSaleTableModel::amountItems()
@@ -1187,12 +1187,12 @@ double SSaleTableModel::amountItems()
 
 QString SSaleTableModel::amountItemsLocale()
 {
-    return sysLocale.toString(m_amountItems, 'f', comSettings->value("classic_kassa").toBool()?2:0);
+    return sysLocale.toString(m_amountItems, 'f', comSettings->classicKassa?2:0);
 }
 
 QString SSaleTableModel::amountWorksLocale()
 {
-    return sysLocale.toString(m_amountWorks, 'f', comSettings->value("classic_kassa").toBool()?2:0);
+    return sysLocale.toString(m_amountWorks, 'f', comSettings->classicKassa?2:0);
 }
 
 QVariant SSaleTableModel::value(const int row, const int column, const int role) const

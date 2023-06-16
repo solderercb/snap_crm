@@ -48,7 +48,7 @@ double STableModelsCommonMethods::total(int column, int sign)
 
 QString STableModelsCommonMethods::dataLocalizedFromDouble(const QModelIndex &item) const
 {
-    return sysLocale.toString(derivedModel->data(item, Qt::DisplayRole | 0x0100).toDouble(), 'f', comSettings->value("classic_kassa").toBool()?2:0);
+    return sysLocale.toString(derivedModel->data(item, Qt::DisplayRole | 0x0100).toDouble(), 'f', comSettings->classicKassa?2:0);
 }
 
 QString STableModelsCommonMethods::userFromId(const QModelIndex &item) const

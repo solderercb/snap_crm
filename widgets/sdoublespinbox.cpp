@@ -5,7 +5,7 @@ SDoubleSpinBox::SDoubleSpinBox(QWidget *parent) :
     QDoubleSpinBox(parent)
 {
     setButtonSymbols(QAbstractSpinBox::NoButtons);
-    if(comSettings->value("classic_kassa").toBool())
+    if(comSettings->classicKassa)
     {
         setDecimals(2);
     }

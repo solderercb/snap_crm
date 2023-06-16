@@ -12,6 +12,7 @@
 #include <QJsonValue>
 #include <QSettings>
 #include "applog.h"
+#include "models/scomsettings.h"
 #include "models/slocalsettings.h"
 #include "models/slocalsettingsstructs.h"
 #include "models/suseractivitymodel.h"
@@ -51,7 +52,7 @@ extern QSqlQueryModel *userDbDataModel;
 extern SLocalSettings *localSettings;
 extern t_userSettings *userLocalData;
 extern SPermissions *permissions;
-extern QMap<QString, QVariant> *comSettings;
+extern SComSettings *comSettings;
 extern SSqlQueryModel *clientPhoneTypesModel;
 extern SSqlQueryModel *companiesModel;
 extern SSqlQueryModel *officesModel;

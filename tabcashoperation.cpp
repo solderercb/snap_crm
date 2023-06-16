@@ -19,7 +19,7 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     ui->pushButtonOpenLinkedObject->hide();
     ui->lineClientId->setReadOnly(true);
     ui->lineEditBalance->setReadOnly(true);
-    ui->checkBoxPrintCheck->setChecked(comSettings->value("print_check").toBool());
+    ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
     ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxCompany->setCurrentIndex(companiesModel->rowByDatabaseID(userDbData->value("company").toInt()));
 

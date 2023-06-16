@@ -21,8 +21,8 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 //    itemDelagates->setTableModel(tableModel);
     params = new int;
     *params = 0;
-    *params |= comSettings->value("qs_print_rn").toBool()?tabSaleSettingsMenu::PrintDoc:0;
-    *params |= comSettings->value("qs_print_pko").toBool()?tabSaleSettingsMenu::PrintCheck:0;
+    *params |= comSettings->printOutInvoice?tabSaleSettingsMenu::PrintDoc:0;
+    *params |= comSettings->printPKO?tabSaleSettingsMenu::PrintCheck:0;
     widgetAction = new tabSaleSettingsMenu(this);
     ui->buttonParams->addAction(widgetAction);
     widgetAction->setParamsModel(params);
@@ -273,7 +273,7 @@ void tabSale::updateWidgets()
         ui->comboBoxPriceCol->setEnabled(true);
         ui->comboBoxCompany->setCurrentText(companiesModel->getDisplayRole(1, 1));  // TODO: несколько компаний
         ui->comboBoxCompany->setEnabled(true);
-        ui->spinBoxReserve->setValue(comSettings->value("default_reserve_days").toInt());
+        ui->spinBoxReserve->setValue(comSettings->defaultItemReserveTime);
         ui->spinBoxReserve->setReadOnly(false);
         ui->lineEditAddByUID->setReadOnly(false);
         ui->buttonPrint->hide();            // будут отображаться только кнопки "Параметры", "Добавить", "Резерв", "Продать ещё" и "Продать"
@@ -317,17 +317,17 @@ bool tabSale::checkInput()
             ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
             error = 2;
         }
-        if (ui->lineEditClientPatronymic->text() == "" && comSettings->value("is_patronymic_required").toBool() && !client)   // если не указано отчество и оно обязятельно
+        if (ui->lineEditClientPatronymic->text() == "" && comSettings->isClientPatronymicRequired && !client)   // если не указано отчество и оно обязятельно
         {
             ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
             error = 3;
         }
-        if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->value("visit_source_force").toBool() && !client)        // если не указан источник обращения, а он обязателен и клиент новый
+        if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->isVisitSourceRequired && !client)        // если не указан источник обращения, а он обязателен и клиент новый
         {
             ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
             error = 4;
         }
-        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool() && clientModel->isNew())   // если не указан телефон и он обязятелен
+        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->isClientPhoneRequired && clientModel->isNew())   // если не указан телефон и он обязятелен
         {
             ui->lineEditClientPhone->setStyleSheet(commonLineEditStyleSheetRed);
             error = 5;

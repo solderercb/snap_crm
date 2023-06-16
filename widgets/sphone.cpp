@@ -127,7 +127,7 @@ bool SPhone::isValid()
     if(!permissions->viewClients && m_isReadOnly)  // если не разрешён просмотр клиентов, но модель содержит номер
         return m_isValid;
 
-    if (!ui->lineEditPhone->hasAcceptableInput() && comSettings->value("phone_required").toBool() && !m_isReadOnly)
+    if (!ui->lineEditPhone->hasAcceptableInput() && comSettings->isClientPhoneRequired && !m_isReadOnly)
     {
         ui->lineEditPhone->setStyleSheet(commonLineEditStyleSheetRed);
         m_isValid = 0;

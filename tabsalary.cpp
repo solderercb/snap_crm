@@ -141,7 +141,7 @@ void tabSalary::periodDateChanged(const QDate date)
 {
     emit showSubsistanceGroup(date.month() == QDate::currentDate().month());
 
-    if(comSettings->value("classic_salary").toBool())
+    if(comSettings->salaryClassic)
     {
         m_periodBegin.setDate(date.addDays(-date.day() + 1));
         m_periodEnd = m_periodBegin.addDays(date.daysInMonth());
@@ -181,7 +181,7 @@ void tabSalary::prevPeriod()
 {
     QDate current = ui->dateEditPeriod->date();
 
-    if(comSettings->value("classic_salary").toBool())
+    if(comSettings->salaryClassic)
     {
         current = current.addMonths(-1);
     }
@@ -197,7 +197,7 @@ void tabSalary::nextPeriod()
 {
     QDate current = ui->dateEditPeriod->date();
 
-    if(comSettings->value("classic_salary").toBool())
+    if(comSettings->salaryClassic)
     {
         current = current.addMonths(1);
     }

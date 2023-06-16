@@ -24,7 +24,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     tableUpdateDelay = new QTimer();
     repairs_table = new STableRepairsModel();
-    if(comSettings->value("cartridge_enable").toBool())
+    if(comSettings->isCartridgeRepairEnabled)
         cartridges_table = new STableRepairsModel();
 
     ui->tableView->setModel(repairs_table);
@@ -73,7 +73,7 @@ QString tabRepairs::tabTitle()
 
 void tabRepairs::updateWidgets()
 {
-    if(!comSettings->value("cartridge_enable").toBool())
+    if(!comSettings->isCartridgeRepairEnabled)
     {
         ui->switchTableMode->hide();
         ui->labelTableMode->hide();
