@@ -10,9 +10,9 @@
 class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
 {
     Q_OBJECT
-    PROPSTRUCT_COMBOBOX(int, currencyId, 0, currency)
+    PROPSTRUCT_COMBOBOX(int, currencyId, 0, currency, QString())
     PROPSTRUCT_CHECKBOX(int, classicKassa, 0, classic_kassa)
-    PROPSTRUCT_COMBOBOX(int, timeZoneId, 0, time_zone)
+    PROPSTRUCT_COMBOBOX(int, timeZoneId, 0, time_zone, QString())
     PROPSTRUCT_LINEEDIT(QString, ascPhoneMask1, 0, phone_mask1)
     PROPSTRUCT_LINEEDIT(QString, ascPhoneMask2, 0, phone_mask2)
 
@@ -22,9 +22,9 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_CHECKBOX(int, isPriceColRoznVisible, 1, it_vis_rozn)
     PROPSTRUCT_CHECKBOX(int, isPriceColServiceVisible, 1, it_vis_price_for_sc)
 
-    PROPSTRUCT_COMBOBOX(int, voipId, 2, settings.voip)
+    PROPSTRUCT_COMBOBOX(int, voipId, 2, settings.voip, QString())
     PROPSTRUCT_CHECKBOX(int, isRealizatorEnable, 2, realizator_enable)
-    PROPSTRUCT_COMBOBOX(int, onlineStoreId, 2, online_store)
+    PROPSTRUCT_COMBOBOX(int, onlineStoreId, 2, online_store, QString())
     PROPSTRUCT_CHECKBOX(int, isCartridgeRepairEnabled, 2, cartridge_enable)
 
     PROPSTRUCT_CHECKBOX(int, isEngineerRequiredOnDeviceRecept, 3, is_master_set_on_new)
@@ -45,9 +45,9 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
 
     PROPSTRUCT_JSON_ARRAY(t_repairDispatcherUsers, repairDispatcherUsersJson, settings.auto_assign_users)
     PROPSTRUCT_JSON_OBJ(t_repairDispatcherAssignCriteria, repairDispatcherAssignCriteriaJson, settings.auto_assign_criteria)
-    PROPSTRUCT_COMBOBOX(QString, repairDispatcherUsers, 4, ignore)
+    PROPSTRUCT_COMBOBOX(QString, repairDispatcherUsers, 4, ignore, "")
     PROPSTRUCT_SPINBOX(int, repairDispatcherDayLimit, 4, ignore, 0, 7)
-    PROPSTRUCT_COMBOBOX(QString, repairDispatcherStatuses, 4, ignore)
+    PROPSTRUCT_COMBOBOX(QString, repairDispatcherStatuses, 4, ignore, "")
 
     PROPSTRUCT_CHECKBOX(int, isClientPatronymicRequired, 5, is_patronymic_required)
     PROPSTRUCT_CHECKBOX(int, isClientEmailRequired, 5, email_required)
@@ -62,31 +62,31 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_SPINBOX(int, itemImagesLimit, 7, item_img_limit, 0, 20)
     PROPSTRUCT_CHECKBOX(int, isReasonForItemIncomeRequired, 7, is_reason_req)
 
-    PROPSTRUCT_COMBOBOX(int, defaultWorksWarranty, 8, default_works_warranty)
-    PROPSTRUCT_COMBOBOX(int, defaultNewItemsWarranty, 8, default_items_warranty)
-    PROPSTRUCT_COMBOBOX(int, defaultUsedItemsWarranty, 8, default_items_used_warranty)
-    PROPSTRUCT_COMBOBOX(int, defaultRefItemsWarranty, 8, default_items_rep_warranty)
-    PROPSTRUCT_COMBOBOX(int, defaultDisasmItemsWarranty, 8, default_items_razb_warranty)
-    PROPSTRUCT_COMBOBOX(int, defaultOtherItemsWarranty, 8, default_items_other_warranty)
+    PROPSTRUCT_COMBOBOX(int, defaultWorksWarranty, 8, default_works_warranty, 31)
+    PROPSTRUCT_COMBOBOX(int, defaultNewItemsWarranty, 8, default_items_warranty, 31)
+    PROPSTRUCT_COMBOBOX(int, defaultUsedItemsWarranty, 8, default_items_used_warranty, 7)
+    PROPSTRUCT_COMBOBOX(int, defaultRefItemsWarranty, 8, default_items_rep_warranty, 31)
+    PROPSTRUCT_COMBOBOX(int, defaultDisasmItemsWarranty, 8, default_items_razb_warranty, 7)
+    PROPSTRUCT_COMBOBOX(int, defaultOtherItemsWarranty, 8, default_items_other_warranty, 0)
 
     PROPSTRUCT_CHECKBOX(int, notifyNewComment, 9, settings.inform_comment)   // все настройки группы 9 хранятся в табл. settings
-    PROPSTRUCT_COMBOBOX(int, notifyNewCommentColor, 9, settings.inform_comment_color)
-    PROPSTRUCT_COMBOBOX(int, notifyRepairStatusUpdateColor, 9, settings.inform_status_color)
+    PROPSTRUCT_COMBOBOX(int, notifyNewCommentColor, 9, settings.inform_comment_color, QString("#FFFFFFFF"))
+    PROPSTRUCT_COMBOBOX(int, notifyRepairStatusUpdateColor, 9, settings.inform_status_color, QString("#FFFFFFFF"))
     PROPSTRUCT_CHECKBOX(int, notifyIncomingSMS, 9, settings.inform_sms)
-    PROPSTRUCT_COMBOBOX(int, notifyIncomingSMSColor, 9, settings.inform_sms_color)
-    PROPSTRUCT_COMBOBOX(int, notifyOutOfTermAlarmColor, 9, settings.inform_terms_color)
+    PROPSTRUCT_COMBOBOX(int, notifyIncomingSMSColor, 9, settings.inform_sms_color, QString("#FFFFFFFF"))
+    PROPSTRUCT_COMBOBOX(int, notifyOutOfTermAlarmColor, 9, settings.inform_terms_color, QString("#FFFFFFFF"))
     PROPSTRUCT_CHECKBOX(int, notifyDeviceMatch, 9, settings.inform_task_match)
-    PROPSTRUCT_COMBOBOX(int, notifyDeviceMatchColor, 9, settings.inform_task_match_color)
+    PROPSTRUCT_COMBOBOX(int, notifyDeviceMatchColor, 9, settings.inform_task_match_color, QString("#FFFFFFFF"))
     PROPSTRUCT_CHECKBOX(int, notifyCustomTask, 9, settings.inform_task_custom)
-    PROPSTRUCT_COMBOBOX(int, notifyCustomTaskColor, 9, settings.inform_task_custom_color)
+    PROPSTRUCT_COMBOBOX(int, notifyCustomTaskColor, 9, settings.inform_task_custom_color, QString("#FFFFFFFF"))
     PROPSTRUCT_CHECKBOX(int, notifyItemRequest, 9, settings.inform_int_request)
-    PROPSTRUCT_COMBOBOX(int, notifyItemRequestColor, 9, settings.inform_int_request_color)
+    PROPSTRUCT_COMBOBOX(int, notifyItemRequestColor, 9, settings.inform_int_request_color, QString("#FFFFFFFF"))
     PROPSTRUCT_CHECKBOX(int, notifyOrderFromOnlineStore, 9, settings.inform_task_request)
-    PROPSTRUCT_COMBOBOX(int, notifyOrderFromOnlineStoreColor, 9, settings.inform_task_request_color)
+    PROPSTRUCT_COMBOBOX(int, notifyOrderFromOnlineStoreColor, 9, settings.inform_task_request_color, QString("#FFFFFFFF"))
     PROPSTRUCT_CHECKBOX(int, notifyIncomingCall, 9, settings.inform_call)
-    PROPSTRUCT_COMBOBOX(int, notifyIncomingCallColor, 9, settings.inform_call_color)
+    PROPSTRUCT_COMBOBOX(int, notifyIncomingCallColor, 9, settings.inform_call_color, QString("#FFFFFFFF"))
     PROPSTRUCT_CHECKBOX(int, notifyItemPurchaseRequest, 9, settings.inform_part_request)
-    PROPSTRUCT_COMBOBOX(int, notifyItemPurchaseRequestColor, 9, settings.inform_part_request_color)
+    PROPSTRUCT_COMBOBOX(int, notifyItemPurchaseRequestColor, 9, settings.inform_part_request_color, QString("#FFFFFFFF"))
 
     PROPSTRUCT_CHECKBOX(int, printPKO, 10, qs_print_pko)
     PROPSTRUCT_CHECKBOX(int, printOutInvoice, 10, qs_print_rn)
@@ -128,7 +128,7 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_JSON_ARRAY(t_repairStatuses, statusesJson, statuses)
 
     PROPSTRUCT_RADIOBTN(bool, exchangeTypeAuto, 21, ignore) // Настройки-»Финансы-»Операции с валютой, exchange_type
-    PROPSTRUCT_COMBOBOX(int, exchangeSourceId, 21, exchange_source) // Настройки-»Финансы-»Операции с валютой
+    PROPSTRUCT_COMBOBOX(int, exchangeSourceId, 21, exchange_source, 1) // Настройки-»Финансы-»Операции с валютой
     PROPSTRUCT_RADIOBTN(bool, exchangeTypeManual, 21, ignore)
     PROPSTRUCT_DSPINBOX(double, exchangeRate, 21, exchange_rate, 0, 9999) // Настройки-»Финансы-»Операции с валютой
     PROPSTRUCT_CHECKBOX(int, backupEnable, 31, backup_enable) // Настройки-»Резервное копирование-»Расписание
@@ -136,8 +136,8 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_DATETIMEEDIT(QDateTime, backupTime, 31, backup_time) // Настройки-»Резервное копирование-»Расписание
 
     PROPSTRUCT_JSON_OBJ(t_smsConfig, smsConfigJson, sms_config)    // Настройки-»Оповещения-»Настройки SMS-»Настройки соединения, JSON
-    PROPSTRUCT_COMBOBOX(int, smsProvider, 41, ignore)
-    PROPSTRUCT_COMBOBOX(int, smsAuthType, 41, ignore)
+    PROPSTRUCT_COMBOBOX(int, smsProvider, 41, ignore, QString())
+    PROPSTRUCT_COMBOBOX(int, smsAuthType, 41, ignore, QString())
     PROPSTRUCT_LINEEDIT(QString, smsApiId, 41, ignore)
     PROPSTRUCT_LINEEDIT(QString, smsLogin, 41, ignore)
     PROPSTRUCT_LINEEDIT(QString, smsPassword, 41, ignore)
@@ -174,26 +174,17 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
 
 public:
     enum Table{Config = 0, Settings = 1};
-    enum WidgetType{Label, Editor};
     explicit SComSettings();
     void initWidgets();
     void load();
     void loadFromTableSettings();
     void loadFromJson();
-    QWidget *widget(const int propId, const WidgetType type);
-    int propertyGroup(const int propId);
-    int propertyId(const char *name) const;
-    void deleteWidgets();
-    int count();
     void save();
     void saveToTableSettings();
     void updateJson();
     bool isDirty();
-    QStringList keys();
-    QList<QVariant> values();
 private:
-    int fieldToPropertyId(const QString &fieldName);
-    void sortFieldsByTable(Table table);
+    void prepareUpdateList(Table table);
     void translate();
 };
 

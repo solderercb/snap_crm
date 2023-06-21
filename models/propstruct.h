@@ -19,6 +19,7 @@
 #include <QRadioButton>
 #include <QDateTime>
 #include <QDateTimeEdit>
+#include <LimeReport>
 #include <QDebug>
 #include "models/sstandarditemmodel.h"
 #include "models/scomsettingstypes.h"
@@ -46,6 +47,7 @@ class SPropertyCollection : public QObject
     Q_OBJECT
 //    PROPSTRUCT_META_OBJECT_METHOD
 public:
+    enum WidgetType{Label, Editor};
     explicit SPropertyCollection(){};
     virtual ~SPropertyCollection() = default;
     QMap<QString, QWidget*> i_labelWidgets;
@@ -54,6 +56,18 @@ public:
     QMap<QString, QString> i_fieldNames;
     QMap<QString, QVariant> i_fieldModified;
     QMap<QString, QVariant> i_jsonFieldModified;
+    QWidget *widget(const int propId, const WidgetType type);
+    void deleteWidgets();
+    int count();
+    int propertyGroup(const int propId);
+    int propertyId(const char *name) const;
+    QStringList keys();
+    QList<QVariant> values();
+protected:
+    int fieldToPropertyId(const QString &fieldName);
+public slots:
+    void reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+    void reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
 };
 
 #define PROPSTRUCT_GET(name) get_##name
@@ -105,7 +119,7 @@ public:
             i_fieldNames.insert(#varName, #fieldName);                                                  \
             return;                                                                                     \
         }                                                                                               \
-}
+    }
 
 /* Create variable for attribute */
 #define PROPSTRUCT_DECLARE_ATTRIBUTE(name, defaultValue)                                                \
@@ -118,7 +132,7 @@ public:
     type name = type();
 
 /* primitive type field*/
-#define PROPSTRUCT_BIND_FIELD(type, name)                                                               \
+#define PROPSTRUCT_BIND_FIELD(type, name, fieldName)                                                    \
     Q_PROPERTY(type name READ PROPSTRUCT_GET(name) WRITE PROPSTRUCT_SET(name))                          \
     private:                                                                                            \
     type PROPSTRUCT_GET(name)() const                                                                   \
@@ -127,6 +141,7 @@ public:
     }                                                                                                   \
     void PROPSTRUCT_SET(name)(const type &var##name)                                                    \
     {                                                                                                   \
+        PROPSTRUCT_REGISTER_DB_FIELD(name, fieldName)                                                   \
         name = QVariant(var##name).value<type>();                                                       \
     }
 
@@ -202,7 +217,7 @@ public:
  *  Поскольку для инициализации виджетов используется метод WRITE, нужно пресечь попытку установки currentIndex на
  *  этом этапе, т. к. модель еще не задана и программа будет падать.
 */
-#define PROPSTRUCT_BIND_COMBOBOX(type, name, group, fieldName)                                          \
+#define PROPSTRUCT_BIND_COMBOBOX(type, name, group, fieldName, invalidIndexValue)                       \
     Q_PROPERTY(QVariant name READ PROPSTRUCT_GET(name) WRITE PROPSTRUCT_SET(name))                      \
     private:                                                                                            \
     QVariant PROPSTRUCT_GET(name)()                                                                     \
@@ -218,7 +233,7 @@ public:
             widgetValue = cb->currentIndex();                                                           \
         }                                                                                               \
         if(QString("ignore").compare(#fieldName) !=0 && widgetValue != name)                            \
-            i_fieldModified.insert(#name, widgetValue);                                                 \
+            i_fieldModified.insert(#name, (widgetValue == -1)?QVariant(invalidIndexValue):widgetValue); \
         name = widgetValue;                                                                             \
         return name;                                                                                    \
     }                                                                                                   \
@@ -328,9 +343,9 @@ public:
 /* CREATE AND BIND: */
 /* Make primitive field and generate propertyes */
 /* For example: PROPSTRUCT_FIELD(int, digit), PROPSTRUCT_FIELD(bool, flag) */
-#define PROPSTRUCT_FIELD(type, name)                                                                    \
+#define PROPSTRUCT_FIELD(type, name, fieldName)                                                         \
     PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \
-    PROPSTRUCT_BIND_FIELD(type, name)
+    PROPSTRUCT_BIND_FIELD(type, name, fieldName)
 
 #define PROPSTRUCT_JSON_ARRAY(type, name, fieldName)                                                    \
     PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \
@@ -348,9 +363,9 @@ public:
     PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \
     PROPSTRUCT_BIND_CHECKBOX(type, name, group, fieldName)
 
-#define PROPSTRUCT_COMBOBOX(type, name, group, fieldName)                                               \
+#define PROPSTRUCT_COMBOBOX(type, name, group, fieldName, invalidIndexValue)                            \
     PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \
-    PROPSTRUCT_BIND_COMBOBOX(type, name, group, fieldName)
+    PROPSTRUCT_BIND_COMBOBOX(type, name, group, fieldName, invalidIndexValue)
 
 //#define PROPSTRUCT_CHECKABLECOMBOBOX(type, name, group, fieldName)                                      \
 //    PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \

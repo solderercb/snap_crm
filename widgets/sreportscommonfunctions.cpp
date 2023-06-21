@@ -140,7 +140,7 @@ void SReportsCommonFunctions::initDataSources()
     m_report->dataManager()->addModel("office", officesModel, false);
 
     // Преобразование QMap<QString, QVariant> в QStandardItemModel
-    m_report->dataManager()->addModel("config", initDemoModel(comSettings->keys(), comSettings->values()), true);
+//    m_report->dataManager()->addModel("config", initDemoModel(comSettings->keys(), comSettings->values()), true);
 
     switch (m_reportType)
     {

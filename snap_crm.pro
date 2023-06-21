@@ -47,6 +47,7 @@ SOURCES += \
     global.cpp \
     loginwindow.cpp \
     mainwindow.cpp \
+    models/propstruct.cpp \
     models/salarytabmodels/sadditionalpaymentmodel.cpp \
     models/salarytabmodels/ssalarymodel.cpp \
     models/salarytabmodels/ssalaryrepairsmodel.cpp \
@@ -93,6 +94,7 @@ SOURCES += \
     models/sstoresaleitemmodel.cpp \
     models/suseractivitymodel.cpp \
     models/susermodel.cpp \
+    models/susersettings.cpp \
     models/sworkmodel.cpp \
     models/sworkshopissuedmodel.cpp \
     models/tabsalesettingsmenu.cpp \
@@ -127,6 +129,7 @@ SOURCES += \
     widgets/settingstabwidgets/ssettingspagebase.cpp \
     widgets/settingstabwidgets/ssettingspageglobal.cpp \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp \
+    widgets/settingstabwidgets/ssettingspageuser.cpp \
     widgets/settingstabwidgets/stableviewpermissions.cpp \
     widgets/spageclientsummary.cpp \
     squerylog.cpp \
@@ -231,6 +234,8 @@ HEADERS  += \
     models/sstoresaleitemmodel.h \
     models/suseractivitymodel.h \
     models/susermodel.h \
+    models/susersettings.h \
+    models/susersettingstypes.h \
     models/sworkmodel.h \
     models/sworkshopissuedmodel.h \
     models/tabsalesettingsmenu.h \
@@ -265,6 +270,7 @@ HEADERS  += \
     widgets/settingstabwidgets/ssettingspagebase.h \
     widgets/settingstabwidgets/ssettingspageglobal.h \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.h \
+    widgets/settingstabwidgets/ssettingspageuser.h \
     widgets/settingstabwidgets/stableviewpermissions.h \
     widgets/spageclientsummary.h \
     squerylog.h \
@@ -328,6 +334,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalarysummary.ui \
     widgets/settingstabwidgets/ssettingspageglobal.ui \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \
+    widgets/settingstabwidgets/ssettingspageuser.ui \
     widgets/spageclientsummary.ui \
     tabcashmoveexch.ui \
     tabcashoperation.ui \

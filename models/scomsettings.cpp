@@ -12,21 +12,9 @@ void SComSettings::initWidgets()
         metaObject()->property(i).read(this);   // при первом вызове метода READ происходит инициализация виджетов
 
     // Модели данных виджетов (ComboBox) должны быть заданы до загрузки данных, иначе будет падать.
-///*DBG*/   static_cast<QComboBox*>(i_editorWidgets.value("currency"))->setModel(warrantyTermsModel);
+//    static_cast<QComboBox*>(i_editorWidgets.value("currency"))->setModel(warrantyTermsModel);
 
     load();
-}
-
-int SComSettings::fieldToPropertyId(const QString &fieldName)
-{
-    QString propertyName = i_fieldNames.key(fieldName);
-    if(propertyName.isEmpty())
-    {
-        appLog->appendRecord(QString("Unknown setting \"%1\"").arg(fieldName));
-        return -1;
-    }
-
-    return metaObject()->indexOfProperty((&propertyName)->toLocal8Bit());
 }
 
 void SComSettings::load()
@@ -39,7 +27,7 @@ void SComSettings::load()
 
     // "переворот" таблицы config
     query->exec("SET @smth := NULL");
-    query->exec("SELECT @smth := CONCAT(IF(@smth IS NOT NULL, CONCAT(@smth, '\\\nUNION ALL\\\n'), ''), 'SELECT \\\'', `COLUMN_NAME`, '\\\', `', `COLUMN_NAME`, '` FROM `config`') FROM information_schema.`COLUMNS` WHERE `TABLE_SCHEMA` = 'latestbackup' AND `TABLE_NAME` = 'config';");
+    query->exec("SELECT @smth := CONCAT(IF(@smth IS NOT NULL, CONCAT(@smth, '\\\nUNION ALL\\\n'), ''), 'SELECT \\\'', `COLUMN_NAME`, '\\\', `', `COLUMN_NAME`, '` FROM `config`') FROM information_schema.`COLUMNS` WHERE `TABLE_SCHEMA` = SCHEMA() AND `TABLE_NAME` = 'config';");
 
     query->last();
     query->exec(query->value(0).toString());
@@ -75,6 +63,8 @@ void SComSettings::loadFromTableSettings()
         metaObject()->property(i).write(this, query->value(1));
     }
 
+    qDebug().nospace() << "[" << this << "] loadFromTableSettings() | salaryClassic = " << salaryClassic;
+    qDebug().nospace() << "[" << this << "] loadFromTableSettings() | salaryIncludeNotIssuedByDefault = " << salaryIncludeNotIssuedByDefault;
     delete query;
 }
 
@@ -106,61 +96,8 @@ void SComSettings::loadFromJson()
     metaObject()->property(i++).write(this, smsConfigJson.Sender);
 }
 
-QWidget* SComSettings::widget(const int propId, const WidgetType type)
-{
-    QString wName = metaObject()->property(propId + metaObject()->propertyOffset()).name();
-    QWidget *w;
-    if(type == WidgetType::Label)
-    {
-        w = i_labelWidgets.value(wName);
-    }
-    else
-    {
-        w = i_editorWidgets.value(wName);
-    }
-
-    return w;
-}
-
-int SComSettings::propertyGroup(const int propId)
-{
-    QString wName = metaObject()->property(propId + metaObject()->propertyOffset()).name();
-    return i_propertyGroup.value(wName);
-}
-
-int SComSettings::propertyId(const char *name) const
-{
-    return (metaObject()->indexOfProperty(name) - metaObject()->propertyOffset());
-}
-
-void SComSettings::deleteWidgets()
-{
-    QWidget *w;
-    QString k;
-    while(i_labelWidgets.count())
-    {
-        w = i_labelWidgets.last();
-        k = i_labelWidgets.lastKey();
-        i_labelWidgets.remove(k);
-        delete w;
-    }
-
-    while(i_editorWidgets.count())
-    {
-        w = i_editorWidgets.last();
-        k = i_editorWidgets.lastKey();
-        i_editorWidgets.remove(k);
-        delete w;
-    }
-}
-
-int SComSettings::count()
-{
-    return metaObject()->propertyCount() - metaObject()->propertyOffset();
-}
-
-// добавление изменённых значений в формате JSON
-void SComSettings::sortFieldsByTable(Table table)
+// распределение изменённых значений по группам по названию таблиц
+void SComSettings::prepareUpdateList(Table table)
 {
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
     {
@@ -195,7 +132,7 @@ void SComSettings::save()
     updateJson();
 
     i_valuesMap.clear();
-    sortFieldsByTable(Table::Config);
+    prepareUpdateList(Table::Config);
 
     fieldsUpdFormatter();
     if(!i_valuesMap.isEmpty())
@@ -219,7 +156,7 @@ void SComSettings::saveToTableSettings()
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
     i_valuesMap.clear();
-    sortFieldsByTable(Table::Settings);
+    prepareUpdateList(Table::Settings);
 
     query->prepare(QString("UPDATE `settings` SET `value` = :value WHERE `name` = :name"));
     QMap<QString, QVariant>::const_iterator i = i_valuesMap.constBegin();
@@ -286,24 +223,6 @@ void SComSettings::updateJson()
         smsConfigJson.Sender = smsSender;
         i_jsonFieldModified.insert("smsConfigJson", smsConfigJson.toRawJson());
     }
-}
-
-QStringList SComSettings::keys()
-{
-    QStringList list;
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        list.append(metaObject()->property(i).name());
-
-    return list;
-}
-
-QList<QVariant> SComSettings::values()
-{
-    QList<QVariant> list;
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        list.append(metaObject()->property(i).read(this));
-
-    return list;
 }
 
 void SComSettings::translate()

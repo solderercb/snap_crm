@@ -7,7 +7,6 @@ SSettingsPageGlobal::SSettingsPageGlobal(QWidget *parent) :
     ui(new Ui::SSettingsPageGlobal)
 {
     ui->setupUi(this);
-    ui->groupBoxTasksTerms->setBaseSize(200, 51);
 
     comSettings->initWidgets();
 

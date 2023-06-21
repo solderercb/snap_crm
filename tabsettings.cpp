@@ -3,6 +3,7 @@
 #include "global.h"
 #include "widgets/spagesettingsdoctempateeditor.h"
 #include "widgets/settingstabwidgets/ssettingspagerolesandpermissions.h"
+#include "widgets/settingstabwidgets/ssettingspageuser.h"
 #include "widgets/settingstabwidgets/ssettingspageglobal.h"
 
 tabSettings* tabSettings::p_instance = nullptr;
@@ -83,7 +84,7 @@ void tabSettings::initPage(const int page)
     QWidget *widget;
     switch (page)
     {
-//        case Page::User: widget = new QWidget(); break;
+        case Page::User: widget = new SSettingsPageUser(); break;
         case Page::Global: widget = new SSettingsPageGlobal(this); break;
 //        case Page::Company: widget = new QWidget(); break;
 //        case Page::Employees: widget = new QWidget(); break;
@@ -115,7 +116,7 @@ void tabSettings::buttonSaveClicked()
         emit saveSettings();
 
 #ifdef QT_DEBUG
-//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
@@ -164,7 +165,7 @@ void tabSettings::randomFill()
 
 void tabSettings::test_scheduler_handler()
 {
-    ui->pages->switchPage(Page::Global);
+    ui->pages->switchPage(Page::User);
 //    ui->pages->switchPage(Page::DocTemplates);
 //    test_scheduler2->start(3000);
 
