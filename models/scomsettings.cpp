@@ -9,7 +9,7 @@ SComSettings::SComSettings() :
 void SComSettings::initWidgets()
 {
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        metaObject()->property(i).read(this);   // при первом вызове метода READ происходит инициализация виджетов
+        metaObject()->invokeMethod(this, QByteArray("init__widget").insert(5, metaObject()->property(i).name()));
 
     // Модели данных виджетов (ComboBox) должны быть заданы до загрузки данных, иначе будет падать.
 //    static_cast<QComboBox*>(i_editorWidgets.value("currency"))->setModel(warrantyTermsModel);
@@ -23,7 +23,7 @@ void SComSettings::load()
     int i = 0;
 
     for(i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        metaObject()->property(i).write(this, 0);   // при первом вызове методов WRITE происходит регистрация имён полей таблиц БД
+        metaObject()->invokeMethod(this, QByteArray("register__db_field").insert(9, metaObject()->property(i).name()), Qt::DirectConnection);
 
     // "переворот" таблицы config
     query->exec("SET @smth := NULL");
@@ -63,8 +63,6 @@ void SComSettings::loadFromTableSettings()
         metaObject()->property(i).write(this, query->value(1));
     }
 
-    qDebug().nospace() << "[" << this << "] loadFromTableSettings() | salaryClassic = " << salaryClassic;
-    qDebug().nospace() << "[" << this << "] loadFromTableSettings() | salaryIncludeNotIssuedByDefault = " << salaryIncludeNotIssuedByDefault;
     delete query;
 }
 

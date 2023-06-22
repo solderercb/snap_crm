@@ -22,7 +22,7 @@ SSettingsPageUser::~SSettingsPageUser()
 
 void SSettingsPageUser::saveSettings()
 {
-    userSettings->save();  // отключено, т. к. еще не заданы модели данных виджетов ComboBox
+//    userSettings->save();  // отключено, т. к. еще не заданы модели данных виджетов ComboBox
 }
 
 void SSettingsPageUser::updateWidgets()

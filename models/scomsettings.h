@@ -171,7 +171,6 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
 //    PROPSTRUCT_FIELD(QString, version)      // здесь это не нужно
 //    PROPSTRUCT_FIELD(QString, version_snap, , version_snap)      // здесь это не нужно
 
-
 public:
     enum Table{Config = 0, Settings = 1};
     explicit SComSettings();

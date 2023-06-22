@@ -42,12 +42,20 @@ int SPropertyCollection::fieldToPropertyId(const QString &fieldName)
 
 void SPropertyCollection::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
 {
-
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = 0; break;
+        case LimeReport::CallbackInfo::HasNext: data = 0; break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = metaObject()->property(info.index + metaObject()->propertyOffset()).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: metaObject()->invokeMethod(this, QByteArray("get__for_report").insert(4, info.columnName.toLocal8Bit()), Qt::DirectConnection, Q_RETURN_ARG(QVariant, data)); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = metaObject()->propertyCount() - metaObject()->propertyOffset(); break;
+        case LimeReport::CallbackInfo::RowCount: data = 1; break;   // всегда одна строка
+    }
 }
 
 void SPropertyCollection::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
 {
-
+    result = 1;
 }
 
 int SPropertyCollection::count()

@@ -908,7 +908,7 @@
 <context>
     <name>SComSettings</name>
     <message>
-        <location filename="../models/scomsettings.cpp" line="230"/>
+        <location filename="../models/scomsettings.cpp" line="228"/>
         <source>editGlobalSettings</source>
         <translation type="unfinished">Изменять служебные настройки</translation>
     </message>
