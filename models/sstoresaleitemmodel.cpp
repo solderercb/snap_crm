@@ -31,7 +31,7 @@ SStoreSaleItemModel::SStoreSaleItemModel(const QList<QStandardItem *> &record, Q
     m_sn = record.at(SStoreItemModel::SaleOpColumns::ColSN)->data(Qt::DisplayRole).toString();
 
     if(!i_id)
-        i_valuesMap.insert("user", userDbData->value("id"));
+        i_valuesMap.insert("user", userDbData->id);
 
     initQueryFields(record);
 }

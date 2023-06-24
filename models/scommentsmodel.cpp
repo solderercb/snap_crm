@@ -36,7 +36,7 @@ bool SCommentsModel::add(const QString &text)
     item->setData(QDateTime::currentDateTimeUtc(), Qt::EditRole);
     item->setData(1, SCommentModel::DataRoles::Changed);
     row << item;
-    item = new QStandardItem(userDbData->value("id").toString());
+    item = new QStandardItem(QString::number(userDbData->id));
     item->setData(1, SCommentModel::DataRoles::Changed);
     row << item;
     item = new QStandardItem(text);

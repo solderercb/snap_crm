@@ -114,13 +114,13 @@ void tabRepairNew::initWidgets()
     ui->phones->setModel(clientModel->phones());
     ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxOffice->setModel(officesModel);
-    ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->value("current_office").toInt()));
+    ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->currentOffice));
     ui->comboBoxPresetEngineer->setModel(engineersModel);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxPresetPaymentAccount->setCurrentIndex(-1);
     ui->comboBoxPrepayAccount->setModel(paymentSystemsProxyModel);
-    ui->comboBoxPrepayAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));
+    ui->comboBoxPrepayAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
     ui->comboBoxPresetPlace->setModel(repairBoxesModel);
     ui->comboBoxPresetPlace->setCurrentIndex(-1);
     ui->comboBoxDeviceClass->setModel(deviceClassesModel);
@@ -235,7 +235,7 @@ void tabRepairNew::setModelData()
     int user;
     double prepaySumm = 0;
 
-    user = userDbData->value("id").toInt();
+    user = userDbData->id;
     preferredPaymentAccIndex = ui->comboBoxPresetPaymentAccount->currentIndex();
 
     if(m_prevRepair)
@@ -250,8 +250,8 @@ void tabRepairNew::setModelData()
     repairModel->setClientId(clientModel->id());
     repairModel->setSerialNumber(ui->lineEditSN->text());
     repairModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-    repairModel->setOffice(userDbData->value("current_office").toInt());
-    repairModel->setStartOffice(userDbData->value("current_office").toInt());
+    repairModel->setOffice(userDbData->currentOffice);
+    repairModel->setStartOffice(userDbData->currentOffice);
     repairModel->setManager(user);
     repairModel->setCurrentManager(user);
     repairModel->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());

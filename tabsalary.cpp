@@ -27,7 +27,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     if(permissions->viewEmployeesSalary)
         usersModelF->setFilterRegularExpression(QRegularExpression("^(?!(admin)).*$")); // без админа
     else
-        usersModelF->setFilterRegularExpression(QRegularExpression(userDbData->value("username").toString())); // только своя ЗП
+        usersModelF->setFilterRegularExpression(QRegularExpression(userDbData->username)); // только своя ЗП
     usersModelF->setFilterKeyColumn(0);
     ui->comboBoxEmployee->setModel(usersModelF);
     ui->comboBoxEmployee->setCurrentIndex(-1);

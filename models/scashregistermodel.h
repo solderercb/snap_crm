@@ -106,7 +106,7 @@ public:
 private:
     void fieldsVerifyFormatter();
     int m_type = -1;
-    int m_systemId = userDbData->value("defaultPaymentSystem", 0).toInt();       // ID платёжной системы (DB: payment_systems.system_id)
+    int m_systemId = userDbData->defaultPaymentSystem;       // ID платёжной системы (DB: payment_systems.system_id)
     int m_client = 0;
     int m_currency = 0;
     QStringList fields_verify;

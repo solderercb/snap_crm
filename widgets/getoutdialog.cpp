@@ -114,7 +114,7 @@ void getOutDialog::initPaymentSystems()
     }
     paymentSystemsProxyModel->setFilterKeyColumn(1);
     ui->comboBoxPaymentAccount->setModel(paymentSystemsProxyModel);
-    ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));
+    ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
 }
 
 bool getOutDialog::checkAmounts()

@@ -21,14 +21,14 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     ui->lineEditBalance->setReadOnly(true);
     ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
     ui->comboBoxCompany->setModel(companiesModel);
-    ui->comboBoxCompany->setCurrentIndex(companiesModel->rowByDatabaseID(userDbData->value("company").toInt()));
+    ui->comboBoxCompany->setCurrentIndex(companiesModel->rowByDatabaseID(userDbData->company));
 
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
     paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
     paymentSystemsProxyModel->setFilterKeyColumn(1);
     ui->comboBoxPaymentAccount->setModel(paymentSystemsProxyModel);
-    ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));
+    ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
     clientModel = new SClientModel();
     cashRegister = new SCashRegisterModel();
     initCashRegisterModel();

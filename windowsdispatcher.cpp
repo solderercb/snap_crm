@@ -58,11 +58,10 @@ void windowsDispatcher::connectOK()
     }
     else
     {
-        userDbData->insert("current_office", officesModel->record(userDbData->value("office").toInt()-1).value("id").toInt());
-        userDbData->insert("current_office_name", officesModel->record(userDbData->value("office").toInt()-1).value("name").toString());
+        userDbData->currentOffice = userDbData->office;
         createMainWindow();
     }
-    userDbData->insert("company", 1);   // TODO: несколько компаний
+    userDbData->company = 1;   // TODO: несколько компаний
 
     if(debugLoginOptions)
         delete debugLoginOptions;
@@ -73,8 +72,7 @@ void windowsDispatcher::createChooseOfficeWindow()
     if(debugLoginOptions)
         if(debugLoginOptions->contains("office"))
         {
-            userDbData->insert("current_office", officesModel->record(debugLoginOptions->value("office").toInt()).value("id").toInt());
-            userDbData->insert("current_office_name", officesModel->record(debugLoginOptions->value("office").toInt()).value("name").toString());
+            userDbData->currentOffice = debugLoginOptions->value("office").toInt();
             createMainWindow();
             return;
         }

@@ -12,7 +12,7 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_LINEEDIT(QString, name, 1, name)
     PROPSTRUCT_LINEEDIT(QString, surname, 1, surname)
     PROPSTRUCT_LINEEDIT(QString, patronymic, 1, patronymic)
-    PROPSTRUCT_COMBOBOX(int, roles, 1, ignore, QString())
+    PROPSTRUCT_COMBOBOX(QString, roles, 1, ignore, QString())
     PROPSTRUCT_COMBOBOX(int, office, 1, office, 1)
     PROPSTRUCT_LINEEDIT(QString, address, 1, address)
     PROPSTRUCT_LINEEDIT(QString, password, 1, ignore)
@@ -60,6 +60,8 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_FIELD(QDateTime, created, created)
     PROPSTRUCT_FIELD(QDateTime, lastLogin, last_login)
     PROPSTRUCT_FIELD(QDateTime, lastActivity, last_activity)
+    PROPSTRUCT_FIELD(int, currentOffice, ignore)
+    PROPSTRUCT_FIELD(int, company, ignore)
     // Страница персональных настроек
     PROPSTRUCT_COMBOBOX(QString, rowColor, 11, row_color, QString("#D8008EA4"))
     PROPSTRUCT_COMBOBOX(QString, colorLabelWs, 11, color_label_ws, QString("#FF000000"))
@@ -67,6 +69,8 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_SPINBOX(int, rowheight, 11, rowheight, 0, 40)
     PROPSTRUCT_COMBOBOX(QString, geHighlightColor, 11, ge_highlight_color, QString("#FFFFDD70"))
 
+    PROPSTRUCT_COMBOBOX(int, defaultDocumentPrinter, 12, ignore, 0)
+    PROPSTRUCT_COMBOBOX(int, defaultStickerPrinter, 12, ignore, 0)
     PROPSTRUCT_CHECKBOX(bool, previewBeforePrint, 12, preview_before_print)
 
     PROPSTRUCT_CHECKBOX(bool, displayOut, 13, display_out)
@@ -82,6 +86,7 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_COMBOBOX(int, defWsFilter, 13, def_ws_filter, 0)
     // новые параметры:
     PROPSTRUCT_CHECKBOX(int, autosavePartList, 13, usersParams.autosave_part_list)
+    PROPSTRUCT_CHECKBOX(int, autosaveDiagResult, 13, usersParams.autosave_diag_result)
 
     PROPSTRUCT_CHECKBOX(bool, preferRegular, 14, prefer_regular)
 
@@ -108,6 +113,9 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_RADIOBTN(int, workspaceItems, 17, ignore)
     PROPSTRUCT_FIELD(int, workspaceMode, workspace_mode)
 
+    // новые параметры:
+    PROPSTRUCT_COMBOBOX(int, defaultPaymentSystem, 18, usersParams.default_payment_system, 0)
+
     // не нашел где настраивается
 //    PROPSTRUCT_CHECKBOX(bool, informComment, inform_comment)
 //    PROPSTRUCT_CHECKBOX(bool, informStatus, inform_status)
@@ -125,7 +133,7 @@ public:
     enum WidgetType{Label, Editor};
     explicit SUserSettings();
     void initWidgets();
-    void load();
+    void load(const QString &username);
     void loadFromUsersParams();
     void save();
     void saveToUsersParams();

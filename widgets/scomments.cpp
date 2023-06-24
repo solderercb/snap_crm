@@ -83,7 +83,7 @@ bool SComments::isEditable(const int row)
 
     // Удаление и редактирование доступно только в течение некоторого времени после создания (подсмотрено в Telegram).
     // Удалять и редактировать можно только свои комментарии или при наличии особого разрешения
-    if((timeDiff < 3600 && authorId == userDbData->value("id").toInt()) || permissions->editAnyComment )
+    if((timeDiff < 3600 && authorId == userDbData->id) || permissions->editAnyComment )
         return 1;
 
     return 0;

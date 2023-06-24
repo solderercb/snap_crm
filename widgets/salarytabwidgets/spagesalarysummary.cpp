@@ -110,7 +110,7 @@ void SPageSalarySummary::setFillMonthChargeOnUpdate(const bool state)
 void SPageSalarySummary::setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date)
 {
     int employee = parentTab->m_userModel->id();
-    int user = userDbData->value("id").toInt();
+    int user = userDbData->id;
     QDateTime periodBegin = parentTab->m_periodBegin;
     QDateTime periodEnd = parentTab->m_periodEnd;
     QDateTime created = QDateTime::currentDateTime();

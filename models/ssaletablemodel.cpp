@@ -149,7 +149,7 @@ bool SSaleTableModel::insertRecord(int row, const QSqlRecord &record, const int 
             item->setData(1, DataRoles::Changed);
             if(recordId == 0 && i == SStoreItemModel::SaleOpColumns::ColUser)
             {
-                item->setData(userDbData->value("id").toInt(), Qt::EditRole);
+                item->setData(userDbData->id, Qt::EditRole);
                 // инициализация поля кодом пользователя производится тоже только для новых товаров; в будущем это позволит
                 // реализовать режим админинстративной правки с возможностью вставлять детали из чужой корзины
             }
@@ -216,7 +216,7 @@ void SSaleTableModel::addCustomWork()
             case SStoreItemModel::SaleOpColumns::ColBox: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColSN: field->setValue(""); break;
             case SStoreItemModel::SaleOpColumns::ColWarranty: field->setValue(0); break;
-            case SStoreItemModel::SaleOpColumns::ColUser: field->setValue(userDbData->value("id").toInt()); break;
+            case SStoreItemModel::SaleOpColumns::ColUser: field->setValue(userDbData->id); break;
             case SStoreItemModel::SaleOpColumns::ColRealization: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColRetPercent: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColState: field->setValue(0); break;

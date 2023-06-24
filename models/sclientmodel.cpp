@@ -19,7 +19,7 @@ SClientModel::SClientModel(int id, QObject *parent) :
     else
     {
         i_valuesMap.clear();
-        i_valuesMap.insert("creator", userDbData->value("id"));
+        i_valuesMap.insert("creator", userDbData->id);
         i_valuesMap.insert("notes", "");
     }
 }
@@ -167,7 +167,7 @@ void SClientModel::clear()
 {
     i_id = 0;
     i_valuesMap.clear();
-    i_valuesMap.insert("creator", userDbData->value("id"));
+    i_valuesMap.insert("creator", userDbData->id);
     i_valuesMap.insert("notes", "");
     m_phones->reset();
 }
@@ -975,8 +975,8 @@ void SBalanceLogRecordModel::setCashOrderId(const int id)
 bool SBalanceLogRecordModel::commit(const double amount)
 {
     setDirection(amount);
-    i_valuesMap.insert("uid", userDbData->value("id"));
-    i_valuesMap.insert("office", userDbData->value("current_office"));
+    i_valuesMap.insert("uid", userDbData->id);
+    i_valuesMap.insert("office", userDbData->currentOffice);
     i_valuesMap.insert("summ", amount);
     if(!i_valuesMap.contains("created"))
         i_valuesMap.insert("created", QDateTime::currentDateTime());

@@ -4,8 +4,7 @@
 
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
-QMap<QString, QVariant> *userDbData = new QMap<QString, QVariant>;
-QSqlQueryModel *userDbDataModel = new QSqlQueryModel();
+SUserSettings *userDbData = new SUserSettings;
 SLocalSettings *localSettings = new SLocalSettings();
 t_userSettings *userLocalData = nullptr;
 SPermissions *permissions = new SPermissions;
@@ -161,7 +160,7 @@ void initGlobalModels()
     clientPhoneTypesModel->setObjectName("clientPhoneTypesModel");
 //    clientPhoneTypesModel->setHorizontalHeaderLabels({"name", "id", "mask"});
 
-    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->currentOffice), QSqlDatabase::database("connMain"));
     warehousesModel->setObjectName("warehousesModel");
     allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
     allUsersModel->setDisplayRoleColumn("username");
@@ -181,7 +180,7 @@ void initGlobalModels()
     engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
     engineersModel->setDisplayRoleColumn("username");
     engineersModel->setObjectName("engineersModel");
-    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->value("current_office").toInt()), QSqlDatabase::database("connMain"));
+    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->currentOffice), QSqlDatabase::database("connMain"));
     itemBoxesModel->setObjectName("itemBoxesModel");
     repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
     repairBoxesModel->setObjectName("repairBoxesModel");
@@ -300,21 +299,12 @@ void initGlobalModels()
 
 void initUserDbData()
 {
-    userDbDataModel->setQuery(QUERY_SEL_USER_DATA(QSqlDatabase::database("connMain").userName()), QSqlDatabase::database("connMain"));
-    userDbDataModel->setObjectName("userDbDataModel");
-
-    // Переписываем результаты запроса в специальный массив
-    // это необходимо, т. к. данные пользователя могут быть дополнены (например, кодом текущего офиса, если у пользователя есть право выбора офиса при входе)
-    // Кроме того, есть параметры, хранящиеся в AppData и эти настройки превалируют над настройками, сохранёнными в БД (например, ширины столбцов таблиц, которые могут иметь разные значения в случае если пользователь работает на разных ПК).
-    for (int i = 0; i < userDbDataModel->record(0).count(); i++)
-    {
-        userDbData->insert(userDbDataModel->record(0).fieldName(i), userDbDataModel->record(0).value(i));
-    }
+    userDbData->load(QSqlDatabase::database("connMain").userName());
 }
 
 void initPermissions()
 {
-    permissions->load(userDbData->value("roles").toString());
+    permissions->load(userDbData->roles);
 }
 
 void initCompanies()    // Список компаний.
@@ -325,7 +315,7 @@ void initCompanies()    // Список компаний.
 
 void initOffices()      // Список офисов
 {
-    officesModel->setQuery(QUERY_SEL_OFFICES(1), QSqlDatabase::database("connMain"));
+    officesModel->setQuery(QUERY_SEL_OFFICES(userDbData->company), QSqlDatabase::database("connMain"));
     officesModel->setObjectName("officesModel");
 }
 

@@ -91,7 +91,6 @@ private:
     bool modelRO = 0;   // признак блокировки карты ремонта
     getOutDialog *modalWidget;
     QWidget *overlay;
-    bool save_state_on_close = 0;
     bool m_worksRO = 1;
     bool m_diagRO = 1;
     bool m_summRO = 1;

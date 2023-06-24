@@ -10,8 +10,8 @@ SLogRecordModel::SLogRecordModel(QObject *parent) :
 bool SLogRecordModel::commit()
 {
     if(!i_valuesMap.contains("user"))
-        i_valuesMap.insert("user", userDbData->value("id"));
-    i_valuesMap.insert("office", userDbData->value("current_office"));
+        i_valuesMap.insert("user", userDbData->id);
+    i_valuesMap.insert("office", userDbData->currentOffice);
     i_valuesMap.insert("values", QVariant());
     i_valuesMap.insert("values_after", QVariant());
     i_valuesMap.insert("created", QDateTime::currentDateTime());

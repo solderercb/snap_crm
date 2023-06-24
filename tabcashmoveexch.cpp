@@ -17,13 +17,13 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(-2)|(-1)).*$"));
     paymentSystemsProxyModel->setFilterKeyColumn(1);
     ui->comboBoxSrcPaymentAccount->setModel(paymentSystemsProxyModel);
-    ui->comboBoxSrcPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));
+    ui->comboBoxSrcPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
     ui->comboBoxDstPaymentAccount->setModel(paymentSystemsProxyModel);
-    ui->comboBoxDstPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->value("defaultPaymentSystem", 0).toInt(), "system_id"));
+    ui->comboBoxDstPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
     ui->comboBoxSrcOffice->setModel(officesModel);
-    ui->comboBoxSrcOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->value("office").toInt()));
+    ui->comboBoxSrcOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
     ui->comboBoxDstOffice->setModel(officesModel);
-    ui->comboBoxDstOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->value("office").toInt()));
+    ui->comboBoxDstOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
     cashRegisterSrc = new SCashRegisterModel();
     cashRegisterDst = new SCashRegisterModel();
     initCashRegisterModel();

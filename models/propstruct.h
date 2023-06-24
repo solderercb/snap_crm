@@ -332,6 +332,7 @@ public slots:
 #define PROPSTRUCT_FIELD(type, name, fieldName)                                                         \
     PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \
     PROPSTRUCT_BIND_FIELD(type, name, fieldName)                                                        \
+    PROPSTRUCT_REGISTER_DB_FIELD(name, fieldName)                                                       \
     PROPSTRUCT_GET_VALUE_FOR_REPORT(name)
 
 #define PROPSTRUCT_JSON_ARRAY(type, name, fieldName)                                                    \

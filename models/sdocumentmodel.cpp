@@ -279,11 +279,11 @@ bool SDocumentModel::commit()
         i_valuesMap.insert("img2", QVariant());
         i_valuesMap.insert("img3", QVariant());
 #ifdef  QT_DEBUG
-        Q_ASSERT_X(userDbData->value("company").toInt(), objectName().toLocal8Bit(), QString("company not set").toLocal8Bit());
+        Q_ASSERT_X(userDbData->company, objectName().toLocal8Bit(), QString("company not set").toLocal8Bit());
 #endif
-        i_valuesMap.insert("company", userDbData->value("company"));
-        i_valuesMap.insert("office", userDbData->value("current_office"));
-        i_valuesMap.insert("user", userDbData->value("id"));
+        i_valuesMap.insert("company", userDbData->company);
+        i_valuesMap.insert("office", userDbData->currentOffice);
+        i_valuesMap.insert("user", userDbData->id);
         i_valuesMap.insert("created", QDateTime::currentDateTime());
 
         insert();

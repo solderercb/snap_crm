@@ -109,7 +109,7 @@ bool SRepairStatusLog::commit()
         return 1;
 
     i_valuesMap.insert("repair_id", m_repair);
-    setUser(userDbData->value("id").toInt());
+    setUser(userDbData->id);
     setCreated(QDateTime::currentDateTime());
     if(insert())
         m_changed = 0;

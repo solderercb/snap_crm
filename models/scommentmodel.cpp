@@ -114,7 +114,7 @@ bool SCommentModel::commit()
     else
     {
         if(!i_valuesMap.contains("user"))
-            setUser(userDbData->value("id").toInt());
+            setUser(userDbData->id);
         if(!i_valuesMap.contains("created"))
             setCreated(QDateTime::currentDateTime());
         insert();

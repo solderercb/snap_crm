@@ -1021,7 +1021,7 @@ bool SRepairModel::lock(bool state)
     i_query->exec(QUERY_BEGIN);
     if(state)
     {
-        QUERY_EXEC(i_query, i_nErr)(QUERY_LOCK_REPAIR(i_id,userDbData->value("id").toString()));
+        QUERY_EXEC(i_query, i_nErr)(QUERY_LOCK_REPAIR(i_id,userDbData->id));
     }
     else
     {
@@ -1035,7 +1035,7 @@ bool SRepairModel::isLock()
 {
     QUERY_EXEC(i_query, i_nErr)(QUERY_SEL_REPAIR_LOCK(i_id));
     i_query->first();
-    if(i_query->value(0).toInt() == 0 || i_query->value(0).toInt() == userDbData->value("id").toInt())
+    if(i_query->value(0).toInt() == 0 || i_query->value(0).toInt() == userDbData->id)
         return 0;
     return 1;
 }

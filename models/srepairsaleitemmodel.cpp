@@ -101,7 +101,7 @@ void SRepairSaleItemModel::setCount(const int count, const QVariant oldValue)
     }
     else
     {
-        logText = tr("Автовыдача %1ед. товара сотруднику %2 для ремонта №%3").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt())).arg(m_repairId);
+        logText = tr("Автовыдача %1ед. товара сотруднику %2 для ремонта №%3").arg(m_count).arg(allUsersMap->value(userDbData->id)).arg(m_repairId);
         setNotes(logText);
     }
     m_storeItem->reserve(logText);
@@ -287,7 +287,7 @@ bool SRepairSaleItemModel::reserve()
     QString logText;
     if(!i_id)
     {
-        logText = tr("Выдача %1ед. товара сотруднику %2").arg(m_count).arg(allUsersMap->value(userDbData->value("id").toInt()));
+        logText = tr("Выдача %1ед. товара сотруднику %2").arg(m_count).arg(allUsersMap->value(userDbData->id));
         setNotes(logText);
         i_nErr = m_storeItem->reserve(logText);
     }
@@ -367,9 +367,9 @@ bool SRepairSaleItemModel::commit()
     {
         setCreated(QDateTime::currentDateTime());
         if(!i_valuesMap.contains("from_user"))
-            setFromUser(userDbData->value("id").toInt());
+            setFromUser(userDbData->id);
         if(!i_valuesMap.contains("to_user"))
-            setToUser(userDbData->value("id").toInt());
+            setToUser(userDbData->id);
         if(!i_valuesMap.contains("notes"))
             setNotes(tr("Выдача товара \"%1\" сотруднику %2").arg(m_name, QSqlDatabase::database("connMain").userName()));
         insert();

@@ -76,7 +76,7 @@ void STableSalaryExtraModel::saveTable()
             additionalPayment->setName(SEditableBaseModel::data(index(i, 1)).toString());
             additionalPayment->setSumm(SEditableBaseModel::data(index(i, 2)).toDouble());
             additionalPayment->setPaymentDate(SEditableBaseModel::data(index(i, 3)).toDateTime());
-            additionalPayment->setUser(userDbData->value("id").toInt());
+            additionalPayment->setUser(userDbData->id);
             additionalPayment->setEmployee(m_employee);
             nErr = additionalPayment->commit();
             delete additionalPayment;
@@ -137,7 +137,7 @@ void STableSalaryExtraModel::slotPrimeInsert(int row, QSqlRecord &record)
     delete field;
 
     field = new QSqlField("user", QVariant::Int);
-    field->setValue(userDbData->value("id").toInt());
+    field->setValue(userDbData->id);
     rec->append(*field);
     delete field;
 

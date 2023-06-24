@@ -56,7 +56,7 @@ bool SWorkshopIssuedModel::commit()
     }
     else
     {
-        setEmployee(userDbData->value("id").toInt());
+        setEmployee(userDbData->id);
         i_valuesMap.insert("created_at", QDateTime::currentDateTime());
         insert();
     }

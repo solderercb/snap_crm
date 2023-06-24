@@ -13,6 +13,7 @@
 #include <QSettings>
 #include "applog.h"
 #include "models/scomsettings.h"
+#include "models/susersettings.h"
 #include "models/slocalsettings.h"
 #include "models/slocalsettingsstructs.h"
 #include "models/suseractivitymodel.h"
@@ -47,8 +48,7 @@ namespace Global
 
 extern QLocale sysLocale;
 extern QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
-extern QMap<QString, QVariant> *userDbData;
-extern QSqlQueryModel *userDbDataModel;
+extern SUserSettings *userDbData;
 extern SLocalSettings *localSettings;
 extern t_userSettings *userLocalData;
 extern SPermissions *permissions;

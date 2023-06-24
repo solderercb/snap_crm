@@ -98,10 +98,10 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_CHECKBOX(int, printRepairRejectDoc, 10, print_reject)
     PROPSTRUCT_CHECKBOX(int, printRKOOnItemIncome, 10, rko_on_pn)
     PROPSTRUCT_CHECKBOX(int, printCheck, 10, print_check)
-    PROPSTRUCT_CHECKBOX(int, printRepairReceptDoc, 10, settings.print_new_repair_report)    // таблица settings!
-    PROPSTRUCT_CHECKBOX(int, printRepairStickers, 10, settings.print_rep_stickers)    // таблица settings!
-    PROPSTRUCT_CHECKBOX(int, printCartridgeReceptDoc, 10, settings.print_new_cartridge_report)    // таблица settings!
-    PROPSTRUCT_CHECKBOX(int, printCartridgeStickers, 10, settings.print_cartridge_stickers)    // таблица settings!
+    PROPSTRUCT_CHECKBOX(int, printRepairReceptDoc, 10, settings.print_new_repair_report)
+    PROPSTRUCT_CHECKBOX(int, printRepairStickers, 10, settings.print_rep_stickers)
+    PROPSTRUCT_CHECKBOX(int, printCartridgeReceptDoc, 10, settings.print_new_cartridge_report)
+    PROPSTRUCT_CHECKBOX(int, printCartridgeStickers, 10, settings.print_cartridge_stickers)
     PROPSTRUCT_SPINBOX(int, defaultRepairStickersQty, 10, rep_stickers_copy, 0, 10)
 
     PROPSTRUCT_CHECKBOX(int, autoSwitchKeyboardLayout, 11, auto_switch_layout)

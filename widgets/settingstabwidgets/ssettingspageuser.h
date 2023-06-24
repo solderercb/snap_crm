@@ -24,7 +24,6 @@ public slots:
 #endif
 private:
     Ui::SSettingsPageUser *ui;
-    SUserSettings *userSettings;
     QMap<int, QWidget*> m_extraWidgets;
 //    void SSettingsPageUser::updateWidgetsOf...Group();
     void saveSettings() override;

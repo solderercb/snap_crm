@@ -101,6 +101,31 @@
            <layout class="QGridLayout" name="gridLayout_11">
             <item row="0" column="0">
              <layout class="QFormLayout" name="formLayoutGoods">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetDefaultConstraint</enum>
+              </property>
+              <property name="formAlignment">
+               <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+              </property>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxFinances">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Финансы</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_12">
+            <item row="0" column="0">
+             <layout class="QFormLayout" name="formLayoutFinances">
               <property name="formAlignment">
                <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
               </property>

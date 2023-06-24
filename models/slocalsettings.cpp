@@ -47,13 +47,13 @@ void SLocalSettings::genSettingsFileName(QFile &file, const QString subVariant)
                              + "-"
                              + subVariant
                              + "-"
-                             + userDbData->value("username").toString()
+                             + userDbData->username
                              + ".xml");
             break;
         default:
             file.setFileName(QString(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant))
                              + "-"
-                             + userDbData->value("username").toString()
+                             + userDbData->username
                              + ".xml");
     }
 }

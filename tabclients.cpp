@@ -30,7 +30,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
-    if (userDbData->value("prefer_regular").toBool())
+    if (userDbData->preferRegular)
         ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(4, 0));
     else
         ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()

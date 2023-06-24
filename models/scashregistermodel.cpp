@@ -110,10 +110,10 @@ bool SCashRegisterModel::commit()
         bool nIntegrityErr = 1;
         QString q;
 
-        i_valuesMap.insert("user", userDbData->value("id"));
-        i_valuesMap.insert("company", userDbData->value("company"));
+        i_valuesMap.insert("user", userDbData->id);
+        i_valuesMap.insert("company", userDbData->company);
         if(!i_valuesMap.contains("office"))
-            i_valuesMap.insert("office", userDbData->value("current_office"));
+            i_valuesMap.insert("office", userDbData->currentOffice);
         if(!i_valuesMap.contains("created"))
             setCreated(QDateTime::currentDateTime());
 

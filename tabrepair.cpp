@@ -57,15 +57,14 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         connect(ui->lineEditQuickAddPart, &SLineEdit::buttonClicked, this, &tabRepair::onReturnQuickAddPart);
         connect(ui->lineEditQuickAddPart, &SLineEdit::returnPressed, this, &tabRepair::onReturnQuickAddPart);
     }
-    if(1)   // userDbData->value("TODO: автосохранение результата диагностики").toBool()
+    if(userDbData->autosaveDiagResult)
     {
         m_autosaveDiag = 1;
         m_autosaveDiagTimer = new QTimer();
         m_autosaveDiagTimer->setSingleShot(true);
         QObject::connect(m_autosaveDiagTimer, SIGNAL(timeout()), this, SLOT(saveDiagAmount()));
     }
-    save_state_on_close = userDbDataModel->record(0).value("save_state_on_close").toBool();
-    if(save_state_on_close)
+    if(userDbData->saveStateOnClose)
     {
         ui->toolButtonSaveState->setHidden(true);
         ui->comboBoxState->disableWheelEvent(true);  // если включено автосохранение статуса ремонта, то нужно игнорировать колёсико мышки
@@ -83,10 +82,10 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
     worksAndPartsModel->setPriceColumn(0);
-//    if(comSettings->auto == SSaleTableModel::EditStrategy::OnManualSubmit)
-//        ui->switchEditStrategy->setChecked(false);
-//    else
+    if(userDbData->autosavePartList)
         ui->switchEditStrategy->setChecked(true);
+    else
+        ui->switchEditStrategy->setChecked(false);
     connect(worksAndPartsModel, SIGNAL(amountChanged(double,double,double)), this, SLOT(updateTotalSumms(double,double,double)));
     connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
     connect(worksAndPartsModel, &SSaleTableModel::tableDataChanged, this, &tabRepair::setSaveSaleTableEnabled);
@@ -407,7 +406,7 @@ void tabRepair::setInfoWidgetVisible(QWidget *field, bool state)
 
 bool tabRepair::setWidgetsParams(const int stateId)
 {
-    m_getOutButtonVisible = permissions->issueDevices;
+    m_getOutButtonVisible = 0;
     m_comboBoxStateEnabled = 1;
     m_worksRO = 1;
     m_diagRO = 1;
@@ -422,7 +421,7 @@ bool tabRepair::setWidgetsParams(const int stateId)
             {
                 case Global::RepStateIds::Returned:
                 case Global::RepStateIds::ReturnedNoRepair:
-                case Global::RepStateIds::ReturnedInCredit: m_getOutButtonVisible &= checkStateAcl(nextState.toInt());
+                case Global::RepStateIds::ReturnedInCredit: m_getOutButtonVisible = permissions->issueDevices && checkStateAcl(nextState.toInt());
             }
         }
     }
@@ -453,7 +452,7 @@ bool tabRepair::setWidgetsParams(const int stateId)
 bool tabRepair::checkStateAcl(const int stateId)
 {
     const QString allowedForRoles = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Roles).toString();
-    if(userDbData->value("roles").toString().contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
+    if(userDbData->roles.contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
     {
         return 1;
     }
@@ -567,7 +566,7 @@ void tabRepair::initEngineer()
     if(repairModel->engineer())
         return;
 
-    repairModel->setEngineer(userDbData->value("id").toInt());
+    repairModel->setEngineer(userDbData->id);
 }
 
 void tabRepair::openInvoice(int)
@@ -890,7 +889,7 @@ void tabRepair::addCustomWork()
 
 void tabRepair::comboBoxStateIndexChanged(int index)
 {
-    if(save_state_on_close)
+    if(userDbData->saveStateOnClose)
     {
         saveState(index);
         return;

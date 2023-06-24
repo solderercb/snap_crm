@@ -3,7 +3,6 @@
 
 SUserSettings::SUserSettings()
 {
-    id = userDbData->value("id").toInt();
 }
 
 void SUserSettings::initWidgets()
@@ -14,11 +13,12 @@ void SUserSettings::initWidgets()
     // Модели данных виджетов (ComboBox) должны быть заданы до загрузки данных, иначе будет падать.
 //   static_cast<QComboBox*>(i_editorWidgets.value("..."))->setModel(...);
 
-    load();
+    load(username);
 }
 
-void SUserSettings::load()
+void SUserSettings::load(const QString &connectionLogin)
 {
+    QString q;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
     int i = 0;
 
@@ -26,11 +26,13 @@ void SUserSettings::load()
         metaObject()->invokeMethod(this, QByteArray("register__db_field").insert(9, metaObject()->property(i).name()), Qt::DirectConnection);
 
     // "переворот" таблицы users
+    q = QString("SELECT @smth := CONCAT(IF(@smth IS NOT NULL, CONCAT(@smth, '\\\nUNION ALL\\\n'), ''), 'SELECT \\\'', `COLUMN_NAME`, '\\\', `', `COLUMN_NAME`, '` FROM `users` WHERE `username` = \\\'%1\\\'') FROM information_schema.`COLUMNS` WHERE `TABLE_SCHEMA` = SCHEMA() AND `TABLE_NAME` = 'users';").arg(connectionLogin);
     query->exec("SET @smth := NULL");
-    query->exec(QString("SELECT @smth := CONCAT(IF(@smth IS NOT NULL, CONCAT(@smth, '\\\nUNION ALL\\\n'), ''), 'SELECT \\\'', `COLUMN_NAME`, '\\\', `', `COLUMN_NAME`, '` FROM `users` WHERE `id` = %1') FROM information_schema.`COLUMNS` WHERE `TABLE_SCHEMA` = SCHEMA() AND `TABLE_NAME` = 'users';").arg(id));
+    query->exec(q);
 
     query->last();
-    query->exec(query->value(0).toString());
+    q = query->value(0).toString();
+    query->exec(q);
     while (query->next())
     {
         i = fieldToPropertyId(query->value(0).toString());
@@ -39,6 +41,14 @@ void SUserSettings::load()
 
         metaObject()->property(i).write(this, query->value(1));
     }
+
+    q = QString("SELECT GROUP_CONCAT(`role_id`) AS 'roles' FROM `roles_users` WHERE `user_id` = %1 GROUP BY `user_id`  LIMIT 1;").arg(id);
+    query->exec(q);
+    if(query->first())
+        roles = query->value(0).toString();
+
+    // TODO: несколько компаний
+    company = 1;
 
     delete query;
 

@@ -133,11 +133,10 @@ QStandardItemModel *SReportsCommonFunctions::initDemoModel(const QStringList &de
 void SReportsCommonFunctions::initDataSources()
 {
     // Преобразование QMap<QString, QVariant> в QStandardItemModel
-    m_report->dataManager()->addModel("user", initDemoModel(userDbData->keys(), userDbData->values()), true);
-//    m_reportDatasouces << "user";
-//    LimeReport::ICallbackDatasource *userDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
-//    QObject::connect(userDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), userDbData, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
-//    QObject::connect(userDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), userDbData, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+    m_reportDatasouces << "user";
+    LimeReport::ICallbackDatasource *userDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(userDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), userDbData, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(userDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), userDbData, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
 
     m_report->dataManager()->addModel("company", companiesModel, false);
 //    m_reportDatasouces << "company";

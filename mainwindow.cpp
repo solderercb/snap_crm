@@ -58,7 +58,7 @@ MainWindow::MainWindow(windowsDispatcher*) :
 
     ui->setupUi(this);
 
-    setWindowTitle("SNAP CRM ["+userDbData->value("current_office_name").toString()+"] ["+QSqlDatabase::database("connMain").userName()+"]");
+    setWindowTitle(QString("SNAP CRM [%1] [%2]").arg(officesModel->getDisplayRole(userDbData->currentOffice, 2), userDbData->username));
     initGlobalModels();
 
     tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)

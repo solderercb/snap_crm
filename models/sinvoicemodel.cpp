@@ -191,8 +191,8 @@ bool SInvoiceModel::commit()
     else
     {
         setCreated(QDateTime::currentDateTime());
-        setUser(userDbData->value("id").toInt());
-        setOffice(userDbData->value("current_office").toInt());
+        setUser(userDbData->id);
+        setOffice(userDbData->currentOffice);
 
         insert();
     }
