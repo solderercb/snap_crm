@@ -372,18 +372,20 @@ UI_HEADERS_DIR = $${OUT_PWD}/ui
 UI_SOURCES_DIR = $${OUT_PWD}/ui
 RCC_DIR        = $${OUT_PWD}/$${BUILD_TYPE}/rcc
 
-equals(QT_MAJOR_VERSION, 6){
-    LIB_DIR = $$PWD/libQt6
-}
-else {
-    LIB_DIR = $$PWD/libQt5
-}
+LIB_DIR = $$section(OUT_PWD, /, -1, -1)
+LIB_DIR = $${PWD}/lib/$$replace(LIB_DIR, "Desktop", $$lower($$QMAKE_HOST.name))
+#message($$LIB_DIR)
+
 INCLUDEPATH += $$LIB_DIR/include
 DEPENDPATH += $$LIB_DIR/include
 PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
 
 LIBS += -lwinspool -lKernel32
-LIBS += -L$$LIB_DIR -llimereport
+CONFIG(release, debug|release) {
+    LIBS += -L$$LIB_DIR -llimereport
+}else{
+    LIBS += -L$$LIB_DIR -llimereportd
+}
 
 win32:BIN_DIR ~= s,/,\\,g
 win32:LIB_DIR ~= s,/,\\,g
