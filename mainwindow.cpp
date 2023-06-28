@@ -577,6 +577,11 @@ void MainWindow::reactivateTabRepairNew(int)
     ui->tabWidget->setCurrentWidget(tabRepairNew::getInstance());
 }
 
+void MainWindow::switchToLastUsedTab()
+{
+    ui->tabWidget->setCurrentWidget(tabList.last());
+}
+
 void MainWindow::createTabSale(int doc_id)
 {
     if(!permissions->saleGoods)

@@ -68,7 +68,7 @@ extern SSqlQueryModel *repairBoxesModel;
 extern SSqlQueryModel *paymentSystemsModel;
 extern SPaymentTypesModel *receiptTypesModel;
 extern SPaymentTypesModel *expenditureTypesModel;
-extern QStandardItemModel* clientsTypesList;
+extern SStandardItemModel* clientsTypesList;
 extern SSqlQueryModel* clientAdTypesList;
 extern SStandardItemModel *statusesModel;
 extern qint64 repairTermSeconds;
@@ -94,6 +94,7 @@ extern SStandardItemModel *clientBinaryProperties;
 extern QSettings *debugOptions;
 extern QMap<QString, QVariant> *debugLoginOptions;
 extern SStandardItemModel* storeItemsIntReserveStatesModel;
+extern QVector<QWidget*> tabList;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

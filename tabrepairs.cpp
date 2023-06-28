@@ -116,11 +116,11 @@ void tabRepairs::refreshTable()
     if ( !userDbData->displayOut && ui->lineEditSearch->text().isEmpty() )
         l1.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
     if(filterSettings->contains("status") && filterSettings->value("status") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, statusesModel->item(filterSettings->value("status"), 1)->text()));
+        l1.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, statusesModel->databaseIDByRow(filterSettings->value("status"))));
     if(filterSettings->contains("office") && filterSettings->value("office") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`office`", FilterField::Equals, officesModel->record(filterSettings->value("office")).value("id").toInt()));
+        l1.fields.append(STableViewBase::initFilterField("t1.`office`", FilterField::Equals, officesModel->databaseIDByRow(filterSettings->value("office"))));
     if(filterSettings->contains("employee") && filterSettings->value("employee") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, usersModel->record(filterSettings->value("employee")).value("id").toInt()));
+        l1.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, usersModel->databaseIDByRow(filterSettings->value("employee"))));
     if(filterSettings->contains("client") && filterSettings->value("client") >= 0)
         l1.fields.append(STableViewBase::initFilterField("t5." + clientsTypesList->item(filterSettings->value("client"), 2)->text(), FilterField::NoOp, ""));
 

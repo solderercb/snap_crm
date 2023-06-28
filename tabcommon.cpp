@@ -1,8 +1,11 @@
 #include "tabcommon.h"
+#include "global.h"
 
 tabCommon::tabCommon(MainWindow *p) :
     SWidget(p)
 {
+    installEventFilter(this);
+    connect(this, &tabCommon::tabClosed, p, &MainWindow::switchToLastUsedTab);
 #ifdef QT_DEBUG
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
@@ -15,6 +18,12 @@ tabCommon::tabCommon(MainWindow *p) :
 
 tabCommon::~tabCommon()
 {
+    while(tabList.removeOne(this));
+    // если вкладка создана с другой вкладки (выбор клиента/ремонта/др.), то сработает механизм переключения на вызвавшую вкладку,
+    // иначе переключение на последнюю использованную вкладку
+    if(callerPtr == nullptr)
+        emit tabClosed();
+
 #ifdef QT_DEBUG
     delete test_scheduler;
     delete test_scheduler2;
@@ -29,4 +38,15 @@ bool tabCommon::tabCloseRequest()
 QIcon *tabCommon::tabIcon()
 {
     return i_tabIcon;
+}
+
+bool tabCommon::eventFilter(QObject *watched, QEvent *event)
+{
+//    if(event->type() != QEvent::Paint)
+//        qDebug().nospace() << "[" << this << "] tabCommon::eventFilter() | event->type(): " << event->type();
+
+    if(event->type() == QEvent::HideToParent)
+        tabList.append(this);
+
+    return false;
 }

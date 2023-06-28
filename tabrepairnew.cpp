@@ -46,13 +46,11 @@ tabRepairNew::~tabRepairNew()
     delete classIncomingSetsModel;
     delete classExteriorsModel;
     delete additionalFields;
-    delete clientModel;
     p_instance = nullptr;   // Обязательно блять!
 }
 
 void tabRepairNew::initDataModels()
 {
-    clientModel = new SClientModel();
     deviceClassesModel = new SSqlQueryModel();
     deviceClassesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
     deviceVendorsModel = new SSqlQueryModel();
@@ -85,13 +83,10 @@ void tabRepairNew::initWidgets()
     ui->labelDoc->hide();       // хрен знает, что это за поле "Документ", оно не у всех пользователей отображается, а у кого отображается, не содержит ни одного эл-та. Спрячу от пользователя.
     ui->comboBoxDoc->hide();
 
-    ui->pushButtonCreateTabClient->hide();  // кнопка открытия карточки клиента будет отображаться, только когда выбран клиент из базы
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->comboBoxProblem->lineEdit()->setPlaceholderText(tr("неисправность"));
     ui->comboBoxIncomingSet->lineEdit()->setPlaceholderText(tr("комплектность"));
     ui->comboBoxExterior->lineEdit()->setPlaceholderText(tr("внешний вид"));
-    ui->comboBoxClientAdType->lineEdit()->setPlaceholderText(tr("источник обращения"));
-    ui->comboBoxClientAdType->setButtons("Clear");
     ui->comboBoxDeviceClass->setPlaceholderText(tr("устройство"));
     ui->comboBoxDeviceVendor->setPlaceholderText(tr("производитель"));
     ui->comboBoxDevice->lineEdit()->setPlaceholderText(tr("модель"));
@@ -111,7 +106,6 @@ void tabRepairNew::initWidgets()
     setDefaultStyleSheets();
 
     // установка моделей данных
-    ui->phones->setModel(clientModel->phones());
     ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxOffice->setModel(officesModel);
     ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->currentOffice));
@@ -131,20 +125,14 @@ void tabRepairNew::initWidgets()
     ui->comboBoxProblem->setCurrentIndex(-1);
     ui->comboBoxIncomingSet->setModel(classIncomingSetsModel);
     ui->comboBoxExterior->setModel(classExteriorsModel);
-    ui->comboBoxClientAdType->setModel(clientAdTypesList);
-    ui->comboBoxClientAdType->setCurrentIndex(-1);
     ui->comboBoxPrepayReason->setModel(prepayReasonsModel);
     ui->comboBoxPrepayReason->setCurrentIndex(-1);
     ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
 
-    if(permissions->viewClients)
-    {
-        connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
-        connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
-        connect(ui->phones,SIGNAL(primaryPhoneEdited(QString)),this,SLOT(primaryPhoneEdited(QString)));
-    }
     connect(ui->lineEditSN,SIGNAL(textEdited(QString)),ui->widgetDeviceMatch,SLOT(findBySN(QString)));
     connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
+    connect(ui->widgetClient, &SClientInputForm::createTabClient, this, &tabRepairNew::createTabClient);
+    connect(ui->widgetClient, &SClientInputForm::createTabSelectExistingClient, this, &tabRepairNew::relayCreateTabSelectExistingClient);
 
     // TODO: настройка минимальных сумм в параметрах программы
     if(comSettings->classicKassa)
@@ -157,8 +145,6 @@ void tabRepairNew::initWidgets()
         ui->doubleSpinBoxEstPrice->setMinimum(1.00);
         ui->doubleSpinBoxPrepaySumm->setMinimum(1.00);
     }
-
-    ui->pushButtonSelectExistingClient->setVisible(permissions->viewClients);
 }
 
 void tabRepairNew::clearWidgets()
@@ -316,31 +302,6 @@ void tabRepairNew::getDevices()
 
 }
 
-void tabRepairNew::changeClientType()
-{
-
-    if(ui->checkBoxClientType->checkState())
-    {
-        ui->groupBoxClient->setTitle(tr("Клиент (юридическое лицо)"));
-        // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-        ui->lineEditClientFirstName->setPlaceholderText(tr("Название организации"));
-        ui->lineEditClientLastName->hide();    // скрываем поле "Фамилия"
-        ui->lineEditClientPatronymic->hide();    // скрываем поле "Отчество"
-        ui->gridLayoutClient->addWidget(ui->lineEditClientFirstName, 1, 0, 1, 3); // заменяем поле "Фамилия" самим собой, но растягиваем его по ширине на 6 столбцов (занимаем столбцы полей "Имя" и "Отчество")
-    }
-    else
-    {
-        ui->groupBoxClient->setTitle("Клиент (частное лицо)");
-        ui->gridLayoutClient->addWidget(ui->lineEditClientLastName, 1, 0, 1, 1);
-        ui->gridLayoutClient->addWidget(ui->lineEditClientFirstName, 1, 1, 1, 1); // заменяем поле "Фамилия" самим собой, но сжимаем его по ширине до двух столбцов
-        ui->gridLayoutClient->addWidget(ui->lineEditClientPatronymic, 1, 2, 1, 1);
-        // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-        ui->lineEditClientFirstName->setPlaceholderText(tr("Имя"));
-        ui->lineEditClientLastName->show();    // показываем поле "Имя"
-        ui->lineEditClientPatronymic->show();    // показываем поле "Отчество"
-    }
-}
-
 void tabRepairNew::showLineEditPrevRepair()
 {
     if(ui->checkBoxWasEarlier->checkState() || ui->checkBoxIsWarranty->checkState())
@@ -423,34 +384,6 @@ void tabRepairNew::changeDeviceVendor(int index)
     ui->comboBoxDevice->setCurrentIndex(-1);
 }
 
-void tabRepairNew::clearClientCreds(bool hideCoincidence)
-{
-    setDefaultStyleSheets();
-    m_client = 0;
-    ui->checkBoxClientType->setEnabled(true);
-    ui->lineEditClientLastName->setReadOnly(false);  // разрешение редактирования
-    ui->lineEditClientFirstName->setReadOnly(false);
-    ui->lineEditClientPatronymic->setReadOnly(false);
-    ui->comboBoxClientAdType->setEnabled(true);
-    ui->lineEditClientAddress->setReadOnly(false);
-    ui->lineEditClientEmail->setReadOnly(false);
-
-    ui->pushButtonCreateTabClient->setEnabled(false);
-    ui->lineEditClientLastName->clear();
-    ui->lineEditClientFirstName->clear();
-    ui->lineEditClientPatronymic->clear();
-    ui->comboBoxClientAdType->setCurrentIndex(-1);
-    ui->lineEditClientAddress->clear();
-    ui->lineEditClientEmail->clear();
-
-    clientModel->clear();
-    ui->pushButtonCreateTabClient->hide();
-    ui->listWidgetClientOptions->clear();
-
-    if (hideCoincidence)
-        ui->widgetClientMatch->hide();
-}
-
 void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
 {
     if (button == SLineEdit::Search)
@@ -470,38 +403,6 @@ void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
     }
 }
 
-void tabRepairNew::fillClientCreds(int id)
-{
-    clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
-    m_client = id;
-
-    clientModel->load(m_client);
-    ui->checkBoxClientType->setChecked(clientModel->type());
-    changeClientType();
-    ui->checkBoxClientType->setEnabled(false);
-    ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
-    ui->lineEditClientFirstName->setReadOnly(true);
-    ui->lineEditClientPatronymic->setReadOnly(true);
-    ui->comboBoxClientAdType->setEnabled(false);
-    ui->lineEditClientAddress->setReadOnly(true);
-    ui->lineEditClientEmail->setReadOnly(true);
-
-    ui->pushButtonCreateTabClient->setEnabled(true);
-    ui->lineEditClientFirstName->setText(permissions->viewClients?clientModel->firstName():tr("no permissions"));
-    ui->lineEditClientLastName->setText(permissions->viewClients?clientModel->lastName():tr("no permissions"));
-    ui->lineEditClientPatronymic->setText(permissions->viewClients?clientModel->patronymicName():tr("no permissions"));
-//    if(permissions->viewClients)
-        ui->phones->setModel(clientModel->phones());
-//    else
-//        ui->phones->setEnabled(false);
-    ui->lineEditClientAddress->setText(permissions->viewClients?clientModel->address():tr("no permissions"));
-    ui->lineEditClientEmail->setText(permissions->viewClients?clientModel->email():tr("no permissions"));
-    ui->pushButtonCreateTabClient->setVisible(permissions->viewClients);
-    ui->listWidgetClientOptions->addItems(clientModel->optionsList(1));
-
-    ui->comboBoxProblem->setFocus();    // устанавливаем фокус на полее ввода неисправности
-}
-
 void tabRepairNew::fillDeviceCreds(int id)
 {
     int i;
@@ -518,7 +419,7 @@ void tabRepairNew::fillDeviceCreds(int id)
         deviceVendor = queryDevice->record(0).value("maker").toInt();
         device = queryDevice->record(0).value("model").toInt();
 
-        fillClientCreds(queryDevice->record(0).value("client").toInt());
+        ui->widgetClient->fillClientCreds(queryDevice->record(0).value("client").toInt());
 //        if (ui->comboBoxDeviceClass->currentIndex() < 0)        // только если пользователь не выбрал тип уст-ва
         {
             // TODO: сделать запросы к БД асинхронными. Готовые классы https://github.com/micjabbour/MSqlQuery
@@ -538,11 +439,6 @@ void tabRepairNew::fillDeviceCreds(int id)
     delete queryDevice;
 }
 
-void tabRepairNew::buttonSelectExistingClientClicked()
-{
-    emit createTabSelectExistingClient(1, this);
-}
-
 void tabRepairNew::lineEditSNClearHandler(int)
 {
     if(ui->lineEditSN->text().length())
@@ -558,12 +454,6 @@ void tabRepairNew::setDefaultStyleSheets()
     ui->comboBoxDeviceVendor->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxDevice->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditSN->setStyleSheet(commonLineEditStyleSheet);
-    ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheet);
-    ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheet);
-    ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheet);
-    ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheet);
-    ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheet);
-    ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheet);
     ui->comboBoxProblem->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxIncomingSet->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxExterior->setStyleSheet(commonComboBoxStyleSheet);
@@ -604,38 +494,9 @@ bool tabRepairNew::checkInput()
         ui->lineEditSN->setStyleSheet(commonLineEditStyleSheetRed);
         error = 4;
     }
-    if (ui->lineEditClientLastName->text() == "" && ui->checkBoxClientType->checkState() == 0)       // если не указана фамилия (только для физ. лиц)
-    {
-        ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheetRed);
-        error = 5;
-    }
-    if (ui->lineEditClientFirstName->text() == "")     // если не указано имя (или название организации)
-    {
-        ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
-        error = 6;
-    }
-    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->isClientPatronymicRequired && !m_client)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
-    {
-        ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
-        error = 7;
-    }
-    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->isVisitSourceRequired && !m_client)        // если не указан источник обращения, а он обязателен и клиент новый
-    {
-        ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
-        error = 8;
-    }
-    if (ui->lineEditClientAddress->text() == "" && comSettings->isClientAddressRequired && !m_client)   // если не указан адрес, а он обязателен и клиент новый
-    {
-        ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheetRed);
-        error = 9;
-    }
-    if (ui->lineEditClientEmail->text() == "" && comSettings->isClientEmailRequired && !m_client)   // если не указан email, а он обязателен и клиент новый
-    {
-        ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheetRed);
-        error = 10;
-    }
-    if (!ui->phones->isValid())
-        error = 11;
+
+    error = ui->widgetClient->checkInput();
+
     if (ui->comboBoxProblem->text() == "")        // если не указана(ы) неисправность(и)
     {
         ui->comboBoxProblem->setStyleSheet(commonComboBoxStyleSheetRed);
@@ -703,23 +564,6 @@ bool tabRepairNew::checkInput()
     return true;
 }
 
-void tabRepairNew::createClient()
-{
-    clientModel->setFirstName(ui->lineEditClientFirstName->text());
-    clientModel->setLastName(ui->lineEditClientLastName->text());
-    clientModel->setPatronymicName(ui->lineEditClientPatronymic->text());
-    clientModel->appendLogText(tr("Быстрое создание клиента из формы приёма в ремонт"));
-    clientModel->setAdTypeIndex(ui->comboBoxClientAdType->currentIndex());
-    clientModel->setAddress(ui->lineEditClientAddress->text());
-    clientModel->setType(ui->checkBoxClientType->isChecked());
-    if(ui->checkBoxClientType->isChecked())
-        clientModel->setUrName(ui->lineEditClientFirstName->text());
-    if(!clientModel->commit())
-        throw 1;
-
-    m_client = clientModel->id();
-}
-
 /*  Поиск имеющейся модели устройства в списке или создание новой.
  *  Возвращает id модели.
  *  Пользователь мог выбрать похожую модель из списка с целью дальнейшего редактирования,
@@ -774,16 +618,8 @@ bool tabRepairNew::createRepair()
 
     try
     {
-        if (clientModel->isNew() || clientModel->phones()->isUpdated())
-        {
-            QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-            if(clientModel->isNew())
-                createClient();
-            if(clientModel->phones()->isUpdated())
-                clientModel->phones()->commit();
-            QUERY_COMMIT_ROLLBACK(query,nErr);
-            fillClientCreds(m_client);
-        }
+        ui->widgetClient->commit();
+        clientModel = ui->widgetClient->model();
 
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
@@ -855,15 +691,14 @@ void tabRepairNew::createRepairClose()
     }
 }
 
-void tabRepairNew::primaryPhoneEdited(QString number)
-{
-    if(permissions->viewClients)
-        ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
-}
-
 void tabRepairNew::preferredPaymentSystemChanged(int)
 {
     // при установке модели данных автоматически устанавливается индекс 0 и в модель ремонта устанавливается предпочитаемый тип оплаты, что есть неправильно
+}
+
+void tabRepairNew::relayCreateTabSelectExistingClient(int, QWidget *caller)
+{
+    emit createTabSelectExistingClient(1, this);
 }
 
 void tabRepairNew::print(int repair)
@@ -896,11 +731,6 @@ void tabRepairNew::print(int repair)
     }
 }
 
-void tabRepairNew::buttonCreateTabClientClicked()
-{
-    emit createTabClient(m_client);
-}
-
 #ifdef QT_DEBUG
 void tabRepairNew::randomFill()
 {
@@ -908,49 +738,10 @@ void tabRepairNew::randomFill()
     if (test_scheduler_counter == 0)   // клиент
 //    if (1)
     {
-//        fillClientCreds(33);
+        ui->widgetClient->randomFill();
 //        test_scheduler_counter++;
 //        test_scheduler->start(400);    //  (пере-)запускаем таймер
-//        return;
 //        if(1)
-        if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
-        {
-            fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
-            if (ui->lineEditClientLastName->text() == "")
-                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // если попался id несуществующего клиета
-            else if (ui->lineEditClientLastName->text() == "")
-                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // и еще раз, на всякий пожарный
-        }
-        else    // ввод данных из тестового списка
-        {
-            i = QRandomGenerator::global()->bounded(clients4Test->size());
-            ui->lineEditClientLastName->setText(clients4Test->value(i)->at(0));
-            ui->lineEditClientFirstName->setText(clients4Test->value(i)->at(1));
-            ui->lineEditClientPatronymic->setText(clients4Test->value(i)->at(2));
-            if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или телефон мобильный или городской (это для проверки масок)
-            {
-                ui->phones->primary()->testFill(2, clients4Test->value(i)->at(4));
-            }
-            else
-            {
-                ui->phones->primary()->testFill(1, clients4Test->value(i)->at(3));
-            }
-            if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 заполняем доп. номер или нет и аналогично 50/50 тип доп. номера
-            {
-                ui->phones->addPhone();
-                if (QRandomGenerator::global()->bounded(100) > 50)
-                {
-                    ui->phones->forms().at(1)->testFill(2, clients4Test->value(i)->at(4));
-                }
-                else
-                {
-                    ui->phones->forms().at(1)->testFill(0, clients4Test->value(i)->at(3));
-                }
-            }
-            i = QRandomGenerator::global()->bounded(clientAdTypesList->rowCount()); // если клиент новый, то случайно выбираем источник обращения
-            ui->comboBoxClientAdType->setCurrentIndex(i);
-
-        }
     }
     else if (test_scheduler_counter == 1)
     {
@@ -1069,6 +860,11 @@ void tabRepairNew::randomFill()
 
 }
 
+void tabRepairNew::fillClientCreds(const int id)
+{
+    ui->widgetClient->fillClientCreds(id);
+}
+
 void tabRepairNew::test_scheduler_handler()  //
 {
     randomFill();
@@ -1076,15 +872,12 @@ void tabRepairNew::test_scheduler_handler()  //
 
 void tabRepairNew::test_scheduler2_handler()  // обработик таймера закрытия вкладки
 {
-//    qDebug() << "test_scheduler2_handler(), clientTabId = " << ui->tabWidget->indexOf(tabClients::getInstance(0));
-//    closeTab(ui->tabWidget->indexOf(tabClients::getInstance(0)));
-    //    test_scheduler->start(1000);    //  перезапускаем таймер открытия вкладки
 }
 
 void tabRepairNew::dbgRandomFillClicked()
 {
     test_scheduler_counter = 0;
-    clearClientCreds();
+    ui->widgetClient->clearClientCreds();
     clearWidgets();
     randomFill();
 }

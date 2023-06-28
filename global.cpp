@@ -24,7 +24,7 @@ SSqlQueryModel *repairBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *paymentSystemsModel = new SSqlQueryModel;
 SPaymentTypesModel *receiptTypesModel;
 SPaymentTypesModel *expenditureTypesModel;
-QStandardItemModel* clientsTypesList = new QStandardItemModel;
+SStandardItemModel* clientsTypesList = new SStandardItemModel;
 SSqlQueryModel* clientAdTypesList = new SSqlQueryModel;
 SStandardItemModel *statusesModel = new SStandardItemModel();
 qint64 repairTermSeconds;
@@ -61,6 +61,7 @@ SStandardItemModel *clientBinaryProperties;
 QSettings *debugOptions = nullptr;
 QMap<QString, QVariant> *debugLoginOptions = nullptr;
 SStandardItemModel* storeItemsIntReserveStatesModel = new SStandardItemModel;
+QVector<QWidget*> tabList;
 
 //QWidget *modalWidget = nullptr;
 

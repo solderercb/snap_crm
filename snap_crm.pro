@@ -125,6 +125,7 @@ SOURCES += \
     widgets/salarytabwidgets/stableviewsalaryrepairs.cpp \
     widgets/salarytabwidgets/stableviewsalarysaleparts.cpp \
     widgets/salarytabwidgets/stableviewsalarysales.cpp \
+    widgets/sclientinputform.cpp \
     widgets/sdoublespinbox.cpp \
     widgets/settingstabwidgets/ssettingspagebase.cpp \
     widgets/settingstabwidgets/ssettingspageglobal.cpp \
@@ -266,6 +267,7 @@ HEADERS  += \
     widgets/salarytabwidgets/stableviewsalaryrepairs.h \
     widgets/salarytabwidgets/stableviewsalarysaleparts.h \
     widgets/salarytabwidgets/stableviewsalarysales.h \
+    widgets/sclientinputform.h \
     widgets/sdoublespinbox.h \
     widgets/settingstabwidgets/ssettingspagebase.h \
     widgets/settingstabwidgets/ssettingspageglobal.h \
@@ -332,6 +334,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
     widgets/salarytabwidgets/spagesalarysales.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
+    widgets/sclientinputform.ui \
     widgets/settingstabwidgets/ssettingspageglobal.ui \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \
     widgets/settingstabwidgets/ssettingspageuser.ui \

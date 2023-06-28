@@ -92,6 +92,7 @@ public slots:
     void createTabRepair(int);
     void createTabSale(int doc_id = 0);
     void createTabSparePart(int);
+    void switchToLastUsedTab();
 
 private slots:
     void reactivateCallerTab(QWidget *);

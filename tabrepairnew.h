@@ -10,7 +10,6 @@
 #include <QDateEdit>
 #include "mainwindow.h"
 #include "tabcommon.h"
-#include "models/sclientmodel.h"
 #include "models/sfieldsmodel.h"
 #include "models/sdevmdlmodel.h"
 #include "models/srepairmodel.h"
@@ -64,7 +63,6 @@ private:
     void setDefaultStyleSheets();
     void getDevices();
     bool checkInput();
-    void createClient();
     int deviceId();
     int createDeviceModel();
     void print(int);
@@ -78,23 +76,19 @@ private:
     void randomFill() override;
 #endif
 public slots:
+    void fillClientCreds(const int);
     void fillDeviceCreds(int);
 private slots:
-    void changeClientType();
     void showLineEditPrevRepair();
     void enablePrepayWidgets(bool);
     void changeDeviceClass(int);
     void changeDeviceVendor(int);
-    void clearClientCreds(bool hideCoincidence = true);
     void lineEditPrevRepairButtonsHandler(int);
-    void fillClientCreds(int);
-    void buttonSelectExistingClientClicked();
-    void buttonCreateTabClientClicked();
     void lineEditSNClearHandler(int);
     bool createRepair();
     void createRepairClose();
-    void primaryPhoneEdited(QString);
     void preferredPaymentSystemChanged(int);
+    void relayCreateTabSelectExistingClient(int, QWidget *caller);
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;
