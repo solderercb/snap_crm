@@ -60,6 +60,9 @@ SOURCES += \
     models/salarytabmodels/stablesalaryreceptedissued.cpp \
     models/salarytabmodels/stablesalarysalepartsmodel.cpp \
     models/salarytabmodels/stablesalarysalesmodel.cpp \
+    models/scartridgecardmodel.cpp \
+    models/scartridgematerialmodel.cpp \
+    models/scartridgerepairmodel.cpp \
     models/scomsettings.cpp \
     models/sdatabaseauxiliary.cpp \
     models/seditablebasemodel.cpp \
@@ -106,6 +109,7 @@ SOURCES += \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
+    tabreceptcartridge.cpp \
     tabsalary.cpp \
     tabsettings.cpp \
     widgets/salarytabwidgets/spagesalaryextra.cpp \
@@ -125,6 +129,7 @@ SOURCES += \
     widgets/salarytabwidgets/stableviewsalaryrepairs.cpp \
     widgets/salarytabwidgets/stableviewsalarysaleparts.cpp \
     widgets/salarytabwidgets/stableviewsalarysales.cpp \
+    widgets/scartridgeform.cpp \
     widgets/sclientinputform.cpp \
     widgets/sdoublespinbox.cpp \
     widgets/settingstabwidgets/ssettingspagebase.cpp \
@@ -198,11 +203,15 @@ HEADERS  += \
     models/salarytabmodels/stablesalaryrepairsmodel.h \
     models/salarytabmodels/stablesalarysalepartsmodel.h \
     models/salarytabmodels/stablesalarysalesmodel.h \
+    models/scartridgecardmodel.h \
+    models/scartridgematerialmodel.h \
+    models/scartridgerepairmodel.h \
     models/scomsettings.h \
     models/scomsettingstypes.h \
     models/sdatabaseauxiliary.h \
     models/seditablebasemodel.h \
     models/spermissions.h \
+    models/stablecartridgesmodel.h \
     models/stablemodelscommonmethods.h \
     models/stablerepairsmodel.h \
     models/repairtablefiltermenu.h \
@@ -248,6 +257,7 @@ HEADERS  += \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
     models/sphonesmodel.h \
+    tabreceptcartridge.h \
     tabsalary.h \
     tabsettings.h \
     widgets/salarytabwidgets/spagesalaryextra.h \
@@ -267,6 +277,7 @@ HEADERS  += \
     widgets/salarytabwidgets/stableviewsalaryrepairs.h \
     widgets/salarytabwidgets/stableviewsalarysaleparts.h \
     widgets/salarytabwidgets/stableviewsalarysales.h \
+    widgets/scartridgeform.h \
     widgets/sclientinputform.h \
     widgets/sdoublespinbox.h \
     widgets/settingstabwidgets/ssettingspagebase.h \
@@ -325,6 +336,7 @@ FORMS += \
     models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
+    tabreceptcartridge.ui \
     tabsalary.ui \
     tabsettings.ui \
     widgets/salarytabwidgets/spagesalaryextra.ui \
@@ -334,6 +346,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
     widgets/salarytabwidgets/spagesalarysales.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
+    widgets/scartridgeform.ui \
     widgets/sclientinputform.ui \
     widgets/settingstabwidgets/ssettingspageglobal.ui \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \

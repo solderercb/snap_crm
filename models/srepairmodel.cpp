@@ -103,6 +103,8 @@ void SRepairModel::load(const int id)
     m_smsInform = repair->value("sms_inform").toBool();
     m_invoice = repair->value("invoice").toInt();
     m_cartridge = repair->value("cartridge").toInt();
+    if(m_cartridge)
+        m_cartridgeRepair = new SCartridgeRepairModel(m_cartridge, this);
     m_vendorId = repair->value("vendor_id").toInt();
     m_termsControl = repair->value("termsControl").toBool();
     m_repairStatusLog->setRepair(i_id);
@@ -173,6 +175,23 @@ void SRepairModel::initDemo()
     m_termsControl = 0;
 }
 
+void SRepairModel::initCartridgeRepairModel(const int id)
+{
+    if(m_cartridgeRepair)
+        qDebug().nospace() << "[" << this << "] initCartridgeRepairModel() | Warning! Model overwritten.";
+
+    m_cartridgeRepair  = new SCartridgeRepairModel(this);
+    m_cartridgeRepair->setCardId(id);
+}
+
+bool SRepairModel::isNew()
+{
+    if(i_id)
+        return false;
+
+    return true;
+}
+
 void SRepairModel::reload()
 {
     load(i_id);
@@ -195,6 +214,7 @@ QString SRepairModel::title()
 
 void SRepairModel::setTitle(const QString str)
 {
+    m_title = str;
     i_valuesMap.insert("Title", str);
 }
 
@@ -250,6 +270,7 @@ QString SRepairModel::serialNumber()
 
 void SRepairModel::setSerialNumber(const QString str)
 {
+    m_serialNumber = str;
     i_valuesMap.insert("serial_number", str);
 }
 
@@ -519,6 +540,7 @@ bool SRepairModel::isRepeat()
 
 void SRepairModel::setIsRepeat(const bool state)
 {
+    m_isRepeat = state;
     i_valuesMap.insert("is_repeat", state);
 }
 
@@ -581,19 +603,21 @@ int SRepairModel::boxIndex()
 
 void SRepairModel::setBoxIndex(const int index)
 {
-    if(index < 0 && m_box)
+    int current_box = m_box;
+
+    if(index < 0 && current_box)
     {
-        appendLogText(tr("Заказаз-наряд %1 изъят из ячейки \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(m_box)));
+        appendLogText(tr("Заказаз-наряд %1 изъят из ячейки \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(current_box)));
         i_valuesMap.insert("box", QVariant());
         m_box = 0;
     }
     else if(index >= 0)
     {
-        if(m_box)
+        m_box = repairBoxesModel->databaseIDByRow(index);
+        if(current_box)
             appendLogText(tr("Заказаз-наряд %1 перемещён в ячейку \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(m_box)));
         else
             appendLogText(tr("Заказаз-наряд %1 помещён в ячейку \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(m_box)));
-        m_box = repairBoxesModel->databaseIDByRow(index);
         i_valuesMap.insert("box", repairBoxesModel->databaseIDByRow(index));
     }
 }
@@ -970,14 +994,14 @@ void SRepairModel::setInvoice(const int id)
     i_valuesMap.insert("invoice", id);
 }
 
-int SRepairModel::cartridge()
+SCartridgeRepairModel *SRepairModel::cartridge()
 {
-    return m_cartridge;
+    return m_cartridgeRepair;
 }
 
-void SRepairModel::setCartridge(const int id)
+void SRepairModel::setCartridge(SCartridgeRepairModel *model)
 {
-    i_valuesMap.insert("cartridge", id);
+     m_cartridgeRepair = model;
 }
 
 bool SRepairModel::termsControl()
@@ -990,6 +1014,20 @@ void SRepairModel::setTermsControl(const bool state)
     i_valuesMap.insert("termsControl", state);
 }
 
+bool SRepairModel::commitCartridge()
+{
+    if(!m_cartridgeRepair)
+        return 1;
+
+    bool nErr = 1;
+
+    nErr = m_cartridgeRepair->commit();
+
+    i_valuesMap.insert("cartridge", m_cartridgeRepair->id());
+
+    return nErr;
+}
+
 bool SRepairModel::commit()
 {
     if(i_id)
@@ -999,6 +1037,8 @@ bool SRepairModel::commit()
     }
     else
     {
+        commitCartridge();
+
         setDiagnosticResult(QVariant());
         setRejectReason("");
         setInDate(QDateTime::currentDateTime());

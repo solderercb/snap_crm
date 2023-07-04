@@ -95,6 +95,7 @@ extern QSettings *debugOptions;
 extern QMap<QString, QVariant> *debugLoginOptions;
 extern SStandardItemModel* storeItemsIntReserveStatesModel;
 extern QVector<QWidget*> tabList;
+extern SStandardItemModel *cartridgeRepeatReason;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

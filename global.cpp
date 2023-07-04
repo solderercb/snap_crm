@@ -62,6 +62,7 @@ QSettings *debugOptions = nullptr;
 QMap<QString, QVariant> *debugLoginOptions = nullptr;
 SStandardItemModel* storeItemsIntReserveStatesModel = new SStandardItemModel;
 QVector<QWidget*> tabList;
+SStandardItemModel *cartridgeRepeatReason = new SStandardItemModel();
 
 //QWidget *modalWidget = nullptr;
 
@@ -292,6 +293,18 @@ void initGlobalModels()
     }
     storeItemsIntReserveStatesModel->setObjectName("storeItemsIntReserveStatesModel");
     storeItemsIntReserveStatesModel->setHorizontalHeaderLabels({"name", "id"});
+
+    QVector<QString> cartridgeRepeatReasonList = {QObject::tr("Гарантийный ремонт"), QObject::tr("Ранее было в ремонте")};
+    QVector<QString> cartridgeRepeatReasonIdsList = {"1", "2"};
+    QList<QStandardItem*> *cartridgeRepeatReasonSelector;
+    for (int i=0; i<cartridgeRepeatReasonList.size(); i++)
+    {
+        cartridgeRepeatReasonSelector = new QList<QStandardItem*>();
+        *cartridgeRepeatReasonSelector << new QStandardItem(cartridgeRepeatReasonList.at(i)) << new QStandardItem(cartridgeRepeatReasonIdsList.at(i));
+        cartridgeRepeatReason->appendRow(*cartridgeRepeatReasonSelector);
+    }
+    cartridgeRepeatReason->setObjectName("cartridgeRepeatReason");
+    cartridgeRepeatReason->setHorizontalHeaderLabels({"name", "id"});
 
 #ifdef QT_DEBUG
     initClients4Test();

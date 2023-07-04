@@ -335,9 +335,12 @@ void SComboBox::longTextHandler()
         setToolTip(QString());
 }
 
-void SComboBox::clearButtonPress(int)
+void SComboBox::clearButtonPress(int id)
 {
-    lineEditWidget->clear();
-    setCurrentIndex(-1);
+    if(id == SLineEdit::Clear)
+    {
+        lineEditWidget->clear();
+        setCurrentIndex(-1);
+    }
 }
 

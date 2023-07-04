@@ -262,8 +262,6 @@ void tabRepairNew::setModelData()
         repairModel->setCanFormat(1);
     if(ui->checkBoxIsCheckNeeded->isChecked())
         repairModel->setPrintCheck(1);
-    if(ui->comboBoxPresetPlace->currentIndex() >= 0)
-        repairModel->setBoxIndex(ui->comboBoxPresetPlace->currentIndex());
     if(ui->checkBoxWasInOtherWorkshop->isChecked())
         repairModel->setThirsPartySc(1);
     if(ui->lineEditPrevRepairFromOldDB->text().length())
@@ -448,7 +446,7 @@ void tabRepairNew::lineEditSNClearHandler(int)
     ui->widgetDeviceMatch->findBySN("");
 }
 
-void tabRepairNew::setDefaultStyleSheets()
+void tabRepairNew:: setDefaultStyleSheets()
 {
     ui->comboBoxDeviceClass->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxDeviceVendor->setStyleSheet(commonComboBoxStyleSheet);
@@ -634,6 +632,12 @@ bool tabRepairNew::createRepair()
 
         if (!ui->lineEditInsideComment->text().isEmpty())
             saveInternalComment();
+
+        if(ui->comboBoxPresetPlace->currentIndex() >= 0)
+        {
+            repairModel->setBoxIndex(ui->comboBoxPresetPlace->currentIndex());
+            repairModel->commit();
+        }
 
         if (ui->checkBoxIsPrepay->isChecked())
         {

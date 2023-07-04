@@ -1,0 +1,98 @@
+#ifndef SCARTRIDGEFORM_H
+#define SCARTRIDGEFORM_H
+
+#include <QWidget>
+#include "models/srepairmodel.h"
+#include "models/scartridgecardmodel.h"
+#include "models/ssortfilterproxymodel.h"
+
+namespace Ui {
+class SCartridgeForm;
+}
+
+class SCartridgeForm : public QFrame
+{
+    Q_OBJECT
+signals:
+    void updateTotalPreagreedAmount();
+public:
+    explicit SCartridgeForm(const int repairId = 0, QWidget *parent = nullptr);
+    ~SCartridgeForm();
+    bool eventFilter(QObject *, QEvent *);
+    SRepairModel *model();
+    void initModels();
+    void initWidgets();
+    bool createRepair();
+    bool updateRepair();
+    const QString &title() const;
+    void setTitle(const QString &title);
+    bool isRepeat() const;
+    void setIsRepeat(bool isRepeat);
+    int deviceClassId() const;
+    void setDeviceClassId(int id);
+    int deviceVendorId() const;
+    void setDeviceVendorId(int id);
+    int deviceModelId() const;
+    void setDeviceModelId(int id);
+    const QString &serialNumber() const;
+    void setSerialNumber(const QString &serial);
+    int cardId() const;
+    void setCardId(int id);
+    int clientId() const;
+    void setClientId(int clientId);
+    int companyIndex() const;
+    void setCompanyIndex(int index);
+    int officeIndex() const;
+    void setOfficeIndex(int index);
+    int engineerIndex() const;
+    void setEngineerIndex(int index);
+    bool isHighPriority() const;
+    void setIsHighPriority(bool isHighPriority);
+    int paymentSystemIndex() const;
+    void setPaymentSystemIndex(int paymentSystemIndex);
+    double preargeedAmount();
+    int checkInput();
+private:
+    Ui::SCartridgeForm *ui;
+    SRepairModel *m_repairModel = nullptr;
+    SCartridgeCardModel *m_cartridgeCard = nullptr;
+    SSaleTableModel *worksAndPartsModel = nullptr;
+    SSortFilterProxyModel *statusesProxyModel = nullptr;
+    QMap<int, double> preagreedAmounts;
+    int m_repairId = 0;
+    QString m_title;
+    bool m_isRepeat = 0;
+    int m_deviceClassId = 0;
+    int m_deviceVendorId = 0;
+    int m_deviceModelId = 0;
+    int m_cardId = 0;
+    QString m_serialNumber;
+    int m_clientId = 0;
+    int m_companyIndex = 0;
+    int m_officeIndex = 0;
+    int m_engineerIndex = 0;
+    bool m_isHighPriority = 0;
+    int m_paymentSystemIndex = 0;
+    double m_amount = 0;
+    void updateWidgets();
+    bool checkData(const int);
+    void doStateActions(const int);
+    void updatePreagreedAmount(SCartridgeMaterialModel *material, const int state);
+    void setDefaultStyleSheets();
+private slots:
+    void updateTotalSumms(const double, const double, const double);
+    void saveTotalSumms();
+    void setRefill(int);
+    void setChipReplace(int);
+    void setDrumReplace(int);
+    void setBladeReplace(int);
+    void addRefillWorksAndParts(int);
+    void addChipWorksAndParts(int);
+    void addDrumWorksAndParts(int);
+    void addBladeWorksAndParts(int);
+    void comboBoxPlaceButtonClickHandler(int);
+    void saveState(int);
+    void removeWidget();
+};
+
+#endif // SCARTRIDGEFORM_H

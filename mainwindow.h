@@ -111,6 +111,7 @@ private slots:
     void createTabSparePartReserve(int);
     void createTabSettings();
     void createTabSalary();
+    void createTabReceptCartridge();
     bool closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);

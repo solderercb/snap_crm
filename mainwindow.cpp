@@ -5,6 +5,7 @@
 #include "bottoolbarwidget.h"
 #include "tabcommon.h"
 #include "tabrepairnew.h"
+#include "tabreceptcartridge.h"
 #include "tabrepairs.h"
 #include "tabrepair.h"
 #include "tabsale.h"
@@ -157,7 +158,7 @@ void MainWindow::createMenu()
 
     QAction *workshop_refill = new QAction(tr("Заправка"), this);
     workshop_menu->addAction(workshop_refill);
-    workshop_refill->setEnabled(false);
+    QObject::connect(workshop_refill,SIGNAL(triggered()),this,SLOT(createTabReceptCartridge()));
 
     QAction *workshop_price = new QAction(tr("Прайс-лист"), this);
     workshop_menu->addAction(workshop_price);
@@ -439,6 +440,20 @@ void MainWindow::createTabRepairNew()
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int,QWidget*)), this, SLOT(createTabRepairs(int,QWidget*)));
+    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
+    QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
+    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
+}
+
+void MainWindow::createTabReceptCartridge()
+{
+    if(!permissions->receptDevices)
+        return;
+
+    tabReceptCartridge *subwindow = tabReceptCartridge::getInstance(this);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+    ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
@@ -950,11 +965,12 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
 //    createTabSale(0);
-    createTabRepair(25541);
+//    createTabRepair(25541);
 //    createTabSale(16316);
 //    if (test_scheduler_counter < 375)
 //    {
 //        createTabRepairNew();
+        createTabReceptCartridge();
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
 //        createTabCashOperation(42268);

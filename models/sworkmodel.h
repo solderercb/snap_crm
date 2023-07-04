@@ -9,6 +9,7 @@ class SWorkModel : public SComRecord
 {
     Q_OBJECT
 public:
+    enum Type{Regular = 0, CartridgeRefill, CartridgeDrumReplace, CartridgeChipReplace, CartridgeBladeReplace};
     explicit SWorkModel(QObject *parent = nullptr);
     explicit SWorkModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
     int id();

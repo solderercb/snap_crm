@@ -9,6 +9,8 @@
 #include "sclientmodel.h"
 #include "ssaletablemodel.h"
 #include "srepairstatuslog.h"
+#include "scartridgerepairmodel.h"
+#include "scartridgematerialmodel.h"
 
 class SRepairModel : public SComRecord
 {
@@ -69,7 +71,7 @@ class SRepairModel : public SComRecord
     Q_PROPERTY(QString issuedMsg READ issuedMsg)
     Q_PROPERTY(bool smsInform READ smsInform)
     Q_PROPERTY(int invoice READ invoice)
-    Q_PROPERTY(int isCartridge READ cartridge)
+//    Q_PROPERTY(int isCartridge READ cartridge)
     Q_PROPERTY(bool termsControl READ termsControl)
 signals:
     void modelUpdated();
@@ -221,17 +223,20 @@ public:
     void setSmsInform(const bool);
     int invoice();
     void setInvoice(const int);
-    int cartridge();
-    void setCartridge(const int);
+    SCartridgeRepairModel* cartridge();
+    void setCartridge(SCartridgeRepairModel *model);
     bool termsControl();
     void setTermsControl(const bool);
     bool commit();
     bool lock(bool state = 1);
     bool isLock();
     void initDemo() override;
+    void initCartridgeRepairModel(const int id);
+    bool isNew();
 private:
     SClientModel *m_clientModel;
     SRepairStatusLog *m_repairStatusLog;
+    SCartridgeRepairModel *m_cartridgeRepair = nullptr;
     bool m_isHidden = 0;
     QString m_title;
     int m_clientId = 0;
@@ -314,6 +319,7 @@ private:
     QString realWorksCostStr();
     QString realPartsCostStr();
     QString warranty();
+    bool commitCartridge();
 };
 
 #endif // SREPAIRMODEL_H

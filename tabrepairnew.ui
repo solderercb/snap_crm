@@ -740,6 +740,12 @@
    <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
+   <class>SClientInputForm</class>
+   <extends>QWidget</extends>
+   <header location="global">widgets/sclientinputform.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets/slineedit.h</header>
@@ -763,12 +769,6 @@
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header location="global">widgets/sdoublespinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SClientInputForm</class>
-   <extends>QWidget</extends>
-   <header location="global">widgets/sclientinputform.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

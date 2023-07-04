@@ -75,6 +75,8 @@
                                                 "ON\n"\
                                                 "  (LENGTH(REPLACE(t1.`look_list`, ',', ''))-LENGTH(t1.`look_list`) <= enumerator.`number`+1));\n")\
                                                 .arg((device))
+#define QUERY_SEL_CARTRIDGE_CAT_ID          QString("SELECT `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 1 LIMIT 1;")
+#define QUERY_SEL_CARTRIDGE_MODELS(vendor)          QString("SELECT  `name`, `id`  FROM `cartridge_cards` WHERE `maker` = %1 AND `archive` = 0;").arg((vendor))
 
 #define QUERY_SEL_ADDITIONAL_FIELDS_TYPES(isRepair, id) QString(\
                                                 "SELECT\n"\
