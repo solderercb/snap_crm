@@ -12,7 +12,8 @@ public:
     enum OpOnItem { Nop = 0, Sale = 1, Reserve = 2, SaleReserved = 3, SaleRepair = 4, Unsale = 5, Free = 6, WriteOff = 7, CancelWriteOff = 8, UnsaleRepair = 9, ReserveRepair = 10 };
     enum QtyField { Count = 0, Sold = 1, Reserved = 2 };
     enum SaleMode {Store = 1, Repair = 2};
-    enum SaleOpColumns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColUser, ColRealization, ColRetPercent, ColState, ColNotes, ColItemId, ColInPrice, ColObjId, ColDealer, ColBuyer, ColCreated, ColWorkId, ColRecordType};
+    enum SaleOpColumns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColUser, ColRealization, ColRetPercent, ColState, ColNotes, ColItemId, ColInPrice, ColObjId, ColDealer, ColBuyer, ColCreated, ColWorkId, ColRecordType, ColWorkType};
+    Q_ENUM(SaleOpColumns)
     explicit SStoreItemModel(QObject *parent = nullptr);
     explicit SStoreItemModel(const QList<QStandardItem *> &record, const int qtyToSale = 0, QObject *parent = nullptr);
     ~SStoreItemModel();

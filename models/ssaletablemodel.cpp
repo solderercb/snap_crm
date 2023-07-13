@@ -120,6 +120,7 @@ Qt::ItemFlags SSaleTableModel::flags(const QModelIndex &index) const
 
 bool SSaleTableModel::insertRecord(int row, const QSqlRecord &record, const int recType)
 {
+    // Внимание! При изменении кол-ва полей в запросах нужно изменить enum SaleOpColumns или TODO: придумать более гибкий способ работы с полями
     Q_ASSERT_X(record.count() == columnCount(), "insertRecord()", "different column count");
     bool ret = 1;
     QList<QStandardItem*> rowData;
@@ -201,11 +202,13 @@ void SSaleTableModel::addCustomWork()
     QSqlRecord *customWork = new QSqlRecord();
     QSqlField *field;
     m_currentIndex = rowCount();
-    for(int i = 0; i < SStoreItemModel::SaleOpColumns::ColRecordType + 1; i++)
+
+    for(int i = 0; i < SStoreItemModel::staticMetaObject.enumerator(SStoreItemModel::staticMetaObject.indexOfEnumerator("SaleOpColumns")).keyCount(); i++)
     {
         field = new QSqlField("", QVariant::Int);
         switch(i)
         {
+
             case SStoreItemModel::SaleOpColumns::ColId: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColUID: field->setValue(""); break;
             case SStoreItemModel::SaleOpColumns::ColName: field->setValue(""); break;
@@ -229,6 +232,7 @@ void SSaleTableModel::addCustomWork()
             case SStoreItemModel::SaleOpColumns::ColCreated: field->setValue(QDateTime::currentDateTimeUtc()); break;
             case SStoreItemModel::SaleOpColumns::ColWorkId: field->setValue(0); break;
             case SStoreItemModel::SaleOpColumns::ColRecordType: field->setValue(RecordType::Work); break;
+            case SStoreItemModel::SaleOpColumns::ColWorkType: field->setValue(0); break;
         }
 
         customWork->append(*field);
@@ -436,7 +440,7 @@ void SSaleTableModel::store_markRowRemove(const int row, const int db_id)
 */
 int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
 {
-    int newState = SRepairSaleItemModel::EngineerBasket;
+    int newState;
     int recordType = index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
     QMap<int, int> *pendingRemoveList;
     if(recordType == RecordType::Work)   // сначала обрабатываем записи о товарах привязанных к удаляемой работе
@@ -450,6 +454,11 @@ int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
     }
     else
         pendingRemoveList = m_itemsPendingRemoveList;
+
+    if(m_repairType == RepairType::RegularRepair)
+        newState = SRepairSaleItemModel::EngineerBasket;
+    else
+        newState = SRepairSaleItemModel::Archive;
 
     if(m_editStrategy == OnManualSubmit && !index(row, SStoreItemModel::SaleOpColumns::ColObjId).data().toInt())
     {
@@ -842,6 +851,7 @@ bool SSaleTableModel::isRowMarkedRemove(const int row) const
 {
     int state = value(row, SStoreItemModel::SaleOpColumns::ColState).toInt();
     if((m_tableMode == SSaleTableModel::WorkshopSale && state == SRepairSaleItemModel::EngineerBasket) || \
+       (m_tableMode == SSaleTableModel::WorkshopSale && state == SRepairSaleItemModel::Archive) || \
        (m_tableMode == SSaleTableModel::StoreSale && state == SStoreSaleItemModel::Cancelled))
         return 1;
 
@@ -854,7 +864,10 @@ bool SSaleTableModel::repair_removeRows()
 
     if(ret && !m_itemsPendingRemoveList->isEmpty())
     {
-        ret = repair_removeItems();
+        if(m_repairType == RepairType::RegularRepair)
+            ret = repair_removeItems();
+        else
+            ret = cartridge_removeItems();
         m_currentIndex = m_itemsPendingRemoveList->firstKey() - 1;
     }
     if(ret && !m_worksPendingRemoveList->isEmpty())
@@ -914,6 +927,29 @@ bool SSaleTableModel::repair_removeWorks()
     {
         SWorkModel *itm = repair_work(i.key());
         nErr = itm->remove();
+        delete itm;
+
+#ifdef QT_DEBUG
+//    nErr = 0;    // для отладки режима удаления
+#endif
+
+        if(!nErr)
+            throw 1;
+    }
+
+    return nErr;
+}
+
+bool SSaleTableModel::cartridge_removeItems()
+{
+    bool nErr = 1;
+
+    QMap<int, int>::const_iterator i;
+    for (i = m_itemsPendingRemoveList->constBegin(); i != m_itemsPendingRemoveList->constEnd() && nErr; ++i)
+    {
+        SRepairSaleItemModel *itm = repair_item(i.key());
+        nErr = itm->unlinkRepair();
+        nErr = itm->free();
         delete itm;
 
 #ifdef QT_DEBUG
@@ -1142,13 +1178,13 @@ void SSaleTableModel::indexSelected(const QModelIndex &index)
  */
 void SSaleTableModel::setHorizontalHeaderLabels()
 {
-    QStringList labels = {"",tr("UID"),tr("Наименование"),tr("Кол-во"),tr("Доступно"),tr("Цена"),tr("Сумма"),tr("Место"),tr("Серийный номер"),tr("Гарантия"),tr("Сотрудник")};
-    QStandardItemModel::setHorizontalHeaderLabels(m_fieldsDep);
-    for(int i = 0; i < labels.count(); i++)
+    QStringList m_fieldsDep;
+    QMetaEnum e = SStoreItemModel::staticMetaObject.enumerator(SStoreItemModel::staticMetaObject.indexOfEnumerator("SaleOpColumns"));
+    for(int i = 0; i < e.keyCount(); i++)
     {
-        Q_ASSERT_X(horizontalHeaderItem(i)->text() == m_fieldsDep.at(i), "SSaleTableModel::setHorizontalHeaderLabels()", "fields dependencies");
+        m_fieldsDep.append(e.key(i));
     }
-    QStandardItemModel::setHorizontalHeaderLabels(labels);
+    QStandardItemModel::setHorizontalHeaderLabels(m_fieldsDep);
 }
 
 /* Сумма всех товаров
@@ -1214,17 +1250,13 @@ int SSaleTableModel::modelState()
 
 /* В этом слоте происходит копирование данных из QSqlQueryModel в QStandardItemModel
  * Для сохранённых данных будет достаточно вызвать метод this->setQuery()
- *
  */
 void SSaleTableModel::sqlDataChanged()
 {
     clear();
     setHorizontalHeaderLabels();
     setRowCount(m_queryData->rowCount());
-    setColumnCount(m_queryData->columnCount());
     m_itemsPendingRemoveList->clear();
-//    m_worksPendingRemoveList->clear();
-//    m_itemsPendingSplitList->clear();
     this->blockSignals(true);
     for(int i = 0; i < m_queryData->rowCount(); i++)
     {
@@ -1399,6 +1431,11 @@ QString SSaleTableModel::reportWarranty()
 QString SSaleTableModel::reportPerformer()
 {
     return index(m_reportRowNum, SStoreItemModel::SaleOpColumns::ColUser).data().toString();
+}
+
+void SSaleTableModel::setRepairType(bool type)
+{
+    m_repairType = type;
 }
 
 #ifdef QT_DEBUG

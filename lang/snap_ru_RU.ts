@@ -2721,95 +2721,45 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SSaleTableModel</name>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="305"/>
+        <location filename="../models/ssaletablemodel.cpp" line="309"/>
         <source>Повтор</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="306"/>
+        <location filename="../models/ssaletablemodel.cpp" line="310"/>
         <source>&quot;%1&quot; (UID %2) уже добавлен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="311"/>
+        <location filename="../models/ssaletablemodel.cpp" line="315"/>
         <source>Товар отсутствует</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="312"/>
+        <location filename="../models/ssaletablemodel.cpp" line="316"/>
         <source>Запрошенное кол-во товара &quot;%1&quot; (UID %2) не доступно для продажи</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="316"/>
-        <location filename="../models/ssaletablemodel.cpp" line="359"/>
+        <location filename="../models/ssaletablemodel.cpp" line="320"/>
+        <location filename="../models/ssaletablemodel.cpp" line="363"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="317"/>
-        <location filename="../models/ssaletablemodel.cpp" line="360"/>
+        <location filename="../models/ssaletablemodel.cpp" line="321"/>
+        <location filename="../models/ssaletablemodel.cpp" line="364"/>
         <source>Не выбрана работа. Укажите работу в которой была использована деталь</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="700"/>
+        <location filename="../models/ssaletablemodel.cpp" line="709"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="700"/>
+        <location filename="../models/ssaletablemodel.cpp" line="709"/>
         <source>Список работ и деталей сохранён</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>UID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Наименование</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Кол-во</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Доступно</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Цена</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Место</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Серийный номер</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Гарантия</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1145"/>
-        <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

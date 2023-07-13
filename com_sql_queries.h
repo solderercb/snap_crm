@@ -240,7 +240,7 @@
 #define QUERY_SEL_COMMENTS(field, id)           QString("SELECT `id`, `created`, `user`, `text` FROM `comments` WHERE `%1` = %2 ORDER BY `created` DESC,`id` DESC;").arg((field)).arg((id)), QSqlDatabase::database("connMain")
 
 #define QUERY_SEL_REPAIR_WORKS_AND_PARTS(id)    QString(\
-                                                "SELECT `id`, `UID`, `name`, `count`, `avail`, `price`, `summ`, `box`, `sn`, `warranty`, `user`, `is_realization`, `return_percent`, `state`, `notes`, `item_id`, `in_price`, `obj_id`, `dealer`, `buyer`, `created`, `work_id`, `is_item` FROM (\n"\
+                                                "SELECT `id`, `UID`, `name`, `count`, `avail`, `price`, `summ`, `box`, `sn`, `warranty`, `user`, `is_realization`, `return_percent`, `state`, `notes`, `item_id`, `in_price`, `obj_id`, `dealer`, `buyer`, `created`, `work_id`, `is_item`, `work_type` FROM (\n"\
                                                 "SELECT\n"\
                                                 "  t1.`id`,\n"\
                                                 "  t1.`price_id` AS 'UID',\n"\
@@ -265,7 +265,8 @@
                                                 "  NULL AS 'created',\n"\
                                                 "  `id` AS 'work_id',\n"\
                                                 "  0 AS 'item_rsrv_id',\n"\
-                                                "  0 AS 'is_item'\n"\
+                                                "  0 AS 'is_item',\n"\
+                                                "  t1.`type` AS 'work_type'\n"\
                                                 "FROM\n"\
                                                 "  `works` AS t1\n"\
                                                 "WHERE\n"\
@@ -295,7 +296,8 @@
                                                 "  t2.`created`,\n"\
                                                 "  t2.`work_id`,\n"\
                                                 "  t2.`id`,\n"\
-                                                "  1\n"\
+                                                "  1,\n"\
+                                                "  NULL\n"\
                                                 "FROM\n"\
                                                 "  `store_int_reserve` AS t2\n"\
                                                 "  LEFT JOIN\n"\
@@ -341,7 +343,8 @@
                                                         "	t1.`customer_id` AS 'buyer',\n"\
                                                         "	NULL AS 'created',\n"\
                                                         "	NULL AS 'work_id',\n"\
-                                                        "	1 AS 'is_item'\n"\
+                                                        "	1 AS 'is_item',\n"\
+                                                        "	NULL AS 'work_type'\n"\
                                                         "FROM\n"\
                                                         "	store_sales AS t1 LEFT JOIN\n"\
                                                         "	store_items AS t2\n"\
@@ -374,7 +377,8 @@
                                                         "  t1.`customer_id` AS 'buyer',\n"\
                                                         "  NULL AS 'created',\n"\
                                                         "  NULL AS 'work_id',\n"\
-                                                        "	1 AS 'is_item'\n"\
+                                                        "  1 AS 'is_item',\n"\
+                                                        "  NULL AS 'work_type'\n"\
                                                         "FROM\n"\
                                                         "  store_sales AS t1 LEFT JOIN\n"\
                                                         "  store_items AS t2\n"\
@@ -408,7 +412,8 @@
                                                         "  0 AS 'buyer',\n"\
                                                         "  NULL AS 'created',\n"\
                                                         "  NULL AS 'work_id',\n"\
-                                                        "  1 AS 'is_item'\n"\
+                                                        "  1 AS 'is_item',\n"\
+                                                        "  NULL AS 'work_type'\n"\
                                                         "FROM\n"\
                                                         "  store_items\n"\
                                                         "WHERE\n"\
@@ -440,7 +445,8 @@
                                                         "  0 AS 'buyer',\n"\
                                                         "  `created`,\n"\
                                                         "  NULL AS 'work_id',\n"\
-                                                        "  1 AS 'is_item'\n"\
+                                                        "  1 AS 'is_item',\n"\
+                                                        "  NULL AS 'work_type'\n"\
                                                         "FROM (\n"\
                                                         "  SELECT t1.`id`,  t1.`item_id`,  t1.`name`,  t1.`count`,  t1.`created`,  t1.`from_user`,  t1.`to_user`,  t1.`notes`,  t1.`state`,  t1.`repair_id`,  t1.`work_id`,  t1.`sn`,  t1.`warranty`, t2.`articul`, t2.`count` - t2.`reserved` + t1.`count` AS 'avail', t1.`price`, t2.`in_price`, t2.`document`, t2.`box`, t2.`is_realization`, t2.`return_percent`, t3.`dealer` FROM\n"\
                                                         "  store_int_reserve AS t1 \n"\

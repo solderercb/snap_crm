@@ -24,7 +24,7 @@ SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
     i_createdUtc = record.at(SStoreItemModel::SaleOpColumns::ColCreated)->data(Qt::DisplayRole).toDateTime();
 //    m_documentId = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
 //    m_isPay = record.at(SStoreItemModel::SaleOpColumns::)->data(Qt::DisplayRole).toBool();
-//    m_type = record.at(SStoreItemModel::SaleOpColumns::Col)->data(Qt::DisplayRole).toInt();
+    m_type = record.at(SStoreItemModel::SaleOpColumns::ColWorkType)->data(Qt::DisplayRole).toInt();
     i_logRecord->setRepairId(m_repair);
 
     if(!i_id)
@@ -260,6 +260,7 @@ void SWorkModel::setQueryField(const int fieldNum, const QVariant value, const Q
         case SStoreItemModel::ColWarranty: setWarranty(value.toInt(), oldValue); break;
         case SStoreItemModel::ColItemId: setPriceId(value.toInt()); break;
         case SStoreItemModel::ColCreated: setCreated(value.toDateTime()); break;
+        case SStoreItemModel::ColWorkType: setType(value.toInt()); break;
     }
 }
 

@@ -150,7 +150,7 @@ void SPhone::updateButtons()
 {
     ui->pushButtonAddPhone->setVisible(!m_isReadOnly);
     ui->pushButtonDelPhone->setVisible(!m_isPrimary & !m_isReadOnly);
-    ui->pushButtonEditPhone->setVisible(m_isReadOnly & !m_notEditable & permissions->editClients);
+    ui->pushButtonEditPhone->setVisible(m_isReadOnly & !m_notEditable && permissions->editClients);
 }
 
 int SPhone::maskIndex()

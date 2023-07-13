@@ -10,6 +10,7 @@
 #include <QSqlRecord>
 #include <QSqlField>
 #include <QMap>
+#include <QMetaEnum>
 #ifdef QT_DEBUG
 #include <QRandomGenerator>
 #endif
@@ -42,6 +43,7 @@ public:
     enum DataRoles {OldValue = SComRecord::DataRoles::OldValue, Changed = SComRecord::DataRoles::Changed, State, RecordType};
     enum RecordType {Work = 0, Item = 1};
     enum TablesSet {StoreSale = 0, WorkshopSale = 1};
+    enum RepairType {RegularRepair = 0, CartridgeRepair};
     enum EditStrategy {OnFieldChange = 0, OnRowChange = 1, OnManualSubmit = 2, Nop = 0x55AA};
     explicit SSaleTableModel(QObject *parent = nullptr);
     ~SSaleTableModel();
@@ -94,6 +96,7 @@ public:
     bool repair_removeRows();
     bool repair_removeItems();
     bool repair_removeWorks();
+    bool cartridge_removeItems();
     void sale();
     int itemsAffected();
     void store_markAllItemsToRemove(StoreOpType);
@@ -118,10 +121,12 @@ public:
     QString reportSN();
     QString reportWarranty();
     QString reportPerformer();
+    void setRepairType(bool type);
 #ifdef QT_DEBUG
     void dbgAddRandomItem();
     void dbgAddRandomItemBasket();
 #endif
+
 
 signals:
     void tableDataChanged();
@@ -141,6 +146,7 @@ private:
     int m_priceIndex = 1; // по умолчанию "Цена розница" ("`price2`")
     QString m_extraUnsaleReason;
     bool m_tableMode = TablesSet::StoreSale;
+    bool m_repairType = RepairType::RegularRepair;
     int m_editStrategy = EditStrategy::OnFieldChange;
     double m_amountItems = 0, m_amountWorks = 0, m_amountTotal = 0;
     int m_currentIndex = -1;
@@ -150,7 +156,7 @@ private:
     QList<QStandardItem *> row(int) const;
 
     // названия столбцов по-умолчанию; подробнее см. в комментарии к методу SaleTableModel::setHorizontalHeaderLabels
-    QStringList m_fieldsDep = {"id", "UID", "name", "count", "avail", "price", "summ", "box", "sn", "warranty", "user", "is_realization", "return_percent", "state", "notes", "item_id", "in_price", "obj_id", "dealer", "buyer", "created", "work_id", "is_item"};
+//    QStringList m_fieldsDep = {"id", "UID", "name", "count", "avail", "price", "summ", "box", "sn", "warranty", "user", "is_realization", "return_percent", "state", "notes", "item_id", "in_price", "obj_id", "dealer", "buyer", "created", "work_id", "is_item", "work_type"};
     int m_hiddenColumns = 0x000FF810;
     int getItemInsertionRow();
     int getParentWorkRow(const int itemRow);
