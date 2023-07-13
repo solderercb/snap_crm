@@ -90,6 +90,7 @@ public slots:
     void createTabRepairs(int type = 0, QWidget *caller = nullptr);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
     void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
     void createTabRepair(int);
+    void createTabRepairCartridges(QList<int> *list);
     void createTabSale(int doc_id = 0);
     void createTabSparePart(int);
     void switchToLastUsedTab();

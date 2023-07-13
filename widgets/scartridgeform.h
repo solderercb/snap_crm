@@ -2,9 +2,11 @@
 #define SCARTRIDGEFORM_H
 
 #include <QWidget>
+#include "widgets/swidget.h"
 #include "models/srepairmodel.h"
 #include "models/scartridgecardmodel.h"
 #include "models/ssortfilterproxymodel.h"
+#include "models/sstoreitemmodel.h"
 
 namespace Ui {
 class SCartridgeForm;
@@ -15,8 +17,12 @@ class SCartridgeForm : public QFrame
     Q_OBJECT
 signals:
     void updateTotalPreagreedAmount();
+    void updateParentTab();
+    void createTabClient(int id);
+    void createTabRepair(int id);
 public:
-    explicit SCartridgeForm(const int repairId = 0, QWidget *parent = nullptr);
+    explicit SCartridgeForm(QWidget *parent = nullptr);
+    explicit SCartridgeForm(const int repairId, QWidget *parent = nullptr);
     ~SCartridgeForm();
     bool eventFilter(QObject *, QEvent *);
     SRepairModel *model();
@@ -52,8 +58,10 @@ public:
     void setPaymentSystemIndex(int paymentSystemIndex);
     double preargeedAmount();
     int checkInput();
+    int isReady();
 private:
     Ui::SCartridgeForm *ui;
+    SQueryLog *i_queryLog;
     SRepairModel *m_repairModel = nullptr;
     SCartridgeCardModel *m_cartridgeCard = nullptr;
     SSaleTableModel *worksAndPartsModel = nullptr;
@@ -74,25 +82,41 @@ private:
     bool m_isHighPriority = 0;
     int m_paymentSystemIndex = 0;
     double m_amount = 0;
+    bool worksCheckboxesEn = 1;
+    bool engineerComboBoxEn = 1;
+    bool placeComboBoxEn = 1;
+    bool m_groupUpdate = 0;
     void updateWidgets();
+    void updateStatesModel(const int statusId);
     bool checkData(const int);
     void doStateActions(const int);
     void updatePreagreedAmount(SCartridgeMaterialModel *material, const int state);
     void setDefaultStyleSheets();
+    bool setWidgetsParams(const int);
+    bool checkStateAcl(const int);
+    void setPricesToZero();
+    void setInformedStatus(int);
+    void initEngineer();
+    void updateComboBoxEngineer(const int id);
+    bool commit(const QString &notificationCaption = tr("Успешно"), const QString &notificationText = tr("Данные сохранены"));
+    bool addWorkAndPart(const int workType);
+    bool removeWorkAndPart(const int workType);
+    bool workAndPartHandler(const int workType, const int state);
 private slots:
     void updateTotalSumms(const double, const double, const double);
     void saveTotalSumms();
+    void updateLists();
     void setRefill(int);
     void setChipReplace(int);
     void setDrumReplace(int);
     void setBladeReplace(int);
-    void addRefillWorksAndParts(int);
-    void addChipWorksAndParts(int);
-    void addDrumWorksAndParts(int);
-    void addBladeWorksAndParts(int);
     void comboBoxPlaceButtonClickHandler(int);
+    void comboBoxEngineerChanged(int);
     void saveState(int);
     void removeWidget();
+    void buttonClientCardClicked();
+    void buttonClassicTabClicked();
+    void buttonCartridgeCardClicked();
 };
 
 #endif // SCARTRIDGEFORM_H

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1191</width>
+    <width>1223</width>
     <height>125</height>
    </rect>
   </property>
@@ -76,7 +76,7 @@
      <property name="lineWidth">
       <number>0</number>
      </property>
-     <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1,0,0,0" columnminimumwidth="23,400,0,400,23,23">
+     <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,1,0,0,0" columnminimumwidth="23,400,0,0,400,23,23">
       <property name="sizeConstraint">
        <enum>QLayout::SetMaximumSize</enum>
       </property>
@@ -95,10 +95,10 @@
       <property name="verticalSpacing">
        <number>0</number>
       </property>
-      <item row="0" column="5">
-       <widget class="QToolButton" name="toolButtonHelp">
+      <item row="0" column="6">
+       <widget class="QToolButton" name="toolButtonCartridgeCard">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
@@ -118,12 +118,90 @@
           <height>23</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Карточка картриджа</string>
+        </property>
         <property name="text">
          <string>...</string>
         </property>
         <property name="icon">
          <iconset resource="../styles/styles.qrc">
           <normaloff>:/icons/light/2753_32.png</normaloff>:/icons/light/2753_32.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="pushButtonClientCard">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Карточка клиента</string>
+        </property>
+        <property name="text">
+         <string>clientCard</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="labelTitle">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Title</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>212</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="5">
+       <widget class="QToolButton" name="toolButtonClassicTab">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+          <horstretch>1</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>23</width>
+          <height>23</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Классический ремонт</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../styles/styles.qrc">
+          <normaloff>:/icons/light/1F3E0_32.png</normaloff>:/icons/light/1F3E0_32.png</iconset>
         </property>
        </widget>
       </item>
@@ -147,6 +225,9 @@
           <height>23</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Удалить</string>
+        </property>
         <property name="text">
          <string>...</string>
         </property>
@@ -156,73 +237,36 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QPushButton" name="pushButtonClientCard">
-        <property name="text">
-         <string>clientCard</string>
+      <item row="1" column="0" colspan="7">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
       <item row="0" column="2">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>212</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="4">
-       <widget class="QToolButton" name="toolButtonClassicRepairCard">
+       <widget class="QLabel" name="labelLimitReached">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-          <horstretch>1</horstretch>
-          <verstretch>1</verstretch>
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>23</width>
-          <height>23</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>23</width>
-          <height>23</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../styles/styles.qrc">
-          <normaloff>:/icons/light/1F3E0_32.png</normaloff>:/icons/light/1F3E0_32.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="labelTitle">
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
-        <property name="text">
-         <string>Title</string>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 175, 176);
+color: rgb(197, 255, 172);</string>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="6">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+        <property name="text">
+         <string>Превышен ресурс!</string>
+        </property>
+        <property name="margin">
+         <number>5</number>
         </property>
        </widget>
       </item>
@@ -230,187 +274,20 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0,0,0,0,0,0,0,1,1" columnminimumwidth="150,0,0,0,0,0,0,0,0,0,0,0">
-     <item row="0" column="3">
-      <widget class="QSplitter" name="splitterRefillWeight">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelRefillWeight">
-        <property name="text">
-         <string>Вес</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spinBoxRefillWeight">
-        <property name="minimumSize">
-         <size>
-          <width>51</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
-        </property>
-        <property name="maximum">
-         <number>99999</number>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="0" column="4">
-      <widget class="QSplitter" name="splitterPreagreedDrumReplace">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelPreagreedDrumReplace">
-        <property name="text">
-         <string>Фотовал</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxPreagreedDrumReplace">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="0" column="5">
-      <widget class="QSplitter" name="splitterPreagreedChipReplace">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelPreagreedChipReplace">
-        <property name="text">
-         <string>Чип</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxPreagreedChipReplace">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="0" column="6">
-      <widget class="QSplitter" name="splitterPreagreedBladeReplace">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelPreagreedBladeReplace">
-        <property name="text">
-         <string>Ракель</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxPreagreedBladeReplace">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="0" column="7">
-      <widget class="QSplitter" name="splitterComment">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelComment">
-        <property name="text">
-         <string>Примечание</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="lineEditComment">
-        <property name="minimumSize">
-         <size>
-          <width>160</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="0" column="8">
-      <widget class="QSplitter" name="splitterWasEarly">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelWasEarly">
-        <property name="text">
-         <string>История</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBoxWasEarly">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="0" column="9">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QSplitter" name="splitterPreagreedAmount">
-         <property name="minimumSize">
-          <size>
-           <width>60</width>
-           <height>0</height>
-          </size>
-         </property>
+    <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1,1" columnminimumwidth="750,0,0">
+     <item row="0" column="0" rowspan="2">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QSplitter" name="splitterSerial">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QLabel" name="labelPreagreedAmount">
+         <widget class="QLabel" name="labelSerial">
           <property name="text">
-           <string>Цена</string>
+           <string>Серийный номер</string>
           </property>
          </widget>
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxPreagreedAmount">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSplitter" name="splitterPlace">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <widget class="QLabel" name="labelPlace">
-          <property name="text">
-           <string>Ячейка</string>
-          </property>
-         </widget>
-         <widget class="SComboBox" name="comboBoxPlace">
+         <widget class="QLineEdit" name="lineEditSerial">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -426,22 +303,452 @@
          </widget>
         </widget>
        </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
+       <item row="0" column="1" colspan="2">
+        <widget class="QSplitter" name="splitterPreagreedRefill">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
+         <widget class="QLabel" name="labelPreagreedRefill">
+          <property name="text">
+           <string>Заправка</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxPreagreedRefill">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QSplitter" name="splitterRefillWeight">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-        </spacer>
+         <widget class="QLabel" name="labelRefillWeight">
+          <property name="text">
+           <string>Вес</string>
+          </property>
+         </widget>
+         <widget class="QSpinBox" name="spinBoxRefillWeight">
+          <property name="minimumSize">
+           <size>
+            <width>51</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>99999</number>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QSplitter" name="splitterPreagreedDrumReplace">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelPreagreedDrumReplace">
+          <property name="text">
+           <string>Фотовал</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxPreagreedDrumReplace">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="0" column="5">
+        <widget class="QSplitter" name="splitterPreagreedChipReplace">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelPreagreedChipReplace">
+          <property name="text">
+           <string>Чип</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxPreagreedChipReplace">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QSplitter" name="splitterPreagreedBladeReplace">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelPreagreedBladeReplace">
+          <property name="text">
+           <string>Ракель</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxPreagreedBladeReplace">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="0" column="7">
+        <widget class="QSplitter" name="splitterComment">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelComment">
+          <property name="text">
+           <string>Примечание</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lineEditComment">
+          <property name="minimumSize">
+           <size>
+            <width>160</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="0" column="8">
+        <widget class="QSplitter" name="splitterWasEarly">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelWasEarly">
+          <property name="text">
+           <string>История</string>
+          </property>
+         </widget>
+         <widget class="QComboBox" name="comboBoxWasEarly">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="0" column="9">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QSplitter" name="splitterPreagreedAmount">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <widget class="QLabel" name="labelPreagreedAmount">
+            <property name="text">
+             <string>Цена</string>
+            </property>
+           </widget>
+           <widget class="SDoubleSpinBox" name="doubleSpinBoxPreagreedAmount">
+            <property name="minimumSize">
+             <size>
+              <width>40</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::NoButtons</enum>
+            </property>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSplitter" name="splitterPlace">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <widget class="QLabel" name="labelPlace">
+            <property name="text">
+             <string>Ячейка</string>
+            </property>
+           </widget>
+           <widget class="SComboBox" name="comboBoxPlace">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QSplitter" name="splitterEngineer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelEngineer">
+          <property name="text">
+           <string>Ответственный инженер</string>
+          </property>
+         </widget>
+         <widget class="QComboBox" name="comboBoxEngineer">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="QSplitter" name="splitterRefill">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelRefill">
+          <property name="text">
+           <string>Заправка</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxRefill">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QSplitter" name="splitterRealRefillWeight">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelRealRefillWeight">
+          <property name="text">
+           <string>Вес (факт.)</string>
+          </property>
+         </widget>
+         <widget class="QSpinBox" name="spinBoxRealRefillWeight">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>51</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::NoButtons</enum>
+          </property>
+          <property name="maximum">
+           <number>99999</number>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="4">
+        <widget class="QSplitter" name="splitterDrumReplace">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelDrumReplace">
+          <property name="text">
+           <string>Фотовал</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxDrumReplace">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="5">
+        <widget class="QSplitter" name="splitterChipReplace">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelChipReplace">
+          <property name="text">
+           <string>Чип</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxChipReplace">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="6">
+        <widget class="QSplitter" name="splitterBladeReplace">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QLabel" name="labelBladeReplace">
+          <property name="text">
+           <string>Ракель</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBoxBladeReplace">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="9">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QSplitter" name="splitterState">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <widget class="QLabel" name="labelState">
+            <property name="text">
+             <string>Статус</string>
+            </property>
+           </widget>
+           <widget class="QComboBox" name="comboBoxState">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSplitter" name="splitterTotalAmount">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <widget class="QLabel" name="labelTotalAmount">
+            <property name="text">
+             <string>Стоимость ремонта</string>
+            </property>
+           </widget>
+           <widget class="SDoubleSpinBox" name="doubleSpinBoxTotalAmount">
+            <property name="minimumSize">
+             <size>
+              <width>40</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::NoButtons</enum>
+            </property>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
-     <item row="0" column="10" rowspan="2">
+     <item row="0" column="1" rowspan="2">
       <widget class="QListWidget" name="listWidgetWorks">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
@@ -451,7 +758,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="11" rowspan="2">
+     <item row="0" column="2" rowspan="2">
       <widget class="QListWidget" name="listWidgetParts">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
@@ -459,265 +766,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QSplitter" name="splitterEngineer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelEngineer">
-        <property name="text">
-         <string>Ответственный инженер</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBoxEngineer">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QSplitter" name="splitterRealRefillWeight">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelRealRefillWeight">
-        <property name="text">
-         <string>Вес (факт.)</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spinBoxRealRefillWeight">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>51</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
-        </property>
-        <property name="maximum">
-         <number>99999</number>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QSplitter" name="splitterDrumReplace">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelDrumReplace">
-        <property name="text">
-         <string>Фотовал</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxDrumReplace">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="1" column="5">
-      <widget class="QSplitter" name="splitterChipReplace">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelChipReplace">
-        <property name="text">
-         <string>Чип</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxChipReplace">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="1" column="6">
-      <widget class="QSplitter" name="splitterBladeReplace">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelBladeReplace">
-        <property name="text">
-         <string>Ракель</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxBladeReplace">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="1" column="9">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QSplitter" name="splitterState">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <widget class="QLabel" name="labelState">
-          <property name="text">
-           <string>Статус</string>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="comboBoxState">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSplitter" name="splitterTotalAmount">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <widget class="QLabel" name="labelTotalAmount">
-          <property name="text">
-           <string>Стоимость ремонта</string>
-          </property>
-         </widget>
-         <widget class="SDoubleSpinBox" name="doubleSpinBoxTotalAmount">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::NoButtons</enum>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="0">
-      <widget class="QSplitter" name="splitterSerial">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelSerial">
-        <property name="text">
-         <string>Серийный номер</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="lineEditSerial">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="2">
-      <widget class="QSplitter" name="splitterRefill">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelRefill">
-        <property name="text">
-         <string>Заправка</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxRefill">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item row="0" column="1" colspan="2">
-      <widget class="QSplitter" name="splitterPreagreedRefill">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QLabel" name="labelPreagreedRefill">
-        <property name="text">
-         <string>Заправка</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="checkBoxPreagreedRefill">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-       </widget>
       </widget>
      </item>
     </layout>
@@ -736,6 +784,32 @@
    <header location="global">widgets/sdoublespinbox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lineEditSerial</tabstop>
+  <tabstop>checkBoxPreagreedRefill</tabstop>
+  <tabstop>checkBoxPreagreedDrumReplace</tabstop>
+  <tabstop>checkBoxPreagreedChipReplace</tabstop>
+  <tabstop>checkBoxPreagreedBladeReplace</tabstop>
+  <tabstop>lineEditComment</tabstop>
+  <tabstop>comboBoxWasEarly</tabstop>
+  <tabstop>comboBoxPlace</tabstop>
+  <tabstop>comboBoxEngineer</tabstop>
+  <tabstop>checkBoxRefill</tabstop>
+  <tabstop>spinBoxRealRefillWeight</tabstop>
+  <tabstop>checkBoxDrumReplace</tabstop>
+  <tabstop>checkBoxChipReplace</tabstop>
+  <tabstop>checkBoxBladeReplace</tabstop>
+  <tabstop>comboBoxState</tabstop>
+  <tabstop>pushButtonClientCard</tabstop>
+  <tabstop>toolButtonClassicTab</tabstop>
+  <tabstop>toolButtonCartridgeCard</tabstop>
+  <tabstop>toolButtonRemove</tabstop>
+  <tabstop>spinBoxRefillWeight</tabstop>
+  <tabstop>doubleSpinBoxPreagreedAmount</tabstop>
+  <tabstop>doubleSpinBoxTotalAmount</tabstop>
+  <tabstop>listWidgetWorks</tabstop>
+  <tabstop>listWidgetParts</tabstop>
+ </tabstops>
  <resources>
   <include location="../styles/styles.qrc"/>
  </resources>

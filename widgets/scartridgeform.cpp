@@ -1,7 +1,7 @@
 #include "scartridgeform.h"
 #include "ui_scartridgeform.h"
 
-SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
+SCartridgeForm::SCartridgeForm(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::SCartridgeForm)
 {
@@ -9,6 +9,11 @@ SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
 
 //    ui->frameHeader->setStyleSheet("QFrame::hover {background-color: rgb(205,230,247);}");    // подсветка заголовка
     installEventFilter(this);
+}
+
+SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
+    SCartridgeForm(parent)
+{
     m_repairId = repairId;
 }
 
@@ -20,6 +25,7 @@ void SCartridgeForm::initModels()
         m_repairModel = new SRepairModel();
         m_repairModel->load(m_repairId);
         m_cardId = m_repairModel->cartridge()->cardId();
+        m_clientId = m_repairModel->clientId();
         statusesProxyModel = new SSortFilterProxyModel;
         statusesProxyModel->setSourceModel(statusesModel);
         statusesProxyModel->setFilterKeyColumn(Global::RepStateHeaders::Id);
@@ -30,7 +36,10 @@ void SCartridgeForm::initModels()
         worksAndPartsModel->setPriceColumn(0);
         connect(worksAndPartsModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
         connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
+        connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);
         worksAndPartsModel->repair_loadTable(m_repairModel->id());
+        worksAndPartsModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
+        worksAndPartsModel->setRepairType(SSaleTableModel::CartridgeRepair);
     }
 
     m_cartridgeCard->load(m_cardId);
@@ -43,33 +52,43 @@ void SCartridgeForm::initWidgets()
     ui->comboBoxWasEarly->setCurrentIndex(-1);
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxPlace->setCurrentIndex(-1);
+    ui->labelLimitReached->hide();  // TODO: определение превышения по кол-ву заправок
     connect(ui->toolButtonRemove, &QToolButton::clicked, this, &SCartridgeForm::removeWidget);
 
     if(m_repairId)
     {
-        ui->labelTitle->setText(m_repairModel->title());
+        ui->labelTitle->setText(QString("%1 [%2]").arg(m_repairModel->id()).arg(m_repairModel->title()));
+
+        SClientModel *client = new SClientModel(m_repairModel->clientId());
+        ui->pushButtonClientCard->setText(client->fullLongName());
+        delete client;  // TODO: модель нужна только для получения ФИО; подумать над более оптимальным способом.
+
         ui->splitterComment->hide();
         ui->splitterWasEarly->hide();
         ui->lineEditSerial->setText(m_repairModel->serialNumber());
         ui->lineEditSerial->setReadOnly(true);
         ui->checkBoxPreagreedRefill->setChecked(m_repairModel->cartridge()->refill());
-        ui->checkBoxPreagreedRefill->setCheckable(false);   // сработает?
+        ui->checkBoxPreagreedRefill->installEventFilter(this);
         ui->checkBoxPreagreedChipReplace->setChecked(m_repairModel->cartridge()->chip());
-        ui->checkBoxPreagreedChipReplace->setCheckable(false);
+        ui->checkBoxPreagreedChipReplace->installEventFilter(this);
         ui->checkBoxPreagreedDrumReplace->setChecked(m_repairModel->cartridge()->drum());
-        ui->checkBoxPreagreedDrumReplace->setCheckable(false);
+        ui->checkBoxPreagreedDrumReplace->installEventFilter(this);
         ui->checkBoxPreagreedBladeReplace->setChecked(m_repairModel->cartridge()->Blade());
-        ui->checkBoxPreagreedBladeReplace->setCheckable(false);
+        ui->checkBoxPreagreedBladeReplace->installEventFilter(this);
         ui->spinBoxRefillWeight->setValue(m_cartridgeCard->tonerWeight());
         ui->doubleSpinBoxPreagreedAmount->setValue(m_repairModel->preAgreedAmount());
-        ui->comboBoxEngineer->setCurrentIndex(m_repairModel->engineerIndex());
+        ui->comboBoxEngineer->setModel(engineersModel);
+        updateComboBoxEngineer(m_repairModel->engineer());
+        connect(ui->comboBoxEngineer, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::comboBoxEngineerChanged);
         ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isRepeat()?1:-1);
         ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isWarranty()?0:-1);
         ui->comboBoxWasEarly->setEnabled(false);
 
         ui->comboBoxState->setModel(statusesProxyModel);
-        ui->comboBoxState->setCurrentIndex(m_repairModel->stateIndex());
-        connect(ui->comboBoxState, SIGNAL(currentIndexChanged()), this, SLOT(saveState()));
+        updateStatesModel(m_repairModel->state());
+        setWidgetsParams(m_repairModel->state());
+        updateWidgets();
+        connect(ui->comboBoxState, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::saveState);
 
         ui->doubleSpinBoxTotalAmount->setValue(m_repairModel->realRepairCost());
 
@@ -77,16 +96,19 @@ void SCartridgeForm::initWidgets()
         ui->comboBoxPlace->setButtons("Apply");
         connect(ui->comboBoxPlace, &SComboBox::buttonClicked, this, &SCartridgeForm::comboBoxPlaceButtonClickHandler);
 
-        connect(ui->checkBoxRefill, &QCheckBox::stateChanged, this, &SCartridgeForm::addRefillWorksAndParts);
-        connect(ui->checkBoxChipReplace, &QCheckBox::stateChanged, this, &SCartridgeForm::addChipWorksAndParts);
-        connect(ui->checkBoxDrumReplace, &QCheckBox::stateChanged, this, &SCartridgeForm::addDrumWorksAndParts);
-        connect(ui->checkBoxBladeReplace, &QCheckBox::stateChanged, this, &SCartridgeForm::addBladeWorksAndParts);
+        ui->checkBoxRefill->installEventFilter(this);
+        ui->checkBoxChipReplace->installEventFilter(this);
+        ui->checkBoxDrumReplace->installEventFilter(this);
+        ui->checkBoxBladeReplace->installEventFilter(this);
+        connect(ui->pushButtonClientCard, &QPushButton::clicked, this, &SCartridgeForm::buttonClientCardClicked);
+        connect(ui->toolButtonClassicTab, &QPushButton::clicked, this, &SCartridgeForm::buttonClassicTabClicked);
+        connect(ui->toolButtonCartridgeCard, &QPushButton::clicked, this, &SCartridgeForm::buttonCartridgeCardClicked);
     }
     else
     {
         ui->pushButtonClientCard->hide();
-        ui->toolButtonClassicRepairCard->hide();
-        ui->toolButtonHelp->hide();
+        ui->toolButtonClassicTab->hide();
+        ui->toolButtonCartridgeCard->hide();
         ui->splitterRefillWeight->hide();
         ui->splitterRefill->hide();
         ui->splitterRealRefillWeight->hide();
@@ -128,6 +150,31 @@ bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
     // TODO: выделение виджета (фокус):
     // QEvent::MouseButtonPress
     // любое взаимодействие с дочерними виджетами
+
+    QCheckBox *checkBox = dynamic_cast<QCheckBox*>(watched);
+    if(checkBox)
+    {
+        if(event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
+        {
+            if( checkBox == ui->checkBoxPreagreedRefill ||
+                checkBox == ui->checkBoxPreagreedChipReplace ||
+                checkBox == ui->checkBoxPreagreedDrumReplace ||
+                checkBox == ui->checkBoxPreagreedBladeReplace )
+                return true;
+
+            int ret;
+            int nSt = checkBox->checkState()?0:2;
+            if(checkBox == ui->checkBoxRefill)
+                ret = !workAndPartHandler(SWorkModel::Type::CartridgeRefill, nSt);
+            else if(checkBox == ui->checkBoxChipReplace)
+                ret = !workAndPartHandler(SWorkModel::Type::CartridgeChipReplace, nSt);
+            else if(checkBox == ui->checkBoxDrumReplace)
+                ret = !workAndPartHandler(SWorkModel::Type::CartridgeDrumReplace, nSt);
+            else if(checkBox == ui->checkBoxBladeReplace)
+                ret = !workAndPartHandler(SWorkModel::Type::CartridgeBladeReplace, nSt);
+            return nSt?1:ret; // при добавлении работ нужно фильтровать событие, а при удалении нет
+        }
+    }
 
     return false;
 }
@@ -354,14 +401,39 @@ double SCartridgeForm::preargeedAmount()
     return m_amount;
 }
 
-bool SCartridgeForm::checkData(const int)
+bool SCartridgeForm::checkData(const int stateId)
 {
-
+    setDefaultStyleSheets();
+    if(stateId == Global::RepStateIds::Ready || stateId == Global::RepStateIds::ReadyNoRepair)
+    {
+        if(worksAndPartsModel->amountTotal() == 0)
+        {
+            ui->doubleSpinBoxTotalAmount->setStyleSheet(commonSpinBoxStyleSheetRed);
+            throw 2;
+        }
+    }
 }
 
-void SCartridgeForm::doStateActions(const int)
+void SCartridgeForm::doStateActions(const int stateId)
 {
+    QStringList stateActions = statusesProxyModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Actions).toString().split('|');
 
+    // подробное описание см. в методе tabRepair::doStateActions()
+    if(stateId == Global::RepStateIds::InWork)
+    {
+        stateActions << QString::number(Global::RepStateActions::SetEngineer);
+    }
+
+    // TODO: этот код скопирован из метода tabRepair::doStateActions(), его нужно вынести куда-то в общий доступ
+    for(const QString &action : qAsConst(stateActions))
+        switch (action.toInt())
+        {
+            case Global::RepStateActions::NoPayDiag: setPricesToZero(); break;
+            case Global::RepStateActions::ResetInformedStatus: setInformedStatus(0); break;
+            case Global::RepStateActions::SetEngineer: initEngineer(); break;
+            case Global::RepStateActions::InformManager:; break;
+            case Global::RepStateActions::InformEngineer:; break;
+        }
 }
 
 void SCartridgeForm::updatePreagreedAmount(SCartridgeMaterialModel *material, const int state)
@@ -381,6 +453,220 @@ void SCartridgeForm::updatePreagreedAmount(SCartridgeMaterialModel *material, co
 void SCartridgeForm::setDefaultStyleSheets()
 {
     ui->lineEditSerial->setStyleSheet(commonLineEditStyleSheet);
+}
+
+bool SCartridgeForm::setWidgetsParams(const int stateId)
+{
+    worksCheckboxesEn = 0;
+    engineerComboBoxEn = 0;
+    placeComboBoxEn = 0;
+
+    switch(stateId)
+    {
+        case Global::RepStateIds::GetIn: engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
+        case Global::RepStateIds::InWork: worksCheckboxesEn = 1; engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
+        case Global::RepStateIds::Ready:
+        case Global::RepStateIds::ReadyNoRepair: engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
+        default: ;
+    }
+}
+
+bool SCartridgeForm::checkStateAcl(const int stateId)
+{
+    const QString allowedForRoles = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Roles).toString();
+    if(userDbData->roles.contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+void SCartridgeForm::setPricesToZero()
+{
+//    tableWorksParts->setPricesToZero();
+    m_repairModel->setRepairCost(0);
+}
+
+void SCartridgeForm::setInformedStatus(int status)
+{
+    if(m_repairModel->informedStatusIndex())
+        return;
+
+    m_repairModel->setInformedStatusIndex(status);
+
+    if(m_groupUpdate)
+        return;
+
+    commit(tr("Успешно"), tr("Статус информирования клиента обновлён"));
+}
+
+void SCartridgeForm::initEngineer()
+{
+    if(m_repairModel->engineer())
+        return;
+
+    m_repairModel->setEngineer(userDbData->id);
+}
+
+void SCartridgeForm::updateComboBoxEngineer(const int id)
+{
+    ui->comboBoxEngineer->blockSignals(true);
+    ui->comboBoxEngineer->setCurrentIndex(-1);
+    ui->comboBoxEngineer->setPlaceholderText(usersModel->getDisplayRole(id));
+    ui->comboBoxEngineer->blockSignals(false);
+}
+
+void SCartridgeForm::updateLists()
+{
+    QString recName;
+    QString recSumm;
+    int itemId = 0;
+    int workType;
+    int recType;
+    QListWidget *list;
+    QListWidgetItem *listItem;
+
+    ui->listWidgetWorks->clear();
+    ui->listWidgetParts->clear();
+
+    for(int i = 0; i < worksAndPartsModel->rowCount(); i++)
+    {
+        recType = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
+        recName = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColName).data().toString();
+        recSumm = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColSumm).data().toString();
+        listItem = new QListWidgetItem(QString("%1 %2%3").arg(recName).arg(recSumm).arg(sysLocale.currencySymbol()));    // TODO: мультивалютность
+        if(recType == SSaleTableModel::RecordType::Work)
+        {
+            list = ui->listWidgetWorks;
+            workType = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
+            switch(workType)
+            {
+                case SWorkModel::Type::CartridgeRefill: ui->checkBoxRefill->setChecked(true); break;
+                case SWorkModel::Type::CartridgeDrumReplace: ui->checkBoxDrumReplace->setChecked(true); break;
+                case SWorkModel::Type::CartridgeChipReplace: ui->checkBoxChipReplace->setChecked(true); break;
+                case SWorkModel::Type::CartridgeBladeReplace: ui->checkBoxBladeReplace->setChecked(true); break;
+            }
+        }
+        else
+        {
+            list = ui->listWidgetParts;
+            itemId = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt();
+            listItem->setData(Qt::UserRole, itemId);    // для открытия карточки товара при двойном клике
+        }
+
+        list->addItem(listItem);
+    }
+}
+
+bool SCartridgeForm::commit(const QString &notificationCaption, const QString &notificationText)
+{
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    i_queryLog = new SQueryLog();
+    bool nErr = 1;
+    try
+    {
+        QUERY_LOG_START(metaObject()->className());
+        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        m_repairModel->updateLastSave();
+        nErr = m_repairModel->commit();
+        shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
+        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_LOG_STOP;
+    }
+    catch (int type)
+    {
+        nErr = 0;
+        if(type == 0)
+        {
+            QString err = "DEBUG ROLLBACK";
+            QUERY_ROLLBACK_MSG(query, err);
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query, nErr);
+        return 0;
+    }
+    return 1;
+}
+
+// Добавление работы и товара.
+// Возвращает 0 в случае ошибки.
+bool SCartridgeForm::addWorkAndPart(const int workType)
+{
+    int rowWork = worksAndPartsModel->rowCount();
+    int rowItem = -1;
+    int itemId = 0;
+    int materialType = 0;
+    QString workName;
+    SCartridgeMaterialModel *material;
+    QSqlQuery query(QSqlDatabase::database("connThird"));
+
+    switch(workType)
+    {
+        case SWorkModel::Type::CartridgeRefill: workName = tr("Заправка"); materialType = SCartridgeMaterialModel::Toner; break;
+        case SWorkModel::Type::CartridgeDrumReplace: workName = tr("Замена фотобарабана"); materialType = SCartridgeMaterialModel::Drum; break;
+        case SWorkModel::Type::CartridgeChipReplace: workName = tr("Замена чипа"); materialType = SCartridgeMaterialModel::Chip; break;
+        case SWorkModel::Type::CartridgeBladeReplace: workName = tr("Замена лезвия"); materialType = SCartridgeMaterialModel::Blade; break;
+    }
+
+    material =  m_cartridgeCard->material(materialType);
+    query.exec(QString("SELECT `id` FROM `store_items` WHERE `articul` = %1 AND `count` - `reserved` >= %2 ORDER BY `id` ASC LIMIT 1;").arg(material->articul()).arg(material->count()));
+    if(!query.first())
+    {
+        shortlivedNotification *newPopup = new shortlivedNotification(this,
+                                                                      tr("Ошибка"),
+                                                                      tr("Кол-во больше наличия, списание не возможно"),
+                                                                      QColor(255,164,119),
+                                                                      QColor(255,199,173));
+        return 0;
+    }
+
+    itemId = query.value(0).toInt();
+
+    worksAndPartsModel->addCustomWork();
+    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColName), workName);
+    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColCount), 1);
+    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColPrice), material->worksPrice());
+    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColWorkType), workType);
+//    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColSumm), material->worksPrice());
+
+    rowItem = worksAndPartsModel->rowCount();
+    worksAndPartsModel->addItemByUID(itemId, 1, material->count());
+#ifdef QT_DEBUG // в методе SSaleTableModel::insertRecord() для удобства отладки устанавливается случайное кол-во; здесь это не нужно
+    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColCount), material->count());
+#endif
+    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColPrice), material->price()/material->count());
+//    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColSumm), material->count()*material->worksPrice());
+
+    return worksAndPartsModel->repair_saveTablesStandalone();
+}
+
+bool SCartridgeForm::removeWorkAndPart(const int workType)
+{
+    int nErr = 1;
+    int row = 0;
+    for(; row < worksAndPartsModel->rowCount(); row++)
+    {
+        if(worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt() == workType)
+            break;
+    }
+    worksAndPartsModel->removeRowHandler(row, worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
+    nErr = worksAndPartsModel->repair_saveTablesStandalone();
+
+    return nErr;
+}
+
+bool SCartridgeForm::workAndPartHandler(const int workType, const int state)
+{
+    int ret;
+    if(state)
+    {
+        ret = addWorkAndPart(workType);
+    }
+    else
+    {
+        ret = removeWorkAndPart(workType);
+    }
+    return ret;
 }
 
 int SCartridgeForm::checkInput()
@@ -405,6 +691,52 @@ int SCartridgeForm::checkInput()
     }
 
     return false;
+}
+
+int SCartridgeForm::isReady()
+{
+    switch(m_repairModel->state())
+    {
+    case Global::RepStateIds::Ready:
+    case Global::RepStateIds::ReadyNoRepair: return 1;
+    }
+
+    return 0;
+}
+
+void SCartridgeForm::updateWidgets()
+{
+    ui->checkBoxRefill->setEnabled(worksCheckboxesEn);
+    ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn);
+    ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn);
+    ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn);
+    ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
+    updateComboBoxEngineer(m_repairModel->engineer());
+    ui->comboBoxPlace->setEnabled(placeComboBoxEn);
+//    updateLists();
+}
+
+void SCartridgeForm::updateStatesModel(const int statusId)
+{
+
+    QString allowedStates;// = statusesProxyModel->value(statusId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Contains).toString();
+    switch(statusId)
+    {
+        case Global::RepStateIds::GetIn: allowedStates = QString::number(Global::RepStateIds::InWork); break;
+        case Global::RepStateIds::InWork: allowedStates = QString("%1|%2").arg(Global::RepStateIds::Ready).arg(Global::RepStateIds::ReadyNoRepair); break;
+        case Global::RepStateIds::Ready: allowedStates = "---"; break;
+        case Global::RepStateIds::ReadyNoRepair: allowedStates = "---"; break;
+        default: allowedStates = "---";
+    }
+    QString activeState = statusesProxyModel->getDisplayRole(statusId);
+    ui->comboBoxState->blockSignals(true);
+    statusesProxyModel->setFilterRegularExpression(QString("\\b(%1)\\b").arg(allowedStates));
+    ui->comboBoxState->setCurrentIndex(-1);
+    // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
+    ui->comboBoxState->setPlaceholderText(activeState);
+    ui->comboBoxState->blockSignals(false);
+
+    emit updateParentTab();
 }
 
 void SCartridgeForm::updateTotalSumms(const double, const double, const double)
@@ -443,29 +775,15 @@ void SCartridgeForm::setBladeReplace(int state)
     updatePreagreedAmount(material, state);
 }
 
-void SCartridgeForm::addRefillWorksAndParts(int state)
-{
-
-}
-
-void SCartridgeForm::addChipWorksAndParts(int state)
-{
-
-}
-
-void SCartridgeForm::addDrumWorksAndParts(int state)
-{
-
-}
-
-void SCartridgeForm::addBladeWorksAndParts(int state)
-{
-
-}
-
 void SCartridgeForm::comboBoxPlaceButtonClickHandler(int)
 {
     qDebug().nospace() << "[" << this << "] comboBoxPlaceButtonClickHandler()";
+}
+
+void SCartridgeForm::comboBoxEngineerChanged(int index)
+{
+    m_repairModel->setEngineerIndex(index);
+    commit();
 }
 
 void SCartridgeForm::saveState(int index)
@@ -473,36 +791,57 @@ void SCartridgeForm::saveState(int index)
     if (index < 0)
         return;
 
+    m_groupUpdate = 1;
+
     int newStateId = statusesProxyModel->databaseIDByRow(index);
 
     try
     {
-//        if(!checkStateAcl(newStateId))
-//        {
-//            shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
-//            throw 2;
-//        }
+        if(!checkStateAcl(newStateId))
+        {
+            shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
+            throw 2;
+        }
         checkData(newStateId);
         doStateActions(newStateId);
-//        repairModel->setState(newStateId);
+        m_repairModel->setState(newStateId);
     }
     catch (int type)
     {
-//        ui->comboBoxState->blockSignals(true);
-//        ui->comboBoxState->setCurrentIndex(-1);
-//        ui->comboBoxState->blockSignals(false);
-//        return;
+        ui->comboBoxState->blockSignals(true);
+        ui->comboBoxState->setCurrentIndex(-1);
+        ui->comboBoxState->blockSignals(false);
+        return;
     }
-//    updateStatesModel(newStateId);
-//    setWidgetsParams(newStateId);
+    updateStatesModel(newStateId);
+    setWidgetsParams(newStateId);
 
-//    if(!commit())
-//        return;
+    if(!commit())
+        return;
 
-    //    updateWidgets();
+    m_groupUpdate = 0;
+
+    updateWidgets();
+
+    emit updateParentTab();
 }
 
 void SCartridgeForm::removeWidget()
 {
     this->deleteLater();
+}
+
+void SCartridgeForm::buttonClientCardClicked()
+{
+    emit createTabClient(m_repairModel->clientId());
+}
+
+void SCartridgeForm::buttonClassicTabClicked()
+{
+    emit createTabRepair(m_repairModel->id());
+}
+
+void SCartridgeForm::buttonCartridgeCardClicked()
+{
+
 }

@@ -8,6 +8,7 @@
 #include "tabreceptcartridge.h"
 #include "tabrepairs.h"
 #include "tabrepair.h"
+#include "tabrepaircartridges.h"
 #include "tabsale.h"
 #include "tabclients.h"
 #include "tabclient.h"
@@ -428,6 +429,17 @@ void MainWindow::createTabRepair(int repair_id)
     QObject::connect(subwindow,SIGNAL(createTabSelectItem(int,QWidget*)), this, SLOT(createTabWarehouseItems(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSparePart(int)), this, SLOT(createTabSparePart(int)));
     QObject::connect(subwindow,SIGNAL(createTabSparePartReserve(int)), this, SLOT(createTabSparePartReserve(int)));
+}
+
+void MainWindow::createTabRepairCartridges(QList<int> *list)
+{
+    tabRepairCartridges *subwindow = tabRepairCartridges::getInstance(list, this);
+    if(ui->tabWidget->indexOf(subwindow) == -1)
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+
+    ui->tabWidget->setCurrentWidget(subwindow);
+    QObject::connect(subwindow, &tabRepairCartridges::createTabClient, this, &MainWindow::createTabClient);
+    QObject::connect(subwindow, &tabRepairCartridges::createTabRepair, this, &MainWindow::createTabRepair);
 }
 
 void MainWindow::createTabRepairNew()
@@ -965,12 +977,12 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
 //    createTabSale(0);
-//    createTabRepair(25541);
-//    createTabSale(16316);
+//    createTabRepair(25589);
+//    createTabSale(17782);
 //    if (test_scheduler_counter < 375)
 //    {
 //        createTabRepairNew();
-        createTabReceptCartridge();
+//        createTabReceptCartridge();
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
 //        createTabCashOperation(42268);
@@ -988,7 +1000,10 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    createTabSettings();
 //    createTabSalary();
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
-
+        QList<int> *testCartridges = new QList<int>();
+        testCartridges->append(25597);
+        testCartridges->append(25607);
+        createTabRepairCartridges(testCartridges);
 }
 
 void MainWindow::test_scheduler2_handler()  // обработик таймера закрытия вкладки

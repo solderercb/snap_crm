@@ -110,6 +110,7 @@ SOURCES += \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
     tabreceptcartridge.cpp \
+    tabrepaircartridges.cpp \
     tabsalary.cpp \
     tabsettings.cpp \
     widgets/salarytabwidgets/spagesalaryextra.cpp \
@@ -258,6 +259,7 @@ HEADERS  += \
     models/sphonemodel.h \
     models/sphonesmodel.h \
     tabreceptcartridge.h \
+    tabrepaircartridges.h \
     tabsalary.h \
     tabsettings.h \
     widgets/salarytabwidgets/spagesalaryextra.h \
@@ -337,6 +339,7 @@ FORMS += \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
     tabreceptcartridge.ui \
+    tabrepaircartridges.ui \
     tabsalary.ui \
     tabsettings.ui \
     widgets/salarytabwidgets/spagesalaryextra.ui \
