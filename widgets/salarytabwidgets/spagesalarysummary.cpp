@@ -196,7 +196,7 @@ void SPageSalarySummary::markRepairsPayed()
     catch(int)
     {
         delete salaryRepairsModel;
-        throw 1;
+        throw Global::ThrowType::QueryError;
     }
 
 }
@@ -305,20 +305,24 @@ void SPageSalarySummary::pay()
 
 
 #ifdef QT_DEBUG
-//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
 
         shortlivedNotification *newPopup = new shortlivedNotification(this, parentTab->tabTitle(), tr("Ошибка выполнения запроса"), QColor(255,164,119), QColor(255,199,173));
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
 //            nErr = 1; // это чтобы проверить работу дальше
+        }
+        else if (type == Global::ThrowType::QueryError)
+        {
+            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
         }
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);

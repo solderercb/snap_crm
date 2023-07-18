@@ -44,6 +44,7 @@ namespace Global
                   invoice1 = 17, invoice2 = 18, invoice3 = 19, vatinvoice0 = 20, p_list0 = 21, w_list0 = 22,
                   new_cartridge = 23, sticker_cartridge = 24, issue_cartridge = 25, slip = 27, move = 28, buyout = 29};
     Q_ENUM_NS(Reports)
+    enum ThrowType {Debug = 0, QueryError = 1, IntegrityError = 253, ConditionsError = 254, UserCanceled = 255};
 }
 
 extern QLocale sysLocale;

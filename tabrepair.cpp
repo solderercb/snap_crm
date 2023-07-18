@@ -484,7 +484,7 @@ bool tabRepair::checkData(const int stateId)
             case 2: msg = tr("Не установлена согласованная сумма"); break;
         }
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), msg, QColor(255,164,119), QColor(255,199,173));
-        throw 2;
+        throw 0;
     }
 
     return !ret;
@@ -673,13 +673,17 @@ bool tabRepair::commit(const QString &notificationCaption, const QString &notifi
         QUERY_COMMIT_ROLLBACK(query,nErr);
         QUERY_LOG_STOP;
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
+        }
+        else if (type == Global::ThrowType::QueryError)
+        {
+            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
         }
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);

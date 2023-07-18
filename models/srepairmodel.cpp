@@ -1033,7 +1033,7 @@ bool SRepairModel::commit()
     if(i_id)
     {
         if(!update())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
     else
     {
@@ -1044,7 +1044,7 @@ bool SRepairModel::commit()
         setInDate(QDateTime::currentDateTime());
         setState(Global::RepStateIds::GetIn);
         if(!insert())
-            throw 1;
+            throw Global::ThrowType::QueryError;
         appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
         m_repairStatusLog->setRepair(i_id);
     }

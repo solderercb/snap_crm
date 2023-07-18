@@ -345,11 +345,6 @@ bool tabSale::checkInput()
         ui->lineEditTakeIn->setStyleSheet(commonLineEditStyleSheetRed);
         error = 7;
     }
-    if( ui->checkBoxSaleInCredit->isChecked() || (paymentSystemsModel->index(ui->comboBoxPaymentAccount->currentIndex(), 1).data().toInt() == -2 && clientModel->options()&SClientModel::BalanceEnabled) )
-    {
-        if(!clientModel->balanceEnough(ui->lineEditTotal->text()))
-            error = 8;
-    }
     if (tableModel->rowCount() == 0)   //    в таблице нет строк
     {
         // будет слишкм стрёмно, если окрасить tableView в красный, поэтому просто ничего не делаем.
@@ -651,17 +646,21 @@ bool tabSale::unSale()  // распроведение
         }
 
 #ifdef QT_DEBUG
-//    throw 0; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//    throw Global::ThrowType::Debug; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
+        }
+        else if (type == Global::ThrowType::QueryError)
+        {
+            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
         }
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
@@ -737,6 +736,10 @@ bool tabSale::sale()
 
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
 
+        if(balance)
+            if(!clientModel->balanceEnough(-amount))
+                throw Global::ThrowType::UserCanceled;
+
         if(m_opType == Sale || m_opType == Reserve)
         {
             createNewDoc();
@@ -788,12 +791,12 @@ bool tabSale::sale()
         docModel->commit();
 
 #ifdef QT_DEBUG
-//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
 
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
         if(m_opType == Sale || m_opType == Reserve)
@@ -801,10 +804,14 @@ bool tabSale::sale()
             doc_id = initial_doc_id;
             docModel->setId(0);
         }
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
+        }
+        else if (type == Global::ThrowType::QueryError)
+        {
+            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
         }
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
@@ -961,20 +968,24 @@ void tabSale::reserveCancelButtonClicked()
         docModel->commit();
 
 #ifdef QT_DEBUG
-//    throw 0; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//    throw Global::ThrowType::Debug; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
         }
+        else if (type == Global::ThrowType::QueryError)
+        {
+            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
+        }
         else
-            QUERY_COMMIT_ROLLBACK(query,nErr);
+            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     QUERY_LOG_STOP;
@@ -996,6 +1007,16 @@ void tabSale::logButtonClicked()
 void tabSale::unSaleButtonClicked()
 {
     if(m_docState != SDocumentModel::OutInvoicePayed)   // проверка на всякий случай, вдруг накосячу с отображением кнопок в разных режимах
+        return;
+
+    QMessageBox resBtn( QMessageBox::Question, "SNAP CRM",
+                        tr("Распровести расходную накладную и вернуть средства покупателю?"),
+                        QMessageBox::No | QMessageBox::Yes);
+    QAbstractButton *noButton = resBtn.button(QMessageBox::No);
+    resBtn.setDefaultButton(QMessageBox::No);
+    resBtn.setWindowModality(Qt::ApplicationModal);
+    resBtn.exec();
+    if (resBtn.clickedButton() == noButton)
         return;
 
     if(unSale())

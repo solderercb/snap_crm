@@ -50,7 +50,7 @@ bool SCommentsModel::add(const QString &text)
     delete comment;
 
     if(!nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     this->insertRow(0, row);
     QStandardItemModel::setData(this->index(0, SCommentModel::ColId), newId);
@@ -70,7 +70,7 @@ bool SCommentsModel::remove(const int row)
     delete comment;
 
     if(!nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     for(int i = rowItems.count() - 1; i >= 0; i--)
     {
@@ -159,7 +159,7 @@ bool SCommentsModel::setText(const int rowNum, const QString &text)
     delete comment;
 
     if(!nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     clearChangedFlagForAllField();
     return 1;

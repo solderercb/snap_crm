@@ -594,7 +594,7 @@ bool SSaleTableModel::store_saveTables(StoreOpType type)
     }
 
     if(!ret)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     clearChangedFlagForAllField();
     return ret;
@@ -653,7 +653,7 @@ bool SSaleTableModel::repair_saveTables()
     m_editStrategy = editStrategyBackup;
 
     if(!ret)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     clearChangedFlagForAllField();
     emit tableSaved();
@@ -682,7 +682,7 @@ bool SSaleTableModel::repair_saveTablesStandalone()
         repair_saveTables();
 
 #ifdef QT_DEBUG
-//            throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//            throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
 
         QUERY_COMMIT_ROLLBACK(query,nErr);
@@ -691,7 +691,7 @@ bool SSaleTableModel::repair_saveTablesStandalone()
     {
         nErr = 0;
 
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
@@ -736,7 +736,7 @@ bool SSaleTableModel::repair_saveTables(RepairOpType operation)
     }
 
     if(!ret)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     clearChangedFlagForAllField();
     return ret;
@@ -842,7 +842,7 @@ bool SSaleTableModel::store_backOutItems(StoreOpType type)
         m_itemsAffected = 0;
 
     if(!ret)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     return ret;
 }
@@ -912,7 +912,7 @@ bool SSaleTableModel::repair_removeItems()
 #endif
 
         if(!nErr)
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
 
     return nErr;
@@ -934,7 +934,7 @@ bool SSaleTableModel::repair_removeWorks()
 #endif
 
         if(!nErr)
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
 
     return nErr;
@@ -957,7 +957,7 @@ bool SSaleTableModel::cartridge_removeItems()
 #endif
 
         if(!nErr)
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
 
     return nErr;

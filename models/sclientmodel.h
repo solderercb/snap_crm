@@ -193,7 +193,7 @@ public:
     void deleteBalanceObj();
     bool updateBalance(const double amount, const QString &text);
     bool updateBalance(const double amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason, const int doc_id);
-    bool balanceEnough(const QString summ);
+    bool balanceEnough(const double amount);
     bool receiptBalance();
     bool paymentBalance();
     int priceColumn();
@@ -268,6 +268,7 @@ private:
     int     m_purchases = 0;
     QString m_token;
     SBalanceLogRecordModel *balanceLog = nullptr;
+    bool m_notificationShown = 0;
     void initBinaryOptions(QSqlQueryModel*);
 };
 

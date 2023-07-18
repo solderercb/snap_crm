@@ -74,7 +74,7 @@ bool SAdditionalPaymentModel::commit()
     }
 
     if(!i_nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     return i_nErr;
 }

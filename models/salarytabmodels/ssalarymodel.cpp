@@ -1,4 +1,5 @@
 #include "ssalarymodel.h"
+#include "global.h"
 
 SSalaryModel::SSalaryModel(QObject *parent) : SDatabaseRecord(parent)
 {
@@ -144,7 +145,7 @@ bool SSalaryModel::commit()
     }
 
     if(!i_nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     return i_nErr;
 }

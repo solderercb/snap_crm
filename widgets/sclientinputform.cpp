@@ -185,7 +185,7 @@ void SClientInputForm::createClient()
     if(ui->checkBoxClientType->isChecked())
         clientModel->setUrName(ui->lineEditClientFirstName->text());
     if(!clientModel->commit())
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     m_client = clientModel->id();
 }

@@ -77,8 +77,11 @@ void SClientModel::load(int id)
         m_birthday = clientModel->record(0).value("birthday").toString();
         m_memorial = clientModel->record(0).value("memorial").toString();
         m_notes = clientModel->record(0).value("notes").toString();
-        if(permissions->viewClients && !m_notes.isEmpty())
+        if(permissions->viewClients && !m_notes.isEmpty() && !m_notificationShown)
+        {
+            m_notificationShown = 1;
             showNotification(m_notes, QMessageBox::Information);
+        }
         initBinaryOptions(clientModel);
         if(m_options&BinaryOption::BalanceEnabled)
             createBalanceObj();
@@ -661,7 +664,7 @@ QString SClientModel::balanceStr()
 void SClientModel::createBalanceObj()
 {
     balanceLog = new SBalanceLogRecordModel(i_id);
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird")); // это не ошибка, используется соединение для записи в БД
     query->exec(QUERY_SEL_BALANCE(i_id));
     query->first();
     if(query->isValid())
@@ -686,20 +689,7 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
         return 1;
 
     if(isNew())   // TODO: проверка включен ли баланс у клиента
-        throw 3;
-
-    if(amount < 0 && m_balance < -amount)
-    {
-        QMessageBox resBtn( QMessageBox::Question, "SNAP CRM",
-                            tr("На балансе недостаточно средств, продолжить?"),
-                            QMessageBox::No | QMessageBox::Yes);
-        QAbstractButton *noButton = resBtn.button(QMessageBox::No);
-        resBtn.setDefaultButton(QMessageBox::No);
-        resBtn.setWindowModality(Qt::ApplicationModal);
-        resBtn.exec();
-        if (resBtn.clickedButton() == noButton)
-            throw 4;
-    }
+        throw Global::ThrowType::ConditionsError;
 
     balanceLog->setText(text);
     balanceLog->setClient(i_id);
@@ -711,7 +701,7 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
 
     if(!i_nErr)
     {
-        throw 1;
+        throw Global::ThrowType::QueryError;
     }
 
     QUERY_EXEC_VRFY(i_query,nIntegrityErr);
@@ -719,7 +709,7 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
     if(!nIntegrityErr)
     {
         showNotification(tr("Ошибка целостности данных баланса (id = %1)").arg(i_id), QMessageBox::Critical);
-        throw 2;
+        throw Global::ThrowType::IntegrityError;
     }
 
     m_balance = i_query->value("balance").toDouble();
@@ -737,6 +727,24 @@ bool SClientModel::updateBalance(const double amount, const QString &text, const
     updateBalance(amount, text);
 
     return i_nErr;
+}
+
+bool SClientModel::balanceEnough(const double amount)
+{
+    if( amount < 0 && m_balance >= -amount )
+        return 1;
+
+    QMessageBox resBtn( QMessageBox::Question, "SNAP CRM",
+                        tr("На балансе недостаточно средств, продолжить?"),
+                        QMessageBox::No | QMessageBox::Yes);
+    QAbstractButton *noButton = resBtn.button(QMessageBox::No);
+    resBtn.setDefaultButton(QMessageBox::No);
+    resBtn.setWindowModality(Qt::ApplicationModal);
+    resBtn.exec();
+    if (resBtn.clickedButton() == noButton)
+        return 0;
+
+    return 1;
 }
 
 int SClientModel::priceColumn()
@@ -776,7 +784,7 @@ bool SClientModel::updateRepairs(const int val)
     commit();
 
     if(!i_nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     m_repairs += val;
     return i_nErr;
@@ -797,7 +805,7 @@ bool SClientModel::updatePurchases(int items)
     QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_CLIENT_PURCHASES(i_id, items));
 
     if(!i_nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     return i_nErr;
 }
@@ -862,48 +870,25 @@ bool SClientModel::commit()
     if(i_id)
     {
         if(!update())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
     else
     {
         i_valuesMap.insert("created", QDateTime::currentDateTime());
         i_valuesMap.insert("web_password", genWebPass());
         if(!insert())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
 
     i_logRecord->setClient(i_id);
     if(!commitLogs())
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     m_phones->setClient(i_id);
     if(!m_phones->commit())
-        throw 1;    // исключение генерируется в SPhonesModel::commit(), поэтому это выражение не выполнится никогда
+        throw Global::ThrowType::QueryError;    // исключение генерируется в SPhonesModel::commit(), поэтому это выражение не выполнится никогда
 
     return i_nErr;
-}
-
-bool SClientModel::balanceEnough(const QString summ)
-{
-    if( sysLocale.toDouble(summ) <= m_balance )
-        return 1;
-
-    QMessageBox msgBox;
-
-    msgBox.setWindowTitle("SNAP CRM");
-    msgBox.setText(tr("На балансе клиента недостаточно средств"));
-    msgBox.setInformativeText("продолжить?");
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-    msgBox.setDefaultButton(QMessageBox::No);
-    int ret = msgBox.exec();
-
-    if (ret == QMessageBox::Yes)
-    {
-       return 1;
-    }
-
-    return 0;
 }
 
 bool SClientModel::integrityStatus()

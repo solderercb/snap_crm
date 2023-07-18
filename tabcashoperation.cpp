@@ -199,6 +199,7 @@ bool tabCashOperation::commit(bool repeatAfter)
 
     cashRegister->setOperationType(m_orderType);
     cashRegister->setCreatedDate(ui->dateEdit->date());
+    cashRegister->setAmount(ui->doubleSpinBoxAmount->value());
     cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
     cashRegister->setReason(ui->lineEditReason->text());    // если пользователь отредактировал автоматически сгенерированный комментарий
     cashRegister->setSkipLogRecording(m_skipAutoLogRecord);
@@ -227,23 +228,27 @@ bool tabCashOperation::commit(bool repeatAfter)
         }
 
 #ifdef QT_DEBUG
-//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
 
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
         cashRegister->setId(0);
         m_orderId = initial_order_id;
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
         }
-        else
+        else if (type == Global::ThrowType::QueryError)
+        {
             QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
 #ifdef QT_DEBUG
@@ -281,8 +286,12 @@ bool tabCashOperation::commitSimple()
 
 bool tabCashOperation::commitBalance(const double amount)
 {
+    if(amount < 0 && !clientModel->balanceEnough(amount))
+        throw Global::ThrowType::UserCanceled;
+
     QString note;
     bool nErr = 1;
+
     if(amount > 0)
     {
         note = tr("Баланс клиента №%1 пополнен на %2").arg(m_client).arg(sysLocale.toCurrencyString(amount));

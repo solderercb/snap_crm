@@ -64,7 +64,7 @@ void SSettingsPageRolesAndPermissions::loadRolePermissions(const QModelIndex &in
         }
         else if (result == QMessageBox::Yes)
         {
-            saveSettings();
+            parentTab->buttonSaveClicked();
         }
     }
     ui->lineEditRoleName->setText(m_roles->data(m_roles->index(index.row(), 0)).toString());

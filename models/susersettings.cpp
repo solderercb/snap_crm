@@ -118,7 +118,7 @@ void SUserSettings::save()
         QUERY_EXEC(query, nErr)(q);
     }
     if(!nErr)
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     saveToUsersParams();
 
@@ -145,7 +145,7 @@ void SUserSettings::saveToUsersParams()
         if(!nErr)
         {
             errorToLog(metaObject()->className(), query->lastError().text());
-            throw 1;
+            throw Global::ThrowType::QueryError;
         }
         i++;
     }

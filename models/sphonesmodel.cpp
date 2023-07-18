@@ -87,13 +87,13 @@ bool SPhonesModel::commit()
     foreach(item, m_phonesList)
     {
         if(!item->commit())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
 
     if(logRecord != nullptr)
     {
         if(!logRecord->commit())
-            throw 1;        // запись в журнал об изменении основного номера
+            throw Global::ThrowType::QueryError;
         logRecord->deleteLater();
     }
 
@@ -101,7 +101,7 @@ bool SPhonesModel::commit()
     {
         item = m_removeList.last();
         if(!item->delDBRecord())
-            throw 1;
+            throw Global::ThrowType::QueryError;
 
         m_removeList.removeLast();
         item->deleteLater();

@@ -48,12 +48,12 @@ bool SCartridgeRepairModel::commit()
     if(i_id)
     {
         if(!update())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
     else
     {
         if(!insert())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
 
     return 1;

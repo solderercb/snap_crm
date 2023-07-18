@@ -134,7 +134,7 @@ bool SFieldsModel::commit()
         if(!item->commit())
         {
             m_nErr = 0;
-            throw 1;
+            throw Global::ThrowType::QueryError;
         }
     }
 
@@ -144,7 +144,7 @@ bool SFieldsModel::commit()
         if(!item->delDBRecord())
         {
             m_nErr = 0;
-            throw 1;
+            throw Global::ThrowType::QueryError;
         }
 
         m_removeList.removeLast();

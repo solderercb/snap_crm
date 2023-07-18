@@ -193,7 +193,7 @@ bool SUserModel::commit()
     if(i_id)
     {
         if(!update())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
     else
     {
@@ -201,12 +201,12 @@ bool SUserModel::commit()
             i_valuesMap.insert("created", QDateTime::currentDateTime());
 
         if(!insert())
-            throw 1;
+            throw Global::ThrowType::QueryError;
     }
 
     i_logRecord->setClient(i_id);
     if(!commitLogs())
-        throw 1;
+        throw Global::ThrowType::QueryError;
 
     return i_nErr;
 }

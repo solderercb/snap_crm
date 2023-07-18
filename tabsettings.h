@@ -37,8 +37,9 @@ private:
     bool m_lineEditSearchVisible = 0;
     bool m_editStrategy = 0;
     SQueryLog *m_queryLog;
-private slots:
+public slots:
     void buttonSaveClicked();
+private slots:
     void updateBotToolbar(const int page);
     void initPage(const int page);
 #ifdef QT_DEBUG

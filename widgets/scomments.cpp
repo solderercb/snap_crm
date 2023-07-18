@@ -154,13 +154,17 @@ void SComments::commit()
         QUERY_COMMIT_ROLLBACK(m_query,nErr);
         QUERY_LOG_STOP;
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(m_query, err);
+        }
+        else if (type == Global::ThrowType::QueryError)
+        {
+            QUERY_COMMIT_ROLLBACK_MSG(m_query, nErr);
         }
         else
             QUERY_COMMIT_ROLLBACK(m_query, nErr);
@@ -197,13 +201,17 @@ void SComments::remove()
                 QUERY_COMMIT_ROLLBACK(m_query,nErr);
                 QUERY_LOG_STOP;
             }
-            catch (int type)
+            catch (Global::ThrowType type)
             {
                 nErr = 0;
-                if(type == 0)
+                if(type == Global::ThrowType::Debug)
                 {
                     QString err = "DEBUG ROLLBACK";
                     QUERY_ROLLBACK_MSG(m_query, err);
+                }
+                else if (type == Global::ThrowType::QueryError)
+                {
+                    QUERY_COMMIT_ROLLBACK_MSG(m_query, nErr);
                 }
                 else
                     QUERY_COMMIT_ROLLBACK(m_query, nErr);
