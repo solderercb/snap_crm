@@ -82,6 +82,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
     worksAndPartsModel->setPriceColumn(0);
+    repairModel->setWorksAndPartsModel(worksAndPartsModel);
     if(userDbData->autosavePartList)
         ui->switchEditStrategy->setChecked(true);
     else
@@ -506,17 +507,17 @@ void tabRepair::saveTotalSumms()
 
 void tabRepair::createGetOutDialog()
 {
+    QList<SRepairModel*> list;
     overlay = new QWidget(this);
     overlay->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
     overlay->resize(size());
     overlay->setVisible(true);
 
-    modalWidget = new getOutDialog(this, Qt::SplashScreen);
-    QObject::connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
-    QObject::connect(modalWidget, SIGNAL(getOutOk()), this, SLOT(reloadRepairData()));
-
-    modalWidget ->setWindowModality(Qt::WindowModal);
-    modalWidget ->show();
+    list.append(repairModel);
+    modalWidget = new getOutDialog(list, Qt::SplashScreen, this);
+    connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
+    connect(modalWidget, SIGNAL(issueSuccessfull()), this, SLOT(reloadRepairData()));
+//    connect(modalWidget, &getOutDialog::issueFailed, this, &tabRepair::reloadRepairData);
 }
 
 void tabRepair::closeGetOutDialog()
@@ -631,7 +632,7 @@ void tabRepair::doStateActions(const int stateId)
     {
         case Global::RepStateIds::Returned:
         case Global::RepStateIds::ReturnedNoRepair:
-        case Global::RepStateIds::ReturnedInCredit: createGetOutDialog(); throw 2;
+        case Global::RepStateIds::ReturnedInCredit: createGetOutDialog(); throw 0;
     }
 
     // В АСЦ установка инженера происходит при переключении с "Приём в ремонт" на любой другой.
@@ -717,7 +718,7 @@ void tabRepair::saveState(int index)
         if(!checkStateAcl(newStateId))
         {
             shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
-            throw 2;
+            throw 0;
         }
         checkData(newStateId);
         doStateActions(newStateId);

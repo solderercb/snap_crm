@@ -16,6 +16,8 @@ class SDatabaseRecord : public SSqlQueryModel, public SDatabaseAuxiliary
 {
     Q_OBJECT
     friend class SComRecord;
+signals:
+    void modelUpdated();
 public:
     explicit SDatabaseRecord(QObject *parent = nullptr);
     ~SDatabaseRecord();

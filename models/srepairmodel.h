@@ -73,8 +73,6 @@ class SRepairModel : public SComRecord
     Q_PROPERTY(int invoice READ invoice)
 //    Q_PROPERTY(int isCartridge READ cartridge)
     Q_PROPERTY(bool termsControl READ termsControl)
-signals:
-    void modelUpdated();
 public:
     explicit SRepairModel(QObject *parent = nullptr);
     explicit SRepairModel(const int, QObject *parent = nullptr);
@@ -233,6 +231,9 @@ public:
     void initDemo() override;
     void initCartridgeRepairModel(const int id);
     bool isNew();
+    void setWorksAndPartsModel(SSaleTableModel *model);
+    SSaleTableModel *worksAndPartsModel() const;
+
 private:
     SClientModel *m_clientModel;
     SRepairStatusLog *m_repairStatusLog;
@@ -299,6 +300,7 @@ private:
     int m_cartridge = 0;
     int m_vendorId = 0;
     bool m_termsControl = 0;
+    SSaleTableModel *m_worksAndParts = nullptr;
     QString devClass();
     QString vendor();
     QString device();

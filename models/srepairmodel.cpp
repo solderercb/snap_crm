@@ -192,6 +192,16 @@ bool SRepairModel::isNew()
     return true;
 }
 
+void SRepairModel::setWorksAndPartsModel(SSaleTableModel *model)
+{
+    m_worksAndParts = model;
+}
+
+SSaleTableModel *SRepairModel::worksAndPartsModel() const
+{
+    return m_worksAndParts;
+}
+
 void SRepairModel::reload()
 {
     load(i_id);
@@ -669,6 +679,7 @@ double SRepairModel::prepaidSumm()
 
 void SRepairModel::setPrepaidSumm(const double summ)
 {
+    m_prepaidSumm = summ;
     i_valuesMap.insert("prepaid_summ", summ);
 }
 
@@ -741,6 +752,7 @@ double SRepairModel::preAgreedAmount()
 
 void SRepairModel::setPreAgreedAmount(const double summ)
 {
+    m_preAgreedAmount = summ;
     i_valuesMap.insert("pre_agreed_amount", summ);
 }
 
@@ -763,6 +775,7 @@ double SRepairModel::realRepairCost()
 
 void SRepairModel::setRealRepairCost(const double summ)
 {
+    m_realRepairCost = summ;
     i_valuesMap.insert("real_repair_cost", summ);
 }
 
@@ -773,6 +786,7 @@ double SRepairModel::partsCost()
 
 void SRepairModel::setPartsCost(const double summ)
 {
+    m_partsCost = summ;
     i_valuesMap.insert("parts_cost", summ);
 }
 

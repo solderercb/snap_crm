@@ -96,7 +96,7 @@ void SCashRegisterModel::initDemo()
 }
 
 /*  Создание новой записи о кассовой операции в БД
- *  возвращает 0 в случае успеха
+ *  возвращает 1 в случае успеха
  */
 bool SCashRegisterModel::commit()
 {
@@ -106,6 +106,9 @@ bool SCashRegisterModel::commit()
     }
     else
     {
+        if(m_amount == 0)
+            return 1;
+
         QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
         bool nIntegrityErr = 1;
         QString q;
@@ -330,7 +333,7 @@ QString SCashRegisterModel::constructReason(const QString &linkedObjId)
         case PaymentType::RecptPrepayRepair: reason = tr("Предоплата за ремонт №%1 в размере %2").arg(linkedObjId, m_amount_str); break;
         case PaymentType::RecptBalance: reason = tr("Поступление денег в размере %1 с зачислением на баланс клиента №%2").arg(m_amount_str).arg(m_client); break;
         case PaymentType::RecptGoods:   reason = tr("Поступление денег в размере %1 по расходной накладной №%2").arg(m_amount_str, linkedObjId); break;
-        case PaymentType::RecptRepair:  reason = tr("Поступление денег в размере %1 в счёт выполненного ремонта №%2").arg(m_amount_str, linkedObjId); break;
+        case PaymentType::RecptRepair:  reason = tr("Поступление денег в размере %1 в счёт выполненного(-ых) ремонта(-ов): %2").arg(m_amount_str, linkedObjId); break;
         case PaymentType::ExpInvoiceUndo: reason = tr("Поступление средств в рамере %1. за товары в распроведённой ПН №%2").arg(m_amount_str, linkedObjId); break;
         case PaymentType::RecptInvoice: reason = tr("Поступление денег в размере %1 по счёту №%2").arg(m_amount_str, linkedObjId); break;
         case PaymentType::MoveCash:     reason = tr("Перемещение средств в размере %1; комплементарная операция №%2").arg(m_amount_str, linkedObjId); break;

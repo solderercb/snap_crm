@@ -171,6 +171,9 @@ bool SDatabaseRecord::  insert(bool flushValues)
 
     dbErrFlagHandler(flushValues);
 
+    if(i_nErr)
+        emit modelUpdated();
+
     return i_nErr;
 }
 
@@ -196,6 +199,9 @@ bool SDatabaseRecord::update()
 
     QUERY_EXEC(i_query,i_nErr)(q);
     dbErrFlagHandler(true);
+
+    if(i_nErr)
+        emit modelUpdated();
 
     return i_nErr;
 }
