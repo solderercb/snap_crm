@@ -75,8 +75,11 @@
                                                 "ON\n"\
                                                 "  (LENGTH(REPLACE(t1.`look_list`, ',', ''))-LENGTH(t1.`look_list`) <= enumerator.`number`+1));\n")\
                                                 .arg((device))
-#define QUERY_SEL_CARTRIDGE_CAT_ID          QString("SELECT `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 1 LIMIT 1;")
+#define QUERY_SEL_CARTRIDGE_CAT_ID              QString("SELECT `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 1 LIMIT 1;")
 #define QUERY_SEL_CARTRIDGE_MODELS(vendor)          QString("SELECT  `name`, `id`  FROM `cartridge_cards` WHERE `maker` = %1 AND `archive` = 0;").arg((vendor))
+#define QUERY_SEL_CARTRIDGE_BY_SN(where_clause)     QString("SELECT  t1.`id`, `Title`, `client`, `type`, `maker`, `cartridge`, t2.`card_id`, `serial_number`, `sms_inform`, `termsControl` FROM `workshop` AS t1 LEFT JOIN `c_workshop` AS t2 ON t1.`cartridge` = t2.`id` WHERE %1 GROUP BY `serial_number`;").arg(where_clause)
+#define QUERY_SEL_CARTRIDGE_MATERIAL(articul, count)  QString("SELECT `id` FROM `store_items` WHERE `articul` = %1 AND `count` - `reserved` >= %2 ORDER BY `id` ASC LIMIT 1;").arg(articul).arg(count)
+#define QUERY_SEL_CARTRIDGE_RESOURCE(currentRepair, serial, workType)  QString("SELECT COUNT(t1.`id`) AS 'count' FROM `workshop` AS t1 LEFT JOIN `works` AS t2 ON t1.`id` = t2.`repair` WHERE  IF(%1, t1.`id` < %1, 1) AND `serial_number` = '%2' AND `cartridge` IS NOT NULL AND t2.`type` = %3").arg(currentRepair).arg(serial).arg(workType)
 
 #define QUERY_SEL_ADDITIONAL_FIELDS_TYPES(isRepair, id) QString(\
                                                 "SELECT\n"\

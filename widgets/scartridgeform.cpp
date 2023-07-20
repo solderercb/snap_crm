@@ -17,15 +17,26 @@ SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
     m_repairId = repairId;
 }
 
+SCartridgeForm::~SCartridgeForm()
+{
+    delete ui;
+    if(m_repairModel)
+        delete m_repairModel;
+    if(worksAndPartsModel)
+        delete worksAndPartsModel;
+    if(statusesProxyModel)
+        delete statusesProxyModel;
+    delete m_cartridgeCard;
+}
+
 void SCartridgeForm::initModels()
 {
     m_cartridgeCard = new SCartridgeCardModel();
     if(m_repairId)
     {
         m_repairModel = new SRepairModel();
-        m_repairModel->load(m_repairId);
-        m_cardId = m_repairModel->cartridge()->cardId();
-        m_clientId = m_repairModel->clientId();
+        connect(m_repairModel, &SRepairModel::modelUpdated, this, &SCartridgeForm::updateWidgets);
+
         statusesProxyModel = new SSortFilterProxyModel;
         statusesProxyModel->setSourceModel(statusesModel);
         statusesProxyModel->setFilterKeyColumn(Global::RepStateHeaders::Id);
@@ -37,9 +48,23 @@ void SCartridgeForm::initModels()
         connect(worksAndPartsModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
         connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
         connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);
-        worksAndPartsModel->repair_loadTable(m_repairModel->id());
         worksAndPartsModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
         worksAndPartsModel->setRepairType(SSaleTableModel::CartridgeRepair);
+        m_repairModel->setWorksAndPartsModel(worksAndPartsModel);
+    }
+
+    updateModels();
+}
+
+void SCartridgeForm::updateModels()
+{
+    if(m_repairId)
+    {
+        m_repairModel->load(m_repairId);
+        m_cardId = m_repairModel->cartridge()->cardId();
+        m_clientId = m_repairModel->clientId();
+        worksAndPartsModel->repair_loadTable(m_repairModel->id());
+        updateStatesModel(m_repairModel->state());
     }
 
     m_cartridgeCard->load(m_cardId);
@@ -50,52 +75,25 @@ void SCartridgeForm::initWidgets()
     initModels();
     ui->comboBoxWasEarly->setModel(cartridgeRepeatReason);
     ui->comboBoxWasEarly->setCurrentIndex(-1);
+    ui->comboBoxPlace->setButtons("Clear");
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxPlace->setCurrentIndex(-1);
-    ui->labelLimitReached->hide();  // TODO: определение превышения по кол-ву заправок
+    connect(ui->comboBoxPlace, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::savePlace);
+    connect(ui->comboBoxPlace, &SComboBox::buttonClicked, this, &SCartridgeForm::comboBoxPlaceButtonClickHandler);
+    ui->labelLimitReached->setVisible(checkResource());
     connect(ui->toolButtonRemove, &QToolButton::clicked, this, &SCartridgeForm::removeWidget);
 
     if(m_repairId)
     {
-        ui->labelTitle->setText(QString("%1 [%2]").arg(m_repairModel->id()).arg(m_repairModel->title()));
-
-        SClientModel *client = new SClientModel(m_repairModel->clientId());
-        ui->pushButtonClientCard->setText(client->fullLongName());
-        delete client;  // TODO: модель нужна только для получения ФИО; подумать над более оптимальным способом.
-
-        ui->splitterComment->hide();
-        ui->splitterWasEarly->hide();
-        ui->lineEditSerial->setText(m_repairModel->serialNumber());
-        ui->lineEditSerial->setReadOnly(true);
-        ui->checkBoxPreagreedRefill->setChecked(m_repairModel->cartridge()->refill());
         ui->checkBoxPreagreedRefill->installEventFilter(this);
-        ui->checkBoxPreagreedChipReplace->setChecked(m_repairModel->cartridge()->chip());
         ui->checkBoxPreagreedChipReplace->installEventFilter(this);
-        ui->checkBoxPreagreedDrumReplace->setChecked(m_repairModel->cartridge()->drum());
         ui->checkBoxPreagreedDrumReplace->installEventFilter(this);
-        ui->checkBoxPreagreedBladeReplace->setChecked(m_repairModel->cartridge()->Blade());
         ui->checkBoxPreagreedBladeReplace->installEventFilter(this);
-        ui->spinBoxRefillWeight->setValue(m_cartridgeCard->tonerWeight());
-        ui->doubleSpinBoxPreagreedAmount->setValue(m_repairModel->preAgreedAmount());
         ui->comboBoxEngineer->setModel(engineersModel);
-        updateComboBoxEngineer(m_repairModel->engineer());
         connect(ui->comboBoxEngineer, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::comboBoxEngineerChanged);
-        ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isRepeat()?1:-1);
-        ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isWarranty()?0:-1);
-        ui->comboBoxWasEarly->setEnabled(false);
-
         ui->comboBoxState->setModel(statusesProxyModel);
-        updateStatesModel(m_repairModel->state());
-        setWidgetsParams(m_repairModel->state());
-        updateWidgets();
+        ui->comboBoxState->setCurrentIndex(-1);
         connect(ui->comboBoxState, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::saveState);
-
-        ui->doubleSpinBoxTotalAmount->setValue(m_repairModel->realRepairCost());
-
-        ui->comboBoxPlace->setCurrentIndex(m_repairModel->boxIndex());
-        ui->comboBoxPlace->setButtons("Apply");
-        connect(ui->comboBoxPlace, &SComboBox::buttonClicked, this, &SCartridgeForm::comboBoxPlaceButtonClickHandler);
-
         ui->checkBoxRefill->installEventFilter(this);
         ui->checkBoxChipReplace->installEventFilter(this);
         ui->checkBoxDrumReplace->installEventFilter(this);
@@ -103,6 +101,9 @@ void SCartridgeForm::initWidgets()
         connect(ui->pushButtonClientCard, &QPushButton::clicked, this, &SCartridgeForm::buttonClientCardClicked);
         connect(ui->toolButtonClassicTab, &QPushButton::clicked, this, &SCartridgeForm::buttonClassicTabClicked);
         connect(ui->toolButtonCartridgeCard, &QPushButton::clicked, this, &SCartridgeForm::buttonCartridgeCardClicked);
+
+        updateHeader();
+        updateWidgets();
     }
     else
     {
@@ -130,16 +131,44 @@ void SCartridgeForm::initWidgets()
     }
 }
 
-SCartridgeForm::~SCartridgeForm()
+void SCartridgeForm::updateHeader()
 {
-    delete ui;
-    if(m_repairModel)
-        delete m_repairModel;
-    if(worksAndPartsModel)
-        delete worksAndPartsModel;
-    if(statusesProxyModel)
-        delete statusesProxyModel;
-    delete m_cartridgeCard;
+    ui->labelTitle->setText(QString("%1 [%2]").arg(m_repairModel->id()).arg(m_repairModel->title()));
+
+    SClientModel *client = new SClientModel(m_repairModel->clientId());
+    ui->pushButtonClientCard->setText(client->fullLongName());
+    delete client;  // TODO: модель нужна только для получения ФИО; подумать над более оптимальным способом.
+}
+
+void SCartridgeForm::updateWidgets()
+{
+    ui->splitterComment->hide();    // TODO: придумать где расположить поле с примечанием; поле должно быть редактируемым.
+    ui->splitterWasEarly->hide();   // TODO: ссылка на предыдущий ремонт (открытие классической карты ремонта)
+    ui->lineEditSerial->setText(m_repairModel->serialNumber());
+    ui->lineEditSerial->setReadOnly(true);
+    ui->checkBoxPreagreedRefill->setChecked(m_repairModel->cartridge()->refill());
+    ui->checkBoxPreagreedChipReplace->setChecked(m_repairModel->cartridge()->chip());
+    ui->checkBoxPreagreedDrumReplace->setChecked(m_repairModel->cartridge()->drum());
+    ui->checkBoxPreagreedBladeReplace->setChecked(m_repairModel->cartridge()->Blade());
+    ui->spinBoxRefillWeight->setValue(m_cartridgeCard->tonerWeight());
+    ui->doubleSpinBoxPreagreedAmount->setValue(m_repairModel->preAgreedAmount());
+    updateComboBoxEngineer(m_repairModel->engineer());
+    ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isRepeat()?1:-1);
+    ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isWarranty()?0:-1);
+    ui->comboBoxWasEarly->setEnabled(false);
+
+    setWidgetsParams(m_repairModel->state());
+
+    ui->checkBoxRefill->setEnabled(worksCheckboxesEn);
+    ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn);
+    ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn);
+    ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn);
+    ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
+    updateComboBoxEngineer(m_repairModel->engineer());
+    ui->doubleSpinBoxTotalAmount->setValue(m_repairModel->realRepairCost());
+    ui->comboBoxPlace->setCurrentIndex(m_repairModel->boxIndex());
+    ui->comboBoxPlace->setEnabled(placeComboBoxEn);
+
 }
 
 bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
@@ -156,10 +185,16 @@ bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
     {
         if(event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
         {
+            if(static_cast<QMouseEvent*>(event)->button() != Qt::MouseButton::LeftButton)
+                return true;
+
             if( checkBox == ui->checkBoxPreagreedRefill ||
                 checkBox == ui->checkBoxPreagreedChipReplace ||
                 checkBox == ui->checkBoxPreagreedDrumReplace ||
                 checkBox == ui->checkBoxPreagreedBladeReplace )
+                return true;
+
+            if(!checkBox->isEnabled())
                 return true;
 
             int ret;
@@ -453,6 +488,8 @@ void SCartridgeForm::updatePreagreedAmount(SCartridgeMaterialModel *material, co
 void SCartridgeForm::setDefaultStyleSheets()
 {
     ui->lineEditSerial->setStyleSheet(commonLineEditStyleSheet);
+    ui->doubleSpinBoxPreagreedAmount->setStyleSheet(commonSpinBoxStyleSheet);
+    ui->doubleSpinBoxTotalAmount->setStyleSheet(commonSpinBoxStyleSheet);
 }
 
 bool SCartridgeForm::setWidgetsParams(const int stateId)
@@ -469,6 +506,7 @@ bool SCartridgeForm::setWidgetsParams(const int stateId)
         case Global::RepStateIds::ReadyNoRepair: engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
         default: ;
     }
+    updateStateWidget(stateId);
 }
 
 bool SCartridgeForm::checkStateAcl(const int stateId)
@@ -573,19 +611,25 @@ bool SCartridgeForm::commit(const QString &notificationCaption, const QString &n
         QUERY_COMMIT_ROLLBACK(query,nErr);
         QUERY_LOG_STOP;
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == 0)
+        if(type == Global::ThrowType::Debug)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
         }
+        else if (type == Global::ThrowType::QueryError)
+        {
+            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
+        }
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
-        return 0;
     }
-    return 1;
+
+    delete query;
+
+    return nErr;
 }
 
 // Добавление работы и товара.
@@ -609,7 +653,7 @@ bool SCartridgeForm::addWorkAndPart(const int workType)
     }
 
     material =  m_cartridgeCard->material(materialType);
-    query.exec(QString("SELECT `id` FROM `store_items` WHERE `articul` = %1 AND `count` - `reserved` >= %2 ORDER BY `id` ASC LIMIT 1;").arg(material->articul()).arg(material->count()));
+    query.exec(QUERY_SEL_CARTRIDGE_MATERIAL(material->articul(), material->count()));
     if(!query.first())
     {
         shortlivedNotification *newPopup = new shortlivedNotification(this,
@@ -669,6 +713,26 @@ bool SCartridgeForm::workAndPartHandler(const int workType, const int state)
     return ret;
 }
 
+/* Проверка превышения ресурса заправок
+ * Возвращает 1 если по серийному номеру было произведено больше заправок, чем задано в карточке картриджа.
+*/
+bool SCartridgeForm::checkResource()
+{
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    bool ret = 0;
+
+    query->exec(QUERY_SEL_CARTRIDGE_RESOURCE(m_repairId, m_serialNumber, SWorkModel::Type::CartridgeRefill));
+    if(query->first())
+    {
+        if(query->value(0).toInt() >= m_cartridgeCard->resource())
+            ret = 1;
+    }
+
+    delete query;
+
+    return ret;
+}
+
 int SCartridgeForm::checkInput()
 {
     int error = 0;
@@ -704,18 +768,6 @@ int SCartridgeForm::isReady()
     return 0;
 }
 
-void SCartridgeForm::updateWidgets()
-{
-    ui->checkBoxRefill->setEnabled(worksCheckboxesEn);
-    ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn);
-    ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn);
-    ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn);
-    ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
-    updateComboBoxEngineer(m_repairModel->engineer());
-    ui->comboBoxPlace->setEnabled(placeComboBoxEn);
-//    updateLists();
-}
-
 void SCartridgeForm::updateStatesModel(const int statusId)
 {
 
@@ -728,15 +780,19 @@ void SCartridgeForm::updateStatesModel(const int statusId)
         case Global::RepStateIds::ReadyNoRepair: allowedStates = "---"; break;
         default: allowedStates = "---";
     }
-    QString activeState = statusesProxyModel->getDisplayRole(statusId);
-    ui->comboBoxState->blockSignals(true);
     statusesProxyModel->setFilterRegularExpression(QString("\\b(%1)\\b").arg(allowedStates));
+
+    emit updateParentTab();
+}
+
+void SCartridgeForm::updateStateWidget(const int statusId)
+{
+    QString activeState = statusesModel->getDisplayRole(statusId);
+    ui->comboBoxState->blockSignals(true);
     ui->comboBoxState->setCurrentIndex(-1);
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->comboBoxState->setPlaceholderText(activeState);
     ui->comboBoxState->blockSignals(false);
-
-    emit updateParentTab();
 }
 
 void SCartridgeForm::updateTotalSumms(const double, const double, const double)
@@ -775,9 +831,26 @@ void SCartridgeForm::setBladeReplace(int state)
     updatePreagreedAmount(material, state);
 }
 
-void SCartridgeForm::comboBoxPlaceButtonClickHandler(int)
+void SCartridgeForm::savePlace(int index)
 {
-    qDebug().nospace() << "[" << this << "] comboBoxPlaceButtonClickHandler()";
+    int currentPlace = m_repairModel->boxIndex();
+
+    if(currentPlace == index)
+        return;
+
+    m_repairModel->setBoxIndex(index);
+    if(!commit())
+    {
+        ui->comboBoxPlace->blockSignals(true);
+        ui->comboBoxPlace->setCurrentIndex(currentPlace);
+        ui->comboBoxPlace->blockSignals(false);
+    }
+}
+
+void SCartridgeForm::comboBoxPlaceButtonClickHandler(int id)
+{
+    if(id == SLineEdit::Clear)
+        savePlace(-1);
 }
 
 void SCartridgeForm::comboBoxEngineerChanged(int index)
@@ -805,6 +878,9 @@ void SCartridgeForm::saveState(int index)
         checkData(newStateId);
         doStateActions(newStateId);
         m_repairModel->setState(newStateId);
+
+        if(!commit())
+            throw 3;
     }
     catch (int type)
     {
@@ -814,16 +890,10 @@ void SCartridgeForm::saveState(int index)
         return;
     }
     updateStatesModel(newStateId);
-    setWidgetsParams(newStateId);
-
-    if(!commit())
-        return;
+    updateWidgets();
+    emit updateParentTab();
 
     m_groupUpdate = 0;
-
-    updateWidgets();
-
-    emit updateParentTab();
 }
 
 void SCartridgeForm::removeWidget()

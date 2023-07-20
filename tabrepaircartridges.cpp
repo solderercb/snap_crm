@@ -76,6 +76,8 @@ void tabRepairCartridges::appendToReceptList(SCartridgeForm *form)
     form->initWidgets();
 }
 
+/* Обновление состояния кнопок вкладки
+*/
 void tabRepairCartridges::updateWidgets()
 {
     SCartridgeForm *form;
@@ -96,29 +98,56 @@ void tabRepairCartridges::updateWidgets()
     ui->buttonIssue->setVisible(m_readyButtonVisible);
 }
 
-void tabRepairCartridges::randomFill()
+/* Перезагрузка данных модели из БД
+*/
+void tabRepairCartridges::reloadRepairData()
 {
+    SCartridgeForm *form;
+    SRepairModel *repairModel;
+    SSaleTableModel *worksAndPartsModel;
+    int repairId;
+
+    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    {
+        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
+            continue;
+
+        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+        repairModel = form->model();
+        repairId = repairModel->id();
+        worksAndPartsModel = repairModel->worksAndPartsModel();
+        repairModel->load(repairId);
+        worksAndPartsModel->repair_loadTable(repairId);
+    }
 
 }
 
-void tabRepairCartridges::reloadRepairData()
+void tabRepairCartridges::randomFill()
 {
 
 }
 
 void tabRepairCartridges::createGetOutDialog()
 {
+    QList<SRepairModel*> list;
+    SCartridgeForm *form;
     overlay = new QWidget(this);
     overlay->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
     overlay->resize(size());
     overlay->setVisible(true);
 
-    modalWidget = new getOutDialog(this, Qt::SplashScreen);
-    QObject::connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
-    QObject::connect(modalWidget, SIGNAL(getOutOk()), this, SLOT(reloadRepairData()));
+    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    {
+        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
+            continue;
 
-    modalWidget ->setWindowModality(Qt::WindowModal);
-    modalWidget ->show();
+        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+        list.append(form->model());
+    }
+
+    modalWidget = new getOutDialog(list, Qt::SplashScreen, this);
+    connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
+    connect(modalWidget, &getOutDialog::issueFailed, this, &tabRepairCartridges::reloadRepairData);
 }
 
 void tabRepairCartridges::closeGetOutDialog()

@@ -59,6 +59,7 @@ public:
     double preargeedAmount();
     int checkInput();
     int isReady();
+    void updateModels();
 private:
     Ui::SCartridgeForm *ui;
     SQueryLog *i_queryLog;
@@ -86,8 +87,10 @@ private:
     bool engineerComboBoxEn = 1;
     bool placeComboBoxEn = 1;
     bool m_groupUpdate = 0;
+    void updateHeader();
     void updateWidgets();
     void updateStatesModel(const int statusId);
+    void updateStateWidget(const int statusId);
     bool checkData(const int);
     void doStateActions(const int);
     void updatePreagreedAmount(SCartridgeMaterialModel *material, const int state);
@@ -102,6 +105,7 @@ private:
     bool addWorkAndPart(const int workType);
     bool removeWorkAndPart(const int workType);
     bool workAndPartHandler(const int workType, const int state);
+    bool checkResource();
 private slots:
     void updateTotalSumms(const double, const double, const double);
     void saveTotalSumms();
@@ -110,7 +114,8 @@ private slots:
     void setChipReplace(int);
     void setDrumReplace(int);
     void setBladeReplace(int);
-    void comboBoxPlaceButtonClickHandler(int);
+    void savePlace(int index);
+    void comboBoxPlaceButtonClickHandler(int id);
     void comboBoxEngineerChanged(int);
     void saveState(int);
     void removeWidget();

@@ -387,9 +387,9 @@ void tabReceptCartridge::findAndAddBySerial()
         query_conditions.append(QString("`maker` = %1").arg(m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex())));
 
     if(ui->comboBoxModel->currentIndex() >= 0)
-        query_conditions.append(QString("`cartridge` = %1").arg(m_cartridgesModel->databaseIDByRow(ui->comboBoxModel->currentIndex())));
+        query_conditions.append(QString("t2.`card_id` = %1").arg(m_cartridgesModel->databaseIDByRow(ui->comboBoxModel->currentIndex())));
 
-    query = QString("SELECT  t1.`id`, `Title`, `client`, `type`, `maker`, `cartridge`, t2.`card_id`, `serial_number`, `sms_inform`, `termsControl` FROM `workshop` AS t1 LEFT JOIN `c_workshop` AS t2 ON t1.`cartridge` = t2.`id` WHERE %1 GROUP BY `serial_number`;").arg(query_conditions.join(" AND "));
+    query = QUERY_SEL_CARTRIDGE_BY_SN(query_conditions.join(" AND "));
     q.exec(query);
     if(!q.first())
         return;

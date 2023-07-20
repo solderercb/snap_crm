@@ -614,6 +614,10 @@ int SRepairModel::boxIndex()
 void SRepairModel::setBoxIndex(const int index)
 {
     int current_box = m_box;
+    int new_box = repairBoxesModel->databaseIDByRow(index);
+
+    if(current_box == new_box)
+        return;
 
     if(index < 0 && current_box)
     {
@@ -623,7 +627,7 @@ void SRepairModel::setBoxIndex(const int index)
     }
     else if(index >= 0)
     {
-        m_box = repairBoxesModel->databaseIDByRow(index);
+        m_box = new_box;
         if(current_box)
             appendLogText(tr("Заказаз-наряд %1 перемещён в ячейку \"%2\"").arg(i_id).arg(repairBoxesModel->getDisplayRole(m_box)));
         else

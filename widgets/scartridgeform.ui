@@ -515,6 +515,9 @@ color: rgb(197, 255, 172);</string>
               <height>0</height>
              </size>
             </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::NoInsert</enum>
+            </property>
            </widget>
           </widget>
          </item>
