@@ -601,15 +601,18 @@ bool SCartridgeForm::commit(const QString &notificationCaption, const QString &n
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     i_queryLog = new SQueryLog();
     bool nErr = 1;
+    QUERY_LOG_START(metaObject()->className());
     try
     {
-        QUERY_LOG_START(metaObject()->className());
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
         m_repairModel->updateLastSave();
         nErr = m_repairModel->commit();
         shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
+
+#ifdef QT_DEBUG
+//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+#endif
         QUERY_COMMIT_ROLLBACK(query,nErr);
-        QUERY_LOG_STOP;
     }
     catch (Global::ThrowType type)
     {
@@ -626,6 +629,7 @@ bool SCartridgeForm::commit(const QString &notificationCaption, const QString &n
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
     }
+    QUERY_LOG_STOP;
 
     delete query;
 

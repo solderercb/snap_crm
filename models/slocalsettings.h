@@ -27,7 +27,8 @@ public:
                       KassaGrid, InvoicesGrid, AdditionalPaymentsGrid, SalaryExtraChargesGrid, SalaryRepairsGrid, SalaryRepairWorksGrid, SalaryRepairPartsGrid, SalaryReceptedGrid, SalaryIssuedGrid,
                       SalarySalesGrid, SalaryItemsGrid, SalarySalePartsGrid, SalaryPaymentsGrid,
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
-                      TasksGrid};
+                      TasksGrid,
+                      CartridgeMaterialsGrid};
     Q_ENUM(SettingsVariant)
     static QString appSettingsPath();
     bool import(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");

@@ -8,6 +8,7 @@
 #include "models/ssqlquerymodel.h"
 #include "models/srepairmodel.h"
 #include "widgets/scartridgeform.h"
+#include "widgets/scartridgecard.h"
 
 namespace Ui {
 class tabReceptCartridge;
@@ -37,6 +38,8 @@ private:
     QTimer *m_findBySerialDelay;
     bool m_closePending = 0;
     SClientModel *m_client = nullptr;
+    QWidget *m_cartridgeCardFormBackground;
+    SCartridgeCard *m_cartridgeCardForm;
     void setDefaultStyleSheets();
     void initWidgets();
     void clearWidgets();
@@ -60,6 +63,8 @@ private slots:
     void comboBoxModelButtonClickHandler(int);
     void appendToReceptList();
     void updateTotalPreagreedAmount();
+    void createCartridgeCardForm(const int id);
+    void closeCartridgeCardForm();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

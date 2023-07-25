@@ -9,6 +9,7 @@ class SCartridgeMaterialModel : public SComRecord
     Q_OBJECT
 public:
     enum Type{Toner = 0, Drum, Chip, Blade};
+    Q_ENUM(Type)
     explicit SCartridgeMaterialModel(QObject *parent = nullptr);
     int id();
     void load(const int id);

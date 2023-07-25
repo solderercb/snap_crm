@@ -88,6 +88,7 @@ protected:
     void saveLayout(SLocalSettings::SettingsVariant variant);
     void initHorizontalHeaderMenu();
     void deleteHorizontalHeaderMenu();
+    void resetRowVisibility();
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;

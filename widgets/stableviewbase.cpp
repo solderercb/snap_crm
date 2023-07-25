@@ -321,6 +321,7 @@ void STableViewBase::reset()
     {   // столбцы, не описанные в файле настроек, — служебные; их необходимо скрыть
         horizontalHeader()->hideSection(i);
     }
+    resetRowVisibility();
     QTableView::reset();
 
     applyGridlayout();  // при глобальном обновлении модели ширины столбцов устанавливаются по умолчанию, поэтому их нужно снова задать из файла
@@ -384,6 +385,15 @@ int STableViewBase::visibleWidth()
         w -= verticalScrollBar()->width();
 
     return w;
+}
+
+void STableViewBase::resetRowVisibility()
+{
+    for(int i = 0; i < model()->rowCount(); i++)
+    {
+//        if(isRowHidden(i))
+            showRow(i);
+    }
 }
 
 void STableViewBase::initHorizontalHeaderMenu()

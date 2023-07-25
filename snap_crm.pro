@@ -62,6 +62,7 @@ SOURCES += \
     models/salarytabmodels/stablesalarysalesmodel.cpp \
     models/scartridgecardmodel.cpp \
     models/scartridgematerialmodel.cpp \
+    models/scartridgematerialsmodel.cpp \
     models/scartridgerepairmodel.cpp \
     models/scomsettings.cpp \
     models/sdatabaseauxiliary.cpp \
@@ -131,6 +132,8 @@ SOURCES += \
     widgets/salarytabwidgets/stableviewsalarysaleparts.cpp \
     widgets/salarytabwidgets/stableviewsalarysales.cpp \
     widgets/scartridgeform.cpp \
+    widgets/scartridgematerialstableitemdelegates.cpp \
+    widgets/scartridgecard.cpp \
     widgets/sclientinputform.cpp \
     widgets/sdoublespinbox.cpp \
     widgets/settingstabwidgets/ssettingspagebase.cpp \
@@ -206,6 +209,7 @@ HEADERS  += \
     models/salarytabmodels/stablesalarysalesmodel.h \
     models/scartridgecardmodel.h \
     models/scartridgematerialmodel.h \
+    models/scartridgematerialsmodel.h \
     models/scartridgerepairmodel.h \
     models/scomsettings.h \
     models/scomsettingstypes.h \
@@ -280,6 +284,8 @@ HEADERS  += \
     widgets/salarytabwidgets/stableviewsalarysaleparts.h \
     widgets/salarytabwidgets/stableviewsalarysales.h \
     widgets/scartridgeform.h \
+    widgets/scartridgematerialstableitemdelegates.h \
+    widgets/scartridgecard.h \
     widgets/sclientinputform.h \
     widgets/sdoublespinbox.h \
     widgets/settingstabwidgets/ssettingspagebase.h \
@@ -350,6 +356,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalarysales.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
     widgets/scartridgeform.ui \
+    widgets/scartridgecard.ui \
     widgets/sclientinputform.ui \
     widgets/settingstabwidgets/ssettingspageglobal.ui \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \

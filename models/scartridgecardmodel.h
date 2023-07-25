@@ -14,17 +14,18 @@ public:
     int id();
     void load(const int id);
     void initMaterials();
+    bool commit();
     QString name();
     void setName(const QString&);
-    int maker();
-    void setMaker(const int);
+    int vendor();
+    void setVendor(const int vendor);
     double fullWeight();
     void setFullWeight(const double);
     double tonerWeight();
     void setTonerWeight(const double);
     int resource();
     void setResource(const int);
-    void setCreated(const int);
+    void setCreated(const QDateTime);
     int user();
     void setUser(const int);
     QString notes();
@@ -38,11 +39,11 @@ public:
     SCartridgeMaterialModel *material(const int type);
 private:
     QString m_name;
-    int m_maker;
+    int m_vendor;
     double m_fullWeight;
     double m_tonerWeight;
     int m_resource;
-    int m_created;
+    QDateTime m_created;
     int m_user;
     QString m_notes;
     int m_photo;

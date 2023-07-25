@@ -31,7 +31,7 @@ void SCartridgeCardModel::load(const int id)
     i_id = id;
 
     m_name = record->value("name").toString();
-    m_maker = record->value("maker").toInt();
+    m_vendor = record->value("maker").toInt();
     m_fullWeight = record->value("full_weight").toDouble();
     m_tonerWeight = record->value("toner_weight").toDouble();
     m_resource = record->value("resource").toInt();
@@ -60,6 +60,26 @@ void SCartridgeCardModel::initMaterials()
     }
 }
 
+bool SCartridgeCardModel::commit()
+{
+    if(i_id)
+    {
+        // TODO: запись изменений в журнал
+        update();
+    }
+    else
+    {
+        setCreated(QDateTime::currentDateTime());
+        setUser(userDbData->id);
+        insert();
+    }
+
+    if(!i_nErr)
+        throw Global::ThrowType::QueryError;
+
+    return i_nErr;
+}
+
 QString SCartridgeCardModel::name()
 {
     return m_name;
@@ -67,17 +87,19 @@ QString SCartridgeCardModel::name()
 
 void SCartridgeCardModel::setName(const QString& name)
 {
-    i_valuesMap.insert("name", name);
+    if(m_name.compare(name) != 0)
+        i_valuesMap.insert("name", name);
 }
 
-int SCartridgeCardModel::maker()
+int SCartridgeCardModel::vendor()
 {
-    return m_maker;
+    return m_vendor;
 }
 
-void SCartridgeCardModel::setMaker(const int maker)
+void SCartridgeCardModel::setVendor(const int vendor)
 {
-    i_valuesMap.insert("maker", maker);
+    if(m_vendor != vendor)
+        i_valuesMap.insert("maker", vendor);
 }
 
 double SCartridgeCardModel::fullWeight()
@@ -87,7 +109,8 @@ double SCartridgeCardModel::fullWeight()
 
 void SCartridgeCardModel::setFullWeight(const double full_weight)
 {
-    i_valuesMap.insert("full_weight", full_weight);
+    if(m_fullWeight != full_weight)
+        i_valuesMap.insert("full_weight", full_weight);
 }
 
 double SCartridgeCardModel::tonerWeight()
@@ -97,7 +120,8 @@ double SCartridgeCardModel::tonerWeight()
 
 void SCartridgeCardModel::setTonerWeight(const double toner_weight)
 {
-    i_valuesMap.insert("toner_weight", toner_weight);
+    if(m_tonerWeight != toner_weight)
+        i_valuesMap.insert("toner_weight", toner_weight);
 }
 
 int SCartridgeCardModel::resource()
@@ -107,10 +131,11 @@ int SCartridgeCardModel::resource()
 
 void SCartridgeCardModel::setResource(const int resource)
 {
-    i_valuesMap.insert("resource", resource);
+    if(m_resource != resource)
+        i_valuesMap.insert("resource", resource);
 }
 
-void SCartridgeCardModel::setCreated(const int created)
+void SCartridgeCardModel::setCreated(const QDateTime created)
 {
     i_valuesMap.insert("created", created);
 }
@@ -132,7 +157,8 @@ QString SCartridgeCardModel::notes()
 
 void SCartridgeCardModel::setNotes(const QString& notes)
 {
-    i_valuesMap.insert("notes", notes);
+    if(m_notes.compare(notes) != 0)
+        i_valuesMap.insert("notes", notes);
 }
 
 int SCartridgeCardModel::photo()
@@ -152,7 +178,8 @@ int SCartridgeCardModel::color()
 
 void SCartridgeCardModel::setColor(const int color)
 {
-    i_valuesMap.insert("color", color);
+    if(m_color != color)
+        i_valuesMap.insert("color", color);
 }
 
 bool SCartridgeCardModel::archive()
@@ -162,7 +189,8 @@ bool SCartridgeCardModel::archive()
 
 void SCartridgeCardModel::setArchive(const bool archive)
 {
-    i_valuesMap.insert("archive", archive);
+    if(m_archive != archive)
+        i_valuesMap.insert("archive", archive);
 }
 
 SCartridgeMaterialModel *SCartridgeCardModel::material(const int type)
