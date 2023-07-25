@@ -8,7 +8,7 @@ class SCartridgeMaterialModel : public SComRecord
 {
     Q_OBJECT
 public:
-    enum Type{Toner = 0, Drum, Chip, Blade};
+    enum Type{Toner = 0, Chip = 2, Blade = 3, Drum = 1}; // в таком порядке добавляются ЗИП в карточке картриджа
     Q_ENUM(Type)
     explicit SCartridgeMaterialModel(QObject *parent = nullptr);
     int id();

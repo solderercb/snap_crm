@@ -39,16 +39,16 @@ public:
     SCartridgeMaterialModel *material(const int type);
 private:
     QString m_name;
-    int m_vendor;
-    double m_fullWeight;
-    double m_tonerWeight;
-    int m_resource;
+    int m_vendor = 0;
+    double m_fullWeight = 0;
+    double m_tonerWeight = 0;
+    int m_resource = 0;
     QDateTime m_created;
-    int m_user;
+    int m_user = 0;
     QString m_notes;
-    int m_photo;
-    int m_color;
-    bool m_archive;
+    int m_photo = 0;
+    int m_color = 0;
+    bool m_archive = 0;
     QMap<int, SCartridgeMaterialModel*> materials;
 };
 

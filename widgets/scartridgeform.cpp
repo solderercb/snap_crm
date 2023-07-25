@@ -719,6 +719,7 @@ bool SCartridgeForm::workAndPartHandler(const int workType, const int state)
 
 /* Проверка превышения ресурса заправок
  * Возвращает 1 если по серийному номеру было произведено больше заправок, чем задано в карточке картриджа.
+ * Cм. описание метода SCartridgeCardModel::resource()
 */
 bool SCartridgeForm::checkResource()
 {

@@ -71,6 +71,8 @@ bool SCartridgeCardModel::commit()
     {
         setCreated(QDateTime::currentDateTime());
         setUser(userDbData->id);
+        if(!i_valuesMap.contains("notes"))
+            i_valuesMap.insert("notes", QVariant());
         insert();
     }
 
@@ -88,7 +90,10 @@ QString SCartridgeCardModel::name()
 void SCartridgeCardModel::setName(const QString& name)
 {
     if(m_name.compare(name) != 0)
+    {
+        m_name = name;
         i_valuesMap.insert("name", name);
+    }
 }
 
 int SCartridgeCardModel::vendor()
@@ -99,7 +104,10 @@ int SCartridgeCardModel::vendor()
 void SCartridgeCardModel::setVendor(const int vendor)
 {
     if(m_vendor != vendor)
+    {
+        m_vendor = vendor;
         i_valuesMap.insert("maker", vendor);
+    }
 }
 
 double SCartridgeCardModel::fullWeight()
@@ -110,7 +118,10 @@ double SCartridgeCardModel::fullWeight()
 void SCartridgeCardModel::setFullWeight(const double full_weight)
 {
     if(m_fullWeight != full_weight)
+    {
+        m_fullWeight = full_weight;
         i_valuesMap.insert("full_weight", full_weight);
+    }
 }
 
 double SCartridgeCardModel::tonerWeight()
@@ -121,9 +132,17 @@ double SCartridgeCardModel::tonerWeight()
 void SCartridgeCardModel::setTonerWeight(const double toner_weight)
 {
     if(m_tonerWeight != toner_weight)
+    {
+        m_tonerWeight = toner_weight;
         i_valuesMap.insert("toner_weight", toner_weight);
+    }
 }
 
+/* Ресурс заправок
+ * В АСЦ это поле подразумевает ресурс страниц и его назначение не понятно.
+ * В данной программе было решено использовать этот параметр по-другому; это
+ * позволит предупредить мастера/приёмщика/клиента о превывшении ресурса
+ */
 int SCartridgeCardModel::resource()
 {
     return m_resource;
@@ -132,11 +151,15 @@ int SCartridgeCardModel::resource()
 void SCartridgeCardModel::setResource(const int resource)
 {
     if(m_resource != resource)
+    {
+        m_resource = resource;
         i_valuesMap.insert("resource", resource);
+    }
 }
 
 void SCartridgeCardModel::setCreated(const QDateTime created)
 {
+    m_created = created;
     i_valuesMap.insert("created", created);
 }
 
@@ -147,6 +170,7 @@ int SCartridgeCardModel::user()
 
 void SCartridgeCardModel::setUser(const int user)
 {
+    m_user = user;
     i_valuesMap.insert("user", user);
 }
 
@@ -158,7 +182,10 @@ QString SCartridgeCardModel::notes()
 void SCartridgeCardModel::setNotes(const QString& notes)
 {
     if(m_notes.compare(notes) != 0)
+    {
+        m_notes = notes;
         i_valuesMap.insert("notes", notes);
+    }
 }
 
 int SCartridgeCardModel::photo()
@@ -168,6 +195,7 @@ int SCartridgeCardModel::photo()
 
 void SCartridgeCardModel::setPhoto(const int photo)
 {
+    m_photo = photo;
     i_valuesMap.insert("photo", photo);
 }
 
@@ -179,7 +207,10 @@ int SCartridgeCardModel::color()
 void SCartridgeCardModel::setColor(const int color)
 {
     if(m_color != color)
+    {
+        m_color = color;
         i_valuesMap.insert("color", color);
+    }
 }
 
 bool SCartridgeCardModel::archive()
@@ -190,7 +221,10 @@ bool SCartridgeCardModel::archive()
 void SCartridgeCardModel::setArchive(const bool archive)
 {
     if(m_archive != archive)
+    {
+        m_archive = archive;
         i_valuesMap.insert("archive", archive);
+    }
 }
 
 SCartridgeMaterialModel *SCartridgeCardModel::material(const int type)

@@ -43,13 +43,13 @@ class SCartridgeCard : public SWidget
 {
     Q_OBJECT
 signals:
-    void newCardCreated();
+    void newCardCreated(int id);
     void closeForm();
 public:
     enum Color {Black = 0, Cyan, Magenta, Yellow};
     Q_ENUM(Color)
     explicit SCartridgeCard(Qt::WindowFlags flags, QWidget *parent = nullptr);
-    explicit SCartridgeCard(const int id, Qt::WindowFlags flags, QWidget *parent = nullptr);
+    explicit SCartridgeCard(const int id, const int vendorIndex, Qt::WindowFlags flags, QWidget *parent = nullptr);
     ~SCartridgeCard();
     void load(const int id);
     void initModels();
@@ -60,7 +60,7 @@ private:
     Ui::SCartridgeCard *ui;
     int m_id = 0;
     int m_deviceClassId = 0;
-    int m_deviceMaker = 0;
+    int m_vendorIndex = -1;
     QString m_name;
     int m_fullWeight = 0;
     int m_tonerWeight = 0;
@@ -71,7 +71,6 @@ private:
     bool m_isArchive = 0;
     SCartridgeCardModel *m_cardModel = nullptr;
     SCartridgeMaterialsModel *m_materialsModel = nullptr;
-    FilterList m_materialsFilter;
     SSqlQueryModel* m_vendorsModel = nullptr;
     SStandardItemModel *m_cartridgeColors = nullptr;
     void setModelData();

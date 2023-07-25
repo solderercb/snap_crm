@@ -94,7 +94,7 @@ void tabReceptCartridge::initWidgets()
     ui->comboBoxPresetEngineer->setPlaceholderText(tr("назначить инженером"));
     ui->comboBoxPresetEngineer->setButtons("Clear");
     ui->comboBoxPresetPaymentAccount->setPlaceholderText(tr("тип оплаты"));
-//    ui->comboBoxModel->setButtons("Add, Edit");
+    ui->comboBoxModel->setButtons("Add, Edit");
 
     setDefaultStyleSheets();
 
@@ -279,14 +279,15 @@ void tabReceptCartridge::updateTotalPreagreedAmount()
 
 void tabReceptCartridge::createCartridgeCardForm(const int id)
 {
+    int vendorIndex = ui->comboBoxVendor->currentIndex();
     m_cartridgeCardFormBackground = new QWidget(this);
     m_cartridgeCardFormBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
     m_cartridgeCardFormBackground->resize(size());
     m_cartridgeCardFormBackground->setVisible(true);
 
-    m_cartridgeCardForm = new SCartridgeCard(id, Qt::SplashScreen, this);
+    m_cartridgeCardForm = new SCartridgeCard(id, vendorIndex, Qt::SplashScreen, this);
     connect(m_cartridgeCardForm, &SCartridgeCard::closeForm, this, &tabReceptCartridge::closeCartridgeCardForm);
-    connect(m_cartridgeCardForm, &SCartridgeCard::newCardCreated, this, &tabReceptCartridge::updateMaterialsModel);
+    connect(m_cartridgeCardForm, &SCartridgeCard::newCardCreated, this, &tabReceptCartridge::updateDevicesModel);
 }
 
 void tabReceptCartridge::closeCartridgeCardForm()
@@ -301,6 +302,13 @@ void tabReceptCartridge::closeCartridgeCardForm()
         m_cartridgeCardFormBackground->deleteLater();
         m_cartridgeCardFormBackground = nullptr;
     }
+}
+
+void tabReceptCartridge::updateDevicesModel(const int id)
+{
+    int vendorId = m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex());
+    m_cartridgesModel->setQuery(QUERY_SEL_CARTRIDGE_MODELS(vendorId), QSqlDatabase::database("connMain"));
+    ui->comboBoxModel->setCurrentIndex(m_cartridgesModel->rowByDatabaseID(id));
 }
 
 void tabReceptCartridge::print(int repair)
@@ -381,12 +389,7 @@ void tabReceptCartridge::fillClientCreds(const int id)
 
 void tabReceptCartridge::changeVendor(int index)
 {
-    int vendorId = m_vendorsModel->databaseIDByRow(index);
-    QString query;
-
-    query = QUERY_SEL_CARTRIDGE_MODELS(vendorId);
-    m_cartridgesModel->setQuery(query, QSqlDatabase::database("connMain"));
-    ui->comboBoxModel->setCurrentIndex(-1);
+    updateDevicesModel();
 }
 
 void tabReceptCartridge::serialTextEdited(QString text)
@@ -548,7 +551,10 @@ void tabReceptCartridge::createRepairsAndClose()
 
 void tabReceptCartridge::comboBoxModelButtonClickHandler(int id)
 {
-    qDebug().nospace() << "[" << this << "] comboBoxModelButtonClickHandler() | id = " << id;
+    if(id == SLineEdit::Edit)
+        createCartridgeCardForm(m_cartridgesModel->databaseIDByRow(ui->comboBoxModel->currentIndex()));
+    else if(id == SLineEdit::Add)
+        createCartridgeCardForm(0);
 }
 
 #ifdef QT_DEBUG

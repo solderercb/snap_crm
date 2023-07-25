@@ -235,6 +235,22 @@
    <header>widgets/scartridgecard.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>comboBoxVendor</tabstop>
+  <tabstop>lineEditName</tabstop>
+  <tabstop>spinBoxResource</tabstop>
+  <tabstop>comboBoxColor</tabstop>
+  <tabstop>spinBoxFullWeight</tabstop>
+  <tabstop>spinBoxTonerWeight</tabstop>
+  <tabstop>pushButtonAddMaterial</tabstop>
+  <tabstop>plainTextEditNotes</tabstop>
+  <tabstop>pushButtonCreateSave</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>pushButtonRemoveMaterial</tabstop>
+  <tabstop>checkBoxArchive</tabstop>
+  <tabstop>tableViewMaterials</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

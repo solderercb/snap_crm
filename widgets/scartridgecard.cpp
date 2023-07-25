@@ -7,16 +7,24 @@ SCartridgeCard::SCartridgeCard(Qt::WindowFlags flags, QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowModality(Qt::WindowModal);
+    initWidgets();
 
-    connect(ui->pushButtonCancel, &QPushButton::clicked, this, &SCartridgeCard::closeForm);
     show();
 }
 
-SCartridgeCard::SCartridgeCard(const int id, Qt::WindowFlags flags, QWidget *parent) :
+SCartridgeCard::SCartridgeCard(const int id, const int vendorIndex, Qt::WindowFlags flags, QWidget *parent) :
     SCartridgeCard(flags, parent)
 {
-    m_id = id;
-    load(m_id);
+    if(id)
+    {
+        load(id);
+    }
+    else
+    {
+        m_vendorIndex = vendorIndex;
+    }
+
+    updateWidgets();
 }
 
 SCartridgeCard::~SCartridgeCard()
@@ -36,35 +44,17 @@ SCartridgeCard::~SCartridgeCard()
 
 void SCartridgeCard::load(const int id)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-
     m_id = id;
-    query->exec(QString("SELECT `name`, `maker`, `full_weight`, `toner_weight`, `resource`, `created`, `user`, `notes`, `photo`, `color`, `archive` FROM `cartridge_cards` WHERE `id` = %1;").arg(m_id));
-    if(query->first())
-    {
-        m_deviceMaker = query->value("maker").toInt();
-        m_name = query->value("name").toString();
-        m_notes = query->value("notes").toString();
-        m_fullWeight = query->value("full_weight").toInt();
-        m_tonerWeight = query->value("toner_weight").toInt();
-        m_resource = query->value("resource").toInt();
-        m_color = query->value("color").toInt();
-        m_photo = new QByteArray(query->value("photo").toByteArray());
-        m_isArchive = query->value("archive").toBool();
-    }
 
-    delete query;
-
-    initWidgets();
-    updateWidgets();
+    m_cardModel->load(m_id);
+    m_materialsModel->setCardId(m_id);
+    m_materialsModel->select();
 }
 
 void SCartridgeCard::initModels()
 {
     QString query;
     QSqlQuery q(QSqlDatabase::database("connMain"));
-    m_materialsFilter.op = FilterList::And;
-    m_materialsFilter.fields.append(STableViewBase::initFilterField("card_id", FilterField::Equals, m_id));
 
     query = QUERY_SEL_CARTRIDGE_CAT_ID;
     q.exec(query);
@@ -76,17 +66,8 @@ void SCartridgeCard::initModels()
     m_vendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
 
     m_cardModel = new SCartridgeCardModel();
-    m_cardModel->load(m_id);
     m_materialsModel = new SCartridgeMaterialsModel();
-    m_materialsModel->setCardId(m_id);
-    m_materialsModel->setSelectStatement(QUERY_SEL_CARTRIDGE_MATERIALS);
-    m_materialsModel->setFilter(QString("`card_id` = %1").arg(m_id));
-    m_materialsModel->select();
     connect(m_materialsModel, &SCartridgeMaterialsModel::noFurtherMaterialAddition, ui->pushButtonAddMaterial, &QPushButton::setDisabled);
-    if(m_id)
-    {
-        m_materialsModel->setCardId(m_id);
-    }
     m_cartridgeColors = colorsList();
 }
 
@@ -97,8 +78,8 @@ void SCartridgeCard::initWidgets()
     ui->comboBoxVendor->setCurrentIndex(-1);
     ui->tableViewMaterials->setModel(m_materialsModel);
     m_materialsModel->findNextMaterial();   // если в карточке уже заданы все расходные материалы, то кнопка "Добавить" будет отключена
-    ui->spinBoxResource->setMinimum(1);
-    ui->spinBoxResource->setMaximum(30);
+    ui->spinBoxResource->setMinimum(0);
+    ui->spinBoxResource->setMaximum(30);    // см. описание метода SCartridgeCardModel::resource()
     ui->spinBoxFullWeight->setMinimum(100);
     ui->spinBoxFullWeight->setMaximum(1000);
     ui->spinBoxTonerWeight->setMinimum(10);
@@ -112,6 +93,7 @@ void SCartridgeCard::initWidgets()
     connect(ui->pushButtonRemoveMaterial, &QPushButton::clicked, this, &SCartridgeCard::removeMaterial);
     connect(ui->spinBoxTonerWeight, qOverload<int>(&QSpinBox::valueChanged), m_materialsModel, &SCartridgeMaterialsModel::setDefaultTonerWeight);
     connect(ui->pushButtonCreateSave, &QPushButton::clicked, this, &SCartridgeCard::commit);
+    connect(ui->pushButtonCancel, &QPushButton::clicked, this, &SCartridgeCard::closeForm);
 }
 
 void SCartridgeCard::updateWidgets()
@@ -121,21 +103,25 @@ void SCartridgeCard::updateWidgets()
         ui->pushButtonCreateSave->setText(tr("Сохранить"));
         ui->checkBoxArchive->setVisible(true);
         ui->checkBoxArchive->setChecked(m_isArchive);
-        ui->comboBoxVendor->setCurrentIndex(m_vendorsModel->rowByDatabaseID(m_deviceMaker));
-        ui->lineEditName->setText(m_name);
-        ui->spinBoxResource->setValue(m_resource);
-        ui->spinBoxFullWeight->setValue(m_fullWeight);
-        ui->spinBoxTonerWeight->setValue(m_tonerWeight);
-        ui->plainTextEditNotes->setPlainText(m_notes);
-        ui->comboBoxColor->setCurrentIndex(m_color);
+        ui->comboBoxVendor->setCurrentIndex(m_vendorsModel->rowByDatabaseID(m_cardModel->vendor()));
+        ui->lineEditName->setText(m_cardModel->name());
+        ui->spinBoxResource->setValue(m_cardModel->resource());
+        ui->spinBoxFullWeight->setValue(m_cardModel->fullWeight());
+        ui->spinBoxTonerWeight->setValue(m_cardModel->tonerWeight());
+        ui->plainTextEditNotes->setPlainText(m_cardModel->notes());
+        ui->comboBoxColor->setCurrentIndex(m_cardModel->color());
         ui->tableViewMaterials->refresh();
         ui->pushButtonRemoveMaterial->setEnabled(false);
     }
     else
     {
+        ui->comboBoxVendor->setCurrentIndex(m_vendorIndex);
+        ui->spinBoxResource->setValue(5);
         ui->pushButtonCreateSave->setText(tr("Создать"));
         ui->checkBoxArchive->setVisible(false);
     }
+    if(m_vendorIndex >= 0)
+        ui->lineEditName->setFocus();
 }
 
 SStandardItemModel *SCartridgeCard::colorsList()
@@ -196,6 +182,7 @@ bool SCartridgeCard::commit()
     {
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
         m_cardModel->commit();
+        m_materialsModel->setCardId(m_cardModel->id());
         m_materialsModel->commit();
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Данные сохранены"), QColor(214,239,220), QColor(229,245,234));
 
@@ -219,9 +206,15 @@ bool SCartridgeCard::commit()
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
     }
+    if(!m_id)
+    {
+        m_id = m_cardModel->id();
+        emit newCardCreated(m_id);
+    }
     QUERY_LOG_STOP;
     delete query;
 
+    updateWidgets();
     return nErr;
 }
 
