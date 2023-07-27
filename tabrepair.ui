@@ -569,9 +569,9 @@ QListView::item  {
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBoxPlace">
+            <widget class="SComboBox" name="comboBoxPlace">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="insertPolicy">
               <enum>QComboBox::NoInsert</enum>
@@ -1598,8 +1598,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <slot>createGetOutDialog()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>366</x>
-     <y>942</y>
+     <x>404</x>
+     <y>982</y>
     </hint>
     <hint type="destinationlabel">
      <x>362</x>
@@ -1631,7 +1631,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <hints>
     <hint type="sourcelabel">
      <x>566</x>
-     <y>942</y>
+     <y>982</y>
     </hint>
     <hint type="destinationlabel">
      <x>542</x>
@@ -1694,8 +1694,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <slot>spinBoxAmountChanged(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>444</x>
-     <y>323</y>
+     <x>443</x>
+     <y>330</y>
     </hint>
     <hint type="destinationlabel">
      <x>1169</x>
@@ -1710,8 +1710,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <slot>saveDiagAmount()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>522</x>
-     <y>325</y>
+     <x>521</x>
+     <y>332</y>
     </hint>
     <hint type="destinationlabel">
      <x>1171</x>
@@ -1726,8 +1726,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <slot>spinBoxAmountEditingFinished()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>416</x>
-     <y>306</y>
+     <x>443</x>
+     <y>330</y>
     </hint>
     <hint type="destinationlabel">
      <x>1172</x>
@@ -1758,8 +1758,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <slot>saveSaleTableClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>795</x>
-     <y>354</y>
+     <x>803</x>
+     <y>378</y>
     </hint>
     <hint type="destinationlabel">
      <x>1167</x>

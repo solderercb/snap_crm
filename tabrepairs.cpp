@@ -105,9 +105,9 @@ void tabRepairs::refreshTable()
 {
     // TODO: нужно уйти от жестко заданных имён/алиасов таблиц
     // TODO: компания/офис
-    // TODO: сохранить текущую прокрутку и выделеные строки и попытаться восстановить после обновления
 
     ui->tableView->setQuery(QUERY_SEL_WORKSHOP_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setUniqueIdColumn(1);
     FilterList l1;
     l1.op = FilterList::And;
 
@@ -139,7 +139,7 @@ void tabRepairs::refreshTable()
     ui->tableView->setGrouping(query_group);
     ui->tableView->refresh();
 
-    tableUpdateDelay->start(10000);
+    tableUpdateDelay->start(userDbData->refreshTime*1000);
 }
 
 void tabRepairs::tableItemDoubleClick(QModelIndex item)

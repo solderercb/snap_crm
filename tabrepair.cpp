@@ -10,8 +10,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui(new Ui::tabRepair),
     repair_id(rep_id)
 {
-    query = new QSqlQuery(QSqlDatabase::database("connThird"));
-
     ui->setupUi(this);
 
     i_tabTitle = tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
@@ -92,7 +90,10 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     connect(worksAndPartsModel, &SSaleTableModel::tableDataChanged, this, &tabRepair::setSaveSaleTableEnabled);
     connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &tabRepair::saveTotalSumms);
 
+    ui->comboBoxPlace->setButtons("Clear");
     ui->comboBoxPlace->setModel(repairBoxesModel);
+    connect(ui->comboBoxPlace, qOverload<int>(&QComboBox::currentIndexChanged), this, &tabRepair::savePlace);
+    connect(ui->comboBoxPlace, &SComboBox::buttonClicked, this, &tabRepair::comboBoxPlaceButtonClickHandler);
     ui->comboBoxState->blockSignals(true);
     ui->comboBoxState->setModel(statusesProxyModel);
     statusesProxyModel->setFilterKeyColumn(Global::RepStateHeaders::Id);
@@ -148,7 +149,6 @@ tabRepair::~tabRepair()
     delete repairModel;
     delete clientModel;
     delete worksAndPartsModel;
-    delete query;
     if(m_autosaveDiag)
     {
         delete m_autosaveDiagTimer;
@@ -228,7 +228,6 @@ void tabRepair::updateWidgets()
     ui->lineEditPreagreedAmount->setText(sysLocale.toCurrencyString(repairModel->preAgreedAmount()));        // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
 
     ui->comboBoxPlace->setCurrentIndex(repairModel->boxIndex());
-    box_name = ui->comboBoxPlace->currentText();
     ui->comboBoxPlace->setEnabled(!modelRO);
     ui->lineEditColor->setStyleSheet(QString("background-color: %1;").arg(repairModel->color()));
     ui->lineEditWarrantyLabel->setText(repairModel->warrantyLabel());
@@ -664,15 +663,17 @@ void tabRepair::setPricesToZero()
 
 bool tabRepair::commit(const QString &notificationCaption, const QString &notificationText)
 {
+    bool nErr = 1;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
+    QUERY_LOG_START(metaObject()->className());
     try
     {
-        QUERY_LOG_START(metaObject()->className());
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
         repairModel->updateLastSave();
         nErr = repairModel->commit();
         shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
         QUERY_COMMIT_ROLLBACK(query,nErr);
-        QUERY_LOG_STOP;
     }
     catch (Global::ThrowType type)
     {
@@ -688,9 +689,12 @@ bool tabRepair::commit(const QString &notificationCaption, const QString &notifi
         }
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
-        return 0;
     }
-    return 1;
+    QUERY_LOG_STOP;
+
+    delete query;
+
+    return nErr;
 }
 
 void tabRepair::saveState()
@@ -890,6 +894,28 @@ void tabRepair::addCustomWork()
     ui->tableViewWorksAndSpareParts->scrollToBottom();
     ui->tableViewWorksAndSpareParts->setCurrentIndex(worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColName));
     ui->tableViewWorksAndSpareParts->setFocus();
+}
+
+void tabRepair::savePlace(int index)
+{
+    int currentPlace = repairModel->boxIndex();
+
+    if(currentPlace == index)
+        return;
+
+    repairModel->setBoxIndex(index);
+    if(!commit())
+    {
+        ui->comboBoxPlace->blockSignals(true);
+        ui->comboBoxPlace->setCurrentIndex(currentPlace);
+        ui->comboBoxPlace->blockSignals(false);
+    }
+}
+
+void tabRepair::comboBoxPlaceButtonClickHandler(int id)
+{
+    if(id == SLineEdit::Clear)
+        savePlace(-1);
 }
 
 void tabRepair::comboBoxStateIndexChanged(int index)

@@ -606,7 +606,8 @@ void MainWindow::reactivateTabRepairNew(int)
 
 void MainWindow::switchToLastUsedTab()
 {
-    ui->tabWidget->setCurrentWidget(tabList.last());
+    if(!tabList.isEmpty())
+        ui->tabWidget->setCurrentWidget(tabList.last());
 }
 
 void MainWindow::createTabSale(int doc_id)

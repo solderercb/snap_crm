@@ -59,6 +59,8 @@ public:
     void filter(const FilterList &filter);
     static FilterField initFilterField(const QString &column, FilterField::Op matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
     void setGrouping(const QStringList &grouping);
+    void setUniqueIdColumn(int uniqueIdColumn);
+
 protected:
     STableBaseModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
@@ -89,6 +91,7 @@ protected:
     void initHorizontalHeaderMenu();
     void deleteHorizontalHeaderMenu();
     void resetRowVisibility();
+    int calculateVScrollOffset(const int rowScrollBeforeUpdate, const int idColumn, const QVariant uniqueId);
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
@@ -98,6 +101,7 @@ private:
     FilterList *m_filter = nullptr;
     QStringList *m_grouping = nullptr;
     int m_modelColumnsCount = 0;
+    int m_uniqueIdColumn = -1;
     void clearFilter();
     void clearGrouping();
     QString formatFilterGroup(const FilterList &filter);

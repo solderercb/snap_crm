@@ -49,7 +49,6 @@ private:
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
-
 public slots:
     void refreshTable();
 private slots:

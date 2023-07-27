@@ -75,8 +75,6 @@ public:
     QString tabTitle() override;
     bool tabCloseRequest() override;
 private:
-    QSqlQuery *query;
-    bool nErr = 1;
     Ui::tabRepair *ui;
     static QMap<int, tabRepair*> p_instance;
     int repair_id;
@@ -163,6 +161,8 @@ private slots:
     void setSaveSaleTableEnabled();
     void buttonWorksAdminEdit(bool state);
     void addCustomWork();
+    void savePlace(int index);
+    void comboBoxPlaceButtonClickHandler(int id);
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};
