@@ -41,13 +41,13 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 //    widgetAction->setComboBoxXModel(repairModel);
     widgetAction->setFilterSettings(filterSettings);
 
-    connect(widgetAction, SIGNAL(hidden()), this, SLOT(refreshTable()));
+    connect(widgetAction, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
     connect(ui->buttonRepairNew, &QPushButton::clicked, this, &tabRepairs::buttonRepairNewClicked);
 
     // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.
     connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
 
-    QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(refreshTable()));
+    QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
     updateWidgets();
@@ -100,8 +100,10 @@ tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleto
  * При включении ЛЮБОГО фильтра (будь то текстовый поиск или фильтр по
  * категориям из всплывающего меню) будут отображаться в том числе и
  * выданные ремонты
+ * preserveScrollPos - флаг указывающий на необходимость сохранить текущюю позицию прокрутки, по умолчанию сохр.
+ * preserveSelection - флаг указывающий на необходимость сохранить текущее выделение, по умолчанию не сохр.
 */
-void tabRepairs::refreshTable()
+void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
 {
     // TODO: нужно уйти от жестко заданных имён/алиасов таблиц
     // TODO: компания/офис
@@ -137,9 +139,14 @@ void tabRepairs::refreshTable()
 
     ui->tableView->setFilter(l1);
     ui->tableView->setGrouping(query_group);
-    ui->tableView->refresh();
+    ui->tableView->refresh(preserveScrollPos, preserveSelection);
 
     tableUpdateDelay->start(userDbData->refreshTime*1000);
+}
+
+void tabRepairs::autorefreshTable()
+{
+    refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
 }
 
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
@@ -152,8 +159,13 @@ void tabRepairs::tableItemDoubleClick(QModelIndex item)
     }
 }
 
+/*  Поиск по введённому тексту
+ *  Производится с задержкой после ввода для уменьшения кол-ва запросов и исключения тормозов интерфейса
+*/
 void tabRepairs::lineEditSearchTextChanged(QString)
-{   // задержка поиска; запрос к базе будет выполняться после каждого введённого символа и при быстром наборе текста прога тормозит
+{
+    ui->tableView->clearSelection();
+    ui->tableView->resetVScrollPos();
     tableUpdateDelay->stop();
     tableUpdateDelay->start(350);
 }
@@ -186,6 +198,11 @@ void tabRepairs::tableModeChanged(bool mode)
     else
         ui->labelTableMode->setText(tr("Ремонты"));
 
-    refreshTable();
+    refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+}
+
+void tabRepairs::filterMenuClosed()
+{
+    refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
 }
 

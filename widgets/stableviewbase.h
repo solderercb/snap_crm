@@ -46,6 +46,8 @@ class STableViewBase : public QTableView
     Q_OBJECT
 public:
     enum horizontalHeaderMenuActions{ToggleAutoWidth = 1, FitContent, BestFitAll, SetDefault, Hide, ColumnChooser};
+    enum ScrollPos {ScrollPosReset = 0, ScrollPosPreserve = 1};
+    enum Selection {SelectionReset = 0, SelectionPreserve = 1};
     explicit STableViewBase(QWidget *parent = nullptr);
     ~STableViewBase();
     void resizeEvent(QResizeEvent*) override;
@@ -60,7 +62,8 @@ public:
     static FilterField initFilterField(const QString &column, FilterField::Op matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
     void setGrouping(const QStringList &grouping);
     void setUniqueIdColumn(int uniqueIdColumn);
-
+    void resetVScrollPos();
+    void clearSelection();
 protected:
     STableBaseModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
@@ -91,7 +94,11 @@ protected:
     void initHorizontalHeaderMenu();
     void deleteHorizontalHeaderMenu();
     void resetRowVisibility();
-    int calculateVScrollOffset(const int rowScrollBeforeUpdate, const int idColumn, const QVariant uniqueId);
+    int calculateVScrollOffset(const int rowScrollBeforeUpdate, const QVariant uniqueId);
+    void saveScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate);
+    void restoreScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate);
+    void saveSelection();
+    void restoreSelection();
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
@@ -102,6 +109,7 @@ private:
     QStringList *m_grouping = nullptr;
     int m_modelColumnsCount = 0;
     int m_uniqueIdColumn = -1;
+    QList<QVariant> m_selectionList;
     void clearFilter();
     void clearGrouping();
     QString formatFilterGroup(const FilterList &filter);
@@ -112,7 +120,7 @@ private:
 public slots:
     void reset() override;
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс
-    virtual void refresh();
+    virtual void refresh(bool preserveScrollPos = ScrollPosReset, bool preserveSelection = SelectionReset);
 protected slots:
     virtual void columnResized(int column, int oldWidth, int newWidth);
 #if QT_VERSION >= 0x060000

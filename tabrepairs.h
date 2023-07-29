@@ -16,6 +16,7 @@
 #include "tabcommon.h"
 #include "models/stablerepairsmodel.h"
 #include "models/repairtablefiltermenu.h"
+#include "widgets/stableviewbase.h"
 
 namespace Ui {
 class tabRepairs;
@@ -50,12 +51,14 @@ private:
     void randomFill() override{};
 #endif
 public slots:
-    void refreshTable();
+    void autorefreshTable();
+    void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
 private slots:
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();
     void tableModeChanged(bool mode);
+    void filterMenuClosed();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

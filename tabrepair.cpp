@@ -80,7 +80,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
     worksAndPartsModel->setPriceColumn(0);
-    repairModel->setWorksAndPartsModel(worksAndPartsModel);
+//    repairModel->setWorksAndPartsModel(worksAndPartsModel);
     if(userDbData->autosavePartList)
         ui->switchEditStrategy->setChecked(true);
     else

@@ -674,10 +674,9 @@ int STableViewBase::columnByName(const QString &name)
 /* Вычисление смещения положения вертикальной полосы прокрутки.
  * Предназначена для случаев, если изменилось кол-во строк в модели данных таблицы после обновления
  * rowScrollBeforeUpdate - положение полосы прокрутки до обновления модели данных (всегда измеряется в строках)
- * idColumn - номер столбца с ID
  * uniqueId - ID записи (например, номер ремонта) для поиска размера смещения прокрутки
 */
-int STableViewBase::calculateVScrollOffset(const int rowScrollBeforeUpdate, const int idColumn, const QVariant uniqueId)
+int STableViewBase::calculateVScrollOffset(const int rowScrollBeforeUpdate, const QVariant uniqueId)
 {
     int scrollMode = verticalScrollMode();
     QModelIndex indexUpper, indexLower;
@@ -686,7 +685,7 @@ int STableViewBase::calculateVScrollOffset(const int rowScrollBeforeUpdate, cons
 
     rowAtScroll = rowScrollBeforeUpdate;
 
-    if(model()->index(rowAtScroll, idColumn).data() == uniqueId)
+    if(model()->index(rowAtScroll, m_uniqueIdColumn).data() == uniqueId)
         return 0;
 
     rowUpper = rowAtScroll - 1;
@@ -695,23 +694,119 @@ int STableViewBase::calculateVScrollOffset(const int rowScrollBeforeUpdate, cons
     {
         if(rowUpper >= 0)
         {
-            indexUpper = model()->index(rowUpper, idColumn);
+            indexUpper = model()->index(rowUpper, m_uniqueIdColumn);
             scrollOffsetUp -= scrollMode?rowHeight(rowUpper):1;
-            if(model()->index(rowUpper, idColumn).data() == uniqueId)
+            if(model()->index(rowUpper, m_uniqueIdColumn).data() == uniqueId)
                 return scrollOffsetUp;
             rowUpper--;
         }
         if(rowLower < model()->rowCount())
         {
-            indexLower = model()->index(rowLower, idColumn);
+            indexLower = model()->index(rowLower, m_uniqueIdColumn);
             scrollOffsetDown += scrollMode?rowHeight(rowLower - 1):1;
-            if(model()->index(rowLower, idColumn).data() == uniqueId)
+            if(model()->index(rowLower, m_uniqueIdColumn).data() == uniqueId)
                 return scrollOffsetDown;
             rowLower++;
         }
     }
 
     return 0; // если строка с уникальным id не будет найдена
+}
+
+void STableViewBase::saveScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate)
+{
+    int scrollMode = verticalScrollMode();
+    QModelIndex index;
+//    int topVisibleRowOffset;
+    rowCountBeforeUpdate = model()->rowCount();
+    vScrollValue = verticalScrollBar()->value();
+    hScrollValue = horizontalScrollBar()->value();
+    if(scrollMode == QAbstractItemView::ScrollMode::ScrollPerPixel)
+    {
+        index = indexAt(QPoint(vScrollValue, 0));
+        topVisibleRow = index.row();
+//        topVisibleRowOffset = rowViewportPosition(topVisibleRow);     // смещение строки; только в режиме прокрутки по пиксельно
+    }
+    else
+    {
+        index = model()->index(vScrollValue, 0);
+        topVisibleRow = index.row();
+    }
+    topVisibleRowUniqueId = index.siblingAtColumn(m_uniqueIdColumn).data();
+}
+
+void STableViewBase::restoreScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate)
+{
+    if(m_uniqueIdColumn >= 0 && model()->rowCount() != rowCountBeforeUpdate)
+    {
+        vScrollValue += calculateVScrollOffset(topVisibleRow, topVisibleRowUniqueId);
+    }
+
+    verticalScrollBar()->setValue(vScrollValue);
+    // На момент обновления гориз. полоса прокрутки еще не отрисована и максимальное значение верт. полосы меньше на высоту горизонтальной.
+    // Чтобы после обновления самая нижняя строка не перекрывалась гориз. полосой производим прокрутку вниз
+    if(vScrollValue >= verticalScrollBar()->maximum())
+        scrollToBottom();
+    horizontalScrollBar()->setValue(hScrollValue);
+}
+
+void STableViewBase::resetVScrollPos()
+{
+    scrollToTop();
+}
+
+/* Сохранение списка выделенных строк для восстановления после обновления модели
+ * Только при режиме выбора строк целиком
+*/
+void STableViewBase::saveSelection()
+{
+    if(selectionBehavior() != QAbstractItemView::SelectRows)
+        return;
+
+    QModelIndexList list = selectedIndexes();
+    int row = -1;
+    foreach(QModelIndex index, list)
+    {
+        if(row == index.row())
+            continue;
+
+        row = index.row();
+        m_selectionList.append(index.siblingAtColumn(m_uniqueIdColumn).data());
+    }
+}
+
+/* Восстановление выделенных строк из ранее сохранённого списка
+ * Только при режиме выбора строк целиком
+*/
+void STableViewBase::restoreSelection()
+{
+    if(selectionBehavior() != QAbstractItemView::SelectRows)
+        return;
+
+    QVariant data;
+    QItemSelection selection;
+    for(int i = 0; i < model()->rowCount() && m_selectionList.size(); i++)
+    {
+        data = model()->index(i, m_uniqueIdColumn).data();
+        if(m_selectionList.contains(data))
+        {
+            m_selectionList.removeOne(data);
+
+            // выделение строк; thanks Patrick: https://stackoverflow.com/a/28699402
+            QItemSelectionRange rowSel(model()->index(i, 0), model()->index(i, model()->columnCount() - 1));
+            selection.append(rowSel);
+        }
+    }
+    selectionModel()->select(selection, QItemSelectionModel::Select);
+    m_selectionList.clear();    // если вдруг в списке остались элементы
+}
+
+/*  Очистка списка выделенных строк
+*/
+void STableViewBase::clearSelection()
+{
+    m_selectionList.clear();
+    QTableView::clearSelection();
 }
 
 /* Установка номера столбца с уникальным ID, например, номером ремонта.
@@ -723,7 +818,11 @@ void STableViewBase::setUniqueIdColumn(int uniqueIdColumn)
     m_uniqueIdColumn = uniqueIdColumn;
 }
 
-void STableViewBase::refresh()
+/* Обновление модели данных для таблицы ремонтов с учетом фильтров.
+ * preserveScrollPos - флаг указывающий на необходимость сохранить текущюю позицию прокрутки, по умолчанию не сохр.
+ * preserveSelection - флаг указывающий на необходимость сохранить текущее выделение, по умолчанию не сохр.
+*/
+void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
 {
     if (m_query.isEmpty() || (!m_db.isValid()))
         return;
@@ -731,28 +830,18 @@ void STableViewBase::refresh()
     if(verticalScrollBar()->isSliderDown() || horizontalScrollBar()->isSliderDown())
         return;
 
+    if(preserveSelection)
+        saveSelection();
+
     QString query = m_query;
-    // TODO: сохранение состояния сортировки (положение прокрутки нужно сбросить при изменении сортировки).
-    int scrollMode = verticalScrollMode();
-    int rowCountBeforeUpdate = model()->rowCount();
-    int vScrollValue = verticalScrollBar()->value();
-    int hScrollValue = horizontalScrollBar()->value();
+    int rowCountBeforeUpdate;
+    int vScrollValue;
+    int hScrollValue;
     int topVisibleRow;
-    int topVisibleRowOffset;
     QVariant topVisibleRowUniqueId;
-    QModelIndex index;
-    if(scrollMode == QAbstractItemView::ScrollMode::ScrollPerPixel)
-    {
-        index = indexAt(QPoint(vScrollValue, 0));
-        topVisibleRow = index.row();
-        topVisibleRowOffset = rowViewportPosition(topVisibleRow);     // смещение строки; только в режиме прокрутки по пиксельно
-    }
-    else
-    {
-        index = model()->index(vScrollValue, 0);
-        topVisibleRow = index.row();
-    }
-    topVisibleRowUniqueId = index.siblingAtColumn(m_uniqueIdColumn).data();
+
+    if(preserveScrollPos)
+        saveScrollPos(vScrollValue, hScrollValue, topVisibleRow, topVisibleRowUniqueId, rowCountBeforeUpdate);
 
     m_model->clear();
 
@@ -782,22 +871,11 @@ void STableViewBase::refresh()
     m_model->setQuery(query, QSqlDatabase::database("connMain"));
 //    qDebug().nospace().noquote() << "[" << this << "] () | \r\n" << query;
 
-    if(0) // условия обнуления положения полосы прокрутки, например, изменение сортировки
-    {
-        vScrollValue = 0;
-    }
-    else if(m_uniqueIdColumn >= 0 && model()->rowCount() != rowCountBeforeUpdate)
-    {
-        vScrollValue += calculateVScrollOffset(topVisibleRow, m_uniqueIdColumn, topVisibleRowUniqueId);
-    }
-    //else // установка значения положения полосы прокрутки, сохранённого до обновления модели
+    if(preserveScrollPos)
+        restoreScrollPos(vScrollValue, hScrollValue, topVisibleRow, topVisibleRowUniqueId, rowCountBeforeUpdate);
 
-    verticalScrollBar()->setValue(vScrollValue);
-    // На момент обновления гориз. полоса прокрутки еще не отрисована и максимальное значение верт. полосы меньше на высоту горизонтальной.
-    // Чтобы после обновления самая нижняя строка не перекрывалась гориз. полосой производим прокрутку вниз
-    if(vScrollValue >= verticalScrollBar()->maximum())
-        scrollToBottom();
-    horizontalScrollBar()->setValue(hScrollValue);
+    if(preserveSelection)
+        restoreSelection();
 }
 
 void STableViewBase::filter(const FilterList &filter)
