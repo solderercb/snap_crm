@@ -9,6 +9,7 @@
 #include <QSignalMapper>
 #include <QMetaEnum>
 #include <QDebug>
+#include <QResizeEvent>
 
 class SLineEdit : public QLineEdit
 {
@@ -35,7 +36,6 @@ public:
     void setText(const QString &text);
     bool isAutoSetCursorPositionToBegin() const;
     void enableAutoSetCursorPositionToBegin(bool state);
-
 private:
     QStringList allowedButtonsList = { "Clear", "DownArrow", "Edit", "Search", "Print", "Apply", "Open", "Add" };
 //    QList<QString> buttonIconList = { "🗙", "▼", "🖉", "🔍", "🖶", "🗸", "🗁" };

@@ -124,8 +124,10 @@ void SLineEdit::arrangeButtons()
 
 void SLineEdit::resizeEvent(QResizeEvent *e)
 {
+    QMargins m = textMargins();
     arrangeButtons();
     QLineEdit::resizeEvent(e);
+    setTextMargins(m);
 }
 
 void SLineEdit::mouseDoubleClickEvent(QMouseEvent *e)

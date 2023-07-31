@@ -5,7 +5,7 @@
 #define MAJOR 0
 #define MINOR 3
 #define PATCH 1
-#define COMMIT 48
+#define COMMIT 49
 
 #include <QCoreApplication>
 #include <QApplication>

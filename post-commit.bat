@@ -1,6 +1,6 @@
 @echo off
 chcp 65001
-for /f "TOKENS=*" %%v in ('hg identify --num -r .') do (
+for /f "TOKENS=*" %%v in ('hg identify --num -r tip') do (
   set /A version=%%v + 1
   )
 ::echo %version%

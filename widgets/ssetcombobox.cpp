@@ -401,8 +401,7 @@ void SSetComboBox::addItem(const QString &text)
 
     rearrangeDaughterLineEdits(this->width());
 
-    proxyModel->setFilterFixedString("");
-    lineEditWidget->clear();
+    updateProxyModelFilter("");
 
     // элементы в списке могут содержать спец. поле для уточнения выбранного свойства
     // например, если пользователь заполняет комплектность устройства и выбирает "адаптер питания <модель>",
@@ -451,11 +450,12 @@ void SSetComboBox::activatedHandler(int index)
 void SSetComboBox::updateProxyModelFilter(const QString &text)
 {
     int cursorPos = lineEditWidget->cursorPosition();
-    proxyModel->setFilterFixedString(text); // установка фильтра обновляет модель, и заменяет текущий текст
-                                            // LineEdit на текст первого элемента в обновлённом выпадающем списке
+    proxyModel->setFilterFixedString(text);         // установка фильтра обновляет модель, и заменяет текущий текст
+                                                    // LineEdit на текст первого элемента в обновлённом выпадающем списке
+    lineEditWidget->setText(text);                  // поэтому перезаписываем текст обратно :-) дичь, а шо делать... не разобрался как (TODO) сделать это элегантнее
+    lineEditWidget->setCursorPosition(cursorPos);   // восстановление позиции курсора
 
-    lineEditWidget->setText(text);              // поэтому перезаписываем текст обратно :-) дичь, а шо делать... не разобрался как (TODO) сделать это элегантнее
-    lineEditWidget->setCursorPosition(cursorPos); // восстановление позиции курсора
+    updateLineEditGeometry();                       // также при обновлении прокси модели размер lineEdit уменьшается на 16пикс. и может частично скрыть дочерние lineEdit
 }
 
 void SSetComboBox::daughterLineEditTextChanged()
