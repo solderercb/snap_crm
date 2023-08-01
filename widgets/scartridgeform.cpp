@@ -44,7 +44,7 @@ void SCartridgeForm::initModels()
 
         worksAndPartsModel = new SSaleTableModel();
         worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
-        worksAndPartsModel->setPriceColumn(0);
+        worksAndPartsModel->setPriceColumn(SStoreItemModel::PriceOptionService);
         connect(worksAndPartsModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
         connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
         connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);

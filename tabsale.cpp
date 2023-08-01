@@ -29,7 +29,8 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 
     ui->comboBoxPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxMoneyBackAccount->setModel(paymentSystemsModel);
-    ui->comboBoxPriceCol->setModel(priceColModel);
+    initPriceColModel();
+    ui->comboBoxPriceCol->setModel(m_priceColProxyModel);
     ui->comboBoxCompany->setModel(companiesModel);  // TODO: несколько компаний
     ui->comboBoxClientPhoneType->setModel(clientPhoneTypesModel);
     ui->comboBoxClientPhoneType->setModelColumn(0);
@@ -90,6 +91,14 @@ QString tabSale::tabTitle()
     if(doc_id)
         return tr("Расходная накладная %1").arg(doc_id);
     return tr("Продажа");
+}
+
+void tabSale::initPriceColModel()
+{
+    m_priceColProxyModel = new SSortFilterProxyModel();
+    m_priceColProxyModel->setSourceModel(priceColModel);
+    m_priceColProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(SStoreItemModel::PriceOptionWarranty) + ")).*$"));
+    m_priceColProxyModel->setFilterKeyColumn(1);
 }
 
 void tabSale::setDefaultStyleSheets()
@@ -553,15 +562,15 @@ void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
     }
 }
 
-void tabSale::selectPriceCol(int comboBoxIndex)
+void tabSale::selectPriceCol(int index)
 {
     if(tableModel->modelState() == SSaleTableModel::State::StoreNew || tableModel->modelState() == SSaleTableModel::State::StoreReserved)
-        tableModel->setPriceColumn(comboBoxIndex);
+        tableModel->setPriceColumn((SStoreItemModel::PriceOption)m_priceColProxyModel->databaseIDByRow(index));
 }
 
 void tabSale::addItemByUID()
 {
-    tableModel->addItemByUID(ui->lineEditAddByUID->text().toInt(), ui->comboBoxPriceCol->currentIndex());
+    tableModel->addItemByUID(ui->lineEditAddByUID->text().toInt());
     ui->lineEditAddByUID->setText("");
 }
 

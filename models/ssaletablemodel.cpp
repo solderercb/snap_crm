@@ -246,7 +246,7 @@ void SSaleTableModel::addCustomWork()
 
 /* Добавление работы из прайс-листа
 */
-bool SSaleTableModel::addWorkByUID(const int uid, const int priceOption)
+bool SSaleTableModel::addWorkByUID(const int uid, const SStoreItemModel::PriceOption priceOption)
 {
 //    QSqlQueryModel *work;
 //    int row = -1;
@@ -268,7 +268,7 @@ bool SSaleTableModel::addWorkByUID(const int uid, const int priceOption)
  *  В режиме простой продажи нельзя добавить один и тот же товар дважды (TODO: пересмотреть это решение)
  *  возвращает 0 в случае неудачи
 */
-bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const int count)
+bool SSaleTableModel::addItemByUID(const int uid, const SStoreItemModel::PriceOption priceOption, const int count)
 {
     QSqlQueryModel *item = nullptr;
     int row = -1;
@@ -284,7 +284,7 @@ bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const i
             if(m_tableMode == TablesSet::StoreSale && rowItemAlreadyInList >= 0)
                 throw 0;
 
-            item->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->index(priceOption, 2).data().toString(), count), QSqlDatabase::database("connMain"));
+            item->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->value(priceOption, "id", "dbColumn").toString(), count), QSqlDatabase::database("connMain"));
             if(count > item->record(0).value("avail").toInt())
                 throw 1;
 
@@ -331,7 +331,15 @@ bool SSaleTableModel::addItemByUID(const int uid, const int priceOption, const i
     return ret;
 }
 
-bool SSaleTableModel::addItemFromBasket(const int id, const int qty, const int priceOpt)
+/*  Добавление товара по id
+ *  Это перегруженный метод; товар добавляется с ценой, заданной при вызове метода setPriceColumn()
+ */
+bool SSaleTableModel::addItemByUID(const int uid, const int count)
+{
+    return addItemByUID(uid, m_priceColumnId, count);
+}
+
+bool SSaleTableModel::addItemFromBasket(const int id, const int qty, const SStoreItemModel::PriceOption priceOpt)
 {
     QSqlQueryModel *item = nullptr;
     bool ret = 1;
@@ -495,15 +503,15 @@ int SSaleTableModel::pendingRemoveItemsCount()
 /* Обновление цены
  * в данном методе для всех товаров, уже добавленных в таблицу, будут запрошен соответствующая колонка цен
  */
-void SSaleTableModel::setPriceColumn(const int idx)
+void SSaleTableModel::setPriceColumn(const SStoreItemModel::PriceOption id)
 {
-    m_priceIndex = idx;
+    m_priceColumnId = id;
     if(rowCount() == 0)
         return;
 
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
 
-    query->prepare(QUERY_SEL_STORE_ITEMS_ITEM_PRICE(priceColModel->index(idx, 2).data().toString()));
+    query->prepare(QUERY_SEL_STORE_ITEMS_ITEM_PRICE(priceColModel->value(id, "id", "dbColumn").toString()));
     for(int i = 0; i < rowCount(); i++)
     {
         query->bindValue(":id", index(i,  SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
@@ -1239,7 +1247,7 @@ QVariant SSaleTableModel::value(const int row, const int column, const int role)
 void SSaleTableModel::setModelState(int state)
 {
     m_modelState = state;
-    modelStateChanged(m_modelState);
+    emit modelStateChanged(m_modelState);
     endResetModel();    // для перерисовки кнопок в таблице
 }
 
@@ -1460,8 +1468,8 @@ void SSaleTableModel::dbgAddRandomItem()
 
         query->first();
         if(query->isValid())
-            addItemByUID(query->record().value(0).toInt(), m_priceIndex);
-//            addItemByUID(28147, m_priceIndex);
+            addItemByUID(query->record().value(0).toInt(), m_priceColumnId);
+//            addItemByUID(28147, m_priceColumnId);
     }
     delete query;
 }
@@ -1479,8 +1487,8 @@ void SSaleTableModel::dbgAddRandomItemBasket()
 
         query->first();
         if(query->isValid())
-            addItemFromBasket(query->record().value(0).toInt(), 0, m_priceIndex);
-//            addItemFromBasket(19728, 0, m_priceIndex);
+            addItemFromBasket(query->record().value(0).toInt(), 0, m_priceColumnId);
+//            addItemFromBasket(19728, 0, m_priceColumnId);
     }
     delete query;
 }

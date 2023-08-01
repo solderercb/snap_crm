@@ -1,7 +1,7 @@
 #include "global.h"
 #include "com_sql_queries.h"
 #include "models/sclientmodel.h"
-#include "models/scartridgematerialsmodel.h"
+#include "models/sstoreitemmodel.h"
 
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
@@ -64,7 +64,6 @@ QMap<QString, QVariant> *debugLoginOptions = nullptr;
 SStandardItemModel* storeItemsIntReserveStatesModel = new SStandardItemModel;
 QVector<QWidget*> tabList;
 SStandardItemModel *cartridgeRepeatReason = new SStandardItemModel();
-SStandardItemModel *cartridgeMaterialsListModel;
 
 //QWidget *modalWidget = nullptr;
 
@@ -261,18 +260,7 @@ void initGlobalModels()
     rejectReasonModel->setObjectName("rejectReasonModel");
     rejectReasonModel->setHorizontalHeaderLabels({"name","id"});
 
-    QVector<QString> priceColNamesList = {QObject::tr("Цена для сервиса"), QObject::tr("Цена розница"), QObject::tr("Цена опт"), QObject::tr("Цена опт2"), QObject::tr("Цена опт3")};
-    QVector<QString> priceColIdsList = {"1", "2", "3", "4", "5"};
-    QVector<QString> priceColDBFieldsList = {"price", "price2", "price3", "price4", "price5"};
-    QList<QStandardItem*> *priceColSelector;
-    for (int i=0; i<priceColNamesList.size(); i++)
-    {
-        priceColSelector = new QList<QStandardItem*>();
-        *priceColSelector << new QStandardItem(priceColNamesList.at(i)) << new QStandardItem(priceColIdsList.at(i)) << new QStandardItem(priceColDBFieldsList.at(i));
-        priceColModel->appendRow(*priceColSelector);
-    }
-    priceColModel->setObjectName("priceColModel");
-    priceColModel->setHorizontalHeaderLabels({"name", "id", "dbColumn"});
+    priceColModel = SStoreItemModel::priceOptionsList();
 
     QVector<QString> itemUnitsList = {QObject::tr("шт"), QObject::tr("г"), QObject::tr("м"), QObject::tr("см"), QObject::tr("л")};
     QVector<QString> itemUnitsIdsList = {"1", "2", "3", "4", "5"};
@@ -308,7 +296,6 @@ void initGlobalModels()
     cartridgeRepeatReason->setObjectName("cartridgeRepeatReason");
     cartridgeRepeatReason->setHorizontalHeaderLabels({"name", "id"});
 
-    cartridgeMaterialsListModel = SCartridgeMaterialsModel::materialsList();
 #ifdef QT_DEBUG
     initClients4Test();
 #endif

@@ -79,7 +79,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     statusesProxyModel->setSourceModel(statusesModel);
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
-    worksAndPartsModel->setPriceColumn(0);
+    worksAndPartsModel->setPriceColumn(SStoreItemModel::PriceOptionService);
 //    repairModel->setWorksAndPartsModel(worksAndPartsModel);
     if(userDbData->autosavePartList)
         ui->switchEditStrategy->setChecked(true);
@@ -580,7 +580,7 @@ void tabRepair::onReturnQuickAddPart()
         ui->lineEditQuickAddPart->setText("");
 }
 
-/*
+/* Быстрое добавление товара по UID
  * Возвращает 0 в случае неудачи
 */
 bool tabRepair::quickAddPart(const int uid)
@@ -588,7 +588,8 @@ bool tabRepair::quickAddPart(const int uid)
     if(m_worksRO)
         return 0;
 
-    return worksAndPartsModel->addItemByUID(uid, 1);
+    // TODO: диалог ввода кол-ва
+    return worksAndPartsModel->addItemByUID(uid);
 }
 
 void tabRepair::editIncomingSet(int)

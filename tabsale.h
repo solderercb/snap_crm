@@ -12,6 +12,7 @@
 #include "tabcommon.h"
 #include "models/sdocumentmodel.h"
 #include "models/sstandarditemmodel.h"
+#include "models/ssortfilterproxymodel.h"
 #include "models/ssqlquerymodel.h"
 #include "models/ssaletablemodel.h"
 #include "models/slogrecordmodel.h"
@@ -71,11 +72,13 @@ private:
 //    SaleTableItemDelegates *itemDelagates;
     tabSaleSettingsMenu *widgetAction;
     SCashRegisterModel *cashRegister;
+    SSortFilterProxyModel *m_priceColProxyModel;
     int client = 0;
     int price_col = 2;
     int m_opType = 0;
     int *params;
     int m_docState = 0;
+    void initPriceColModel();
     void eventResize(QResizeEvent *);
     void setDefaultStyleSheets();
     void setBalanceWidgetsVisible(bool);

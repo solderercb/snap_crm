@@ -35,6 +35,25 @@ SStoreItemModel::~SStoreItemModel()
     delIntegrityCheckObjects();
 }
 
+SStandardItemModel *SStoreItemModel::priceOptionsList()
+{
+    SStandardItemModel *list;
+    QMetaEnum types = SStoreItemModel::staticMetaObject.enumerator(SStoreItemModel::staticMetaObject.indexOfEnumerator("PriceOption"));
+    QVector<QString> priceColDBFieldsList = {"`price`", "`price2`", "`price3`", "`price4`", "`price5`", "0"};
+    QList<QStandardItem*> dbFields;
+
+    list = SStandardItemModel::modelFromEnum(types, tr);
+    for (int i=0; i<priceColDBFieldsList.size(); i++)
+    {
+        dbFields << new QStandardItem(priceColDBFieldsList.at(i));
+    }
+    list->appendColumn(dbFields);
+    list->setObjectName("priceColModel");
+    list->setHorizontalHeaderLabels({"name", "id", "dbColumn"});
+
+    return list;
+}
+
 int id();
 bool SStoreItemModel::isHidden()
 {
@@ -917,6 +936,20 @@ bool SStoreItemModel::commit()
     return i_nErr;
 }
 
+void SStoreItemModel::translateNames()
+{
+    tr("PriceOptionService");
+    tr("PriceOptionRetail");
+    tr("PriceOptionWholesale");
+    tr("PriceOptionWholesale2");
+    tr("PriceOptionWholesale3");
+    tr("PriceOptionWarranty");
+}
+
+// TODO: добавить разрешение для периодического переучета товаров, например, "Уведомлять о необходимости переучета товаров"
+// Для этого завести таблицу очереди с товарами для переучета; товары заносить в очередь по истечении некоторого периода с
+// момента последнего переучета.
+// Генерировать уведомление пользователю, если в таблице есть не обработанные записи (т. е. должно быть только одно уведомление).
 //QDate SStoreItemModel::lastStocktaking_date()
 //{
 //    return m_lastStocktaking_date;

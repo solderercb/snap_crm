@@ -14,9 +14,12 @@ public:
     enum SaleMode {Store = 1, Repair = 2};
     enum SaleOpColumns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColUser, ColRealization, ColRetPercent, ColState, ColNotes, ColItemId, ColInPrice, ColObjId, ColDealer, ColBuyer, ColCreated, ColWorkId, ColRecordType, ColWorkType};
     Q_ENUM(SaleOpColumns)
+    enum PriceOption {PriceOptionService = 1, PriceOptionRetail = 2, PriceOptionWholesale = 3, PriceOptionWholesale2 = 4, PriceOptionWholesale3 = 5, PriceOptionWarranty = 255};
+    Q_ENUM(PriceOption)
     explicit SStoreItemModel(QObject *parent = nullptr);
     explicit SStoreItemModel(const QList<QStandardItem *> &record, const int qtyToSale = 0, QObject *parent = nullptr);
     ~SStoreItemModel();
+    static SStandardItemModel *priceOptionsList();
     int id();
     bool isHidden();
     void setHidden(const bool);
@@ -203,6 +206,7 @@ private:
     int m_buyerId;
     QString m_unsaleReason;
     int m_saleUser;
+    void translateNames();
 };
 
 #endif // SSTOREITEMMODEL_H

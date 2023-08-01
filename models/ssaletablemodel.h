@@ -57,9 +57,10 @@ public:
     bool insertRecord(int, const QSqlRecord &, const int recType = RecordType::Item);
     bool appendRecord(const QSqlRecord&);
     int isItemAlreadyInList(int);
-    bool addWorkByUID(const int uid, const int priceOption);
-    bool addItemByUID(const int uid, const int priceOption, const int count = 1);
-    bool addItemFromBasket(const int id, const int qty = 0, const int priceOpt = 0);
+    bool addWorkByUID(const int uid, const SStoreItemModel::PriceOption priceOption);
+    bool addItemByUID(const int uid, const int count = 1);
+    bool addItemByUID(const int uid, const SStoreItemModel::PriceOption priceOption, const int count = 1);
+    bool addItemFromBasket(const int id, const int qty = 0, const SStoreItemModel::PriceOption priceOption = SStoreItemModel::PriceOptionService);
     void removeRowHandler(const int, const int);
     void buttonHandler(const int buttonNum, const int row);
     void store_markRowRemove(const int, const int);
@@ -73,7 +74,7 @@ public:
     QString amountItemsLocale();
     QString amountWorksLocale();
     QMap<QString, int> *fields;
-    void setPriceColumn(const int index);
+    void setPriceColumn(const SStoreItemModel::PriceOption id);
     bool store_loadTable(const int);
     bool repair_loadTable(const int);
     void setClient(int);
@@ -143,7 +144,7 @@ private:
     QMap<int, int> *m_itemsPendingRemoveList;
     QMap<int, int> *m_worksPendingRemoveList;
     QMap<int, int> *m_itemsPendingSplitList;
-    int m_priceIndex = 1; // по умолчанию "Цена розница" ("`price2`")
+    SStoreItemModel::PriceOption m_priceColumnId = SStoreItemModel::PriceOptionRetail;
     QString m_extraUnsaleReason;
     bool m_tableMode = TablesSet::StoreSale;
     bool m_repairType = RepairType::RegularRepair;
