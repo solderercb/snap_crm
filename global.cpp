@@ -45,8 +45,8 @@ QString commonComboBoxStyleSheetRed = "QComboBox {  height: 18px; border: 1px so
         QComboBox:!editable:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
         QComboBox::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
 
-QString commonLineEditStyleSheet = "QLineEdit {  height: 18px; border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
-QString commonLineEditStyleSheetRed = "QLineEdit {  height: 18px; border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
+QString commonLineEditStyleSheet = "QLineEdit {  height: 18px; border: 1px solid gray;  padding: 1px 1px 1px 3px; background: #FFFFFF;}";
+QString commonLineEditStyleSheetRed = "QLineEdit {  height: 18px; border: 1px solid red;  padding: 1px 1px 1px 3px; background: #FFD1D1;}";
 QString commonTextEditStyleSheet = "QTextEdit {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
 QString commonTextEditStyleSheetRed = "QTextEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 QString commonDateEditStyleSheet = "QDateEdit {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";

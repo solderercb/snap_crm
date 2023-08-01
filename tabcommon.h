@@ -30,6 +30,7 @@ protected:
     QString i_tabTitle = "Untitled";
     QIcon *i_tabIcon = nullptr;
     bool eventFilter(QObject*, QEvent*) override;
+    void setCursorPositionsToZero();
 #ifdef QT_DEBUG
     virtual void randomFill(){};
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;

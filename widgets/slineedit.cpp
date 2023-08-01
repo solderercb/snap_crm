@@ -124,10 +124,8 @@ void SLineEdit::arrangeButtons()
 
 void SLineEdit::resizeEvent(QResizeEvent *e)
 {
-    QMargins m = textMargins();
     arrangeButtons();
     QLineEdit::resizeEvent(e);
-    setTextMargins(m);
 }
 
 void SLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
@@ -143,9 +141,17 @@ void SLineEdit::keyPressEvent(QKeyEvent *event)
     QLineEdit::keyPressEvent(event);
 }
 
+void SLineEdit::focusInEvent(QFocusEvent *e)
+{
+    QLineEdit::focusInEvent(e);
+    if(m_autoSetCursorPositionToBegin && e->reason() != Qt::ActiveWindowFocusReason)
+        QLineEdit::setCursorPosition(m_lastCursorPosition);
+}
+
 void SLineEdit::focusOutEvent(QFocusEvent *e)
 {
-    if(m_autoSetCursorPositionToBegin)
+    m_lastCursorPosition = QLineEdit::cursorPosition();
+    if(m_autoSetCursorPositionToBegin && e->reason() != Qt::ActiveWindowFocusReason)
         QLineEdit::setCursorPosition(0);
     QLineEdit::focusOutEvent(e);
 }

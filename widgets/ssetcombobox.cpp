@@ -145,6 +145,7 @@ SSetComboBox::SSetComboBox(QWidget *parent) :
     setEditable(true);
     setInsertPolicy(SComboBox::NoInsert);    // введённые пользователем не нужно добавлять в выпадающий список.
     setRowHeight(16);
+    lineEditWidget->enableAutoSetCursorPositionToBegin(false);
     daughterLineEditHeight = fontMetrics->height();     // высота дочерних lineEdit по умолчанию будет рассчитываться по размеру шрифта
     defaultComboBoxHeight = this->height();      // = 22; этот размер базовый, используется при перестановке дочерних LineEdit
 

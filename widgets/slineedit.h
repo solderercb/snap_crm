@@ -50,11 +50,12 @@ private:
     QSize buttonSize;
     bool m_extKeyPressHandler = 0;
     bool m_autoSetCursorPositionToBegin = 1;
-
+    int m_lastCursorPosition = 0;
 protected:
     void resizeEvent(QResizeEvent *) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void focusInEvent(QFocusEvent *) override;
     void focusOutEvent(QFocusEvent *e) override;
 private slots:
 };

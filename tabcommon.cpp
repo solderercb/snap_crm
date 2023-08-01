@@ -50,3 +50,11 @@ bool tabCommon::eventFilter(QObject *watched, QEvent *event)
 
     return false;
 }
+
+void tabCommon::setCursorPositionsToZero()
+{
+    QLineEdit *le;
+    QList<QLineEdit*> list = this->findChildren<QLineEdit*>(QRegularExpression(".*"));
+    foreach(le, list)
+        le->setCursorPosition(0);
+}
