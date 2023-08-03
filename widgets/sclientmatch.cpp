@@ -12,7 +12,7 @@ SClientMatch::SClientMatch(QWidget *parent) :
     ui->groupBoxClientMatch->installEventFilter(groupBoxEventFilter);
     ui->tableViewClientMatch->horizontalHeader()->setHidden(false);
     connect(groupBoxEventFilter,SIGNAL(toggleElementsVisibility()),this,SLOT(toggleElementsVisibility()));
-    clientsMatchTable = new QSqlQueryModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
+    clientsMatchTable = new SSqlFetchingModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
 }
 
 SClientMatch::~SClientMatch()
@@ -20,6 +20,12 @@ SClientMatch::~SClientMatch()
     delete ui;
     delete clientsMatchTable;
     delete groupBoxEventFilter;
+}
+
+void SClientMatch::clear()
+{
+    clientsMatchTable->clear();
+    this->hide();
 }
 
 void SClientMatch::setPhoneMask(const int index)
@@ -69,10 +75,9 @@ void SClientMatch::findClient()
         else
             this->hide();  // иначе прячем виджет
     }
-    else
+    else    // если кол-во введённых пользователем символов меньше трёх, то удаляем результаты предыдущего запроса и прячем виджет.
     {
-        clientsMatchTable->clear(); // если кол-во введённых пользователем символов меньше трёх, то удаляем результаты предыдущего запроса и прячем виджет.
-        this->hide();
+        clear();
     }
 }
 

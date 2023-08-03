@@ -29,7 +29,7 @@ private:
     void createClient();
     void setDefaultStyleSheets();
 public slots:
-    void clearClientCreds(bool hideCoincidence = true);
+    void clearClientCreds(bool keepCoincidenceShown = true);
     void fillClientCreds(int);
 private slots:
     void buttonSelectExistingClientClicked();

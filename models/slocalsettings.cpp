@@ -75,18 +75,21 @@ QString SLocalSettings::appSettingsPath()
     return settingsPath.path();
 }
 
-bool SLocalSettings::genSettingsFileFullPath(QFile &file)
+bool SLocalSettings::genSettingsFileFullPath(QFile &file, Operation op)
 {
+    QString fileName = file.fileName();
     QString settingsPath = appSettingsPath();
     QDir::setCurrent(settingsPath + "/..");
 
-    file.setFileName(settingsPath + "/" + file.fileName());
-    if(file.exists())
-        return 1;
-
-    if (selMostRecentSettingFile(file.fileName()))    // QDir::current() будет обновлён
+    file.setFileName(settingsPath + "/" + fileName);
+    if(file.exists() || op == SaveFile)
     {
-        file.setFileName(QDir::current().absolutePath() + "/" + file.fileName());
+        return 1;
+    }
+
+    if (selMostRecentSettingFile(fileName))    // QDir::current() будет обновлён
+    {
+        file.setFileName(QDir::current().absolutePath() + "/" + fileName);
         return 1;
     }
 
@@ -178,7 +181,7 @@ bool SLocalSettings::read(QSerializer *obj, SettingsVariant variant, const QStri
     m_settingsVariant = variant;
 
     genSettingsFileName(file, subVariant);
-    if (genSettingsFileFullPath(file))
+    if (genSettingsFileFullPath(file, ReadFile))
         ret = read(obj, file);     // сначала пробуем прочитать свои настройки (соответствующий текущей версии или предыдущий)
     else
         ret = import(obj, m_settingsVariant, subVariant);  // если ни один файл не найден, пробуем прочитать настройки ASC
@@ -207,7 +210,7 @@ bool SLocalSettings::save(QSerializer *obj, SettingsVariant variant, const QStri
     m_settingsVariant = variant;
 
     genSettingsFileName(file, subVariant);
-    genSettingsFileFullPath(file);
+    genSettingsFileFullPath(file, SaveFile);
 
     return save(obj, file);
 }

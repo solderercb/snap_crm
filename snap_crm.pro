@@ -67,6 +67,7 @@ SOURCES += \
     models/scomsettings.cpp \
     models/sdatabaseauxiliary.cpp \
     models/seditablebasemodel.cpp \
+    models/ssqlfetchingmodel.cpp \
     models/stablemodelscommonmethods.cpp \
     models/stablerepairsmodel.cpp \
     models/repairtablefiltermenu.cpp \
@@ -216,6 +217,7 @@ HEADERS  += \
     models/sdatabaseauxiliary.h \
     models/seditablebasemodel.h \
     models/spermissions.h \
+    models/ssqlfetchingmodel.h \
     models/stablecartridgesmodel.h \
     models/stablemodelscommonmethods.h \
     models/stablerepairsmodel.h \

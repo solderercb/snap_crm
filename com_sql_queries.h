@@ -167,7 +167,7 @@
                                                 "   `fault`,\n"\
                                                 "   `master`,\n"\
                                                 "   t1.`state` AS 'status',\n"\
-                                                "   `repair_cost`,\n"\
+                                                "   `real_repair_cost`,\n"\
                                                 "   `in_date`,\n"\
                                                 "   `out_date`,\n"\
                                                 "   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\n"\
@@ -307,7 +307,7 @@
                                                 "  LEFT JOIN\n"\
                                                 "  `store_items` AS t3 ON t2.`item_id` = t3.`id`\n"\
                                                 "WHERE\n"\
-                                                "  t2.work_id IN (SELECT `id` FROM `works` WHERE `repair` = %1)) AS `tbl`\n"\
+                                                "  t2.work_id IN (SELECT `id` FROM `works` WHERE `repair` = %1) OR t2.`repair_id` = %1) AS `tbl`\n"\
                                                 "ORDER BY\n"\
                                                 "  `work_id` ASC,\n"\
                                                 "  `item_rsrv_id` ASC;")\

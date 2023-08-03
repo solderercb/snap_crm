@@ -73,11 +73,6 @@ void SPhones::markPhonesModelUpdated()
     m_phonesModel->markUpdated();
 }
 
-void SPhones::primaryPhoneEdited()
-{
-
-}
-
 void SPhones::slotModelUpdated()
 {
     deleteAllForms();

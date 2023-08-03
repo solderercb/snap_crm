@@ -68,7 +68,7 @@ void SClientInputForm::changeClientType()
     }
 }
 
-void SClientInputForm::clearClientCreds(bool hideCoincidence)
+void SClientInputForm::clearClientCreds(bool keepCoincidenceShown)
 {
     setDefaultStyleSheets();
     m_client = 0;
@@ -92,13 +92,13 @@ void SClientInputForm::clearClientCreds(bool hideCoincidence)
     ui->pushButtonCreateTabClient->hide();
     ui->listWidgetClientOptions->clear();
 
-    if (hideCoincidence)
-        ui->widgetClientMatch->hide();
+    if (!keepCoincidenceShown)
+        ui->widgetClientMatch->clear();
 }
 
 void SClientInputForm::fillClientCreds(int id)
 {
-    clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
+    clearClientCreds();    // очищаем данные клиента, но не прячем таблицу совпадений
     m_client = id;
 
     clientModel->load(m_client);
@@ -204,6 +204,7 @@ void SClientInputForm::commit()
         QUERY_COMMIT_ROLLBACK(query,nErr);
         fillClientCreds(m_client);
     }
+    delete query;
 }
 
 void SClientInputForm::primaryPhoneEdited(QString number)

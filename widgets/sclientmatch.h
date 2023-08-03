@@ -5,6 +5,7 @@
 #include "global.h"
 #include "com_sql_queries.h"
 #include "sgroupboxeventfilter.h"
+#include "models/ssqlfetchingmodel.h"
 
 namespace Ui {
 class SClientMatch;
@@ -20,11 +21,11 @@ signals:
 public:
     explicit SClientMatch(QWidget *parent = nullptr);
     ~SClientMatch();
-
+    void clear();
 private:
     Ui::SClientMatch *ui;
     SGroupBoxEventFilter *groupBoxEventFilter;
-    QSqlQueryModel* clientsMatchTable;
+    SSqlFetchingModel* clientsMatchTable;
     QString lastName;
     QString phone;
     QString phoneMask;

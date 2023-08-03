@@ -45,7 +45,6 @@ private slots:
     void delPhone(SPhone*);
     void updateFormsButtons();
     void markPhonesModelUpdated();
-    void primaryPhoneEdited();
     void slotModelUpdated();
 public slots:
     void addPhone();

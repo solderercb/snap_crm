@@ -30,6 +30,7 @@ public:
                       TasksGrid,
                       CartridgeMaterialsGrid};
     Q_ENUM(SettingsVariant)
+    enum Operation {SaveFile = 0, ReadFile};
     static QString appSettingsPath();
     bool import(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
     bool read(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
@@ -39,7 +40,7 @@ private:
     SettingsVariant m_settingsVariant;
     void genSettingsFileName(QFile &file, const QString subVariant = "");
     bool selMostRecentSettingFile(const QString &fileName);
-    bool genSettingsFileFullPath(QFile &file);
+    bool genSettingsFileFullPath(QFile &file, Operation op);
     bool genAscSettingsFileFullPath(QFile &file);
     bool openFile(QFile &file, QIODevice::OpenModeFlag mode = QIODevice::ReadOnly);
     bool read(QSerializer *obj, QFile &file);
