@@ -28,7 +28,7 @@ public:
                       SalarySalesGrid, SalaryItemsGrid, SalarySalePartsGrid, SalaryPaymentsGrid,
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
                       TasksGrid,
-                      CartridgeMaterialsGrid};
+                      ClientsMatchGrid, RepairsMatchGrid};
     Q_ENUM(SettingsVariant)
     enum Operation {SaveFile = 0, ReadFile};
     static QString appSettingsPath();

@@ -45,7 +45,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QTableView" name="tableViewClientMatch">
+       <widget class="matchingClientsTable" name="tableViewClientMatch">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -73,11 +73,17 @@
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
+        <property name="sortingEnabled">
+         <bool>false</bool>
+        </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
-        <attribute name="horizontalHeaderVisible">
+        <property name="cornerButtonEnabled">
          <bool>false</bool>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>true</bool>
         </attribute>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>true</bool>
@@ -101,6 +107,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>matchingClientsTable</class>
+   <extends>QTableView</extends>
+   <header>widgets/sclientmatch.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -10,7 +10,6 @@ SClientMatch::SClientMatch(QWidget *parent) :
 
     groupBoxEventFilter = new SGroupBoxEventFilter(this);
     ui->groupBoxClientMatch->installEventFilter(groupBoxEventFilter);
-    ui->tableViewClientMatch->horizontalHeader()->setHidden(false);
     connect(groupBoxEventFilter,SIGNAL(toggleElementsVisibility()),this,SLOT(toggleElementsVisibility()));
     clientsMatchTable = new SSqlFetchingModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
 }
@@ -57,16 +56,7 @@ void SClientMatch::findClient()
         ui->tableViewClientMatch->setModel(clientsMatchTable);  // указываем модель таблицы
         query = QUERY_SEL_CLIENT_MATCH.arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
         clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
-
-        // изменяем размер столбцов под соедржимое.
-        // TODO: нужно бы создать свой класс с наследованием QTableView, реализовать в нём пропорциональное изменение ширин столбцов
-        // при изменении размера окна и тултип для длинного текста (несколько телефонов в одной ячейке). Этот класс использовать везде
-        ui->tableViewClientMatch->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        QStringList horizontalHeader = {"Id",tr("ФИО"),tr("Баланс"),tr("Ремонтов"),tr("Покупок"),tr("Тип"),tr("Телефон")};
-        for(int i = 0; i < horizontalHeader.size(); i++)
-        {
-            clientsMatchTable->setHeaderData(i, Qt::Horizontal, horizontalHeader[i]);
-        }
+        // TODO: сортировка таблицы совпадений
         if (clientsMatchTable->rowCount() > 0)
         {
             this->show();  // только если возвращены результаты, показываем виджет
@@ -108,4 +98,41 @@ void SClientMatch::clientMatchTableDoubleClicked(QModelIndex index)
 void SClientMatch::toggleElementsVisibility()
 {
     ui->tableViewClientMatch->setVisible(!ui->tableViewClientMatch->isVisible());
+}
+
+// ===============================================================================================================
+matchingClientsTable::matchingClientsTable(QWidget*)
+{
+    QMetaEnum headers = staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("Column"));
+    QMetaEnum width = staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("ColumnWidth"));
+    for(int i = 0; i < headers.keyCount(); i++)
+    {
+        i_defaultHeaderLabels << tr(headers.key(i));
+        i_defaultColumnsWidths.insert(headers.value(i), width.value(i));
+    }
+    readLayout(SLocalSettings::ClientsMatchGrid);
+    i_gridLayout->$GridControl.Columns[Column::FullName].Width_marked = true;  // по умолчанию автоширина столбца с ФИО
+}
+
+matchingClientsTable::~matchingClientsTable()
+{
+    saveLayout(SLocalSettings::ClientsMatchGrid);
+}
+
+void matchingClientsTable::setModel(QAbstractItemModel *model)
+{
+    m_model = static_cast<SSqlFetchingModel*>(model);
+    STableViewBase::setModel(model);
+//    matchingClientsTableItemDelegates *itemDelagates = new matchingClientsTableItemDelegates(m_model, this);
+//    setItemDelegate(itemDelagates);
+}
+
+void matchingClientsTable::translateNames()
+{
+    tr("FullName");
+    tr("Balance");
+    tr("Repairs");
+    tr("Purchases");
+    tr("Type");
+    tr("PrimaryPhone");
 }

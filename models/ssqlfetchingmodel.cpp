@@ -75,9 +75,11 @@ bool SSqlFetchingModel::removeRows(int row, int count, const QModelIndex &parent
 
 void SSqlFetchingModel::clear()
 {
-    QStandardItemModel::clear();
+    beginResetModel();
+    QStandardItemModel::removeRows(0, QStandardItemModel::rowCount());
+    QStandardItemModel::removeColumns(0, QStandardItemModel::columnCount());
     m_rowCount = QStandardItemModel::rowCount();
-    m_columnCount = QStandardItemModel::rowCount();
+    m_columnCount = QStandardItemModel::columnCount();
     m_wholeRowCount = 0;
     m_query = "";
     if(m_proxyQuery)

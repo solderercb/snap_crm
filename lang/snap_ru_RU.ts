@@ -3786,6 +3786,39 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>matchingClientsTable</name>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="131"/>
+        <source>FullName</source>
+        <translation>ФИО</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="132"/>
+        <source>Balance</source>
+        <translation>Баланс</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="133"/>
+        <source>Repairs</source>
+        <translation>Ремонтов</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="134"/>
+        <source>Purchases</source>
+        <translation>Покупок</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="135"/>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="136"/>
+        <source>PrimaryPhone</source>
+        <translation>Основной телефон</translation>
+    </message>
+</context>
+<context>
     <name>popupm</name>
     <message>
         <location filename="../models/repairtablefiltermenu.ui" line="14"/>
