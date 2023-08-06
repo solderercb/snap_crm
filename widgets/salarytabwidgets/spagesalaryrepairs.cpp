@@ -121,7 +121,8 @@ void SPageSalaryRepairs::repairsTableColumnResized(int, int)
 }
 
 
-STableViewSalaryRepairsSummary::STableViewSalaryRepairsSummary(QWidget *parent) : STableViewBase(parent)
+STableViewSalaryRepairsSummary::STableViewSalaryRepairsSummary(QWidget *parent) :
+    STableViewBase(SLocalSettings::SalaryRepairsGrid, parent)
 {
     setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);

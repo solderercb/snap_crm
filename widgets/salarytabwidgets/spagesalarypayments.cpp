@@ -38,7 +38,8 @@ void SPageSalaryPayments::repairsTableColumnResized(int, int)
     ui->tableViewPaymentsSummary->applyGridlayout();
 }
 
-STableViewSalaryPaymentsSummary::STableViewSalaryPaymentsSummary(QWidget *parent) : STableViewBase(parent)
+STableViewSalaryPaymentsSummary::STableViewSalaryPaymentsSummary(QWidget *parent) :
+    STableViewBase(SLocalSettings::SalaryPaymentsGrid, parent)
 {
     setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);

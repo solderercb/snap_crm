@@ -11,7 +11,8 @@ SClientMatch::SClientMatch(QWidget *parent) :
     groupBoxEventFilter = new SGroupBoxEventFilter(this);
     ui->groupBoxClientMatch->installEventFilter(groupBoxEventFilter);
     connect(groupBoxEventFilter,SIGNAL(toggleElementsVisibility()),this,SLOT(toggleElementsVisibility()));
-    clientsMatchTable = new SSqlFetchingModel();       // таблица совпадения клиента (по номеру тел. или по фамилии)
+    clientsMatchTable = new SSqlFetchingModel();
+    ui->tableViewClientMatch->setModel(clientsMatchTable);
 }
 
 SClientMatch::~SClientMatch()
@@ -53,7 +54,6 @@ void SClientMatch::findClient()
         if (enteredByUserDigits.length() >= 3 )
             query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(phone, enteredByUserDigits);   // условие поиска по телефонному номеру
 
-        ui->tableViewClientMatch->setModel(clientsMatchTable);  // указываем модель таблицы
         query = QUERY_SEL_CLIENT_MATCH.arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
         clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
         // TODO: сортировка таблицы совпадений
@@ -101,22 +101,15 @@ void SClientMatch::toggleElementsVisibility()
 }
 
 // ===============================================================================================================
-matchingClientsTable::matchingClientsTable(QWidget*)
+matchingClientsTable::matchingClientsTable(QWidget *parent) :
+    STableViewBase(SLocalSettings::ClientsMatchGrid, parent)
 {
-    QMetaEnum headers = staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("Column"));
-    QMetaEnum width = staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("ColumnWidth"));
-    for(int i = 0; i < headers.keyCount(); i++)
-    {
-        i_defaultHeaderLabels << tr(headers.key(i));
-        i_defaultColumnsWidths.insert(headers.value(i), width.value(i));
-    }
-    readLayout(SLocalSettings::ClientsMatchGrid);
+    readLayout();
     i_gridLayout->$GridControl.Columns[Column::FullName].Width_marked = true;  // по умолчанию автоширина столбца с ФИО
 }
 
 matchingClientsTable::~matchingClientsTable()
 {
-    saveLayout(SLocalSettings::ClientsMatchGrid);
 }
 
 void matchingClientsTable::setModel(QAbstractItemModel *model)

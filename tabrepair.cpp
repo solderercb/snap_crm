@@ -941,18 +941,18 @@ return p_instance.value(rep_id);
 }
 
 // ===============================================================================================================
-worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) : STableViewBase(parent)
+worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) :
+    STableViewBase(SLocalSettings::RepairWorksGrid, parent)
 {
     // столбец "Доступно" (4) скрыт
     i_defaultColumnsWidths = {{0, 60},{1, 90},{2, 270},{3, 45},{4, 0},{5, 70},{6, 70},{7, 120},{8, 120},{9, 80},{10, 100}};
     i_defaultHeaderLabels << tr("") << tr("UID") << tr("Наименование") << tr("Кол-во") << tr("Доступно") << tr("Цена") << tr("Сумма") << tr("Место") << tr("Серийный номер") << tr("Гарантия") << tr("Сотрудник");
-    readLayout(SLocalSettings::RepairWorksGrid);
+    readLayout();
     i_gridLayout->$GridControl.Columns[2].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
 }
 
 worksAndSparePartsTable::~worksAndSparePartsTable()
 {
-    saveLayout(SLocalSettings::RepairWorksGrid);
 }
 
 void worksAndSparePartsTable::setModel(QAbstractItemModel *model)

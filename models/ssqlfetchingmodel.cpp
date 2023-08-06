@@ -121,28 +121,29 @@ void SSqlFetchingModel::copyRowsFromSource()
     if(!m_proxyQuery->first())
         return;
 
-
     int destRow = m_rowCount;
     int column = 0;
 
     beginResetModel();
     if(m_columnCount < m_proxyQuery->record().count())
     {
-        insertColumns(m_columnCount, m_proxyQuery->record().count() - m_columnCount, QModelIndex());
         m_columnCount = m_proxyQuery->record().count();
     }
 
-    insertRows(destRow, m_proxyQuery->size(), QModelIndex());
     do
     {
-
+        QList<QStandardItem*> newRow;
         for(; column < m_proxyQuery->record().count(); column++)
         {
-            setData(index(destRow, column), m_proxyQuery->record().value(column), Qt::EditRole);
+            newRow << new QStandardItem(m_proxyQuery->record().value(column).toString());
         }
+
+        appendRow(newRow);
+        m_rowCount++;
         destRow++;
         column = 0;
     } while(m_proxyQuery->next());
+
     endResetModel();
     m_proxyQuery->clear();
 }

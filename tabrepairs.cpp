@@ -47,7 +47,9 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.
     connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
 
-    QObject::connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
+    connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionMoved, this, &tabRepairs::tableLayoutChanged);
+    connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this, &tabRepairs::tableLayoutChanged);
+    connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
     updateWidgets();
@@ -141,7 +143,8 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     ui->tableView->setGrouping(query_group);
     ui->tableView->refresh(preserveScrollPos, preserveSelection);
 
-    tableUpdateDelay->start(userDbData->refreshTime*1000);
+    if(userDbData->autoRefreshWorkspace)
+        tableUpdateDelay->start(userDbData->refreshTime*1000);
 }
 
 void tabRepairs::autorefreshTable()
@@ -204,5 +207,14 @@ void tabRepairs::tableModeChanged(bool mode)
 void tabRepairs::filterMenuClosed()
 {
     refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+}
+
+/*  Перезапуск таймера автообновления
+ *  После изменения размера или положения столбца, нужно сначала сохранить новые параметры и только потом обновлять таблицу
+*/
+void tabRepairs::tableLayoutChanged(int, int, int)
+{
+    if(userDbData->autoRefreshWorkspace)
+        tableUpdateDelay->start(1200);  // сохранение параметров происходит с задержкой 1000мс, автообновление чуть позже
 }
 

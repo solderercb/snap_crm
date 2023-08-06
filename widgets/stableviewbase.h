@@ -48,10 +48,10 @@ public:
     enum horizontalHeaderMenuActions{ToggleAutoWidth = 1, FitContent, BestFitAll, SetDefault, Hide, ColumnChooser};
     enum ScrollPos {ScrollPosReset = 0, ScrollPosPreserve = 1};
     enum Selection {SelectionReset = 0, SelectionPreserve = 1};
-    explicit STableViewBase(QWidget *parent = nullptr);
+    explicit STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent = nullptr);
     ~STableViewBase();
     void resizeEvent(QResizeEvent*) override;
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel *model) override;
     bool eventFilter(QObject *object, QEvent *event) override;
     void setItemDelegate(STableViewBaseItemDelegates *delegate);
 
@@ -67,7 +67,7 @@ public:
 protected:
     STableBaseModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
-    int m_layoutVariant = SLocalSettings::RepairsGrid;
+    SLocalSettings::SettingsVariant m_layoutVariant = SLocalSettings::RepairsGrid;
     XtraSerializer *i_gridLayout;
     QMap<int, int> i_defaultColumnsWidths;
     QList<int> i_defaultMarkedColumns;
@@ -89,8 +89,7 @@ protected:
     void setColumnWidth(int column, int width);
     void setDefaultLayoutParams();
     void setDefaultColumnParams(const int column, const QString &label, const int width);
-    void readLayout(SLocalSettings::SettingsVariant variant);
-    void saveLayout(SLocalSettings::SettingsVariant variant);
+    void readLayout();
     void initHorizontalHeaderMenu();
     void deleteHorizontalHeaderMenu();
     void resetRowVisibility();
@@ -99,6 +98,7 @@ protected:
     void restoreScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate);
     void saveSelection();
     void restoreSelection();
+    bool initHeaders();
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
@@ -110,6 +110,7 @@ private:
     int m_modelColumnsCount = 0;
     int m_uniqueIdColumn = -1;
     QList<QVariant> m_selectionList;
+    QTimer *layoutSaveDelay;
     void clearFilter();
     void clearGrouping();
     QString formatFilterGroup(const FilterList &filter);
@@ -122,7 +123,9 @@ public slots:
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс
     virtual void refresh(bool preserveScrollPos = ScrollPosReset, bool preserveSelection = SelectionReset);
 protected slots:
+    void saveLayout();
     virtual void columnResized(int column, int oldWidth, int newWidth);
+    void sectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
 #if QT_VERSION >= 0x060000
     void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>()) override;
 #else

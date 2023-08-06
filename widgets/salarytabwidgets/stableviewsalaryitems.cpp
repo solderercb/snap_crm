@@ -1,16 +1,16 @@
 #include "stableviewsalaryitems.h"
 
-STableViewSalaryItems::STableViewSalaryItems(QWidget *parent)
+STableViewSalaryItems::STableViewSalaryItems(QWidget *parent) :
+    STableViewBase(SLocalSettings::SalaryItemsGrid, parent)
 {
     i_defaultColumnsWidths = {{0, 100},{1, 280},{2, 115},{3, 60},{4, 115},{5, 115},{6, 115}};
     i_defaultHeaderLabels << tr("UID") << tr("Наименование") << tr("Дата выдачи") << tr("Кол-во") << tr("Цена") << tr("Сумма") << tr("Статус");
-    readLayout(SLocalSettings::SalaryItemsGrid);
+    readLayout();
     i_gridLayout->$GridControl.Columns[1].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
 }
 
 STableViewSalaryItems::~STableViewSalaryItems()
 {
-    saveLayout(SLocalSettings::SalaryItemsGrid);
 }
 
 XtraSerializer *STableViewSalaryItems::gridLayout()

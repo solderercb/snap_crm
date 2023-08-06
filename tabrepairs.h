@@ -59,6 +59,7 @@ private slots:
     void lineEditSearchReturnPressed();
     void tableModeChanged(bool mode);
     void filterMenuClosed();
+    void tableLayoutChanged(int,int,int);
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

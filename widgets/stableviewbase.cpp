@@ -1,8 +1,10 @@
 #include "stableviewbase.h"
 #include "models/ssaletablemodel.h"
 
-STableViewBase::STableViewBase(QWidget *parent) : QTableView(parent)
+STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent) :
+    QTableView(parent), m_layoutVariant(layoutVariant)
 {
+    layoutSaveDelay = new QTimer();
     m_fontMetrics = new QFontMetrics(this->font());
     i_gridLayout = new XtraSerializer();
     i_gridLayout->$GridControl.Columns.resize(0);
@@ -19,10 +21,14 @@ STableViewBase::STableViewBase(QWidget *parent) : QTableView(parent)
     connect(horizontalHeader(),&QHeaderView::sortIndicatorChanged, this, &STableViewBase::orderChanged);
 
     connect(this->horizontalHeader(),SIGNAL(sectionResized(int,int,int)), this, SLOT(columnResized(int,int,int)));
+    connect(this->horizontalHeader(),SIGNAL(sectionMoved(int,int,int)), this, SLOT(sectionMoved(int,int,int)));
+    QObject::connect(layoutSaveDelay, SIGNAL(timeout()), this, SLOT(saveLayout()));
+    layoutSaveDelay->setSingleShot(true);
 }
 
 STableViewBase::~STableViewBase()
 {
+    saveLayout();
     delete m_fontMetrics;
     delete i_gridLayout;
     clearFilter();
@@ -30,6 +36,7 @@ STableViewBase::~STableViewBase()
     deleteHorizontalHeaderMenu();
     if(i_itemDelegates)
         delete i_itemDelegates;
+    delete layoutSaveDelay;
 }
 
 void STableViewBase::resizeEvent(QResizeEvent *event)
@@ -114,6 +121,7 @@ void STableViewBase::resizeColumnsToContents()
 
 void STableViewBase::applyGridlayout()
 {
+    horizontalHeader()->setStretchLastSection(false);
     QMap<int, int> visualIndexes;
     int i;
 
@@ -234,12 +242,13 @@ void STableViewBase::setDefaultColumnParams(const int column, const QString &lab
     i_gridLayout->$GridControl.Columns[column].VisibleIndex = column;
 }
 
-void STableViewBase::readLayout(SLocalSettings::SettingsVariant variant)
+void STableViewBase::readLayout()
 {
-    if( (!localSettings->read(i_gridLayout, variant))/* || (i_gridLayout->$GridControl.Columns.size() != i_defaultHeaderLabels.size())*/ )
+    initHeaders();
+    if( (!localSettings->read(i_gridLayout, m_layoutVariant))/* || (i_gridLayout->$GridControl.Columns.size() != i_defaultHeaderLabels.size())*/ )
     {
         setDefaultLayoutParams();
-        localSettings->save(i_gridLayout, variant);
+        localSettings->save(i_gridLayout, m_layoutVariant);
     }
     for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
     {   // в настройках АСЦ параметр Visible может отсутствовать; значение по умолчанию для такого случая true
@@ -252,7 +261,7 @@ void STableViewBase::readLayout(SLocalSettings::SettingsVariant variant)
     applySorting();
 }
 
-void STableViewBase::saveLayout(SLocalSettings::SettingsVariant variant)
+void STableViewBase::saveLayout()
 {
     if(m_modelColumnsCount == 0)
         return;
@@ -283,9 +292,10 @@ void STableViewBase::saveLayout(SLocalSettings::SettingsVariant variant)
         }
     }
 
-    localSettings->save(i_gridLayout, variant);
+    localSettings->save(i_gridLayout, m_layoutVariant);
 }
 
+// TODO: этот метод вызывается очень много раз если не выключен параметр horizontalHeaderStretchLastSection
 void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
 {
     if(column < i_gridLayout->$GridControl.Columns.size())
@@ -304,6 +314,13 @@ void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
     }
     QTableView::columnResized(column, oldWidth, newWidth);
 //    verticalHeader()->resizeSections(QHeaderView::ResizeToContents); // ЭТО ДОЛГО!!!
+
+    layoutSaveDelay->start(1000);
+}
+
+void STableViewBase::sectionMoved(int, int, int)
+{
+    layoutSaveDelay->start(1000);
 }
 
 void STableViewBase::reset()
@@ -799,6 +816,25 @@ void STableViewBase::restoreSelection()
     }
     selectionModel()->select(selection, QItemSelectionModel::Select);
     m_selectionList.clear();    // если вдруг в списке остались элементы
+}
+
+bool STableViewBase::initHeaders()
+{
+    int headersIndex = metaObject()->indexOfEnumerator("Column");
+    int widthIndex = metaObject()->indexOfEnumerator("ColumnWidth");
+
+    if(headersIndex == -1 || widthIndex == -1)
+        return 0;
+
+    QMetaEnum headers = metaObject()->enumerator(headersIndex);
+    QMetaEnum width = metaObject()->enumerator(widthIndex);
+    for(int i = 0; i < headers.keyCount(); i++)
+    {
+        i_defaultHeaderLabels << metaObject()->tr(headers.key(i), "");
+        i_defaultColumnsWidths.insert(headers.value(i), width.value(i));
+    }
+
+    return 1;
 }
 
 /*  Очистка списка выделенных строк
