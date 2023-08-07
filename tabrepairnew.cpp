@@ -737,6 +737,11 @@ void tabRepairNew::print(int repair)
     }
 }
 
+void tabRepairNew::fillClientCreds(const int id)
+{
+    ui->widgetClient->fillClientCreds(id);
+}
+
 #ifdef QT_DEBUG
 void tabRepairNew::randomFill()
 {
@@ -864,11 +869,6 @@ void tabRepairNew::randomFill()
     }
 //    qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 
-}
-
-void tabRepairNew::fillClientCreds(const int id)
-{
-    ui->widgetClient->fillClientCreds(id);
 }
 
 void tabRepairNew::test_scheduler_handler()  //

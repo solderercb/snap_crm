@@ -47,7 +47,7 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
 //    appendToReceptList(repair);
 //    repair->initCartridgeModel(2);
 #else
-    ui->groupBoxDebugPanel->hide();
+//    ui->groupBoxDebugPanel->hide();
 #endif
 }
 
@@ -336,6 +336,7 @@ void tabReceptCartridge::print(int repair)
     }
 }
 
+#ifdef QT_DEBUG
 void tabReceptCartridge::randomFill()
 {
     int i;
@@ -383,6 +384,7 @@ void tabReceptCartridge::randomFill()
         test_scheduler->start(400);    //  (пере-)запускаем таймер
     }
 }
+#endif
 
 void tabReceptCartridge::fillClientCreds(const int id)
 {
@@ -452,6 +454,8 @@ void tabReceptCartridge::findAndAddBySerial()
     ui->lineEditSerial->setText("");
     ui->lineEditSerial->setFocus();
 }
+
+#ifdef QT_DEBUG
 void tabReceptCartridge::dbgRandomFillClicked()
 {
     test_scheduler_counter = 0;
@@ -459,6 +463,7 @@ void tabReceptCartridge::dbgRandomFillClicked()
     clearWidgets();
     randomFill();
 }
+#endif
 
 void tabReceptCartridge::relayCreateTabSelectExistingClient(int, QWidget *caller)
 {

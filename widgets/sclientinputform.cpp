@@ -223,6 +223,7 @@ void SClientInputForm::buttonSelectExistingClientClicked()
     emit createTabSelectExistingClient(1, this);
 }
 
+#ifdef QT_DEBUG
 void SClientInputForm::randomFill()
 {
     int i;
@@ -267,6 +268,7 @@ void SClientInputForm::randomFill()
 
     }
 }
+#endif
 
 void SClientInputForm::setDefaultStyleSheets()
 {
