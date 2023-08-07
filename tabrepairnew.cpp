@@ -36,8 +36,6 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
 tabRepairNew::~tabRepairNew()
 {
-    userActivityLog->updateActivityTimestamp();
-
     delete ui;
     delete deviceVendorsModel;
     delete devicesModel;

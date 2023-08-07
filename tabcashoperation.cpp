@@ -10,6 +10,8 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     m_orderId(order),
     ui(new Ui::tabCashOperation)
 {
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+
     ui->setupUi(this);
     ui->labelOfLinkedObject->hide();
     ui->lineEditLinkedObjId->setReadOnly(true);
@@ -33,11 +35,14 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     cashRegister = new SCashRegisterModel();
     initCashRegisterModel();
 
+    dateEditRefreshTimer = new QTimer();
+    dateEditRefreshTimer->setSingleShot(true);
+    connect(dateEditRefreshTimer, &QTimer::timeout, this, &tabCashOperation::dateEditRefresh);
+    ui->dateEdit->setDate(QDate::currentDate());    // обязательно после подключения сигнал-слот таймера!
+
     connect(ui->lineEditClientLastName,SIGNAL(buttonClicked(int)),this,SLOT(lineEditClientLastNameButtonClickHandler(int)));
     connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
-
-    userActivityLog->appendRecord("Navigation " + tabTitle());
 }
 
 tabCashOperation *tabCashOperation::getInstance(int orderId, MainWindow *parent)
@@ -49,9 +54,8 @@ tabCashOperation *tabCashOperation::getInstance(int orderId, MainWindow *parent)
 
 tabCashOperation::~tabCashOperation()
 {
-    userActivityLog->updateActivityTimestamp();
-
     delete ui;
+    delete dateEditRefreshTimer;
     delete clientModel;
     delete cashRegister;
     delete paymentSystemsProxyModel;
@@ -198,8 +202,10 @@ bool tabCashOperation::commit(bool repeatAfter)
         return 0;
 
     cashRegister->setOperationType(m_orderType);
-    cashRegister->setCreatedDate(ui->dateEdit->date());
-    cashRegister->setAmount(ui->doubleSpinBoxAmount->value());
+    if(permissions->createBackdatedDocuments && m_backdate)
+        cashRegister->setCreatedDate(ui->dateEdit->date());
+    else
+        cashRegister->setCreatedDate(QDate::currentDate());
     cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
     cashRegister->setReason(ui->lineEditReason->text());    // если пользователь отредактировал автоматически сгенерированный комментарий
     cashRegister->setSkipLogRecording(m_skipAutoLogRecord);
@@ -228,27 +234,23 @@ bool tabCashOperation::commit(bool repeatAfter)
         }
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw 0; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
 
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch (Global::ThrowType type)
+    catch (int type)
     {
         nErr = 0;
         cashRegister->setId(0);
         m_orderId = initial_order_id;
-        if(type == Global::ThrowType::Debug)
+        if(type == 0)
         {
             QString err = "DEBUG ROLLBACK";
             QUERY_ROLLBACK_MSG(query, err);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
         else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
+            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
     }
 
 #ifdef QT_DEBUG
@@ -286,12 +288,8 @@ bool tabCashOperation::commitSimple()
 
 bool tabCashOperation::commitBalance(const double amount)
 {
-    if(amount < 0 && !clientModel->balanceEnough(amount))
-        throw Global::ThrowType::UserCanceled;
-
     QString note;
     bool nErr = 1;
-
     if(amount > 0)
     {
         note = tr("Баланс клиента №%1 пополнен на %2").arg(m_client).arg(sysLocale.toCurrencyString(amount));
@@ -427,8 +425,7 @@ void tabCashOperation::updateWidgets()
     {
         ui->toolButtonApplyPaymentSystem->hide();
         ui->lineEditDate->setVisible(false);
-        ui->dateEdit->setVisible(permissions->createBackdatedDocuments);    // Проводить документы задним числом
-        ui->dateEdit->setDate(QDate::currentDate());
+        ui->dateEdit->setVisible(permissions->createBackdatedDocuments);
         ui->buttonSave->show();
         ui->buttonSaveMore->show();
         ui->buttonPrint->hide();
@@ -727,10 +724,12 @@ void tabCashOperation::dateChanged(QDate)
     if(ui->dateEdit->date() >= QDate::currentDate())
     {
         m_backdate = 0;
+        dateEditRefreshTimer->start(DATE_EDIT_REFRESH_TIMER);
         ui->dateEdit->setDateTime(QDateTime::currentDateTime());
         return;
     }
     m_backdate = 1;
+    dateEditRefreshTimer->stop();
 }
 
 void tabCashOperation::findClientByLastname(QString)
@@ -868,6 +867,12 @@ void tabCashOperation::applyPaymentSystem()
         ui->toolButtonApplyPaymentSystem->hide();
 
     delete query;
+}
+
+void tabCashOperation::dateEditRefresh()
+{
+    ui->dateEdit->setDate(QDate::currentDate());
+    dateEditRefreshTimer->start(DATE_EDIT_REFRESH_TIMER);
 }
 
 #ifdef QT_DEBUG

@@ -14,8 +14,6 @@ public:
     ~SUserActivityModel();
     void setNotes(const QString);
     void appendRecord(const QString &notes, const bool standalone = 1);
-    void updateActivityTimestamp();
-    void updateLoginTimestamp();
 private:
     int m_userId;
     QDateTime m_datetime;

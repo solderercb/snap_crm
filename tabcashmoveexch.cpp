@@ -8,6 +8,8 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabCashMoveExch)
 {
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+
     ui->setupUi(this);
     i_tabTitle = tr("Перемещение денег");
     ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
@@ -29,8 +31,6 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     initCashRegisterModel();
     operationTypeChanged(0);
 
-    userActivityLog->appendRecord("Navigation " + tabTitle());
-
 #ifdef QT_DEBUG
     test_scheduler_counter = RandomFillerStep::OpType;
     test_scheduler->start(200);
@@ -46,8 +46,6 @@ tabCashMoveExch *tabCashMoveExch::getInstance(MainWindow *parent)
 
 tabCashMoveExch::~tabCashMoveExch()
 {
-    userActivityLog->updateActivityTimestamp();
-
     delete ui;
     delete cashRegisterSrc;
     delete cashRegisterDst;

@@ -14,6 +14,8 @@
 #include "models/ssortfilterproxymodel.h"
 #include "widgets/shortlivednotification.h"
 
+#define DATE_EDIT_REFRESH_TIMER 30000
+
 namespace Ui {
 class tabCashOperation;
 }
@@ -76,6 +78,7 @@ private:
     SInvoiceModel *invoice = nullptr;
     Ui::tabCashOperation *ui;
     SClientModel *clientModel = nullptr;
+    QTimer *dateEditRefreshTimer;
     void setWidgetsParams();
     void updateWidgets();
     bool checkInput();
@@ -131,6 +134,7 @@ private slots:
     void buttonRevertClicked();
     void amountChanged(double);
     void applyPaymentSystem();
+    void dateEditRefresh();
 #ifdef QT_DEBUG
     void test_scheduler_handler();
     void test_scheduler2_handler();

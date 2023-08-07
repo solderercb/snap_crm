@@ -10,6 +10,8 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui(new Ui::tabSale),
     doc_id(doc)
 {
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+
     ui->setupUi(this);
     docModel = new SDocumentModel();
     tableModel = new SSaleTableModel(this);
@@ -42,8 +44,6 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->lineEditTrack->setButtons("Apply");
     ui->widgetClientMatch->hide();
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
-
-    userActivityLog->appendRecord("Navigation " + tabTitle());
 
     ui->tableView->setModel(tableModel);
 

@@ -9,6 +9,8 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabReceptCartridge)
 {
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+
     QString query;
     QSqlQuery q(QSqlDatabase::database("connMain"));
 

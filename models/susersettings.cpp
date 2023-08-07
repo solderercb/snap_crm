@@ -75,6 +75,26 @@ void SUserSettings::loadFromUsersParams()
     delete query;
 }
 
+bool SUserSettings::commit()
+{
+    bool nErr = 1;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QString q;
+
+    fieldsUpdFormatter();
+    if(!i_valuesMap.isEmpty())
+    {
+        q = QString("UPDATE\n  `users`\nSET\n  %2\nWHERE `id` = %1;").arg(id).arg(fields.join(",\n  "));
+        QUERY_EXEC(query, nErr)(q);
+    }
+    delete query;
+
+    if(nErr)
+        i_valuesMap.clear();
+
+    return nErr;
+}
+
 // распределение изменённых значений по группам по названию таблиц
 void SUserSettings::prepareUpdateList(Table table)
 {
@@ -99,10 +119,6 @@ void SUserSettings::prepareUpdateList(Table table)
 
 void SUserSettings::save()
 {
-    bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    QString q;
-
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
     {
         metaObject()->property(i).read(this);
@@ -111,19 +127,11 @@ void SUserSettings::save()
     i_valuesMap.clear();
     prepareUpdateList(Table::Users);
 
-    fieldsUpdFormatter();
-    if(!i_valuesMap.isEmpty())
-    {
-        q = QString("UPDATE\n  `users`\nSET\n  %2\nWHERE `id` = %1;").arg(id).arg(fields.join(",\n  "));
-        QUERY_EXEC(query, nErr)(q);
-    }
-    if(!nErr)
-        throw Global::ThrowType::QueryError;
-
+    if(!commit())
+        throw 1;
     saveToUsersParams();
 
     i_fieldModified.clear();
-    delete query;
 }
 
 void SUserSettings::saveToUsersParams()
@@ -145,9 +153,41 @@ void SUserSettings::saveToUsersParams()
         if(!nErr)
         {
             errorToLog(metaObject()->className(), query->lastError().text());
-            throw Global::ThrowType::QueryError;
+            throw 1;
         }
         i++;
+    }
+
+    delete query;
+}
+
+void SUserSettings::updateLoginTimestamp()
+{
+    bool nErr = 1;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
+    query->exec(QUERY_BEGIN);
+    i_valuesMap.insert("last_login", QDateTime::currentDateTime());
+    nErr = commit();
+    QUERY_COMMIT_ROLLBACK(query, nErr);
+
+    delete query;
+}
+
+void SUserSettings::updateActivityTimestamp(const bool standalone)
+{
+    bool nErr = 1;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+
+    if(standalone)
+    {
+        query->exec(QUERY_BEGIN);
+    }
+    i_valuesMap.insert("last_activity", QDateTime::currentDateTime());
+    nErr = commit();
+    if(standalone)
+    {
+        QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     delete query;

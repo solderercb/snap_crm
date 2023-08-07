@@ -132,9 +132,9 @@ public:
     int newStateIndex();
     void setNewStateIndex(const int);
     int userLock();
-    void setUserLock(const int);
+    void setUserLock(const QVariant);
     QDateTime lockDatetime();
-    void setLockDatetime(const QDateTime);
+    void setLockDatetime(const QVariant);
     bool expressRepair();
     void setExpressRepair(const bool);
     bool quickRepair();

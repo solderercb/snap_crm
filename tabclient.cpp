@@ -8,6 +8,8 @@ tabClient::tabClient(int id, MainWindow *parent) :
     ui(new Ui::tabClient),
     m_clientId(id)
 {
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+
     ui->setupUi(this);
     connect(ui->pages, &SPagedInterface::updateBotToolbar, this, &tabClient::updateBotToolbar);
     connect(ui->pages, &SPagedInterface::initPage, this, &tabClient::initPage);

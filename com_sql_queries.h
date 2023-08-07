@@ -627,9 +627,6 @@
                                             }
 
 
-#define QUERY_UPD_LAST_USER_LOGIN(id)       QString("UPDATE `users` SET `last_login`=UTC_TIMESTAMP() WHERE `id` = %1;").arg((id))
-#define QUERY_UPD_LAST_USER_ACTIVITY(id)    QString("UPDATE `users` SET `last_activity`=UTC_TIMESTAMP() WHERE `id` = %1;").arg((id))
-
 #define QUERY_VRFY_CASH(T,S,s,C,U,O,t,R,D,A)  QString(\
                                                 "SELECT IF(`type` = %1 AND `summa` = %2 /*AND `summa_str` = '%3'*/ AND IFNULL(`client`,'NULL') = %4 AND `user` = %5 AND `office` = %6 /*AND `notes` = '%7'*/ AND IFNULL(`repair`,'NULL') = IFNULL(%8,'NULL') AND IFNULL(`document`,'NULL') = IFNULL(%9,'NULL') AND `payment_system` = %10, 21930, 0)\n"\
                                                 "FROM `cash_orders`\n"\
@@ -644,9 +641,6 @@
                                                 .arg(R)\
                                                 .arg(D)\
                                                 .arg(A)
-
-#define QUERY_LOCK_REPAIR(R,U)              QString("UPDATE `workshop` SET `user_lock`=%1, `lock_datetime`=UTC_TIMESTAMP() WHERE `id` = %2;").arg((U)).arg((R))
-#define QUERY_UNLOCK_REPAIR(R)              QString("UPDATE `workshop` SET `user_lock`=NULL, `lock_datetime`=NULL WHERE `id` = %1;").arg((R))
 
 #define QUERY_UPD_REPAIR_STATE(R, S)        QString("UPDATE `workshop` SET `out_date`=UTC_TIMESTAMP(), `state`=%1, `lock_datetime`=UTC_TIMESTAMP(), `box`=NULL, `last_status_changed`=UTC_TIMESTAMP() WHERE `id` = %2;").arg(S)\
                                                 .arg(R)

@@ -197,6 +197,12 @@ void SComments::remove()
             {
                 QUERY_LOG_START(m_parentTab->metaObject()->className());
                 QUERY_EXEC(m_query,nErr)(QUERY_BEGIN);
+                if(ui->plainTextEdit->property("recordId").isValid())
+                {
+                    ui->plainTextEdit->setProperty("recordId", QVariant());
+                    ui->plainTextEdit->setProperty("recordRow", QVariant());
+                    ui->plainTextEdit->clear();
+                }
                 commentsModel->remove(row);
                 QUERY_COMMIT_ROLLBACK(m_query,nErr);
                 QUERY_LOG_STOP;

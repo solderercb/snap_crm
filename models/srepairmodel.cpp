@@ -498,7 +498,7 @@ int SRepairModel::userLock()
     return m_userLock;
 }
 
-void SRepairModel::setUserLock(const int id)
+void SRepairModel::setUserLock(const QVariant id)
 {
     i_valuesMap.insert("user_lock", id);
 }
@@ -508,7 +508,7 @@ QDateTime SRepairModel::lockDatetime()
     return m_lockDatetime;
 }
 
-void SRepairModel::setLockDatetime(const QDateTime timestamp)
+void SRepairModel::setLockDatetime(const QVariant timestamp)
 {
     i_valuesMap.insert("lock_datetime", timestamp);
 }
@@ -1079,12 +1079,15 @@ bool SRepairModel::lock(bool state)
     i_query->exec(QUERY_BEGIN);
     if(state)
     {
-        QUERY_EXEC(i_query, i_nErr)(QUERY_LOCK_REPAIR(i_id,userDbData->id));
+        setUserLock(userDbData->id);
+        setLockDatetime(QDateTime::currentDateTime());
     }
     else
     {
-        QUERY_EXEC(i_query, i_nErr)(QUERY_UNLOCK_REPAIR(i_id));
+        setUserLock(QVariant());
+        setLockDatetime(QVariant());
     }
+    i_nErr = commit();
     QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
     return i_nErr;
 }

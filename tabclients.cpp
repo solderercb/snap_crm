@@ -48,8 +48,6 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
 tabClients::~tabClients()
 {
-    userActivityLog->updateActivityTimestamp();
-
     p_instance[this->m_type] = nullptr;   // Обязательно блять!
     delete ui;
     delete m_tableUpdateDelay;

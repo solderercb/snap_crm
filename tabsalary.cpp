@@ -8,6 +8,8 @@ tabSalary::tabSalary(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabSalary)
 {
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+
     // Игициализация моделей до UI
     m_userModel = new SUserModel();
     m_repairs = new STableSalaryRepairsModel();
@@ -41,7 +43,6 @@ tabSalary::tabSalary(MainWindow *parent) :
     connect(ui->toolButtonPrevPeriod, &QToolButton::clicked, this, &tabSalary::prevPeriod);
     connect(ui->toolButtonNextPeriod, &QToolButton::clicked, this, &tabSalary::nextPeriod);
     connect(ui->toolButtonLoad, &QToolButton::clicked, this, &tabSalary::loadButtonPressed);
-
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
     ui->dateEditPeriod->setDate(QDate(2022,8,01));

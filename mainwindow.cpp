@@ -60,6 +60,7 @@ MainWindow::MainWindow(windowsDispatcher*) :
 
     ui->setupUi(this);
 
+    // Шуточный заголовок окна: перевёрнуто на 180° ɯɹᴐ ᴐsɐ; или зеркально 1 ⱯꓢC Cʁꟽ; или зеркально 2 ∀ƨc ᴄʁw
     setWindowTitle(QString("SNAP CRM [%1] [%2]").arg(officesModel->getDisplayRole(userDbData->currentOffice, 2), userDbData->username));
     initGlobalModels();
 

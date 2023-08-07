@@ -18,6 +18,7 @@ tabCommon::tabCommon(MainWindow *p) :
 
 tabCommon::~tabCommon()
 {
+    userDbData->updateActivityTimestamp();
     while(tabList.removeOne(this));
     // если вкладка создана с другой вкладки (выбор клиента/ремонта/др.), то сработает механизм переключения на вызвавшую вкладку,
     // иначе переключение на последнюю использованную вкладку

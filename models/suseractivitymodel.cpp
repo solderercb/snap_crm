@@ -88,7 +88,7 @@ void SUserActivityModel::appendRecord(const QString &notes, const bool standalon
     {
         i_query->exec(QUERY_BEGIN);
     }
-    QUERY_EXEC(i_query, i_nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->id));
+    userDbData->updateActivityTimestamp(false);
     commit();
     if(standalone)
     {
@@ -96,21 +96,6 @@ void SUserActivityModel::appendRecord(const QString &notes, const bool standalon
     }
     if(i_nErr)
         setId(0);
-}
-
-void SUserActivityModel::updateActivityTimestamp()
-{
-    i_query->exec(QUERY_BEGIN);
-    QUERY_EXEC(i_query, i_nErr)(QUERY_UPD_LAST_USER_ACTIVITY(userDbData->id));
-    QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
-}
-
-void SUserActivityModel::updateLoginTimestamp()
-{
-    i_query->exec(QUERY_BEGIN);
-    QUERY_EXEC(i_query, i_nErr)(QUERY_UPD_LAST_USER_LOGIN(userDbData->id));
-    QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
-
 }
 
 bool SUserActivityModel::commit()

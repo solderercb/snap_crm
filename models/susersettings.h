@@ -135,8 +135,11 @@ public:
     void initWidgets();
     void load(const QString &username);
     void loadFromUsersParams();
+    bool commit();
     void save();
     void saveToUsersParams();
+    void updateLoginTimestamp();
+    void updateActivityTimestamp(const bool standalone = true);
 private:
     QMap<QString, int> m_params;
     void prepareUpdateList(Table table);

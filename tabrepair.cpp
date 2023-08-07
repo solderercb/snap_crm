@@ -140,8 +140,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
 tabRepair::~tabRepair()
 {
-    userActivityLog->updateActivityTimestamp();
-
     setLock(0);
     delAdditionalFieldsWidgets();
     delete additionalFieldsModel;

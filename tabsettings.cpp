@@ -12,6 +12,8 @@ tabSettings::tabSettings(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabSettings)
 {
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+
     ui->setupUi(this);
     connect(ui->pages, &SPagedInterface::updateBotToolbar, this, &tabSettings::updateBotToolbar);
     connect(ui->pages, &SPagedInterface::initPage, this, &tabSettings::initPage);

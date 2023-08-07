@@ -58,8 +58,6 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
 tabRepairs::~tabRepairs()
 {
-    userActivityLog->updateActivityTimestamp();
-
     p_instance[this->m_type] = nullptr;   // Обязательно блять!
     delete ui;
     delete tableUpdateDelay;

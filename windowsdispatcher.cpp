@@ -48,7 +48,7 @@ void windowsDispatcher::connectOK()
     initCompanies();
     initOffices();
 
-    userActivityLog->updateLoginTimestamp();
+    userDbData->updateLoginTimestamp();
     userActivityLog->appendRecord(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
 
     // TODO: добавить разрешение выбора компании при входе
