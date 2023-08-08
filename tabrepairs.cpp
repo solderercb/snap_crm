@@ -20,7 +20,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     ui->buttonShowParamsPopupMenu->addAction(widgetAction);
 
     this->setAttribute(Qt::WA_DeleteOnClose);
-    m_type = type;
+    m_tabType = type;
 
     tableUpdateDelay = new QTimer();
     repairs_table = new STableRepairsModel();
@@ -41,6 +41,8 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 //    widgetAction->setComboBoxXModel(repairModel);
     widgetAction->setFilterSettings(filterSettings);
 
+    ui->switchTableMode->setChecked((userDbData->defWsFilter == WorkshopFilter::CartridgesOnly)?ModeCartridges:ModeRepairs);
+
     connect(widgetAction, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
     connect(ui->buttonRepairNew, &QPushButton::clicked, this, &tabRepairs::buttonRepairNewClicked);
 
@@ -58,14 +60,14 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
 tabRepairs::~tabRepairs()
 {
-    p_instance[this->m_type] = nullptr;   // Обязательно блять!
+    p_instance[this->m_tabType] = nullptr;   // Обязательно блять!
     delete ui;
     delete tableUpdateDelay;
 }
 
 QString tabRepairs::tabTitle()
 {
-    if(m_type)
+    if(m_tabType == Type::SelectRepair)
         return tr("Выбрать ремонт");
     else
         return tr("Ремонты");
@@ -73,22 +75,25 @@ QString tabRepairs::tabTitle()
 
 void tabRepairs::updateWidgets()
 {
-    if(!comSettings->isCartridgeRepairEnabled)
+    if(!comSettings->isCartridgeRepairEnabled || m_tabType == Type::SelectRepair)
     {
         ui->switchTableMode->hide();
         ui->labelTableMode->hide();
-        tableModeChanged(NoCartridges);
+        return;
     }
     else
     {
         ui->switchTableMode->show();
         ui->labelTableMode->show();
-        tableModeChanged(NoCartridges);
-//        tableModeChanged(userLocalData-><TODO: defaultTableMode>.value);
     }
+
+    if(ui->switchTableMode->isChecked() == ModeCartridges)
+        ui->labelTableMode->setText(tr("Картриджи"));
+    else
+        ui->labelTableMode->setText(tr("Ремонты"));
 }
 
-tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
+tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка каждого типа может быть только одна
 {
     if( !p_instance[type] )
       p_instance[type] = new tabRepairs(type, parent);
@@ -113,7 +118,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     FilterList l1;
     l1.op = FilterList::And;
 
-    l1.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, ui->switchTableMode->isChecked()));
+    l1.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, (ui->switchTableMode->isChecked() == ModeCartridges)));
     l1.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, 1));
     if ( !userDbData->displayOut && ui->lineEditSearch->text().isEmpty() )
         l1.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
@@ -152,8 +157,17 @@ void tabRepairs::autorefreshTable()
 
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
 {
-    emit doubleClicked(repairs_table->record(item.row()).value("id").toInt());
-    if (m_type == 1)
+    int id = repairs_table->record(item.row()).value("id").toInt();
+    if(ui->switchTableMode->isChecked() == ModeRepairs)
+        emit doubleClickRepair(id);
+//  else            заготовка под картриджи
+//    {
+//        QList<int> *list = new QList<int>();
+//        list->append(id);
+//        emit doubleClickCartridge(list);
+//    }
+
+    if (m_tabType == Type::SelectRepair)
     {
         emit activateCaller(callerPtr);
         deleteLater();
@@ -184,8 +198,9 @@ void tabRepairs::lineEditSearchReturnPressed()
         num_validator->exec(QString("SELECT 1 FROM workshop WHERE `id` = %1").arg(s));  // проверяем если ли в таблице workshop ремонт с таким номером
         if (num_validator->size() > 0)  // если возвращено не ноль строк
         {
-            emit doubleClicked(s.toInt());  // посылаем сигнал открытия карты ремонта или вставки номера ремонта в поле формы приёма в ремонт
-            if (m_type == 1)
+            if(ui->switchTableMode->isChecked() == ModeRepairs)
+                emit doubleClickRepair(s.toInt());
+            if (m_tabType == Type::SelectRepair)
                 deleteLater();
         }
     }
@@ -194,11 +209,7 @@ void tabRepairs::lineEditSearchReturnPressed()
 
 void tabRepairs::tableModeChanged(bool mode)
 {
-    if(mode)
-        ui->labelTableMode->setText(tr("Картриджи"));
-    else
-        ui->labelTableMode->setText(tr("Ремонты"));
-
+    updateWidgets();
     refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
 }
 

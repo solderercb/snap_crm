@@ -3118,84 +3118,69 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableViewRepairs</name>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>i</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="24"/>
+        <source>Title</source>
+        <translation>Оборудование</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Заказ</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="25"/>
+        <source>Serial</source>
+        <translation>Серийный номер</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Оборудование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="26"/>
+        <source>Fault</source>
+        <translation>Неисправность</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>ФИО клиента</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="27"/>
+        <source>Engineer</source>
+        <translation>Мастер</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Серийный номер</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="28"/>
+        <source>State</source>
+        <translation>Статус</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Офис</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="29"/>
+        <source>RepairAmount</source>
+        <translation>Сумма</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Менеджер</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="30"/>
+        <source>InDate</source>
+        <translation>Дата поступления</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Инженер</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="31"/>
+        <source>OutDate</source>
+        <translation>Дата выдачи</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Дата поступления</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="32"/>
+        <source>ClientFullName</source>
+        <translation>ФИО Клиента</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Дата выдачи</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="33"/>
+        <source>ClientPrimaryPhone</source>
+        <translation>Контактный телефон</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Статус</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="34"/>
+        <source>Place</source>
+        <translation>Ячейка</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Неисправность</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="35"/>
+        <source>Manager</source>
+        <translation>Менеджер</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Контактный телефон</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Ячейка</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/stableviewrepairs.cpp" line="7"/>
-        <source>Срок</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewrepairs.cpp" line="36"/>
+        <source>Progress</source>
+        <translation>Статус</translation>
     </message>
 </context>
 <context>

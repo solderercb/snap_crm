@@ -396,16 +396,17 @@ void MainWindow::createTabRepairs(int type, QWidget* caller)
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
 
-    if (type == 0)
+    if (type == tabRepairs::Workshop)
     {
-        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabRepair(int)));
+        QObject::connect(subwindow, &tabRepairs::doubleClickRepair, this, &MainWindow::createTabRepair);
+//        QObject::connect(subwindow, &tabRepairs::doubleClickCartridge, this, &MainWindow::createTabRepairCartridges);         заготовка под картриджи
     }
     else
     {
         QObject::connect(subwindow,SIGNAL(buttonRepairNewClicked()), this, SLOT(createTabRepairNew()));
         // Сигнал экземпляра вкладки выбора предыдущего ремонта подключаем к слоту вызывающей вкладки для заполнения соотв. полей
         // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
-        QObject::connect(subwindow,SIGNAL(doubleClicked(int)), caller, SLOT(fillDeviceCreds(int)));
+        QObject::connect(subwindow,SIGNAL(doubleClickRepair(int)), caller, SLOT(fillDeviceCreds(int)));
         subwindow->setCallerPtr(caller);
         QObject::connect(subwindow,SIGNAL(activateCaller(QWidget*)),this,SLOT(reactivateCallerTab(QWidget*)));
     }

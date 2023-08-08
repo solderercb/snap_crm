@@ -27,21 +27,23 @@ class tabRepairs : public tabCommon
     Q_OBJECT
 
 signals:
-    void doubleClicked(int);
+    void doubleClickRepair(int);
+    void doubleClickCartridge(QList<int> *);
     void buttonRepairNewClicked();
-
 public:
+    enum Type{Workshop = 0, SelectRepair};
     explicit tabRepairs(bool type = 0, MainWindow *parent = nullptr);
     static tabRepairs* getInstance(bool type, MainWindow *parent = nullptr);
     ~tabRepairs();
     QString tabTitle() override;
     void updateWidgets();
 private:
-    enum TableMode{NoCartridges = 0, Cartridges = 1};
+    enum WorkshopFilter{NoFilter = 0, CartridgesOnly = 1, RepairsOnly = 2};
+    enum TableMode{ModeRepairs = 0, ModeCartridges};
     Ui::tabRepairs *ui;
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
-    bool m_type;
+    bool m_tabType;
     QTableView* tableView;
     STableRepairsModel* repairs_table;
     QSqlQueryModel* cartridges_table = nullptr;
