@@ -63,6 +63,7 @@ public:
     void setGrouping(const QStringList &grouping);
     void setUniqueIdColumn(int uniqueIdColumn);
     void resetVScrollPos();
+    QModelIndexList selectionList();
     void clearSelection();
 protected:
     STableBaseModel *m_model = nullptr;

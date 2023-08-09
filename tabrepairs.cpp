@@ -17,7 +17,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     filterSettings = new QMap<QString, int>;
     repairTableFilterMenu *widgetAction = new repairTableFilterMenu(this);
-    ui->buttonShowParamsPopupMenu->addAction(widgetAction);
+    ui->pushButtonMenu->addAction(widgetAction);
 
     this->setAttribute(Qt::WA_DeleteOnClose);
     m_tabType = type;
@@ -28,11 +28,9 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
         cartridges_table = new STableRepairsModel();
 
     ui->tableView->setModel(repairs_table);
-    if (type == 1)
-        ui->buttonPrint->hide();
 
     if(!permissions->receptDevices || type == 1)
-        ui->buttonRepairNew->hide();
+        ui->pushButtonReceipt->hide();
 
     widgetAction->setComboBoxOfficeModel(officesModel);
     widgetAction->setComboBoxStatusModel(statusesModel);
@@ -41,21 +39,25 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 //    widgetAction->setComboBoxXModel(repairModel);
     widgetAction->setFilterSettings(filterSettings);
 
-    ui->switchTableMode->setChecked((userDbData->defWsFilter == WorkshopFilter::CartridgesOnly)?ModeCartridges:ModeRepairs);
+    if(m_tabType == SelectRepair)
+        ui->switchTableMode->setChecked(ModeRepairs);
+    else
+        ui->switchTableMode->setChecked((userDbData->defWsFilter == WorkshopFilter::CartridgesOnly)?ModeCartridges:ModeRepairs);
 
     connect(widgetAction, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
-    connect(ui->buttonRepairNew, &QPushButton::clicked, this, &tabRepairs::buttonRepairNewClicked);
-
-    // ТУТА нужно быть аккуратным! Если в конструкторе MainWindow вызвать функцию-слот создания вкладки tabRepairs, то получим цикл.
-    connect(ui->buttonRepairNew,SIGNAL(clicked()), MainWindow::getInstance(), SLOT(createTabRepairNew()));
+    connect(ui->pushButtonReceipt, &QPushButton::clicked, this, &tabRepairs::buttonReceptClicked);
+    connect(ui->pushButtonRefill, &QPushButton::clicked, this, &tabRepairs::buttonRefillClicked);
+    connect(ui->pushButtonIssue, &QPushButton::clicked, this, &tabRepairs::buttonIssueClicked);
+    connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabRepairs::buttonRefreshClicked);
 
     connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionMoved, this, &tabRepairs::tableLayoutChanged);
     connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this, &tabRepairs::tableLayoutChanged);
+    connect(ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &tabRepairs::tableSelectionChanged);
     connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
-    updateWidgets();
     refreshTable();
+    updateWidgets();
 }
 
 tabRepairs::~tabRepairs()
@@ -75,17 +77,19 @@ QString tabRepairs::tabTitle()
 
 void tabRepairs::updateWidgets()
 {
-    if(!comSettings->isCartridgeRepairEnabled || m_tabType == Type::SelectRepair)
-    {
-        ui->switchTableMode->hide();
-        ui->labelTableMode->hide();
-        return;
-    }
-    else
-    {
-        ui->switchTableMode->show();
-        ui->labelTableMode->show();
-    }
+    bool visibility = m_tabType == Type::Workshop;
+    bool hasSelection = ui->tableView->selectionModel()->hasSelection();
+
+    ui->switchTableMode->setVisible(visibility);
+    ui->labelTableMode->setVisible(visibility);
+    ui->pushButtonReceipt->setVisible(visibility);
+    ui->pushButtonRefill->setVisible(visibility && (ui->switchTableMode->isChecked() == ModeCartridges));
+    ui->pushButtonRefill->setEnabled(hasSelection);
+    ui->pushButtonIssue->setVisible(visibility);
+    ui->pushButtonIssue->setEnabled(ui->tableView->selectedCanBeIssued());
+    ui->pushButtonPrint->setVisible(visibility);
+    ui->pushButtonRefresh->setVisible(true);
+    ui->pushButtonMenu->setVisible(true);
 
     if(ui->switchTableMode->isChecked() == ModeCartridges)
         ui->labelTableMode->setText(tr("Картриджи"));
@@ -160,12 +164,12 @@ void tabRepairs::tableItemDoubleClick(QModelIndex item)
     int id = repairs_table->record(item.row()).value("id").toInt();
     if(ui->switchTableMode->isChecked() == ModeRepairs)
         emit doubleClickRepair(id);
-//  else            заготовка под картриджи
-//    {
-//        QList<int> *list = new QList<int>();
-//        list->append(id);
-//        emit doubleClickCartridge(list);
-//    }
+  else
+    {
+        QList<int> *list = new QList<int>();
+        list->append(id);
+        emit cartridgesRefill(list);
+    }
 
     if (m_tabType == Type::SelectRepair)
     {
@@ -209,8 +213,7 @@ void tabRepairs::lineEditSearchReturnPressed()
 
 void tabRepairs::tableModeChanged(bool mode)
 {
-    updateWidgets();
-    refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+    buttonRefreshClicked();
 }
 
 void tabRepairs::filterMenuClosed()
@@ -225,5 +228,40 @@ void tabRepairs::tableLayoutChanged(int, int, int)
 {
     if(userDbData->autoRefreshWorkspace)
         tableUpdateDelay->start(1200);  // сохранение параметров происходит с задержкой 1000мс, автообновление чуть позже
+}
+
+void tabRepairs::buttonReceptClicked()
+{
+    if(ui->switchTableMode->isChecked() == ModeCartridges)
+        emit receptCartridges();
+    else
+        emit receptRepair();
+}
+
+void tabRepairs::buttonRefillClicked()
+{
+    if(!ui->tableView->selectionModel()->hasSelection())
+        return;
+
+    emit cartridgesRefill(ui->tableView->selectedRepairsList());
+
+}
+
+void tabRepairs::buttonIssueClicked()
+{
+
+}
+
+void tabRepairs::buttonRefreshClicked()
+{
+    refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+    updateWidgets();
+}
+
+void tabRepairs::tableSelectionChanged(const QItemSelection&, const QItemSelection&)
+{
+    // обновление состояния кнопки "Выдать" в зависимости от статуса ремонта и клиента
+
+    updateWidgets();
 }
 

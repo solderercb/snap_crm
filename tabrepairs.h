@@ -28,8 +28,9 @@ class tabRepairs : public tabCommon
 
 signals:
     void doubleClickRepair(int);
-    void doubleClickCartridge(QList<int> *);
-    void buttonRepairNewClicked();
+    void cartridgesRefill(QList<int> *);
+    void receptRepair();
+    void receptCartridges();
 public:
     enum Type{Workshop = 0, SelectRepair};
     explicit tabRepairs(bool type = 0, MainWindow *parent = nullptr);
@@ -62,6 +63,11 @@ private slots:
     void tableModeChanged(bool mode);
     void filterMenuClosed();
     void tableLayoutChanged(int,int,int);
+    void buttonReceptClicked();
+    void buttonRefillClicked();
+    void buttonIssueClicked();
+    void buttonRefreshClicked();
+    void tableSelectionChanged(const QItemSelection &, const QItemSelection &);
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

@@ -1,4 +1,5 @@
 #include "stableviewrepairs.h"
+#include "models/stablerepairsmodel.h"
 
 STableViewRepairs::STableViewRepairs(QWidget *parent) :
     STableViewBase(SLocalSettings::RepairsGrid, parent)
@@ -17,6 +18,43 @@ STableViewRepairs::STableViewRepairs(QWidget *parent) :
 
 STableViewRepairs::~STableViewRepairs()
 {
+}
+
+QList<int> *STableViewRepairs::selectedRepairsList()
+{
+    QList<int> *list = new QList<int>();
+    STableRepairsModel *model = static_cast<STableRepairsModel*>(this->model());
+    foreach(QModelIndex index, selectionList())
+    {
+        list->append(model->unformattedData(index).toInt());
+    }
+    return list;
+}
+
+bool STableViewRepairs::selectedCanBeIssued()
+{
+    STableRepairsModel *model = static_cast<STableRepairsModel*>(this->model());
+    bool en = !selectionList().isEmpty();
+    int client = 0;
+    foreach(QModelIndex index, selectionList())
+    {
+        int c = model->unformattedData(index.siblingAtColumn(ServiceColumn::ClientId)).toInt();
+        int s = model->unformattedData(index.siblingAtColumn(ServiceColumn::StateId)).toInt();
+        if(!client)
+            client = c;
+        else if(client != c)
+        {
+            en &= 0;
+            break;
+        }
+
+        if(s != Global::RepStateIds::Ready && s != Global::RepStateIds::ReadyNoRepair)
+        {
+            en &= 0;
+            break;
+        }
+    }
+    return en;
 }
 
 void STableViewRepairs::translateNames()

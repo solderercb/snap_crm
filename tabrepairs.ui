@@ -120,41 +120,14 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
           <item row="0" column="2">
            <layout class="QGridLayout" name="CentralGridLayout_2">
             <item row="0" column="0">
-             <widget class="QPushButton" name="buttonRepairNew">
+             <widget class="QPushButton" name="pushButtonReceipt">
               <property name="text">
                <string>Принять</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="buttonRefreshTable">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Обновить</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="buttonPrint">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Печать</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="Line" name="line">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4">
-             <widget class="QToolButton" name="buttonShowParamsPopupMenu">
+            <item row="0" column="6">
+             <widget class="QToolButton" name="pushButtonMenu">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -169,6 +142,47 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
               </property>
               <property name="toolButtonStyle">
                <enum>Qt::ToolButtonTextOnly</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5">
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="pushButtonRefill">
+              <property name="text">
+               <string>Заправка</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QPushButton" name="pushButtonRefresh">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Обновить</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="pushButtonPrint">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Печать</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="pushButtonIssue">
+              <property name="text">
+               <string>Выдать</string>
               </property>
              </widget>
             </item>
@@ -250,8 +264,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>buttonShowParamsPopupMenu</tabstop>
-  <tabstop>buttonRefreshTable</tabstop>
+  <tabstop>pushButtonMenu</tabstop>
+  <tabstop>pushButtonRefresh</tabstop>
  </tabstops>
  <resources>
   <include location="styles/styles.qrc"/>
@@ -306,7 +320,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    </hints>
   </connection>
   <connection>
-   <sender>buttonRefreshTable</sender>
+   <sender>pushButtonRefresh</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairs</receiver>
    <slot>refreshTable()</slot>

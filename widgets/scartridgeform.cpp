@@ -75,9 +75,11 @@ void SCartridgeForm::initWidgets()
     initModels();
     ui->comboBoxWasEarly->setModel(cartridgeRepeatReason);
     ui->comboBoxWasEarly->setCurrentIndex(-1);
+    ui->comboBoxWasEarly->disableWheelEvent(true);
     ui->comboBoxPlace->setButtons("Clear");
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxPlace->setCurrentIndex(-1);
+    ui->comboBoxPlace->disableWheelEvent(true);
     connect(ui->comboBoxPlace, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::savePlace);
     connect(ui->comboBoxPlace, &SComboBox::buttonClicked, this, &SCartridgeForm::comboBoxPlaceButtonClickHandler);
     ui->labelLimitReached->setVisible(checkResource());
@@ -90,9 +92,11 @@ void SCartridgeForm::initWidgets()
         ui->checkBoxPreagreedDrumReplace->installEventFilter(this);
         ui->checkBoxPreagreedBladeReplace->installEventFilter(this);
         ui->comboBoxEngineer->setModel(engineersModel);
+        ui->comboBoxEngineer->disableWheelEvent(true);
         connect(ui->comboBoxEngineer, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::comboBoxEngineerChanged);
         ui->comboBoxState->setModel(statusesProxyModel);
         ui->comboBoxState->setCurrentIndex(-1);
+        ui->comboBoxState->disableWheelEvent(true);
         connect(ui->comboBoxState, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::saveState);
         ui->checkBoxRefill->installEventFilter(this);
         ui->checkBoxChipReplace->installEventFilter(this);
@@ -152,7 +156,6 @@ void SCartridgeForm::updateWidgets()
     ui->checkBoxPreagreedBladeReplace->setChecked(m_repairModel->cartridge()->Blade());
     ui->spinBoxRefillWeight->setValue(m_cartridgeCard->tonerWeight());
     ui->doubleSpinBoxPreagreedAmount->setValue(m_repairModel->preAgreedAmount());
-    updateComboBoxEngineer(m_repairModel->engineer());
     ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isRepeat()?1:-1);
     ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isWarranty()?0:-1);
     ui->comboBoxWasEarly->setEnabled(false);
@@ -444,7 +447,7 @@ bool SCartridgeForm::checkData(const int stateId)
         if(worksAndPartsModel->amountTotal() == 0)
         {
             ui->doubleSpinBoxTotalAmount->setStyleSheet(commonSpinBoxStyleSheetRed);
-            throw 2;
+            throw Global::ThrowType::ConditionsError;
         }
     }
 }
@@ -797,6 +800,7 @@ void SCartridgeForm::updateStateWidget(const int statusId)
     ui->comboBoxState->setCurrentIndex(-1);
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->comboBoxState->setPlaceholderText(activeState);
+    updateStatesModel(statusId);
     ui->comboBoxState->blockSignals(false);
 }
 
@@ -878,23 +882,22 @@ void SCartridgeForm::saveState(int index)
         if(!checkStateAcl(newStateId))
         {
             shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
-            throw 2;
+            throw Global::ThrowType::ConditionsError;
         }
         checkData(newStateId);
         doStateActions(newStateId);
         m_repairModel->setState(newStateId);
 
         if(!commit())
-            throw 3;
+            throw Global::ThrowType::QueryError;
     }
-    catch (int type)
+    catch (Global::ThrowType type)
     {
         ui->comboBoxState->blockSignals(true);
         ui->comboBoxState->setCurrentIndex(-1);
         ui->comboBoxState->blockSignals(false);
         return;
     }
-    updateStatesModel(newStateId);
     updateWidgets();
     emit updateParentTab();
 

@@ -772,6 +772,16 @@ void STableViewBase::resetVScrollPos()
     scrollToTop();
 }
 
+/* Возвращает список индексов, в которых хранятся уникальные идентификаторы (например, номера ремонтов)
+*/
+QModelIndexList STableViewBase::selectionList()
+{
+    if(!selectionModel()->hasSelection())
+        return QModelIndexList();
+
+    return selectionModel()->selectedRows(m_uniqueIdColumn);
+}
+
 /* Сохранение списка выделенных строк для восстановления после обновления модели
  * Только при режиме выбора строк целиком
 */
@@ -780,15 +790,9 @@ void STableViewBase::saveSelection()
     if(selectionBehavior() != QAbstractItemView::SelectRows)
         return;
 
-    QModelIndexList list = selectedIndexes();
-    int row = -1;
-    foreach(QModelIndex index, list)
+    foreach(QModelIndex index, selectionList())
     {
-        if(row == index.row())
-            continue;
-
-        row = index.row();
-        m_selectionList.append(index.siblingAtColumn(m_uniqueIdColumn).data());
+        m_selectionList.append(index.data());
     }
 }
 

@@ -399,11 +399,12 @@ void MainWindow::createTabRepairs(int type, QWidget* caller)
     if (type == tabRepairs::Workshop)
     {
         QObject::connect(subwindow, &tabRepairs::doubleClickRepair, this, &MainWindow::createTabRepair);
-//        QObject::connect(subwindow, &tabRepairs::doubleClickCartridge, this, &MainWindow::createTabRepairCartridges);         заготовка под картриджи
+        QObject::connect(subwindow, &tabRepairs::cartridgesRefill, this, &MainWindow::createTabRepairCartridges);
+        QObject::connect(subwindow, &tabRepairs::receptRepair, this, &MainWindow::createTabRepairNew);
+        QObject::connect(subwindow, &tabRepairs::receptCartridges, this, &MainWindow::createTabReceptCartridge);
     }
     else
     {
-        QObject::connect(subwindow,SIGNAL(buttonRepairNewClicked()), this, SLOT(createTabRepairNew()));
         // Сигнал экземпляра вкладки выбора предыдущего ремонта подключаем к слоту вызывающей вкладки для заполнения соотв. полей
         // и к слоту MainWindow, в котором происходит переключение на вкладку приёма в ремонт при закрытии вкладки выбора ремонта
         QObject::connect(subwindow,SIGNAL(doubleClickRepair(int)), caller, SLOT(fillDeviceCreds(int)));
@@ -1003,10 +1004,10 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    createTabSettings();
 //    createTabSalary();
 //    test_scheduler2->start(1000);    //  (пере-)запускаем таймер закрытия вкладки
-        QList<int> *testCartridges = new QList<int>();
-        testCartridges->append(25597);
-        testCartridges->append(25607);
-        createTabRepairCartridges(testCartridges);
+//        QList<int> *testCartridges = new QList<int>();
+//        testCartridges->append(25597);
+//        testCartridges->append(25607);
+//        createTabRepairCartridges(testCartridges);
 }
 
 void MainWindow::test_scheduler2_handler()  // обработик таймера закрытия вкладки

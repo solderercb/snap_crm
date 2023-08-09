@@ -442,7 +442,7 @@ color: rgb(197, 255, 172);</string>
            <string>История</string>
           </property>
          </widget>
-         <widget class="QComboBox" name="comboBoxWasEarly">
+         <widget class="SComboBox" name="comboBoxWasEarly">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -546,7 +546,7 @@ color: rgb(197, 255, 172);</string>
            <string>Ответственный инженер</string>
           </property>
          </widget>
-         <widget class="QComboBox" name="comboBoxEngineer">
+         <widget class="SComboBox" name="comboBoxEngineer">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -686,7 +686,7 @@ color: rgb(197, 255, 172);</string>
              <string>Статус</string>
             </property>
            </widget>
-           <widget class="QComboBox" name="comboBoxState">
+           <widget class="SComboBox" name="comboBoxState">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
