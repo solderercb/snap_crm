@@ -15,6 +15,7 @@ SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
     SCartridgeForm(parent)
 {
     m_repairId = repairId;
+    initWidgets();
 }
 
 SCartridgeForm::~SCartridgeForm()
@@ -921,5 +922,5 @@ void SCartridgeForm::buttonClassicTabClicked()
 
 void SCartridgeForm::buttonCartridgeCardClicked()
 {
-
+    emit createCartridgeCardForm(m_cardId);
 }

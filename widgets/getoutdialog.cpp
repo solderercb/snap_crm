@@ -346,9 +346,23 @@ void getOutDialog::issueRepairs()
     }
 }
 
+/*  Удаление моделей данных ремонтов
+ *  Используется при групповой выдаче ремонтов непосредственно с вкладки Ремонты
+*/
+void getOutDialog::deleteRepairModels()
+{
+    SRepairModel *repair;
+    while(m_repairsModels.count())
+    {
+        repair = m_repairsModels.last();
+        m_repairsModels.removeLast();
+        delete repair;
+    }
+}
+
 void getOutDialog::buttonCancelClicked()
 {
-    emit close();
+    this->deleteLater();
 }
 
 void getOutDialog::createLooseDoc()

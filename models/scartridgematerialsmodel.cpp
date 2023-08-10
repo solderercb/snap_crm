@@ -79,6 +79,8 @@ bool SCartridgeMaterialsModel::commit()
     {
         throw Global::ThrowType::QueryError;
     }
+
+    return 1;
 }
 
 int SCartridgeMaterialsModel::findNextMaterial(const int targetRow)

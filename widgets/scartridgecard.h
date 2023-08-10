@@ -44,6 +44,7 @@ class SCartridgeCard : public SWidget
     Q_OBJECT
 signals:
     void newCardCreated(int id);
+    void cardModified(int id);
     void closeForm();
 public:
     enum Color {Black = 0, Cyan, Magenta, Yellow};

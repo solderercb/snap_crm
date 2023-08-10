@@ -72,8 +72,8 @@ void tabRepairCartridges::appendToReceptList(SCartridgeForm *form)
     ui->verticalLayoutCartridges->addWidget(form);
     connect(form, &SCartridgeForm::createTabClient, this, &tabRepairCartridges::createTabClient);
     connect(form, &SCartridgeForm::createTabRepair, this, &tabRepairCartridges::createTabRepair);
+    connect(form, &SCartridgeForm::createCartridgeCardForm, this, &tabRepairCartridges::createCartridgeCardForm);
     connect(form, &SCartridgeForm::updateParentTab, this, &tabRepairCartridges::updateWidgets);
-    form->initWidgets();
 }
 
 /* Обновление состояния кнопок вкладки
@@ -122,19 +122,53 @@ void tabRepairCartridges::reloadRepairData()
 
 }
 
-void tabRepairCartridges::randomFill()
+void tabRepairCartridges::createCartridgeCardForm(const int id)
 {
+    m_modalWidgetBackground = new QWidget(this);
+    m_modalWidgetBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
+    m_modalWidgetBackground->resize(size());
+    m_modalWidgetBackground->setVisible(true);
 
+    m_cartridgeCardForm = new SCartridgeCard(id, 0, Qt::SplashScreen, this);
+    connect(m_cartridgeCardForm, &SCartridgeCard::cardModified, this, &tabRepairCartridges::reloadCardModel);
+    connect(m_cartridgeCardForm, &SCartridgeCard::closeForm, this, &tabRepairCartridges::closeCartridgeCardForm);
+}
+
+void tabRepairCartridges::closeCartridgeCardForm()
+{
+    if(m_cartridgeCardForm != nullptr)
+    {
+        m_cartridgeCardForm->deleteLater();
+        m_cartridgeCardForm = nullptr;
+    }
+    if (m_modalWidgetBackground != nullptr)
+    {
+        m_modalWidgetBackground->deleteLater();
+        m_modalWidgetBackground = nullptr;
+    }
+}
+
+void tabRepairCartridges::reloadCardModel(int id)
+{
+    SCartridgeForm *form;
+    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    {
+        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
+            continue;
+
+        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+        form->updateModels();
+    }
 }
 
 void tabRepairCartridges::createGetOutDialog()
 {
     QList<SRepairModel*> list;
     SCartridgeForm *form;
-    overlay = new QWidget(this);
-    overlay->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
-    overlay->resize(size());
-    overlay->setVisible(true);
+    m_modalWidgetBackground = new QWidget(this);
+    m_modalWidgetBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
+    m_modalWidgetBackground->resize(size());
+    m_modalWidgetBackground->setVisible(true);
 
     for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
     {
@@ -157,11 +191,17 @@ void tabRepairCartridges::closeGetOutDialog()
         modalWidget->deleteLater();
         modalWidget = nullptr;
     }
-    if (overlay != nullptr)
+    if (m_modalWidgetBackground != nullptr)
     {
-        overlay->deleteLater();
-        overlay = nullptr;
+        m_modalWidgetBackground->deleteLater();
+        m_modalWidgetBackground = nullptr;
     }
+}
+
+#ifdef QT_DEBUG
+void tabRepairCartridges::randomFill()
+{
+
 }
 
 void tabRepairCartridges::test_scheduler_handler()
@@ -173,3 +213,5 @@ void tabRepairCartridges::test_scheduler2_handler()
 {
 
 }
+#endif
+

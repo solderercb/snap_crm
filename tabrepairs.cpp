@@ -249,7 +249,7 @@ void tabRepairs::buttonRefillClicked()
 
 void tabRepairs::buttonIssueClicked()
 {
-
+    createGetOutDialog();
 }
 
 void tabRepairs::buttonRefreshClicked()
@@ -260,8 +260,48 @@ void tabRepairs::buttonRefreshClicked()
 
 void tabRepairs::tableSelectionChanged(const QItemSelection&, const QItemSelection&)
 {
-    // обновление состояния кнопки "Выдать" в зависимости от статуса ремонта и клиента
-
     updateWidgets();
+}
+
+void tabRepairs::createGetOutDialog()
+{
+    QList<SRepairModel*> list;
+    QList<int> *idsList = ui->tableView->selectedRepairsList();
+    SRepairModel *repair;
+    SSaleTableModel *worksAndPartsModel;
+    m_modalWidgetBackground = new QWidget(this);
+    m_modalWidgetBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
+    m_modalWidgetBackground->resize(size());
+    m_modalWidgetBackground->setVisible(true);
+
+    for(int i = 0; i < idsList->count(); i++)
+    {
+        repair = new SRepairModel(idsList->at(i));
+        worksAndPartsModel = new SSaleTableModel(repair);
+        worksAndPartsModel->repair_loadTable(idsList->at(i));
+        repair->setWorksAndPartsModel(worksAndPartsModel);
+        list.append(repair);
+    }
+
+    modalWidget = new getOutDialog(list, Qt::SplashScreen, this);
+    connect(modalWidget, &getOutDialog::close, this, &tabRepairs::closeGetOutDialog);
+
+    delete idsList;
+}
+
+void tabRepairs::closeGetOutDialog()
+{
+    modalWidget->deleteRepairModels();
+    if(modalWidget != nullptr)
+    {
+        modalWidget->deleteLater();
+        modalWidget = nullptr;
+    }
+    if (m_modalWidgetBackground != nullptr)
+    {
+        m_modalWidgetBackground->deleteLater();
+        m_modalWidgetBackground = nullptr;
+    }
+    refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionReset);
 }
 

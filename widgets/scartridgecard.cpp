@@ -175,6 +175,7 @@ bool SCartridgeCard::commit()
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     i_queryLog = new SQueryLog();
     bool nErr = 1;
+    bool isNew = (m_cardModel->id() == 0);
     setModelData();
 
     QUERY_LOG_START(metaObject()->className());
@@ -182,7 +183,8 @@ bool SCartridgeCard::commit()
     {
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
         m_cardModel->commit();
-        m_materialsModel->setCardId(m_cardModel->id());
+        if(isNew)
+            m_materialsModel->setCardId(m_cardModel->id());
         m_materialsModel->commit();
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Данные сохранены"), QColor(214,239,220), QColor(229,245,234));
 
@@ -210,6 +212,10 @@ bool SCartridgeCard::commit()
     {
         m_id = m_cardModel->id();
         emit newCardCreated(m_id);
+    }
+    else
+    {
+        emit cardModified(m_id);
     }
     QUERY_LOG_STOP;
     delete query;

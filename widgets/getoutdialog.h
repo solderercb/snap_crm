@@ -32,7 +32,7 @@ public:
     void setRepairModel(SRepairModel *model);
     void setClientModel(SClientModel *model);
     void setSaleTableModel(SSaleTableModel *model);
-
+    void deleteRepairModels();
 private:
     Ui::getOutDialog *ui;
     bool m_summsNotEq = 0;

@@ -20,6 +20,7 @@ signals:
     void updateParentTab();
     void createTabClient(int id);
     void createTabRepair(int id);
+    void createCartridgeCardForm(int id);
 public:
     explicit SCartridgeForm(QWidget *parent = nullptr);
     explicit SCartridgeForm(const int repairId, QWidget *parent = nullptr);
