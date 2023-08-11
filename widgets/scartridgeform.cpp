@@ -297,6 +297,11 @@ bool SCartridgeForm::updateRepair()
 
 }
 
+int SCartridgeForm::repairId()
+{
+    return m_repairId;
+}
+
 const QString &SCartridgeForm::title() const
 {
     return m_title;
@@ -770,8 +775,8 @@ int SCartridgeForm::isReady()
 {
     switch(m_repairModel->state())
     {
-    case Global::RepStateIds::Ready:
-    case Global::RepStateIds::ReadyNoRepair: return 1;
+        case Global::RepStateIds::Ready:
+        case Global::RepStateIds::ReadyNoRepair: return 1;
     }
 
     return 0;

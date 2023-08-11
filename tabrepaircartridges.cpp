@@ -14,7 +14,7 @@ tabRepairCartridges::tabRepairCartridges(MainWindow *parent) :
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents {\
                                                     background-color: rgb(255, 255, 255);\
                                                 }");
-    connect(ui->buttonIssue, &QPushButton::clicked, this, &tabRepairCartridges::createGetOutDialog);
+    connect(ui->buttonIssue, &QPushButton::clicked, this, &tabRepairCartridges::createDialogIssue);
 }
 
 bool tabRepairCartridges::eventFilter(QObject *watched, QEvent *event)
@@ -44,14 +44,28 @@ tabRepairCartridges *tabRepairCartridges::getInstance(QList<int> *list, MainWind
 {
     if( !p_instance )
         p_instance = new tabRepairCartridges(list, parent);
+    else
+        p_instance->loadForms(list);
     return p_instance;
 }
 
 void tabRepairCartridges::loadForms(QList<int> *list)
 {
     SCartridgeForm *form;
+    QList<int> currentList;
+    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    {
+        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
+            continue;
+
+        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+        currentList.append(form->repairId());
+    }
+
     for(int i = 0; i < list->count(); i++)
     {
+        if(currentList.contains(list->at(i)))
+            continue;
         form = new SCartridgeForm(list->at(i));
         appendToReceptList(form);
     }
@@ -74,6 +88,7 @@ void tabRepairCartridges::appendToReceptList(SCartridgeForm *form)
     connect(form, &SCartridgeForm::createTabRepair, this, &tabRepairCartridges::createTabRepair);
     connect(form, &SCartridgeForm::createCartridgeCardForm, this, &tabRepairCartridges::createCartridgeCardForm);
     connect(form, &SCartridgeForm::updateParentTab, this, &tabRepairCartridges::updateWidgets);
+    updateWidgets();
 }
 
 /* Обновление состояния кнопок вкладки
@@ -124,28 +139,13 @@ void tabRepairCartridges::reloadRepairData()
 
 void tabRepairCartridges::createCartridgeCardForm(const int id)
 {
-    m_modalWidgetBackground = new QWidget(this);
-    m_modalWidgetBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
-    m_modalWidgetBackground->resize(size());
-    m_modalWidgetBackground->setVisible(true);
-
     m_cartridgeCardForm = new SCartridgeCard(id, 0, Qt::SplashScreen, this);
     connect(m_cartridgeCardForm, &SCartridgeCard::cardModified, this, &tabRepairCartridges::reloadCardModel);
-    connect(m_cartridgeCardForm, &SCartridgeCard::closeForm, this, &tabRepairCartridges::closeCartridgeCardForm);
+    connect(m_cartridgeCardForm, &SCartridgeCard::onDelete, this, &tabRepairCartridges::closeCartridgeCardForm);
 }
 
 void tabRepairCartridges::closeCartridgeCardForm()
 {
-    if(m_cartridgeCardForm != nullptr)
-    {
-        m_cartridgeCardForm->deleteLater();
-        m_cartridgeCardForm = nullptr;
-    }
-    if (m_modalWidgetBackground != nullptr)
-    {
-        m_modalWidgetBackground->deleteLater();
-        m_modalWidgetBackground = nullptr;
-    }
 }
 
 void tabRepairCartridges::reloadCardModel(int id)
@@ -161,14 +161,10 @@ void tabRepairCartridges::reloadCardModel(int id)
     }
 }
 
-void tabRepairCartridges::createGetOutDialog()
+void tabRepairCartridges::createDialogIssue()
 {
     QList<SRepairModel*> list;
     SCartridgeForm *form;
-    m_modalWidgetBackground = new QWidget(this);
-    m_modalWidgetBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
-    m_modalWidgetBackground->resize(size());
-    m_modalWidgetBackground->setVisible(true);
 
     for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
     {
@@ -179,23 +175,13 @@ void tabRepairCartridges::createGetOutDialog()
         list.append(form->model());
     }
 
-    modalWidget = new getOutDialog(list, Qt::SplashScreen, this);
-    connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
-    connect(modalWidget, &getOutDialog::issueFailed, this, &tabRepairCartridges::reloadRepairData);
+    m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
+    connect(m_dialogIssue, &SDialogIssueRepair::onDelete, this, &tabRepairCartridges::closeDialogIssue);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::reloadRepairData);
 }
 
-void tabRepairCartridges::closeGetOutDialog()
+void tabRepairCartridges::closeDialogIssue()
 {
-    if(modalWidget != nullptr)
-    {
-        modalWidget->deleteLater();
-        modalWidget = nullptr;
-    }
-    if (m_modalWidgetBackground != nullptr)
-    {
-        m_modalWidgetBackground->deleteLater();
-        m_modalWidgetBackground = nullptr;
-    }
 }
 
 #ifdef QT_DEBUG

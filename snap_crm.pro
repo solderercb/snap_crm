@@ -142,6 +142,7 @@ SOURCES += \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp \
     widgets/settingstabwidgets/ssettingspageuser.cpp \
     widgets/settingstabwidgets/stableviewpermissions.cpp \
+    widgets/smodalwidget.cpp \
     widgets/spageclientsummary.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
@@ -163,7 +164,7 @@ SOURCES += \
     widgets/stableviewclientsitemdelegates.cpp \
     widgets/stableviewrepairsitemdelegates.cpp \
     widgets/stableviewrepairs.cpp \
-    widgets/getoutdialog.cpp \
+    widgets/sdialogissuerepair.cpp \
     widgets/saletableitemdelegates.cpp \
     widgets/sclientmatch.cpp \
     widgets/scombobox.cpp \
@@ -295,6 +296,7 @@ HEADERS  += \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.h \
     widgets/settingstabwidgets/ssettingspageuser.h \
     widgets/settingstabwidgets/stableviewpermissions.h \
+    widgets/smodalwidget.h \
     widgets/spageclientsummary.h \
     squerylog.h \
     stable.h \
@@ -318,7 +320,7 @@ HEADERS  += \
     widgets/stableviewgridlayout.h \
     widgets/stableviewbase.h \
     widgets/stableviewrepairs.h \
-    widgets/getoutdialog.h \
+    widgets/sdialogissuerepair.h \
     widgets/saletableitemdelegates.h \
     widgets/sclientmatch.h \
     widgets/scombobox.h \
@@ -373,7 +375,7 @@ FORMS += \
     tabrepairnew.ui \
     tabrepairs.ui \
     tabsale.ui \
-    widgets/getoutdialog.ui \
+    widgets/sdialogissuerepair.ui \
     widgets/sclientmatch.ui \
     widgets/scomments.ui \
     widgets/sdevicematch.ui \

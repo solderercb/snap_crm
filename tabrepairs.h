@@ -17,7 +17,7 @@
 #include "models/stablerepairsmodel.h"
 #include "models/repairtablefiltermenu.h"
 #include "widgets/stableviewbase.h"
-#include "widgets/getoutdialog.h"
+#include "widgets/sdialogissuerepair.h"
 
 namespace Ui {
 class tabRepairs;
@@ -51,8 +51,7 @@ private:
     QSqlQueryModel* cartridges_table = nullptr;
     QStringList query_group;
     QTimer *tableUpdateDelay;
-    QWidget *m_modalWidgetBackground;
-    getOutDialog *modalWidget;
+    SDialogIssueRepair *m_dialogIssue;
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
@@ -71,8 +70,8 @@ private slots:
     void buttonIssueClicked();
     void buttonRefreshClicked();
     void tableSelectionChanged(const QItemSelection &, const QItemSelection &);
-    void createGetOutDialog();
-    void closeGetOutDialog();
+    void createDialogIssue();
+    void closeDialogIssue();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

@@ -2,7 +2,7 @@
 #include "ui_scartridgecard.h"
 
 SCartridgeCard::SCartridgeCard(Qt::WindowFlags flags, QWidget *parent) :
-    SWidget(parent, flags),
+    SModalWidget(parent, flags),
     ui(new Ui::SCartridgeCard)
 {
     ui->setupUi(this);
@@ -222,6 +222,11 @@ bool SCartridgeCard::commit()
 
     updateWidgets();
     return nErr;
+}
+
+void SCartridgeCard::closeForm()
+{
+    this->deleteLater();
 }
 
 void SCartridgeCard::translateNames()

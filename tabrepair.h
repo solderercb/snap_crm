@@ -17,7 +17,7 @@
 #include <QLocale>
 #include <QClipboard>
 #include "tabcommon.h"
-#include "widgets/getoutdialog.h"
+#include "widgets/sdialogissuerepair.h"
 #include "widgets/sgroupboxeventfilter.h"
 #include "widgets/stableviewbase.h"
 #include "models/srepairmodel.h"
@@ -57,7 +57,7 @@ class tabRepair : public tabCommon
 {
     Q_OBJECT
 
-    friend class getOutDialog;
+    friend class SDialogIssueRepair;
 
 signals:
     void worksTreeDoubleClicked(int);
@@ -87,8 +87,7 @@ private:
     double works_sum, parts_sum, total_sum;
     QString box_name;
     bool modelRO = 0;   // признак блокировки карты ремонта
-    getOutDialog *modalWidget;
-    QWidget *overlay;
+    SDialogIssueRepair *m_dialogIssue;
     bool m_worksRO = 1;
     bool m_diagRO = 1;
     bool m_summRO = 1;
@@ -135,8 +134,8 @@ private slots:
     void comboBoxStateIndexChanged(int);
     void updateTotalSumms(const double, const double, const double);
     void saveTotalSumms();
-    void createGetOutDialog();
-    void closeGetOutDialog();
+    void createDialogIssue();
+    void closeDialogIssue();
     void openPrevRepair();
     void printStickers(int);
     void changeOffice(int);

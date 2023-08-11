@@ -1,11 +1,11 @@
 #include "global.h"
-#include "getoutdialog.h"
-#include "ui_getoutdialog.h"
+#include "sdialogissuerepair.h"
+#include "ui_sdialogissuerepair.h"
 #include "tabrepair.h"
 
-getOutDialog::getOutDialog(QList<SRepairModel*> repairs, Qt::WindowFlags flags, QWidget *parent) :
-    SWidget(parent, flags),
-    ui(new Ui::getOutDialog)
+SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowFlags flags, QWidget *parent) :
+    SModalWidget(parent, flags),
+    ui(new Ui::SDialogIssueRepair)
 {
     ui->setupUi(this);
     setWindowModality(Qt::WindowModal);
@@ -21,6 +21,11 @@ getOutDialog::getOutDialog(QList<SRepairModel*> repairs, Qt::WindowFlags flags, 
     ui->comboBoxRejectReason->setCurrentIndex(-1);
     connect(ui->comboBoxRejectReason, SIGNAL(currentTextChanged(QString)), this, SLOT(otheRejectReasonShow(QString)));
     connect(ui->textEditRejectReason, SIGNAL(textChanged()), this, SLOT(textEditTextChanged()));
+    connect(ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(buttonCancelClicked()));
+    connect(ui->pushButtonIssue, SIGNAL(clicked()), this, SLOT(buttonIssueClicked()));
+    connect(ui->pushButtonLooseDocPrint, SIGNAL(clicked()), this, SLOT(createLooseDoc()));
+    connect(ui->comboBoxPaymentAccount, SIGNAL(currentIndexChanged(int)), this, SLOT(paymentSystemChanged(int)));
+    connect(ui->checkBoxCreditPayment, SIGNAL(toggled(bool)), this, SLOT(checkBoxInCreditToggled(bool)));
 
     collectRepairsData();
     ui->checkBoxDiagDocPrint->setVisible(m_singleRepairWidgetsVisible);
@@ -60,20 +65,19 @@ getOutDialog::getOutDialog(QList<SRepairModel*> repairs, Qt::WindowFlags flags, 
 #endif
 }
 
-getOutDialog::~getOutDialog()
+SDialogIssueRepair::~SDialogIssueRepair()
 {
     delete ui;
-    emit close();
 }
 
-void getOutDialog::setDefaultStyleSheets()
+void SDialogIssueRepair::setDefaultStyleSheets()
 {
     ui->comboBoxRejectReason->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->textEditRejectReason->setStyleSheet(commonTextEditStyleSheet);
 }
 
-void getOutDialog::initPaymentSystems()
+void SDialogIssueRepair::initPaymentSystems()
 {
     m_paymentSystemsProxyModel = new SSortFilterProxyModel();
     m_paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
@@ -87,7 +91,7 @@ void getOutDialog::initPaymentSystems()
     ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
 }
 
-bool getOutDialog::checkInput()
+bool SDialogIssueRepair::checkInput()
 {
     setDefaultStyleSheets();
     if(ui->comboBoxRejectReason->isVisible() && ui->comboBoxRejectReason->currentIndex() == -1)
@@ -104,7 +108,7 @@ bool getOutDialog::checkInput()
     return 1;
 }
 
-bool getOutDialog::checkAmounts()
+bool SDialogIssueRepair::checkAmounts()
 {
     if(m_summsNotEq)
     {
@@ -120,7 +124,7 @@ bool getOutDialog::checkAmounts()
     return 1;
 }
 
-void getOutDialog::collectRepairsData()
+void SDialogIssueRepair::collectRepairsData()
 {
     SRepairModel *repairModel;
     SSaleTableModel *worksAndSparePartsModel;
@@ -184,7 +188,7 @@ void getOutDialog::collectRepairsData()
     }
 }
 
-void getOutDialog::buttonIssueClicked()
+void SDialogIssueRepair::buttonIssueClicked()
 {
     bool nErr = 1;
 
@@ -245,7 +249,7 @@ void getOutDialog::buttonIssueClicked()
     }
 }
 
-void getOutDialog::issueRepairs()
+void SDialogIssueRepair::issueRepairs()
 {
     bool nErr = 1;
     int paymentAccount = 0;
@@ -349,7 +353,7 @@ void getOutDialog::issueRepairs()
 /*  Удаление моделей данных ремонтов
  *  Используется при групповой выдаче ремонтов непосредственно с вкладки Ремонты
 */
-void getOutDialog::deleteRepairModels()
+void SDialogIssueRepair::deleteRepairModels()
 {
     SRepairModel *repair;
     while(m_repairsModels.count())
@@ -360,17 +364,17 @@ void getOutDialog::deleteRepairModels()
     }
 }
 
-void getOutDialog::buttonCancelClicked()
+void SDialogIssueRepair::buttonCancelClicked()
 {
     this->deleteLater();
 }
 
-void getOutDialog::createLooseDoc()
+void SDialogIssueRepair::createLooseDoc()
 {
 
 }
 
-void getOutDialog::otheRejectReasonShow(QString comboBoxText)
+void SDialogIssueRepair::otheRejectReasonShow(QString comboBoxText)
 {
     ui->comboBoxRejectReason->setStyleSheet(commonComboBoxStyleSheet);
     if(comboBoxText == rejectReasonModel->getDisplayRole(rejectReasonModel->property("other_reject_reason").toInt(), 1))
@@ -385,12 +389,12 @@ void getOutDialog::otheRejectReasonShow(QString comboBoxText)
     }
 }
 
-void getOutDialog::textEditTextChanged()
+void SDialogIssueRepair::textEditTextChanged()
 {
     ui->textEditRejectReason->setStyleSheet(commonTextEditStyleSheet);
 }
 
-void getOutDialog::paymentSystemChanged(int index)
+void SDialogIssueRepair::paymentSystemChanged(int index)
 {
     ui->checkBoxCreditPayment->blockSignals(true);
     if(paymentSystemsModel->databaseIDByRow(index, "system_id") == Global::PaymentSystemIds::Balance)
@@ -400,7 +404,7 @@ void getOutDialog::paymentSystemChanged(int index)
     ui->checkBoxCreditPayment->blockSignals(false);
 }
 
-void getOutDialog::checkBoxInCreditToggled(bool state)
+void SDialogIssueRepair::checkBoxInCreditToggled(bool state)
 {
     ui->comboBoxPaymentAccount->blockSignals(true);
     if(state)

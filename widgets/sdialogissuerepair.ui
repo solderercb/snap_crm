@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>getOutDialog</class>
- <widget class="QWidget" name="getOutDialog">
+ <class>SDialogIssueRepair</class>
+ <widget class="QWidget" name="SDialogIssueRepair">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -495,88 +495,7 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>pushButtonCancel</sender>
-   <signal>clicked()</signal>
-   <receiver>getOutDialog</receiver>
-   <slot>buttonCancelClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>548</x>
-     <y>282</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>427</x>
-     <y>267</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonIssue</sender>
-   <signal>clicked()</signal>
-   <receiver>getOutDialog</receiver>
-   <slot>buttonIssueClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>458</x>
-     <y>282</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>252</x>
-     <y>265</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonLooseDocPrint</sender>
-   <signal>clicked()</signal>
-   <receiver>getOutDialog</receiver>
-   <slot>createLooseDoc()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>108</x>
-     <y>123</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>86</x>
-     <y>268</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxPaymentAccount</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>getOutDialog</receiver>
-   <slot>paymentSystemChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>510</x>
-     <y>162</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>558</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxCreditPayment</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>getOutDialog</receiver>
-   <slot>checkBoxInCreditToggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>547</x>
-     <y>184</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>542</x>
-     <y>206</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>buttonIssueClicked()</slot>
   <slot>buttonCancelClicked()</slot>

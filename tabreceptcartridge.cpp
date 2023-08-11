@@ -282,28 +282,14 @@ void tabReceptCartridge::updateTotalPreagreedAmount()
 void tabReceptCartridge::createCartridgeCardForm(const int id)
 {
     int vendorIndex = ui->comboBoxVendor->currentIndex();
-    m_cartridgeCardFormBackground = new QWidget(this);
-    m_cartridgeCardFormBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
-    m_cartridgeCardFormBackground->resize(size());
-    m_cartridgeCardFormBackground->setVisible(true);
 
     m_cartridgeCardForm = new SCartridgeCard(id, vendorIndex, Qt::SplashScreen, this);
-    connect(m_cartridgeCardForm, &SCartridgeCard::closeForm, this, &tabReceptCartridge::closeCartridgeCardForm);
+    connect(m_cartridgeCardForm, &SCartridgeCard::onDelete, this, &tabReceptCartridge::closeCartridgeCardForm);
     connect(m_cartridgeCardForm, &SCartridgeCard::newCardCreated, this, &tabReceptCartridge::updateDevicesModel);
 }
 
 void tabReceptCartridge::closeCartridgeCardForm()
 {
-    if(m_cartridgeCardForm != nullptr)
-    {
-        m_cartridgeCardForm->deleteLater();
-        m_cartridgeCardForm = nullptr;
-    }
-    if (m_cartridgeCardFormBackground != nullptr)
-    {
-        m_cartridgeCardFormBackground->deleteLater();
-        m_cartridgeCardFormBackground = nullptr;
-    }
 }
 
 void tabReceptCartridge::updateDevicesModel(const int id)

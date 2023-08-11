@@ -981,7 +981,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabRepair(rand_rep_id.value(0).toInt());
 //    }
 //    createTabSale(0);
-//    createTabRepair(25589);
+//    createTabRepair(18513);
 //    createTabSale(17782);
 //    if (test_scheduler_counter < 375)
 //    {

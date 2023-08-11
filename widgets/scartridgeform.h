@@ -31,6 +31,7 @@ public:
     void initWidgets();
     bool createRepair();
     bool updateRepair();
+    int repairId();
     const QString &title() const;
     void setTitle(const QString &title);
     bool isRepeat() const;

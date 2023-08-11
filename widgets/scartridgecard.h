@@ -5,7 +5,7 @@
 #include "models/scartridgecardmodel.h"
 #include "models/scartridgematerialmodel.h"
 #include "models/scartridgematerialsmodel.h"
-#include "widgets/swidget.h"
+#include "widgets/smodalwidget.h"
 #include "widgets/stableviewbase.h"
 #include "widgets/scartridgematerialstableitemdelegates.h"
 #include "widgets/shortlivednotification.h"
@@ -39,13 +39,12 @@ private slots:
 #endif
 };
 
-class SCartridgeCard : public SWidget
+class SCartridgeCard : public SModalWidget
 {
     Q_OBJECT
 signals:
     void newCardCreated(int id);
     void cardModified(int id);
-    void closeForm();
 public:
     enum Color {Black = 0, Cyan, Magenta, Yellow};
     Q_ENUM(Color)
@@ -81,6 +80,7 @@ private slots:
     void removeMaterial();
     void setTonerWeight(const int weight);
     bool commit();
+    void closeForm();
 };
 
 #endif // SCARTRIDGECARD_H

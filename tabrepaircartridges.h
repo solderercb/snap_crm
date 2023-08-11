@@ -4,7 +4,7 @@
 #include "tabcommon.h"
 #include "models/srepairmodel.h"
 #include "widgets/scartridgeform.h"
-#include "widgets/getoutdialog.h"
+#include "widgets/sdialogissuerepair.h"
 #include "widgets/scartridgecard.h"
 
 #include <QWidget>
@@ -32,9 +32,8 @@ private:
     Ui::tabRepairCartridges *ui;
     static tabRepairCartridges* p_instance;
     bool m_readyButtonVisible = 1;
-    QWidget *m_modalWidgetBackground;
     SCartridgeCard *m_cartridgeCardForm;
-    getOutDialog *modalWidget;
+    SDialogIssueRepair *m_dialogIssue;
     void appendToReceptList(SCartridgeForm *form);
     void updateWidgets();
 #ifdef QT_DEBUG
@@ -43,8 +42,8 @@ private:
 public slots:
 private slots:
     void reloadRepairData();
-    void createGetOutDialog();
-    void closeGetOutDialog();
+    void createDialogIssue();
+    void closeDialogIssue();
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();
     void reloadCardModel(int id);

@@ -127,7 +127,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
 #ifdef QT_DEBUG
     if( m_getOutButtonVisible && (repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair) )
-        createGetOutDialog();
+        createDialogIssue();
     connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(reloadRepairData()));
     connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItem);
     connect(ui->dbgBtnAddRandomPartBasket, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItemBasket);
@@ -502,33 +502,19 @@ void tabRepair::saveTotalSumms()
     repairModel->commit();
 }
 
-void tabRepair::createGetOutDialog()
+void tabRepair::createDialogIssue()
 {
     QList<SRepairModel*> list;
-    overlay = new QWidget(this);
-    overlay->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
-    overlay->resize(size());
-    overlay->setVisible(true);
 
     list.append(repairModel);
-    modalWidget = new getOutDialog(list, Qt::SplashScreen, this);
-    connect(modalWidget, SIGNAL(close()), this, SLOT(closeGetOutDialog()));
-    connect(modalWidget, SIGNAL(issueSuccessfull()), this, SLOT(reloadRepairData()));
-//    connect(modalWidget, &getOutDialog::issueFailed, this, &tabRepair::reloadRepairData);
+    m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
+    connect(m_dialogIssue, SIGNAL(onDelete()), this, SLOT(closeDialogIssue()));
+    connect(m_dialogIssue, SIGNAL(issueSuccessfull()), this, SLOT(reloadRepairData()));
+//    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepair::reloadRepairData);
 }
 
-void tabRepair::closeGetOutDialog()
+void tabRepair::closeDialogIssue()
 {
-    if(modalWidget != nullptr)
-    {
-        modalWidget->deleteLater();
-        modalWidget = nullptr;
-    }
-    if (overlay != nullptr)
-    {
-        overlay->deleteLater();
-        overlay = nullptr;
-    }
 }
 
 void tabRepair::openPrevRepair()
@@ -630,7 +616,7 @@ void tabRepair::doStateActions(const int stateId)
     {
         case Global::RepStateIds::Returned:
         case Global::RepStateIds::ReturnedNoRepair:
-        case Global::RepStateIds::ReturnedInCredit: createGetOutDialog(); throw 0;
+        case Global::RepStateIds::ReturnedInCredit: createDialogIssue(); throw 0;
     }
 
     // В АСЦ установка инженера происходит при переключении с "Приём в ремонт" на любой другой.

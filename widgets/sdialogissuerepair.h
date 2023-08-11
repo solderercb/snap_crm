@@ -1,7 +1,7 @@
-#ifndef GETOUTDIALOG_H
-#define GETOUTDIALOG_H
+#ifndef SDIALOGISSUEREPAIR_H
+#define SDIALOGISSUEREPAIR_H
 
-#include "widgets/swidget.h"
+#include "widgets/smodalwidget.h"
 #include <QLocale>
 #include "global.h"
 #include "shortlivednotification.h"
@@ -15,26 +15,25 @@
 #include "models/srepairstatuslog.h"
 
 namespace Ui {
-class getOutDialog;
+class SDialogIssueRepair;
 }
 
-class getOutDialog : public SWidget
+class SDialogIssueRepair : public SModalWidget
 {
     Q_OBJECT
 
 signals:
-    void close();
     void issueSuccessfull();
     void issueFailed();
 public:
-    explicit getOutDialog(QList<SRepairModel*> repairs, Qt::WindowFlags flags = Qt::WindowFlags(), QWidget *parent = nullptr);
-    ~getOutDialog();
+    explicit SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowFlags flags = Qt::WindowFlags(), QWidget *parent = nullptr);
+    ~SDialogIssueRepair();
     void setRepairModel(SRepairModel *model);
     void setClientModel(SClientModel *model);
     void setSaleTableModel(SSaleTableModel *model);
     void deleteRepairModels();
 private:
-    Ui::getOutDialog *ui;
+    Ui::SDialogIssueRepair *ui;
     bool m_summsNotEq = 0;
     bool m_balanceNotEnough = 1;
     bool m_singleRepairWidgetsVisible = 1;
@@ -63,4 +62,4 @@ private slots:
     void checkBoxInCreditToggled(bool);
 };
 
-#endif // GETOUTDIALOG_H
+#endif // SDIALOGISSUEREPAIR_H

@@ -164,7 +164,7 @@ void tabRepairs::tableItemDoubleClick(QModelIndex item)
     int id = repairs_table->record(item.row()).value("id").toInt();
     if(ui->switchTableMode->isChecked() == ModeRepairs)
         emit doubleClickRepair(id);
-  else
+    else
     {
         QList<int> *list = new QList<int>();
         list->append(id);
@@ -249,7 +249,7 @@ void tabRepairs::buttonRefillClicked()
 
 void tabRepairs::buttonIssueClicked()
 {
-    createGetOutDialog();
+    createDialogIssue();
 }
 
 void tabRepairs::buttonRefreshClicked()
@@ -263,16 +263,12 @@ void tabRepairs::tableSelectionChanged(const QItemSelection&, const QItemSelecti
     updateWidgets();
 }
 
-void tabRepairs::createGetOutDialog()
+void tabRepairs::createDialogIssue()
 {
     QList<SRepairModel*> list;
     QList<int> *idsList = ui->tableView->selectedRepairsList();
     SRepairModel *repair;
     SSaleTableModel *worksAndPartsModel;
-    m_modalWidgetBackground = new QWidget(this);
-    m_modalWidgetBackground->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
-    m_modalWidgetBackground->resize(size());
-    m_modalWidgetBackground->setVisible(true);
 
     for(int i = 0; i < idsList->count(); i++)
     {
@@ -283,25 +279,15 @@ void tabRepairs::createGetOutDialog()
         list.append(repair);
     }
 
-    modalWidget = new getOutDialog(list, Qt::SplashScreen, this);
-    connect(modalWidget, &getOutDialog::close, this, &tabRepairs::closeGetOutDialog);
+    m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
+    connect(m_dialogIssue, &SDialogIssueRepair::onDelete, this, &tabRepairs::closeDialogIssue);
 
     delete idsList;
 }
 
-void tabRepairs::closeGetOutDialog()
+void tabRepairs::closeDialogIssue()
 {
-    modalWidget->deleteRepairModels();
-    if(modalWidget != nullptr)
-    {
-        modalWidget->deleteLater();
-        modalWidget = nullptr;
-    }
-    if (m_modalWidgetBackground != nullptr)
-    {
-        m_modalWidgetBackground->deleteLater();
-        m_modalWidgetBackground = nullptr;
-    }
+    m_dialogIssue->deleteRepairModels();
     refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionReset);
 }
 

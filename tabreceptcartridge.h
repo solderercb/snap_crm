@@ -38,7 +38,6 @@ private:
     QTimer *m_findBySerialDelay;
     bool m_closePending = 0;
     SClientModel *m_client = nullptr;
-    QWidget *m_cartridgeCardFormBackground;
     SCartridgeCard *m_cartridgeCardForm;
     void setDefaultStyleSheets();
     void initWidgets();
