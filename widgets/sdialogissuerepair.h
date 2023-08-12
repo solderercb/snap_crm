@@ -51,6 +51,7 @@ private:
     bool checkInput();
     bool checkAmounts();
     void collectRepairsData();
+    void setRepairReady(SRepairModel *model);
     void issueRepairs();
 private slots:
     void buttonIssueClicked();

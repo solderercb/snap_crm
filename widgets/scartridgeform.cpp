@@ -98,7 +98,7 @@ void SCartridgeForm::initWidgets()
         ui->comboBoxState->setModel(statusesProxyModel);
         ui->comboBoxState->setCurrentIndex(-1);
         ui->comboBoxState->disableWheelEvent(true);
-        connect(ui->comboBoxState, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::saveState);
+        connect(ui->comboBoxState, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::stateIndexChanged);
         ui->checkBoxRefill->installEventFilter(this);
         ui->checkBoxChipReplace->installEventFilter(this);
         ui->checkBoxDrumReplace->installEventFilter(this);
@@ -201,7 +201,7 @@ bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
             if(!checkBox->isEnabled())
                 return true;
 
-            int ret;
+            int ret = 1;
             int nSt = checkBox->checkState()?0:2;
             if(checkBox == ui->checkBoxRefill)
                 ret = !workAndPartHandler(SWorkModel::Type::CartridgeRefill, nSt);
@@ -503,7 +503,7 @@ void SCartridgeForm::setDefaultStyleSheets()
 
 bool SCartridgeForm::setWidgetsParams(const int stateId)
 {
-    worksCheckboxesEn = 0;
+    worksCheckboxesEn = comSettings->useSimplifiedCartridgeRepair;
     engineerComboBoxEn = 0;
     placeComboBoxEn = 0;
 
@@ -712,10 +712,13 @@ bool SCartridgeForm::removeWorkAndPart(const int workType)
     return nErr;
 }
 
-bool SCartridgeForm::workAndPartHandler(const int workType, const int state)
+bool SCartridgeForm::workAndPartHandler(const int workType, const int checkboxState)
 {
     int ret;
-    if(state)
+    if(comSettings->useSimplifiedCartridgeRepair && m_repairModel->state() == Global::RepStateIds::GetIn)
+        saveState(Global::RepStateIds::InWork);
+
+    if(checkboxState)
     {
         ret = addWorkAndPart(workType);
     }
@@ -775,6 +778,7 @@ int SCartridgeForm::isReady()
 {
     switch(m_repairModel->state())
     {
+        case Global::RepStateIds::InWork: return (comSettings->useSimplifiedCartridgeRepair && worksAndPartsModel->rowCount());
         case Global::RepStateIds::Ready:
         case Global::RepStateIds::ReadyNoRepair: return 1;
     }
@@ -874,25 +878,31 @@ void SCartridgeForm::comboBoxEngineerChanged(int index)
     commit();
 }
 
-void SCartridgeForm::saveState(int index)
+void SCartridgeForm::stateIndexChanged(int index)
 {
     if (index < 0)
         return;
 
-    m_groupUpdate = 1;
+    saveState(statusesProxyModel->databaseIDByRow(index));
+}
 
-    int newStateId = statusesProxyModel->databaseIDByRow(index);
+void SCartridgeForm::saveState(int stateId)
+{
+    if (stateId < 0)
+        return;
+
+    m_groupUpdate = 1;
 
     try
     {
-        if(!checkStateAcl(newStateId))
+        if(!checkStateAcl(stateId))
         {
             shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
             throw Global::ThrowType::ConditionsError;
         }
-        checkData(newStateId);
-        doStateActions(newStateId);
-        m_repairModel->setState(newStateId);
+        checkData(stateId);
+        doStateActions(stateId);
+        m_repairModel->setState(stateId);
 
         if(!commit())
             throw Global::ThrowType::QueryError;

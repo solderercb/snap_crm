@@ -188,6 +188,11 @@ void SDialogIssueRepair::collectRepairsData()
     }
 }
 
+void SDialogIssueRepair::setRepairReady(SRepairModel *model)
+{
+    model->setState(Global::RepStateIds::Ready);
+}
+
 void SDialogIssueRepair::buttonIssueClicked()
 {
     bool nErr = 1;
@@ -286,6 +291,9 @@ void SDialogIssueRepair::issueRepairs()
     while(i != m_repairsModels.constEnd() && m_pushButtonIssueEnabled)
     {
         repairModel = (*i);
+
+        if(comSettings->useSimplifiedCartridgeRepair && repairModel->cartridge() && repairModel->state() == Global::RepStateIds::InWork)
+            setRepairReady(repairModel);
 
         switch (repairModel->state())
         {

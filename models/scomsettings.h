@@ -40,6 +40,7 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_CHECKBOX(int, isPaySalaryForRepairsIssuedInDebt, 3, debt_rep_2_salary)
     PROPSTRUCT_CHECKBOX(int, isAutoSetCompanyOnRepairRecept, 3, rep_auto_company)
     PROPSTRUCT_CHECKBOX(int, isVendorWarrantyEnabled, 3, vw_enable)
+    PROPSTRUCT_CHECKBOX(int, useSimplifiedCartridgeRepair, 3, settings.use_simplified_cartridge_repair)
     PROPSTRUCT_SPINBOX(int, autoCloseRepairTabTimeout, 3, card_close_time, 0, 32400)
     PROPSTRUCT_SPINBOX(int, repairImagesLimit, 3, rep_img_limit, 0, 20)
 

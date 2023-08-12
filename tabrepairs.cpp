@@ -40,9 +40,9 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     widgetAction->setFilterSettings(filterSettings);
 
     if(m_tabType == SelectRepair)
-        ui->switchTableMode->setChecked(ModeRepairs);
+        ui->switchTableMode->setChecked(STableViewRepairs::ModeRepairs);
     else
-        ui->switchTableMode->setChecked((userDbData->defWsFilter == WorkshopFilter::CartridgesOnly)?ModeCartridges:ModeRepairs);
+        ui->switchTableMode->setChecked((userDbData->defWsFilter == WorkshopFilter::CartridgesOnly)?STableViewRepairs::ModeCartridges:STableViewRepairs::ModeRepairs);
 
     connect(widgetAction, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
     connect(ui->pushButtonReceipt, &QPushButton::clicked, this, &tabRepairs::buttonReceptClicked);
@@ -83,7 +83,7 @@ void tabRepairs::updateWidgets()
     ui->switchTableMode->setVisible(visibility);
     ui->labelTableMode->setVisible(visibility);
     ui->pushButtonReceipt->setVisible(visibility);
-    ui->pushButtonRefill->setVisible(visibility && (ui->switchTableMode->isChecked() == ModeCartridges));
+    ui->pushButtonRefill->setVisible(visibility && (ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges));
     ui->pushButtonRefill->setEnabled(hasSelection);
     ui->pushButtonIssue->setVisible(visibility);
     ui->pushButtonIssue->setEnabled(ui->tableView->selectedCanBeIssued());
@@ -91,7 +91,7 @@ void tabRepairs::updateWidgets()
     ui->pushButtonRefresh->setVisible(true);
     ui->pushButtonMenu->setVisible(true);
 
-    if(ui->switchTableMode->isChecked() == ModeCartridges)
+    if(ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges)
         ui->labelTableMode->setText(tr("Картриджи"));
     else
         ui->labelTableMode->setText(tr("Ремонты"));
@@ -122,7 +122,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     FilterList l1;
     l1.op = FilterList::And;
 
-    l1.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, (ui->switchTableMode->isChecked() == ModeCartridges)));
+    l1.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, (ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges)));
     l1.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, 1));
     if ( !userDbData->displayOut && ui->lineEditSearch->text().isEmpty() )
         l1.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
@@ -162,7 +162,7 @@ void tabRepairs::autorefreshTable()
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
 {
     int id = repairs_table->record(item.row()).value("id").toInt();
-    if(ui->switchTableMode->isChecked() == ModeRepairs)
+    if(ui->switchTableMode->isChecked() == STableViewRepairs::ModeRepairs)
         emit doubleClickRepair(id);
     else
     {
@@ -202,7 +202,7 @@ void tabRepairs::lineEditSearchReturnPressed()
         num_validator->exec(QString("SELECT 1 FROM workshop WHERE `id` = %1").arg(s));  // проверяем если ли в таблице workshop ремонт с таким номером
         if (num_validator->size() > 0)  // если возвращено не ноль строк
         {
-            if(ui->switchTableMode->isChecked() == ModeRepairs)
+            if(ui->switchTableMode->isChecked() == STableViewRepairs::ModeRepairs)
                 emit doubleClickRepair(s.toInt());
             if (m_tabType == Type::SelectRepair)
                 deleteLater();
@@ -213,6 +213,7 @@ void tabRepairs::lineEditSearchReturnPressed()
 
 void tabRepairs::tableModeChanged(bool mode)
 {
+    ui->tableView->setMode(mode);
     buttonRefreshClicked();
 }
 
@@ -232,7 +233,7 @@ void tabRepairs::tableLayoutChanged(int, int, int)
 
 void tabRepairs::buttonReceptClicked()
 {
-    if(ui->switchTableMode->isChecked() == ModeCartridges)
+    if(ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges)
         emit receptCartridges();
     else
         emit receptRepair();

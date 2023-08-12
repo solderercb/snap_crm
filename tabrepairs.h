@@ -41,7 +41,6 @@ public:
     void updateWidgets();
 private:
     enum WorkshopFilter{NoFilter = 0, CartridgesOnly = 1, RepairsOnly = 2};
-    enum TableMode{ModeRepairs = 0, ModeCartridges};
     Ui::tabRepairs *ui;
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];

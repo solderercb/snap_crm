@@ -108,6 +108,7 @@ private:
     bool removeWorkAndPart(const int workType);
     bool workAndPartHandler(const int workType, const int state);
     bool checkResource();
+    void saveState(int);
 private slots:
     void updateTotalSumms(const double, const double, const double);
     void saveTotalSumms();
@@ -119,7 +120,7 @@ private slots:
     void savePlace(int index);
     void comboBoxPlaceButtonClickHandler(int id);
     void comboBoxEngineerChanged(int);
-    void saveState(int);
+    void stateIndexChanged(int);
     void removeWidget();
     void buttonClientCardClicked();
     void buttonClassicTabClicked();

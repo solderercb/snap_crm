@@ -40,6 +40,8 @@ bool STableViewRepairs::selectedCanBeIssued()
     {
         int c = model->unformattedData(index.siblingAtColumn(ServiceColumn::ClientId)).toInt();
         int s = model->unformattedData(index.siblingAtColumn(ServiceColumn::StateId)).toInt();
+        int a = model->unformattedData(index.siblingAtColumn(ServiceColumn::RealRepairCost)).toInt();
+
         if(!client)
             client = c;
         else if(client != c)
@@ -48,13 +50,31 @@ bool STableViewRepairs::selectedCanBeIssued()
             break;
         }
 
-        if(s != Global::RepStateIds::Ready && s != Global::RepStateIds::ReadyNoRepair)
+        if(m_mode == ModeCartridges && comSettings->useSimplifiedCartridgeRepair)
         {
-            en &= 0;
-            break;
+            if(!(s == Global::RepStateIds::Ready || s == Global::RepStateIds::ReadyNoRepair || (a > 0 && s == Global::RepStateIds::InWork)))
+            {
+                en &= 0;
+                break;
+            }
+        }
+        else
+        {
+            if(s != Global::RepStateIds::Ready && s != Global::RepStateIds::ReadyNoRepair)
+            {
+                en &= 0;
+                break;
+            }
+
         }
     }
+
     return en;
+}
+
+void STableViewRepairs::setMode(const int mode)
+{
+    m_mode = mode;
 }
 
 void STableViewRepairs::translateNames()
