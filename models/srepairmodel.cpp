@@ -469,8 +469,14 @@ void SRepairModel::setState(const int id)
 {
     m_state = id;
     i_valuesMap.insert("state", m_state);
-    if(id != Global::RepStateIds::GetIn)
-        appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
+    switch (id)
+    {
+        case Global::RepStateIds::GetIn: break;
+        case Global::RepStateIds::Returned:
+        case Global::RepStateIds::ReturnedNoRepair: setOutDate(QDateTime::currentDateTime());
+        default: appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
+    }
+
     m_repairStatusLog->setStatus(m_state);
     m_repairStatusLog->setManager(m_currentManager); // менеджер и мастер могут быть изменены между сменами статуса
     m_repairStatusLog->setEngineer(m_master);

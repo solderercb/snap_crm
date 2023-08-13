@@ -822,7 +822,7 @@ void SCartridgeForm::updateTotalSumms(const double, const double, const double)
 void SCartridgeForm::saveTotalSumms()
 {
     m_repairModel->setRealRepairCost(worksAndPartsModel->amountTotal());
-//    m_repairModel->setPartsCost(worksAndPartsModel->amountItems());
+    m_repairModel->setPartsCost(worksAndPartsModel->amountItems());
     m_repairModel->commit();
 }
 
