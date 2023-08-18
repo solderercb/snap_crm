@@ -173,7 +173,6 @@ void SCartridgeCard::setTonerWeight(const int weight)
 bool SCartridgeCard::commit()
 {
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    i_queryLog = new SQueryLog();
     bool nErr = 1;
     bool isNew = (m_cardModel->id() == 0);
     setModelData();

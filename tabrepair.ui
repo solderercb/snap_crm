@@ -1595,7 +1595,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <sender>pushButtonGetout</sender>
    <signal>clicked()</signal>
    <receiver>tabRepair</receiver>
-   <slot>createGetOutDialog()</slot>
+   <slot>createDialogIssue()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>404</x>
@@ -1785,7 +1785,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
   </connection>
  </connections>
  <slots>
-  <slot>createGetOutDialog()</slot>
+  <slot>createDialogIssue()</slot>
   <slot>openPrevRepair()</slot>
   <slot>buttonClientClicked()</slot>
   <slot>setInformedStatus(int)</slot>

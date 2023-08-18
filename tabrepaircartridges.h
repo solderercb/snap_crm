@@ -25,9 +25,9 @@ public:
     ~tabRepairCartridges();
     static tabRepairCartridges* getInstance(QList<int> *list, MainWindow *parent = nullptr);
     void loadForms(QList<int> *list);
-    virtual bool tabCloseRequest();
+    virtual bool tabCloseRequest() override;
     QString tabTitle() override;
-    bool eventFilter(QObject *, QEvent *);
+    bool eventFilter(QObject *, QEvent *) override;
 private:
     Ui::tabRepairCartridges *ui;
     static tabRepairCartridges* p_instance;

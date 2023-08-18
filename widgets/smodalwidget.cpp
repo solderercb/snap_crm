@@ -1,6 +1,5 @@
 #include "global.h"
 #include "smodalwidget.h"
-#include "ui_smodalwidget.h"
 
 SModalWidget::SModalWidget(QWidget *parent, Qt::WindowFlags flags) :
     SWidget(parent, flags)

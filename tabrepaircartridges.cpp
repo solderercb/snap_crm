@@ -26,6 +26,7 @@ bool tabRepairCartridges::eventFilter(QObject *watched, QEvent *event)
             updateWidgets();
         }
     }
+    return tabCommon::eventFilter(watched, event);
 }
 
 tabRepairCartridges::tabRepairCartridges(QList<int> *list, MainWindow *parent) :

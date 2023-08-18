@@ -97,7 +97,7 @@ private:
     void doStateActions(const int);
     void updatePreagreedAmount(SCartridgeMaterialModel *material, const int state);
     void setDefaultStyleSheets();
-    bool setWidgetsParams(const int);
+    void setWidgetsParams(const int);
     bool checkStateAcl(const int);
     void setPricesToZero();
     void setInformedStatus(int);

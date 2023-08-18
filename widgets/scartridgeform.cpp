@@ -294,7 +294,7 @@ bool SCartridgeForm::createRepair()
 
 bool SCartridgeForm::updateRepair()
 {
-
+    return 1;
 }
 
 int SCartridgeForm::repairId()
@@ -456,6 +456,7 @@ bool SCartridgeForm::checkData(const int stateId)
             throw Global::ThrowType::ConditionsError;
         }
     }
+    return 1;
 }
 
 void SCartridgeForm::doStateActions(const int stateId)
@@ -501,7 +502,7 @@ void SCartridgeForm::setDefaultStyleSheets()
     ui->doubleSpinBoxTotalAmount->setStyleSheet(commonSpinBoxStyleSheet);
 }
 
-bool SCartridgeForm::setWidgetsParams(const int stateId)
+void SCartridgeForm::setWidgetsParams(const int stateId)
 {
     worksCheckboxesEn = comSettings->useSimplifiedCartridgeRepair;
     engineerComboBoxEn = 0;
