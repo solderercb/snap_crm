@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Package>
+	<DisplayName>библиотеки LimeReport</DisplayName>
+	<Description>необходимы для печати квитанций, стикеров и документов</Description>
+  <Version>1.6.8</Version>
+  <ReleaseDate>2022-02-07</ReleaseDate>
+  <Default>true</Default>
+</Package>

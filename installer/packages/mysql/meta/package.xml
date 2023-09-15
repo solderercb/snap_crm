@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Package>
+	<DisplayName>библиотека MySQL</DisplayName>
+	<Description>необходима для подключения к БД</Description>
+  <Version>5.7.38</Version>
+  <ReleaseDate>2022-04-26</ReleaseDate>
+  <Default>true</Default>
+</Package>

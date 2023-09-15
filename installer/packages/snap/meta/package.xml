@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Package>
+	<DisplayName>SNAP CRM</DisplayName>
+	<Description>исполняемый и вспомогательные файлы</Description>
+  <Version>0.0.0.239</Version>
+  <ReleaseDate>2023-08-07</ReleaseDate>
+  <Default>true</Default>
+  <Script>installscript.js</Script>
+</Package>

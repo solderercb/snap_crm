@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>SNAP CRM</Name>
+    <Version>0.0.0.239</Version>
+    <Title>SNAP CRM</Title>
+    <Publisher>snap_crm</Publisher>
+    <StartMenuDir>SNAP CRM</StartMenuDir>
+    <TargetDir>C:\Program Files\SNAP CRM</TargetDir>
+    <SupportsModify>true</SupportsModify>
+    <ControlScript>controller.qs</ControlScript>
+    <RepositorySettingsPageVisible>false</RepositorySettingsPageVisible>
+    <SaveDefaultRepositories>false</SaveDefaultRepositories>
+    <RemoteRepositories>
+      <Repository>
+         <Url>https://github.com/solderercb/snap_crm/releases/latest/download</Url>
+         <Enabled>1</Enabled>
+      </Repository>
+    </RemoteRepositories>
+</Installer>
