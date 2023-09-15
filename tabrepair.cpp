@@ -17,7 +17,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     repairModel = new SRepairModel();
     repairModel->setId(repair_id);
     connect(repairModel, SIGNAL(modelUpdated()), this, SLOT(updateWidgets()));
-    setLock(1);
     clientModel = new SClientModel();
     if(permissions->printStickers)
     {
@@ -80,7 +79,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
     worksAndPartsModel->setPriceColumn(SStoreItemModel::PriceOptionService);
-//    repairModel->setWorksAndPartsModel(worksAndPartsModel);
+    repairModel->setWorksAndPartsModel(worksAndPartsModel);
     if(userDbData->autosavePartList)
         ui->switchEditStrategy->setChecked(true);
     else
@@ -124,6 +123,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     reloadRepairData();
+    setLock(1); // вызов этого метода должен происходить только после инициализации моделей данных
 
 #ifdef QT_DEBUG
     if( m_getOutButtonVisible && (repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair) )

@@ -688,7 +688,7 @@ bool SCartridgeForm::addWorkAndPart(const int workType)
 //    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColSumm), material->worksPrice());
 
     rowItem = worksAndPartsModel->rowCount();
-    worksAndPartsModel->addItemByUID(itemId, 1, material->count());
+    worksAndPartsModel->addItemByUID(itemId, material->count());
 #ifdef QT_DEBUG // в методе SSaleTableModel::insertRecord() для удобства отладки устанавливается случайное кол-во; здесь это не нужно
     worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColCount), material->count());
 #endif

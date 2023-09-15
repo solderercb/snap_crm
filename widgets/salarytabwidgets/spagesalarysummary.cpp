@@ -193,7 +193,7 @@ void SPageSalarySummary::markRepairsPayed()
             delete salaryRepairsModel;
         }
     }
-    catch(int)
+    catch(Global::ThrowType)
     {
         delete salaryRepairsModel;
         throw Global::ThrowType::QueryError;

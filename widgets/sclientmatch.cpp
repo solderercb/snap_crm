@@ -10,6 +10,7 @@ SClientMatch::SClientMatch(QWidget *parent) :
 
     groupBoxEventFilter = new SGroupBoxEventFilter(this);
     ui->groupBoxClientMatch->installEventFilter(groupBoxEventFilter);
+    ui->tableViewClientMatch->horizontalHeader()->setHidden(false);
     connect(groupBoxEventFilter,SIGNAL(toggleElementsVisibility()),this,SLOT(toggleElementsVisibility()));
     clientsMatchTable = new SSqlFetchingModel();
     ui->tableViewClientMatch->setModel(clientsMatchTable);

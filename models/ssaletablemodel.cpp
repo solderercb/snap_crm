@@ -695,7 +695,7 @@ bool SSaleTableModel::repair_saveTablesStandalone()
 
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
-    catch(int type)
+    catch(Global::ThrowType type)
     {
         nErr = 0;
 

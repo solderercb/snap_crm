@@ -70,6 +70,7 @@ void tabRepairCartridges::loadForms(QList<int> *list)
         form = new SCartridgeForm(list->at(i));
         appendToReceptList(form);
     }
+    delete list;    // этот объект больше не нужен
 }
 
 bool tabRepairCartridges::tabCloseRequest()

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "com_sql_queries.h"
 #include "models/sclientmodel.h"
+#include "models/scartridgematerialsmodel.h"
 #include "models/sstoreitemmodel.h"
 
 QLocale sysLocale = QLocale::system();
@@ -64,6 +65,7 @@ QMap<QString, QVariant> *debugLoginOptions = nullptr;
 SStandardItemModel* storeItemsIntReserveStatesModel = new SStandardItemModel;
 QVector<QWidget*> tabList;
 SStandardItemModel *cartridgeRepeatReason = new SStandardItemModel();
+SStandardItemModel *cartridgeMaterialsListModel;
 
 //QWidget *modalWidget = nullptr;
 
@@ -296,6 +298,7 @@ void initGlobalModels()
     cartridgeRepeatReason->setObjectName("cartridgeRepeatReason");
     cartridgeRepeatReason->setHorizontalHeaderLabels({"name", "id"});
 
+    cartridgeMaterialsListModel = SCartridgeMaterialsModel::materialsList();
 #ifdef QT_DEBUG
     initClients4Test();
 #endif

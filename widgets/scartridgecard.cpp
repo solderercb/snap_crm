@@ -237,7 +237,8 @@ void SCartridgeCard::translateNames()
 }
 
 // ===============================================================================================================
-materialsTable::materialsTable(QWidget *parent) : STableViewBase(parent)
+materialsTable::materialsTable(QWidget *parent) :
+    STableViewBase(SLocalSettings::CartridgeMaterialsGrid, parent)
 {
     QMetaEnum headers = staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("Column"));
     QMetaEnum width = staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("ColumnWidth"));
@@ -246,14 +247,13 @@ materialsTable::materialsTable(QWidget *parent) : STableViewBase(parent)
         i_defaultHeaderLabels << tr(headers.key(i));
         i_defaultColumnsWidths.insert(headers.value(i), width.value(i));
     }
-    readLayout(SLocalSettings::CartridgeMaterialsGrid);
+    readLayout();
     i_gridLayout->$GridControl.Columns[Column::Name].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
 
 }
 
 materialsTable::~materialsTable()
 {
-    saveLayout(SLocalSettings::CartridgeMaterialsGrid);
 }
 
 void materialsTable::setModel(QAbstractItemModel *model)
