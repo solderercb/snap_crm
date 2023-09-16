@@ -1,0 +1,16 @@
+[submodule "3rdparty/LimeReport"]
+	path = 3rdparty/LimeReport
+	url = git@github.com:solderercb/LimeReport.git
+	branch = mod
+[submodule "3rdparty/QSerializer"]
+	path = 3rdparty/QSerializer
+	url = git@github.com:solderercb/QSerializer.git
+	branch = mod
+[submodule "3rdparty/installer-framework"]
+	path = 3rdparty/installer-framework
+	url = git@github.com:solderercb/installer-framework.git
+	branch = mod
+[submodule "3rdparty/QtAutoUpdater"]
+	path = 3rdparty/QtAutoUpdater
+	url = git@github.com:solderercb/QtAutoUpdater.git
+	branch = mod

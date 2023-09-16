@@ -3,7 +3,7 @@
 */
 #ifndef STABLEVIEWGRIDLAYOUT_H
 #define STABLEVIEWGRIDLAYOUT_H
-#include <3rdparty/QSerializer>
+#include <3rdparty/QSerializer/QSerializer>
 class t_GroupSummary : public QSerializer{
     Q_GADGET
     QS_SERIALIZABLE

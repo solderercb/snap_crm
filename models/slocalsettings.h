@@ -10,7 +10,7 @@
 #include <QIODevice>
 #include <QCryptographicHash>
 #include <QCollator>
-#include <3rdparty/QSerializer>
+#include <3rdparty/QSerializer/QSerializer>
 #define ASC_APP_PATH   "C:/Program Files (x86)/ASCApp"
 #define ASC_SETTINGS_PATH   "VLab/ASC.exe_Url_1ttwwpflaim4gbzvmtfpiarttwuebugu"    // путь к файлу настроек АЦС для пути к приложению "C:\Program Files (x86)\ASCApp\ASC.exe"
 

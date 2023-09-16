@@ -1,6 +1,6 @@
 #ifndef SCOMSETTINGSTYPES_H
 #define SCOMSETTINGSTYPES_H
-#include <3rdparty/QSerializer>
+#include <3rdparty/QSerializer/QSerializer>
 
 class t_status : public QSerializer
 {

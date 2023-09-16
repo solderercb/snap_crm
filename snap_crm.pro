@@ -185,7 +185,7 @@ SOURCES += \
     windowsdispatcher.cpp
 
 HEADERS  += \
-    3rdparty/qserializer.h \
+    3rdparty/QSerializer/src/qserializer.h \
     amountToWords.h \
     applog.h \
     appver.h \
