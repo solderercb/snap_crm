@@ -68,7 +68,7 @@ QString SLocalSettings::appSettingsPath()
     QString appPathHash = hash.result().toHex();
 
     // рабочий каталог C:/Users/<user>/AppData/Local/snap/<MD5-hash>
-    settingsPath.setPath(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/" + appPathHash + "/" + APP_VER);  // путь, соответствующий текущей версии приложения
+    settingsPath.setPath(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/" + appPathHash + "/" + APP_VER_STR);  // путь, соответствующий текущей версии приложения
     if (!settingsPath.exists())                 // C:/Users/<user</AppData/Local/snap/<MD5-hash>/<APP_VER>
         settingsPath.mkpath(settingsPath.path());
 

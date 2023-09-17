@@ -12,7 +12,7 @@ LoginWindow::LoginWindow(QObject*) :
     logoScene = new QGraphicsScene();
     logoScene->addItem(logo);
     ui->graphicsLogo->setScene(logoScene);
-    ui->labelAppVer->setText(QString(APP_VER));
+    ui->labelAppVer->setText(QString(APP_VER_STR));
 
     debugInitLoginOptions();
     userLocalData = new t_userSettings;
@@ -167,7 +167,7 @@ bool LoginWindow::updateDB(int startFrom)
                 }
                 else    // обновление значения `config`.`version_snap`
                 {
-                    if(!queryUpdate.exec(QUERY_UPD_APP_VER(APP_VER)))
+                    if(!queryUpdate.exec(QUERY_UPD_APP_VER(APP_VER_STR)))
                         throw 1;
                 }
                 queryUpdate.exec(QUERY_COMMIT);

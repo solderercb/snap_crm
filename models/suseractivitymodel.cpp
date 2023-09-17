@@ -108,7 +108,7 @@ bool SUserActivityModel::commit()
     {
         setUserId(userDbData->id);
         setDatetime(QDateTime::currentDateTime());
-        setAppVersion(APP_VER);
+        setAppVersion(APP_VER_STR);
         setMachineName(QHostInfo::localHostName());
         insert();
     }
