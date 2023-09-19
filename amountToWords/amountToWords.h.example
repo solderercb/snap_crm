@@ -1,0 +1,17 @@
+// Implement function for converting number to words according to your country rules
+// Use russian or ukrainian implementation as reference.
+
+// Напиши функцию преобразования числового значения в прописное согласно правил своей страны
+// Для примера используй файлы с русской или украинской схемой.
+
+#ifndef AMOUNTTOWORDS<your_country_code>_H
+#define AMOUNTTOWORDS<your_country_code>_H
+
+#include <QString>
+
+inline QString amountToWords<your_country_code>(double n)
+{
+    return "Converting not implemented";
+}
+
+#endif // AMOUNTTOWORDS<your_country_code>_H

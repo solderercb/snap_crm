@@ -33,7 +33,6 @@
 #include <QCloseEvent>
 #include "windowsdispatcher.h"
 #include "widgets/shortlivednotification.h"
-#include "amountToWords.h"
 
 namespace Ui {
 class MainWindow;

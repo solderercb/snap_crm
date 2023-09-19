@@ -7,7 +7,7 @@
 
 #include <QObject>
 #include "global.h"
-#include "amountToWords.h"
+#include "amountToWords/amountToWords.h"
 #include "com_sql_queries.h"
 #include "models/scomrecord.h"
 #include "models/slogrecordmodel.h"

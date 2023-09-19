@@ -5,7 +5,6 @@
 #include <QLocale>
 #include "global.h"
 #include "shortlivednotification.h"
-#include "amountToWords.h"
 #include "models/srepairmodel.h"
 #include "models/sclientmodel.h"
 #include "models/scashregistermodel.h"

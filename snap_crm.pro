@@ -42,7 +42,7 @@ PRECOMPILED_HEADER = stable.h
 SOURCES += \
     applog.cpp \
     main.cpp\
-    amountToWords.cpp \
+    amountToWords/amountToWords.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
     clients4test.cpp \
@@ -188,7 +188,18 @@ SOURCES += \
 
 HEADERS  += \
     3rdparty/QSerializer/src/qserializer.h \
-    amountToWords.h \
+    amountToWords/amountToWords.h \
+    amountToWords/amountToWordsBg.h \
+    amountToWords/amountToWordsBy.h \
+    amountToWords/amountToWordsCn.h \
+    amountToWords/amountToWordsIl.h \
+    amountToWords/amountToWordsKz.h \
+    amountToWords/amountToWordsMd.h \
+    amountToWords/amountToWordsPl.h \
+    amountToWords/amountToWordsRu.h \
+    amountToWords/amountToWordsUa.h \
+    amountToWords/amountToWordsUs.h \
+    amountToWords/amountToWordsUz.h \
     applog.h \
     appver.h \
     bottoolbarwidget.h \
