@@ -12,9 +12,27 @@ void SComSettings::initWidgets()
         metaObject()->invokeMethod(this, QByteArray("init__widget").insert(5, metaObject()->property(i).name()));
 
     // Модели данных виджетов (ComboBox) должны быть заданы до загрузки данных, иначе будет падать.
-//    static_cast<QComboBox*>(i_editorWidgets.value("currency"))->setModel(warrantyTermsModel);
+    setComboBoxModel("currencyId", currencyListModel);
 
     load();
+
+//    QMap<QString, QWidget*>::ConstIterator w = i_editorWidgets.constBegin();
+//    while(w != i_editorWidgets.constEnd())
+//    {
+//        qDebug().nospace() << "[" << this << "] initWidgets() | widget[" << w.key() << "]: " << w.value()->metaObject()->className();
+//        w++;
+//    }
+}
+
+void SComSettings::setComboBoxModel(const QString propertyName, SStandardItemModel *model)
+{
+    QComboBox *cb;
+
+    cb = static_cast<QComboBox*>(i_editorWidgets.value(propertyName));
+    Q_ASSERT_X(cb, metaObject()->className(), QString("comboBox %1 wasn't found").arg(propertyName).toLocal8Bit());
+
+    cb->setModel(model);
+
 }
 
 void SComSettings::load()

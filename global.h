@@ -98,6 +98,7 @@ extern SStandardItemModel* storeItemsIntReserveStatesModel;
 extern QVector<QWidget*> tabList;
 extern SStandardItemModel *cartridgeRepeatReason;
 extern SStandardItemModel *cartridgeMaterialsListModel;
+extern SStandardItemModel *currencyListModel;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

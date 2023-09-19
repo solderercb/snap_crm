@@ -219,16 +219,18 @@ public slots:
     {                                                                                                   \
         QComboBox *cb = dynamic_cast<QComboBox*>(i_editorWidgets.value(#name));                         \
         SStandardItemModel *mdl = dynamic_cast<SStandardItemModel*>(cb->model());                       \
-        int widgetValue;                                                                                \
+        QVariant widgetValue;                                                                           \
         if(mdl)                                                                                         \
-            widgetValue = mdl->databaseIDByRow(cb->currentIndex(), 1);                                  \
+            widgetValue = mdl->rowColumnToValue<type>(cb->currentIndex(), 1);                           \
         else                                                                                            \
-        {                                                                                               \
-            widgetValue = cb->currentIndex();                                                           \
-        }                                                                                               \
-        if(QString("ignore").compare(#fieldName) !=0 && widgetValue != name)                            \
-            i_fieldModified.insert(#name, (widgetValue == -1)?QVariant(invalidIndexValue):widgetValue); \
-        name = widgetValue;                                                                             \
+            widgetValue = cb->currentText();                                                            \
+                                                                                                        \
+        if(!widgetValue.isValid())                                                                      \
+            widgetValue = invalidIndexValue;                                                            \
+                                                                                                        \
+        if(QString("ignore").compare(#fieldName) !=0 && widgetValue.value<type>() != name)              \
+            i_fieldModified.insert(#name, widgetValue);                                                 \
+        name = widgetValue.value<type>();                                                               \
         return name;                                                                                    \
     }                                                                                                   \
     void PROPSTRUCT_SET(name)(QVariant value)                                                           \
@@ -239,7 +241,7 @@ public slots:
         {                                                                                               \
             SStandardItemModel *mdl = dynamic_cast<SStandardItemModel*>(cb->model());                   \
             if(mdl)                                                                                     \
-                cb->setCurrentIndex(mdl->rowByDatabaseID(value.toInt(), 1));                            \
+                cb->setCurrentIndex(mdl->valueColumnToRow<type>(name, 1));                              \
             else                                                                                        \
                 cb->setCurrentIndex(value.toInt());                                                     \
         }                                                                                               \

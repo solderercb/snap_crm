@@ -66,6 +66,7 @@ SStandardItemModel* storeItemsIntReserveStatesModel = new SStandardItemModel;
 QVector<QWidget*> tabList;
 SStandardItemModel *cartridgeRepeatReason = new SStandardItemModel();
 SStandardItemModel *cartridgeMaterialsListModel;
+SStandardItemModel *currencyListModel = new SStandardItemModel();
 
 //QWidget *modalWidget = nullptr;
 
@@ -299,6 +300,23 @@ void initGlobalModels()
     cartridgeRepeatReason->setHorizontalHeaderLabels({"name", "id"});
 
     cartridgeMaterialsListModel = SCartridgeMaterialsModel::materialsList();
+
+    QVector<QString> currencyList = {QObject::tr("Российский рубль"), QObject::tr("Доллар США"), QObject::tr("Украинская гривна"),
+                                     QObject::tr("Белорусский рубль"), QObject::tr("Новый израильский шекель"), QObject::tr("Молдавкий лей"),
+                                     QObject::tr("Польский злотый"), QObject::tr("Китайский юань"), QObject::tr("Болгарский лев"),
+                                     QObject::tr("Узбекский сум"), QObject::tr("Казахста́нский тенге́")};
+//    QVector<QString> currencyIdsList = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+    QVector<QString> currencyCodeList = {"RUB", "USD", "UAH", "BYN", "ILS", "MDL", "PLN", "CNY", "BGN", "UZS", "KZT"};
+    QList<QStandardItem*> *currencySelector;
+    for (int i=0; i<currencyList.size(); i++)
+    {
+        currencySelector = new QList<QStandardItem*>();
+        *currencySelector << new QStandardItem(currencyList.at(i)) << new QStandardItem(currencyCodeList.at(i));
+        currencyListModel->appendRow(*currencySelector);
+    }
+    currencyListModel->setObjectName("currency");
+    currencyListModel->setHorizontalHeaderLabels({"name", "id"});
+
 #ifdef QT_DEBUG
     initClients4Test();
 #endif

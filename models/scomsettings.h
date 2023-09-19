@@ -10,7 +10,7 @@
 class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
 {
     Q_OBJECT
-    PROPSTRUCT_COMBOBOX(int, currencyId, 0, currency, QString())
+    PROPSTRUCT_COMBOBOX(QString, currencyId, 0, currency, QString())
     PROPSTRUCT_CHECKBOX(int, classicKassa, 0, classic_kassa)
     PROPSTRUCT_COMBOBOX(int, timeZoneId, 0, time_zone, QString())
     PROPSTRUCT_LINEEDIT(QString, ascPhoneMask1, 0, phone_mask1)
@@ -176,6 +176,7 @@ public:
     enum Table{Config = 0, Settings = 1};
     explicit SComSettings();
     void initWidgets();
+    void setComboBoxModel(const QString propertyName, SStandardItemModel* model);
     void load();
     void loadFromTableSettings();
     void loadFromJson();
