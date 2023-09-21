@@ -11,8 +11,6 @@
 #include <QCryptographicHash>
 #include <QCollator>
 #include <3rdparty/QSerializer/QSerializer>
-#define ASC_APP_PATH   "C:/Program Files (x86)/ASCApp"
-#define ASC_SETTINGS_PATH   "VLab/ASC.exe_Url_1ttwwpflaim4gbzvmtfpiarttwuebugu"    // путь к файлу настроек АЦС для пути к приложению "C:\Program Files (x86)\ASCApp\ASC.exe"
 
 class SLocalSettings : public QObject
 {
@@ -36,8 +34,10 @@ public:
     bool import(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
     bool read(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
     bool save(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
+    QString ascAppDataPath(const QString &executablePath);
 protected:
 private:
+    static const QLatin1String base32StringEncodeMap;
     SettingsVariant m_settingsVariant;
     void genSettingsFileName(QFile &file, const QString subVariant = "");
     bool selMostRecentSettingFile(const QString &fileName);
@@ -46,6 +46,7 @@ private:
     bool openFile(QFile &file, QIODevice::OpenModeFlag mode = QIODevice::ReadOnly);
     bool read(QSerializer *obj, QFile &file);
     bool save(QSerializer *obj, QFile &file);
+    QString base32StringSuitableForDirName(const QByteArray &payloadSha1);
 };
 
 #endif // SLOCALSETTINGS_H

@@ -153,6 +153,7 @@ class t_userSettings : public QSerializer
     QS_OBJECT(t_string, SSLCA)
     QS_OBJECT(t_string, SSLCAPath)
     QS_OBJECT(t_string, SSLCipher)
+    QS_OBJECT(t_string, ASCExecutablePath)
 };
 
 class t_asc_userSettings : public QSerializer

@@ -17,29 +17,34 @@ LoginWindow::LoginWindow(QObject*) :
     debugInitLoginOptions();
     userLocalData = new t_userSettings;
 
-    localSettings->read(userLocalData);
-    ui->editIPaddr->setText(userLocalData->dbHost.value);
-    ui->editPort->setText(userLocalData->dbPort.value);
-    ui->editDBName->setText(userLocalData->dbName.value);
-    ui->editLogin->setText(userLocalData->lastLogin.value);
-    ui->editPassword->setFocus();
-    ui->checkBoxSSL->setChecked(userLocalData->SSLConnection.value);
-
 //  shortlivedNotification::setSize(385, 90);
     shortlivedNotification::setAppearance(this, shortlivedNotification::bottomRight);
     statusBarDelay = new QTimer();
     statusBarDelay->setSingleShot(true);
 
-    QObject::connect(statusBarDelay, SIGNAL(timeout()), this, SLOT(clearStatusLabel()));
-    QObject::connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
-    QObject::connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
+    connect(statusBarDelay, SIGNAL(timeout()), this, SLOT(clearStatusLabel()));
+    connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
+    connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
+    connect(ui->pushButtonSettingsImport, &QPushButton::clicked, this, &LoginWindow::selectAscExe);
 
+    localSettings->read(userLocalData);
+    fillConnectionParams();
 }
 
 LoginWindow::~LoginWindow()
 {
     delete logo;
     delete ui;
+}
+
+void LoginWindow::fillConnectionParams()
+{
+    ui->editIPaddr->setText(userLocalData->dbHost.value);
+    ui->editPort->setText(userLocalData->dbPort.value);
+    ui->editDBName->setText(userLocalData->dbName.value);
+    ui->editLogin->setText(userLocalData->lastLogin.value);
+    ui->editPassword->setFocus();
+    ui->checkBoxSSL->setChecked(userLocalData->SSLConnection.value);
 }
 
 void LoginWindow::statusBarMsg(const QString &text, int delay)
@@ -412,6 +417,21 @@ void LoginWindow::closeSSLOptionsDialog()
     {
         overlay->deleteLater();
         overlay = nullptr;
+    }
+}
+
+void LoginWindow::selectAscExe()
+{
+    QString fileName;
+    fileName = QFileDialog::getOpenFileName(this,
+                                                                          tr("Select ASC application executable"),
+                                                                          "C:/Program Files (x86)/",
+                                                                          tr("Executable (*.exe)"));
+    if(!fileName.isEmpty())
+    {
+        userLocalData->ASCExecutablePath.value = fileName;  // до импорта
+        localSettings->import(userLocalData);
+        fillConnectionParams();
     }
 }
 

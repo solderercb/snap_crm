@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>598</width>
-    <height>292</height>
+    <width>606</width>
+    <height>302</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,7 +28,7 @@
      <property name="spacing">
       <number>5</number>
      </property>
-     <item row="8" column="0" rowspan="4" colspan="3">
+     <item row="7" column="0" rowspan="4" colspan="3">
       <layout class="QHBoxLayout" name="horizontalLayoutStatus">
        <item>
         <widget class="QLabel" name="labelStatus">
@@ -61,10 +61,100 @@
        </item>
       </layout>
      </item>
-     <item row="4" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayoutDBName">
+     <item row="3" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayoutSSL">
        <item>
-        <widget class="QLabel" name="labelDBName">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxSSL">
+         <property name="text">
+          <string>SSL</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonSSL">
+         <property name="text">
+          <string>Опции SSL</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="6" column="2">
+      <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,1">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="btnLogin">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Вход</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButtonSettingsImport">
+         <property name="toolTip">
+          <string>Программа может импортировать некоторые настройки АСЦ</string>
+         </property>
+         <property name="text">
+          <string>Импорт настроек АСЦ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="btnCancel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Отмена</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayoutLogin">
+       <item>
+        <widget class="QLabel" name="labelLogin">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -87,7 +177,7 @@
           <enum>Qt::RightToLeft</enum>
          </property>
          <property name="text">
-          <string>название БД</string>
+          <string>логин</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -95,67 +185,26 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="editDBName">
+        <widget class="QLineEdit" name="editLogin">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string>mysql</string>
-         </property>
          <property name="placeholderText">
-          <string>назазвание БД</string>
+          <string>логин</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
-     <item row="0" column="0" rowspan="8">
-      <widget class="QGraphicsView" name="graphicsLogo">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="lineWidth">
-        <number>0</number>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="interactive">
-        <bool>false</bool>
+     <item row="0" column="1" rowspan="7">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
       </widget>
-     </item>
-     <item row="5" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayoutSave">
-       <item>
-        <widget class="QCheckBox" name="checkBoxSaveOnSuccess">
-         <property name="text">
-          <string>сохранить</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
      <item row="1" column="2">
       <layout class="QHBoxLayout" name="horizontalLayoutPassword">
@@ -208,97 +257,19 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayoutSSL">
+     <item row="5" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayoutSave">
        <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxSSL">
+        <widget class="QCheckBox" name="checkBoxSaveOnSuccess">
          <property name="text">
-          <string>SSL</string>
+          <string>сохранить</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonSSL">
-         <property name="text">
-          <string>Опции SSL</string>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
       </layout>
-     </item>
-     <item row="0" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayoutLogin">
-       <item>
-        <widget class="QLabel" name="labelLogin">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="text">
-          <string>логин</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="editLogin">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="placeholderText">
-          <string>логин</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="7" column="2">
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item row="2" column="2">
       <layout class="QHBoxLayout" name="horizontalLayoutIPPort">
@@ -392,46 +363,85 @@
        </item>
       </layout>
      </item>
-     <item row="6" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayoutLoginCancel">
+     <item row="4" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayoutDBName">
        <item>
-        <widget class="QPushButton" name="btnLogin">
+        <widget class="QLabel" name="labelDBName">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
          <property name="text">
-          <string>Вход</string>
+          <string>название БД</string>
          </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnCancel">
+        <widget class="QLineEdit" name="editDBName">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Отмена</string>
+          <string>mysql</string>
+         </property>
+         <property name="placeholderText">
+          <string>назазвание БД</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
-     <item row="0" column="1" rowspan="8">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+     <item row="0" column="0" rowspan="7">
+      <widget class="QGraphicsView" name="graphicsLogo">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="lineWidth">
+        <number>0</number>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="interactive">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -448,8 +458,6 @@
   <tabstop>pushButtonSSL</tabstop>
   <tabstop>editDBName</tabstop>
   <tabstop>checkBoxSaveOnSuccess</tabstop>
-  <tabstop>btnLogin</tabstop>
-  <tabstop>btnCancel</tabstop>
   <tabstop>graphicsLogo</tabstop>
  </tabstops>
  <resources/>

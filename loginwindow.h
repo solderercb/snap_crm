@@ -51,7 +51,7 @@ private:
     bool updateDB(int);
     void closeConnections();
     void debugInitLoginOptions();
-
+    void fillConnectionParams();
 private slots:
     void editPassword_onReturnPressed();
     void btnLoginHandler();
@@ -59,6 +59,7 @@ private slots:
     void clearStatusLabel();
     void createSSLOptionsDialog();
     void closeSSLOptionsDialog();
+    void selectAscExe();
 };
 
 #endif // LOGINWINDOW_H
