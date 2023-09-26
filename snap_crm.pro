@@ -16,6 +16,8 @@ CONFIG(debug, debug|release){
 
 greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
+CONFIG += c++17
+
 TARGET = snap
 TEMPLATE = app
 
@@ -232,7 +234,6 @@ HEADERS  += \
     models/seditablebasemodel.h \
     models/spermissions.h \
     models/ssqlfetchingmodel.h \
-    models/stablecartridgesmodel.h \
     models/stablemodelscommonmethods.h \
     models/stablerepairsmodel.h \
     models/repairtablefiltermenu.h \
@@ -415,25 +416,44 @@ UI_HEADERS_DIR = $${OUT_PWD}/ui
 UI_SOURCES_DIR = $${OUT_PWD}/ui
 RCC_DIR        = $${OUT_PWD}/$${BUILD_TYPE}/rcc
 
-LIB_DIR = $$section(OUT_PWD, /, -1, -1)
-LIB_DIR = $${PWD}/lib/$$replace(LIB_DIR, "Desktop", $$lower($$QMAKE_HOST.name))
-#message($$LIB_DIR)
+include(3rdparty/3rdparty-common.pri)
 
-INCLUDEPATH += $$LIB_DIR/include
-DEPENDPATH += $$LIB_DIR/include
+# копирование плагинов в папку с исполняемым файлом; копирование производится только если файлы изменены
+PLUGINS_SRC = $${EXPORT_LIBS}/plugins
+PLUGINS_DST = $${OUT_PWD}/$${BUILD_TYPE}/plugins
+UPDATE_REQ = 1
+exists($$PLUGINS_DST/updaters/qtifw.dll) {
+    UPDATE_REQ = 0
+    SRC_FILE_MD5 = $$system("@echo off & for /f \"SKIP=1 TOKENS=*\" %i in ('certutil -hashfile $$PLUGINS_SRC/updaters/qtifw.dll MD5') do (echo %i & exit)")
+    DST_FILE_MD5 = $$system("@echo off & for /f \"SKIP=1 TOKENS=*\" %i in ('certutil -hashfile $$PLUGINS_DST/updaters/qtifw.dll MD5') do (echo %i & exit)")
+    !equals(SRC_FILE_MD5, $$DST_FILE_MD5) {
+        UPDATE_REQ = 1
+    }
+}
+
+equals(UPDATE_REQ, 1) {
+    PLUGINS_SRC ~= s,/,\\,g
+    PLUGINS_DST ~= s,/,\\,g
+    QMAKE_POST_LINK += $$QMAKE_COPY_DIR \"$${PLUGINS_SRC}\" \"$${PLUGINS_DST}\" $$escape_expand(\\n\\t)
+}
+
+INCLUDEPATH += $$EXPORT_LIBS/include
+DEPENDPATH += $$EXPORT_LIBS/include
 PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
 
 LIBS += -lwinspool -lKernel32
 CONFIG(release, debug|release) {
-    LIBS += -L$$LIB_DIR -llimereport
+    LIBS += -L$$EXPORT_LIBS -llimereport
 }else{
-    LIBS += -L$$LIB_DIR -llimereportd
+    LIBS += -L$$EXPORT_LIBS -llimereportd
 }
+LIBS += -lQt5AutoUpdaterCore -lQt5AutoUpdaterWidgets
+
 
 win32:BIN_DIR ~= s,/,\\,g
-win32:LIB_DIR ~= s,/,\\,g
+win32:EXPORT_LIBS ~= s,/,\\,g
 QMAKE_PRE_LINK  += rcc -binary $${PWD}\\schema-updates\\schema-updates.qrc -o $${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc $$escape_expand(\\n\\t)
-#QMAKE_PRE_LINK += $$QMAKE_COPY \"$${LIB_DIR}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
+#QMAKE_PRE_LINK += $$QMAKE_COPY \"$${EXPORT_LIBS}\\*.dll\" \"$${BIN_DIR}\"  $$escape_expand(\\n\\t)
 
 TRANSLATIONS_PATH = $$PWD/lang
 LANGUAGES = ru_RU #uk_UA be_BY kk_KZ uz_UZ en_US en_GB az_AZ bg_BG cs_CZ de_AT de_DE et_EE fi_FI hu_HU hy_AM ka_GE ku_TR lt_LT lv_LV pl_PL ro_RO tr_TR

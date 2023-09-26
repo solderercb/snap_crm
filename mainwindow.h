@@ -33,6 +33,8 @@
 #include <QCloseEvent>
 #include "windowsdispatcher.h"
 #include "widgets/shortlivednotification.h"
+#include <QtAutoUpdaterWidgets/UpdateController>
+#include <QtAutoUpdaterWidgets/UpdateButton>
 
 namespace Ui {
 class MainWindow;
@@ -81,6 +83,7 @@ private:
 	QStringList tableGoodsHeaders;
 	QStandardItemModel *tableConsignmentsModel; // Модель таблицы, отображающей партии товара
 	QStringList tableConsignmentsHeaders;
+    QtAutoUpdater::UpdateController *updateController = nullptr;
 #ifdef QT_DEBUG
     void createTestTab();
 #endif
@@ -115,6 +118,7 @@ private slots:
     bool closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);
+    void createUpdaterWidget();
 #ifdef QT_DEBUG
     void btnClick();
     void on_treeView_clicked(const QModelIndex &index);

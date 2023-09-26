@@ -1,0 +1,50 @@
+Для сборки в директории lib/<machineName_kitName>/include должны располагаться заголовочные файлы (*.h) сторонних библиотек. Файлы копируются туда при сборке этих сторонних библиотек. Смотри аналогичные инструкции в директориях 3rdparty/LimeReport и 3rdparty/QtAutoUpdater.
+
+Итоговые файлы:
+  snap.exe
+  schema-updates.rcc
+  
+Зависимости:
+  libgcc_s_seh-1.dll
+  libmysql.dll
+  libstdc++-6.dll
+  libwinpthread-1.dll
+  limereport.dll (limereportd.dll)
+  Qt5Core.dll
+  Qt5Designer.dll
+  Qt5DesignerComponents.dll
+  Qt5Gui.dll
+  Qt5Network.dll
+  Qt5PrintSupport.dll
+  Qt5Qml.dll
+  Qt5Sql.dll
+  Qt5Svg.dll
+  Qt5Widgets.dll
+  Qt5Xml.dll
+  QtZint.dll (QtZintd.dll)
+  plugins\imageformats\qgif.dll
+  plugins\imageformats\qico.dll
+  plugins\imageformats\qjpeg.dll
+  plugins\sqldrivers\qsqlmysql.dll
+  plugins\imageformats\qsvg.dll
+  plugins\platforms\qwindows.dll
+  plugins\styles\qwindowsvistastyle.dll
+  plugins\printsupport\windowsprintersupport.dll
+  plugins\updaters\qtifw.dll
+  
+Библиотеки LimeReport должны соответствать типу сборки (Debug, Release).
+Cборка проверена с Qt 5.15.
+
+1. Сборка
+  qmake
+  mingw32-make -j<n>
+    где <n> — число ядер ЦП
+1а. Сборка в Qt Creator
+  - Открыть snap_crm.pro
+  - при первом открытии будет предложено настроить комплект (Kit) и тип сборки (Debug, Release)
+  - для соответствующего комплекта выбрать желаемый тип сборки (кнопка [Details ▼])
+    • для комплекта по умолчанию список типов сборки будет развёрнут
+    • если вы не знаете в чем разница, выбирайте Release
+  - при желании укажите путь, куда будут записываться скомпилированные файлы
+  - нажмите кнопку [Configure Project] под этим списком
+  - В меню Build выберите Build project ... (или нажмите Ctrl+B)

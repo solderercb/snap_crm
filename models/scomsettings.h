@@ -15,6 +15,7 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_COMBOBOX(int, timeZoneId, 0, time_zone, QString())
     PROPSTRUCT_LINEEDIT(QString, ascPhoneMask1, 0, phone_mask1)
     PROPSTRUCT_LINEEDIT(QString, ascPhoneMask2, 0, phone_mask2)
+    PROPSTRUCT_LINEEDIT(QString, updateChannel, 0, settings.update_channel)
 
     PROPSTRUCT_CHECKBOX(int, isPriceColOptVisible, 1, it_vis_opt)
     PROPSTRUCT_CHECKBOX(int, isPriceColOpt2Visible, 1, it_vis_opt2)

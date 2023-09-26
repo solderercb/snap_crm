@@ -15,6 +15,8 @@
 #include "models/ssloptionsdialog.h"
 #include "widgets/shortlivednotification.h"
 #include "windowsdispatcher.h"
+#include <QtAutoUpdaterWidgets/UpdateController>
+#include <QtAutoUpdaterWidgets/UpdateButton>
 
 namespace Ui {
 class LoginWindow;
@@ -45,6 +47,7 @@ private:
     QTimer *statusBarDelay;
     SSLOptionsDialog *modalWidget;
     QWidget *overlay;
+    QtAutoUpdater::UpdateController *updateController = nullptr;
     bool checkAppVer();
     int checkSchema();
     QStringList usersOnline();

@@ -33,6 +33,8 @@ LoginWindow::LoginWindow(QObject*) :
 
 LoginWindow::~LoginWindow()
 {
+    if(updateController)
+        delete updateController;
     delete logo;
     delete ui;
 }
@@ -66,8 +68,26 @@ bool LoginWindow::checkAppVer()
     queryCheckAppVer.exec(QUERY_SEL_APP_VER);
     queryCheckAppVer.first();
     appVer = queryCheckAppVer.value(0).toString().split('.');
+
     if( appVer.at(3).toInt() > APP_COMMIT )
+    {
+        queryCheckAppVer.exec(QUERY_SEL_UPDATE_CHANNEL);
+        queryCheckAppVer.first();
+        QString updateChannel = queryCheckAppVer.value(0).toString();
+
+        // Если канал обновления официальный, то скачивачиваем конкретную версию, а не самую последнюю
+        // По задумке такой механизм позволит избежать лишней головной боли админа организации
+        if(updateChannel.contains("github.com/solderercb/snap_crm"))
+            updateChannel.replace("releases/latest/download", QString("releases/download/%1").arg(appVer.join('.')));
+
+        QVariantMap config;
+        config.insert(QLatin1String("path"), QLatin1String("maintenancetool.exe"));
+        config.insert(QLatin1String("repoPathArg"), updateChannel);
+        auto updater = QtAutoUpdater::Updater::create(QLatin1String("qtifw"), config, qApp);
+        Q_ASSERT(updater);
+        updateController = new QtAutoUpdater::UpdateController(updater, this);
         throw 5;
+    }
     else if(appVer.at(3).toInt() < APP_COMMIT)
         return 1;
     return 0;
@@ -375,7 +395,15 @@ void LoginWindow::btnLoginHandler()
                 case 2: statusBarMsg(tr("Не удалось обновить базу данных. Есть пользователи онлайн.")); break;
                 case 3: statusBarMsg(tr("Попытка подключения к старой версии БД. Обратитесь к администратору.")); break;
                 case 4: statusBarMsg(tr("Учетная запись отключена"), 0); break;
-                case 5: statusBarMsg(tr("Требуется обновление программы"), 0);/* TODO: обновление ПО (до нужной версии) */ break;
+                case 5:
+                {
+                    statusBarMsg(tr("Требуется обновление программы"), 0);
+                    if(updateController)
+                    {
+                        updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Ask);
+                    }
+                    break;
+                }
             }
             closeConnections();
         }

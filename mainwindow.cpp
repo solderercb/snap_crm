@@ -332,9 +332,9 @@ void MainWindow::createMenu()
 
     QAction *checkUpdates = new QAction(tr("Проверить обновления"), this);
     settingsMenu->addAction(checkUpdates);
-    checkUpdates->setEnabled(false);
+//    checkUpdates->setEnabled(false);
     checkUpdates->setVisible(permissions->editGlobalSettings);
-//    QObject::connect(checkUpdates,SIGNAL(triggered()),this,SLOT(createUpdaterWidget()));
+    QObject::connect(checkUpdates,SIGNAL(triggered()),this,SLOT(createUpdaterWidget()));
 
     QAction *about = new QAction(tr("О программе"), this);
     settingsMenu->addAction(about);
@@ -374,6 +374,8 @@ MainWindow::~MainWindow()
     delete repairBoxesModel;
     for (int i = 0; i<connections.size(); i++)  // закрываем соединения
         connections[i]->close();
+    if(updateController)
+        delete updateController;
 #ifdef QT_DEBUG
     delete tableConsignmentsModel;
     delete tableGoodsModel;
@@ -709,6 +711,17 @@ void MainWindow::updateTabIcon(QWidget *w)
         ui->tabWidget->setTabIcon(ui->tabWidget->indexOf(w), *icon);
     else
         ui->tabWidget->setTabIcon(ui->tabWidget->indexOf(w), QIcon());
+}
+
+void MainWindow::createUpdaterWidget()
+{
+    QVariantMap config;
+    config.insert(QLatin1String("path"), QLatin1String("maintenancetool.exe"));
+    config.insert(QLatin1String("repoPathArg"), comSettings->updateChannel);
+    auto updater = QtAutoUpdater::Updater::create(QLatin1String("qtifw"), config, qApp);
+    Q_ASSERT(updater);
+    updateController = new QtAutoUpdater::UpdateController(updater, this);
+    updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Progress);
 }
 
 #ifdef QT_DEBUG
