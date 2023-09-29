@@ -37,15 +37,7 @@ void SWorkshopIssuedModel::load(const int id)
     if(!id)
         return;
 
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    query->exec(QUERY_SEL_REPAIR_RPRT(id));
-    if(!query->first())
-        return;
-
-    i_id = id;
-    m_repair = query->value("repair_id").toInt();
-    m_employeeId = query->value("employee_id").toInt();
-    i_createdUtc = query->value("created_at").toDateTime();
+    // TODO: а этот метод вообще нужен?
 }
 
 bool SWorkshopIssuedModel::commit()

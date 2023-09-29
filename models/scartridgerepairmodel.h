@@ -3,6 +3,7 @@
 
 #include "scomrecord.h"
 #include <QObject>
+#include "widgets/shortlivednotification.h"
 
 class SCartridgeRepairModel : public SComRecord
 {
@@ -13,6 +14,7 @@ public:
     ~SCartridgeRepairModel();
     int id();
     void load(const int id);
+    void loadError();
     bool commit();
     bool refill();
     void setRefill(const bool);

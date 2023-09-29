@@ -79,6 +79,7 @@
 #define QUERY_SEL_CARTRIDGE_CAT_ID              QString("SELECT `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 1 LIMIT 1;")
 #define QUERY_SEL_CARTRIDGE_MODELS(vendor)          QString("SELECT  `name`, `id`  FROM `cartridge_cards` WHERE `maker` = %1 AND `archive` = 0;").arg((vendor))
 #define QUERY_SEL_CARTRIDGE_BY_SN(where_clause)     QString("SELECT  t1.`id`, `Title`, `client`, `type`, `maker`, `cartridge`, t2.`card_id`, `serial_number`, `sms_inform`, `termsControl` FROM `workshop` AS t1 LEFT JOIN `c_workshop` AS t2 ON t1.`cartridge` = t2.`id` WHERE %1 GROUP BY `serial_number`;").arg(where_clause)
+#define QUERY_SEL_CARTRIDGE_REPAIR_DATA(id)     QString("SELECT `refill`, `chip`, `opc_drum`, `c_blade`, `card_id` FROM `c_workshop` WHERE `id` = %1;").arg((id))
 #define QUERY_SEL_CARTRIDGE_MATERIAL(articul, count)  QString("SELECT `id` FROM `store_items` WHERE `articul` = %1 AND `count` - `reserved` >= %2 ORDER BY `id` ASC LIMIT 1;").arg(articul).arg(count)
 #define QUERY_SEL_CARTRIDGE_MATERIALS           QString("SELECT `id`, `type`, `count`, `price`, `works_price`, 0, `name`, `articul` FROM `materials`")
 #define QUERY_SEL_CARTRIDGE_RESOURCE(currentRepair, serial, workType)  QString("SELECT COUNT(t1.`id`) AS 'count' FROM `workshop` AS t1 LEFT JOIN `works` AS t2 ON t1.`id` = t2.`repair` WHERE  IF(%1, t1.`id` < %1, 1) AND `serial_number` = '%2' AND `cartridge` IS NOT NULL AND t2.`type` = %3").arg(currentRepair).arg(serial).arg(workType)
@@ -211,36 +212,14 @@
 
 #define QUERY_SEL_REPAIR_DATA(id)           QString(\
                                                 "SELECT\n"\
-                                                "  t2.PrepaidTypeStr,\n"\
-                                                "  workshop.*\n"\
+                                                "  t1.*,\n"\
+                                                "  t2.`refill` AS 'is_cartridge'\n"\
                                                 "FROM\n"\
-                                                "  workshop\n"\
-                                                "LEFT JOIN (\n"\
-                                                "  SELECT\n"\
-                                                "    \"полная предоплата\" AS 'PrepaidTypeStr',\n"\
-                                                "    0 AS 'id'\n"\
-                                                "  UNION\n"\
-                                                "  SELECT\n"\
-                                                "    \"за детали\",\n"\
-                                                "    1\n"\
-                                                "  UNION\n"\
-                                                "  SELECT\n"\
-                                                "    \"за часть стоимости деталей\",\n"\
-                                                "    2\n"\
-                                                "  UNION\n"\
-                                                "  SELECT\n"\
-                                                "    \"за часть стоимости работ\",\n"\
-                                                "    3\n"\
-                                                "  UNION\n"\
-                                                "  SELECT\n"\
-                                                "    \"за диагностику\",\n"\
-                                                "    4\n"\
-                                                "  ) AS `t2`\n"\
-                                                "ON\n"\
-                                                "  workshop.prepaid_type = t2.`id`\n"\
-                                                "  AND workshop.`is_prepaid` = 1\n"\
+                                                "  workshop AS t1\n"\
+                                                "  LEFT JOIN `devices` AS t2\n"\
+                                                "  ON t1.`type` = t2.`id`\n"\
                                                 "WHERE\n"\
-                                                "  workshop.`id` = %1;")\
+                                                "  t1.`id` = %1;")\
                                                 .arg((id))
 
 #define QUERY_SEL_COMMENTS(field, id)           QString("SELECT `id`, `created`, `user`, `text` FROM `comments` WHERE `%1` = %2 ORDER BY `created` DESC,`id` DESC;").arg((field)).arg((id)), QSqlDatabase::database("connMain")
@@ -535,44 +514,6 @@
                                                         "WHERE\r\n"\
                                                         "  t1.`id` = %1;")\
                                                         .arg((id))
-/**************** SELECT queries for data models for reports ******************/
-#define QUERY_SEL_REPAIR_RPRT(R)            QString("SELECT t2.PrepaidTypeStr, workshop.* FROM workshop LEFT JOIN (SELECT \"полная предоплата\" AS 'PrepaidTypeStr', 0 AS 'id' UNION SELECT \"за детали\", 1 UNION SELECT \"за часть стоимости деталей\", 2 UNION SELECT \"за часть стоимости работ\", 3 UNION SELECT \"за диагностику\", 4 ) AS `t2` ON workshop.prepaid_type = t2.`id` AND workshop.`is_prepaid` = 1 WHERE workshop.`id` = %1;").arg(R)
-#define QUERY_SEL_CLIENT_RPRT(C)            QString(\
-                                                "SELECT\r\n"\
-                                                "  t1.*,\r\n"\
-                                                "  GROUP_CONCAT(t2.phone ORDER BY t2.`type` DESC SEPARATOR ',') AS 'phone',\r\n"\
-                                                "  IF( t1.`type` = 1, t1.`ur_name`,\r\n"\
-                                                "    CONCAT(\r\n"\
-                                                "      IF(t1.`surname` IS NULL OR t1.`surname` = '',\r\n"\
-                                                "        '',\r\n"\
-                                                "        CONCAT(t1.`surname`,' ')\r\n"\
-                                                "      ),\r\n"\
-                                                "      t1.`name`,\r\n"\
-                                                "      IF(t1.`patronymic` IS NULL OR t1.`patronymic` = '',\r\n"\
-                                                "        '',\r\n"\
-                                                "        CONCAT(' ', t1.`patronymic`)\r\n"\
-                                                "      )\r\n"\
-                                                "    )\r\n"\
-                                                "  ) AS 'FioOrUrName'\r\n"\
-                                                "FROM clients AS t1\r\n"\
-                                                "LEFT JOIN tel AS t2\r\n"\
-                                                "  ON t1.id = t2.customer\r\n"\
-                                                "WHERE t1.`id` = %1\r\n"\
-                                                "GROUP BY t1.`id`;").arg(C), QSqlDatabase::database("connMain")
-
-#define QUERY_SEL_REP_FIELDS_RPRT(R)        QString("(SELECT 'Предоплата' AS 'name', CONCAT(ROUND(`prepaid_summ`, 0), '$D{config.currency}') AS 'value', `prepaid_type` AS 'comment' FROM workshop WHERE `id` = %1 AND `is_prepaid` = 1)\
-                                                      UNION ALL\
-                                                      (SELECT 'Ориентировочная стоимость ремонта', CONCAT(ROUND(`pre_agreed_amount`, 0), '$D{config.currency}'), '' FROM workshop WHERE `id` = %1 AND `is_pre_agreed` = 1)\
-                                                      UNION ALL\
-                                                      (SELECT '', 'Уст-во было в другом СЦ', '' FROM workshop WHERE `id` = %1 AND `thirs_party_sc` = 1)\
-                                                      UNION ALL\
-                                                      (SELECT t2.`name`, t1.`value`, '' AS 'comment' FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t2.`printable` = 1 AND t2.`archive` = 0 AND t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC);\
-                                                      ").arg((R)), QSqlDatabase::database("connMain")
-
-//#define QUERY_SEL__RPRT()  QString("").arg(()), QSqlDatabase::database("connMain")
-//#define QUERY_SEL__RPRT()  QString("").arg(()), QSqlDatabase::database("connMain")
-//#define QUERY_SEL__RPRT()  QString("").arg(()), QSqlDatabase::database("connMain")
-//#define QUERY_SEL__RPRT()  QString("").arg(()), QSqlDatabase::database("connMain")
 
 /**************** Queries for data insertion ******************/
 #define QUERY_SEL_LAST_INSERT_ID            QString("SELECT LAST_INSERT_ID();")

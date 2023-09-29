@@ -31,6 +31,7 @@ public:
 private:
     Ui::tabRepairCartridges *ui;
     static tabRepairCartridges* p_instance;
+    bool m_issueButtonVisible = 1;
     bool m_readyButtonVisible = 1;
     SCartridgeCard *m_cartridgeCardForm;
     SDialogIssueRepair *m_dialogIssue;
@@ -47,6 +48,8 @@ private slots:
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();
     void reloadCardModel(int id);
+    void setReadyToIssue();
+    void closeTab();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

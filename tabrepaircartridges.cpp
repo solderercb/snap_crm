@@ -1,4 +1,5 @@
 #include "global.h"
+#include "tabrepairs.h"
 #include "tabrepaircartridges.h"
 #include "ui_tabrepaircartridges.h"
 
@@ -15,6 +16,7 @@ tabRepairCartridges::tabRepairCartridges(MainWindow *parent) :
                                                     background-color: rgb(255, 255, 255);\
                                                 }");
     connect(ui->buttonIssue, &QPushButton::clicked, this, &tabRepairCartridges::createDialogIssue);
+    connect(ui->buttonSetReadyToIssue, &QPushButton::clicked, this, &tabRepairCartridges::setReadyToIssue);
 }
 
 bool tabRepairCartridges::eventFilter(QObject *watched, QEvent *event)
@@ -100,19 +102,28 @@ void tabRepairCartridges::updateWidgets()
     SCartridgeForm *form;
     int client = 0;
 
-    m_readyButtonVisible = 1;
+    m_readyButtonVisible = 0;
+    m_issueButtonVisible = 1;
+    bool formReady;
+
+    if(comSettings->useSimplifiedCartridgeRepair)
+        m_readyButtonVisible = 1;        // кнопка видна только в упрощенном режиме работы с картриджами
+
     for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
     {
         if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
             continue;
 
         form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
-        m_readyButtonVisible &= form->isReady();
+        formReady = form->isReady();
+        m_readyButtonVisible &= formReady;
+        m_issueButtonVisible &= formReady;
         if(client && client != form->clientId())
-            m_readyButtonVisible &= 0;
+            m_issueButtonVisible &= 0;
         client = form->clientId();
     }
-    ui->buttonIssue->setVisible(m_readyButtonVisible);
+    ui->buttonSetReadyToIssue->setVisible(m_readyButtonVisible);
+    ui->buttonIssue->setVisible(m_issueButtonVisible);
 }
 
 /* Перезагрузка данных модели из БД
@@ -163,6 +174,33 @@ void tabRepairCartridges::reloadCardModel(int id)
     }
 }
 
+void tabRepairCartridges::setReadyToIssue()
+{
+    SCartridgeForm *form;
+    bool ret = 1;
+
+    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    {
+        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
+            continue;
+
+        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+        form->model()->setState(Global::RepStateIds::Ready);
+        ret &= form->model()->commit();
+    }
+
+    if(ret)
+    {
+        closeTab();
+    }
+}
+
+void tabRepairCartridges::closeTab()
+{
+    tabRepairs::refreshIfTabExists();
+    this->deleteLater();
+}
+
 void tabRepairCartridges::createDialogIssue()
 {
     QList<SRepairModel*> list;
@@ -179,6 +217,7 @@ void tabRepairCartridges::createDialogIssue()
 
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
     connect(m_dialogIssue, &SDialogIssueRepair::onDelete, this, &tabRepairCartridges::closeDialogIssue);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepairCartridges::closeTab);
     connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::reloadRepairData);
 }
 

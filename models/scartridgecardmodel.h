@@ -4,6 +4,7 @@
 #include "scomrecord.h"
 #include <QObject>
 #include "scartridgematerialmodel.h"
+#include "widgets/shortlivednotification.h"
 
 class SCartridgeCardModel : public SComRecord
 {
@@ -13,6 +14,7 @@ public:
     ~SCartridgeCardModel();
     int id();
     void load(const int id);
+    void loadError();
     void initMaterials();
     bool commit();
     QString name();
@@ -37,6 +39,7 @@ public:
     bool archive();
     void setArchive(const bool);
     SCartridgeMaterialModel *material(const int type);
+    bool isMaterialSet(const int type);
 private:
     QString m_name;
     int m_vendor = 0;
@@ -49,7 +52,7 @@ private:
     int m_photo = 0;
     int m_color = 0;
     bool m_archive = 0;
-    QMap<int, SCartridgeMaterialModel*> materials;
+    QMap<int, SCartridgeMaterialModel*> m_materials;
 };
 
 #endif // SCARTRIDGECARDMODEL_H

@@ -39,7 +39,7 @@
           <x>0</x>
           <y>0</y>
           <width>1123</width>
-          <height>419</height>
+          <height>427</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
@@ -119,62 +119,16 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <layout class="QGridLayout" name="gridLayoutBot" columnstretch="0,1,0,1,0" rowminimumheight="0" columnminimumwidth="250,0,0,0,250">
+       <layout class="QGridLayout" name="gridLayoutBot" columnstretch="0,0,0,0,0">
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
-        <item row="0" column="1">
-         <spacer name="horizontalSpacerLeft">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::MinimumExpanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>70</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <spacer name="horizontalSpacerRight">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>70</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="4">
-         <layout class="QGridLayout" name="RightGridLayout">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
-          </property>
-         </layout>
-        </item>
-        <item row="0" column="0">
-         <layout class="QGridLayout" name="LeftGridLayout" columnstretch="0">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
-          </property>
-         </layout>
-        </item>
         <item row="0" column="2">
          <layout class="QGridLayout" name="CentralGridLayout">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
-          <item row="0" column="2">
+          <item row="0" column="3">
            <widget class="QWidget" name="dummyWidget" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -197,6 +151,31 @@
            </widget>
           </item>
           <item row="0" column="1">
+           <widget class="QPushButton" name="buttonIssue">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Выдать все картриджи в списке</string>
+            </property>
+            <property name="text">
+             <string>Выдать</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
            <widget class="QPushButton" name="buttonRefresh">
             <property name="enabled">
              <bool>true</bool>
@@ -219,28 +198,62 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QPushButton" name="buttonIssue">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>23</height>
-             </size>
+           <widget class="QPushButton" name="buttonSetReadyToIssue">
+            <property name="toolTip">
+             <string>Установить всем картритджам в скиске статус &quot;Готово к выдаче&quot;</string>
             </property>
             <property name="text">
-             <string>Выдать</string>
+             <string>Готово</string>
             </property>
            </widget>
           </item>
          </layout>
+        </item>
+        <item row="0" column="4">
+         <layout class="QGridLayout" name="RightGridLayout">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+         </layout>
+        </item>
+        <item row="0" column="3">
+         <spacer name="horizontalSpacerRight">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>70</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="LeftGridLayout" columnstretch="0">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+         </layout>
+        </item>
+        <item row="0" column="1">
+         <spacer name="horizontalSpacerLeft">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::MinimumExpanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>70</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>

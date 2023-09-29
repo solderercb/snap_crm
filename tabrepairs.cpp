@@ -104,6 +104,17 @@ tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleto
     return p_instance[type];
 }
 
+void tabRepairs::refreshIfTabExists()
+{
+    tabRepairs *repairsTab = nullptr;
+
+    repairsTab = MainWindow::getInstance()->findChild<tabRepairs*>();
+    if(repairsTab)
+    {
+        repairsTab->refreshTable();
+    }
+}
+
 /* Обновление модели данных для таблицы ремонтов с учетом фильтров.
  * При первом запуске модель содержит только текущие ремонты.
  * При включении ЛЮБОГО фильтра (будь то текстовый поиск или фильтр по

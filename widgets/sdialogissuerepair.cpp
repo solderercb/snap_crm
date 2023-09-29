@@ -1,6 +1,7 @@
 #include "global.h"
 #include "sdialogissuerepair.h"
 #include "ui_sdialogissuerepair.h"
+#include "tabrepairs.h"
 #include "tabrepair.h"
 
 SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowFlags flags, QWidget *parent) :
@@ -250,6 +251,7 @@ void SDialogIssueRepair::buttonIssueClicked()
     if(nErr)
     {
         emit issueSuccessfull();
+        tabRepairs::refreshIfTabExists();
         this->deleteLater();
     }
 }

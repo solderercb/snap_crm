@@ -37,7 +37,7 @@ void SRepairModel::load(const int id)
         return;
 
     QSqlQuery *repair = new QSqlQuery(QSqlDatabase::database("connMain"));
-    repair->exec(QUERY_SEL_REPAIR_RPRT(id));
+    repair->exec(QUERY_SEL_REPAIR_DATA(id));
     if(!repair->first())
         return;
 
@@ -103,8 +103,10 @@ void SRepairModel::load(const int id)
     m_smsInform = repair->value("sms_inform").toBool();
     m_invoice = repair->value("invoice").toInt();
     m_cartridge = repair->value("cartridge").toInt();
-    if(m_cartridge)
+    if(repair->value("is_cartridge").toBool())
+    {
         m_cartridgeRepair = new SCartridgeRepairModel(m_cartridge, this);
+    }
     m_vendorId = repair->value("vendor_id").toInt();
     m_termsControl = repair->value("termsControl").toBool();
     m_repairStatusLog->setRepair(i_id);
@@ -659,6 +661,7 @@ QString SRepairModel::extNotes()
 
 void SRepairModel::setExtNotes(const QString str)
 {
+    m_extNotes = str;
     i_valuesMap.insert("ext_notes", str);
 }
 

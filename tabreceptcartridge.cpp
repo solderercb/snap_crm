@@ -132,6 +132,8 @@ void tabReceptCartridge::initWidgets()
 
 void tabReceptCartridge::clearWidgets()
 {
+    SCartridgeForm *form;
+
     ui->checkBoxIsHighPriority->setCheckState(Qt::Unchecked);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
@@ -139,6 +141,14 @@ void tabReceptCartridge::clearWidgets()
     ui->spinBoxQty->setValue(1);
     ui->comboBoxVendor->setCurrentIndex(-1);
     ui->comboBoxModel->setCurrentIndex(-1);
+    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    {
+        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
+            continue;
+
+        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+        form->deleteLater();
+    }
 }
 
 void tabReceptCartridge::setModelData()
@@ -462,7 +472,6 @@ bool tabReceptCartridge::createRepairs()
         return 0;
 
     bool nErr = 1;
-    tabRepairs *repairsTab = nullptr;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     SCartridgeForm *form;
 
@@ -521,9 +530,7 @@ bool tabReceptCartridge::createRepairs()
     {
 //        print();  // TODO: печать акта приёма картриджей
         clearWidgets();
-        repairsTab = parent()->findChild<tabRepairs*>();
-        if(repairsTab)
-            repairsTab->refreshTable();
+        tabRepairs::refreshIfTabExists();
     }
 
     return nErr;

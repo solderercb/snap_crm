@@ -39,6 +39,7 @@ public:
     ~tabRepairs();
     QString tabTitle() override;
     void updateWidgets();
+    static void refreshIfTabExists();
 private:
     enum WorkshopFilter{NoFilter = 0, CartridgesOnly = 1, RepairsOnly = 2};
     Ui::tabRepairs *ui;

@@ -21,22 +21,23 @@ SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
 SCartridgeForm::~SCartridgeForm()
 {
     delete ui;
+    delete m_cartridgeCard; // перед удалением модели m_repairModel
     if(m_repairModel)
         delete m_repairModel;
     if(worksAndPartsModel)
         delete worksAndPartsModel;
     if(statusesProxyModel)
         delete statusesProxyModel;
-    delete m_cartridgeCard;
 }
 
 void SCartridgeForm::initModels()
 {
-    m_cartridgeCard = new SCartridgeCardModel();
+    m_cartridgeCard = new SCartridgeCardModel(this);
     if(m_repairId)
     {
         m_repairModel = new SRepairModel();
         connect(m_repairModel, &SRepairModel::modelUpdated, this, &SCartridgeForm::updateWidgets);
+        m_cartridgeCard->setParent(m_repairModel);
 
         statusesProxyModel = new SSortFilterProxyModel;
         statusesProxyModel->setSourceModel(statusesModel);
@@ -106,6 +107,7 @@ void SCartridgeForm::initWidgets()
         connect(ui->pushButtonClientCard, &QPushButton::clicked, this, &SCartridgeForm::buttonClientCardClicked);
         connect(ui->toolButtonClassicTab, &QPushButton::clicked, this, &SCartridgeForm::buttonClassicTabClicked);
         connect(ui->toolButtonCartridgeCard, &QPushButton::clicked, this, &SCartridgeForm::buttonCartridgeCardClicked);
+        connect(ui->lineEditComment, &QLineEdit::editingFinished, this, &SCartridgeForm::updateComment);
 
         updateHeader();
         updateWidgets();
@@ -147,7 +149,7 @@ void SCartridgeForm::updateHeader()
 
 void SCartridgeForm::updateWidgets()
 {
-    ui->splitterComment->hide();    // TODO: придумать где расположить поле с примечанием; поле должно быть редактируемым.
+//    ui->splitterComment->hide();    // TODO: придумать где расположить поле с примечанием; поле должно быть редактируемым.
     ui->splitterWasEarly->hide();   // TODO: ссылка на предыдущий ремонт (открытие классической карты ремонта)
     ui->lineEditSerial->setText(m_repairModel->serialNumber());
     ui->lineEditSerial->setReadOnly(true);
@@ -163,16 +165,16 @@ void SCartridgeForm::updateWidgets()
 
     setWidgetsParams(m_repairModel->state());
 
-    ui->checkBoxRefill->setEnabled(worksCheckboxesEn);
-    ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn);
-    ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn);
-    ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn);
+    ui->checkBoxRefill->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Toner));
+    ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Chip));
+    ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Drum));
+    ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Blade));
     ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
     updateComboBoxEngineer(m_repairModel->engineer());
     ui->doubleSpinBoxTotalAmount->setValue(m_repairModel->realRepairCost());
     ui->comboBoxPlace->setCurrentIndex(m_repairModel->boxIndex());
     ui->comboBoxPlace->setEnabled(placeComboBoxEn);
-
+    ui->lineEditComment->setText(m_repairModel->extNotes());
 }
 
 bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
@@ -513,7 +515,7 @@ void SCartridgeForm::setWidgetsParams(const int stateId)
         case Global::RepStateIds::GetIn: engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
         case Global::RepStateIds::InWork: worksCheckboxesEn = 1; engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
         case Global::RepStateIds::Ready:
-        case Global::RepStateIds::ReadyNoRepair: engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
+        case Global::RepStateIds::ReadyNoRepair: worksCheckboxesEn = 0; engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
         default: ;
     }
     updateStateWidget(stateId);
@@ -667,18 +669,21 @@ bool SCartridgeForm::addWorkAndPart(const int workType)
     }
 
     material =  m_cartridgeCard->material(materialType);
-    query.exec(QUERY_SEL_CARTRIDGE_MATERIAL(material->articul(), material->count()));
-    if(!query.first())
+    if(material->articul()) // если артикул не задан, подразумевается работа без склада
     {
-        shortlivedNotification *newPopup = new shortlivedNotification(this,
-                                                                      tr("Ошибка"),
-                                                                      tr("Кол-во больше наличия, списание не возможно"),
-                                                                      QColor(255,164,119),
-                                                                      QColor(255,199,173));
-        return 0;
-    }
+        query.exec(QUERY_SEL_CARTRIDGE_MATERIAL(material->articul(), material->count()));
+        if(!query.first())
+        {
+            shortlivedNotification *newPopup = new shortlivedNotification(this,
+                                                                          tr("Ошибка"),
+                                                                          tr("Кол-во больше наличия, списание не возможно"),
+                                                                          QColor(255,164,119),
+                                                                          QColor(255,199,173));
+            return 0;
+        }
 
-    itemId = query.value(0).toInt();
+        itemId = query.value(0).toInt();
+    }
 
     worksAndPartsModel->addCustomWork();
     worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColName), workName);
@@ -688,12 +693,15 @@ bool SCartridgeForm::addWorkAndPart(const int workType)
 //    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColSumm), material->worksPrice());
 
     rowItem = worksAndPartsModel->rowCount();
-    worksAndPartsModel->addItemByUID(itemId, material->count());
+    if(material->articul())
+    {
+        worksAndPartsModel->addItemByUID(itemId, material->count());
 #ifdef QT_DEBUG // в методе SSaleTableModel::insertRecord() для удобства отладки устанавливается случайное кол-во; здесь это не нужно
-    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColCount), material->count());
+        worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColCount), material->count());
 #endif
-    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColPrice), material->price()/material->count());
-//    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColSumm), material->count()*material->worksPrice());
+        worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColPrice), material->price()/material->count());
+        //    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColSumm), material->count()*material->worksPrice());
+    }
 
     return worksAndPartsModel->repair_saveTablesStandalone();
 }
@@ -939,4 +947,11 @@ void SCartridgeForm::buttonClassicTabClicked()
 void SCartridgeForm::buttonCartridgeCardClicked()
 {
     emit createCartridgeCardForm(m_cardId);
+}
+
+void SCartridgeForm::updateComment()
+{
+    m_repairModel->setExtNotes(ui->lineEditComment->text());
+    if(m_repairModel->commit())
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Примечание сохранено"), QColor(214,239,220), QColor(229,245,234));
 }

@@ -125,6 +125,7 @@ private slots:
     void buttonClientCardClicked();
     void buttonClassicTabClicked();
     void buttonCartridgeCardClicked();
+    void updateComment();
 };
 
 #endif // SCARTRIDGEFORM_H

@@ -416,6 +416,10 @@ UI_HEADERS_DIR = $${OUT_PWD}/ui
 UI_SOURCES_DIR = $${OUT_PWD}/ui
 RCC_DIR        = $${OUT_PWD}/$${BUILD_TYPE}/rcc
 
+!exists(3rdparty/outpwd.tmp){
+    system("copy NUL 3rdparty\\outpwd.tmp")    # пустышка на случай отсутствия файла
+}
+
 include(3rdparty/3rdparty-common.pri)
 
 # копирование плагинов в папку с исполняемым файлом; копирование производится только если файлы изменены

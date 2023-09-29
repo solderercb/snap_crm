@@ -1,4 +1,5 @@
 #include "scartridgecardmodel.h"
+#include "models/srepairmodel.h"
 
 SCartridgeCardModel::SCartridgeCardModel(QObject *parent) : SComRecord(parent)
 {
@@ -9,8 +10,8 @@ SCartridgeCardModel::SCartridgeCardModel(QObject *parent) : SComRecord(parent)
 
 SCartridgeCardModel::~SCartridgeCardModel()
 {
-    while(!materials.isEmpty())
-        materials.remove(materials.lastKey());
+    while(!m_materials.isEmpty())
+        m_materials.remove(m_materials.lastKey());
 }
 
 int SCartridgeCardModel::id()
@@ -20,15 +21,21 @@ int SCartridgeCardModel::id()
 
 void SCartridgeCardModel::load(const int id)
 {
+    i_id = id;
+
     if(!id)
+    {
+        loadError();
         return;
+    }
 
     QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
     record->exec(QString("SELECT `name`, `maker`, `full_weight`, `toner_weight`, `resource`, `created`, `user`, `notes`, `photo`, `color`, `archive` FROM `cartridge_cards` WHERE `id` = %1;").arg(id));
     if(!record->first())
+    {
+        loadError();
         return;
-
-    i_id = id;
+    }
 
     m_name = record->value("name").toString();
     m_vendor = record->value("maker").toInt();
@@ -46,6 +53,17 @@ void SCartridgeCardModel::load(const int id)
     delete record;
 }
 
+// TODO: аналогичный метод есть в классе SCartridgeRepairModel; нужно их обобщить
+void SCartridgeCardModel::loadError()
+{
+    SRepairModel* repair = dynamic_cast<SRepairModel*>(parent());
+    if(repair)
+    {
+        appLog->appendRecord(tr("Не удалось инициализировать модель SCartridgeCardModel ремонта №%1").arg(repair->id()));
+        shortlivedNotification *newPopup = new shortlivedNotification(this, "Ошибка", "Не удалось загрузить информацию о модели картриджа. Обратитесь к администратору", QColor("#FFC7AD"), QColor("#FFA477"));
+    }
+}
+
 void SCartridgeCardModel::initMaterials()
 {
     QSqlQuery query(QSqlDatabase::database("connMain"));
@@ -56,7 +74,7 @@ void SCartridgeCardModel::initMaterials()
     {
         material = new SCartridgeMaterialModel();
         material->load(query.value(0).toInt());
-        materials.insert(material->type(), material);
+        m_materials.insert(material->type(), material);
     }
 }
 
@@ -229,6 +247,11 @@ void SCartridgeCardModel::setArchive(const bool archive)
 
 SCartridgeMaterialModel *SCartridgeCardModel::material(const int type)
 {
-    return materials.value(type, 0);
+    return m_materials.value(type, 0);
+}
+
+bool SCartridgeCardModel::isMaterialSet(const int type)
+{
+    return m_materials.contains(type);
 }
 

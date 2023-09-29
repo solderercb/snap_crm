@@ -674,9 +674,7 @@ bool tabRepairNew::createRepair()
     {
         print(repair);
         clearWidgets();
-        repairsTab = parent()->findChild<tabRepairs*>();
-        if(repairsTab)
-            repairsTab->refreshTable();
+        tabRepairs::refreshIfTabExists();
         // TODO: обработка списка совпадений устройств (табл. tasks, type == 5)
     }
 
