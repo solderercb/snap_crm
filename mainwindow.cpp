@@ -998,7 +998,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    createTabSale(17782);
 //    if (test_scheduler_counter < 375)
 //    {
-//        createTabRepairNew();
+        createTabRepairNew();
 //        createTabReceptCartridge();
 //        createTabNewPKO();
 //        createTabCashOperation(36192);

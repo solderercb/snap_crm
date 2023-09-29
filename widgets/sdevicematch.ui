@@ -61,6 +61,9 @@
       </property>
       <item row="0" column="0">
        <widget class="QTableView" name="tableViewDeviceMatch">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>

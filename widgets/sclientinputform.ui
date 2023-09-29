@@ -10,9 +10,6 @@
     <height>167</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>0</number>
@@ -70,6 +67,9 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -315,6 +315,9 @@ QListView::item  {
             <height>0</height>
            </size>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
           <property name="whatsThis">
            <string/>
           </property>
@@ -357,15 +360,15 @@ QListView::item  {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
+  </customwidget>
+  <customwidget>
    <class>SPhones</class>
    <extends>QWidget</extends>
    <header>widgets/sphones.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
    <class>SClientMatch</class>
@@ -374,6 +377,20 @@ QListView::item  {
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lineEditClientLastName</tabstop>
+  <tabstop>lineEditClientFirstName</tabstop>
+  <tabstop>lineEditClientPatronymic</tabstop>
+  <tabstop>phones</tabstop>
+  <tabstop>comboBoxClientAdType</tabstop>
+  <tabstop>lineEditClientAddress</tabstop>
+  <tabstop>lineEditClientEmail</tabstop>
+  <tabstop>checkBoxClientType</tabstop>
+  <tabstop>pushButtonSelectExistingClient</tabstop>
+  <tabstop>pushButtonClientCredsClearAll</tabstop>
+  <tabstop>pushButtonCreateTabClient</tabstop>
+  <tabstop>listWidgetClientOptions</tabstop>
+ </tabstops>
  <resources>
   <include location="../styles/styles.qrc"/>
  </resources>

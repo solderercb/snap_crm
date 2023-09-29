@@ -6,6 +6,7 @@ SPhone::SPhone(QWidget *parent) :
     ui(new Ui::SPhone)
 {
     ui->setupUi(this);
+    QWidget::setFocusProxy(ui->lineEditPhone);
 
     ui->comboBoxPhoneMask->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditPhone->setStyleSheet(commonLineEditStyleSheet);

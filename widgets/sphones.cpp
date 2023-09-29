@@ -47,7 +47,11 @@ void SPhones::addForm(SPhoneModel *model)
 
     m_isPrimary = model->type();
     if(m_isPrimary)
+    {
         m_primaryForm = phoneForm;  // форма с основным телефоном только одна; задача определения типа лежит на методах класса SPhonesModel
+        m_primaryForm->setFocusPolicy(Qt::StrongFocus);
+        QWidget::setFocusProxy(m_primaryForm);
+    }
 
     m_phoneFormsList.append(phoneForm);
     ui->gridLayout_2->addWidget(phoneForm);

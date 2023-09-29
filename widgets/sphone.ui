@@ -54,6 +54,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
       </widget>
      </item>
      <item>
@@ -86,6 +89,9 @@
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>основной</string>
        </property>
@@ -102,6 +108,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
        <property name="placeholderText">
         <string>примечание</string>
        </property>
@@ -109,6 +118,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBoxViber">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>Viber</string>
        </property>
@@ -116,6 +128,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBoxTelegram">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>Telegram</string>
        </property>
@@ -123,6 +138,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBoxWhatsapp">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>WhatsApp</string>
        </property>
@@ -130,6 +148,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBoxSMS">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="toolTip">
         <string>Согласен получать SMS</string>
        </property>
@@ -201,6 +222,9 @@
          <height>20</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="toolTip">
         <string>редактировать номер</string>
        </property>
@@ -221,6 +245,9 @@
          <height>20</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="toolTip">
         <string>удалить номер</string>
        </property>
@@ -236,6 +263,9 @@
          <width>20</width>
          <height>20</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
         <string>добавить еще один номер</string>

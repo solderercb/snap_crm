@@ -6,6 +6,7 @@ SClientInputForm::SClientInputForm(QWidget *parent) :
     ui(new Ui::SClientInputForm)
 {
     ui->setupUi(this);
+    QWidget::setFocusProxy(ui->lineEditClientLastName);
     clientModel = new SClientModel();
 
     initWidgets();

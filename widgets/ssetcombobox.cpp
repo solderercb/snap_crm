@@ -3,6 +3,7 @@
 daughterLineEdit::daughterLineEdit(QWidget *parent)
     : QLineEdit(parent)
 {
+    setFocusPolicy(Qt::FocusPolicy::ClickFocus);
     fm = new QFontMetrics(this->font());
     frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth)*2;
     setStyleSheet("QLineEdit { background-color: #E5E5E5; border: none }\
