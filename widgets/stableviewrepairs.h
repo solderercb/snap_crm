@@ -19,6 +19,7 @@ public:
     ~STableViewRepairs();
     QList<int> *selectedRepairsList();
     bool selectedCanBeIssued();
+    bool mode();
     void setMode(const int mode);
 private:
     int m_mode = 0;

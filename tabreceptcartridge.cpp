@@ -117,6 +117,7 @@ void tabReceptCartridge::initWidgets()
     ui->comboBoxVendor->setCurrentIndex(-1);
     ui->comboBoxModel->setModel(m_cartridgesModel);
     m_client = ui->widgetClient->model();
+    ui->checkBoxPrintReceipt->setChecked(comSettings->printCartridgeReceptDoc);
 
 //    connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
     connect(ui->widgetClient, &SClientInputForm::createTabClient, this, &tabReceptCartridge::createTabClient);
@@ -128,6 +129,7 @@ void tabReceptCartridge::initWidgets()
     connect(ui->lineEditSerial, &QLineEdit::textEdited, this, &tabReceptCartridge::serialTextEdited);
     connect(ui->lineEditSerial, &QLineEdit::returnPressed, this, &tabReceptCartridge::findAndAddBySerial);
     connect(ui->comboBoxModel, &SComboBox::buttonClicked, this, &tabReceptCartridge::comboBoxModelButtonClickHandler);
+    connect(m_client, &SClientModel::modelUpdated, [=](){ui->checkBoxPrintReceipt->setChecked(comSettings->printCartridgeReceptDoc && !(m_client->options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular)));});
 }
 
 void tabReceptCartridge::clearWidgets()
@@ -309,27 +311,39 @@ void tabReceptCartridge::updateDevicesModel(const int id)
     ui->comboBoxModel->setCurrentIndex(m_cartridgesModel->rowByDatabaseID(id));
 }
 
-void tabReceptCartridge::print(int repair)
+void tabReceptCartridge::print()
 {
-    QMap<QString, QVariant> report_vars;
-    // печать квитанции
-    if(comSettings->printCartridgeReceptDoc)
+    // печать чека-квитанции
+    if(m_printReport)
     {
-        report_vars.insert("type", Global::Reports::new_cartridge);
-        report_vars.insert("repair_id", repair);
-        emit generatePrintout(report_vars);
-        report_vars.clear();
+        qDebug().nospace() << "[" << this << "] print()";
+        SPrintPOSReport *report = new SPrintPOSReport();
+        report->setClientModel(m_client);
+        report->openPrinter(userLocalData->PosPrinter.value);
+        SCartridgeForm *form;
+        for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+        {
+            if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
+                continue;
+
+            form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+            report->addPrintJob(form->model());
+        }
+
+        report->closePrinter();
+        delete report;
     }
 
     // печать стикеров
-    if(comSettings->printCartridgeStickers)
-    {
-        report_vars.insert("type", Global::Reports::rep_label);
-        report_vars.insert("repair_id", repair);
-        report_vars.insert("copies", ui->spinBoxStickersCount->value());
-        emit generatePrintout(report_vars);
-        report_vars.clear();
-    }
+//    QMap<QString, QVariant> report_vars;
+//    if(comSettings->printCartridgeStickers)
+//    {
+//        report_vars.insert("type", Global::Reports::rep_label);
+//        report_vars.insert("repair_id", repair);
+//        report_vars.insert("copies", ui->spinBoxStickersCount->value());
+//        emit generatePrintout(report_vars);
+//        report_vars.clear();
+//    }
 }
 
 #ifdef QT_DEBUG
@@ -476,6 +490,7 @@ bool tabReceptCartridge::createRepairs()
     SCartridgeForm *form;
 
     setDefaultStyleSheets();
+    m_printReport = ui->checkBoxPrintReceipt->isChecked(); // кэширование состояния
 
     QUERY_LOG_START(metaObject()->className());
 
@@ -528,7 +543,7 @@ bool tabReceptCartridge::createRepairs()
 
     if (nErr)   // если все запросы выполнены без ошибок
     {
-//        print();  // TODO: печать акта приёма картриджей
+        print();
         clearWidgets();
         tabRepairs::refreshIfTabExists();
     }
@@ -538,7 +553,7 @@ bool tabReceptCartridge::createRepairs()
 
 void tabReceptCartridge::createRepairsAndClose()
 {
-    if(!m_closePending)    // TODO: программа падает при двойном клике по кнопке.
+    if(!m_closePending)    // программа падает при двойном клике по кнопке.
     {
         m_closePending = 1;
         if (createRepairs())

@@ -439,6 +439,7 @@ QString SRepairModel::inDate()
 
 void SRepairModel::setInDate(const QDateTime timestamp)
 {
+    i_createdUtc = timestamp.toUTC();
     i_valuesMap.insert("in_date", timestamp);
 }
 

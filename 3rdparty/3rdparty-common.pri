@@ -18,8 +18,6 @@ KIT_NAME = $$lower($$QMAKE_HOST.name)_"Qt_"$$replace(QT_VERSION, "\.", "_")"_"$$
 
 # путь к директории, куда будут копироваться скомпилированные библиотеки сторонних проектов
 EXPORT_LIBS = $${3RDPARTY_ROOT}/../lib/$${KIT_NAME}
-
-# утилита copy в windows не создаёт пути назначения
-!exists($${EXPORT_LIBS}\\include) {
-   $$system("mkdir \"$${EXPORT_LIBS}\\include\"")
+!exists($${EXPORT_LIBS}\\include){
+   QMAKE_POST_LINK += mkdir \"$${EXPORT_LIBS}\\include\" $$escape_expand(\\n\\t)
 }

@@ -3,6 +3,7 @@
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
 #include "com_sql_queries.h"
+#include "reports/sprintposreport.h"
 //#include "mainwindow.h"
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
@@ -14,6 +15,8 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     userActivityLog->appendRecord(tr("Navigation Ремонты"));
 
     ui->setupUi(this);
+    initTableRepairsMenu();
+    initTableCartridgesMenu();
 
     filterSettings = new QMap<QString, int>;
     repairTableFilterMenu *widgetAction = new repairTableFilterMenu(this);
@@ -28,6 +31,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
         cartridges_table = new STableRepairsModel();
 
     ui->tableView->setModel(repairs_table);
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     if(!permissions->receptDevices || type == 1)
         ui->pushButtonReceipt->hide();
@@ -53,6 +57,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionMoved, this, &tabRepairs::tableLayoutChanged);
     connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this, &tabRepairs::tableLayoutChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &tabRepairs::tableSelectionChanged);
+    connect(ui->tableView, &QTableView::customContextMenuRequested, this, &tabRepairs::menuRequest);
     connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
@@ -113,6 +118,25 @@ void tabRepairs::refreshIfTabExists()
     {
         repairsTab->refreshTable();
     }
+}
+
+void tabRepairs::initTableRepairsMenu()
+{
+
+}
+
+void tabRepairs::initTableCartridgesMenu()
+{
+    tableCartridgesMenu = new QMenu(this);
+    QAction * printReceipt = new QAction(tr("Печать квитанции"), tableCartridgesMenu);
+    printReceipt->setProperty("type", MenuCartridgesActions::PrintReceipt);
+    connect(printReceipt, &QAction::triggered, this, &tabRepairs::printCartridgeReceiptReport);
+    tableCartridgesMenu->addAction(printReceipt);
+
+    QAction * printIssue = new QAction(tr("Печать акта"), tableCartridgesMenu);
+    printIssue->setProperty("type", MenuCartridgesActions::PrintIssue);
+    connect(printIssue, &QAction::triggered, this, &tabRepairs::printCartridgeWorksReport);
+    tableCartridgesMenu->addAction(printIssue);
 }
 
 /* Обновление модели данных для таблицы ремонтов с учетом фильтров.
@@ -301,5 +325,60 @@ void tabRepairs::closeDialogIssue()
 {
     m_dialogIssue->deleteRepairModels();
     refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionReset);
+}
+
+void tabRepairs::menuRequest(QPoint pos)
+{
+
+    if(ui->tableView->mode() == STableViewRepairs::ModeCartridges)
+    {
+        int receiptPrintable = 1;
+        int issuePrintable = 0;
+        int state = repairs_table->unformattedData(ui->tableView->selectionModel()->currentIndex().siblingAtColumn(STableViewRepairs::Column::State)).toInt();
+
+        // печать квитанции в любом статусе, кроме выданных; печать акта только для выданных
+        switch (state)
+        {
+            case Global::RepStateIds::Returned:
+            case Global::RepStateIds::ReturnedInCredit: receiptPrintable = 0; issuePrintable = 1; break;
+            case Global::RepStateIds::ReturnedNoRepair: receiptPrintable = 0; break;    // TODO: для выданных без ремонта акт нужен?
+        }
+
+        const QList<QAction*> actions = tableCartridgesMenu->actions();
+        for(QAction *action : actions)
+        {
+            switch (action->property("type").toInt())
+            {
+            case MenuCartridgesActions::PrintReceipt: action->setVisible(receiptPrintable); break;
+            case MenuCartridgesActions::PrintIssue: action->setVisible(issuePrintable); break;
+            }
+        }
+        tableCartridgesMenu->popup(ui->tableView->viewport()->mapToGlobal(pos));
+    }
+}
+
+void tabRepairs::printCartridgeReceiptReport()
+{
+    SClientModel *client = new SClientModel();
+    SRepairModel *repair = new SRepairModel();
+    SPrintPOSReport *report = new SPrintPOSReport();
+    int repairId = repairs_table->unformattedData(ui->tableView->selectionModel()->currentIndex().siblingAtColumn(STableViewRepairs::Column::ID)).toInt();
+
+    repair->load(repairId);
+    client->load(repair->clientId());
+    report->setClientModel(client);
+
+    report->openPrinter(userLocalData->PosPrinter.value);
+    report->addPrintJob(repair);
+    report->closePrinter();
+
+    delete report;
+    delete repair;
+    delete client;
+}
+
+void tabRepairs::printCartridgeWorksReport()
+{
+    printCartridgeReceiptReport();
 }
 

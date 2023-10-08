@@ -21,9 +21,9 @@ SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
 SCartridgeForm::~SCartridgeForm()
 {
     delete ui;
-    delete m_cartridgeCard; // перед удалением модели m_repairModel
-    if(m_repairModel)
-        delete m_repairModel;
+    delete m_cartridgeCard; // перед удалением модели m_repair
+    if(m_repair)
+        delete m_repair;
     if(worksAndPartsModel)
         delete worksAndPartsModel;
     if(statusesProxyModel)
@@ -35,9 +35,9 @@ void SCartridgeForm::initModels()
     m_cartridgeCard = new SCartridgeCardModel(this);
     if(m_repairId)
     {
-        m_repairModel = new SRepairModel();
-        connect(m_repairModel, &SRepairModel::modelUpdated, this, &SCartridgeForm::updateWidgets);
-        m_cartridgeCard->setParent(m_repairModel);
+        m_repair = new SRepairModel();
+        connect(m_repair, &SRepairModel::modelUpdated, this, &SCartridgeForm::updateWidgets);
+        m_cartridgeCard->setParent(m_repair);
 
         statusesProxyModel = new SSortFilterProxyModel;
         statusesProxyModel->setSourceModel(statusesModel);
@@ -52,7 +52,7 @@ void SCartridgeForm::initModels()
         connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);
         worksAndPartsModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
         worksAndPartsModel->setRepairType(SSaleTableModel::CartridgeRepair);
-        m_repairModel->setWorksAndPartsModel(worksAndPartsModel);
+        m_repair->setWorksAndPartsModel(worksAndPartsModel);
     }
 
     updateModels();
@@ -62,11 +62,11 @@ void SCartridgeForm::updateModels()
 {
     if(m_repairId)
     {
-        m_repairModel->load(m_repairId);
-        m_cardId = m_repairModel->cartridge()->cardId();
-        m_clientId = m_repairModel->clientId();
-        worksAndPartsModel->repair_loadTable(m_repairModel->id());
-        updateStatesModel(m_repairModel->state());
+        m_repair->load(m_repairId);
+        m_cardId = m_repair->cartridge()->cardId();
+        m_clientId = m_repair->clientId();
+        worksAndPartsModel->repair_loadTable(m_repair->id());
+        updateStatesModel(m_repair->state());
     }
 
     m_cartridgeCard->load(m_cardId);
@@ -140,9 +140,9 @@ void SCartridgeForm::initWidgets()
 
 void SCartridgeForm::updateHeader()
 {
-    ui->labelTitle->setText(QString("%1 [%2]").arg(m_repairModel->id()).arg(m_repairModel->title()));
+    ui->labelTitle->setText(QString("%1 [%2]").arg(m_repair->id()).arg(m_repair->title()));
 
-    SClientModel *client = new SClientModel(m_repairModel->clientId());
+    SClientModel *client = new SClientModel(m_repair->clientId());
     ui->pushButtonClientCard->setText(client->fullLongName());
     delete client;  // TODO: модель нужна только для получения ФИО; подумать над более оптимальным способом.
 }
@@ -151,36 +151,36 @@ void SCartridgeForm::updateWidgets()
 {
 //    ui->splitterComment->hide();    // TODO: придумать где расположить поле с примечанием; поле должно быть редактируемым.
     ui->splitterWasEarly->hide();   // TODO: ссылка на предыдущий ремонт (открытие классической карты ремонта)
-    ui->lineEditSerial->setText(m_repairModel->serialNumber());
+    ui->lineEditSerial->setText(m_repair->serialNumber());
     ui->lineEditSerial->setReadOnly(true);
-    ui->checkBoxPreagreedRefill->setChecked(m_repairModel->cartridge()->refill());
-    ui->checkBoxPreagreedChipReplace->setChecked(m_repairModel->cartridge()->chip());
-    ui->checkBoxPreagreedDrumReplace->setChecked(m_repairModel->cartridge()->drum());
-    ui->checkBoxPreagreedBladeReplace->setChecked(m_repairModel->cartridge()->Blade());
+    ui->checkBoxPreagreedRefill->setChecked(m_repair->cartridge()->refill());
+    ui->checkBoxPreagreedChipReplace->setChecked(m_repair->cartridge()->chip());
+    ui->checkBoxPreagreedDrumReplace->setChecked(m_repair->cartridge()->drum());
+    ui->checkBoxPreagreedBladeReplace->setChecked(m_repair->cartridge()->Blade());
     ui->spinBoxRefillWeight->setValue(m_cartridgeCard->tonerWeight());
-    ui->doubleSpinBoxPreagreedAmount->setValue(m_repairModel->preAgreedAmount());
-    ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isRepeat()?1:-1);
-    ui->comboBoxWasEarly->setCurrentIndex(m_repairModel->isWarranty()?0:-1);
+    ui->doubleSpinBoxPreagreedAmount->setValue(m_repair->preAgreedAmount());
+    ui->comboBoxWasEarly->setCurrentIndex(m_repair->isRepeat()?1:-1);
+    ui->comboBoxWasEarly->setCurrentIndex(m_repair->isWarranty()?0:-1);
     ui->comboBoxWasEarly->setEnabled(false);
 
-    setWidgetsParams(m_repairModel->state());
+    setWidgetsParams(m_repair->state());
 
     ui->checkBoxRefill->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Toner));
     ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Chip));
     ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Drum));
     ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Blade));
     ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
-    updateComboBoxEngineer(m_repairModel->engineer());
-    ui->doubleSpinBoxTotalAmount->setValue(m_repairModel->realRepairCost());
-    ui->comboBoxPlace->setCurrentIndex(m_repairModel->boxIndex());
+    updateComboBoxEngineer(m_repair->engineer());
+    ui->doubleSpinBoxTotalAmount->setValue(m_repair->realRepairCost());
+    ui->comboBoxPlace->setCurrentIndex(m_repair->boxIndex());
     ui->comboBoxPlace->setEnabled(placeComboBoxEn);
-    ui->lineEditComment->setText(m_repairModel->extNotes());
+    ui->lineEditComment->setText(m_repair->extNotes());
 }
 
 bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
 {
 //    if(event->type() != QEvent::Paint)
-//        qDebug().nospace() << "[" << this << "] eventFilter() | watched: " << m_repairModel->objectName() << "; event->type(): " << event->type();
+//        qDebug().nospace() << "[" << this << "] eventFilter() | watched: " << m_repair->objectName() << "; event->type(): " << event->type();
 
     // TODO: выделение виджета (фокус):
     // QEvent::MouseButtonPress
@@ -222,75 +222,75 @@ bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
 
 SRepairModel *SCartridgeForm::model()
 {
-    return m_repairModel;
+    return m_repair;
 }
 
 bool SCartridgeForm::createRepair()
 {
     bool nErr = 1;
-    SRepairModel *repair = new SRepairModel(this);
-    repair->initCartridgeRepairModel(m_cardId);
+    m_repair = new SRepairModel(this);
+
+    m_repair->initCartridgeRepairModel(m_cardId);
 
     QStringList faultList;
     if(ui->checkBoxPreagreedRefill->isChecked())
     {
         faultList.append(tr("Заправка"));
-        repair->cartridge()->setRefill(1);
+        m_repair->cartridge()->setRefill(1);
     }
     if(ui->checkBoxPreagreedChipReplace->isChecked())
     {
         faultList.append(tr("Чип"));
-        repair->cartridge()->setChip(1);
+        m_repair->cartridge()->setChip(1);
     }
     if(ui->checkBoxPreagreedDrumReplace->isChecked())
     {
         faultList.append(tr("Фотовал"));
-        repair->cartridge()->setDrum(1);
+        m_repair->cartridge()->setDrum(1);
     }
     if(ui->checkBoxPreagreedBladeReplace->isChecked())
     {
         faultList.append(tr("Ракель"));
-        repair->cartridge()->setBlade(1);
+        m_repair->cartridge()->setBlade(1);
     }
-    repair->setTitle(m_title);
-    repair->setClassId(m_deviceClassId);
-    repair->setVendorId(m_deviceVendorId);
-    repair->setClientId(m_clientId);
-    repair->setFault(faultList.join(", "));
-    repair->setSerialNumber(ui->lineEditSerial->text());
-    repair->setExtNotes(ui->lineEditComment->text());
+    m_repair->setTitle(m_title);
+    m_repair->setClassId(m_deviceClassId);
+    m_repair->setVendorId(m_deviceVendorId);
+    m_repair->setClientId(m_clientId);
+    m_repair->setFault(faultList.join(", "));
+    m_repair->setSerialNumber(ui->lineEditSerial->text());
+    m_repair->setExtNotes(ui->lineEditComment->text());
     switch(ui->comboBoxWasEarly->currentIndex())
     {
-        case -1: repair->setIsWarranty(0); repair->setIsRepeat(0); break;
-        case 0: repair->setIsWarranty(1); repair->setIsRepeat(0); break;
-        case 1: repair->setIsRepeat(1); repair->setIsWarranty(0); break;
+        case -1: m_repair->setIsWarranty(0); m_repair->setIsRepeat(0); break;
+        case 0: m_repair->setIsWarranty(1); m_repair->setIsRepeat(0); break;
+        case 1: m_repair->setIsRepeat(1); m_repair->setIsWarranty(0); break;
     }
-    repair->setPreAgreedAmount(ui->doubleSpinBoxPreagreedAmount->value());
-    repair->setRejectReason("");
-    repair->setCompanyIndex(m_companyIndex);
-    repair->setOfficeIndex(m_officeIndex);
-    repair->setStartOfficeIndex(m_officeIndex);
-    repair->setManager(userDbData->id);
-    repair->setCurrentManager(userDbData->id);
-    repair->setEngineerIndex(m_engineerIndex);
+    m_repair->setPreAgreedAmount(ui->doubleSpinBoxPreagreedAmount->value());
+    m_repair->setRejectReason("");
+    m_repair->setCompanyIndex(m_companyIndex);
+    m_repair->setOfficeIndex(m_officeIndex);
+    m_repair->setStartOfficeIndex(m_officeIndex);
+    m_repair->setManager(userDbData->id);
+    m_repair->setCurrentManager(userDbData->id);
+    m_repair->setEngineerIndex(m_engineerIndex);
     if(m_isHighPriority)
-        repair->setExpressRepair(1);
+        m_repair->setExpressRepair(1);
     if( m_paymentSystemIndex >= 0)
     {
-        repair->setPaymentSystemIndex(m_paymentSystemIndex);
+        m_repair->setPaymentSystemIndex(m_paymentSystemIndex);
         if(paymentSystemsModel->databaseIDByRow(m_paymentSystemIndex, "system_id") == -1)
-            repair->setIsCardPayment(1);
+            m_repair->setIsCardPayment(1);
     }
 
-    nErr = repair->commit();
+    nErr = m_repair->commit();
 
     if(ui->comboBoxPlace->currentIndex() >= 0)
     {
-        repair->setBoxIndex(ui->comboBoxPlace->currentIndex());
-        nErr = repair->commit();
+        m_repair->setBoxIndex(ui->comboBoxPlace->currentIndex());
+        nErr = m_repair->commit();
     }
 
-    delete repair;
     return nErr;
 }
 
@@ -534,15 +534,15 @@ bool SCartridgeForm::checkStateAcl(const int stateId)
 void SCartridgeForm::setPricesToZero()
 {
 //    tableWorksParts->setPricesToZero();
-    m_repairModel->setRepairCost(0);
+    m_repair->setRepairCost(0);
 }
 
 void SCartridgeForm::setInformedStatus(int status)
 {
-    if(m_repairModel->informedStatusIndex())
+    if(m_repair->informedStatusIndex())
         return;
 
-    m_repairModel->setInformedStatusIndex(status);
+    m_repair->setInformedStatusIndex(status);
 
     if(m_groupUpdate)
         return;
@@ -552,10 +552,10 @@ void SCartridgeForm::setInformedStatus(int status)
 
 void SCartridgeForm::initEngineer()
 {
-    if(m_repairModel->engineer())
+    if(m_repair->engineer())
         return;
 
-    m_repairModel->setEngineer(userDbData->id);
+    m_repair->setEngineer(userDbData->id);
 }
 
 void SCartridgeForm::updateComboBoxEngineer(const int id)
@@ -617,8 +617,8 @@ bool SCartridgeForm::commit(const QString &notificationCaption, const QString &n
     try
     {
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-        m_repairModel->updateLastSave();
-        nErr = m_repairModel->commit();
+        m_repair->updateLastSave();
+        nErr = m_repair->commit();
         shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
 
 #ifdef QT_DEBUG
@@ -724,7 +724,7 @@ bool SCartridgeForm::removeWorkAndPart(const int workType)
 bool SCartridgeForm::workAndPartHandler(const int workType, const int checkboxState)
 {
     int ret;
-    if(comSettings->useSimplifiedCartridgeRepair && m_repairModel->state() == Global::RepStateIds::GetIn)
+    if(comSettings->useSimplifiedCartridgeRepair && m_repair->state() == Global::RepStateIds::GetIn)
         saveState(Global::RepStateIds::InWork);
 
     if(checkboxState)
@@ -785,7 +785,7 @@ int SCartridgeForm::checkInput()
 
 int SCartridgeForm::isReady()
 {
-    switch(m_repairModel->state())
+    switch(m_repair->state())
     {
         case Global::RepStateIds::InWork: return (comSettings->useSimplifiedCartridgeRepair && worksAndPartsModel->rowCount());
         case Global::RepStateIds::Ready:
@@ -830,9 +830,9 @@ void SCartridgeForm::updateTotalSumms(const double, const double, const double)
 
 void SCartridgeForm::saveTotalSumms()
 {
-    m_repairModel->setRealRepairCost(worksAndPartsModel->amountTotal());
-    m_repairModel->setPartsCost(worksAndPartsModel->amountItems());
-    m_repairModel->commit();
+    m_repair->setRealRepairCost(worksAndPartsModel->amountTotal());
+    m_repair->setPartsCost(worksAndPartsModel->amountItems());
+    m_repair->commit();
 }
 
 void SCartridgeForm::setRefill(int state)
@@ -861,12 +861,12 @@ void SCartridgeForm::setBladeReplace(int state)
 
 void SCartridgeForm::savePlace(int index)
 {
-    int currentPlace = m_repairModel->boxIndex();
+    int currentPlace = m_repair->boxIndex();
 
     if(currentPlace == index)
         return;
 
-    m_repairModel->setBoxIndex(index);
+    m_repair->setBoxIndex(index);
     if(!commit())
     {
         ui->comboBoxPlace->blockSignals(true);
@@ -883,7 +883,7 @@ void SCartridgeForm::comboBoxPlaceButtonClickHandler(int id)
 
 void SCartridgeForm::comboBoxEngineerChanged(int index)
 {
-    m_repairModel->setEngineerIndex(index);
+    m_repair->setEngineerIndex(index);
     commit();
 }
 
@@ -911,7 +911,7 @@ void SCartridgeForm::saveState(int stateId)
         }
         checkData(stateId);
         doStateActions(stateId);
-        m_repairModel->setState(stateId);
+        m_repair->setState(stateId);
 
         if(!commit())
             throw Global::ThrowType::QueryError;
@@ -936,12 +936,12 @@ void SCartridgeForm::removeWidget()
 
 void SCartridgeForm::buttonClientCardClicked()
 {
-    emit createTabClient(m_repairModel->clientId());
+    emit createTabClient(m_repair->clientId());
 }
 
 void SCartridgeForm::buttonClassicTabClicked()
 {
-    emit createTabRepair(m_repairModel->id());
+    emit createTabRepair(m_repair->id());
 }
 
 void SCartridgeForm::buttonCartridgeCardClicked()
@@ -951,7 +951,7 @@ void SCartridgeForm::buttonCartridgeCardClicked()
 
 void SCartridgeForm::updateComment()
 {
-    m_repairModel->setExtNotes(ui->lineEditComment->text());
-    if(m_repairModel->commit())
+    m_repair->setExtNotes(ui->lineEditComment->text());
+    if(m_repair->commit())
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Примечание сохранено"), QColor(214,239,220), QColor(229,245,234));
 }

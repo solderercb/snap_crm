@@ -39,6 +39,7 @@ private:
     bool m_closePending = 0;
     SClientModel *m_client = nullptr;
     SCartridgeCard *m_cartridgeCardForm;
+    bool m_printReport = 0;
     void setDefaultStyleSheets();
     void initWidgets();
     void clearWidgets();
@@ -46,7 +47,7 @@ private:
     bool checkInput();
     bool checkInputBeforeAdd();
     void appendToReceptList(SCartridgeForm *form);
-    void print(int);
+    void print();
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif

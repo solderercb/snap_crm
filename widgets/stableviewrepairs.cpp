@@ -72,6 +72,11 @@ bool STableViewRepairs::selectedCanBeIssued()
     return en;
 }
 
+bool STableViewRepairs::mode()
+{
+    return m_mode;
+}
+
 void STableViewRepairs::setMode(const int mode)
 {
     m_mode = mode;

@@ -1,5 +1,6 @@
 #include "sclientmodel.h"
 #include "global.h"
+#include "sstoreitemmodel.h"
 
 SClientModel::SClientModel(int id, QObject *parent) :
     SComRecord(parent)
@@ -112,6 +113,8 @@ void SClientModel::load(int id)
         m_purchases = clientModel->record(0).value("purchases").toInt();
         m_token = clientModel->record(0).value("token").toString();
         i_createdUtc = clientModel->record(0).value("created").toDateTime();
+
+        emit modelUpdated();
     }
 
     delete clientModel;
@@ -172,7 +175,58 @@ void SClientModel::clear()
     i_valuesMap.clear();
     i_valuesMap.insert("creator", userDbData->id);
     i_valuesMap.insert("notes", "");
+
+    m_firstName = "";
+    m_lastName = "";
+    m_patronymicName = "";
+    m_address = "";
+    m_postIndex = "";
+
+
+        m_passportNum = "";
+        m_passportIssuedDate = "";
+        m_passportIssuedBy = "";
+        m_INN = "";
+        m_KPP = "";
+        m_OGRN = "";
+
+
+    m_state = 0;
+    m_type = 0;
+    m_birthday = "";
+    m_memorial = "";
+    m_notes = "";
+    m_options = 0;
+    m_photoId = 0;
+    m_visitSource = -1;
+    m_webPassword = "";
+    m_urName = "";
+    m_email = "";
+    m_icq = "";
+    m_skype = "";
+    m_viber = "";
+    m_telegram = "";
+    m_site = "";
+    m_whatsapp = "";
+    m_agentName = "";
+    m_agentSurname = "";
+    m_agentPatronymic = "";
+    m_agentPhone = "";
+    m_agentPhoneClean = "";
+    m_agent2Name = "";
+    m_agent2Surname = "";
+    m_agent2Patronymic = "";
+    m_agent2Phone = "";
+    m_agent2PhoneClean = "";
+    m_priceColumn = SStoreItemModel::PriceOptionRetail;
+    m_repairs = 0;
+    m_purchases = 0;
+    m_token = "";
+    i_createdUtc = QDateTime();
+
     m_phones->reset();
+
+    emit modelUpdated();
 }
 
 void SClientModel::setEditStrategy(EditStrategy strategy)

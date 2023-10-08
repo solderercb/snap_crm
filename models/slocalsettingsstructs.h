@@ -127,6 +127,7 @@ class t_userSettings : public QSerializer
     QS_OBJECT(t_bool, ClShowArchive)
     QS_OBJECT(t_string, DocsPrinter)
     QS_OBJECT(t_string, StickersPrinter)
+    QS_OBJECT(t_string, PosPrinter)
     QS_OBJECT(t_bool, TasksVisible)
     QS_OBJECT(t_bool, StockTakingPhotoVis)
     QS_OBJECT(t_bool, NewRepLeftPanel)

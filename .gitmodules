@@ -14,3 +14,7 @@
 	path = 3rdparty/QtAutoUpdater
 	url = git@github.com:solderercb/QtAutoUpdater.git
 	branch = mod
+[submodule "3rdparty/escpos-qt"]
+	path = 3rdparty/escpos-qt
+	url = git@github.com:solderercb/escpos-qt.git
+	branch = mod

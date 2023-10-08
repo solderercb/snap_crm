@@ -77,6 +77,8 @@ class SClientModel : public SComRecord
     Q_PROPERTY(int repairs READ repairs)
     Q_PROPERTY(int purchases READ purchases)
 
+signals:
+    void modelUpdated();
 public:
     enum BinaryOption{Company = 1, Regular = 2, Broker = 4, IgnoreCalls = 8, PreferCashless = 16, TakeLong = 32, Supplier = 64, SaleOrReturn = 128, BalanceEnabled = 256, Bad = 512, Archived = 1024};
     enum EditStrategy { OnFieldChange, OnManualSubmit };

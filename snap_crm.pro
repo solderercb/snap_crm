@@ -115,6 +115,7 @@ SOURCES += \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
+    reports/sprintposreport.cpp \
     tabreceptcartridge.cpp \
     tabrepaircartridges.cpp \
     tabsalary.cpp \
@@ -279,6 +280,7 @@ HEADERS  += \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
     models/sphonesmodel.h \
+    reports/sprintposreport.h \
     tabreceptcartridge.h \
     tabrepaircartridges.h \
     tabsalary.h \
@@ -452,6 +454,7 @@ CONFIG(release, debug|release) {
     LIBS += -L$$EXPORT_LIBS -llimereportd
 }
 LIBS += -lQt5AutoUpdaterCore -lQt5AutoUpdaterWidgets
+LIBS += -lEscPosQt
 
 
 win32:BIN_DIR ~= s,/,\\,g

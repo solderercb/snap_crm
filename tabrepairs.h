@@ -42,6 +42,8 @@ public:
     static void refreshIfTabExists();
 private:
     enum WorkshopFilter{NoFilter = 0, CartridgesOnly = 1, RepairsOnly = 2};
+//    enum MenuRepairsActions{};
+    enum MenuCartridgesActions{PrintReceipt = 0, PrintIssue};
     Ui::tabRepairs *ui;
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
@@ -52,6 +54,10 @@ private:
     QStringList query_group;
     QTimer *tableUpdateDelay;
     SDialogIssueRepair *m_dialogIssue;
+    QMenu *tableRepairsMenu = nullptr;
+    QMenu *tableCartridgesMenu = nullptr;
+    void initTableRepairsMenu();
+    void initTableCartridgesMenu();
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
@@ -72,6 +78,9 @@ private slots:
     void tableSelectionChanged(const QItemSelection &, const QItemSelection &);
     void createDialogIssue();
     void closeDialogIssue();
+    void menuRequest(QPoint pos);
+    void printCartridgeReceiptReport();
+    void printCartridgeWorksReport();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

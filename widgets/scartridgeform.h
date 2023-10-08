@@ -65,7 +65,7 @@ public:
 private:
     Ui::SCartridgeForm *ui;
     SQueryLog *i_queryLog;
-    SRepairModel *m_repairModel = nullptr;
+    SRepairModel *m_repair = nullptr;
     SCartridgeCardModel *m_cartridgeCard = nullptr;
     SSaleTableModel *worksAndPartsModel = nullptr;
     SSortFilterProxyModel *statusesProxyModel = nullptr;

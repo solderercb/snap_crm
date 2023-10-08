@@ -12,6 +12,7 @@
 #include "models/ssortfilterproxymodel.h"
 #include "models/sworkshopissuedmodel.h"
 #include "models/srepairstatuslog.h"
+#include "reports/sprintposreport.h"
 
 namespace Ui {
 class SDialogIssueRepair;
@@ -45,6 +46,7 @@ private:
     double m_totalAgreedAmount = 0;
     double m_totalAmount = 0;
     double m_totalAmountToPay = 0;
+    bool m_isCartridgeIssue = 0;
     void setDefaultStyleSheets();
     void initPaymentSystems();
     bool checkInput();
@@ -52,6 +54,7 @@ private:
     void collectRepairsData();
     void setRepairReady(SRepairModel *model);
     void issueRepairs();
+    void printCartridgeWorksReport();
 private slots:
     void buttonIssueClicked();
     void buttonCancelClicked();

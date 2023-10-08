@@ -13,10 +13,21 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
     ui->doubleSpinBoxTotalAmount->setMinimum(-9999999.990000);
     setDefaultStyleSheets();
     m_repairsModels = repairs;
+    if(m_repairsModels.first()->cartridge())    // если картридж, то
+    {
+        m_isCartridgeIssue = 1;
+        ui->checkBoxWorksDocPrint->setText(tr("Печать чек-акта(ов)", "", m_repairsModels.size()));
+        ui->checkBoxWorksDocPrint->setEnabled(true);    // TODO: убрать когда будет реализована печать акта выполненных работа с пом. LimeReport
+    }
+    else
+    {
+        ui->checkBoxWorksDocPrint->setText(tr("Печать акта(ов) выполненных работ", "", m_repairsModels.size()));
+    }
     m_clientModel = new SClientModel();
     m_clientModel->load(repairs.at(0)->clientId());
     initPaymentSystems();
 
+    ui->checkBoxWorksDocPrint->setChecked(comSettings->printWorksList && !(m_clientModel->options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular)));
     ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxRejectReason->setModel(rejectReasonModel);
     ui->comboBoxRejectReason->setCurrentIndex(-1);
@@ -358,6 +369,27 @@ void SDialogIssueRepair::issueRepairs()
         if(!nErr)
             throw Global::ThrowType::QueryError;
     }
+
+    if(ui->checkBoxWorksDocPrint->isChecked())
+    {
+        if(m_isCartridgeIssue)
+            printCartridgeWorksReport();
+    }
+}
+
+void SDialogIssueRepair::printCartridgeWorksReport()
+{
+    SPrintPOSReport *posReport = new SPrintPOSReport();
+    posReport->setClientModel(m_clientModel);
+
+    posReport->openPrinter(userLocalData->PosPrinter.value);
+    QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
+    while(i != m_repairsModels.constEnd())
+    {
+        posReport->addPrintJob(*i);
+        i++;
+    }
+    posReport->closePrinter();
 }
 
 /*  Удаление моделей данных ремонтов
