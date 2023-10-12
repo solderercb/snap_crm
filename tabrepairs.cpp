@@ -4,6 +4,7 @@
 #include "ui_tabrepairs.h"
 #include "com_sql_queries.h"
 #include "reports/sprintposreport.h"
+#include "tabPrintDialog.h"
 //#include "mainwindow.h"
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
@@ -53,6 +54,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     connect(ui->pushButtonRefill, &QPushButton::clicked, this, &tabRepairs::buttonRefillClicked);
     connect(ui->pushButtonIssue, &QPushButton::clicked, this, &tabRepairs::buttonIssueClicked);
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabRepairs::buttonRefreshClicked);
+    connect(ui->pushButtonPrint, &QPushButton::clicked, this, &tabRepairs::buttonPrintClicked);
 
     connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionMoved, this, &tabRepairs::tableLayoutChanged);
     connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this, &tabRepairs::tableLayoutChanged);
@@ -292,6 +294,13 @@ void tabRepairs::buttonRefreshClicked()
 {
     refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
     updateWidgets();
+}
+
+void tabRepairs::buttonPrintClicked()
+{
+    tabPrintDialog *tab = tabPrintDialog::create(ui->tableView->mode()?(Global::Reports::cartridges):(Global::Reports::repairs));
+    tab->addDataModel(repairs_table);
+    tab->startRender();
 }
 
 void tabRepairs::tableSelectionChanged(const QItemSelection&, const QItemSelection&)

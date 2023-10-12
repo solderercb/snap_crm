@@ -75,6 +75,7 @@ private slots:
     void buttonRefillClicked();
     void buttonIssueClicked();
     void buttonRefreshClicked();
+    void buttonPrintClicked();
     void tableSelectionChanged(const QItemSelection &, const QItemSelection &);
     void createDialogIssue();
     void closeDialogIssue();

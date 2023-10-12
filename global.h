@@ -42,7 +42,9 @@ namespace Global
     enum Reports {new_rep = 1, pko = 2, reject = 3, rko = 4, sticker1 = 5, sticker2 = 6, sticker3 = 7, rep_label = 8,
                   warranty = 9, works = 10, diag = 11, pn = 12, rn = 13, lost = 14, price1 = 15, invoice0 = 16,
                   invoice1 = 17, invoice2 = 18, invoice3 = 19, vatinvoice0 = 20, p_list0 = 21, w_list0 = 22,
-                  new_cartridge = 23, sticker_cartridge = 24, issue_cartridge = 25, slip = 27, move = 28, buyout = 29};
+                  new_cartridge = 23, sticker_cartridge = 24, issue_cartridge = 25, slip = 27, move = 28, buyout = 29,
+                  repairs = 30, cartridges = 31,
+                  not_impl = 256};
     Q_ENUM_NS(Reports)
     enum ThrowType {Debug = 0, QueryError = 1, IntegrityError = 253, ConditionsError = 254, UserCanceled = 255};
 }

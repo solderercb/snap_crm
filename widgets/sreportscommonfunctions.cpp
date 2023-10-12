@@ -10,11 +10,22 @@ SReportsCommonFunctions::SReportsCommonFunctions()
 
 }
 
+SReportsCommonFunctions::~SReportsCommonFunctions()
+{
+    if(m_repairsDemoModel)
+        delete m_repairsDemoModel;
+}
+
 QString SReportsCommonFunctions::hash(QByteArray *data)
 {
     QCryptographicHash hash(QCryptographicHash::Sha1);
     hash.addData(*data);
     return hash.result().toHex();
+}
+
+void SReportsCommonFunctions::addDataModel(void *p)
+{
+    m_extDataModels.append(p);
 }
 
 void SReportsCommonFunctions::setTemplateName(const QString &reportName)
@@ -185,6 +196,8 @@ void SReportsCommonFunctions::initDataSources()
 //        case Global::Reports::slip: ; break;
 //        case Global::Reports::move: ; break;
 //        case Global::Reports::buyout: ; break;
+        case Global::Reports::repairs:
+        case Global::Reports::cartridges: initRepairsDataSources(); break;
         default: notImplementedReport(); return;
     }
 }
@@ -275,5 +288,28 @@ void SReportsCommonFunctions::initItemStickerDataSources()
 
 void SReportsCommonFunctions::initPKODataSources()
 {
+}
+
+/* Список ремонтов (устройства и картриджи) */
+void SReportsCommonFunctions::initRepairsDataSources()
+{
+    STableRepairsModel *model = nullptr;
+    QList<void*>::const_iterator i = m_extDataModels.constBegin();
+    while(i != m_extDataModels.constEnd())
+    {
+        model = reinterpret_cast<STableRepairsModel*>(*i++);
+        if(model)
+            break;
+    }
+    if(!model)
+    {
+        m_repairsDemoModel = new STableRepairsModel();
+        model = m_repairsDemoModel;
+        model->initDemo();
+    }
+
+    m_reportDatasouces << "repairs";
+    LimeReport::ICallbackDatasource *repairsDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(repairsDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), model, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
 }
 

@@ -197,7 +197,8 @@
                                                 "   `Hidden`,\n"\
                                                 "   `company`,\n"\
                                                 "   `informed_status`,\n"\
-                                                "   `client`\n"\
+                                                "   `client` AS 'client_id',\n"\
+                                                "   `ext_notes`\n"\
                                                 "FROM `workshop` AS t1\n"\
                                                 "LEFT JOIN `devices` AS t2\n"\
                                                 "   ON t1.`type` = t2.`id`\n"\

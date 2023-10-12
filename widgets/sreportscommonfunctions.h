@@ -18,13 +18,15 @@
 #include "models/sphonesmodel.h"
 #include "models/sfieldsmodel.h"
 #include "models/ssaletablemodel.h"
-
+#include "models/stablerepairsmodel.h"
 
 class SReportsCommonFunctions
 {
 public:
     SReportsCommonFunctions();
+    ~SReportsCommonFunctions();
     QString hash(QByteArray *data);
+    void addDataModel(void *p);
 protected:
     int m_reportType;
     QString m_reportName;
@@ -33,6 +35,7 @@ protected:
     QString m_templatesDir;
     QFile CurrentFile;
     QStringList m_reportDatasouces;
+    STableRepairsModel* i_repairsTable = nullptr;
     void setTemplateName(const QString &reportName);
     QByteArray* readFile(QFile &file);
     bool writeFile(QFile &file, QByteArray *data = nullptr);
@@ -44,9 +47,12 @@ protected:
     virtual void initWorksDataSources();
     virtual void initItemStickerDataSources();
     virtual void initPKODataSources();
+    virtual void initRepairsDataSources();
     virtual void notImplementedReport(){};
 private:
-    QStandardItemModel* initDemoModel(const QStringList &demoHeaders, const QList<QVariant> &demoValues);
+    STableRepairsModel *m_repairsDemoModel = nullptr;
+    QList<void*> m_extDataModels;
+    QStandardItemModel *initDemoModel(const QStringList &demoHeaders, const QList<QVariant> &demoValues);
 };
 
 #endif // SREPORTSCOMMONFUNCTIONS_H

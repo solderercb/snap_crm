@@ -3,26 +3,27 @@
 #include "ui_tabprintdialog.h"
 #include "com_sql_queries.h"
 
-tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> report_vars):
+tabPrintDialog::tabPrintDialog(MainWindow *parent, Global::Reports type) :
     tabCommon(parent),
     ui(new Ui::tabPrintDialog)
 {
     ui->setupUi(this);
-    m_reportVars = report_vars;
+
     initProgressWidget();
     logRecord = new SLogRecordModel();
 
-    renderDelayTimer = new QTimer();
-    renderDelayTimer->setSingleShot(true);
-    connect(renderDelayTimer, &QTimer::timeout, this, &tabPrintDialog::initReport);
-    progressUpdateTimer = new QTimer();
-
-        m_printersList = QPrinterInfo::availablePrinterNames();
+    m_reportType = type;
+    m_printersList = QPrinterInfo::availablePrinterNames();
     ui->comboBoxPrinters->addItems(m_printersList);
 
     connect(ui->comboBoxPrinters, &QComboBox::currentTextChanged, this, &tabPrintDialog::setPrinter);   // подключение сигнал-слот именно здесь, чтобы избежать лишних вызовов слота при установке принтеров, сохранённых в настройках
+}
 
-    renderDelayTimer->start(100);
+tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> report_vars):
+    tabPrintDialog(parent, (Global::Reports)report_vars.value("type").toInt())
+{
+    m_reportVars = report_vars;
+    startRender();
 }
 
 tabPrintDialog::~tabPrintDialog()
@@ -47,6 +48,26 @@ tabPrintDialog::~tabPrintDialog()
         previewDelayTimer = 0;
     }
     delete logRecord;
+}
+
+void tabPrintDialog::startRender()
+{
+    renderDelayTimer = new QTimer();
+    renderDelayTimer->setSingleShot(true);
+    connect(renderDelayTimer, &QTimer::timeout, this, &tabPrintDialog::initReport);
+    progressUpdateTimer = new QTimer();
+
+    renderDelayTimer->start(100);
+}
+
+tabPrintDialog *tabPrintDialog::create(Global::Reports type)
+{
+    MainWindow *mw = MainWindow::getInstance();
+    QTabWidget *tw = mw->findChild<QTabWidget*>();
+    tabPrintDialog *subwindow = new tabPrintDialog(mw, type);
+    tw->addTab(subwindow, subwindow->tabTitle());
+    tw->setCurrentWidget(subwindow);
+    return subwindow;
 }
 
 bool tabPrintDialog::tabCloseRequest()
@@ -142,7 +163,6 @@ void tabPrintDialog::initReport()
     m_report = new LimeReport::ReportEngine(this);
     connect(m_report, &LimeReport::ReportEngine::renderStarted, this, &tabPrintDialog::reportRenderStarted);
     connect(m_report, &LimeReport::ReportEngine::renderFinished, this, &tabPrintDialog::reportRenderFinished);
-    m_reportType = m_reportVars.value("type").toInt();
     m_reportName = Global::staticMetaObject.enumerator(Global::staticMetaObject.indexOfEnumerator("Reports")).valueToKey(m_reportType);
 
     setTemplateName(m_reportName);

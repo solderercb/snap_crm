@@ -871,7 +871,7 @@ void tabRepairNew::randomFill()
 
 void tabRepairNew::test_scheduler_handler()  //
 {
-//    randomFill();
+    randomFill();
 }
 
 void tabRepairNew::test_scheduler2_handler()  // обработик таймера закрытия вкладки

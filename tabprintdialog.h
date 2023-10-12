@@ -23,10 +23,13 @@ class tabPrintDialog : public tabCommon, public SReportsCommonFunctions
     Q_OBJECT
 public:
     enum BelongReportsList {NotInList, InList};
+    explicit tabPrintDialog(MainWindow *parent, Global::Reports type = Global::Reports::not_impl);
     explicit tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv = {{"type","dummy"}});
     ~tabPrintDialog();
+    static tabPrintDialog* create(Global::Reports type);
     virtual bool tabCloseRequest() override;
     QString tabTitle() override;
+    void startRender();
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
     QMap<int, int> PageSizeMap = {
