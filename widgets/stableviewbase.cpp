@@ -558,12 +558,8 @@ void STableViewBase::clearFilter()
 
 QString STableViewBase::formatFilterGroup(const FilterList &filter)
 {
-
     QString subCond;
     QStringList cond;
-
-    if(&filter == nullptr)
-        return QString();
 
     if(filter.childs.count())
     {
@@ -888,10 +884,12 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
     QRegularExpression re("( +\n)|((;?) +$)");  // удаление пробелов-заполнителей в конце строк, а также точки с запятой в конце запроса (при наличии ; не будет работать сортировка)
     query.replace(re, "\n");
 
-    QString filter = formatFilterGroup(*m_filter);
-
-    if(!filter.isEmpty())
-        query.append("\nWHERE " + filter);
+    if(m_filter)
+    {
+        QString f = formatFilterGroup(*m_filter);
+        if(!f.isEmpty())
+            query.append("\nWHERE " + f);
+    }
 
     if(m_grouping)
         query.append(m_grouping->count()>0?"\nGROUP BY " + m_grouping->join(", "):"");

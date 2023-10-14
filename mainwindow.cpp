@@ -313,9 +313,6 @@ void MainWindow::createMenu()
     QAction *salary = new QAction(tr("Заработная плата"), this);
     finances_menu->addAction(salary);
     QObject::connect(salary,SIGNAL(triggered()),this,SLOT(createTabSalary()));
-#ifndef QT_DEBUG
-    salary->setEnabled(false);
-#endif
     QToolButton* finances_button = new QToolButton();
     finances_button->setMenu(finances_menu);
     finances_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -327,7 +324,6 @@ void MainWindow::createMenu()
     ui->toolBar->addSeparator();
 
     /* Кнопка Настройки и меню */
-#ifdef QT_DEBUG
     QMenu *settingsMenu = new QMenu();
 
     QAction *checkUpdates = new QAction(tr("Проверить обновления"), this);
@@ -360,7 +356,6 @@ void MainWindow::createMenu()
     ui->toolBar->addWidget(settingsButton);
     QObject::connect(settingsButton, SIGNAL(clicked()), this, SLOT(createTabSettings()));
     ui->toolBar->addSeparator();
-#endif
 }
 
 MainWindow::~MainWindow()

@@ -21,7 +21,7 @@ SSettingsPageUser::~SSettingsPageUser()
 
 void SSettingsPageUser::saveSettings()
 {
-//    userDbData->save();  // отключено, т. к. еще не заданы модели данных виджетов ComboBox
+    userDbData->save();
 }
 
 void SSettingsPageUser::updateWidgets()
@@ -44,7 +44,6 @@ void SSettingsPageUser::updateWidgets()
         layout->setWidget(i, QFormLayout::LabelRole, userDbData->widget(i, SPropertyCollection::Label));
         layout->setWidget(i, QFormLayout::FieldRole, userDbData->widget(i, SPropertyCollection::Editor));
     }
-
 }
 
 //void SSettingsPageUser::updateWidgetsOf...Group()

@@ -474,15 +474,21 @@ void tabPrintDialog::selectPrinter(const BelongReportsList belong, const QList<i
     if(list.contains(m_reportType) == belong)
     {
         QString printerName = belong?userLocalData->StickersPrinter.value:userLocalData->DocsPrinter.value;
-        int rdpKeywordPos = -1;
-        QRegularExpression rdpKeywordRegExp(tr("\\(перенаправлено \\d\\)"));  // Microsoft RDP перенаправленным принтерам добавляет "(перенаправлено N)"; от сессии к сессии номер может меняться и чтобы не приходилось как в АСЦ изменять принтеры по умолчанию в настройках ...
-        rdpKeywordPos = userLocalData->StickersPrinter.value.indexOf(rdpKeywordRegExp);    // вернёт -1 если не найдёт
-        if(rdpKeywordPos >= 0)  // если будет найден паттерн rdpKeywordRegExp, то и поиск индекса принтера будет происходить по рег. выражению
-            ui->comboBoxPrinters->setCurrentIndex( m_printersList.indexOf(QRegularExpression(printerName.left(rdpKeywordPos)+
-                                                                        rdpKeywordRegExp.pattern())) );
-        else                    // иначе по простой строке (чтобы в случае содержащихся в названии принтера спец. символов рег. выражений корректно определялся индекс)
-            ui->comboBoxPrinters->setCurrentIndex( m_printersList.indexOf(printerName));
+        ui->comboBoxPrinters->setCurrentIndex(findPrinterIndex(m_printersList, printerName));
     }
+}
+
+int tabPrintDialog::findPrinterIndex(const QStringList &list, const QString &pName)
+{
+    int rdpKeywordPos = -1;
+    QRegularExpression rdpKeywordRegExp(tr("\\(перенаправлено \\d\\)"));  // Microsoft RDP перенаправленным принтерам добавляет "(перенаправлено N)"; от сессии к сессии номер может меняться и чтобы не приходилось как в АСЦ изменять принтеры по умолчанию в настройках ...
+    rdpKeywordPos = pName.indexOf(rdpKeywordRegExp);    // вернёт -1 если не найдёт
+
+    if(rdpKeywordPos >= 0)  // если будет найден паттерн rdpKeywordRegExp, то и поиск индекса принтера будет происходить по рег. выражению
+        return list.indexOf(QRegularExpression(pName.left(rdpKeywordPos)+
+                                                                    rdpKeywordRegExp.pattern()));
+    else                    // иначе по простой строке (чтобы в случае содержащихся в названии принтера спец. символов рег. выражений корректно определялся индекс)
+        return list.indexOf(pName);
 }
 
 void tabPrintDialog::on_labelPrinterSettings_linkActivated(const QString&)

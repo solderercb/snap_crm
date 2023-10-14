@@ -30,6 +30,7 @@ public:
     virtual bool tabCloseRequest() override;
     QString tabTitle() override;
     void startRender();
+    static int findPrinterIndex(const QStringList &list, const QString &pName);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
     QMap<int, int> PageSizeMap = {

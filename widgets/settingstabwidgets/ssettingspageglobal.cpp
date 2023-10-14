@@ -21,7 +21,7 @@ SSettingsPageGlobal::~SSettingsPageGlobal()
 
 void SSettingsPageGlobal::saveSettings()
 {
-//    comSettings->save();  // отключено, т. к. еще не заданы модели данных виджетов ComboBox
+    comSettings->save();
 }
 
 void SSettingsPageGlobal::updateWidgets()

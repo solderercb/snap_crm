@@ -40,6 +40,7 @@ tabSettings::tabSettings(MainWindow *parent) :
         ui->pages->addButton(tr("Резервное копирование"), QIcon(), Page::Backup);
     }
     ui->pages->redraw();
+    ui->pages->switchPage(Page::User);
     // эмуляция задержки
 #ifdef QT_DEBUG
     test_scheduler->start(500);
@@ -118,7 +119,7 @@ void tabSettings::buttonSaveClicked()
         emit saveSettings();
 
 #ifdef QT_DEBUG
-        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
         QUERY_COMMIT_ROLLBACK(query,nErr);
     }
@@ -171,7 +172,6 @@ void tabSettings::randomFill()
 
 void tabSettings::test_scheduler_handler()
 {
-    ui->pages->switchPage(Page::User);
 //    ui->pages->switchPage(Page::DocTemplates);
 //    test_scheduler2->start(3000);
 

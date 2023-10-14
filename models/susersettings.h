@@ -1,8 +1,10 @@
 #ifndef SUSERSETTINGS_H
 #define SUSERSETTINGS_H
+#include <QPrinterInfo>
 #include "propstruct.h"
 #include "models/sdatabaseauxiliary.h"
 #include "models/susersettingstypes.h"
+#include "ssqlquerymodel.h"
 
 class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
 {
@@ -72,6 +74,7 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_COMBOBOX(int, defaultDocumentPrinter, 12, ignore, 0)
     PROPSTRUCT_COMBOBOX(int, defaultStickerPrinter, 12, ignore, 0)
     PROPSTRUCT_CHECKBOX(bool, previewBeforePrint, 12, preview_before_print)
+    PROPSTRUCT_COMBOBOX(int, defaultPosPrinter, 12, ignore, 0)
 
     PROPSTRUCT_CHECKBOX(bool, displayOut, 13, display_out)
     PROPSTRUCT_CHECKBOX(bool, displayComplete, 13, display_complete)
@@ -97,17 +100,17 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_COMBOBOX(int, xlsC2, 16, xls_c2, 1)
     PROPSTRUCT_COMBOBOX(int, xlsC3, 16, xls_c3, 2)
     PROPSTRUCT_COMBOBOX(int, xlsC4, 16, xls_c4, 3)
-    PROPSTRUCT_COMBOBOX(int, xlsC5, 16, xls_c5, 4)
+    PROPSTRUCT_COMBOBOX(int, xlsC14, 16, xls_c14, 13)
     PROPSTRUCT_COMBOBOX(int, xlsC6, 16, xls_c6, 5)
+    PROPSTRUCT_COMBOBOX(int, xlsC5, 16, xls_c5, 4)
     PROPSTRUCT_COMBOBOX(int, xlsC7, 16, xls_c7, 6)
     PROPSTRUCT_COMBOBOX(int, xlsC8, 16, xls_c8, 7)
     PROPSTRUCT_COMBOBOX(int, xlsC9, 16, xls_c9, 8)
     PROPSTRUCT_COMBOBOX(int, xlsC10, 16, xls_c10, 9)
     PROPSTRUCT_COMBOBOX(int, xlsC11, 16, xls_c11, 10)
     PROPSTRUCT_COMBOBOX(int, xlsC12, 16, xls_c12, 11)
-    PROPSTRUCT_COMBOBOX(int, xlsC13, 16, xls_c13, 12)
-    PROPSTRUCT_COMBOBOX(int, xlsC14, 16, xls_c14, 13)
     PROPSTRUCT_COMBOBOX(int, xlsC15, 16, xls_c15, 14)
+    PROPSTRUCT_COMBOBOX(int, xlsC13, 16, xls_c13, 12)
 
     PROPSTRUCT_RADIOBTN(int, workspaceRepairs, 17, ignore)
     PROPSTRUCT_RADIOBTN(int, workspaceItems, 17, ignore)
@@ -135,13 +138,18 @@ public:
     void initWidgets();
     void load(const QString &username);
     void loadFromUsersParams();
+    void loadPrinterSettings();
     bool commit();
     void save();
     void saveToUsersParams();
+    void savePrinterSettings();
     void updateLoginTimestamp();
     void updateActivityTimestamp(const bool standalone = true);
 private:
     QMap<QString, int> m_params;
+    QStringList m_printersList;
+    void setComboBoxModel(const QString propertyName, SSqlQueryModel* model);
+    void disableWidget(const QString propertyName);
     void prepareUpdateList(Table table);
     void translate();
 };

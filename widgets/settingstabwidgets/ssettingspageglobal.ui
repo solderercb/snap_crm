@@ -364,7 +364,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>Дополнительные настроки</string>
+            <string>Дополнительные настройки</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_16">
             <item row="0" column="0">

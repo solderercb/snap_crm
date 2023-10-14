@@ -11,17 +11,40 @@ void SComSettings::initWidgets()
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
         metaObject()->invokeMethod(this, QByteArray("init__widget").insert(5, metaObject()->property(i).name()));
 
+
     // Модели данных виджетов (ComboBox) должны быть заданы до загрузки данных, иначе будет падать.
     setComboBoxModel("currencyId", currencyListModel);
+    setComboBoxModel("defaultWorksWarranty", warrantyTermsModel);
+    setComboBoxModel("defaultNewItemsWarranty", warrantyTermsModel);
+    setComboBoxModel("defaultUsedItemsWarranty", warrantyTermsModel);
+    setComboBoxModel("defaultRefItemsWarranty", warrantyTermsModel);
+    setComboBoxModel("defaultDisasmItemsWarranty", warrantyTermsModel);
+    setComboBoxModel("defaultOtherItemsWarranty", warrantyTermsModel);
 
     load();
 
-//    QMap<QString, QWidget*>::ConstIterator w = i_editorWidgets.constBegin();
-//    while(w != i_editorWidgets.constEnd())
-//    {
-//        qDebug().nospace() << "[" << this << "] initWidgets() | widget[" << w.key() << "]: " << w.value()->metaObject()->className();
-//        w++;
-//    }
+/**************************************************************************************/
+/******************* Виджеты, работа с которыми еще не реализована ********************/
+/******************** см. метод SComSettings::prepareUpdateList() *********************/
+/**************************************************************************************/
+    disableWidget("repairDispatcherUsers");
+    disableWidget("repairDispatcherDayLimit");
+    disableWidget("repairDispatcherStatuses");
+    disableWidget("ascPhoneMask1");
+    disableWidget("ascPhoneMask2");
+    disableWidget("timeZoneId");
+    disableWidget("voipId");
+    disableWidget("onlineStoreId");
+    disableWidget("notifyNewCommentColor");
+    disableWidget("notifyRepairStatusUpdateColor");
+    disableWidget("notifyIncomingSMSColor");
+    disableWidget("notifyOutOfTermAlarmColor");
+    disableWidget("notifyDeviceMatchColor");
+    disableWidget("notifyCustomTaskColor");
+    disableWidget("notifyItemRequestColor");
+    disableWidget("notifyOrderFromOnlineStoreColor");
+    disableWidget("notifyIncomingCallColor");
+    disableWidget("notifyItemPurchaseRequestColor");
 }
 
 void SComSettings::setComboBoxModel(const QString propertyName, SStandardItemModel *model)
@@ -32,7 +55,11 @@ void SComSettings::setComboBoxModel(const QString propertyName, SStandardItemMod
     Q_ASSERT_X(cb, metaObject()->className(), QString("comboBox %1 wasn't found").arg(propertyName).toLocal8Bit());
 
     cb->setModel(model);
+}
 
+void SComSettings::disableWidget(const QString propertyName)
+{
+    i_editorWidgets.value(propertyName)->setEnabled(false);
 }
 
 void SComSettings::load()
@@ -117,18 +144,26 @@ void SComSettings::prepareUpdateList(Table table)
 {
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
     {
-        QString field = i_fieldNames.value(metaObject()->property(i).name());
+        QString propName = metaObject()->property(i).name();
+        QString field = i_fieldNames.value(propName);
         if(field.startsWith("settings") != table)
             continue;
 
         if(table)   // Table::Settings
             field = field.replace("settings.", "");
 
-        QVariant val = i_fieldModified.value(metaObject()->property(i).name());
+        QVariant val = i_fieldModified.value(propName);
         if(!val.isValid())
-            val = i_jsonFieldModified.value(metaObject()->property(i).name());
+            val = i_jsonFieldModified.value(propName);
         if(!val.isValid())
             continue;
+
+/******* TEMPORARY *******/
+        // Данные отключенных виджетов не записывать в БД
+        QWidget *w = i_editorWidgets.value(propName);
+        if(w && !w->isEnabled())
+            continue;
+/**************/
 
         i_valuesMap.insert(field, val);
     }
@@ -243,5 +278,112 @@ void SComSettings::updateJson()
 
 void SComSettings::translate()
 {
-    tr("editGlobalSettings");
+    tr("currencyId");
+    tr("classicKassa");
+    tr("timeZoneId");
+    tr("ascPhoneMask1");
+    tr("ascPhoneMask2");
+    tr("updateChannel");
+    tr("isPriceColOptVisible");
+    tr("isPriceColOpt2Visible");
+    tr("isPriceColOpt3Visible");
+    tr("isPriceColRoznVisible");
+    tr("isPriceColServiceVisible");
+    tr("voipId");
+    tr("isRealizatorEnable");
+    tr("onlineStoreId");
+    tr("isCartridgeRepairEnabled");
+    tr("isEngineerRequiredOnDeviceRecept");
+    tr("isVisitSourceRequired");
+    tr("isSerialNumberRequired");
+    tr("isCartridgeSerialNumberRequired");
+    tr("isSearchOnlyBySerial");
+    tr("isPhotoOnReceptRequired");
+    tr("isPhotoOnIssueRequired");
+    tr("isDiagRequired");
+    tr("isVendorAddingAllowedOnRecept");
+    tr("isRepairSummSetByManager");
+    tr("isPaySalaryForRepairsIssuedInDebt");
+    tr("isAutoSetCompanyOnRepairRecept");
+    tr("isVendorWarrantyEnabled");
+    tr("useSimplifiedCartridgeRepair");
+    tr("autoCloseRepairTabTimeout");
+    tr("repairImagesLimit");
+    tr("repairDispatcherUsers");
+    tr("repairDispatcherDayLimit");
+    tr("repairDispatcherStatuses");
+    tr("isClientPatronymicRequired");
+    tr("isClientEmailRequired");
+    tr("isClientAddressRequired");
+    tr("isClientPhoneRequired");
+    tr("isAnyClientDealer");
+    tr("timeoutForItemsRequestsHandling");
+    tr("timeoutForDiagnosisConfirmation");
+    tr("defaultItemReserveTime");
+    tr("itemImagesLimit");
+    tr("isReasonForItemIncomeRequired");
+    tr("defaultWorksWarranty");
+    tr("defaultNewItemsWarranty");
+    tr("defaultUsedItemsWarranty");
+    tr("defaultRefItemsWarranty");
+    tr("defaultDisasmItemsWarranty");
+    tr("defaultOtherItemsWarranty");
+    tr("notifyNewComment");
+    tr("notifyRepairStatusUpdateColor");
+    tr("notifyIncomingSMS");
+    tr("notifyOutOfTermAlarmColor");
+    tr("notifyDeviceMatch");
+    tr("notifyCustomTask");
+    tr("notifyItemRequest");
+    tr("notifyOrderFromOnlineStore");
+    tr("notifyIncomingCall");
+    tr("notifyItemPurchaseRequest");
+    tr("printPKO");
+    tr("printOutInvoice");
+    tr("printInInvoice");
+    tr("printRKO");
+    tr("printWarrantyDoc");
+    tr("printWorksList");
+    tr("printDiagResult");
+    tr("printRepairRejectDoc");
+    tr("printRKOOnItemIncome");
+    tr("printCheck");
+    tr("printRepairReceptDoc");
+    tr("printRepairStickers");
+    tr("printCartridgeReceptDoc");
+    tr("printCartridgeStickers");
+    tr("defaultRepairStickersQty");
+    tr("autoSwitchKeyboardLayout");
+    tr("voipAsteriskHost");
+    tr("voipAsteriskPort");
+    tr("voipAsteriskLogin");
+    tr("voipAsteriskPassword");
+    tr("voipAsteriskWebPort");
+    tr("voipPrefix");
+    tr("voipEndpoint");
+    tr("voipKey");
+    tr("voipSecret");
+    tr("onlineStoreUrl");
+    tr("onlineStoreKey");
+    tr("salaryClassic");
+    tr("salaryIncludeNotIssuedByDefault");
+    tr("newClientSmsEnabled");
+    tr("exchangeTypeAuto");
+    tr("exchangeTypeManual");
+    tr("backupEnable");
+    tr("backupImages");
+    tr("backupTime");
+    tr("smsProvider");
+    tr("smsAuthType");
+    tr("smsApiId");
+    tr("smsLogin");
+    tr("smsPassword");
+    tr("smsSender");
+    tr("emailServer");
+    tr("emailPort");
+    tr("emailLogin");
+    tr("emailPassword");
+    tr("emailTimeout");
+    tr("emailEnableSsl");
+    tr("emailEnableImplicitSsl");
 }

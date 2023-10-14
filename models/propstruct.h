@@ -75,7 +75,7 @@ public slots:
 #define PROPSTRUCT_ASSERT(name) Q_ASSERT_X(i_editorWidgets.value(#name, nullptr), metaObject()->className(), "attempt to call READ method before widget initialization");
 
 #define NEW_LABEL(name)                                                                                 \
-    QLabel *l = new QLabel(#name);                                                                      \
+    QLabel *l = new QLabel(tr(#name));                                                                  \
     i_labelWidgets.insert(#name, l);                                                                    \
 
 #define NEW_LINEEDIT                                                                                    \
@@ -223,7 +223,7 @@ public slots:
         if(mdl)                                                                                         \
             widgetValue = mdl->rowColumnToValue<type>(cb->currentIndex(), 1);                           \
         else                                                                                            \
-            widgetValue = cb->currentText();                                                            \
+            widgetValue = cb->currentIndex();                                                           \
                                                                                                         \
         if(!widgetValue.isValid())                                                                      \
             widgetValue = invalidIndexValue;                                                            \

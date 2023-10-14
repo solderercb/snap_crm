@@ -122,7 +122,6 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_LINEEDIT(QString, onlineStoreKey, 13, online_store_key)
 
     // параметры таблицы settings, добавленные в этой программе
-//    PROPSTRUCT_CHECKBOX(int, autosave_part_list, , autosave_part_list) // это должно быть в персональных настройка пользователя
     PROPSTRUCT_CHECKBOX(int, salaryClassic, 14, settings.classic_salary)
     PROPSTRUCT_CHECKBOX(int, salaryIncludeNotIssuedByDefault, 14, settings.salary_include_not_issued_by_default)
     PROPSTRUCT_CHECKBOX(int, newClientSmsEnabled, 14, settings.new_client_sms_enabled)
@@ -178,13 +177,13 @@ public:
     explicit SComSettings();
     void initWidgets();
     void setComboBoxModel(const QString propertyName, SStandardItemModel* model);
+    void disableWidget(const QString propertyName);
     void load();
     void loadFromTableSettings();
     void loadFromJson();
     void save();
     void saveToTableSettings();
     void updateJson();
-    bool isDirty();
 private:
     void prepareUpdateList(Table table);
     void translate();
