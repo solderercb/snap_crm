@@ -120,6 +120,7 @@ void STableSalaryExtraModel::saveTable()
 
 void STableSalaryExtraModel::slotPrimeInsert(int row, QSqlRecord &record)
 {
+    Q_UNUSED(row);
     QSqlRecord *rec = new QSqlRecord();
     QSqlField *field;
 

@@ -41,7 +41,7 @@ public slots:
     void updateModels();
     void updateWidgets();
 private slots:
-    void repairsTableColumnResized(int column, int newWidth);
+    void tableColumnResized(int column, int newWidth);
 };
 
 #endif // SPAGESALARYEXTRA_H

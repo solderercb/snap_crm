@@ -217,7 +217,6 @@ void tabRepairNew::setModelData()
 {
     int preferredPaymentAccIndex;
     int user;
-    double prepaySumm = 0;
 
     user = userDbData->id;
     preferredPaymentAccIndex = ui->comboBoxPresetPaymentAccount->currentIndex();
@@ -401,7 +400,6 @@ void tabRepairNew::lineEditPrevRepairButtonsHandler(int button)
 
 void tabRepairNew::fillDeviceCreds(int id)
 {
-    int i;
     int deviceClass, deviceVendor, device;
 
     m_prevRepair = 0;
@@ -604,7 +602,6 @@ bool tabRepairNew::createRepair()
 
     bool nErr = 1;
     int repair;
-    tabRepairs *repairsTab = nullptr;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     repairModel = new SRepairModel(this);
 
@@ -700,7 +697,7 @@ void tabRepairNew::preferredPaymentSystemChanged(int)
     // при установке модели данных автоматически устанавливается индекс 0 и в модель ремонта устанавливается предпочитаемый тип оплаты, что есть неправильно
 }
 
-void tabRepairNew::relayCreateTabSelectExistingClient(int, QWidget *caller)
+void tabRepairNew::relayCreateTabSelectExistingClient(int, QWidget*)
 {
     emit createTabSelectExistingClient(1, this);
 }

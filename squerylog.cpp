@@ -88,6 +88,7 @@ bool SQueryLog::saveLog()
 
 void SQueryLog::start(const QString &className)
 {
+    Q_UNUSED(className);
 #ifdef QT_DEBUG
     setFile(QApplication::applicationDirPath() + "\\" + className + ".sql");
     if(super_priv)

@@ -14,7 +14,9 @@ CONFIG(debug, debug|release){
     QT      += testlib
 }
 
-greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
+greaterThan(QT_MAJOR_VERSION, 5){
+    QT += core5compat
+}
 
 CONFIG += c++17
 

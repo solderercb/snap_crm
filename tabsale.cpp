@@ -1072,6 +1072,7 @@ void sparePartsTable::setModel(QAbstractItemModel *model)
 
 void sparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event);
     int row = currentIndex().row();
     if(m_model->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool())
     {

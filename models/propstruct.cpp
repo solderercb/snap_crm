@@ -55,6 +55,7 @@ void SPropertyCollection::reportCallbackData(const LimeReport::CallbackInfo &inf
 
 void SPropertyCollection::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
 {
+    Q_UNUSED(type);
     result = 1;
 }
 

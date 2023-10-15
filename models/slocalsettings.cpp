@@ -111,7 +111,7 @@ bool SLocalSettings::genAscSettingsFileFullPath(QFile &file)
             break;
         case StoreItemsGrid:
             // в АСЦ CRM до версии 3.7.37.1184 (включительно) файл имел имя "-<категория>-<имя_пользователя>.xml", например, "-0-admin.xml"
-            file.setFileName(file.fileName().replace(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant), ""));
+            file.setFileName(file.fileName().replace(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant), "")); Q_FALLTHROUGH();
         default:
             QDir::setCurrent(QFileInfo(userLocalData->ASCExecutablePath.value).absolutePath() + QString("/cfg"));
     }

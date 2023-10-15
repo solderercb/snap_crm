@@ -127,7 +127,7 @@ void SPageSettingsDocTempateEditor::reportSaved()
 //    qDebug().nospace() << "[" << this << "] reportSaved()";
 }
 
-void SPageSettingsDocTempateEditor::reportOnSave(bool &saved)
+void SPageSettingsDocTempateEditor::reportOnSave(bool&)
 {   // Этот сигнал посылается при нажатии кнопки "Сохранить", но до того как файл будет перезаписан (контролировал путём сравнения контрольной суммы с оригинальным)
     // оставлю для истории
 //    qDebug().nospace() << "[" << this << "] reportOnSave() | saved = " << saved;

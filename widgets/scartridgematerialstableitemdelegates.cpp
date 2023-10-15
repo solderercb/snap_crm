@@ -6,7 +6,7 @@ SCartridgeMaterialsTableItemDelegates::SCartridgeMaterialsTableItemDelegates(QOb
 
 }
 
-SCartridgeMaterialsTableItemDelegates::SCartridgeMaterialsTableItemDelegates(SCartridgeMaterialsModel *, QObject *parent)
+SCartridgeMaterialsTableItemDelegates::SCartridgeMaterialsTableItemDelegates(SCartridgeMaterialsModel*, QObject*)
 {
 
 }
@@ -175,7 +175,7 @@ void  SCartridgeMaterialsTableItemDelegates::setModelDataFromComboBox(QWidget *e
 }
 
 // Create the spinbox and populate it
-QSpinBox * SCartridgeMaterialsTableItemDelegates::createSpinBox(QWidget *parent, const QModelIndex &index) const
+QSpinBox * SCartridgeMaterialsTableItemDelegates::createSpinBox(QWidget *parent, const QModelIndex&) const
 {
     QSpinBox *sb = new QSpinBox(parent);
     sb->setMinimum(1);
@@ -198,7 +198,7 @@ void  SCartridgeMaterialsTableItemDelegates::setModelDataFromSpinBox(QWidget *ed
 }
 
 // Create the spinbox and populate it
-QDoubleSpinBox * SCartridgeMaterialsTableItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
+QDoubleSpinBox * SCartridgeMaterialsTableItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex&) const
 {
     QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
     if(comSettings->classicKassa)

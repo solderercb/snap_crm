@@ -161,7 +161,7 @@ void tabRepairCartridges::closeCartridgeCardForm()
 {
 }
 
-void tabRepairCartridges::reloadCardModel(int id)
+void tabRepairCartridges::reloadCardModel(int)
 {
     SCartridgeForm *form;
     for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)

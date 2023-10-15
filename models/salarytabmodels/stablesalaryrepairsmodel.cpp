@@ -65,7 +65,7 @@ QVariant STableSalaryRepairsModel::data(const QModelIndex &item, int role) const
             default: ;
         }
     }
-    else if(role == Qt::BackgroundColorRole) // ранее оплаченные сотруднику ремонты выделены зелёным
+    else if(role == Qt::BackgroundRole) // ранее оплаченные сотруднику ремонты выделены зелёным
     {
         if(index(item.row(), 10).data().toInt())
             return QColor(192,192,192);

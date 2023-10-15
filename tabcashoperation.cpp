@@ -692,7 +692,7 @@ void tabCashOperation::setWidgetsParams()
     case SCashRegisterModel::ExpInvoice:   m_linkedObjType = LinkedObjectType::Document; m_clientRO = ClientFieldsAccess::SelNClr; break; /* выбор ПН; поля клиента RO; сумма редактируемая для "оплаты часятями" */
     case SCashRegisterModel::RecptGoods:   m_linkedObjType = LinkedObjectType::Document; m_clientRO = ClientFieldsAccess::Denied; m_amountRO = true; break;  /* выбор РН; поля клиента RO */
     case SCashRegisterModel::ExpZ:         m_showClient = Client::NotVisible; m_skipAutoLogRecord = 1; break;                /* нет полей связанного объекта; нет полей клиента */
-    case SCashRegisterModel::RecptRepair:  m_amountRO = true;                                       /* те же режимы, что и для предоплаты, но сумма не редактируемая */
+    case SCashRegisterModel::RecptRepair:  m_amountRO = true;  Q_FALLTHROUGH();                     /* те же режимы, что и для предоплаты, но сумма не редактируемая */
     case SCashRegisterModel::RecptPrepayRepair: m_linkedObjType = LinkedObjectType::Repair; m_clientRO = ClientFieldsAccess::Denied; m_skipAutoLogRecord = 1; break;    /* выбор ремонта; поля клиента RO */
     case SCashRegisterModel::RecptInvoice: m_linkedObjType = LinkedObjectType::Invoice; m_clientRO = ClientFieldsAccess::Denied; m_amountRO = true; m_skipAutoLogRecord = 1; break;   /* выбор счета; поля клиента RO */
     case SCashRegisterModel::RecptSimple:

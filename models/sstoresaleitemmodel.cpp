@@ -293,6 +293,7 @@ bool SStoreSaleItemModel::isProfitable()
 
 void SStoreSaleItemModel::setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue)
 {
+    Q_UNUSED(oldValue);
     switch(fieldNum)
     {
         case SStoreItemModel::ColDealer: setDealer(value.toInt()); break;

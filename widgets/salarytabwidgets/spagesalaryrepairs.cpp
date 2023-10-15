@@ -10,7 +10,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     ui->checkBoxIncludeNotIssued->setChecked(comSettings->salaryIncludeNotIssuedByDefault);
 
     ui->tableViewRepairsSummary->setGridLayout(ui->tableViewRepairs->gridLayout());
-    connect(ui->tableViewRepairs, &STableViewSalaryRepairs::signalColumnResized, this, &SPageSalaryRepairs::repairsTableColumnResized);
+    connect(ui->tableViewRepairs, &STableViewSalaryRepairs::signalColumnResized, this, &SPageSalaryRepairs::tableColumnResized);
 
     ui->tableViewRepairs->setModel(parentTab->m_repairs);
     ui->tableViewRepairWorks->setModel(parentTab->m_repairWorks);
@@ -101,6 +101,7 @@ void SPageSalaryRepairs::tableRepairsRowActivated(const QModelIndex &index)
 
 void SPageSalaryRepairs::tableRepairsRowSelected(const QModelIndex &current, const QModelIndex &prev)
 {
+    Q_UNUSED(prev);
     tableRepairsRowActivated(current);
 }
 
@@ -114,7 +115,7 @@ void SPageSalaryRepairs::tableRepairPartsRowDoubleClicked(const QModelIndex &ind
     mainWindow->createTabSparePart(parentTab->m_repairs->index(index.row(), 0).data().toInt());
 }
 
-void SPageSalaryRepairs::repairsTableColumnResized(int, int)
+void SPageSalaryRepairs::tableColumnResized(int, int)
 {
     enableVScrollbarPadding(ui->tableViewRepairs->verticalScrollBar()->isVisible());
     ui->tableViewRepairsSummary->applyGridlayout();

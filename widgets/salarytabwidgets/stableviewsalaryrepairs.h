@@ -20,12 +20,4 @@ public slots:
     void refresh(const bool showPayed = false);
 };
 
-class STableViewSalaryRepairsItemDelegates : public STableViewBaseItemDelegates
-{
-    Q_OBJECT
-public:
-    explicit STableViewSalaryRepairsItemDelegates(QWidget *parent = nullptr);
-
-};
-
 #endif // STABLEVIEWSALARYREPAIRS_H

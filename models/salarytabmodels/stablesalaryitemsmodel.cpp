@@ -22,7 +22,7 @@ QVariant STableSalaryItemsModel::data(const QModelIndex &item, int role) const
             default: ;
         }
     }
-    if(role == Qt::BackgroundColorRole)
+    if(role == Qt::BackgroundRole)
     {
         if(STableBaseModel::data(index(item.row(), 6)).toInt() == SRepairSaleItemModel::RepairLinked)
             return QColor(144,238,144);

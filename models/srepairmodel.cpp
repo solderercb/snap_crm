@@ -476,7 +476,7 @@ void SRepairModel::setState(const int id)
     {
         case Global::RepStateIds::GetIn: break;
         case Global::RepStateIds::Returned:
-        case Global::RepStateIds::ReturnedNoRepair: setOutDate(QDateTime::currentDateTime());
+        case Global::RepStateIds::ReturnedNoRepair: setOutDate(QDateTime::currentDateTime()); Q_FALLTHROUGH();
         default: appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
     }
 

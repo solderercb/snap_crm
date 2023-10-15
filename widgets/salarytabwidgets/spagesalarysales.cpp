@@ -53,6 +53,7 @@ void SPageSalarySales::updateWidgets()
 
 void SPageSalarySales::tableSalesRowSelected(const QModelIndex &current, const QModelIndex &prev)
 {
+    Q_UNUSED(prev);
     tableSalesRowActivated(current);
 }
 

@@ -90,6 +90,7 @@ Qt::ItemFlags SSaleTableModel::flags(const QModelIndex &index) const
             case SSaleTableModel::RecordType::Work << 7 | SSaleTableModel::WorkshopSale << 6 | SStoreItemModel::SaleOpColumns::ColPrice:
                 if(!this->index(index.row(), SStoreItemModel::SaleOpColumns::ColUID).data().toString().isEmpty())
                     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+                Q_FALLTHROUGH();
             case SSaleTableModel::RecordType::Item << 7 | SSaleTableModel::StoreSale << 6    | SStoreItemModel::SaleOpColumns::ColCount:
             case SSaleTableModel::RecordType::Item << 7 | SSaleTableModel::StoreSale << 6    | SStoreItemModel::SaleOpColumns::ColPrice:
             case SSaleTableModel::RecordType::Item << 7 | SSaleTableModel::StoreSale << 6    | SStoreItemModel::SaleOpColumns::ColSN:
@@ -105,9 +106,11 @@ Qt::ItemFlags SSaleTableModel::flags(const QModelIndex &index) const
             case SSaleTableModel::RecordType::Item << 7 | SSaleTableModel::WorkshopSale << 6 | SStoreItemModel::SaleOpColumns::ColUser:
                 if(m_modelState == State::WorkshopAdm)
                     return Qt::ItemIsEnabled | Qt::ItemIsEditable;
+                Q_FALLTHROUGH();
             case SSaleTableModel::RecordType::Item << 7 | SSaleTableModel::WorkshopSale << 6 | SStoreItemModel::SaleOpColumns::ColCount:
                 if(m_modelState == State::WorkshopAdm && permissions->addGoodsFromWarehouse)   // Устанавливать детали со склада
                     return Qt::ItemIsEnabled | Qt::ItemIsEditable;
+                Q_FALLTHROUGH();
             default:
                 return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
         }
@@ -120,6 +123,7 @@ Qt::ItemFlags SSaleTableModel::flags(const QModelIndex &index) const
 
 bool SSaleTableModel::insertRecord(int row, const QSqlRecord &record, const int recType)
 {
+    Q_UNUSED(recType);
     // Внимание! При изменении кол-ва полей в запросах нужно изменить enum SaleOpColumns или TODO: придумать более гибкий способ работы с полями
     Q_ASSERT_X(record.count() == columnCount(), "insertRecord()", "different column count");
     bool ret = 1;
@@ -248,6 +252,8 @@ void SSaleTableModel::addCustomWork()
 */
 bool SSaleTableModel::addWorkByUID(const int uid, const SStoreItemModel::PriceOption priceOption)
 {
+    Q_UNUSED(uid);
+    Q_UNUSED(priceOption);
 //    QSqlQueryModel *work;
 //    int row = -1;
     bool ret = 1;
@@ -1295,6 +1301,8 @@ void SSaleTableModel::dataChangedHook(const QModelIndex &topLeft, const QModelIn
 void SSaleTableModel::dataChangedHook(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 #endif
 {
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
     int row = topLeft.row();
     int column = topLeft.column();
     if( (column == SStoreItemModel::SaleOpColumns::ColCount || column == SStoreItemModel::SaleOpColumns::ColPrice) )
@@ -1476,7 +1484,6 @@ void SSaleTableModel::dbgAddRandomItem()
 
 void SSaleTableModel::dbgAddRandomItemBasket()
 {
-    int i;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
 
     for(int j = 0; j < 3; j++)

@@ -403,11 +403,13 @@ void tabReceptCartridge::fillClientCreds(const int id)
 
 void tabReceptCartridge::changeVendor(int index)
 {
+    Q_UNUSED(index);
     updateDevicesModel();
 }
 
 void tabReceptCartridge::serialTextEdited(QString text)
 {
+    Q_UNUSED(text);
     m_findBySerialDelay->stop();
     m_findBySerialDelay->start(1000);
 }
@@ -475,7 +477,7 @@ void tabReceptCartridge::dbgRandomFillClicked()
 }
 #endif
 
-void tabReceptCartridge::relayCreateTabSelectExistingClient(int, QWidget *caller)
+void tabReceptCartridge::relayCreateTabSelectExistingClient(int, QWidget*)
 {
     emit createTabSelectExistingClient(1, this);
 }

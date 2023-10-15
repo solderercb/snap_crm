@@ -25,53 +25,19 @@ STableViewBaseItemDelegates::~STableViewBaseItemDelegates()
 
 QWidget *STableViewBaseItemDelegates::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    switch (index.column())
-    {
-//        case SStoreItemModel::SaleOpColumns::ColCount:
-//            return createSpinBox(parent, index); break;
-//        case SStoreItemModel::SaleOpColumns::ColPrice:
-//            return createDoubleSpinBox(parent, index); break;
-//        case SStoreItemModel::SaleOpColumns::ColWarranty:
-//            return createComboBox(parent, warrantyTermsModel); break;
-//        case SStoreItemModel::SaleOpColumns::ColUser:
-//            return createComboBox(parent, usersModel); break;
-//        default:
-//            return QStyledItemDelegate::createEditor(parent, option, index);
-    }
+    return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
 
 void STableViewBaseItemDelegates::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    switch (index.column())
-    {
-//        case SStoreItemModel::SaleOpColumns::ColCount:
-//            setSpinBoxData(editor, index.data().toInt()); return;
-//        case SStoreItemModel::SaleOpColumns::ColPrice:
-//            setDoubleSpinBoxData(editor, sysLocale.toDouble(index.data().toString())); return;
-//        case SStoreItemModel::SaleOpColumns::ColWarranty:
-//        case SStoreItemModel::SaleOpColumns::ColUser:
-//            setComboBoxData(editor, index.data().toString()); return;
-//        default:
-//            setLineEditData(editor, index.data().toString());
-    }
+    setLineEditData(editor, index.data().toString());
 }
 
 
 void STableViewBaseItemDelegates::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    switch (index.column())
-    {
-//        case SStoreItemModel::SaleOpColumns::ColCount:
-//            setModelDataFromSpinBox(editor, model, index); return;
-//        case SStoreItemModel::SaleOpColumns::ColPrice:
-//            setModelDataFromDoubleSpinBox(editor, model, index); return;
-//        case SStoreItemModel::SaleOpColumns::ColWarranty:
-//        case SStoreItemModel::SaleOpColumns::ColUser:
-//            setModelDataFromComboBox(editor, model, index); return;
-//        default:
-//            QStyledItemDelegate::setModelData(editor, model, index);
-    }
+    QStyledItemDelegate::setModelData(editor, model, index);
 }
 
 void STableViewBaseItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -145,6 +111,7 @@ bool STableViewBaseItemDelegates::eventFilter(QObject *obj, QEvent *event)
 
 QLineEdit *STableViewBaseItemDelegates::createLineEdit(QWidget *parent, QAbstractItemModel *index) const
 {
+    Q_UNUSED(index);
 //    MLineEdit *lineEdit = new MLineEdit(parent);
     QLineEdit *lineEdit = new QLineEdit(parent);
     lineEdit->setFrame(false);
@@ -203,6 +170,7 @@ void STableViewBaseItemDelegates::setModelDataFromComboBox(QWidget *editor, QAbs
 // Create the spinbox and populate it
 QSpinBox *STableViewBaseItemDelegates::createSpinBox(QWidget *parent, const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     QSpinBox *sb = new QSpinBox(parent);
     return sb;
 }
@@ -224,6 +192,7 @@ void STableViewBaseItemDelegates::setModelDataFromSpinBox(QWidget *editor, QAbst
 // Create the spinbox and populate it
 QDoubleSpinBox *STableViewBaseItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
     return sb;
 }
@@ -278,6 +247,7 @@ void STableViewBaseItemDelegates::initProgressBarsStyles()
 
 void STableViewBaseItemDelegates::paintColorizedProgressBar(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget) const
 {
+    Q_UNUSED(widget);
     painter->save();
 //    i_style->drawPrimitive(QStyle::PE_PanelItemViewItem, option, painter, widget);
 

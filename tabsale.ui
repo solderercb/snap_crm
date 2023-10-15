@@ -53,7 +53,7 @@
            <property name="whatsThis">
             <string/>
            </property>
-           <layout class="QGridLayout" name="gridLayout_6">
+           <layout class="QGridLayout" name="gridLayoutClientMatch">
             <property name="leftMargin">
              <number>5</number>
             </property>

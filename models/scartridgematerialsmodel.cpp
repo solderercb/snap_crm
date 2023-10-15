@@ -51,8 +51,12 @@ Qt::ItemFlags SCartridgeMaterialsModel::flags(const QModelIndex &item) const
 
 bool SCartridgeMaterialsModel::appendRow()
 {
-    insertRow(rowCount());
-    findNextMaterial();
+    if (insertRow(rowCount()))
+    {
+        findNextMaterial();
+        return 1;
+    }
+    return 0;
 }
 
 void SCartridgeMaterialsModel::setDefaultTonerWeight(const int weight)
@@ -62,8 +66,12 @@ void SCartridgeMaterialsModel::setDefaultTonerWeight(const int weight)
 
 bool SCartridgeMaterialsModel::removeRow(const int row, const QModelIndex&)
 {
-    removeRows(row, materialsTable::Column::Type); // сначала удаление, потом установка значения -1
-    setData(index(row, materialsTable::Column::Type), -1, Qt::EditRole);
+    if(removeRows(row, materialsTable::Column::Type)) // сначала удаление, потом установка значения -1
+    {
+        setData(index(row, materialsTable::Column::Type), -1, Qt::EditRole);
+        return 1;
+    }
+    return 0;
 }
 
 void SCartridgeMaterialsModel::setCardId(const int id)

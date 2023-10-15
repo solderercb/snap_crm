@@ -76,7 +76,7 @@ void STableViewBase::setItemDelegate(STableViewBaseItemDelegates *delegate)
 
 int STableViewBase::sizeHintForColumn(int column) const
 {
-    return i_defaultColumnsWidths[column, 0];
+    return i_defaultColumnsWidths.value(column, 0);
 }
 
 QVariant STableViewBase::headerData(int section, Qt::Orientation orientation, int role) const
@@ -367,6 +367,7 @@ void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &
 
 void STableViewBase::orderChanged(int logicalIndex, Qt::SortOrder order)
 {
+    Q_UNUSED(order);
     if(!isSortingEnabled())
         return;
 
@@ -648,7 +649,7 @@ QString STableViewBase::formatFilterField(const FilterField &field)
 
     switch(field.operation & ~FilterField::NotMark)
     {
-        case FilterField::Contains: escFilterString.prepend("%");
+        case FilterField::Contains: escFilterString.prepend("%");  Q_FALLTHROUGH();
         case FilterField::StartsWith: escFilterString.append("%"); break;
         case FilterField::EndsWith:  escFilterString.prepend("%"); break;
     }

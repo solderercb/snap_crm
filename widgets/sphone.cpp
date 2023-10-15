@@ -164,7 +164,7 @@ void SPhone::setEditable(const int state)
     switch (state)
     {
         case Mode::EditableRW: setReadOnly(0); break;
-        case Mode::NotEditable: m_notEditable = 1;
+        case Mode::NotEditable: m_notEditable = 1; Q_FALLTHROUGH();
         case Mode::EditableRO: setReadOnly(1); break;
     }
 }

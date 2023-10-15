@@ -8,7 +8,7 @@ SPageSalaryItems::SPageSalaryItems(QWidget *parent) :
     ui->setupUi(this);
 
     ui->tableViewItemsSummary->setGridLayout(ui->tableViewItems->gridLayout());
-    connect(ui->tableViewItems, &STableViewSalaryItems::signalColumnResized, this, &SPageSalaryItems::repairsTableColumnResized);
+    connect(ui->tableViewItems, &STableViewSalaryItems::signalColumnResized, this, &SPageSalaryItems::tableColumnResized);
 
     ui->tableViewItems->setModel(parentTab->m_items);
 
@@ -62,7 +62,7 @@ void SPageSalaryItems::tableItemsRowDoubleClicked(const QModelIndex &index)
     mainWindow->createTabSparePart(parentTab->m_items->index(index.row(), 7).data().toInt());
 }
 
-void SPageSalaryItems::repairsTableColumnResized(int column, int newWidth)
+void SPageSalaryItems::tableColumnResized(int, int)
 {
     enableVScrollbarPadding(ui->tableViewItems->verticalScrollBar()->isVisible());
     ui->tableViewItemsSummary->applyGridlayout();

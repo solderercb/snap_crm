@@ -25,7 +25,6 @@ void SDeviceMatch::findDevice()
 {
     QStringList query_where;    // список условий для запроса к БД
     QString query;  // весь запрос к БД
-    int i;
 
     if(serialNumber.length() >= 3 || fieldClauses.count() )  // если пользователь ввёл более двух символов в одно из полей
     {

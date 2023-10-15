@@ -266,13 +266,15 @@ void materialsTable::setModel(QAbstractItemModel *model)
 
 void materialsTable::mouseClickEvent(QMouseEvent *event)
 {
-    int row = currentIndex().row();
+    Q_UNUSED(event);
+/*    int row = currentIndex().row();
     int column = currentIndex().column();
     switch (column)
     {
         // TODO: implement me!
         default: ;
     }
+*/
 }
 
 void materialsTable::translateNames()

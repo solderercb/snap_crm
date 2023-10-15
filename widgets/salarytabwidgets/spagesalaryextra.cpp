@@ -8,7 +8,7 @@ SPageSalaryExtra::SPageSalaryExtra(QWidget *parent) :
     ui->setupUi(this);
 
     ui->tableViewExtraChargesSummary->setGridLayout(ui->tableViewExtraCharges->gridLayout());
-    connect(ui->tableViewExtraCharges, &STableViewSalaryExtra::signalColumnResized, this, &SPageSalaryExtra::repairsTableColumnResized);
+    connect(ui->tableViewExtraCharges, &STableViewSalaryExtra::signalColumnResized, this, &SPageSalaryExtra::tableColumnResized);
     connect(parentTab->m_extraCharges, &STableSalaryExtraModel::repopulate, this, &SPageSalaryExtra::updateModels);
 
     ui->tableViewExtraCharges->setModel(parentTab->m_extraCharges);
@@ -41,7 +41,7 @@ void SPageSalaryExtra::updateWidgets()
     ui->tableViewExtraChargesSummary->setTotal(2, parentTab->m_extraCharges->total(2));
 }
 
-void SPageSalaryExtra::repairsTableColumnResized(int, int)
+void SPageSalaryExtra::tableColumnResized(int, int)
 {
     enableVScrollbarPadding(ui->tableViewExtraCharges->verticalScrollBar()->isVisible());
     ui->tableViewExtraChargesSummary->applyGridlayout();

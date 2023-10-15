@@ -229,6 +229,7 @@ bool SaleTableItemDelegates::eventFilter(QObject *obj, QEvent *event)
 
 QLineEdit *SaleTableItemDelegates::createLineEdit(QWidget *parent, QAbstractItemModel *index) const
 {
+    Q_UNUSED(index);
 //    MLineEdit *lineEdit = new MLineEdit(parent);
     QLineEdit *lineEdit = new QLineEdit(parent);
     lineEdit->setFrame(false);

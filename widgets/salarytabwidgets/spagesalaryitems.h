@@ -42,7 +42,7 @@ public slots:
     void updateWidgets();
     void tableItemsRowDoubleClicked(const QModelIndex &index);
 private slots:
-    void repairsTableColumnResized(int column, int newWidth);
+    void tableColumnResized(int column, int newWidth);
 };
 
 #endif // SPAGESALARYITEMS_H

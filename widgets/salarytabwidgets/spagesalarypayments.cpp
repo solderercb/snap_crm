@@ -7,7 +7,7 @@ SPageSalaryPayments::SPageSalaryPayments(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tableViewPaymentsSummary->setGridLayout(ui->tableViewPayments->gridLayout());
-    connect(ui->tableViewPayments, &STableViewSalaryPayments::signalColumnResized, this, &SPageSalaryPayments::repairsTableColumnResized);
+    connect(ui->tableViewPayments, &STableViewSalaryPayments::signalColumnResized, this, &SPageSalaryPayments::tableColumnResized);
     ui->tableViewPayments->setModel(parentTab->m_payments);
 }
 
@@ -33,7 +33,7 @@ void SPageSalaryPayments::updateWidgets()
     ui->tableViewPaymentsSummary->setTotal(3, parentTab->m_payments->STableBaseModel::total(3));
 }
 
-void SPageSalaryPayments::repairsTableColumnResized(int, int)
+void SPageSalaryPayments::tableColumnResized(int, int)
 {
     ui->tableViewPaymentsSummary->applyGridlayout();
 }

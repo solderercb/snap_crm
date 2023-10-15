@@ -97,7 +97,7 @@ void SComRecord::reportCallbackData(const LimeReport::CallbackInfo &info, QVaria
 */
 void SComRecord::reportCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
 {
-//    qDebug().nospace() << "[" << this << "] reportCallbackDataChangePos() | type = " << type;
+    Q_UNUSED(type);
     result = 1;
 }
 

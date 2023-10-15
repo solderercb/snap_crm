@@ -27,9 +27,6 @@ void STextEdit::setFixedHeight(int height)
 
 void STextEdit::resizeEvent(QResizeEvent *e)
 {
-//    qDebug().nospace() << "[" << this << "] resizeEvent() | " << \
-//                          "oldSize: " << e->oldSize() << \
-//                          "; newSize: " << e->size();
     SComTextEdit::updateTextBufferWidth(e);
     QTextEdit::resizeEvent(e);
 }

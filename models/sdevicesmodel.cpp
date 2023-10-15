@@ -22,6 +22,7 @@ SDevicesModel::~SDevicesModel()
  */
 void SDevicesModel::load(const int office)
 {
+    Q_UNUSED(office);
     m_sqlModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
 }
 

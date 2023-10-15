@@ -368,18 +368,18 @@ public slots:
     PROPSTRUCT_INIT_WIDGET(name, COMBOBOX, group)                                                       \
     PROPSTRUCT_GET_VALUE_FOR_REPORT(name)
 
-//#define PROPSTRUCT_CHECKABLECOMBOBOX(type, name, group, fieldName)                                      \
-//    PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \
-//    PROPSTRUCT_BIND_CHECKABLECOMBOBOX(type, name, group, fieldName)                                     \
-//    PROPSTRUCT_REGISTER_DB_FIELD(name, fieldName)                                                       \
-//    PROPSTRUCT_INIT_WIDGET(name, CHECKABLECOMBOBOX, group)                                              \
+//#define PROPSTRUCT_CHECKABLECOMBOBOX(type, name, group, fieldName)
+//    PROPSTRUCT_DECLARE_MEMBER(type, name)
+//    PROPSTRUCT_BIND_CHECKABLECOMBOBOX(type, name, group, fieldName)
+//    PROPSTRUCT_REGISTER_DB_FIELD(name, fieldName)
+//    PROPSTRUCT_INIT_WIDGET(name, CHECKABLECOMBOBOX, group)
 //    PROPSTRUCT_GET_VALUE_FOR_REPORT(name)
 
-//#define PROPSTRUCT_COLORPICKER(type, name, group, fieldName)                                            \
-//    PROPSTRUCT_DECLARE_MEMBER(type, name)                                                               \
-//    PROPSTRUCT_BIND_COLORPICKER(type, name, group, fieldName)                                           \
-//    PROPSTRUCT_REGISTER_DB_FIELD(name, fieldName)                                                       \
-//    PROPSTRUCT_INIT_WIDGET(name, COLORPICKER, group)                                                    \
+//#define PROPSTRUCT_COLORPICKER(type, name, group, fieldName)
+//    PROPSTRUCT_DECLARE_MEMBER(type, name)
+//    PROPSTRUCT_BIND_COLORPICKER(type, name, group, fieldName)
+//    PROPSTRUCT_REGISTER_DB_FIELD(name, fieldName)
+//    PROPSTRUCT_INIT_WIDGET(name, COLORPICKER, group)
 //    PROPSTRUCT_GET_VALUE_FOR_REPORT(name)
 
 #define PROPSTRUCT_SPINBOX(type, name, group, fieldName, min, max)                                      \

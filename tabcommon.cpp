@@ -41,7 +41,7 @@ QIcon *tabCommon::tabIcon()
     return i_tabIcon;
 }
 
-bool tabCommon::eventFilter(QObject *watched, QEvent *event)
+bool tabCommon::eventFilter(QObject*, QEvent *event)
 {
 //    if(event->type() != QEvent::Paint)
 //        qDebug().nospace() << "[" << this << "] tabCommon::eventFilter() | event->type(): " << event->type();

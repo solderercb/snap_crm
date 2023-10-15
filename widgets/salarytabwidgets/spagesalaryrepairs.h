@@ -47,7 +47,7 @@ public slots:
     void tableRepairsRowDoubleClicked(const QModelIndex &index);
     void tableRepairPartsRowDoubleClicked(const QModelIndex &index);
 private slots:
-    void repairsTableColumnResized(int column, int newWidth);
+    void tableColumnResized(int column, int newWidth);
 };
 
 #endif // SPAGESALARYREPAIRS_H

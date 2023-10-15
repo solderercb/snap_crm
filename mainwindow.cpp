@@ -541,6 +541,8 @@ void MainWindow::createTabCashMoveExch()
 }
 void MainWindow::createTabDocuments(int type, QWidget *caller)
 {
+    Q_UNUSED(type);
+    Q_UNUSED(caller);
 //    if(!permissions->viewDocuments) // TODO
 //        return;
 
@@ -549,6 +551,8 @@ void MainWindow::createTabDocuments(int type, QWidget *caller)
 
 void MainWindow::createTabInvoices(int type, QWidget *caller)
 {
+    Q_UNUSED(type);
+    Q_UNUSED(caller);
     //    if(!permissions->viewInvoices) // TODO
     //        return;
 
@@ -557,6 +561,8 @@ void MainWindow::createTabInvoices(int type, QWidget *caller)
 
 void MainWindow::createTabWarehouseItems(int type, QWidget *caller)
 {
+    Q_UNUSED(type);
+    Q_UNUSED(caller);
     qDebug().nospace() << "TODO: [MainWindow] createTabWarehouseItems()";
 }
 

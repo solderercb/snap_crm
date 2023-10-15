@@ -3,6 +3,7 @@
 
 STableModelsCommonMethods::STableModelsCommonMethods(QObject *parent)
 {
+    Q_UNUSED(parent);
 }
 
 int STableModelsCommonMethods::field(const QString &field)

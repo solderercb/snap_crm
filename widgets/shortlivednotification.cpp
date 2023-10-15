@@ -17,6 +17,7 @@ int shortlivedNotification::maxDisplayedNotifications = MAX_POPUPS;
 shortlivedNotification::shortlivedNotification(QObject *parent, QString caption, QString message, QColor captionColor_, QColor messageColor_, int millisecondsTimeout):
     QWidget()
 {
+    Q_UNUSED(parent);
     const QString labelCaptionStyle =   "border: 0px;\
                                         border-top: 1px solid gray;\
                                         border-left: 1px solid gray;\
