@@ -704,14 +704,16 @@
                                                 "    t1.`price`,                                                                              \n"\
                                                 "    t1.`count`*t1.`price` AS 'summ',                                                         \n"\
                                                 "    t1.`warranty`,                                                                           \n"\
-                                                "    @percent := IF(t2.quick_repair, t1.`pay_repair_quick`, t1.`pay_repair`) AS 'percent',    \n"\
+                                                "    @percent := IF(t2.`cartridge`, t3.`pay_cartridge_refill`, IF(t2.quick_repair, IFNULL(t1.`pay_repair_quick`, t3.`pay_repair_quick`), IFNULL(t1.`pay_repair`, t3.`pay_repair`))) AS 'percent',    \n"\
                                                 "    t1.`count`*t1.`price`*@percent/100 AS 'salary_part'                                      \n"\
                                                 "FROM works AS t1                                                                             \n"\
                                                 "LEFT JOIN workshop AS t2                                                                     \n"\
                                                 "    ON t1.`repair` = t2.`id`                                                                 \n"\
+                                                "LEFT JOIN users AS t3                                                                        \n"\
+                                                "    ON t1.`user` = t3.`id`                                                                   \n"\
                                                 "WHERE                                                                                        \n"\
                                                 "    t1.`repair` = %1                                                                         \n"\
-                                                "    AND USER = %2                                                                            \n"\
+                                                "    AND t1.`user` = %2                                                                       \n"\
                                                 )\
                                                 .arg(id)\
                                                 .arg(user),\
