@@ -208,6 +208,9 @@ void tabRepair::updateWidgets()
     ui->lineEditDevice->setText(repairModel->title());
     ui->lineEditSN->setText(repairModel->serialNumber());
     ui->lineEditClient->setText(permissions->viewClients?clientModel->fullLongName():tr("no permissions"));
+    ui->labelPrimaryPhone->setVisible(permissions->viewClients);
+    ui->lineEditPrimaryPhone->setVisible(permissions->viewClients);
+    ui->lineEditPrimaryPhone->setText(clientModel->phones()->primaryStr());
     ui->lineEditInDate->setText(repairModel->created());
     setInfoWidgetVisible(ui->lineEditOutDate, m_outDateVisible);
     ui->lineEditOutDate->setText(repairModel->outDateTime());
