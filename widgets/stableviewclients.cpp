@@ -7,6 +7,11 @@ STableViewClients::STableViewClients(QWidget *parent) :
     i_defaultHeaderLabels << tr("ID") << tr("ФИО") << tr("Баланс") << tr("Ремонтов") << tr("Покупок") << tr("Тип") << tr("Телефон") << tr("email");
 
     readLayout();
+    // в файле АСЦ заголовки столбцов на английском, после импорта восстанавливаем значения по умолчанию
+    for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
+    {
+        i_gridLayout->$GridControl.Columns[i].FieldName = i_defaultHeaderLabels.value(i, i_gridLayout->$GridControl.Columns[i].FieldName);
+    }
 //    setItemDelegate(new STableViewClientsItemDelegates());
 }
 
