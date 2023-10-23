@@ -134,6 +134,41 @@ SStandardItemModel *SCartridgeCard::colorsList()
     return list;
 }
 
+bool SCartridgeCard::checkInput()
+{
+    try
+    {
+        for(int i = 0; i < m_materialsModel->rowCount(); i++)
+        {
+            if(!m_materialsModel->index(i, materialsTable::Column::Count).data().isValid()) throw 1;
+            if(!m_materialsModel->index(i, materialsTable::Column::Price).data().isValid()) throw 2;
+            if(!m_materialsModel->index(i, materialsTable::Column::PriceWork).data().isValid()) throw 3;
+            if(m_materialsModel->index(i, materialsTable::Column::Name).data().toString().isEmpty()) throw 4;
+        }
+    }
+    catch (int err)
+    {
+        QString errMsg;
+        const QString notSet = tr("Не указано: ");
+        switch (err)
+        {
+            case 1: errMsg = QString("%1 %2").arg(notSet, materialsTable::tr("Count")); break;
+            case 2: errMsg = QString("%1 %2").arg(notSet, materialsTable::tr("Price")); break;
+            case 3: errMsg = QString("%1 %2").arg(notSet, materialsTable::tr("PriceWork")); break;
+            case 4: errMsg = QString("%1 %2").arg(notSet, materialsTable::tr("Name")); break;
+            default: errMsg = "";
+        }
+        shortlivedNotification *newPopup = new shortlivedNotification(this,
+                                                                      tr("Ошибка"),
+                                                                      errMsg,
+                                                                      QColor(255,164,119),
+                                                                      QColor(255,199,173));
+        return 0;
+    }
+
+    return 1;
+}
+
 void SCartridgeCard::setModelData()
 {
     m_cardModel->setArchive(ui->checkBoxArchive->isChecked());
@@ -172,6 +207,9 @@ void SCartridgeCard::setTonerWeight(const int weight)
 
 bool SCartridgeCard::commit()
 {
+    if(!checkInput())
+        return 0;
+
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
     bool isNew = (m_cardModel->id() == 0);
@@ -286,6 +324,7 @@ void materialsTable::translateNames()
     tr("Summ");
     tr("Name");
     tr("Articul");
+    tr("SalarySumm");
 }
 
 #if QT_VERSION >= 0x060000

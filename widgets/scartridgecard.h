@@ -20,9 +20,9 @@ class materialsTable : public STableViewBase
 signals:
     void tonerWeightChanged(int weight);
 public:
-    enum Column{ID = 0, Type = 1, Count = 2, Price = 3, PriceWork = 4, Summ = 5, Name = 6, Articul = 7};
+    enum Column{ID = 0, Type = 1, Count = 2, Price = 3, PriceWork = 4, Summ = 5, Name = 6, Articul = 7, SalarySumm = 8};
     Q_ENUM(Column)
-    enum ColumnWidth{ID_w = 80, Type_w = 80, Count_w = 80, Price_w = 80, PriceWork_w = 80, Summ_w = 80, Name_w = 160, Articul_w = 80};
+    enum ColumnWidth{ID_w = 80, Type_w = 80, Count_w = 80, Price_w = 80, PriceWork_w = 80, Summ_w = 80, Name_w = 160, Articul_w = 80, SalarySumm_w = 80};
     Q_ENUM(ColumnWidth)
     explicit materialsTable(QWidget *parent = nullptr);
     ~materialsTable();
@@ -56,6 +56,7 @@ public:
     void initWidgets();
     void updateWidgets();
     static SStandardItemModel *colorsList();
+    bool checkInput();
 private:
     Ui::SCartridgeCard *ui;
     int m_id = 0;

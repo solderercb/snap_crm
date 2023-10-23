@@ -20,6 +20,7 @@
 #include "models/sstoresaleitemmodel.h"
 #include "models/srepairsaleitemmodel.h"
 #include "models/sworkmodel.h"
+#include "models/scartridgecardmodel.h"
 
 class SSaleTableModel : public QStandardItemModel
 {
@@ -123,6 +124,7 @@ public:
     QString reportWarranty();
     QString reportPerformer();
     void setRepairType(bool type);
+    void setCartridgeCardModel(SCartridgeCardModel *cartridgeCardModel);
 #ifdef QT_DEBUG
     void dbgAddRandomItem();
     void dbgAddRandomItemBasket();
@@ -154,6 +156,7 @@ private:
     bool m_isWarranty = 0;
     bool m_unsaved = 0;
     qsizetype m_reportRowNum = 0;
+    SCartridgeCardModel *m_cartridgeCardModel = nullptr;
     QList<QStandardItem *> row(int) const;
 
     // названия столбцов по-умолчанию; подробнее см. в комментарии к методу SaleTableModel::setHorizontalHeaderLabels

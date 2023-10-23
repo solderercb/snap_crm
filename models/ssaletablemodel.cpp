@@ -645,7 +645,13 @@ bool SSaleTableModel::repair_saveTables()
 
             SWorkModel *work = repair_work(i);
             if(rowModified)
+            {
+                if(m_repairType == RepairType::CartridgeRepair)
+                {
+                    work->setSalarySumm(m_cartridgeCardModel->material((SWorkModel::Type)index(i, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt())->salarySumm());
+                }
                 ret = work->commit();
+            }
             lastHandledWorkId = work->id();
             lastInsertId = lastHandledWorkId;
             delete work;
@@ -1454,6 +1460,11 @@ void SSaleTableModel::setRepairType(bool type)
     m_repairType = type;
 }
 
+void SSaleTableModel::setCartridgeCardModel(SCartridgeCardModel *cartridgeCardModel)
+{
+    m_cartridgeCardModel = cartridgeCardModel;
+}
+
 #ifdef QT_DEBUG
 void SSaleTableModel::dbgAddRandomItem()
 {
@@ -1499,5 +1510,4 @@ void SSaleTableModel::dbgAddRandomItemBasket()
     }
     delete query;
 }
-
 #endif

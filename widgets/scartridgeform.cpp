@@ -1,11 +1,13 @@
 #include "scartridgeform.h"
 #include "ui_scartridgeform.h"
+#include "models/scartridgematerialsmodel.h"
 
 SCartridgeForm::SCartridgeForm(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::SCartridgeForm)
 {
     ui->setupUi(this);
+    setDefaultStyleSheets();
 
 //    ui->frameHeader->setStyleSheet("QFrame::hover {background-color: rgb(205,230,247);}");    // подсветка заголовка
     installEventFilter(this);
@@ -50,8 +52,10 @@ void SCartridgeForm::initModels()
         connect(worksAndPartsModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
         connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
         connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);
+        connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateWorksActionsCheckedState);
         worksAndPartsModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
         worksAndPartsModel->setRepairType(SSaleTableModel::CartridgeRepair);
+        worksAndPartsModel->setCartridgeCardModel(m_cartridgeCard);
         m_repair->setWorksAndPartsModel(worksAndPartsModel);
     }
 
@@ -72,6 +76,12 @@ void SCartridgeForm::updateModels()
     m_cartridgeCard->load(m_cardId);
 }
 
+void SCartridgeForm::randomFill()
+{
+    if(ui->lineEditSerial->text().isEmpty())
+        ui->lineEditSerial->setText(QString::number(QRandomGenerator::global()->bounded(9999)));
+}
+
 void SCartridgeForm::initWidgets()
 {
     initModels();
@@ -86,6 +96,7 @@ void SCartridgeForm::initWidgets()
     connect(ui->comboBoxPlace, &SComboBox::buttonClicked, this, &SCartridgeForm::comboBoxPlaceButtonClickHandler);
     ui->labelLimitReached->setVisible(checkResource());
     connect(ui->toolButtonRemove, &QToolButton::clicked, this, &SCartridgeForm::removeWidget);
+    ui->comboBoxState->view()->setMinimumWidth(230);
 
     if(m_repairId)
     {
@@ -109,6 +120,7 @@ void SCartridgeForm::initWidgets()
         connect(ui->toolButtonCartridgeCard, &QPushButton::clicked, this, &SCartridgeForm::buttonCartridgeCardClicked);
         connect(ui->lineEditComment, &QLineEdit::editingFinished, this, &SCartridgeForm::updateComment);
 
+        initWorksMenu();
         updateHeader();
         updateWidgets();
     }
@@ -126,6 +138,7 @@ void SCartridgeForm::initWidgets()
         ui->splitterState->hide();
         ui->splitterTotalAmount->hide();
         ui->splitterEngineer->hide();
+        ui->splitterOtherWorks->hide();
         ui->listWidgetWorks->hide();
         ui->listWidgetParts->hide();
         ui->comboBoxWasEarly->setCurrentIndex(m_isRepeat?1:-1);
@@ -169,6 +182,7 @@ void SCartridgeForm::updateWidgets()
     ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Chip));
     ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Drum));
     ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Blade));
+    ui->toolButtonOtherWorksMenu->setEnabled(worksCheckboxesEn);
     ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
     updateComboBoxEngineer(m_repair->engineer());
     ui->doubleSpinBoxTotalAmount->setValue(m_repair->realRepairCost());
@@ -216,6 +230,12 @@ bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
             return nSt?1:ret; // при добавлении работ нужно фильтровать событие, а при удалении нет
         }
     }
+
+//    QAction *worksMenuAction = dynamic_cast<QAction*>(watched);
+//    if(worksMenuAction)
+//    {
+//        workAndPartHandler(worksMenuAction->property("WorkType").toInt(), worksMenuAction->isChecked());
+//    }
 
     return false;
 }
@@ -450,7 +470,7 @@ double SCartridgeForm::preargeedAmount()
 bool SCartridgeForm::checkData(const int stateId)
 {
     setDefaultStyleSheets();
-    if(stateId == Global::RepStateIds::Ready || stateId == Global::RepStateIds::ReadyNoRepair)
+    if(stateId == Global::RepStateIds::Ready)
     {
         if(worksAndPartsModel->amountTotal() == 0)
         {
@@ -516,6 +536,9 @@ void SCartridgeForm::setWidgetsParams(const int stateId)
         case Global::RepStateIds::InWork: worksCheckboxesEn = 1; engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
         case Global::RepStateIds::Ready:
         case Global::RepStateIds::ReadyNoRepair: worksCheckboxesEn = 0; engineerComboBoxEn = 1; placeComboBoxEn = 1; break;
+        case Global::RepStateIds::Returned:
+        case Global::RepStateIds::ReturnedNoRepair:
+        case Global::RepStateIds::ReturnedInCredit: worksCheckboxesEn = 0; break;
         default: ;
     }
     updateStateWidget(stateId);
@@ -589,13 +612,7 @@ void SCartridgeForm::updateLists()
         {
             list = ui->listWidgetWorks;
             workType = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
-            switch(workType)
-            {
-                case SWorkModel::Type::CartridgeRefill: ui->checkBoxRefill->setChecked(true); break;
-                case SWorkModel::Type::CartridgeDrumReplace: ui->checkBoxDrumReplace->setChecked(true); break;
-                case SWorkModel::Type::CartridgeChipReplace: ui->checkBoxChipReplace->setChecked(true); break;
-                case SWorkModel::Type::CartridgeBladeReplace: ui->checkBoxBladeReplace->setChecked(true); break;
-            }
+            setWorkCheckBoxChecked(workType);
         }
         else
         {
@@ -655,20 +672,10 @@ bool SCartridgeForm::addWorkAndPart(const int workType)
     int rowWork = worksAndPartsModel->rowCount();
     int rowItem = -1;
     int itemId = 0;
-    int materialType = 0;
-    QString workName;
     SCartridgeMaterialModel *material;
     QSqlQuery query(QSqlDatabase::database("connThird"));
 
-    switch(workType)
-    {
-        case SWorkModel::Type::CartridgeRefill: workName = tr("Заправка"); materialType = SCartridgeMaterialModel::Toner; break;
-        case SWorkModel::Type::CartridgeDrumReplace: workName = tr("Замена фотобарабана"); materialType = SCartridgeMaterialModel::Drum; break;
-        case SWorkModel::Type::CartridgeChipReplace: workName = tr("Замена чипа"); materialType = SCartridgeMaterialModel::Chip; break;
-        case SWorkModel::Type::CartridgeBladeReplace: workName = tr("Замена лезвия"); materialType = SCartridgeMaterialModel::Blade; break;
-    }
-
-    material =  m_cartridgeCard->material(materialType);
+    material =  m_cartridgeCard->material((SWorkModel::Type)workType);
     if(material->articul()) // если артикул не задан, подразумевается работа без склада
     {
         query.exec(QUERY_SEL_CARTRIDGE_MATERIAL(material->articul(), material->count()));
@@ -686,7 +693,7 @@ bool SCartridgeForm::addWorkAndPart(const int workType)
     }
 
     worksAndPartsModel->addCustomWork();
-    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColName), workName);
+    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColName), material->workName());
     worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColCount), 1);
     worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColPrice), material->worksPrice());
     worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColWorkType), workType);
@@ -838,7 +845,8 @@ void SCartridgeForm::saveTotalSumms()
 void SCartridgeForm::setRefill(int state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Toner);
-    updatePreagreedAmount(material, state);
+    if(material)
+        updatePreagreedAmount(material, state);
 }
 
 void SCartridgeForm::setChipReplace(int state)
@@ -942,6 +950,7 @@ void SCartridgeForm::buttonClientCardClicked()
 void SCartridgeForm::buttonClassicTabClicked()
 {
     emit createTabRepair(m_repair->id());
+    this->deleteLater();    // TODO: когда будет настроена синхронизация модели данных таблицы работ и деталей, тогда можно будет не удалять форму из списка
 }
 
 void SCartridgeForm::buttonCartridgeCardClicked()
@@ -954,4 +963,78 @@ void SCartridgeForm::updateComment()
     m_repair->setExtNotes(ui->lineEditComment->text());
     if(m_repair->commit())
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Примечание сохранено"), QColor(214,239,220), QColor(229,245,234));
+}
+
+void SCartridgeForm::initWorksMenu()
+{
+    QMenu *works_menu = new QMenu();
+    QMetaEnum types = SWorkModel::staticMetaObject.enumerator(SWorkModel::staticMetaObject.indexOfEnumerator("Type"));
+    SWorkModel::Type type;
+    SCartridgeMaterialModel *material;
+
+    for(int i = SWorkModel::Type::CartridgeReplaceOfWorn; i < types.keyCount(); i++)
+    {
+        type = (SWorkModel::Type)types.value(i);
+        material = m_cartridgeCard->material(type);
+        if(material)
+        {
+            QAction *item = new QAction(material->workName(), this);
+            item->setCheckable(true);
+            item->setProperty("WorkType", type);
+            works_menu->addAction(item);
+//            item->installEventFilter(this);
+            connect(item, &QAction::triggered, [=](){workAndPartHandler(item->property("WorkType").toInt(), item->isChecked());});
+        }
+    }
+    if(works_menu->actions().count())
+    {
+        ui->toolButtonOtherWorksMenu->setMenu(works_menu);
+        updateWorksActionsCheckedState();
+    }
+    else
+        ui->toolButtonOtherWorksMenu->setDisabled(true);
+}
+
+void SCartridgeForm::setWorkCheckBoxChecked(const int workType)
+{
+    switch(workType)
+    {
+        case SWorkModel::Type::CartridgeRefill: ui->checkBoxRefill->setChecked(true); break;
+        case SWorkModel::Type::CartridgeDrumReplace: ui->checkBoxDrumReplace->setChecked(true); break;
+        case SWorkModel::Type::CartridgeChipReplace: ui->checkBoxChipReplace->setChecked(true); break;
+        case SWorkModel::Type::CartridgeBladeReplace: ui->checkBoxBladeReplace->setChecked(true); break;
+        default: ;
+    }
+}
+
+void SCartridgeForm::updateWorksActionsCheckedState()
+{
+    if(!ui->toolButtonOtherWorksMenu->menu())
+        return;
+
+    QList<QAction*> actions = ui->toolButtonOtherWorksMenu->menu()->actions();
+    if(actions.isEmpty())
+        return;
+
+    int recType;
+    int workType;
+    QList<QAction*>::const_iterator action = actions.constBegin();
+    while(action != actions.constEnd())
+    {
+        (*action)->setChecked(false);
+        for(int row = 0; row < worksAndPartsModel->rowCount(); row++)
+        {
+            recType = worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
+            if(recType != SSaleTableModel::RecordType::Work)
+                continue;
+
+            workType = worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
+            if((*action)->property("WorkType").toInt() == workType)
+            {
+                (*action)->setChecked(true);
+                return;
+            }
+        }
+        action++;
+    }
 }

@@ -27,6 +27,7 @@ QWidget *SCartridgeMaterialsTableItemDelegates::createEditor(QWidget *parent, co
             w = createSpinBox(parent, index); break;
         case materialsTable::Column::Price:
         case materialsTable::Column::PriceWork:
+        case materialsTable::Column::SalarySumm:
             w = createDoubleSpinBox(parent, index); break;
         case materialsTable::Column::Articul:
             w = createSpinBox(parent, index); static_cast<QSpinBox*>(w)->setButtonSymbols(QSpinBox::NoButtons); break;
@@ -44,7 +45,9 @@ void SCartridgeMaterialsTableItemDelegates::setEditorData(QWidget *editor, const
         case materialsTable::Column::Count:
         case materialsTable::Column::Articul: setSpinBoxData(editor, index.data().toInt()); return;
         case materialsTable::Column::Price:
-        case materialsTable::Column::PriceWork: setDoubleSpinBoxData(editor, sysLocale.toDouble(index.data().toString())); return;
+        case materialsTable::Column::PriceWork:
+        case materialsTable::Column::SalarySumm:
+            setDoubleSpinBoxData(editor, sysLocale.toDouble(index.data().toString())); return;
         case materialsTable::Column::Name: setLineEditData(editor, index.data().toString()); return;
         default: ;
     }
@@ -61,6 +64,7 @@ void SCartridgeMaterialsTableItemDelegates::setModelData(QWidget *editor, QAbstr
             setModelDataFromSpinBox(editor, model, index); return;
         case materialsTable::Column::Price:
         case materialsTable::Column::PriceWork:
+        case materialsTable::Column::SalarySumm:
             setModelDataFromDoubleSpinBox(editor, model, index); return;
         case materialsTable::Column::Name:
             setModelDataFromLineEdit(editor, model, index); return;
@@ -194,7 +198,10 @@ void  SCartridgeMaterialsTableItemDelegates::setModelDataFromSpinBox(QWidget *ed
 {
     QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
     Q_ASSERT(sb);
-    model->setData(index, sb->value(), Qt::EditRole);
+    if(sb->hasAcceptableInput())
+        model->setData(index, sb->value(), Qt::EditRole);
+    else
+        model->setData(index, QVariant(), Qt::EditRole);
 }
 
 // Create the spinbox and populate it
@@ -228,5 +235,8 @@ void  SCartridgeMaterialsTableItemDelegates::setModelDataFromDoubleSpinBox(QWidg
 {
     QDoubleSpinBox *sb = qobject_cast<QDoubleSpinBox *>(editor);
     Q_ASSERT(sb);
-    model->setData(index, sb->value(), Qt::EditRole);
+    if(sb->hasAcceptableInput())
+        model->setData(index, sb->value(), Qt::EditRole);
+    else
+        model->setData(index, QVariant(), Qt::EditRole);
 }

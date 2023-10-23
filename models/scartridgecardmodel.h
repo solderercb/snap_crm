@@ -5,6 +5,7 @@
 #include <QObject>
 #include "scartridgematerialmodel.h"
 #include "widgets/shortlivednotification.h"
+#include "models/sworkmodel.h"
 
 class SCartridgeCardModel : public SComRecord
 {
@@ -38,7 +39,8 @@ public:
     void setColor(const int);
     bool archive();
     void setArchive(const bool);
-    SCartridgeMaterialModel *material(const int type);
+    SCartridgeMaterialModel *material(const SCartridgeMaterialModel::Type type);
+    SCartridgeMaterialModel *material(const SWorkModel::Type type);
     bool isMaterialSet(const int type);
 private:
     QString m_name;

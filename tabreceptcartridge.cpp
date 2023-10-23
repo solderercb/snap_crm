@@ -185,7 +185,7 @@ bool tabReceptCartridge::checkInput()
         ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 1;
     }
-    if ( ui->comboBoxPresetEngineer->currentIndex() < 0 )
+    if ( comSettings->isEngineerRequiredOnDeviceRecept && ui->comboBoxPresetEngineer->currentIndex() < 0 )
     {
         ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 2;
@@ -267,7 +267,11 @@ void tabReceptCartridge::appendToReceptList()
             // TODO: параметр глобальных настроек с паттерном серийного номера
         }
 
+#ifdef QT_DEBUG
+        form->randomFill();
+#endif
         appendToReceptList(form);
+
     }
 
     ui->comboBoxModel->setCurrentIndex(-1);
@@ -388,7 +392,7 @@ void tabReceptCartridge::randomFill()
     {
         ui->pushButtonAdd->click();
     }
-    if (test_scheduler_counter < 8)
+    if (test_scheduler_counter < 6)
     {
         test_scheduler_counter++;
         test_scheduler->start(400);    //  (пере-)запускаем таймер
@@ -425,10 +429,9 @@ void tabReceptCartridge::findAndAddBySerial()
     QStringList query_conditions;
 
     query_conditions.append(QString("`type` = %1").arg(m_deviceClassId));
-    query_conditions.append(QString("`serial_number` LIKE '%1%'").arg(ui->lineEditSerial->text()));
+    query_conditions.append(QString("`serial_number` LIKE '%1'").arg(ui->lineEditSerial->text()));
 
-
-    if(ui->comboBoxVendor->currentIndex() >= 0)
+    if(ui->comboBoxVendor->currentIndex() >= 0 && !m_vendorsModel->rowColumnToValue<QString>(ui->comboBoxVendor->currentIndex(), 0).trimmed().isEmpty())
         query_conditions.append(QString("`maker` = %1").arg(m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex())));
 
     if(ui->comboBoxModel->currentIndex() >= 0)

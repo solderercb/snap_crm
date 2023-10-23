@@ -81,7 +81,7 @@
 #define QUERY_SEL_CARTRIDGE_BY_SN(where_clause)     QString("SELECT  t1.`id`, `Title`, `client`, `type`, `maker`, `cartridge`, t2.`card_id`, `serial_number`, `sms_inform`, `termsControl` FROM `workshop` AS t1 LEFT JOIN `c_workshop` AS t2 ON t1.`cartridge` = t2.`id` WHERE %1 GROUP BY `serial_number`;").arg(where_clause)
 #define QUERY_SEL_CARTRIDGE_REPAIR_DATA(id)     QString("SELECT `refill`, `chip`, `opc_drum`, `c_blade`, `card_id` FROM `c_workshop` WHERE `id` = %1;").arg((id))
 #define QUERY_SEL_CARTRIDGE_MATERIAL(articul, count)  QString("SELECT `id` FROM `store_items` WHERE `articul` = %1 AND `count` - `reserved` >= %2 ORDER BY `id` ASC LIMIT 1;").arg(articul).arg(count)
-#define QUERY_SEL_CARTRIDGE_MATERIALS           QString("SELECT `id`, `type`, `count`, `price`, `works_price`, 0, `name`, `articul` FROM `materials`")
+#define QUERY_SEL_CARTRIDGE_MATERIALS           QString("SELECT `id`, `type`, `count`, `price`, `works_price`, 0, `name`, `articul`, `salary_summ` FROM `materials`")
 #define QUERY_SEL_CARTRIDGE_RESOURCE(currentRepair, serial, workType)  QString("SELECT COUNT(t1.`id`) AS 'count' FROM `workshop` AS t1 LEFT JOIN `works` AS t2 ON t1.`id` = t2.`repair` WHERE  IF(%1, t1.`id` < %1, 1) AND `serial_number` = '%2' AND `cartridge` IS NOT NULL AND t2.`type` = %3").arg(currentRepair).arg(serial).arg(workType)
 
 #define QUERY_SEL_ADDITIONAL_FIELDS_TYPES(isRepair, id) QString(\
@@ -640,9 +640,9 @@
                                                 "        g1t1.*,                                                                                                                                                       \n"\
                                                 "        g1t2.`created_at`,                                                                                                                                            \n"\
                                                 "        (g1t3.`price`*g1t3.`count`) AS 'work_by_employee',                                                                                                            \n"\
-                                                "        (g1t3.`price`*g1t3.`count`*(IF(g1t1.`cartridge`, g1t5.`pay_cartridge_refill`, IF(g1t1.quick_repair, IFNULL(g1t3.`pay_repair_quick`, g1t5.`pay_repair_quick`), IFNULL(g1t3.`pay_repair`, g1t5.`pay_repair`))))/100) AS 'employee_salary_for_work', \n"\
+                                                "        CAST((IF((g1t1.`cartridge` AND g1t3.`salary_summ` IS NOT NULL), g1t3.`salary_summ`, (g1t3.`price`*(IF(g1t1.`cartridge`, g1t5.`pay_cartridge_refill`, IF(g1t1.quick_repair, IFNULL(g1t3.`pay_repair_quick`, g1t5.`pay_repair_quick`), IFNULL(g1t3.`pay_repair`, g1t5.`pay_repair`))))/100))*g1t3.`count`) AS DECIMAL(19,4)) AS 'employee_salary_for_work', \n"\
                                                 "        IFNULL(SUM(g1t4.`price`*g1t4.`count`), 0) AS 'employee_parts',                                                                                                \n"\
-                                                "        IF(g1t5.`pay_4_sale_in_repair` AND g1t1.`cartridge` IS NULL, IFNULL(SUM((g1t4.`price` - g1t6.`in_price`)*g1t4.`count`*g1t5.`pay_sale`/100), 0), 0) AS 'employee_salary_for_parts', \n"\
+                                                "        CAST(IF(g1t5.`pay_4_sale_in_repair` AND g1t1.`cartridge` IS NULL, IFNULL(SUM((g1t4.`price` - g1t6.`in_price`)*g1t4.`count`*g1t5.`pay_sale`/100), 0), 0) AS DECIMAL(19,4)) AS 'employee_salary_for_parts', \n"\
                                                 "        g1t7.`summ`,                                                                                                                                                  \n"\
                                                 "        g1t2.`status_id`,                                                                                                                                             \n"\
                                                 "        g1t2.`filter1`                                                                                                                                                \n"\
@@ -704,8 +704,8 @@
                                                 "    t1.`price`,                                                                              \n"\
                                                 "    t1.`count`*t1.`price` AS 'summ',                                                         \n"\
                                                 "    t1.`warranty`,                                                                           \n"\
-                                                "    @percent := IF(t2.`cartridge`, t3.`pay_cartridge_refill`, IF(t2.quick_repair, IFNULL(t1.`pay_repair_quick`, t3.`pay_repair_quick`), IFNULL(t1.`pay_repair`, t3.`pay_repair`))) AS 'percent',    \n"\
-                                                "    t1.`count`*t1.`price`*@percent/100 AS 'salary_part'                                      \n"\
+                                                "    IF((t2.`cartridge` AND t1.`salary_summ` IS NOT NULL), '-', (@percent := IF(t2.`cartridge`, t3.`pay_cartridge_refill`, IF(t2.quick_repair, IFNULL(t1.`pay_repair_quick`, t3.`pay_repair_quick`), IFNULL(t1.`pay_repair`, t3.`pay_repair`))))) AS 'percent',    \n"\
+                                                "    CAST(IF((t2.`cartridge` AND t1.`salary_summ` IS NOT NULL), t1.`salary_summ`, (t1.`price`*@percent/100))*t1.`count` AS DECIMAL(19,4)) AS 'salary_part'                                      \n"\
                                                 "FROM works AS t1                                                                             \n"\
                                                 "LEFT JOIN workshop AS t2                                                                     \n"\
                                                 "    ON t1.`repair` = t2.`id`                                                                 \n"\
@@ -729,12 +729,14 @@
                                                 "    t1.`sn`,                                                                                 \n"\
                                                 "    t1.`warranty`,                                                                           \n"\
                                                 "    @profit:=t1.`count`*(t1.`price`-t2.`in_price`) AS 'profit',                              \n"\
-                                                "    @profit*IF(t3.`pay_4_sale_in_repair`, t3.`pay_sale`, 0)/100 AS 'salary_part'             \n"\
+                                                "    IF(t4.`cartridge`, '-', CAST(@profit*IF(t3.`pay_4_sale_in_repair`, t3.`pay_sale`, 0)/100 AS DECIMAL(19,4))) AS 'salary_part'  \n"\
                                                 "FROM store_int_reserve AS t1                                                                 \n"\
                                                 "LEFT JOIN store_items AS t2                                                                  \n"\
                                                 "    ON t1.`item_id` = t2.`id`                                                                \n"\
                                                 "LEFT JOIN `users` AS t3                                                                      \n"\
                                                 "     ON t1.`to_user` = t3.`id`                                                               \n"\
+                                                "LEFT JOIN `workshop` AS t4                                                                   \n"\
+                                                "     ON t1.`repair_id` = t4.`id`                                                             \n"\
                                                 "WHERE                                                                                        \n"\
                                                 "    `repair_id` = %1                                                                         \n"\
                                                 "    AND `to_user` = %2                                                                       \n"\

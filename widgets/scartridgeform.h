@@ -2,6 +2,7 @@
 #define SCARTRIDGEFORM_H
 
 #include <QWidget>
+#include <QMenu>
 #include "widgets/swidget.h"
 #include "models/srepairmodel.h"
 #include "models/scartridgecardmodel.h"
@@ -62,6 +63,7 @@ public:
     int checkInput();
     int isReady();
     void updateModels();
+    void randomFill();
 private:
     Ui::SCartridgeForm *ui;
     SQueryLog *i_queryLog;
@@ -126,6 +128,9 @@ private slots:
     void buttonClassicTabClicked();
     void buttonCartridgeCardClicked();
     void updateComment();
+    void initWorksMenu();
+    void setWorkCheckBoxChecked(const int workType);
+    void updateWorksActionsCheckedState();
 };
 
 #endif // SCARTRIDGEFORM_H

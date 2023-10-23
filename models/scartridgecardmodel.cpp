@@ -245,9 +245,29 @@ void SCartridgeCardModel::setArchive(const bool archive)
     }
 }
 
-SCartridgeMaterialModel *SCartridgeCardModel::material(const int type)
+SCartridgeMaterialModel *SCartridgeCardModel::material(const SCartridgeMaterialModel::Type type)
 {
-    return m_materials.value(type, 0);
+    return m_materials.value(type, nullptr);
+}
+
+SCartridgeMaterialModel *SCartridgeCardModel::material(const SWorkModel::Type type)
+{
+    switch(type)
+    {
+        case SWorkModel::Type::CartridgeRefill:            return material(SCartridgeMaterialModel::Type::Toner);
+        case SWorkModel::Type::CartridgeDrumReplace:       return material(SCartridgeMaterialModel::Type::Drum);
+        case SWorkModel::Type::CartridgeChipReplace:       return material(SCartridgeMaterialModel::Type::Chip);
+        case SWorkModel::Type::CartridgeBladeReplace:      return material(SCartridgeMaterialModel::Type::Blade);
+        case SWorkModel::Type::CartridgeReplaceOfWorn:     return material(SCartridgeMaterialModel::Type::Replace);
+        case SWorkModel::Type::CartridgeRefillPlus:        return material(SCartridgeMaterialModel::Type::TonerPlus);
+        case SWorkModel::Type::CartridgeMagRollerReplace:  return material(SCartridgeMaterialModel::Type::MagRoller);
+        case SWorkModel::Type::CartridgeProphilaxy:        return material(SCartridgeMaterialModel::Type::Prophilaxy);
+        case SWorkModel::Type::CartridgePrimRollerReplace: return material(SCartridgeMaterialModel::Type::PrimRoller);
+        case SWorkModel::Type::CartridgeMarkerReplace:     return material(SCartridgeMaterialModel::Type::Marker);
+        case SWorkModel::Type::CartridgeScraperReplace:    return material(SCartridgeMaterialModel::Type::Scraper);
+        case SWorkModel::Type::CartridgeBushingsReplace:   return material(SCartridgeMaterialModel::Type::Bushings);
+        default: return nullptr;
+    }
 }
 
 bool SCartridgeCardModel::isMaterialSet(const int type)

@@ -18,7 +18,7 @@ void SCartridgeMaterialModel::load(const int id)
         return;
 
     QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
-    record->exec(QString("SELECT `name`, `type`, `count`, `articul`, `card_id`, `price`, `works_price` FROM `materials` WHERE `id` = %1;`").arg(id));
+    record->exec(QString("SELECT `name`, `type`, `count`, `articul`, `card_id`, `price`, `works_price`, `salary_summ` FROM `materials` WHERE `id` = %1;`").arg(id));
     if(!record->first())
         return;
 
@@ -31,6 +31,8 @@ void SCartridgeMaterialModel::load(const int id)
     m_cardId = record->value("card_id").toInt();
     m_price = record->value("price").toDouble();
     m_worksPrice = record->value("works_price").toDouble();
+    m_salarySumm = record->value("salary_summ").toDouble();
+    initWorkName((Type)m_type);
 
     delete record;
 }
@@ -105,3 +107,39 @@ void SCartridgeMaterialModel::setWorksPrice(const double works_price)
     i_valuesMap.insert("works_price", works_price);
 }
 
+QString SCartridgeMaterialModel::workName()
+{
+    return m_workName;
+}
+
+double SCartridgeMaterialModel::salarySumm() const
+{
+    return m_salarySumm;
+}
+
+void SCartridgeMaterialModel::setSalarySumm(double salarySumm)
+{
+    m_salarySumm = salarySumm;
+    i_valuesMap.insert("salary_summ", salarySumm);
+}
+
+/* Название работы, которая будет добавлена в список работ и деталей
+*/
+void SCartridgeMaterialModel::initWorkName(const Type type)
+{
+    switch(type)
+    {
+        case Toner: m_workName = tr("Заправка"); break;
+        case Drum: m_workName = tr("Замена фотобарабана"); break;
+        case Chip: m_workName = tr("Замена чипа"); break;
+        case Blade: m_workName = tr("Замена лезвия"); break;
+        case Replace: m_workName = tr("Замена картриджа"); break;
+        case TonerPlus: m_workName = tr("Заправка (увелич.)"); break;
+        case MagRoller: m_workName = tr("Замена магн. вала"); break;
+        case Prophilaxy: m_workName = tr("Профилактика"); break;
+        case PrimRoller: m_workName = tr("Замена первич. вала"); break;
+        case Marker: m_workName = tr("Флажок сброса"); break;
+        case Scraper: m_workName = tr("Замена ракеля"); break;
+        case Bushings: m_workName = tr("Замена втулок"); break;
+    }
+}

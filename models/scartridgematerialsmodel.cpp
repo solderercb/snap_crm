@@ -168,6 +168,10 @@ void SCartridgeMaterialsModel::slotPrimeInsert(int row, QSqlRecord &record)
     rec->append(*field);
     delete field;
 
+    field = new QSqlField("salary_summ", QVariant::Double);
+    rec->append(*field);
+    delete field;
+
     record = *rec;
 }
 
@@ -179,6 +183,14 @@ void SCartridgeMaterialsModel::translateNames()
     tr("Drum");
     tr("Chip");
     tr("Blade");
+    tr("Replace");
+    tr("TonerPlus");
+    tr("MagRoller");
+    tr("Prophilaxy");
+    tr("PrimRoller");
+    tr("Marker");
+    tr("Scraper");
+    tr("Bushings");
 }
 
 bool SCartridgeMaterialsModel::insertRowIntoTable(const QSqlRecord &values)

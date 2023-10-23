@@ -280,3 +280,14 @@ bool SWorkModel::commit()
     return i_nErr;
 }
 
+double SWorkModel::salarySumm() const
+{
+    return m_salarySumm;
+}
+
+void SWorkModel::setSalarySumm(double salarySumm)
+{
+    m_salarySumm = salarySumm;
+    i_valuesMap.insert("salary_summ", salarySumm);
+}
+

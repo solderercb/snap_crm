@@ -163,7 +163,7 @@ int SClientInputForm::checkInput()
         ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheetRed);
         error = 10;
     }
-    if (!ui->phones->isValid())
+    if (clientModel->isNew() && !ui->phones->isValid())
         error = 11;
 
     return error;

@@ -9,7 +9,10 @@ class SWorkModel : public SComRecord
 {
     Q_OBJECT
 public:
-    enum Type{Regular = 0, CartridgeRefill, CartridgeChipReplace, CartridgeDrumReplace, CartridgeBladeReplace};
+    enum Type{Regular = 0, CartridgeRefill, CartridgeChipReplace, CartridgeDrumReplace, CartridgeBladeReplace, CartridgeReplaceOfWorn,
+              CartridgeRefillPlus, CartridgeMagRollerReplace,  CartridgeProphilaxy, CartridgePrimRollerReplace,
+              CartridgeMarkerReplace, CartridgeScraperReplace, CartridgeBushingsReplace};
+    Q_ENUM(Type)
     explicit SWorkModel(QObject *parent = nullptr);
     explicit SWorkModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
     int id();
@@ -42,6 +45,9 @@ public:
     bool remove();
     void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue = QVariant()) override;
     bool commit();
+    double salarySumm() const;
+    void setSalarySumm(double salarySumm);
+
 private:
     int m_user;
     int m_repair;
@@ -55,7 +61,7 @@ private:
     int m_type;
     int m_payRepair;
     int m_payRepair_quick;
-
+    double m_salarySumm;
 };
 
 #endif // SWORKMODEL_H
