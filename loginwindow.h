@@ -55,6 +55,7 @@ private:
     void closeConnections();
     void debugInitLoginOptions();
     void fillConnectionParams();
+    void startMaintanaceTool();
 private slots:
     void editPassword_onReturnPressed();
     void btnLoginHandler();

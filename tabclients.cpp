@@ -40,7 +40,8 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
 
-    QObject::connect(m_tableUpdateDelay, SIGNAL(timeout()), this, SLOT(refreshTable()));
+    connect(ui->buttonRefreshTable, &QPushButton::clicked, this, &tabClients::buttonRefreshClicked);
+    connect(m_tableUpdateDelay, &QTimer::timeout, this, &tabClients::autorefreshTable);
     m_tableUpdateDelay->setSingleShot(true);
 
     refreshTable();
@@ -74,9 +75,10 @@ void tabClients::lineEditSearchSetFocus()
     ui->lineEditSearch->setFocus();
 }
 
-void tabClients::refreshTable()
+void tabClients::refreshTable(bool preserveScrollPos, bool preserveSelection)
 {
     ui->tableView->setQuery(QUERY_SEL_CLIENTS_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setUniqueIdColumn(0);
     FilterList l1;
     l1.op = FilterList::And;
 
@@ -105,11 +107,11 @@ void tabClients::refreshTable()
 
     ui->tableView->setFilter(l1);
     ui->tableView->setGrouping(query_group);
-    ui->tableView->refresh();
+    ui->tableView->refresh(preserveScrollPos, preserveSelection);
     ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));
 
     m_tableUpdateDelay->stop();
-//    m_tableUpdateDelay->start(10000);
+    m_tableUpdateDelay->start(10000);
 }
 
 void tabClients::clientTypeChanged(QModelIndex)
@@ -150,4 +152,15 @@ void tabClients::togglePropertiesPanel()
 {
 
 }
+
+void tabClients::buttonRefreshClicked()
+{
+    refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+}
+
+void tabClients::autorefreshTable()
+{
+    refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
+}
+
 

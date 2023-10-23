@@ -49,6 +49,35 @@ void LoginWindow::fillConnectionParams()
     ui->checkBoxSSL->setChecked(userLocalData->SSLConnection.value);
 }
 
+void LoginWindow::startMaintanaceTool()
+{
+    QString targerUpdateVer;
+    QString updateChannel ;
+    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
+
+    query.exec(QUERY_SEL_UPDATE_CHANNEL);
+    query.first();
+    updateChannel = query.value(0).toString();
+    if(!updateChannel.contains("github.com/solderercb/snap_crm"))
+        return;
+
+    // Если канал обновления официальный, то скачивачиваем конкретную версию, а не самую последнюю
+    // По задумке такой механизм позволит избежать лишней головной боли админа организации
+    query.exec(QUERY_SEL_APP_VER);
+    query.first();
+    targerUpdateVer= query.value(0).toString();
+
+    updateChannel.replace("releases/latest/download", QString("releases/download/%1").arg(targerUpdateVer));
+
+    QVariantMap config;
+    config.insert(QLatin1String("path"), QLatin1String("maintenancetool.exe"));
+    config.insert(QLatin1String("repoPathArg"), updateChannel);
+    auto updater = QtAutoUpdater::Updater::create(QLatin1String("qtifw"), config, qApp);
+    Q_ASSERT(updater);
+    updateController = new QtAutoUpdater::UpdateController(updater, this);
+    updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Ask);
+}
+
 void LoginWindow::statusBarMsg(const QString &text, int delay)
 {
     ui->labelStatus->setText(text);
@@ -70,24 +99,7 @@ bool LoginWindow::checkAppVer()
     appVer = queryCheckAppVer.value(0).toString().split('.');
 
     if( appVer.at(3).toInt() > APP_COMMIT )
-    {
-        queryCheckAppVer.exec(QUERY_SEL_UPDATE_CHANNEL);
-        queryCheckAppVer.first();
-        QString updateChannel = queryCheckAppVer.value(0).toString();
-
-        // Если канал обновления официальный, то скачивачиваем конкретную версию, а не самую последнюю
-        // По задумке такой механизм позволит избежать лишней головной боли админа организации
-        if(updateChannel.contains("github.com/solderercb/snap_crm"))
-            updateChannel.replace("releases/latest/download", QString("releases/download/%1").arg(appVer.join('.')));
-
-        QVariantMap config;
-        config.insert(QLatin1String("path"), QLatin1String("maintenancetool.exe"));
-        config.insert(QLatin1String("repoPathArg"), updateChannel);
-        auto updater = QtAutoUpdater::Updater::create(QLatin1String("qtifw"), config, qApp);
-        Q_ASSERT(updater);
-        updateController = new QtAutoUpdater::UpdateController(updater, this);
         throw 5;
-    }
     else if(appVer.at(3).toInt() < APP_COMMIT)
         return 1;
     return 0;
@@ -398,10 +410,7 @@ void LoginWindow::btnLoginHandler()
                 case 5:
                 {
                     statusBarMsg(tr("Требуется обновление программы"), 0);
-                    if(updateController)
-                    {
-                        updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Ask);
-                    }
+                    startMaintanaceTool();
                     break;
                 }
             }

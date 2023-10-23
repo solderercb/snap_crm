@@ -13,6 +13,7 @@
 #include <QTimer>
 #include "mainwindow.h"
 #include "tabcommon.h"
+#include "widgets/stableviewbase.h"
 
 namespace Ui {
 class tabClients;
@@ -43,13 +44,15 @@ private:
 #endif
 
 private slots:
-    void refreshTable();
+    void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
     void clientTypeChanged(QModelIndex);
     void clientAdvertisingChanged(int);
     void tableItemDoubleClick(QModelIndex);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();
     void togglePropertiesPanel();
+    void buttonRefreshClicked();
+    void autorefreshTable();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

@@ -114,37 +114,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="394"/>
+        <location filename="../loginwindow.cpp" line="406"/>
         <source>Не удалось обновить базу данных.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="395"/>
+        <location filename="../loginwindow.cpp" line="407"/>
         <source>Не удалось обновить базу данных. Есть пользователи онлайн.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="396"/>
+        <location filename="../loginwindow.cpp" line="408"/>
         <source>Попытка подключения к старой версии БД. Обратитесь к администратору.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="397"/>
+        <location filename="../loginwindow.cpp" line="409"/>
         <source>Учетная запись отключена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="400"/>
+        <location filename="../loginwindow.cpp" line="412"/>
         <source>Требуется обновление программы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="455"/>
+        <location filename="../loginwindow.cpp" line="464"/>
         <source>Select ASC application executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="457"/>
+        <location filename="../loginwindow.cpp" line="466"/>
         <source>Executable (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1046,23 +1046,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="917"/>
+        <location filename="../widgets/scartridgeform.cpp" line="920"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="917"/>
+        <location filename="../widgets/scartridgeform.cpp" line="920"/>
         <source>Проверьте права доступа или обратитесь к администратору</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="965"/>
+        <location filename="../widgets/scartridgeform.cpp" line="968"/>
         <source>Примечание сохранено</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../widgets/scartridgeform.cpp" line="573"/>
-        <location filename="../widgets/scartridgeform.cpp" line="965"/>
+        <location filename="../widgets/scartridgeform.cpp" line="968"/>
         <location filename="../widgets/scartridgeform.h" line="108"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
@@ -1468,542 +1468,542 @@
 <context>
     <name>SComSettings</name>
     <message>
-        <location filename="../models/scomsettings.cpp" line="281"/>
+        <location filename="../models/scomsettings.cpp" line="282"/>
         <source>currencyId</source>
         <translation>Основная валюта</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="282"/>
+        <location filename="../models/scomsettings.cpp" line="283"/>
         <source>classicKassa</source>
         <translation>Операции с копейками</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="283"/>
+        <location filename="../models/scomsettings.cpp" line="284"/>
         <source>timeZoneId</source>
         <translation>Часовой пояс</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="284"/>
+        <location filename="../models/scomsettings.cpp" line="285"/>
         <source>ascPhoneMask1</source>
         <translation>Маска телефона 1</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="285"/>
+        <location filename="../models/scomsettings.cpp" line="286"/>
         <source>ascPhoneMask2</source>
         <translation>Маска телефона 2</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="286"/>
+        <location filename="../models/scomsettings.cpp" line="287"/>
         <source>updateChannel</source>
         <translation>Ссылка на обновления</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="287"/>
+        <location filename="../models/scomsettings.cpp" line="288"/>
         <source>isPriceColOptVisible</source>
         <translation>Опт</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="288"/>
+        <location filename="../models/scomsettings.cpp" line="289"/>
         <source>isPriceColOpt2Visible</source>
         <translation>Опт 2</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="289"/>
+        <location filename="../models/scomsettings.cpp" line="290"/>
         <source>isPriceColOpt3Visible</source>
         <translation>Опт 3</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="290"/>
+        <location filename="../models/scomsettings.cpp" line="291"/>
         <source>isPriceColRoznVisible</source>
         <translation>Розница</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="291"/>
+        <location filename="../models/scomsettings.cpp" line="292"/>
         <source>isPriceColServiceVisible</source>
         <translation>Сервис</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="292"/>
+        <location filename="../models/scomsettings.cpp" line="293"/>
         <source>voipId</source>
         <translation>Телефония</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="293"/>
+        <location filename="../models/scomsettings.cpp" line="294"/>
         <source>isRealizatorEnable</source>
         <translation>Работа с реализаторами</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="294"/>
+        <location filename="../models/scomsettings.cpp" line="295"/>
         <source>onlineStoreId</source>
         <translation>Работа с Интернет-магазинами</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="295"/>
+        <location filename="../models/scomsettings.cpp" line="296"/>
         <source>isCartridgeRepairEnabled</source>
         <translation>Заправка картриджей</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="296"/>
+        <location filename="../models/scomsettings.cpp" line="297"/>
         <source>isEngineerRequiredOnDeviceRecept</source>
         <translation>Обязательное указание инженера на этапе приёмки</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="297"/>
+        <location filename="../models/scomsettings.cpp" line="298"/>
         <source>isVisitSourceRequired</source>
         <translation>Обязательное указание источника обращения</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="298"/>
+        <location filename="../models/scomsettings.cpp" line="299"/>
         <source>isSerialNumberRequired</source>
         <translation>Обязательное указание SN при приёмке</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="299"/>
+        <location filename="../models/scomsettings.cpp" line="300"/>
         <source>isCartridgeSerialNumberRequired</source>
         <translation>Обязательное указание SN картриджа</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="300"/>
+        <location filename="../models/scomsettings.cpp" line="301"/>
         <source>isSearchOnlyBySerial</source>
         <translation>Искать предыдущие ремонты только по SN</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="301"/>
+        <location filename="../models/scomsettings.cpp" line="302"/>
         <source>isPhotoOnReceptRequired</source>
         <translation>Обязательное фото при приёмке</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="302"/>
+        <location filename="../models/scomsettings.cpp" line="303"/>
         <source>isPhotoOnIssueRequired</source>
         <translation>Обязательное фото при выдаче</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="303"/>
+        <location filename="../models/scomsettings.cpp" line="304"/>
         <source>isDiagRequired</source>
         <translation>Обязательное указание диагностики</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="304"/>
+        <location filename="../models/scomsettings.cpp" line="305"/>
         <source>isVendorAddingAllowedOnRecept</source>
         <translation>Добавление производителя на этапе приёмки</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="305"/>
+        <location filename="../models/scomsettings.cpp" line="306"/>
         <source>isRepairSummSetByManager</source>
         <translation>Стоимость ремонта назначает менеджер</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="306"/>
+        <location filename="../models/scomsettings.cpp" line="307"/>
         <source>isPaySalaryForRepairsIssuedInDebt</source>
         <translation>Оплачивать инженеру выданные в долг устройства</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="307"/>
+        <location filename="../models/scomsettings.cpp" line="308"/>
         <source>isAutoSetCompanyOnRepairRecept</source>
         <translation>Автовыбор компании при приёме в ремонт</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="308"/>
+        <location filename="../models/scomsettings.cpp" line="309"/>
         <source>isVendorWarrantyEnabled</source>
         <translation>Гарантия производителя вкл.</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="309"/>
+        <location filename="../models/scomsettings.cpp" line="310"/>
         <source>useSimplifiedCartridgeRepair</source>
         <translation>Упрощённая схема работы с картриджами</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="310"/>
+        <location filename="../models/scomsettings.cpp" line="311"/>
         <source>autoCloseRepairTabTimeout</source>
         <translation>Автозакрытие карты ремонта, секунд</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="311"/>
+        <location filename="../models/scomsettings.cpp" line="312"/>
         <source>repairImagesLimit</source>
         <translation>Изображений в карте ремонта</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="312"/>
+        <location filename="../models/scomsettings.cpp" line="313"/>
         <source>repairDispatcherUsers</source>
         <translation>Пользователи</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="313"/>
+        <location filename="../models/scomsettings.cpp" line="314"/>
         <source>repairDispatcherDayLimit</source>
         <translation>Макс. заказов в день</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="314"/>
+        <location filename="../models/scomsettings.cpp" line="315"/>
         <source>repairDispatcherStatuses</source>
         <translation>Статусы min</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="315"/>
+        <location filename="../models/scomsettings.cpp" line="316"/>
         <source>isClientPatronymicRequired</source>
         <translation>Обязательное указание отчества</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="316"/>
+        <location filename="../models/scomsettings.cpp" line="317"/>
         <source>isClientEmailRequired</source>
         <translation>Обязательное указание email</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="317"/>
+        <location filename="../models/scomsettings.cpp" line="318"/>
         <source>isClientAddressRequired</source>
         <translation>Обязательное указание адреса</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="318"/>
+        <location filename="../models/scomsettings.cpp" line="319"/>
         <source>isClientPhoneRequired</source>
         <translation>Обязательное указание телефона</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="319"/>
+        <location filename="../models/scomsettings.cpp" line="320"/>
         <source>isAnyClientDealer</source>
         <translation>Любой клиент —&#xa0;поставщик</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="320"/>
+        <location filename="../models/scomsettings.cpp" line="321"/>
         <source>timeoutForItemsRequestsHandling</source>
         <translation>Время выдачи товара сотруднику</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="321"/>
+        <location filename="../models/scomsettings.cpp" line="322"/>
         <source>timeoutForDiagnosisConfirmation</source>
         <translation>Время подтверждения диагностики</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="322"/>
+        <location filename="../models/scomsettings.cpp" line="323"/>
         <source>defaultItemReserveTime</source>
         <translation>Срок резерва товара по умолчанию, дней</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="323"/>
+        <location filename="../models/scomsettings.cpp" line="324"/>
         <source>itemImagesLimit</source>
         <translation>Изображений в карте товара</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="324"/>
+        <location filename="../models/scomsettings.cpp" line="325"/>
         <source>isReasonForItemIncomeRequired</source>
         <translation>Обязательное указание основания в ПН</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="325"/>
+        <location filename="../models/scomsettings.cpp" line="326"/>
         <source>defaultWorksWarranty</source>
         <translation>Срок гарантии на работы по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="326"/>
+        <location filename="../models/scomsettings.cpp" line="327"/>
         <source>defaultNewItemsWarranty</source>
         <translation>Срок гарантии на новые товары по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="327"/>
+        <location filename="../models/scomsettings.cpp" line="328"/>
         <source>defaultUsedItemsWarranty</source>
         <translation>Срок гарантии на б/у товары по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="328"/>
+        <location filename="../models/scomsettings.cpp" line="329"/>
         <source>defaultRefItemsWarranty</source>
         <translation>Срок гарантии на восстановленные товары по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="329"/>
+        <location filename="../models/scomsettings.cpp" line="330"/>
         <source>defaultDisasmItemsWarranty</source>
         <translation>Срок гарантии на товары с разборки по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="330"/>
+        <location filename="../models/scomsettings.cpp" line="331"/>
         <source>defaultOtherItemsWarranty</source>
         <translation>Срок гарантии на прочие товары по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="331"/>
+        <location filename="../models/scomsettings.cpp" line="332"/>
         <source>notifyNewComment</source>
         <translation>Оповещение о новых комментариях</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="332"/>
+        <location filename="../models/scomsettings.cpp" line="333"/>
         <source>notifyRepairStatusUpdateColor</source>
         <translation>Оповещение о смене статуса заказа</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="333"/>
+        <location filename="../models/scomsettings.cpp" line="334"/>
         <source>notifyIncomingSMS</source>
         <translation>Оповещение о новых SMS</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="334"/>
+        <location filename="../models/scomsettings.cpp" line="335"/>
         <source>notifyOutOfTermAlarmColor</source>
         <translation>Оповещение о превышении сроков</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="335"/>
+        <location filename="../models/scomsettings.cpp" line="336"/>
         <source>notifyDeviceMatch</source>
         <translation>Оповещение о совпадении устройства</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="336"/>
+        <location filename="../models/scomsettings.cpp" line="337"/>
         <source>notifyCustomTask</source>
         <translation>Оповещение о новом пользовательском задании</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="337"/>
+        <location filename="../models/scomsettings.cpp" line="338"/>
         <source>notifyItemRequest</source>
         <translation>Оповещение о запросе детали</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="338"/>
+        <location filename="../models/scomsettings.cpp" line="339"/>
         <source>notifyOrderFromOnlineStore</source>
         <translation>Оповещение о заказе с сайта</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="339"/>
+        <location filename="../models/scomsettings.cpp" line="340"/>
         <source>notifyIncomingCall</source>
         <translation>Оповещение о входящем звонке</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="340"/>
+        <location filename="../models/scomsettings.cpp" line="341"/>
         <source>notifyItemPurchaseRequest</source>
         <translation>Оповещение о запросе на покупку</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="341"/>
+        <location filename="../models/scomsettings.cpp" line="342"/>
         <source>printPKO</source>
         <translation>Печать ПКО</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="342"/>
+        <location filename="../models/scomsettings.cpp" line="343"/>
         <source>printOutInvoice</source>
         <translation>Печать РН</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="343"/>
+        <location filename="../models/scomsettings.cpp" line="344"/>
         <source>printInInvoice</source>
         <translation>Печать ПН</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="344"/>
+        <location filename="../models/scomsettings.cpp" line="345"/>
         <source>printRKO</source>
         <translation>Печать РКО</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="345"/>
+        <location filename="../models/scomsettings.cpp" line="346"/>
         <source>printWarrantyDoc</source>
         <translation>Печать гарантийного талона</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="346"/>
+        <location filename="../models/scomsettings.cpp" line="347"/>
         <source>printWorksList</source>
         <translation>Печать акта выполненных работ</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="347"/>
+        <location filename="../models/scomsettings.cpp" line="348"/>
         <source>printDiagResult</source>
         <translation>Печать акта диагностики</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="348"/>
+        <location filename="../models/scomsettings.cpp" line="349"/>
         <source>printRepairRejectDoc</source>
         <translation>Печать акта отказа от ремонта</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="349"/>
+        <location filename="../models/scomsettings.cpp" line="350"/>
         <source>printRKOOnItemIncome</source>
         <translation>Печать РКО при создании ПН</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="350"/>
+        <location filename="../models/scomsettings.cpp" line="351"/>
         <source>printCheck</source>
         <translation>Печать кассового чека</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="351"/>
+        <location filename="../models/scomsettings.cpp" line="352"/>
         <source>printRepairReceptDoc</source>
         <translation>Печать квитанции после приёмки устройства</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="352"/>
+        <location filename="../models/scomsettings.cpp" line="353"/>
         <source>printRepairStickers</source>
         <translation>Печать стикеров при приёме в ремонт устройства</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="353"/>
+        <location filename="../models/scomsettings.cpp" line="354"/>
         <source>printCartridgeReceptDoc</source>
         <translation>Печать квитанции после приёмки картриджа</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="354"/>
+        <location filename="../models/scomsettings.cpp" line="355"/>
         <source>printCartridgeStickers</source>
         <translation>Печать стикеров при приёме в ремонт картриджа</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="355"/>
+        <location filename="../models/scomsettings.cpp" line="356"/>
         <source>defaultRepairStickersQty</source>
         <translation>Стикеров по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="356"/>
+        <location filename="../models/scomsettings.cpp" line="357"/>
         <source>autoSwitchKeyboardLayout</source>
         <translation>Автоматически переключать раскладку клавиатуры</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="357"/>
+        <location filename="../models/scomsettings.cpp" line="358"/>
         <source>voipAsteriskHost</source>
         <translation>Сервер</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="358"/>
+        <location filename="../models/scomsettings.cpp" line="359"/>
         <source>voipAsteriskPort</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="359"/>
+        <location filename="../models/scomsettings.cpp" line="360"/>
         <source>voipAsteriskLogin</source>
         <translation>Имя пользователя</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="360"/>
+        <location filename="../models/scomsettings.cpp" line="361"/>
         <source>voipAsteriskPassword</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="361"/>
+        <location filename="../models/scomsettings.cpp" line="362"/>
         <source>voipAsteriskWebPort</source>
         <translation>Web-порт</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="362"/>
+        <location filename="../models/scomsettings.cpp" line="363"/>
         <source>voipPrefix</source>
         <translation>Префикс</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="363"/>
+        <location filename="../models/scomsettings.cpp" line="364"/>
         <source>voipEndpoint</source>
         <translation>Адрес АТС</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="364"/>
+        <location filename="../models/scomsettings.cpp" line="365"/>
         <source>voipKey</source>
         <translation>Key</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="365"/>
+        <location filename="../models/scomsettings.cpp" line="366"/>
         <source>voipSecret</source>
         <translation>Secret</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="366"/>
+        <location filename="../models/scomsettings.cpp" line="367"/>
         <source>onlineStoreUrl</source>
         <translation>API URL</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="367"/>
+        <location filename="../models/scomsettings.cpp" line="368"/>
         <source>onlineStoreKey</source>
         <translation>API KEY</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="368"/>
+        <location filename="../models/scomsettings.cpp" line="369"/>
         <source>salaryClassic</source>
         <translation>Период зарплаты: вкл —&#xa0;месяц, выкл —&#xa0;неделя</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="369"/>
+        <location filename="../models/scomsettings.cpp" line="370"/>
         <source>salaryIncludeNotIssuedByDefault</source>
         <translation>Учитывать готовые но не выданные по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="370"/>
+        <location filename="../models/scomsettings.cpp" line="371"/>
         <source>newClientSmsEnabled</source>
         <translation>SMS по умолчанию для новых клиентов</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="371"/>
+        <location filename="../models/scomsettings.cpp" line="372"/>
         <source>exchangeTypeAuto</source>
         <translation>Авто</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="372"/>
+        <location filename="../models/scomsettings.cpp" line="373"/>
         <source>exchangeTypeManual</source>
         <translation>Ручной</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="373"/>
+        <location filename="../models/scomsettings.cpp" line="374"/>
         <source>backupEnable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="374"/>
+        <location filename="../models/scomsettings.cpp" line="375"/>
         <source>backupImages</source>
         <translation>Без фотографий</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="375"/>
+        <location filename="../models/scomsettings.cpp" line="376"/>
         <source>backupTime</source>
         <translation>Время</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="376"/>
+        <location filename="../models/scomsettings.cpp" line="377"/>
         <source>smsProvider</source>
         <translation>Провайдер</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="377"/>
+        <location filename="../models/scomsettings.cpp" line="378"/>
         <source>smsAuthType</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="378"/>
+        <location filename="../models/scomsettings.cpp" line="379"/>
         <source>smsApiId</source>
         <translation>API ID</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="379"/>
+        <location filename="../models/scomsettings.cpp" line="380"/>
         <source>smsLogin</source>
         <translation>Имя пользователя</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="380"/>
+        <location filename="../models/scomsettings.cpp" line="381"/>
         <source>smsPassword</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="381"/>
+        <location filename="../models/scomsettings.cpp" line="382"/>
         <source>smsSender</source>
         <translation>Отправитель</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="382"/>
+        <location filename="../models/scomsettings.cpp" line="383"/>
         <source>emailServer</source>
         <translation>Сервер</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="383"/>
+        <location filename="../models/scomsettings.cpp" line="384"/>
         <source>emailPort</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="384"/>
+        <location filename="../models/scomsettings.cpp" line="385"/>
         <source>emailLogin</source>
         <translation>Адрес</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="385"/>
+        <location filename="../models/scomsettings.cpp" line="386"/>
         <source>emailPassword</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="386"/>
+        <location filename="../models/scomsettings.cpp" line="387"/>
         <source>emailTimeout</source>
         <translation>Таймаут</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="387"/>
+        <location filename="../models/scomsettings.cpp" line="388"/>
         <source>emailEnableSsl</source>
         <translation>SSL</translation>
     </message>
     <message>
-        <location filename="../models/scomsettings.cpp" line="388"/>
+        <location filename="../models/scomsettings.cpp" line="389"/>
         <source>emailEnableImplicitSsl</source>
         <translation>Implicil SSL</translation>
     </message>
@@ -4597,529 +4597,534 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SUserSettings</name>
     <message>
-        <location filename="../models/susersettings.cpp" line="20"/>
+        <location filename="../models/susersettings.cpp" line="379"/>
         <source>ColumnA</source>
         <translation>Колонка A</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="22"/>
+        <location filename="../models/susersettings.cpp" line="381"/>
         <source>ColumnN</source>
         <translation>Колонка N</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="20"/>
+        <location filename="../models/susersettings.cpp" line="379"/>
         <source>ColumnC</source>
         <translation>Колонка C</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="29"/>
+        <location filename="../models/susersettings.cpp" line="36"/>
         <source>Ремонты</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="29"/>
+        <location filename="../models/susersettings.cpp" line="36"/>
         <source>Картриджи</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="282"/>
+        <location filename="../models/susersettings.cpp" line="289"/>
         <source>username</source>
         <translation>Имя пользователя (login)</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="283"/>
+        <location filename="../models/susersettings.cpp" line="290"/>
         <source>name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="284"/>
+        <location filename="../models/susersettings.cpp" line="291"/>
         <source>surname</source>
         <translation>Фамилия</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="285"/>
+        <location filename="../models/susersettings.cpp" line="292"/>
         <source>patronymic</source>
         <translation>Отчество</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="286"/>
+        <location filename="../models/susersettings.cpp" line="293"/>
         <source>roles</source>
         <translation>Роли</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="287"/>
+        <location filename="../models/susersettings.cpp" line="294"/>
         <source>office</source>
         <translation>Офис</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="288"/>
+        <location filename="../models/susersettings.cpp" line="295"/>
         <source>address</source>
         <translation>Адрес</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="289"/>
+        <location filename="../models/susersettings.cpp" line="296"/>
         <source>password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="290"/>
+        <location filename="../models/susersettings.cpp" line="297"/>
         <source>notes</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="291"/>
+        <location filename="../models/susersettings.cpp" line="298"/>
         <source>signature</source>
         <translation>Подпись</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="292"/>
+        <location filename="../models/susersettings.cpp" line="299"/>
         <source>phone</source>
         <translation>Телефон</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="293"/>
+        <location filename="../models/susersettings.cpp" line="300"/>
         <source>phoneMask</source>
         <translation>Маска</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="294"/>
+        <location filename="../models/susersettings.cpp" line="301"/>
         <source>phone2</source>
         <translation>Телефон 2</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="295"/>
+        <location filename="../models/susersettings.cpp" line="302"/>
         <source>phone2Mask</source>
         <translation>Маска</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="296"/>
+        <location filename="../models/susersettings.cpp" line="303"/>
         <source>sipUserId</source>
         <translation>Внутренний номер (SIP)</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="297"/>
+        <location filename="../models/susersettings.cpp" line="304"/>
         <source>birthday</source>
         <translation>Дата рождения</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="298"/>
+        <location filename="../models/susersettings.cpp" line="305"/>
         <source>inn</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="299"/>
+        <location filename="../models/susersettings.cpp" line="306"/>
         <source>kkt</source>
         <translation>ККТ</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="300"/>
+        <location filename="../models/susersettings.cpp" line="307"/>
         <source>pinpad</source>
         <translation>Терминал</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="301"/>
+        <location filename="../models/susersettings.cpp" line="308"/>
         <source>cardOnCall</source>
         <translation>Карточка клиента при вызове</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="302"/>
+        <location filename="../models/susersettings.cpp" line="309"/>
         <source>trackActivity</source>
         <translation>Отслеживать активность</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="303"/>
+        <location filename="../models/susersettings.cpp" line="310"/>
         <source>state</source>
         <translation>Архивный</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="304"/>
+        <location filename="../models/susersettings.cpp" line="311"/>
         <source>isBot</source>
         <translation>Бот</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="305"/>
+        <location filename="../models/susersettings.cpp" line="312"/>
         <source>photo</source>
         <translation>Фото</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="306"/>
+        <location filename="../models/susersettings.cpp" line="313"/>
         <source>clientUserId</source>
         <translation>ID клиента</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="307"/>
+        <location filename="../models/susersettings.cpp" line="314"/>
         <source>passportNum</source>
         <translation>Серия и номер</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="308"/>
+        <location filename="../models/susersettings.cpp" line="315"/>
         <source>passportDate</source>
         <translation>Дата выдачи</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="309"/>
+        <location filename="../models/susersettings.cpp" line="316"/>
         <source>passportOrgan</source>
         <translation>кем выдан</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="310"/>
+        <location filename="../models/susersettings.cpp" line="317"/>
         <source>salaryRate</source>
         <translation>Ставка за месяц</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="311"/>
+        <location filename="../models/susersettings.cpp" line="318"/>
         <source>payDayOff</source>
         <translation>Оплата выходного дня</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="312"/>
+        <location filename="../models/susersettings.cpp" line="319"/>
         <source>payDay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="313"/>
+        <location filename="../models/susersettings.cpp" line="320"/>
         <source>payDeviceIn</source>
         <translation>Сумма за принятую технику</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="314"/>
+        <location filename="../models/susersettings.cpp" line="321"/>
         <source>payDeviceOut</source>
         <translation>Сумма за выданную технику</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="315"/>
+        <location filename="../models/susersettings.cpp" line="322"/>
         <source>payRepair</source>
         <translation>% от выполненный работ</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="316"/>
+        <location filename="../models/susersettings.cpp" line="323"/>
         <source>payRepairQuick</source>
         <translation>% с работ быстрый ремонт</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="317"/>
+        <location filename="../models/susersettings.cpp" line="324"/>
         <source>payCartridgeRefill</source>
         <translation>% с заправки картриджа</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="318"/>
+        <location filename="../models/susersettings.cpp" line="325"/>
         <source>paySale</source>
         <translation>% от прибыли с продаж товаров</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="319"/>
+        <location filename="../models/susersettings.cpp" line="326"/>
         <source>payRepairQSale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="320"/>
+        <location filename="../models/susersettings.cpp" line="327"/>
         <source>pay4SaleInRepair</source>
         <translation>Начисление за продажу деталей в ремонте</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="321"/>
+        <location filename="../models/susersettings.cpp" line="328"/>
         <source>created</source>
         <translation>Дата создания уч. записи</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="322"/>
+        <location filename="../models/susersettings.cpp" line="329"/>
         <source>lastLogin</source>
         <translation>Последний раз входил</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="323"/>
+        <location filename="../models/susersettings.cpp" line="330"/>
         <source>lastActivity</source>
         <translation>Последняя активность</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="324"/>
+        <location filename="../models/susersettings.cpp" line="331"/>
         <source>currentOffice</source>
         <translation>Текущий офис</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="325"/>
+        <location filename="../models/susersettings.cpp" line="332"/>
         <source>company</source>
         <translation>Организация</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="326"/>
+        <location filename="../models/susersettings.cpp" line="333"/>
         <source>rowColor</source>
         <translation>Выделенная строка</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="327"/>
+        <location filename="../models/susersettings.cpp" line="334"/>
         <source>colorLabelWs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="328"/>
+        <location filename="../models/susersettings.cpp" line="335"/>
         <source>fontsize</source>
         <translation>Размер шрифта</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="329"/>
+        <location filename="../models/susersettings.cpp" line="336"/>
         <source>rowheight</source>
         <translation>Высота строки</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="330"/>
+        <location filename="../models/susersettings.cpp" line="337"/>
         <source>geHighlightColor</source>
         <translation>Подстветка строки в гр. редакторе</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="331"/>
+        <location filename="../models/susersettings.cpp" line="338"/>
         <source>defaultDocumentPrinter</source>
         <translation>Принтер для документов по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="332"/>
+        <location filename="../models/susersettings.cpp" line="339"/>
         <source>defaultStickerPrinter</source>
         <translation>Принтер стикеров по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="333"/>
+        <location filename="../models/susersettings.cpp" line="340"/>
         <source>previewBeforePrint</source>
         <translation>Предпросмотр перед печатью документов</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="334"/>
+        <location filename="../models/susersettings.cpp" line="341"/>
         <source>defaultPosPrinter</source>
         <translation>POS принтер по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="335"/>
+        <location filename="../models/susersettings.cpp" line="342"/>
         <source>displayOut</source>
         <translation>Отображать выданные</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="336"/>
+        <location filename="../models/susersettings.cpp" line="343"/>
         <source>displayComplete</source>
         <translation>Отображать готовые</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="337"/>
+        <location filename="../models/susersettings.cpp" line="344"/>
         <source>newOnTop</source>
         <translation>Сначала новые</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="338"/>
+        <location filename="../models/susersettings.cpp" line="345"/>
         <source>saveStateOnClose</source>
         <translation>Автосохранение статуса ремонта</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="339"/>
+        <location filename="../models/susersettings.cpp" line="346"/>
         <source>autoRefreshWorkspace</source>
         <translation>Автообновление списка заказов</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="340"/>
+        <location filename="../models/susersettings.cpp" line="347"/>
         <source>refreshTime</source>
         <translation>Период автообновления</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="341"/>
+        <location filename="../models/susersettings.cpp" line="348"/>
         <source>issuedColor</source>
         <translation>Выданные в результатах поиска</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="342"/>
+        <location filename="../models/susersettings.cpp" line="349"/>
         <source>defOffice</source>
         <translation>Офис по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="343"/>
+        <location filename="../models/susersettings.cpp" line="350"/>
         <source>defEmployee</source>
         <translation>Сотрудник по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="344"/>
+        <location filename="../models/susersettings.cpp" line="351"/>
         <source>defStatus</source>
         <translation>Статус по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="345"/>
+        <location filename="../models/susersettings.cpp" line="352"/>
         <source>defWsFilter</source>
         <translation>Режим</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="346"/>
+        <location filename="../models/susersettings.cpp" line="353"/>
         <source>autosavePartList</source>
         <translation>Автосохранение списка работ и деталей</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="347"/>
+        <location filename="../models/susersettings.cpp" line="354"/>
         <source>autosaveDiagResult</source>
         <translation>Автосохранение результатов диагностики</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="348"/>
+        <location filename="../models/susersettings.cpp" line="355"/>
         <source>preferRegular</source>
         <translation>Окно клиентов, сначала постоянные</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="349"/>
+        <location filename="../models/susersettings.cpp" line="356"/>
         <source>groupStoreItems</source>
         <translation>Группировать товары по артикулу</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="350"/>
+        <location filename="../models/susersettings.cpp" line="357"/>
         <source>defStore</source>
         <translation>Склад по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="351"/>
+        <location filename="../models/susersettings.cpp" line="358"/>
         <source>xlsC1</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="352"/>
+        <location filename="../models/susersettings.cpp" line="359"/>
         <source>xlsC2</source>
         <translation>Кол-во</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="353"/>
+        <location filename="../models/susersettings.cpp" line="360"/>
         <source>xlsC3</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="354"/>
+        <location filename="../models/susersettings.cpp" line="361"/>
         <source>xlsC4</source>
         <translation>Описание в Интернет-магазине</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="355"/>
+        <location filename="../models/susersettings.cpp" line="362"/>
         <source>xlsC14</source>
         <translation>Заголовок в Интернет-магазине</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="356"/>
+        <location filename="../models/susersettings.cpp" line="363"/>
         <source>xlsC6</source>
         <translation>Серийный номер</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="357"/>
+        <location filename="../models/susersettings.cpp" line="364"/>
         <source>xlsC5</source>
         <translation>Партномер</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="358"/>
+        <location filename="../models/susersettings.cpp" line="365"/>
         <source>xlsC7</source>
         <translation>Стоимость</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="359"/>
+        <location filename="../models/susersettings.cpp" line="366"/>
         <source>xlsC8</source>
         <translation>Розница</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="360"/>
+        <location filename="../models/susersettings.cpp" line="367"/>
         <source>xlsC9</source>
         <translation>Опт</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="361"/>
+        <location filename="../models/susersettings.cpp" line="368"/>
         <source>xlsC10</source>
         <translation>Опт 2</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="362"/>
+        <location filename="../models/susersettings.cpp" line="369"/>
         <source>xlsC11</source>
         <translation>Опт 3</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="363"/>
+        <location filename="../models/susersettings.cpp" line="370"/>
         <source>xlsC12</source>
         <translation>Цена для сервиса</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="364"/>
+        <location filename="../models/susersettings.cpp" line="371"/>
         <source>xlsC15</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="365"/>
+        <location filename="../models/susersettings.cpp" line="372"/>
         <source>xlsC13</source>
         <translation>Ячейка</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="366"/>
+        <location filename="../models/susersettings.cpp" line="373"/>
         <source>workspaceRepairs</source>
         <translation>Ремонты</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="367"/>
+        <location filename="../models/susersettings.cpp" line="374"/>
         <source>workspaceItems</source>
         <translation>Товары</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="368"/>
+        <location filename="../models/susersettings.cpp" line="375"/>
         <source>workspaceMode</source>
         <translation>Режим главного окна</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="369"/>
+        <location filename="../models/susersettings.cpp" line="376"/>
         <source>defaultPaymentSystem</source>
         <translation>Платёжная система по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="20"/>
+        <location filename="../models/susersettings.cpp" line="379"/>
         <source>ColumnD</source>
         <translation>Колонка D</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="20"/>
+        <location filename="../models/susersettings.cpp" line="379"/>
         <source>ColumnE</source>
         <translation>Колонка E</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="20"/>
+        <location filename="../models/susersettings.cpp" line="379"/>
         <source>ColumnB</source>
         <translation>Колонка B</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="21"/>
+        <location filename="../models/susersettings.cpp" line="380"/>
         <source>ColumnF</source>
         <translation>Колонка F</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="21"/>
+        <location filename="../models/susersettings.cpp" line="380"/>
         <source>ColumnG</source>
         <translation>Колонка G</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="21"/>
+        <location filename="../models/susersettings.cpp" line="380"/>
         <source>ColumnH</source>
         <translation>Колонка H</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="21"/>
+        <location filename="../models/susersettings.cpp" line="380"/>
         <source>ColumnI</source>
         <translation>Колонка I</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="21"/>
+        <location filename="../models/susersettings.cpp" line="380"/>
         <source>ColumnJ</source>
         <translation>Колонка J</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="22"/>
+        <location filename="../models/susersettings.cpp" line="381"/>
         <source>ColumnK</source>
         <translation>Колонка K</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="22"/>
+        <location filename="../models/susersettings.cpp" line="381"/>
         <source>ColumnL</source>
         <translation>Колонка L</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="22"/>
+        <location filename="../models/susersettings.cpp" line="381"/>
         <source>ColumnM</source>
         <translation>Колонка M</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="22"/>
+        <location filename="../models/susersettings.cpp" line="381"/>
         <source>ColumnO</source>
         <translation>Колонка O</translation>
+    </message>
+    <message>
+        <location filename="../models/susersettings.cpp" line="382"/>
+        <source>NoColumn</source>
+        <translation>нет</translation>
     </message>
 </context>
 <context>
@@ -5752,12 +5757,12 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabclients.cpp" line="59"/>
+        <location filename="../tabclients.cpp" line="60"/>
         <source>Выбрать клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabclients.cpp" line="61"/>
+        <location filename="../tabclients.cpp" line="62"/>
         <source>Клиенты</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6801,6 +6806,16 @@ p, li { white-space: pre-wrap; }
         <location filename="../tabsalary.cpp" line="102"/>
         <source>Список дополнительных начислений и списаний не сохранён!
 Сохранить перед закрытием?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabsalary.cpp" line="178"/>
+        <source>Информация</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabsalary.cpp" line="179"/>
+        <source>Сначала нажмите кнопку Загрузить</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -6,6 +6,12 @@ SUserSettings::SUserSettings()
 {
 }
 
+SUserSettings::~SUserSettings()
+{
+    if(xlsColumnsList)
+        delete xlsColumnsList;
+}
+
 void SUserSettings::initWidgets()
 {
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
@@ -16,12 +22,13 @@ void SUserSettings::initWidgets()
     static_cast<QComboBox*>(i_editorWidgets.value("defaultStickerPrinter"))->addItems(m_printersList);
     static_cast<QComboBox*>(i_editorWidgets.value("defaultPosPrinter"))->addItems(m_printersList);
 
-    QStringList xlsColumns;
-    xlsColumns << tr("ColumnA") << tr("ColumnB") << tr("ColumnC") << tr("ColumnD") << tr("ColumnE")
-               << tr("ColumnF") << tr("ColumnG") << tr("ColumnH") << tr("ColumnI") << tr("ColumnJ")
-               << tr("ColumnK") << tr("ColumnL") << tr("ColumnM") << tr("ColumnN") << tr("ColumnO");
+    QMetaEnum types = SUserSettings::staticMetaObject.enumerator(SUserSettings::staticMetaObject.indexOfEnumerator("XlsColumns"));
+    xlsColumnsList = SStandardItemModel::modelFromEnum(types, tr);
+    xlsColumnsList->setObjectName("xlsColumns");
+    xlsColumnsList->setHorizontalHeaderLabels({"name", "id"});
     for(int i = 1; i < 16; i++)
-        static_cast<QComboBox*>(i_editorWidgets.value("xlsC" + QString::number(i)))->addItems(xlsColumns);
+        static_cast<QComboBox*>(i_editorWidgets.value("xlsC" + QString::number(i)))->setModel(xlsColumnsList);
+
 
     // Модели данных виджетов (ComboBox) должны быть заданы до загрузки данных, иначе будет падать.
 //   static_cast<QComboBox*>(i_editorWidgets.value("..."))->setModel(...);
@@ -367,4 +374,10 @@ void SUserSettings::translate()
     tr("workspaceItems");
     tr("workspaceMode");
     tr("defaultPaymentSystem");
+
+    // Перевод значений в выпадающем списке
+    tr("ColumnA"); tr("ColumnB"); tr("ColumnC"); tr("ColumnD"); tr("ColumnE");
+    tr("ColumnF"); tr("ColumnG"); tr("ColumnH"); tr("ColumnI"); tr("ColumnJ");
+    tr("ColumnK"); tr("ColumnL"); tr("ColumnM"); tr("ColumnN"); tr("ColumnO");
+    tr("NoColumn");
 }

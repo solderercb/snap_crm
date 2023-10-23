@@ -25,14 +25,17 @@ bool SLocalSettings::selMostRecentSettingFile(const QString &fileName)
     std::sort(subDirsList.begin(), subDirsList.end(), collator);    // числовая сортировка папок
 
     QStringList::iterator subDir = subDirsList.end();
-    while ( --subDir != subDirsList.begin() )
+    do
     {
+        subDir--;
         if (QFile::exists(dir.path() + "/" + subDir->toUtf8() + "/" + fileName))     // определяем файл самой последней версии приложения
         {
             QDir::setCurrent(dir.path() + "/" + subDir->toUtf8());
             return 1;
         }
     }
+    while ( subDir != subDirsList.begin());
+
     return 0;
 }
 
@@ -285,3 +288,4 @@ QString SLocalSettings::base32StringSuitableForDirName(const QByteArray &payload
     return result;
 }
 
+                                                                                                                              

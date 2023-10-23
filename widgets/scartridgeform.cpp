@@ -852,19 +852,22 @@ void SCartridgeForm::setRefill(int state)
 void SCartridgeForm::setChipReplace(int state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Chip);
-    updatePreagreedAmount(material, state);
+    if(material)
+        updatePreagreedAmount(material, state);
 }
 
 void SCartridgeForm::setDrumReplace(int state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Drum);
-    updatePreagreedAmount(material, state);
+    if(material)
+        updatePreagreedAmount(material, state);
 }
 
 void SCartridgeForm::setBladeReplace(int state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Blade);
-    updatePreagreedAmount(material, state);
+    if(material)
+        updatePreagreedAmount(material, state);
 }
 
 void SCartridgeForm::savePlace(int index)

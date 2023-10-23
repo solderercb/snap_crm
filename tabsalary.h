@@ -80,6 +80,7 @@ public slots:
     void periodDateChanged(const QDate date);
     void tabChanged(const int index);
     void setExtraChargesButtonsVisible(bool state = true);
+    void buttonAddExtraChargeClicked();
     void fillClientCreds(int);
     void prevPeriod();
     void nextPeriod();

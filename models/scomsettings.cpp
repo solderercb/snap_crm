@@ -153,10 +153,8 @@ void SComSettings::prepareUpdateList(Table table)
             field = field.replace("settings.", "");
 
         QVariant val = i_fieldModified.value(propName);
-        if(!val.isValid())
-            val = i_jsonFieldModified.value(propName);
-        if(!val.isValid())
-            continue;
+//        if(!val.isValid())                                // также временно отключено
+//            val = i_jsonFieldModified.value(propName);
 
 /******* TEMPORARY *******/
         // Данные отключенных виджетов не записывать в БД
@@ -164,6 +162,9 @@ void SComSettings::prepareUpdateList(Table table)
         if(w && !w->isEnabled())
             continue;
 /**************/
+
+        if(!val.isValid())
+            continue;
 
         i_valuesMap.insert(field, val);
     }

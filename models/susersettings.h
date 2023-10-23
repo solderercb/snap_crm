@@ -134,7 +134,10 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
 public:
     enum Table{Users = 0, UsersParams = 1};
     enum WidgetType{Label, Editor};
+    enum XlsColumns{ColumnA = 0, ColumnB, ColumnC, ColumnD, ColumnE, ColumnF, ColumnG, ColumnH, ColumnI, ColumnJ, ColumnK, ColumnL, ColumnM, ColumnN, ColumnO, NoColumn = 99};
+    Q_ENUM(XlsColumns)
     explicit SUserSettings();
+    ~SUserSettings();
     void initWidgets();
     void load(const QString &username);
     void loadFromUsersParams();
@@ -148,6 +151,7 @@ public:
 private:
     QMap<QString, int> m_params;
     QStringList m_printersList;
+    SStandardItemModel *xlsColumnsList = nullptr;
     void setComboBoxModel(const QString propertyName, SSqlQueryModel* model);
     void disableWidget(const QString propertyName);
     void prepareUpdateList(Table table);

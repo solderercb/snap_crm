@@ -38,7 +38,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     ui->dateEditPeriod->setDate(QDate::currentDate());
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &tabSalary::tabChanged);
 
-    connect(ui->buttonAddExtraCharge, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::addNewRow);
+    connect(ui->buttonAddExtraCharge, &QPushButton::clicked, this, &tabSalary::buttonAddExtraChargeClicked);
     connect(ui->buttonSaveExtraChargesList, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::saveTable);
     connect(ui->toolButtonPrevPeriod, &QToolButton::clicked, this, &tabSalary::prevPeriod);
     connect(ui->toolButtonNextPeriod, &QToolButton::clicked, this, &tabSalary::nextPeriod);
@@ -166,6 +166,21 @@ void tabSalary::setExtraChargesButtonsVisible(bool state)
     bool stateForPeriod = m_periodBegin.date().month() == QDate::currentDate().month();
     ui->buttonAddExtraCharge->setVisible(state && stateForPeriod);
     ui->buttonSaveExtraChargesList->setVisible(state && stateForPeriod);
+}
+
+void tabSalary::buttonAddExtraChargeClicked()
+{
+    if(checkInput())
+        return;
+
+    if(m_userModel->id() != usersModelF->databaseIDByRow(ui->comboBoxEmployee->currentIndex()))
+        shortlivedNotification *newPopup = new shortlivedNotification(this,
+                                                                      tr("Информация"),
+                                                                      tr("Сначала нажмите кнопку Загрузить"),
+                                                                      QColor(255,164,119),
+                                                                      QColor(255,199,173));
+
+    m_extraCharges->addNewRow();
 }
 
 void tabSalary::createTabSelectExistingClient()
