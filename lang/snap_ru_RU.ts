@@ -1097,7 +1097,7 @@
     </message>
     <message>
         <location filename="../models/scartridgematerialmodel.cpp" line="136"/>
-        <source>Замена картриджа</source>
+        <source>Восстановление</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4060,6 +4060,19 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>STableSalaryExtraModel</name>
+    <message>
+        <location filename="../models/salarytabmodels/stablesalaryextramodel.cpp" line="115"/>
+        <source>Начисления и списания</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../models/salarytabmodels/stablesalaryextramodel.cpp" line="115"/>
+        <source>Список успешно сохранён</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>STableViewBase</name>
     <message>
         <location filename="../widgets/stableviewbase.cpp" line="421"/>
@@ -4330,6 +4343,16 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
         <source>Основание</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
+        <source>С</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
+        <source>По</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6809,12 +6832,12 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="178"/>
+        <location filename="../tabsalary.cpp" line="183"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="179"/>
+        <location filename="../tabsalary.cpp" line="184"/>
         <source>Сначала нажмите кнопку Загрузить</source>
         <translation type="unfinished"></translation>
     </message>

@@ -133,7 +133,7 @@ void SCartridgeMaterialModel::initWorkName(const Type type)
         case Drum: m_workName = tr("Замена фотобарабана"); break;
         case Chip: m_workName = tr("Замена чипа"); break;
         case Blade: m_workName = tr("Замена лезвия"); break;
-        case Replace: m_workName = tr("Замена картриджа"); break;
+        case Replace: m_workName = tr("Восстановление"); break; // данная работа, как таковая не выполняется ввиду нерентабельности; под ней подразумавается замена картриджа на новый не оригинальный; с таким названием работа будет фигурировать в документах, предназначенных для основной массы клиентов — организаций, и позволяет избежать лишней бюрократии со списанием изношенного и приёмом на баланс нового картриджа
         case TonerPlus: m_workName = tr("Заправка (увелич.)"); break;
         case MagRoller: m_workName = tr("Замена магн. вала"); break;
         case Prophilaxy: m_workName = tr("Профилактика"); break;

@@ -19,8 +19,9 @@ XtraSerializer* STableViewSalaryRepairs::gridLayout()
     return i_gridLayout;
 }
 
-void STableViewSalaryRepairs::showRowsEarlyPayed(bool state)
+void STableViewSalaryRepairs::showRowsPayed(bool state)
 {
+    m_showPayedRepairs = state;
     for(int i = 0; i < m_model->rowCount(); i++)
     {
         if(state)
@@ -39,8 +40,8 @@ void STableViewSalaryRepairs::columnResized(int column, int oldWidth, int newWid
     emit signalColumnResized(column, newWidth);
 }
 
-void STableViewSalaryRepairs::refresh(const bool showPayed)
+void STableViewSalaryRepairs::refresh(bool, bool)
 {
     STableViewBase::refresh();
-    showRowsEarlyPayed(showPayed);
+    showRowsPayed(m_showPayedRepairs);
 }

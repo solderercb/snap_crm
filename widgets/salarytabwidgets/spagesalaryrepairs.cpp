@@ -22,7 +22,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     connect(ui->tableViewRepairs, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairsRowDoubleClicked);
     connect(ui->tableViewRepairParts, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairPartsRowDoubleClicked);
     connect(ui->tableViewRepairs->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SPageSalaryRepairs::tableRepairsRowSelected);
-    connect(ui->checkBoxShowPayed, &QCheckBox::toggled, ui->tableViewRepairs, &STableViewSalaryRepairs::showRowsEarlyPayed);
+    connect(ui->checkBoxShowPayed, &QCheckBox::toggled, ui->tableViewRepairs, &STableViewSalaryRepairs::showRowsPayed);
 }
 
 SPageSalaryRepairs::~SPageSalaryRepairs()
@@ -54,6 +54,7 @@ void SPageSalaryRepairs::updateModels()
     QStringList query_group;
     query_group << "`id`";    // default GROUP part of query
 
+    // TODO: исправть числовые значения на enum'ы
     ui->tableViewRepairs->setQuery(QUERY_SEL_SALARY_REPAIRS(
                                        parentTab->periodBegin(),
                                        parentTab->periodEnd(),
@@ -61,7 +62,7 @@ void SPageSalaryRepairs::updateModels()
                                        parentTab->employeeId()));
 
     ui->tableViewRepairs->setGrouping(query_group);
-    ui->tableViewRepairs->refresh(ui->checkBoxShowPayed->isChecked());
+    ui->tableViewRepairs->refresh();
 
     parentTab->setModelUpdatedFlag(RepairsModel);
 }

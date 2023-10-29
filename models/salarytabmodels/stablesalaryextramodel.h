@@ -4,6 +4,7 @@
 #include "../seditablebasemodel.h"
 #include "sadditionalpaymentmodel.h"
 #include "../../squerylog.h"
+#include "widgets/shortlivednotification.h"
 
 #include <QObject>
 #include <QSqlField>

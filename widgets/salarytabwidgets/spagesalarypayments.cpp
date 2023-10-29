@@ -29,8 +29,8 @@ void SPageSalaryPayments::updateModels()
 
 void SPageSalaryPayments::updateWidgets()
 {
-    ui->tableViewPaymentsSummary->setTotal(2, parentTab->m_payments->STableBaseModel::total(2));
-    ui->tableViewPaymentsSummary->setTotal(3, parentTab->m_payments->STableBaseModel::total(3));
+    ui->tableViewPaymentsSummary->setTotal(4, parentTab->m_payments->STableBaseModel::total(4));
+    ui->tableViewPaymentsSummary->setTotal(5, parentTab->m_payments->STableBaseModel::total(5));
 }
 
 void SPageSalaryPayments::tableColumnResized(int, int)
@@ -62,7 +62,8 @@ void STableViewSalaryPaymentsSummary::setGridLayout(XtraSerializer *layout)
     QList<QStandardItem*> *emptyModelData = new QList<QStandardItem*>();
     for(int i = 0; i < i_gridLayout->$GridControl.Columns.count(); i++)
         *emptyModelData << new QStandardItem();
-    emptyModelData->at(2)->setText("<value>");
+    emptyModelData->at(4)->setText("<value>");
+    emptyModelData->at(5)->setText("<value>");
     dataModel->appendRow(*emptyModelData);
     setRowHeight(0, this->height());
 }

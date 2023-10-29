@@ -111,8 +111,10 @@ void STableSalaryExtraModel::saveTable()
 
     m_queryLog->stop();
     if(nErr)
+    {
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Начисления и списания"), tr("Список успешно сохранён"), QColor(214,239,220), QColor(229,245,234));
         emit repopulate();
-
+    }
 
     delete query;
     delete m_queryLog;

@@ -383,14 +383,14 @@ void STableViewBase::orderChanged(int logicalIndex, Qt::SortOrder order)
 
     m_sortColumn = logicalIndex;
 
-    refresh();
+    this->refresh();
 }
 
 void STableViewBase::clearSorting()
 {
     m_sortColumn = -1;
     horizontalHeader()->setSortIndicator(m_sortColumn, Qt::AscendingOrder);
-    refresh();
+    this->refresh();
 }
 
 int STableViewBase::visibleWidth()

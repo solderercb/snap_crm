@@ -846,6 +846,8 @@
                                                 "SELECT                                                                          \n"\
                                                 "    t1.`id`,                                                                    \n"\
                                                 "    t1.`payment_date`,                                                          \n"\
+                                                "    t1.`period_from`,                                                           \n"\
+                                                "    t1.`period_to`,                                                             \n"\
                                                 "    t1.`summ`,                                                                  \n"\
                                                 "    t4.`summ` AS 'toBalance',                                                   \n"\
                                                 "    t2.`username` AS 'employee',                                                \n"\
@@ -860,8 +862,8 @@
                                                 "INNER JOIN `users` AS t3                                                        \n"\
                                                 "    ON t1.`from_user` = t3.`id`                                                 \n"\
                                                 "WHERE                                                                           \n"\
-                                                "    t1.`period_from` >= '%1'                                                    \n"\
-                                                "    AND t1.`period_to` <= '%2'                                                  \n"\
+                                                "    t1.`period_to` >= '%1'                                                      \n"\
+                                                "    AND t1.`period_from` <= '%2'                                                \n"\
                                                 "    AND t1.`user_id` = %3;                                                      \n"\
                                                 )\
                                                 .arg(date1)\

@@ -163,7 +163,12 @@ void tabSalary::tabChanged(const int index)
 
 void tabSalary::setExtraChargesButtonsVisible(bool state)
 {
-    bool stateForPeriod = m_periodBegin.date().month() == QDate::currentDate().month();
+    bool stateForPeriod = 0;
+    int daysFromPeriodBegin = m_periodBegin.date().daysTo(QDate::currentDate());
+    int daysToPeriodEnd = QDate::currentDate().daysTo(m_periodEnd.date());
+    if(daysFromPeriodBegin >= 0 && daysToPeriodEnd >= 0)
+        stateForPeriod = 1;
+
     ui->buttonAddExtraCharge->setVisible(state && stateForPeriod);
     ui->buttonSaveExtraChargesList->setVisible(state && stateForPeriod);
 }
@@ -177,8 +182,8 @@ void tabSalary::buttonAddExtraChargeClicked()
         shortlivedNotification *newPopup = new shortlivedNotification(this,
                                                                       tr("Информация"),
                                                                       tr("Сначала нажмите кнопку Загрузить"),
-                                                                      QColor(255,164,119),
-                                                                      QColor(255,199,173));
+                                                                      QColor(255,255,255),
+                                                                      QColor(245,245,245));
 
     m_extraCharges->addNewRow();
 }

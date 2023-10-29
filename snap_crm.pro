@@ -447,7 +447,6 @@ equals(UPDATE_REQ, 1) {
 
 INCLUDEPATH += $$EXPORT_LIBS/include
 DEPENDPATH += $$EXPORT_LIBS/include
-PROGRAM_FILES_DIR = C:\Program Files\SNAP CRM
 
 LIBS += -lwinspool -lKernel32
 CONFIG(release, debug|release) {
@@ -490,26 +489,14 @@ QMAKE_EXTRA_TARGETS += qm ts
 POST_TARGETDEPS +=  qm
 
 DEST = $$OUT_PWD/$${BUILD_TYPE}/lang
-DEST2 = $${PROGRAM_FILES_DIR}/lang
 win32:TRANSLATIONS_PATH ~= s,/,\\,g
 win32:DEST ~= s,/,\\,g
 
 QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
 !exists($${DEST}){
-   QMAKE_POST_LINK += mkdir \"$${DEST}\" $$escape_expand(\\n\\t)
+   system("mkdir $$DEST")
 }
 for(qmfile, TRANSLATIONS_FILES) {
     win32:qmfile ~= s,/,\\,g
     QMAKE_POST_LINK += $$QMAKE_COPY $$qmfile \"$$DEST\" $$escape_expand(\\n\\t)
-}
-
-equals(QT_MAJOR_VERSION, 5){
-    CONFIG(release, debug|release) {
-        QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\$${TARGET}.exe\" \"$${PROGRAM_FILES_DIR}\\$${TARGET}.exe\" $$escape_expand(\\n\\t)
-        QMAKE_POST_LINK += $$QMAKE_COPY \"$${OUT_PWD}\\$${BUILD_TYPE}\\schema-updates.rcc\" \"$${PROGRAM_FILES_DIR}\\\" $$escape_expand(\\n\\t)
-        for(qmfile, TRANSLATIONS_FILES) {
-            win32:qmfile ~= s,/,\\,g
-            QMAKE_POST_LINK += $$QMAKE_COPY $$qmfile \"$$DEST\" $$escape_expand(\\n\\t)
-        }
-    }
 }
