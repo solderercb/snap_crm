@@ -87,7 +87,7 @@ protected:
     void applySorting();
     void initAutosizedColumns();
     void adoptAutosizedColumns();
-    void setColumnWidth(int column, int width);
+    virtual void setColumnWidth(int column, int width);
     void setDefaultLayoutParams();
     void setDefaultColumnParams(const int column, const QString &label, const int width);
     void readLayout();

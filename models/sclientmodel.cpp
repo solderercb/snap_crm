@@ -91,6 +91,7 @@ void SClientModel::load(int id)
         m_visitSource = clientModel->record(0).value("visit_source").toInt();
         m_webPassword = clientModel->record(0).value("web_password").toString();
         m_urName = clientModel->record(0).value("ur_name").toString();
+        m_shortName = clientModel->record(0).value("short_name").toString();
         m_email = clientModel->record(0).value("email").toString();
         m_icq = clientModel->record(0).value("icq").toString();
         m_skype = clientModel->record(0).value("skype").toString();
@@ -566,6 +567,17 @@ QString SClientModel::urName()
 void SClientModel::setUrName(const QString &name)
 {
     i_valuesMap.insert("ur_name", name);
+}
+
+const QString SClientModel::shortName()
+{
+    return m_shortName;
+}
+
+void SClientModel::setShortName(const QString &shortName)
+{
+    m_shortName = shortName;
+    i_valuesMap.insert("short_name", shortName);
 }
 
 QString SClientModel::email()

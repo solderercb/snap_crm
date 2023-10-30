@@ -1,4 +1,5 @@
 #include "stablerepairsmodel.h"
+#include "widgets/stableviewrepairs.h"
 
 STableRepairsModel::STableRepairsModel(QObject *parent) : STableBaseModel(parent)
 {
@@ -30,17 +31,17 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
         else if(fieldName == QString("repair_cost"))
             return dataLocalizedFromDouble(index);
         else if(fieldName == QString("in_date"))
-            return timestampLocal(index);
+            return dateTime(index);
         else if(fieldName == QString("out_date"))
-            return timestampLocal(index);
+            return dateTime(index);
         else if(fieldName == QString("master") || fieldName == QString("manager"))
             return userFromId(index);
         else if(fieldName == QString("box"))
             return QVariant(repairBoxesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
         else if(fieldName == QString("id"))
             return QString("%1-%2").arg(record(index.row()).value("office").toString().rightJustified(3, '0')).arg(QSqlQueryModel::data(index).toString().rightJustified(6, '0'));
-        else if(!permissions->viewClients && fieldName == QString("client"))
-            return tr("no permissions");
+        else if(fieldName == QString("client"))
+            return clientName(index);
         else if(!permissions->viewClients &&fieldName == QString("phone"))
             return tr("no permissions");
     }
@@ -109,4 +110,36 @@ void STableRepairsModel::reportCallbackData(const LimeReport::CallbackInfo &info
         case LimeReport::CallbackInfo::ColumnCount: data = columnCount(); break;
         case LimeReport::CallbackInfo::RowCount: data = rowCount(); break;
     }
+}
+
+QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
+{
+    if(!permissions->viewClients)
+        return tr("no permissions");
+
+    QString value;
+
+    // полное имя (название организации)
+    value = STableBaseModel::data(idx).toString();
+    if(value.length() < i_columnWidths[idx.column()])
+        return value;
+
+    // короткое имя
+    value = STableBaseModel::data(index(idx.row(), 38)).toString(); // TODO: заменить число на enum
+    if(!value.isEmpty() && value.length() < i_columnWidths[idx.column()])
+        return value;
+
+    return STableBaseModel::data(idx);
+}
+
+QVariant STableRepairsModel::dateTime(const QModelIndex &idx) const
+{
+    int width = i_columnWidths[idx.column()];
+
+    if(width > 16)
+        return timestampLocal(idx).toString("dd.MM.yyyy hh:mm");
+    else if(width > 10)
+        return timestampLocal(idx).toString("dd.MM.yyyy");
+    else
+        return timestampLocal(idx).toString("dd.MM.yy");
 }

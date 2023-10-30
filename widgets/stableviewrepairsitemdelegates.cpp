@@ -117,10 +117,10 @@ void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, 
         case Global::ClientInformStateIds::NotInformedOther: color.setRgb(255,165,0); break;
         default: return;
     }
-    QSize sz = i_fontMetrics->size(Qt::TextSingleLine, index.data().toString());
+    int w = i_fontMetrics->horizontalAdvance(index.data().toString());
     QPoint pt = option.rect.center();
-    pt.setX(option.rect.left() + sz.width() + 10);
-    QRect rect(0, 0, 4, sz.height()+2);
+    pt.setX(option.rect.left() + w + 10);
+    QRect rect(0, 0, 4, i_fontMetrics->height()+2);
     rect.moveCenter(pt);
 
     // TODO: всплывающая подсказка статуса информирования клиента

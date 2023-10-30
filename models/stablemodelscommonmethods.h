@@ -21,9 +21,11 @@ public:
     QVariant data(const int row, const int column, int role = Qt::DisplayRole) const;
     QVariant unformattedData(const QModelIndex &item, int role = Qt::DisplayRole) const;
     QVariant unformattedData(const int row, const int column, int role = Qt::DisplayRole) const;
+    void setColumnWidth(const int column, const int width);
 private:
 protected:
     QMap<QString, int> i_fields;
+    QMap<int, int> i_columnWidths;  // ширина столбца в символах
     QSqlQueryModel *derivedModel;
 public slots:
     void cashFieldsNames();

@@ -60,6 +60,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this, &tabRepairs::tableLayoutChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &tabRepairs::tableSelectionChanged);
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &tabRepairs::menuRequest);
+    connect(ui->tableView, &QTableView::clicked, this, &tabRepairs::tableItemClick);
     connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
     tableUpdateDelay->setSingleShot(true);
 
@@ -102,6 +103,8 @@ void tabRepairs::updateWidgets()
         ui->labelTableMode->setText(tr("Картриджи"));
     else
         ui->labelTableMode->setText(tr("Ремонты"));
+
+    ui->tableView->setAlternatingRowColors(userDbData->alternateRowsBackground);
 }
 
 tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка каждого типа может быть только одна
@@ -177,6 +180,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     l2.fields.append(STableViewBase::initFilterField("t1.`id`", FilterField::RegExp, ui->lineEditSearch->text()));
     l2.fields.append(STableViewBase::initFilterField("t1.`title`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
     l2.fields.append(STableViewBase::initFilterField("t1.`serial_number`", FilterField::RegExp, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    l2.fields.append(STableViewBase::initFilterField("t5.`short_name`", FilterField::RegExp, ui->lineEditSearch->text(), Qt::CaseInsensitive));
     l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)", FilterField::RegExp, ui->lineEditSearch->text(), Qt::CaseInsensitive));
     l1.childs.append(l2);
 
@@ -212,6 +216,14 @@ void tabRepairs::tableItemDoubleClick(QModelIndex item)
     {
         emit activateCaller(callerPtr);
         deleteLater();
+    }
+}
+
+void tabRepairs::tableItemClick(QModelIndex index)
+{
+    if(index.column() == STableViewRepairs::Column::ClientFullName && QGuiApplication::queryKeyboardModifiers() & Qt::AltModifier)
+    {
+        ui->lineEditSearch->setText(ui->tableView->model()->data(index).toString());
     }
 }
 

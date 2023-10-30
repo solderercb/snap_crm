@@ -17,7 +17,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     m_type = type;
     m_tableUpdateDelay = new QTimer();
 
-    clientsTable = new QSqlQueryModel();
+    clientsTable = new STableBaseModel();
     ui->tableView->setModel(clientsTable);
     if (type == 1)
     {

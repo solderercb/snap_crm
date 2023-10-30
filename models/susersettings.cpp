@@ -201,6 +201,9 @@ void SUserSettings::save()
     i_valuesMap.clear();
     prepareUpdateList(Table::Users);
 
+    if(i_valuesMap.contains("fontsize"))
+        QApplication::setFont(QFont("Segoe UI", userDbData->fontSize));
+
     if(!commit())
         throw Global::ThrowType::QueryError;
     saveToUsersParams();
@@ -332,8 +335,8 @@ void SUserSettings::translate()
     tr("company");
     tr("rowColor");
     tr("colorLabelWs");
-    tr("fontsize");
-    tr("rowheight");
+    tr("fontSize");
+    tr("rowHeight");
     tr("geHighlightColor");
     tr("defaultDocumentPrinter");
     tr("defaultStickerPrinter");
@@ -374,6 +377,7 @@ void SUserSettings::translate()
     tr("workspaceItems");
     tr("workspaceMode");
     tr("defaultPaymentSystem");
+    tr("alternateRowsBackground");
 
     // Перевод значений в выпадающем списке
     tr("ColumnA"); tr("ColumnB"); tr("ColumnC"); tr("ColumnD"); tr("ColumnE");

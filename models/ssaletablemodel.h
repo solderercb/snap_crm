@@ -125,6 +125,7 @@ public:
     QString reportPerformer();
     void setRepairType(bool type);
     void setCartridgeCardModel(SCartridgeCardModel *cartridgeCardModel);
+    QMap<int, int> i_columnWidths;  // не используется; условная заглушка для нормальной работы STableViewBase с этой моделью данных
 #ifdef QT_DEBUG
     void dbgAddRandomItem();
     void dbgAddRandomItemBasket();

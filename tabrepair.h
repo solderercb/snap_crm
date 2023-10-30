@@ -153,6 +153,7 @@ private slots:
     void spinBoxAmountChanged(double);
     void spinBoxAmountEditingFinished();
     void saveDiagAmount();
+    void autosaveTimeout();
     void diagAmountSaved();
     void buttonAddItemClicked();
     void switchEditStrategy(bool);

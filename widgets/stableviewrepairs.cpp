@@ -97,5 +97,15 @@ void STableViewRepairs::translateNames()
     tr("Place");
     tr("Manager");
     tr("Progress");
+    tr("ExtNotes");
+    tr("DevClass");
+}
+
+void STableViewRepairs::setColumnWidth(int column, int width)
+{
+    if(m_model)
+        m_model->setColumnWidth(column, (int)(width/m_fontMetrics->averageCharWidth()));
+
+    STableViewBase::setColumnWidth(column, width);
 }
 

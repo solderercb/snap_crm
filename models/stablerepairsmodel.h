@@ -20,6 +20,9 @@ public:
     void initDemo();
 public slots:
     void reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+private:
+    QVariant clientName(const QModelIndex &index) const;
+    QVariant dateTime(const QModelIndex &index) const;
 };
 
 #endif // STABLEREPAIRSMODEL_H

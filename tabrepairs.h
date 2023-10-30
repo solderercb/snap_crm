@@ -66,6 +66,7 @@ public slots:
     void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
 private slots:
     void tableItemDoubleClick(QModelIndex);
+    void tableItemClick(QModelIndex index);
     void lineEditSearchTextChanged(QString);
     void lineEditSearchReturnPressed();
     void tableModeChanged(bool mode);

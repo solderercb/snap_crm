@@ -77,6 +77,11 @@ QVariant STableModelsCommonMethods::unformattedData(const int row, const int col
     return derivedModel->data(derivedModel->index(row, column), role | 0x0100);
 }
 
+void STableModelsCommonMethods::setColumnWidth(const int column, const int width)
+{
+    i_columnWidths[column] = width;
+}
+
 void STableModelsCommonMethods::cashFieldsNames()
 {
     i_fields.clear();

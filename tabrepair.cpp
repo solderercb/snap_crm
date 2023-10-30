@@ -59,7 +59,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         m_autosaveDiag = 1;
         m_autosaveDiagTimer = new QTimer();
         m_autosaveDiagTimer->setSingleShot(true);
-        QObject::connect(m_autosaveDiagTimer, SIGNAL(timeout()), this, SLOT(saveDiagAmount()));
+        QObject::connect(m_autosaveDiagTimer, SIGNAL(timeout()), this, SLOT(autosaveTimeout()));
     }
     if(userDbData->saveStateOnClose)
     {
@@ -277,6 +277,11 @@ void tabRepair::updateWidgets()
     ui->comboBoxNotifyStatus->setCurrentIndex(repairModel->informedStatusIndex());
     ui->comboBoxNotifyStatus->blockSignals(false);
     ui->comboBoxNotifyStatus->setEnabled(m_comboBoxNotifyStatusEnabled && !modelRO);
+    if(repairModel->cartridge())
+    {
+        ui->groupBoxDeviceSummary->setVisible(false);
+        ui->groupBoxDiagResult->setVisible(false);
+    }
     ui->lineEditProblem->setText(repairModel->fault());
     ui->lineEditIncomingSet->setText(repairModel->complect());
     ui->lineEditExterior->setText(repairModel->look());
@@ -813,6 +818,15 @@ void tabRepair::saveDiagAmount()
     diagAmountSaved();
     if(m_autosaveDiag)
         m_autosaveDiagTimer->stop();
+}
+
+void tabRepair::autosaveTimeout()
+{
+    QTextCursor tc = ui->textEditDiagResult->textCursor();
+    int pos = tc.position();
+    saveDiagAmount();
+    tc.setPosition(pos);    // после сохранения позиция курсора в tc почему-то изменяется (хотя это копия объекта)
+    ui->textEditDiagResult->setTextCursor(tc);
 }
 
 void tabRepair::diagAmountSaved()

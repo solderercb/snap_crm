@@ -43,6 +43,7 @@ class SClientModel : public SComRecord
     Q_PROPERTY(QString patronymicName READ patronymicName)
     Q_PROPERTY(QString fullLongName READ fullLongName)
     Q_PROPERTY(QString fullShortName READ fullShortName)
+    Q_PROPERTY(QString shortName READ shortName)
     Q_PROPERTY(QString address READ address)
     Q_PROPERTY(QString postIndex READ postIndex)
     Q_PROPERTY(QString passportNum READ passportNum)
@@ -152,6 +153,8 @@ public:
     void setWeb_Password(const QString&);
     QString urName();
     void setUrName(const QString&);
+    const QString shortName();
+    void setShortName(const QString &shortName);
     QString email();
     void setEmail(const QString&);
     QString icq();
@@ -247,6 +250,7 @@ private:
     QString m_OGRN;
     QString m_webPassword;
     QString m_urName;
+    QString m_shortName;
     QString m_email;
     QString m_icq;
     QString m_skype;
