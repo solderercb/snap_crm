@@ -96,6 +96,7 @@ void tabClients::refreshTable(bool preserveScrollPos, bool preserveSelection)
         l2.op = FilterList::Or;
         QString str = ui->lineEditSearch->text();
         l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)", FilterField::RegExp, str, Qt::CaseInsensitive));
+        l2.fields.append(STableViewBase::initFilterField("t1.`short_name`", FilterField::RegExp, str, Qt::CaseInsensitive));
         l2.fields.append(STableViewBase::initFilterField("t1.`id`", FilterField::Equals, str, Qt::CaseInsensitive));
         l2.fields.append(STableViewBase::initFilterField("t2.`phone`", FilterField::RegExp, str, Qt::CaseInsensitive));
         l2.fields.append(STableViewBase::initFilterField("t2.`phone_clean`", FilterField::RegExp, str, Qt::CaseInsensitive));

@@ -10,6 +10,7 @@ SComboBox::SComboBox(QWidget *parent) :
     lineEditWidget = new SLineEdit();
     lineEditWidget->setReadOnly(true);
     lineEditWidget->installEventFilter(this);
+    lineEditWidget->enableAutoSetCursorPositionToBegin(false);
     resize(size().width(), lineEditWidget->minimumSizeHint().height()+1);
     connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::clearButtonPress);
     connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::buttonClicked);

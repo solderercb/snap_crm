@@ -6,6 +6,8 @@ SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
     ui(new Ui::SPageSalarySummary)
 {
     ui->setupUi(this);
+    SPageSalarySummary::guiFontChanged();
+
     ui->textEditDisclaimer->setVisible(ui->toolButtonDisclaimer->isChecked());
     connect(parentTab, &tabSalary::showSubsistanceGroup, this, &SPageSalarySummary::setGroupBoxSubsistanceVisible);
     connect(parentTab, &tabSalary::setFillMonthChargeOnUpdate, this, &SPageSalarySummary::setFillMonthChargeOnUpdate);
@@ -413,6 +415,21 @@ void SPageSalarySummary::fillClientCreds(int id)
     addOldBalanceValue();
     m_commitUserClientModelsPending = 1;
     paySalary();
+}
+
+void SPageSalarySummary::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+    font.setKerning(true);
+
+    ui->doubleSpinBoxEarning->setFont(font);
+    ui->doubleSpinBoxSubsistence->setFont(font);
+    ui->doubleSpinBoxPayed->setFont(font);
+    ui->doubleSpinBoxSummaryAmountToPay->setFont(font);
+    ui->doubleSpinBoxExtraCharges->setFont(font);
+    ui->doubleSpinBoxExtraChargesOff->setFont(font);
 }
 
 /*  Кнопка справа от поля "По ставке начислить" должна выполнять те же действия, что и кнопка "Загрузить" на нижней панели,

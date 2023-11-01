@@ -78,6 +78,7 @@ private slots:
     void checkBoxTelegramClicked(bool);
     void checkBoxWhatsappClicked(bool);
     void checkBoxSMSClicked(bool);
+    void guiFontChanged();
 };
 
 #endif // SPhone_H

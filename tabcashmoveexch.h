@@ -62,7 +62,7 @@ private:
 
 #ifdef QT_DEBUG
     enum RandomFillerStep {OpType = 1, SrcAccount, DstAccount, Amount, End};
-    void randomFill();
+    void randomFill() override;
 #endif
 
 private slots:
@@ -78,9 +78,10 @@ private slots:
     void chargeChanged(double);
     void chargeChanged();
     void flipCurrency();
+    void guiFontChanged() override;
 #ifdef QT_DEBUG
-    void test_scheduler_handler();
-    void test_scheduler2_handler();
+    void test_scheduler_handler() override;
+    void test_scheduler2_handler() override;
 #endif
 };
 

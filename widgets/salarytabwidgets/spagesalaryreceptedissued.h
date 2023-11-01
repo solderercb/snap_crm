@@ -18,9 +18,11 @@ public:
 private:
     Ui::SPageSalaryReceptedIssued *ui;
 public slots:
-    void updateModels();
-    void updateWidgets();
+    void updateModels() override;
+    void updateWidgets() override;
     void tableRepairsRowDoubleClicked(const QModelIndex &index);
+private slots:
+    void guiFontChanged() override;
 };
 
 #endif // SPAGESALARYRECEPTEDISSUED_H

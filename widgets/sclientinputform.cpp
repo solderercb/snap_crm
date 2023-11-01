@@ -6,10 +6,12 @@ SClientInputForm::SClientInputForm(QWidget *parent) :
     ui(new Ui::SClientInputForm)
 {
     ui->setupUi(this);
+    guiFontChanged();
     QWidget::setFocusProxy(ui->lineEditClientLastName);
     clientModel = new SClientModel();
 
     initWidgets();
+    connect(userDbData, &SUserSettings::fontSizeChanged, this, &SClientInputForm::guiFontChanged);
 }
 
 SClientInputForm::~SClientInputForm()
@@ -212,6 +214,20 @@ void SClientInputForm::primaryPhoneEdited(QString number)
 {
     if(permissions->viewClients)
         ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
+}
+
+void SClientInputForm::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->lineEditClientAddress->setFont(font);
+    ui->lineEditClientEmail->setFont(font);
+    ui->lineEditClientFirstName->setFont(font);
+    ui->lineEditClientLastName->setFont(font);
+    ui->lineEditClientPatronymic->setFont(font);
+    ui->comboBoxClientAdType->setFont(font);
 }
 
 void SClientInputForm::buttonCreateTabClientClicked()

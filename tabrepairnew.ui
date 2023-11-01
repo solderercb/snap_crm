@@ -28,6 +28,12 @@
         <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,0,0">
          <item row="12" column="0" colspan="3">
           <widget class="QComboBox" name="comboBoxOffice">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -44,6 +50,12 @@
          </item>
          <item row="13" column="0" colspan="3">
           <widget class="QComboBox" name="comboBoxCompany">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -105,6 +117,12 @@
            <property name="enabled">
             <bool>true</bool>
            </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -159,6 +177,12 @@
          </item>
          <item row="11" column="0" colspan="3">
           <widget class="SComboBox" name="comboBoxPresetPlace">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -241,6 +265,12 @@
          </item>
          <item row="14" column="1" colspan="2">
           <widget class="QComboBox" name="comboBoxPresetPaymentAccount">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -283,6 +313,12 @@
          </item>
          <item row="10" column="0" colspan="3">
           <widget class="SComboBox" name="comboBoxPresetEngineer">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -406,9 +442,15 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_19">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayoutDevice">
+             <layout class="QGridLayout" name="gridLayoutDevice" columnstretch="1,1,1,1">
               <item row="0" column="0">
                <widget class="QComboBox" name="comboBoxDeviceClass">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="autoFillBackground">
                  <bool>false</bool>
                 </property>
@@ -431,6 +473,12 @@
               </item>
               <item row="0" column="2">
                <widget class="SComboBox" name="comboBoxDevice">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="editable">
                  <bool>true</bool>
                 </property>
@@ -444,6 +492,12 @@
               </item>
               <item row="0" column="1">
                <widget class="QComboBox" name="comboBoxDeviceVendor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="editable">
                  <bool>false</bool>
                 </property>
@@ -458,7 +512,7 @@
               <item row="0" column="3">
                <widget class="SLineEdit" name="lineEditSN">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -573,6 +627,12 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="focusPolicy">
                  <enum>Qt::ClickFocus</enum>
                 </property>
@@ -583,6 +643,12 @@
               </item>
               <item row="1" column="0">
                <widget class="QCheckBox" name="checkBoxIsPrepay">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="focusPolicy">
                  <enum>Qt::ClickFocus</enum>
                 </property>
@@ -600,7 +666,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -629,6 +695,12 @@
               </item>
               <item row="0" column="0">
                <widget class="QCheckBox" name="checkBoxIsEstPrice">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="focusPolicy">
                  <enum>Qt::ClickFocus</enum>
                 </property>
@@ -646,7 +718,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -667,6 +739,12 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>80</width>
@@ -685,6 +763,12 @@
                <widget class="SDoubleSpinBox" name="doubleSpinBoxPrepaySumm">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
                 <property name="minimumSize">
                  <size>
@@ -826,6 +910,15 @@
    <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
+   <class>SLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets/slineedit.h</header>
+   <slots>
+    <signal>buttonClicked(int)</signal>
+    <signal>mouseDoubleClick()</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header location="global">widgets/sdoublespinbox.h</header>
@@ -835,15 +928,6 @@
    <extends>QWidget</extends>
    <header location="global">widgets/sclientinputform.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
-   <slots>
-    <signal>buttonClicked(int)</signal>
-    <signal>mouseDoubleClick()</signal>
-   </slots>
   </customwidget>
   <customwidget>
    <class>SSetComboBox</class>

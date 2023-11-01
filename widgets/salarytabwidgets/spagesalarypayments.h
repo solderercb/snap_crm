@@ -4,26 +4,19 @@
 #include <QWidget>
 #include "spagesalarybase.h"
 #include "../stableviewbase.h"
+#include "../stableviewsummarybase.h"
 
 namespace Ui {
 class SPageSalaryPayments;
 }
 
 // Таблица с суммами по столбцам
-class STableViewSalaryPaymentsSummary : public STableViewBase
+class STableViewSalaryPaymentsSummary : public STableViewSummaryBase
 {
     Q_OBJECT
 public:
     explicit STableViewSalaryPaymentsSummary(QWidget *parent = nullptr);
-    ~STableViewSalaryPaymentsSummary();
     void setGridLayout(XtraSerializer* layout);
-    void setTotal(int column, double value);
-private:
-    QStandardItemModel *dataModel;
-public slots:
-    void applyGridlayout();
-protected slots:
-    void columnResized(int, int, int) override {};
 };
 
 class SPageSalaryPayments : public SPageSalaryBase

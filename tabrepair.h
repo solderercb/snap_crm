@@ -163,6 +163,7 @@ private slots:
     void addCustomWork();
     void savePlace(int index);
     void comboBoxPlaceButtonClickHandler(int id);
+    void guiFontChanged() override;
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

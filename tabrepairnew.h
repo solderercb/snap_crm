@@ -89,6 +89,7 @@ private slots:
     void createRepairClose();
     void preferredPaymentSystemChanged(int);
     void relayCreateTabSelectExistingClient(int, QWidget *caller);
+    void guiFontChanged() override;
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

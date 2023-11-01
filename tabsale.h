@@ -127,6 +127,7 @@ private slots:
     void logButtonClicked();
     void unSaleButtonClicked();
     void paymentSystemChanged(int);
+    void guiFontChanged();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

@@ -8,6 +8,7 @@ SPageSalarySales::SPageSalarySales(QWidget *parent) :
     ui(new Ui::SPageSalarySales)
 {
     ui->setupUi(this);
+    SPageSalarySales::guiFontChanged();
 
     ui->tableViewSales->setModel(parentTab->m_sales);
     ui->tableViewSaleParts->setModel(parentTab->m_saleParts);
@@ -70,5 +71,16 @@ void SPageSalarySales::tableSalesRowDoubleClicked(const QModelIndex &index)
 void SPageSalarySales::tableSalePartsRowDoubleClicked(const QModelIndex &index)
 {
     mainWindow->createTabSparePart(parentTab->m_repairs->index(index.row(), 0).data().toInt());
+}
+
+void SPageSalarySales::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+    font.setBold(true);
+
+    ui->labelPercentPartsValue->setFont(font);
+    ui->labelSalesSummValue->setFont(font);
 }
 

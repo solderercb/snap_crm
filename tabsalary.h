@@ -84,6 +84,8 @@ public slots:
     void fillClientCreds(int);
     void prevPeriod();
     void nextPeriod();
+private slots:
+    void guiFontChanged() override;
 };
 
 #endif // TABSALARY_H

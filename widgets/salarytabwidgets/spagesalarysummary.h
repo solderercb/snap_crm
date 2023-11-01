@@ -36,8 +36,8 @@ private:
     void setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date = QDate::currentDate());
     void addOldBalanceValue();
 public slots:
-    void updateModels();
-    void updateWidgets();
+    void updateModels() override;
+    void updateWidgets() override;
     void fillClientCreds(int id);
 private slots:
     void setMonthCharge();
@@ -47,6 +47,7 @@ private slots:
     void paySubsistence();
     void markRepairsPayed();
     void paySalary();
+    void guiFontChanged() override;
 };
 
 #endif // SPAGESALARYSUMMARY_H

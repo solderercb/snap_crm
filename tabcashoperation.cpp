@@ -13,6 +13,7 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     userActivityLog->appendRecord("Navigation " + tabTitle());
 
     ui->setupUi(this);
+    tabCashOperation::guiFontChanged();
     ui->labelOfLinkedObject->hide();
     ui->lineEditLinkedObjId->setReadOnly(true);
     ui->lineEditLinkedObjId->hide();
@@ -882,6 +883,18 @@ void tabCashOperation::dateEditRefresh()
 {
     ui->dateEdit->setDate(QDate::currentDate());
     dateEditRefreshTimer->start(DATE_EDIT_REFRESH_TIMER);
+}
+
+void tabCashOperation::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->lineEditLinkedObjCaption->setFont(font);
+    ui->doubleSpinBoxAmount->setFont(font);
+    ui->lineEditClientLastName->setFont(font);
+    ui->comboBoxPaymentAccount->setFont(font);
 }
 
 #ifdef QT_DEBUG

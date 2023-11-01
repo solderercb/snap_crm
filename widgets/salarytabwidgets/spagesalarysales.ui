@@ -48,7 +48,6 @@
          <widget class="QLabel" name="labelPercentPartsValue">
           <property name="font">
            <font>
-            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -72,7 +71,6 @@
          <widget class="QLabel" name="labelSalesSummValue">
           <property name="font">
            <font>
-            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>

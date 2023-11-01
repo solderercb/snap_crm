@@ -6,6 +6,7 @@ SPhone::SPhone(QWidget *parent) :
     ui(new Ui::SPhone)
 {
     ui->setupUi(this);
+    guiFontChanged();
     QWidget::setFocusProxy(ui->lineEditPhone);
 
     ui->comboBoxPhoneMask->setStyleSheet(commonComboBoxStyleSheet);
@@ -27,6 +28,7 @@ SPhone::SPhone(QWidget *parent) :
     connect(ui->checkBoxTelegram,SIGNAL(clicked(bool)), this,SLOT(checkBoxTelegramClicked(bool)));
     connect(ui->checkBoxWhatsapp,SIGNAL(clicked(bool)), this,SLOT(checkBoxWhatsappClicked(bool)));
     connect(ui->checkBoxSMS,SIGNAL(clicked(bool)), this,SLOT(checkBoxSMSClicked(bool)));
+    connect(userDbData, &SUserSettings::fontSizeChanged, this, &SPhone::guiFontChanged);
 }
 
 SPhone::SPhone(SPhoneModel *model, QWidget *parent) :
@@ -265,6 +267,16 @@ void SPhone::checkBoxWhatsappClicked(bool state)
 void SPhone::checkBoxSMSClicked(bool state)
 {
     m_phoneModel->setReceiveSMS(state);
+}
+
+void SPhone::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->lineEditPhone->setFont(font);
+    ui->comboBoxPhoneMask->setFont(font);
 }
 
 SCheckBox::SCheckBox(QWidget *parent) :

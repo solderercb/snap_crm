@@ -7,9 +7,12 @@ SCartridgeForm::SCartridgeForm(QWidget *parent) :
     ui(new Ui::SCartridgeForm)
 {
     ui->setupUi(this);
+    guiFontChanged();
     setDefaultStyleSheets();
 
 //    ui->frameHeader->setStyleSheet("QFrame::hover {background-color: rgb(205,230,247);}");    // подсветка заголовка
+
+    connect(userDbData, &SUserSettings::fontSizeChanged, this, &SCartridgeForm::guiFontChanged);
     installEventFilter(this);
 }
 
@@ -872,6 +875,9 @@ void SCartridgeForm::setBladeReplace(int state)
 
 void SCartridgeForm::savePlace(int index)
 {
+    if(!m_repair)
+        return;
+
     int currentPlace = m_repair->boxIndex();
 
     if(currentPlace == index)
@@ -889,7 +895,7 @@ void SCartridgeForm::savePlace(int index)
 void SCartridgeForm::comboBoxPlaceButtonClickHandler(int id)
 {
     if(id == SLineEdit::Clear)
-        savePlace(-1);
+        ui->comboBoxPlace->setCurrentIndex(-1);
 }
 
 void SCartridgeForm::comboBoxEngineerChanged(int index)
@@ -1040,4 +1046,26 @@ void SCartridgeForm::updateWorksActionsCheckedState()
         }
         action++;
     }
+}
+
+void SCartridgeForm::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    QFont font1(font);
+    font1.setBold(true);
+    font1.setWeight(75);
+
+    QFont font2(font1);
+    font2.setPixelSize(userDbData->fontSize+1);
+
+    ui->labelTitle->setFont(font);
+    ui->labelLimitReached->setFont(font1);
+    ui->labelLimitReached->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 175, 176);\n"
+                                                           "color: rgb(197, 255, 172);"));
+    ui->labelLimitReached->setMargin(5);
+    ui->lineEditSerial->setFont(font2);
+
 }

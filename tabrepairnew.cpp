@@ -17,6 +17,8 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     userActivityLog->appendRecord(tr("Navigation Приём в ремонт"));
 
     ui->setupUi(this);
+    tabRepairNew::guiFontChanged();
+
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
 #ifdef QT_DEBUG
@@ -489,7 +491,7 @@ bool tabRepairNew::checkInput()
         error = 4;
     }
 
-    error = ui->widgetClient->checkInput();
+    error = qMax(error, ui->widgetClient->checkInput());
 
     if (ui->comboBoxProblem->text() == "")        // если не указана(ы) неисправность(и)
     {
@@ -702,6 +704,31 @@ void tabRepairNew::relayCreateTabSelectExistingClient(int, QWidget*)
     emit createTabSelectExistingClient(1, this);
 }
 
+void tabRepairNew::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->comboBoxDeviceClass->setFont(font);
+    ui->comboBoxDeviceVendor->setFont(font);
+    ui->comboBoxDevice->setFont(font);
+    ui->lineEditSN->setFont(font);
+    ui->comboBoxProblem->setFont(font);
+    ui->comboBoxIncomingSet->setFont(font);
+    ui->comboBoxExterior->setFont(font);
+    ui->comboBoxPresetEngineer->setFont(font);
+    ui->comboBoxPresetPlace->setFont(font);
+//    ui->comboBoxOffice->setFont(font);
+    ui->comboBoxCompany->setFont(font);
+    ui->comboBoxPresetPaymentAccount->setFont(font);
+    ui->doubleSpinBoxEstPrice->setFont(font);
+    ui->comboBoxPrepayReason->setFont(font);
+    ui->doubleSpinBoxPrepaySumm->setFont(font);
+    ui->comboBoxPrepayAccount->setFont(font);
+    ui->lineEditPrevRepair->setFont(font);
+}
+
 void tabRepairNew::print(int repair)
 {
     QMap<QString, QVariant> report_vars;
@@ -751,6 +778,7 @@ void tabRepairNew::randomFill()
     }
     else if (test_scheduler_counter == 1)
     {
+        return;
         i = deviceClassesModel->rowCount();
         ui->comboBoxDeviceClass->setCurrentIndex(QRandomGenerator::global()->bounded(i));
 //        ui->comboBoxDeviceClass->setCurrentIndex(2);

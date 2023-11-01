@@ -47,6 +47,7 @@ void SUserSettings::initWidgets()
 /**************************************************************************************/
     disableWidget("rowColor");
     disableWidget("colorLabelWs");
+    disableWidget("fontFamily");
     disableWidget("geHighlightColor");
     disableWidget("issuedColor");
     disableWidget("defStore");
@@ -58,6 +59,8 @@ void SUserSettings::initWidgets()
     disableWidget("defOffice");
     disableWidget("defEmployee");
     disableWidget("defStatus");
+    disableWidget("phoneMask");
+    disableWidget("phone2Mask");
 }
 
 void SUserSettings::disableWidget(const QString propertyName)
@@ -191,18 +194,33 @@ void SUserSettings::prepareUpdateList(Table table)
 
 void SUserSettings::save()
 {
+    QString oldFontFamily;
+
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
     {
         metaObject()->property(i).read(this);
     }
 
     savePrinterSettings();
+    oldFontFamily = userLocalData->FontFamily.value;
+//    userLocalData->FontFamily.value = fontFamily; // TODO: модель данных шрифтов
 
     i_valuesMap.clear();
     prepareUpdateList(Table::Users);
 
-    if(i_valuesMap.contains("fontsize"))
-        QApplication::setFont(QFont("Segoe UI", userDbData->fontSize));
+    if(i_valuesMap.contains("fontsize") || oldFontFamily.compare(fontFamily) != 0)
+    {
+        QFont f;
+        f.setFamily(userLocalData->FontFamily.value);
+        f.setPixelSize(userDbData->fontSize);
+        QApplication::setFont(f);
+        emit fontSizeChanged();
+    }
+
+    if(i_valuesMap.contains("rowheight"))
+    {
+        emit rowHeightChanged();
+    }
 
     if(!commit())
         throw Global::ThrowType::QueryError;

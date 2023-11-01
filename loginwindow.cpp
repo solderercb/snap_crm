@@ -28,6 +28,8 @@ LoginWindow::LoginWindow(QObject*) :
     connect(ui->pushButtonSettingsImport, &QPushButton::clicked, this, &LoginWindow::selectAscExe);
 
     localSettings->read(userLocalData);
+    if(userLocalData->FontFamily.value.isEmpty())
+        userLocalData->FontFamily.value = "Segoe UI";
     fillConnectionParams();
 }
 

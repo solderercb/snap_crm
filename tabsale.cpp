@@ -13,6 +13,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     userActivityLog->appendRecord("Navigation " + tabTitle());
 
     ui->setupUi(this);
+    tabSale::guiFontChanged();
     docModel = new SDocumentModel();
     tableModel = new SSaleTableModel(this);
 //    itemDelagates = new SaleTableItemDelegates(ui->tableView);
@@ -69,6 +70,9 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 
 tabSale::~tabSale()
 {
+    // Bug: когда в настройках изменяется размер шрифта и применяется "на лету" к приложению, закрытие этой вкладки в фоне приводит к порче настроек таблицы (visualIndex'ы горизонтальных
+    // заголовков равны -1). Чтобы настройки не портились, методом тыка определено, что перед удалением ui нужно как-то взаимодействовать с заголовком или переключиться на вкладку перед закрытием.
+    ui->tableView->horizontalHeader()->visualIndex(0);
     delete ui;
     p_instance.remove(doc_id);   // Обязательно блять!
     delete params;
@@ -1037,6 +1041,27 @@ void tabSale::paymentSystemChanged(int index)
 {
     int sysId = paymentSystemsModel->databaseIDByRow(index, "system_id");
     cashRegister->setSystemId(sysId);
+}
+
+void tabSale::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->lineEditClientLastName->setFont(font);
+    ui->lineEditClientFirstName->setFont(font);
+    ui->lineEditClientPatronymic->setFont(font);
+    ui->lineEditClientPhone->setFont(font);
+    ui->lineEditTotal->setFont(font);
+    ui->lineEditTakeIn->setFont(font);
+    ui->comboBoxClientPhoneType->setFont(font);
+    ui->comboBoxClientAdType->setFont(font);
+    ui->comboBoxCompany->setFont(font);
+    ui->comboBoxPaymentAccount->setFont(font);
+    ui->comboBoxMoneyBackAccount->setFont(font);
+    ui->comboBoxPriceCol->setFont(font);
+    ui->comboBoxCompany->setFont(font);
 }
 
 tabSale* tabSale::getInstance(int doc_id, MainWindow *parent)

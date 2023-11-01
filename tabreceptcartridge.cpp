@@ -15,6 +15,7 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
     QSqlQuery q(QSqlDatabase::database("connMain"));
 
     ui->setupUi(this);
+    tabReceptCartridge::guiFontChanged();
     // установка белого фона только для scrollArea (не наследуется)
     // https://qtcentre.org/threads/14099-How-to-stop-child-widgets-from-inheriting-parent-s-StyleSheet-and-use-system-default?p=73101#post73101
     ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents {\
@@ -313,6 +314,21 @@ void tabReceptCartridge::updateDevicesModel(const int id)
     int vendorId = m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex());
     m_cartridgesModel->setQuery(QUERY_SEL_CARTRIDGE_MODELS(vendorId), QSqlDatabase::database("connMain"));
     ui->comboBoxModel->setCurrentIndex(m_cartridgesModel->rowByDatabaseID(id));
+}
+
+void tabReceptCartridge::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->comboBoxPresetEngineer->setFont(font);
+    ui->comboBoxCompany->setFont(font);
+//    ui->comboBoxOffice->setFont(font);
+    ui->comboBoxPresetPaymentAccount->setFont(font);
+    ui->comboBoxVendor->setFont(font);
+    ui->comboBoxModel->setFont(font);
+    ui->lineEditSerial->setFont(font);
 }
 
 void tabReceptCartridge::print()

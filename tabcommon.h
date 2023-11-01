@@ -41,6 +41,8 @@ protected slots:
     virtual void test_scheduler_handler(){};
     virtual void test_scheduler2_handler(){};
 #endif
+private slots:
+    virtual void guiFontChanged(){};
 };
 
 

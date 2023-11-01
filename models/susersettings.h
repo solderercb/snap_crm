@@ -69,6 +69,7 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_COMBOBOX(QString, colorLabelWs, 11, color_label_ws, QString("#FF000000"))
     PROPSTRUCT_SPINBOX(int, fontSize, 11, fontsize, 0, 16)
     PROPSTRUCT_SPINBOX(int, rowHeight, 11, rowheight, 0, 40)
+    PROPSTRUCT_COMBOBOX(QString, fontFamily, 11, ignore, "Segoe UI")
     PROPSTRUCT_COMBOBOX(QString, geHighlightColor, 11, ge_highlight_color, QString("#FFFFDD70"))
 
     PROPSTRUCT_COMBOBOX(int, defaultDocumentPrinter, 12, ignore, 0)
@@ -132,6 +133,9 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
 //    PROPSTRUCT_JSON_ARRAY(QString, fieldsCfg, fields_cfg) // похоже, не используется
 //    QString, animation, animation
 
+signals:
+    void fontSizeChanged();
+    void rowHeightChanged();
 public:
     enum Table{Users = 0, UsersParams = 1};
     enum WidgetType{Label, Editor};

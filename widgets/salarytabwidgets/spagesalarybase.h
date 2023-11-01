@@ -17,6 +17,8 @@ protected:
     SUserModel *m_userModel;
     virtual void updateModels(){};
     virtual void updateWidgets(){};
+private slots:
+    virtual void guiFontChanged(){};
 };
 
 #endif // SPAGESALARYBASE_H

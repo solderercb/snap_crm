@@ -7,5 +7,5 @@ SPageSalaryBase::SPageSalaryBase(QWidget *parent) :
     mainWindow = MainWindow::getInstance();
     connect(parentTab, &tabSalary::updateDaughterTabsModels, this, &SPageSalaryBase::updateModels);
     connect(parentTab, &tabSalary::updateDaughterTabsWidgets, this, &SPageSalaryBase::updateWidgets);
-
+    connect(userDbData, &SUserSettings::fontSizeChanged, this, &SPageSalaryBase::guiFontChanged);
 }

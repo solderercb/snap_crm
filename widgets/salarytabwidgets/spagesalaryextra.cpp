@@ -48,41 +48,15 @@ void SPageSalaryExtra::tableColumnResized(int, int)
 }
 
 STableViewSalaryExtraSummary::STableViewSalaryExtraSummary(QWidget *parent) :
-    STableViewBase(SLocalSettings::SalaryExtraChargesGrid, parent)
+    STableViewSummaryBase(SLocalSettings::SalaryExtraChargesGrid, parent)
 {
-    setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-    horizontalHeader()->setVisible(false);
-    dataModel = new QStandardItemModel();
-    setModel(dataModel);
     setBackgroundRole(QPalette::Window);
-}
-
-STableViewSalaryExtraSummary::~STableViewSalaryExtraSummary()
-{
-    i_gridLayout = nullptr;
+//    setStyleSheet("background-color: rgb(240, 240, 240);");
 }
 
 void STableViewSalaryExtraSummary::setGridLayout(XtraSerializer *layout)
 {
-    delete i_gridLayout;
-    i_gridLayout = layout;
-    dataModel->setColumnCount(i_gridLayout->$GridControl.Columns.count());
-    QList<QStandardItem*> *emptyModelData = new QList<QStandardItem*>();
-    for(int i = 0; i < i_gridLayout->$GridControl.Columns.count(); i++)
-        *emptyModelData << new QStandardItem();
-    emptyModelData->at(0)->setText("<value>");
-    emptyModelData->at(2)->setText("<value>");
-    dataModel->appendRow(*emptyModelData);
-    setRowHeight(0, this->height());
-}
-
-void STableViewSalaryExtraSummary::setTotal(int column, double value)
-{
-    dataModel->setData(dataModel->index(0, column), value);
-}
-
-void STableViewSalaryExtraSummary::applyGridlayout()
-{
-    STableViewBase::applyGridlayout();
+    STableViewSummaryBase::setGridLayout(layout);
+    setData(0, 0, "<value>");
+    setData(0, 2, "<value>");
 }

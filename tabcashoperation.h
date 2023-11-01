@@ -106,7 +106,7 @@ private:
     void updateOrderIdLineEdit();
 #ifdef QT_DEBUG
     enum RandomFillerStep {OpType = 1, LinkedObj, RClient, Amount, PaymentSys, End};
-    void randomFill();
+    void randomFill() override;
     void dbgRandomRepair();
     void dbgRandomDocument(int type);
     void dbgRandomInvoice();
@@ -135,9 +135,10 @@ private slots:
     void amountChanged(double);
     void applyPaymentSystem();
     void dateEditRefresh();
+    void guiFontChanged() override;
 #ifdef QT_DEBUG
-    void test_scheduler_handler();
-    void test_scheduler2_handler();
+    void test_scheduler_handler() override;
+    void test_scheduler2_handler() override;
 #endif
 };
 

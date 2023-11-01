@@ -11,6 +11,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     repair_id(rep_id)
 {
     ui->setupUi(this);
+    tabRepair::guiFontChanged();
 
     i_tabTitle = tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
     userActivityLog->appendRecord(tr("Navigation %1").arg(i_tabTitle));
@@ -918,6 +919,17 @@ void tabRepair::comboBoxPlaceButtonClickHandler(int id)
 {
     if(id == SLineEdit::Clear)
         savePlace(-1);
+}
+
+void tabRepair::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->comboBoxState->setFont(font);
+    ui->comboBoxNotifyStatus->setFont(font);
+    ui->comboBoxPlace->setFont(font);
 }
 
 void tabRepair::comboBoxStateIndexChanged(int index)

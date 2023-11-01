@@ -73,6 +73,12 @@
         </item>
         <item row="0" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryMonthRate">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -98,6 +104,12 @@
           </property>
           <item>
            <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryMonthCharge">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -108,6 +120,12 @@
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonApplySummaryMonthCharge">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+              <horstretch>1</horstretch>
+              <verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -134,6 +152,12 @@
         </item>
         <item row="2" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsRepairs">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -154,6 +178,12 @@
         </item>
         <item row="3" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsSales">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -174,6 +204,12 @@
         </item>
         <item row="4" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryEarningsReceiptIssue">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -194,6 +230,12 @@
         </item>
         <item row="5" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryItemsCost">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -214,6 +256,12 @@
         </item>
         <item row="6" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxExtraCharges">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -234,6 +282,12 @@
         </item>
         <item row="7" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxExtraChargesOff">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>
@@ -257,6 +311,12 @@
         </item>
         <item row="8" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxEarning">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">color: rgb(4, 78, 255);</string>
           </property>
@@ -280,6 +340,12 @@
         </item>
         <item row="9" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxSubsistence">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">color: rgb(255, 4, 37);</string>
           </property>
@@ -306,6 +372,12 @@
         </item>
         <item row="10" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxPayed">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">color: rgb(255, 4, 37);</string>
           </property>
@@ -329,6 +401,12 @@
         </item>
         <item row="11" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxBalance">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -349,6 +427,12 @@
         </item>
         <item row="12" column="1">
          <widget class="SDoubleSpinBox" name="doubleSpinBoxSummaryAmountToPay">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="styleSheet">
            <string notr="true">color: rgb(94, 131, 0);</string>
           </property>
@@ -550,6 +634,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="labelSalaryOK">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Данные верны</string>
             </property>
@@ -557,6 +647,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="3" column="1">
            <widget class="QCheckBox" name="checkBoxSalaryOK">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -649,6 +745,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="labelSubsistenceOK">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Данные верны</string>
             </property>
@@ -656,6 +758,12 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="3" column="1">
            <widget class="QCheckBox" name="checkBoxSubsistenceOK">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -734,14 +842,14 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SPlainTextEdit</class>
-   <extends>QPlainTextEdit</extends>
-   <header location="global">widgets/splaintextedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header location="global">widgets/sdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SPlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header location="global">widgets/splaintextedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -66,6 +66,7 @@ private slots:
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();
     void updateDevicesModel(const int id = 0);
+    void guiFontChanged() override;
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

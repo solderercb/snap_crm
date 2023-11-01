@@ -24,6 +24,8 @@ tabSalary::tabSalary(MainWindow *parent) :
     m_issued = new STableSalaryReceptedIssued();
 
     ui->setupUi(this);
+    tabSalary::guiFontChanged();
+
     usersModelF = new SSortFilterProxyModel();
     usersModelF->setSourceModel(usersModel);
     if(permissions->viewEmployeesSalary)
@@ -32,7 +34,8 @@ tabSalary::tabSalary(MainWindow *parent) :
         usersModelF->setFilterRegularExpression(QRegularExpression(userDbData->username)); // только своя ЗП
     usersModelF->setFilterKeyColumn(0);
     ui->comboBoxEmployee->setModel(usersModelF);
-    ui->comboBoxEmployee->setCurrentIndex(-1);
+    if(usersModelF->rowCount() > 1)
+        ui->comboBoxEmployee->setCurrentIndex(-1);
     tabChanged(ui->tabWidget->currentIndex());
 
     ui->dateEditPeriod->setDate(QDate::currentDate());
@@ -60,6 +63,10 @@ tabSalary *tabSalary::getInstance(MainWindow *parent)
 
 tabSalary::~tabSalary()
 {
+    // Bug: когда в настройках изменяется размер шрифта и применяется "на лету" к приложению, закрытие этой вкладки в фоне приводит к порче настроек таблиц (visualIndex'ы горизонтальных
+    // заголовков равны -1). Чтобы настройки не портились, методом тыка определено, что перед удалением ui нужно закрыть все дочерние вкладки.
+    while(ui->tabWidget->count())
+        delete ui->tabWidget->widget(0);
     delete ui;
     delete m_repairs;
     delete m_repairWorks;
@@ -228,6 +235,20 @@ void tabSalary::nextPeriod()
     }
 
     ui->dateEditPeriod->setDate(current);
+}
+
+void tabSalary::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    QFont font1(font);
+    font1.setBold(true);
+    font1.setWeight(75);
+
+    ui->comboBoxEmployee->setFont(font);
+    ui->labelPeriod->setFont(font1);
 }
 
 void tabSalary::updateWidgets()

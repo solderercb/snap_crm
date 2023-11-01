@@ -131,6 +131,7 @@ private slots:
     void initWorksMenu();
     void setWorkCheckBoxChecked(const int workType);
     void updateWorksActionsCheckedState();
+    void guiFontChanged();
 };
 
 #endif // SCARTRIDGEFORM_H

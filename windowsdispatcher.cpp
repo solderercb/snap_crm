@@ -48,7 +48,11 @@ void windowsDispatcher::connectOK()
     initCompanies();
     initOffices();
 
-    QApplication::setFont(QFont("Segoe UI", userDbData->fontSize));
+    QFont f;
+    f.setFamily(userLocalData->FontFamily.value);
+    f.setPixelSize(userDbData->fontSize);
+    QApplication::setFont(f);
+
     userDbData->updateLoginTimestamp();
     userActivityLog->appendRecord(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
 

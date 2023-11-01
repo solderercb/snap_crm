@@ -59,6 +59,7 @@ MainWindow::MainWindow(windowsDispatcher*) :
 	QTextCodec::setCodecForLocale(codec);
 
     ui->setupUi(this);
+    connect(userDbData, &SUserSettings::fontSizeChanged, this, &MainWindow::applyGuiSettings);
 
     // Шуточный заголовок окна: перевёрнуто на 180° ɯɹᴐ ᴐsɐ; или зеркально 1 ⱯꓢC Cʁꟽ; или зеркально 2 ∀ƨc ᴄʁw
     setWindowTitle(QString("SNAP CRM [%1] [%2]").arg(officesModel->getDisplayRole(userDbData->currentOffice, 2), userDbData->username));
@@ -140,15 +141,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::createMenu()
 {
-    QString toolButtonStyle = "QToolButton{\
-                                   border: 0px;\
-                                   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
-                                                                     stop: 0 #f6f7fa, stop: 1 #dadbde);\
-                               }\
-                               \
-                               QToolButton::menu-button {\
-                                   width: 32px;\
-                               }";
     ui->toolBar->setStyleSheet("QToolBar::separator {width: 10px; border: none;}");
 
     /* Кнопка Ремонты и меню */
@@ -175,8 +167,6 @@ void MainWindow::createMenu()
     workshop_button->setMenu(workshop_menu);
     workshop_button->setPopupMode(QToolButton::MenuButtonPopup);
     workshop_button->setText(tr("Ремонты"));
-    workshop_button->setFixedSize(128,48);
-    workshop_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(workshop_button);
     ui->toolBar->addSeparator();
     QObject::connect(workshop_button, SIGNAL(clicked()), this, SLOT(createTabRepairs()));
@@ -233,8 +223,6 @@ void MainWindow::createMenu()
     goods_button->setMenu(goods_menu);
     goods_button->setPopupMode(QToolButton::MenuButtonPopup);
     goods_button->setText(tr("Товары"));
-    goods_button->setFixedSize(128,48);
-    goods_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(goods_button);
     ui->toolBar->addSeparator();
 
@@ -263,8 +251,6 @@ void MainWindow::createMenu()
     clients_button->setMenu(clients_menu);
     clients_button->setPopupMode(QToolButton::MenuButtonPopup);
     clients_button->setText(tr("Клиенты"));
-    clients_button->setFixedSize(128,48);
-    clients_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(clients_button);
     if(!permissions->viewClients)
     {
@@ -317,8 +303,6 @@ void MainWindow::createMenu()
     finances_button->setMenu(finances_menu);
     finances_button->setPopupMode(QToolButton::MenuButtonPopup);
     finances_button->setText(tr("Финансы"));
-    finances_button->setFixedSize(128,48);
-    finances_button->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(finances_button);
     QObject::connect(finances_button, SIGNAL(clicked()), this, SLOT(createTabCashOperations()));
     ui->toolBar->addSeparator();
@@ -351,11 +335,11 @@ void MainWindow::createMenu()
     settingsButton->setMenu(settingsMenu);
     settingsButton->setPopupMode(QToolButton::MenuButtonPopup);
     settingsButton->setText(tr("Настройки"));
-    settingsButton->setFixedSize(128,48);
-    settingsButton->setStyleSheet(toolButtonStyle);
     ui->toolBar->addWidget(settingsButton);
     QObject::connect(settingsButton, SIGNAL(clicked()), this, SLOT(createTabSettings()));
     ui->toolBar->addSeparator();
+
+    applyGuiSettings();
 }
 
 MainWindow::~MainWindow()
@@ -723,6 +707,38 @@ void MainWindow::createUpdaterWidget()
     Q_ASSERT(updater);
     updateController = new QtAutoUpdater::UpdateController(updater, this);
     updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Progress);
+}
+
+void MainWindow::applyGuiSettings()
+{
+    int menuButtonWidth = 32;
+    QString toolButtonStyle = QString("QToolButton{\
+                                   border: 0px;\
+                                   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
+                                                                     stop: 0 #f6f7fa, stop: 1 #dadbde);\
+                               }\
+                               \
+                               QToolButton::menu-button {\
+                                   width: %1px;\
+                               }").arg(menuButtonWidth);
+    int newWidth = 96;
+    QFontMetrics *fontMetrics = new QFontMetrics(this->font());
+
+    foreach(auto w, ui->toolBar->findChildren<QToolButton*>())
+    {
+        w->setStyleSheet("");
+        // Текст кнопки всегда центрирован и чтобы стрелка на пересекалась с текстом, нужно пересчитать ширину всей кнопки:
+        newWidth = qMax(newWidth, ((fontMetrics->size(Qt::TextSingleLine, w->text()).width()/2 + 4 + menuButtonWidth) * 2));
+    }
+
+    foreach(auto w, ui->toolBar->findChildren<QToolButton*>())
+    {
+
+        w->setFixedSize(newWidth, 48);
+        w->setStyleSheet(toolButtonStyle);
+    }
+
+    delete fontMetrics;
 }
 
 #ifdef QT_DEBUG

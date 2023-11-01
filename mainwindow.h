@@ -119,6 +119,7 @@ private slots:
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);
     void createUpdaterWidget();
+    void applyGuiSettings();
 #ifdef QT_DEBUG
     void btnClick();
     void on_treeView_clicked(const QModelIndex &index);

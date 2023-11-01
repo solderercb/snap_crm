@@ -6,6 +6,7 @@ SPageSalaryReceptedIssued::SPageSalaryReceptedIssued(QWidget *parent) :
     ui(new Ui::SPageSalaryReceptedIssued)
 {
     ui->setupUi(this);
+    SPageSalaryReceptedIssued::guiFontChanged();
 
     ui->tableViewRecepted->setModel(parentTab->m_recepted);
     ui->tableViewIssued->setModel(parentTab->m_issued);
@@ -51,4 +52,19 @@ void SPageSalaryReceptedIssued::updateWidgets()
 void SPageSalaryReceptedIssued::tableRepairsRowDoubleClicked(const QModelIndex &index)
 {
     mainWindow->createTabRepair(index.model()->index(index.row(), 0).data().toInt());
+}
+
+void SPageSalaryReceptedIssued::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+    font.setBold(true);
+
+    ui->labelIssuedSummaryValue->setFont(font);
+    ui->labelPayForIssueValue->setFont(font);
+    ui->labelPayForReceptValue->setFont(font);
+    ui->labelReceptedSummaryValue->setFont(font);
+    ui->labelRepairsSummaryValue->setFont(font);
+    ui->labelSummValue->setFont(font);
 }

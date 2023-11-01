@@ -12,7 +12,9 @@ STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QW
     initHorizontalHeaderMenu();
     horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
 
+    applyGuiSettings();
     verticalHeader()->hide();
+    connect(userDbData, &SUserSettings::rowHeightChanged, this, &STableViewBase::applyGuiSettings);
     horizontalHeader()->setMinimumSectionSize(15);
     horizontalHeader()->setSectionsMovable(true);
     horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -28,6 +30,7 @@ STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QW
 
 STableViewBase::~STableViewBase()
 {
+    disconnect(userDbData, &SUserSettings::rowHeightChanged, this, &STableViewBase::applyGuiSettings);
     saveLayout();
     delete m_fontMetrics;
     delete i_gridLayout;
@@ -133,7 +136,10 @@ void STableViewBase::applyGridlayout()
     {
         if(i_gridLayout->$GridControl.Columns[i].Visible)
         {
-            visualIndexes.insert(i_gridLayout->$GridControl.Columns[i].VisibleIndex, i);
+            if(i_gridLayout->$GridControl.Columns[i].VisibleIndex >= 0)
+                visualIndexes.insert(i_gridLayout->$GridControl.Columns[i].VisibleIndex, i);
+            else
+                visualIndexes.insert(i, i);
         }
         else
             horizontalHeader()->hideSection(i);
@@ -145,7 +151,7 @@ void STableViewBase::applyGridlayout()
     }
 
     // Установка порядка стобцов
-    for(int i : visualIndexes.keys())
+    foreach(auto i, visualIndexes.keys())
     {
         horizontalHeader()->moveSection(horizontalHeader()->visualIndex(visualIndexes[i]), i);
     }
@@ -201,9 +207,9 @@ void STableViewBase::adoptAutosizedColumns()
                 spaceForVariableColumns -= columnWidth(i);
             }
         }
-        for(int i : m_autosizedColumns.keys())
+        foreach(auto i, m_autosizedColumns.keys())
         {
-            if(m_autosizedColumnsSummaryActualWidth <= spaceForVariableColumns)
+            if(m_autosizedColumnsSummaryActualWidth > 0 && m_autosizedColumnsSummaryActualWidth <= spaceForVariableColumns)
             {
                 // Если столбцы с автонастройкой ширины вписываются в доступное место, то их ширина рассчитывается пропорционально ширине текста
                 setColumnWidth(i, spaceForVariableColumns*m_autosizedColumns[i]/m_autosizedColumnsSummaryActualWidth);
@@ -915,6 +921,12 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
 
     if(preserveSelection)
         restoreSelection();
+}
+
+void STableViewBase::applyGuiSettings()
+{
+    verticalHeader()->setMinimumSectionSize(userDbData->rowHeight);
+    verticalHeader()->setDefaultSectionSize(userDbData->rowHeight);
 }
 
 void STableViewBase::filter(const FilterList &filter)

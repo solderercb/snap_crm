@@ -36,6 +36,7 @@ private slots:
     void buttonCreateTabClientClicked();
     void changeClientType();
     void primaryPhoneEdited(QString);
+    void guiFontChanged();
 };
 
 #endif // SCLIENTINPUTFORM_H

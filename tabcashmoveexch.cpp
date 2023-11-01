@@ -12,6 +12,7 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
 
     ui->setupUi(this);
     i_tabTitle = tr("Перемещение денег");
+    tabCashMoveExch::guiFontChanged();
     ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
 
     paymentSystemsProxyModel = new SSortFilterProxyModel();
@@ -186,6 +187,20 @@ void tabCashMoveExch::flipCurrency()
         ui->doubleSpinBoxCharge->setValue(1/ui->doubleSpinBoxCharge->value());
     }
     currencyFlipped ^= 1;
+}
+
+void tabCashMoveExch::guiFontChanged()
+{
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+
+    ui->doubleSpinBoxSrcAmount->setFont(font);
+    ui->doubleSpinBoxDstAmount->setFont(font);
+    ui->doubleSpinBoxCharge->setFont(font);
+    ui->comboBoxSrcPaymentAccount->setFont(font);
+    ui->comboBoxDstPaymentAccount->setFont(font);
+    ui->lineEditReason->setFont(font);
 }
 
 QString tabCashMoveExch::tabTitle()

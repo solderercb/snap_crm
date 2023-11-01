@@ -7,6 +7,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     ui(new Ui::SPageSalaryRepairs)
 {
     ui->setupUi(this);
+    SPageSalaryRepairs::guiFontChanged();
     ui->checkBoxIncludeNotIssued->setChecked(comSettings->salaryIncludeNotIssuedByDefault);
 
     ui->tableViewRepairsSummary->setGridLayout(ui->tableViewRepairs->gridLayout());
@@ -122,47 +123,36 @@ void SPageSalaryRepairs::tableColumnResized(int, int)
     ui->tableViewRepairsSummary->applyGridlayout();
 }
 
-
-STableViewSalaryRepairsSummary::STableViewSalaryRepairsSummary(QWidget *parent) :
-    STableViewBase(SLocalSettings::SalaryRepairsGrid, parent)
+void SPageSalaryRepairs::guiFontChanged()
 {
-    setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-    horizontalHeader()->setVisible(false);
-    dataModel = new QStandardItemModel();
-    setModel(dataModel);
-    setBackgroundRole(QPalette::Window);
+    QFont font;
+//    font.setFamily(userLocalData->FontFamily.value);
+    font.setPixelSize(userDbData->fontSize);
+    font.setBold(true);
+
+    ui->labelNotUssuedValue->setFont(font);
+    ui->labelPercentPartsValue->setFont(font);
+    ui->labelPercentRefillValue->setFont(font);
+    ui->labelPercentWorksQuickValue->setFont(font);
+    ui->labelPercentWorksValue->setFont(font);
+    ui->labelSalaryToPayValue->setFont(font);
+    ui->labelSalaryValue->setFont(font);
 }
 
-STableViewSalaryRepairsSummary::~STableViewSalaryRepairsSummary()
+
+STableViewSalaryRepairsSummary::STableViewSalaryRepairsSummary(QWidget *parent) :
+    STableViewSummaryBase(SLocalSettings::SalaryRepairsGrid, parent)
 {
-    i_gridLayout = nullptr;
+    setBackgroundRole(QPalette::Window);
+//    setStyleSheet("background-color: rgb(240, 240, 240);");
 }
 
 void STableViewSalaryRepairsSummary::setGridLayout(XtraSerializer *layout)
 {
-    delete i_gridLayout;
-    i_gridLayout = layout;
-    dataModel->setColumnCount(i_gridLayout->$GridControl.Columns.count());
-    QList<QStandardItem*> *emptyModelData = new QList<QStandardItem*>();
-    for(int i = 0; i < i_gridLayout->$GridControl.Columns.count(); i++)
-        *emptyModelData << new QStandardItem();
+    STableViewSummaryBase::setGridLayout(layout);
     for(int i = 2; i < 8; i++)
     {
         if(i == 6) continue;
-        emptyModelData->at(i)->setText("<value>");
+        setData(0, i, "<value>");
     }
-    dataModel->appendRow(*emptyModelData);
-    setRowHeight(0, this->height());
 }
-
-void STableViewSalaryRepairsSummary::setTotal(int column, double value)
-{
-    dataModel->setData(dataModel->index(0, column), value);
-}
-
-void STableViewSalaryRepairsSummary::applyGridlayout()
-{
-    STableViewBase::applyGridlayout();
-}
-

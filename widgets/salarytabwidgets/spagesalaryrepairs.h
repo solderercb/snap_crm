@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "spagesalarybase.h"
 #include "../stableviewbase.h"
+#include "../stableviewsummarybase.h"
 #include "widgets/stableviewbaseitemdelegates.h"
 
 namespace Ui {
@@ -11,20 +12,12 @@ class SPageSalaryRepairs;
 }
 
 // Таблица с суммами по столбцам
-class STableViewSalaryRepairsSummary : public STableViewBase
+class STableViewSalaryRepairsSummary : public STableViewSummaryBase
 {
     Q_OBJECT
 public:
     explicit STableViewSalaryRepairsSummary(QWidget *parent = nullptr);
-    ~STableViewSalaryRepairsSummary();
-    void setGridLayout(XtraSerializer* layout);
-    void setTotal(int column, double value);
-private:
-    QStandardItemModel *dataModel;
-public slots:
-    void applyGridlayout();
-protected slots:
-    void columnResized(int, int, int) override {};
+    void setGridLayout(XtraSerializer* layout) override;
 };
 
 class SPageSalaryRepairs : public SPageSalaryBase
@@ -39,8 +32,8 @@ private:
     void loadRepairData(const int id);
     void enableVScrollbarPadding(const bool state = 1);
 public slots:
-    void updateModels();
-    void updateWidgets();
+    void updateModels() override;
+    void updateWidgets() override;
     void repairsModelReset();
     void tableRepairsRowActivated(const QModelIndex &index);
     void tableRepairsRowSelected(const QModelIndex &current, const QModelIndex &prev);
@@ -48,6 +41,7 @@ public slots:
     void tableRepairPartsRowDoubleClicked(const QModelIndex &index);
 private slots:
     void tableColumnResized(int column, int newWidth);
+    void guiFontChanged() override;
 };
 
 #endif // SPAGESALARYREPAIRS_H

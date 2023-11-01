@@ -185,6 +185,7 @@ SOURCES += \
     widgets/sphones.cpp \
     widgets/splaintextedit.cpp \
     widgets/ssetcombobox.cpp \
+    widgets/stableviewsummarybase.cpp \
     widgets/stabpage.cpp \
     widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
@@ -352,6 +353,7 @@ HEADERS  += \
     widgets/sphones.h \
     widgets/splaintextedit.h \
     widgets/ssetcombobox.h \
+    widgets/stableviewsummarybase.h \
     widgets/stabpage.h \
     widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
