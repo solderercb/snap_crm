@@ -53,6 +53,7 @@ void SUserSettings::initWidgets()
     disableWidget("defStore");
     disableWidget("workspaceRepairs");
     disableWidget("workspaceItems");
+    disableWidget("roles");
     disableWidget("office");
     disableWidget("kkt");
     disableWidget("pinpad");
@@ -198,6 +199,14 @@ void SUserSettings::save()
 
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
     {
+        QString propName = metaObject()->property(i).name();
+        /******* TEMPORARY *******/
+        // Данные отключенных виджетов не считывать в структуру
+        QWidget *w = i_editorWidgets.value(propName);
+        if(w && !w->isEnabled())
+            continue;
+        /**************/
+
         metaObject()->property(i).read(this);
     }
 

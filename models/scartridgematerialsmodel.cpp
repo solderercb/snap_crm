@@ -43,7 +43,7 @@ QVariant SCartridgeMaterialsModel::data(const QModelIndex &idx, int role) const
 
 Qt::ItemFlags SCartridgeMaterialsModel::flags(const QModelIndex &item) const
 {
-    if( item.column() == materialsTable::Column::ID || item.column() == materialsTable::Column::Summ )
+    if( item.column() == materialsTable::Column::ID || item.column() == materialsTable::Column::Summ  || !permissions->editCartridgeCards)
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;

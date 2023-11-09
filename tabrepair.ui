@@ -609,7 +609,7 @@ QListView::item  {
            </property>
           </widget>
          </item>
-         <item row="20" column="0" colspan="2">
+         <item row="21" column="0" colspan="2">
           <widget class="QGroupBox" name="groupBoxCashless">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -676,7 +676,7 @@ QListView::item  {
            </layout>
           </widget>
          </item>
-         <item row="21" column="1">
+         <item row="22" column="1">
           <spacer name="verticalSpacer_3">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -689,21 +689,21 @@ QListView::item  {
            </property>
           </spacer>
          </item>
-         <item row="23" column="0">
+         <item row="24" column="0">
           <widget class="QPushButton" name="pushButtonManualUpdateRepairData">
            <property name="text">
             <string>Обновить данные</string>
            </property>
           </widget>
          </item>
-         <item row="23" column="1">
+         <item row="24" column="1">
           <widget class="QPushButton" name="dbgBtnAddRandomPart">
            <property name="text">
             <string>Add random part</string>
            </property>
           </widget>
          </item>
-         <item row="22" column="1">
+         <item row="23" column="1">
           <widget class="QPushButton" name="dbgBtnAddRandomPartBasket">
            <property name="text">
             <string>Add random part (basket)</string>
@@ -717,6 +717,16 @@ QListView::item  {
           <widget class="QLabel" name="labelPrimaryPhone">
            <property name="text">
             <string>Основной телефон</string>
+           </property>
+          </widget>
+         </item>
+         <item row="20" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButtonDebtReceived">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Задолженность получена</string>
            </property>
           </widget>
          </item>
@@ -1269,6 +1279,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
                 </item>
                 <item row="1" column="0">
                  <widget class="worksAndSparePartsTable" name="tableViewWorksAndSpareParts">
+                  <property name="focusPolicy">
+                   <enum>Qt::TabFocus</enum>
+                  </property>
                   <property name="horizontalScrollBarPolicy">
                    <enum>Qt::ScrollBarAlwaysOn</enum>
                   </property>
@@ -1625,7 +1638,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <hints>
     <hint type="sourcelabel">
      <x>308</x>
-     <y>408</y>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1656,8 +1669,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <slot>setInformedStatus(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>153</x>
-     <y>572</y>
+     <x>175</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>

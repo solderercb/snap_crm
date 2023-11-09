@@ -26,7 +26,7 @@ public:
     explicit tabReceptCartridge(MainWindow *parent = nullptr);
     ~tabReceptCartridge();
     static tabReceptCartridge* getInstance(MainWindow *parent = nullptr);
-    virtual bool tabCloseRequest();
+    bool tabCloseRequest() override;
     QString tabTitle() override;
 private:
     Ui::tabReceptCartridge *ui;

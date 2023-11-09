@@ -23,7 +23,6 @@
 #include "widgets/tabsalesettingsmenu.h"
 #include "widgets/shortlivednotification.h"
 #include "widgets/stableviewbase.h"
-#include "widgets/saletableitemdelegates.h"
 
 namespace Ui {
 class tabSale;
@@ -41,7 +40,6 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
     SSaleTableModel *m_model = nullptr;
-    SaleTableItemDelegates *m_itemDelagates = nullptr;
 };
 
 class tabSale : public tabCommon
@@ -69,7 +67,6 @@ private:
     SClientModel *clientModel;
     QSqlQueryModel* clientPhonesModel;
     SSaleTableModel *tableModel;
-//    SaleTableItemDelegates *itemDelagates;
     tabSaleSettingsMenu *widgetAction;
     SCashRegisterModel *cashRegister;
     SSortFilterProxyModel *m_priceColProxyModel;

@@ -70,6 +70,7 @@ private:
     QByteArray *m_photo = nullptr;
     int m_color = 0;
     bool m_isArchive = 0;
+    bool m_modelRW = 1;
     SCartridgeCardModel *m_cardModel = nullptr;
     SCartridgeMaterialsModel *m_materialsModel = nullptr;
     SSqlQueryModel* m_vendorsModel = nullptr;

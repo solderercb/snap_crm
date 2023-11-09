@@ -10,7 +10,7 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     m_orderId(order),
     ui(new Ui::tabCashOperation)
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    logUserActivity();
 
     ui->setupUi(this);
     tabCashOperation::guiFontChanged();
@@ -66,14 +66,14 @@ tabCashOperation::~tabCashOperation()
 
 void tabCashOperation::initPKO()
 {
-    i_tabTitle = tr("Приходный кассовый ордер");
+    m_tabTitle = tr("Приходный кассовый ордер");
     paymentTypesModel = receiptTypesModel;
     ui->comboBoxOrderType->setModel(paymentTypesModel);
 }
 
 void tabCashOperation::initRKO()
 {
-    i_tabTitle = tr("Расходный кассовый ордер");
+    m_tabTitle = tr("Расходный кассовый ордер");
     paymentTypesModel = expenditureTypesModel;
     ui->comboBoxOrderType->setModel(paymentTypesModel);
     m_showCheckBoxPrint = 0;
@@ -193,14 +193,15 @@ void tabCashOperation::setDefaultStylesheets()
 
 bool tabCashOperation::commit(bool repeatAfter)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery *query;
     bool nErr = 1;
     int initial_order_id = m_orderId;
 
-    QUERY_LOG_START(metaObject()->className());
-
     if(!checkInput())
         return 0;
+
+    query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QUERY_LOG_START(metaObject()->className());
 
     cashRegister->setOperationType(m_orderType);
     if(permissions->createBackdatedDocuments && m_backdate)
@@ -378,10 +379,13 @@ void tabCashOperation::updateOrderIdLineEdit()
 
 QString tabCashOperation::tabTitle()
 {
-    if(m_orderId > 0)
-        return i_tabTitle + QString(" %1").arg(m_orderId);
-
-    return i_tabTitle;
+    switch (m_initialOrderId)
+    {
+        case 0:
+        case tabCashOperation::PKO: return tr("Новый ПКО");
+        case tabCashOperation::RKO: return tr("Новый РКО");
+        default: return tr("Кассовый ордер №%1").arg(m_orderId);
+    }
 }
 
 void tabCashOperation::prepareTemplate(QMap<int, QVariant> data)
@@ -433,7 +437,6 @@ void tabCashOperation::updateWidgets()
     }
     else
     {
-        ui->toolButtonApplyPaymentSystem->hide();
         ui->lineEditDate->setVisible(false);
         ui->dateEdit->setVisible(permissions->createBackdatedDocuments);
         ui->buttonSave->show();
@@ -576,7 +579,10 @@ void tabCashOperation::initCashRegisterModel()
 {
     cashRegister->setId(0);
 
-    switch (m_orderId) {
+    // m_orderId может быть инициализирован отрицательными значениями в случаях создания новых ордеров
+    switch (m_orderId)
+    {
+        case 0:
         case tabCashOperation::PKO: initPKO(); break;
         case tabCashOperation::RKO: initRKO(); break;
         default: load(m_orderId);
@@ -812,7 +818,7 @@ void tabCashOperation::reasonEdited(QString)
 
 void tabCashOperation::paymentSystemChanged(int index)
 {
-    if(m_orderId > 0)
+    if(m_orderId > 0 && permissions->editPaymentSystemInCommittedCashRegisters)
         ui->toolButtonApplyPaymentSystem->show();
     if(cashRegister)
         cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(index, "system_id"));

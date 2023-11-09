@@ -10,18 +10,16 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui(new Ui::tabSale),
     doc_id(doc)
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    logUserActivity();
 
     ui->setupUi(this);
     tabSale::guiFontChanged();
     docModel = new SDocumentModel();
     tableModel = new SSaleTableModel(this);
-//    itemDelagates = new SaleTableItemDelegates(ui->tableView);
     clientModel = new SClientModel();
     cashRegister = new SCashRegisterModel();
 
     tableModel->setTableMode(SSaleTableModel::TablesSet::StoreSale);
-//    itemDelagates->setTableModel(tableModel);
     params = new int;
     *params = 0;
     *params |= comSettings->printOutInvoice?tabSaleSettingsMenu::PrintDoc:0;
@@ -138,6 +136,7 @@ void tabSale::updateWidgets()
 {
     QSqlQuery query;
 
+    emit updateTabTitle(this);
     setDefaultStyleSheets();
     if(doc_id)
     {
@@ -843,7 +842,6 @@ bool tabSale::sale()
         p_instance.remove(initial_doc_id);   // Если всё ОК, то нужно заменить указатель
         p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
 
-        emit updateTabTitle(this);
         print();
         return false;
     }
@@ -1091,8 +1089,8 @@ void sparePartsTable::setModel(QAbstractItemModel *model)
 {
     m_model = static_cast<SSaleTableModel*>(model);
     STableViewBase::setModel(model);
-    m_itemDelagates = new SaleTableItemDelegates(m_model, this);
-    setItemDelegate(m_itemDelagates);
+    SaleTableItemDelegates *itemDelagates = new SaleTableItemDelegates(m_model, this);
+    setItemDelegate(itemDelagates);
 }
 
 void sparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
@@ -1220,7 +1218,6 @@ void tabSale::test_updateWidgetsWithDocNum()
     p_instance.remove(doc_id);   // заменить указатель
     doc_id = testLineEdit->text().toInt();
     p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
-    emit updateTabTitle(this);
     updateWidgets();
 }
 

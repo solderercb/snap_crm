@@ -9,6 +9,8 @@ tabRepairCartridges::tabRepairCartridges(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairCartridges)
 {
+    logUserActivity();
+
     ui->setupUi(this);
     ui->scrollAreaWidgetContents->installEventFilter(this);
 

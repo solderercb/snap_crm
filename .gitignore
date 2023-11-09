@@ -3,3 +3,6 @@ snap_crm.pro.user*
 lang/*.qm
 appver_build_remark.h
 3rdparty/outpwd.tmp
+doc/
+tmp/
+*.lrxml*

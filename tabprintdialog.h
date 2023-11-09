@@ -103,6 +103,7 @@ private:
     void setProgressText(const QString &text);
     void updateProgressWidget();
     bool isPagesPrepared();
+    void translate();
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif

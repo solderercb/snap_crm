@@ -23,9 +23,11 @@ public:
 private:
     Ui::SPageSettingsDocTempateEditor *ui;
     SSqlQueryModel* docTemplatesList;
+//    SStandardItemModel* docTemplatesList;
     LimeReport::ReportDesignWindowInterface *reportDesigner;
     bool saveTemplateToDB();
     void removeReportDataSources();
+    void translate();
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif

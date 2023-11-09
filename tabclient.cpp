@@ -8,7 +8,7 @@ tabClient::tabClient(int id, MainWindow *parent) :
     ui(new Ui::tabClient),
     m_clientId(id)
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    logUserActivity();
 
     ui->setupUi(this);
     connect(ui->pages, &SPagedInterface::updateBotToolbar, this, &tabClient::updateBotToolbar);
@@ -34,7 +34,7 @@ tabClient::~tabClient()
 
 QString tabClient::tabTitle()
 {
-    return tr("Клиент") + " " + QString::number(m_clientId);
+    return tr("Клиент %1").arg(m_clientId);
 }
 
 void tabClient::updateBotToolbar(const int page)

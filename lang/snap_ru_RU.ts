@@ -114,37 +114,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="406"/>
+        <location filename="../loginwindow.cpp" line="408"/>
         <source>Не удалось обновить базу данных.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="407"/>
+        <location filename="../loginwindow.cpp" line="409"/>
         <source>Не удалось обновить базу данных. Есть пользователи онлайн.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="408"/>
+        <location filename="../loginwindow.cpp" line="410"/>
         <source>Попытка подключения к старой версии БД. Обратитесь к администратору.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="409"/>
+        <location filename="../loginwindow.cpp" line="411"/>
         <source>Учетная запись отключена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="412"/>
+        <location filename="../loginwindow.cpp" line="414"/>
         <source>Требуется обновление программы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="464"/>
+        <location filename="../loginwindow.cpp" line="466"/>
         <source>Select ASC application executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="466"/>
+        <location filename="../loginwindow.cpp" line="468"/>
         <source>Executable (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -204,168 +204,168 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="156"/>
+        <location filename="../mainwindow.cpp" line="148"/>
         <source>Принять</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="161"/>
+        <location filename="../mainwindow.cpp" line="153"/>
         <source>Заправка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="165"/>
+        <location filename="../mainwindow.cpp" line="158"/>
         <source>Прайс-лист</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="169"/>
+        <location filename="../mainwindow.cpp" line="162"/>
         <source>Групповой редактор ремонтов</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="177"/>
+        <location filename="../mainwindow.cpp" line="170"/>
         <source>Ремонты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="187"/>
+        <location filename="../mainwindow.cpp" line="178"/>
         <source>Приход</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="192"/>
+        <location filename="../mainwindow.cpp" line="183"/>
         <source>Продажа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="197"/>
-        <location filename="../mainwindow.cpp" line="293"/>
+        <location filename="../mainwindow.cpp" line="188"/>
+        <location filename="../mainwindow.cpp" line="280"/>
         <source>Документы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="202"/>
+        <location filename="../mainwindow.cpp" line="193"/>
         <source>Менеджер закупок</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="207"/>
+        <location filename="../mainwindow.cpp" line="198"/>
         <source>Управление складом</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="212"/>
+        <location filename="../mainwindow.cpp" line="203"/>
         <source>Групповой редактор товаров</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="217"/>
+        <location filename="../mainwindow.cpp" line="208"/>
         <source>Выгрузка товаров</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="222"/>
+        <location filename="../mainwindow.cpp" line="213"/>
         <source>Выкуп техники</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="227"/>
+        <location filename="../mainwindow.cpp" line="218"/>
         <source>Переучет</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="235"/>
+        <location filename="../mainwindow.cpp" line="226"/>
         <source>Товары</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="244"/>
+        <location filename="../mainwindow.cpp" line="233"/>
         <source>Новый клиент</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="249"/>
+        <location filename="../mainwindow.cpp" line="238"/>
         <source>Вызовы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="254"/>
+        <location filename="../mainwindow.cpp" line="243"/>
         <source>SMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="265"/>
+        <location filename="../mainwindow.cpp" line="254"/>
         <source>Клиенты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="278"/>
+        <location filename="../mainwindow.cpp" line="265"/>
         <source>Приходный кассовый ордер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="283"/>
+        <location filename="../mainwindow.cpp" line="270"/>
         <source>Расходный кассовый ордер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="288"/>
+        <location filename="../mainwindow.cpp" line="275"/>
         <source>Перемещение/обмен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="299"/>
+        <location filename="../mainwindow.cpp" line="286"/>
         <source>Счёт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="302"/>
+        <location filename="../mainwindow.cpp" line="289"/>
         <source>Счёт-фактура</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="305"/>
+        <location filename="../mainwindow.cpp" line="292"/>
         <source>Товарная накладная</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="308"/>
+        <location filename="../mainwindow.cpp" line="295"/>
         <source>Акт выполненных работ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="313"/>
+        <location filename="../mainwindow.cpp" line="300"/>
         <source>Заработная плата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="319"/>
+        <location filename="../mainwindow.cpp" line="306"/>
         <source>Финансы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="329"/>
+        <location filename="../mainwindow.cpp" line="314"/>
         <source>Проверить обновления</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="335"/>
+        <location filename="../mainwindow.cpp" line="320"/>
         <source>О программе</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="340"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>Сменить пользователя</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="345"/>
+        <location filename="../mainwindow.cpp" line="330"/>
         <source>Выход</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="353"/>
+        <location filename="../mainwindow.cpp" line="338"/>
         <source>Настройки</source>
         <translation type="unfinished"></translation>
     </message>
@@ -814,7 +814,7 @@
     </message>
     <message>
         <location filename="../widgets/scartridgecard.ui" line="149"/>
-        <location filename="../widgets/scartridgecard.cpp" line="120"/>
+        <location filename="../widgets/scartridgecard.cpp" line="131"/>
         <source>Создать</source>
         <translation type="unfinished"></translation>
     </message>
@@ -844,47 +844,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="103"/>
+        <location filename="../widgets/scartridgecard.cpp" line="104"/>
         <source>Сохранить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="152"/>
+        <location filename="../widgets/scartridgecard.cpp" line="163"/>
         <source>Не указано: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="162"/>
+        <location filename="../widgets/scartridgecard.cpp" line="173"/>
         <source>Ошибка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="226"/>
+        <location filename="../widgets/scartridgecard.cpp" line="238"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="226"/>
+        <location filename="../widgets/scartridgecard.cpp" line="238"/>
         <source>Данные сохранены</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="271"/>
+        <location filename="../widgets/scartridgecard.cpp" line="283"/>
         <source>Black</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="272"/>
+        <location filename="../widgets/scartridgecard.cpp" line="284"/>
         <source>Cyan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="273"/>
+        <location filename="../widgets/scartridgecard.cpp" line="285"/>
         <source>Magenta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="274"/>
+        <location filename="../widgets/scartridgecard.cpp" line="286"/>
         <source>Yellow</source>
         <translation type="unfinished"></translation>
     </message>
@@ -905,170 +905,185 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="122"/>
+        <location filename="../widgets/scartridgeform.ui" line="154"/>
         <source>Карточка картриджа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="125"/>
-        <location filename="../widgets/scartridgeform.ui" line="200"/>
-        <location filename="../widgets/scartridgeform.ui" line="232"/>
-        <location filename="../widgets/scartridgeform.ui" line="804"/>
+        <location filename="../widgets/scartridgeform.ui" line="157"/>
+        <location filename="../widgets/scartridgeform.ui" line="199"/>
+        <location filename="../widgets/scartridgeform.ui" line="273"/>
+        <location filename="../widgets/scartridgeform.ui" line="915"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="229"/>
+        <location filename="../widgets/scartridgeform.ui" line="270"/>
         <source>Удалить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="142"/>
+        <location filename="../widgets/scartridgeform.ui" line="293"/>
         <source>Карточка клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="145"/>
+        <location filename="../widgets/scartridgeform.ui" line="296"/>
         <source>clientCard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="197"/>
+        <location filename="../widgets/scartridgeform.ui" line="196"/>
         <source>Классический ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="159"/>
+        <location filename="../widgets/scartridgeform.ui" line="168"/>
         <source>Title</source>
         <translation type="unfinished">Оборудование</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="266"/>
+        <location filename="../widgets/scartridgeform.ui" line="239"/>
         <source>Превышен ресурс!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="735"/>
+        <location filename="../widgets/scartridgeform.ui" line="326"/>
+        <source>Повт./гар.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/scartridgeform.ui" line="778"/>
         <source>Вес</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="411"/>
-        <location filename="../widgets/scartridgeform.ui" line="773"/>
-        <location filename="../widgets/scartridgeform.cpp" line="268"/>
+        <location filename="../widgets/scartridgeform.ui" line="564"/>
+        <source>Инженер</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/scartridgeform.ui" line="429"/>
+        <location filename="../widgets/scartridgeform.ui" line="464"/>
+        <location filename="../widgets/scartridgeform.cpp" line="348"/>
         <source>Фотовал</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="431"/>
-        <location filename="../widgets/scartridgeform.ui" line="497"/>
-        <location filename="../widgets/scartridgeform.cpp" line="263"/>
+        <location filename="../widgets/scartridgeform.ui" line="480"/>
+        <location filename="../widgets/scartridgeform.ui" line="677"/>
+        <location filename="../widgets/scartridgeform.cpp" line="343"/>
         <source>Чип</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="477"/>
-        <location filename="../widgets/scartridgeform.ui" line="715"/>
-        <location filename="../widgets/scartridgeform.cpp" line="273"/>
+        <location filename="../widgets/scartridgeform.ui" line="629"/>
+        <location filename="../widgets/scartridgeform.ui" line="864"/>
+        <location filename="../widgets/scartridgeform.cpp" line="353"/>
         <source>Ракель</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="307"/>
+        <location filename="../widgets/scartridgeform.ui" line="816"/>
         <source>Примечание</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="669"/>
+        <location filename="../widgets/scartridgeform.ui" line="645"/>
         <source>История</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="557"/>
+        <location filename="../widgets/scartridgeform.ui" line="445"/>
         <source>Итоговая стоимость</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="329"/>
+        <location filename="../widgets/scartridgeform.ui" line="848"/>
         <source>Ячейка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="370"/>
+        <location filename="../widgets/scartridgeform.ui" line="959"/>
         <source>Предв. стоимость</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="451"/>
-        <source>Ответственный инженер</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/scartridgeform.ui" line="637"/>
+        <location filename="../widgets/scartridgeform.ui" line="706"/>
         <source>Вес (факт.)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="799"/>
+        <location filename="../widgets/scartridgeform.ui" line="940"/>
         <source>Другие работы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="519"/>
+        <location filename="../widgets/scartridgeform.ui" line="661"/>
         <source>Статус</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="598"/>
+        <location filename="../widgets/scartridgeform.ui" line="880"/>
         <source>Серийный номер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.ui" line="287"/>
-        <location filename="../widgets/scartridgeform.ui" line="695"/>
-        <location filename="../widgets/scartridgeform.cpp" line="258"/>
+        <location filename="../widgets/scartridgeform.ui" line="832"/>
+        <location filename="../widgets/scartridgeform.ui" line="896"/>
+        <location filename="../widgets/scartridgeform.cpp" line="338"/>
         <source>Заправка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="573"/>
+        <location filename="../widgets/scartridgeform.cpp" line="202"/>
+        <source>Повтор</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/scartridgeform.cpp" line="205"/>
+        <source>Гарантия</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/scartridgeform.cpp" line="654"/>
         <source>Статус информирования клиента обновлён</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="685"/>
+        <location filename="../widgets/scartridgeform.cpp" line="766"/>
         <source>Ошибка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="686"/>
+        <location filename="../widgets/scartridgeform.cpp" line="767"/>
         <source>Кол-во больше наличия, списание не возможно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="920"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1003"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="920"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1003"/>
         <source>Проверьте права доступа или обратитесь к администратору</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="968"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1051"/>
         <source>Примечание сохранено</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="573"/>
-        <location filename="../widgets/scartridgeform.cpp" line="968"/>
-        <location filename="../widgets/scartridgeform.h" line="108"/>
+        <location filename="../widgets/scartridgeform.cpp" line="654"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1051"/>
+        <location filename="../widgets/scartridgeform.h" line="114"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.h" line="108"/>
+        <location filename="../widgets/scartridgeform.h" line="114"/>
         <source>Данные сохранены</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1333,24 +1348,24 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.ui" line="59"/>
+        <location filename="../widgets/sclientinputform.ui" line="65"/>
         <source>Адрес</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.ui" line="81"/>
+        <location filename="../widgets/sclientinputform.ui" line="87"/>
         <source>Источник обращения</source>
         <extracomment>dfgdasf</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.ui" line="91"/>
-        <location filename="../widgets/sclientinputform.cpp" line="66"/>
+        <location filename="../widgets/sclientinputform.ui" line="103"/>
+        <location filename="../widgets/sclientinputform.cpp" line="68"/>
         <source>Имя</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.ui" line="112"/>
+        <location filename="../widgets/sclientinputform.ui" line="118"/>
         <source>Организация</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1370,41 +1385,41 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.ui" line="290"/>
+        <location filename="../widgets/sclientinputform.ui" line="296"/>
         <source>Отчество</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.ui" line="300"/>
+        <location filename="../widgets/sclientinputform.ui" line="312"/>
         <source>e-mail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.cpp" line="24"/>
+        <location filename="../widgets/sclientinputform.cpp" line="26"/>
         <source>источник обращения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.cpp" line="52"/>
+        <location filename="../widgets/sclientinputform.cpp" line="54"/>
         <source>Клиент (юридическое лицо)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.cpp" line="54"/>
+        <location filename="../widgets/sclientinputform.cpp" line="56"/>
         <source>Название организации</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.cpp" line="117"/>
-        <location filename="../widgets/sclientinputform.cpp" line="118"/>
         <location filename="../widgets/sclientinputform.cpp" line="119"/>
-        <location filename="../widgets/sclientinputform.cpp" line="124"/>
-        <location filename="../widgets/sclientinputform.cpp" line="125"/>
+        <location filename="../widgets/sclientinputform.cpp" line="120"/>
+        <location filename="../widgets/sclientinputform.cpp" line="121"/>
+        <location filename="../widgets/sclientinputform.cpp" line="126"/>
+        <location filename="../widgets/sclientinputform.cpp" line="127"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.cpp" line="182"/>
+        <location filename="../widgets/sclientinputform.cpp" line="184"/>
         <source>Быстрое создание клиента из формы приёма в ремонт</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2593,13 +2608,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysales.ui" line="57"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysales.ui" line="81"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysales.ui" line="56"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysales.ui" line="79"/>
         <source>&lt;value&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysales.ui" line="67"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysales.ui" line="66"/>
         <source>Продажи</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2622,73 +2637,73 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="90"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="96"/>
         <source>По ставке начислить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="131"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="149"/>
         <source>Заработок с ремонтов</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="151"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="175"/>
         <source>Заработок с продаж</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="171"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="201"/>
         <source>Принятые/выданные устройства</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="191"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="227"/>
         <source>Запчасти на руках</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="211"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="253"/>
         <source>Дополнительные начиления</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="231"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="279"/>
         <source>Дополнительные списания</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="254"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="308"/>
         <source>Заработок</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="277"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="602"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="337"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="698"/>
         <source>Аванс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="300"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="366"/>
         <source>Сумма включает выплаты и записи на баланс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="303"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="369"/>
         <source>Было выплачено (?)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="326"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="398"/>
         <source>Баланс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="346"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="424"/>
         <source>Итого к оплате</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="407"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="491"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -2710,139 +2725,139 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="431"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="515"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="447"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="531"/>
         <source>ВНИМАНИЕ!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="509"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="593"/>
         <source>Заработная плата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="517"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="616"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="601"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="712"/>
         <source>Сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="524"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="623"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="608"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="719"/>
         <source>Оплата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="534"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="633"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="618"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="729"/>
         <source>Дата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="554"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="653"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="644"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="755"/>
         <source>Данные верны</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="568"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="674"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="664"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="782"/>
         <source>Выплатить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="667"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="775"/>
         <source>Примечание</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="706"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="814"/>
         <source>Выплата аванса сотруднику</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="44"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="46"/>
         <source>Выбрать</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="46"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="48"/>
         <source>Баланс сотрудника не включен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="47"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="49"/>
         <source>Для зачисления разницы на баланс сотрудника необходимо указать или создать карточку клиента-сотрудника. Создать автоматически?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="63"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="78"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="65"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="80"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="64"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="66"/>
         <source>У вас недостаточно прав. Обратитесь к администратору.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="79"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="81"/>
         <source>Сумма выплаты не соответствует значению в поле &quot;Итого к оплате&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="97"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="99"/>
         <source>Быстрое создание клиента при выплате заработной платы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="149"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="151"/>
         <source>Баланс сотрудника</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="150"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="152"/>
         <source>Записать старое значение баланса в новом формате?
 Сумма будет прибавлена или вычтена если была выбрана карточка существующего клиента (не рекомендуется, см. справку).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="241"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="243"/>
         <source>Выплата заработной платы за период с %1 по %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="273"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="275"/>
         <source>Карточка сотрудника-клиента успешно создана или связана</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="278"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="280"/>
         <source>Преобразование данных о сумме на балансе сотрудника из формата программы АСЦ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="297"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="299"/>
         <source>Списание средств с баланса сотрудника-клиента при выплате заработной платы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="299"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="301"/>
         <source>Зачисление разницы заработка и выплаченной суммы на баланс сотрудника-клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="316"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="318"/>
         <source>Ошибка выполнения запроса</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="333"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="335"/>
         <source>Проведено</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2852,22 +2867,172 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/spagesettingsdoctempateeditor.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/spagesettingsdoctempateeditor.ui" line="48"/>
         <source>Импорт</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/spagesettingsdoctempateeditor.ui" line="58"/>
         <source>Экспорт</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/spagesettingsdoctempateeditor.ui" line="71"/>
         <source>Новое имя</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="137"/>
+        <source>new_rep</source>
+        <translation>Приём в ремонт</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="138"/>
+        <source>pko</source>
+        <translation>ПКО (приходный кассовый ордер)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="139"/>
+        <source>reject</source>
+        <translation>Отказ от ремонта</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="140"/>
+        <source>rko</source>
+        <translation>РКО (расходный кассовый ордер)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="141"/>
+        <source>sticker1</source>
+        <translation>Стикер 1</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="142"/>
+        <source>sticker2</source>
+        <translation>Стикер 2</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="143"/>
+        <source>sticker3</source>
+        <translation>Стикер 3</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="144"/>
+        <source>rep_label</source>
+        <translation>Стикер на ремонт</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="145"/>
+        <source>warranty</source>
+        <translation>Гарантийный талон</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="146"/>
+        <source>works</source>
+        <translation>Акт выполненных работ</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="147"/>
+        <source>diag</source>
+        <translation>Акт диагностики оборудования</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="148"/>
+        <source>pn</source>
+        <translation>ПН (приходная накладная)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="149"/>
+        <source>rn</source>
+        <translation>РН (расходная накладная)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="150"/>
+        <source>lost</source>
+        <translation>Бланк утери квитанции</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="151"/>
+        <source>price1</source>
+        <translation>Ценник 1</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="152"/>
+        <source>invoice0</source>
+        <translation>Счёт стандартный</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="153"/>
+        <source>invoice1</source>
+        <translation>Счёт стандартный с образцом п.п.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="154"/>
+        <source>invoice2</source>
+        <translation>Счёт с колонкой НДС</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="155"/>
+        <source>invoice3</source>
+        <translation>Счёт с колонкой НДС и образцом п.п</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="156"/>
+        <source>vatinvoice0</source>
+        <translation>Счёт-фактура</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="157"/>
+        <source>p_list0</source>
+        <translation>Товарная накладная (Торг-12)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="158"/>
+        <source>w_list0</source>
+        <translation>Акт на выполнение работ-услуг (без нал.)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="159"/>
+        <source>new_cartridge</source>
+        <translation>Приём картриджа</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="160"/>
+        <source>sticker_cartridge</source>
+        <translation>Стикер на картридж</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="161"/>
+        <source>issue_cartridge</source>
+        <translation>Выдача картриджа</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="162"/>
+        <source>slip</source>
+        <translation>Слип-чек</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="163"/>
+        <source>move</source>
+        <translation>Накладная перемещения</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="164"/>
+        <source>buyout</source>
+        <translation>Закупочный акт</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="165"/>
+        <source>repairs</source>
+        <translation>Список ремонтов</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spagesettingsdoctempateeditor.cpp" line="166"/>
+        <source>cartridges</source>
+        <translation>Список картриджей</translation>
     </message>
 </context>
 <context>
@@ -3482,8 +3647,8 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sphone.cpp" line="58"/>
-        <location filename="../widgets/sphone.cpp" line="63"/>
+        <location filename="../widgets/sphone.cpp" line="60"/>
+        <location filename="../widgets/sphone.cpp" line="65"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4075,32 +4240,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableViewBase</name>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="421"/>
+        <location filename="../widgets/stableviewbase.cpp" line="427"/>
         <source>Автоширина</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="427"/>
+        <location filename="../widgets/stableviewbase.cpp" line="433"/>
         <source>Размер по содержимому</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="432"/>
+        <location filename="../widgets/stableviewbase.cpp" line="438"/>
         <source>Вписать все</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="437"/>
+        <location filename="../widgets/stableviewbase.cpp" line="443"/>
         <source>Сделать значением по умолчанию</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="442"/>
+        <location filename="../widgets/stableviewbase.cpp" line="448"/>
         <source>Скрыть</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="448"/>
+        <location filename="../widgets/stableviewbase.cpp" line="454"/>
         <source>Выбрать столбцы</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4630,17 +4795,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SUserSettings</name>
     <message>
-        <location filename="../models/susersettings.cpp" line="383"/>
+        <location filename="../models/susersettings.cpp" line="410"/>
         <source>ColumnA</source>
         <translation>Колонка A</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="385"/>
+        <location filename="../models/susersettings.cpp" line="412"/>
         <source>ColumnN</source>
         <translation>Колонка N</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="383"/>
+        <location filename="../models/susersettings.cpp" line="410"/>
         <source>ColumnC</source>
         <translation>Колонка C</translation>
     </message>
@@ -4655,512 +4820,512 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="292"/>
+        <location filename="../models/susersettings.cpp" line="319"/>
         <source>username</source>
         <translation>Имя пользователя (login)</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="293"/>
+        <location filename="../models/susersettings.cpp" line="320"/>
         <source>name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="294"/>
+        <location filename="../models/susersettings.cpp" line="321"/>
         <source>surname</source>
         <translation>Фамилия</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="295"/>
+        <location filename="../models/susersettings.cpp" line="322"/>
         <source>patronymic</source>
         <translation>Отчество</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="296"/>
+        <location filename="../models/susersettings.cpp" line="323"/>
         <source>roles</source>
         <translation>Роли</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="297"/>
+        <location filename="../models/susersettings.cpp" line="324"/>
         <source>office</source>
         <translation>Офис</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="298"/>
+        <location filename="../models/susersettings.cpp" line="325"/>
         <source>address</source>
         <translation>Адрес</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="299"/>
+        <location filename="../models/susersettings.cpp" line="326"/>
         <source>password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="300"/>
+        <location filename="../models/susersettings.cpp" line="327"/>
         <source>notes</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="301"/>
+        <location filename="../models/susersettings.cpp" line="328"/>
         <source>signature</source>
         <translation>Подпись</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="302"/>
+        <location filename="../models/susersettings.cpp" line="329"/>
         <source>phone</source>
         <translation>Телефон</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="303"/>
+        <location filename="../models/susersettings.cpp" line="330"/>
         <source>phoneMask</source>
         <translation>Маска</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="304"/>
+        <location filename="../models/susersettings.cpp" line="331"/>
         <source>phone2</source>
         <translation>Телефон 2</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="305"/>
+        <location filename="../models/susersettings.cpp" line="332"/>
         <source>phone2Mask</source>
         <translation>Маска</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="306"/>
+        <location filename="../models/susersettings.cpp" line="333"/>
         <source>sipUserId</source>
         <translation>Внутренний номер (SIP)</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="307"/>
+        <location filename="../models/susersettings.cpp" line="334"/>
         <source>birthday</source>
         <translation>Дата рождения</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="308"/>
+        <location filename="../models/susersettings.cpp" line="335"/>
         <source>inn</source>
         <translation>ИНН</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="309"/>
+        <location filename="../models/susersettings.cpp" line="336"/>
         <source>kkt</source>
         <translation>ККТ</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="310"/>
+        <location filename="../models/susersettings.cpp" line="337"/>
         <source>pinpad</source>
         <translation>Терминал</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="311"/>
+        <location filename="../models/susersettings.cpp" line="338"/>
         <source>cardOnCall</source>
         <translation>Карточка клиента при вызове</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="312"/>
+        <location filename="../models/susersettings.cpp" line="339"/>
         <source>trackActivity</source>
         <translation>Отслеживать активность</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="313"/>
+        <location filename="../models/susersettings.cpp" line="340"/>
         <source>state</source>
         <translation>Архивный</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="314"/>
+        <location filename="../models/susersettings.cpp" line="341"/>
         <source>isBot</source>
         <translation>Бот</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="315"/>
+        <location filename="../models/susersettings.cpp" line="342"/>
         <source>photo</source>
         <translation>Фото</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="316"/>
+        <location filename="../models/susersettings.cpp" line="343"/>
         <source>clientUserId</source>
         <translation>ID клиента</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="317"/>
+        <location filename="../models/susersettings.cpp" line="344"/>
         <source>passportNum</source>
         <translation>Серия и номер</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="318"/>
+        <location filename="../models/susersettings.cpp" line="345"/>
         <source>passportDate</source>
         <translation>Дата выдачи</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="319"/>
+        <location filename="../models/susersettings.cpp" line="346"/>
         <source>passportOrgan</source>
         <translation>кем выдан</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="320"/>
+        <location filename="../models/susersettings.cpp" line="347"/>
         <source>salaryRate</source>
         <translation>Ставка за месяц</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="321"/>
+        <location filename="../models/susersettings.cpp" line="348"/>
         <source>payDayOff</source>
         <translation>Оплата выходного дня</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="322"/>
+        <location filename="../models/susersettings.cpp" line="349"/>
         <source>payDay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="323"/>
+        <location filename="../models/susersettings.cpp" line="350"/>
         <source>payDeviceIn</source>
         <translation>Сумма за принятую технику</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="324"/>
+        <location filename="../models/susersettings.cpp" line="351"/>
         <source>payDeviceOut</source>
         <translation>Сумма за выданную технику</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="325"/>
+        <location filename="../models/susersettings.cpp" line="352"/>
         <source>payRepair</source>
         <translation>% от выполненный работ</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="326"/>
+        <location filename="../models/susersettings.cpp" line="353"/>
         <source>payRepairQuick</source>
         <translation>% с работ быстрый ремонт</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="327"/>
+        <location filename="../models/susersettings.cpp" line="354"/>
         <source>payCartridgeRefill</source>
         <translation>% с заправки картриджа</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="328"/>
+        <location filename="../models/susersettings.cpp" line="355"/>
         <source>paySale</source>
         <translation>% от прибыли с продаж товаров</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="329"/>
+        <location filename="../models/susersettings.cpp" line="356"/>
         <source>payRepairQSale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="330"/>
+        <location filename="../models/susersettings.cpp" line="357"/>
         <source>pay4SaleInRepair</source>
         <translation>Начисление за продажу деталей в ремонте</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="331"/>
+        <location filename="../models/susersettings.cpp" line="358"/>
         <source>created</source>
         <translation>Дата создания уч. записи</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="332"/>
+        <location filename="../models/susersettings.cpp" line="359"/>
         <source>lastLogin</source>
         <translation>Последний раз входил</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="333"/>
+        <location filename="../models/susersettings.cpp" line="360"/>
         <source>lastActivity</source>
         <translation>Последняя активность</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="334"/>
+        <location filename="../models/susersettings.cpp" line="361"/>
         <source>currentOffice</source>
         <translation>Текущий офис</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="335"/>
+        <location filename="../models/susersettings.cpp" line="362"/>
         <source>company</source>
         <translation>Организация</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="336"/>
+        <location filename="../models/susersettings.cpp" line="363"/>
         <source>rowColor</source>
         <translation>Выделенная строка</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="337"/>
+        <location filename="../models/susersettings.cpp" line="364"/>
         <source>colorLabelWs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="338"/>
+        <location filename="../models/susersettings.cpp" line="365"/>
         <source>fontSize</source>
         <translation>Размер шрифта</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="339"/>
+        <location filename="../models/susersettings.cpp" line="366"/>
         <source>rowHeight</source>
         <translation>Высота строки</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="340"/>
+        <location filename="../models/susersettings.cpp" line="367"/>
         <source>geHighlightColor</source>
         <translation>Подстветка строки в гр. редакторе</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="341"/>
+        <location filename="../models/susersettings.cpp" line="368"/>
         <source>defaultDocumentPrinter</source>
         <translation>Принтер для документов по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="342"/>
+        <location filename="../models/susersettings.cpp" line="369"/>
         <source>defaultStickerPrinter</source>
         <translation>Принтер стикеров по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="343"/>
+        <location filename="../models/susersettings.cpp" line="370"/>
         <source>previewBeforePrint</source>
         <translation>Предпросмотр перед печатью документов</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="344"/>
+        <location filename="../models/susersettings.cpp" line="371"/>
         <source>defaultPosPrinter</source>
         <translation>POS принтер по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="345"/>
+        <location filename="../models/susersettings.cpp" line="372"/>
         <source>displayOut</source>
         <translation>Отображать выданные</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="346"/>
+        <location filename="../models/susersettings.cpp" line="373"/>
         <source>displayComplete</source>
         <translation>Отображать готовые</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="347"/>
+        <location filename="../models/susersettings.cpp" line="374"/>
         <source>newOnTop</source>
         <translation>Сначала новые</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="348"/>
+        <location filename="../models/susersettings.cpp" line="375"/>
         <source>saveStateOnClose</source>
         <translation>Автосохранение статуса ремонта</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="349"/>
+        <location filename="../models/susersettings.cpp" line="376"/>
         <source>autoRefreshWorkspace</source>
         <translation>Автообновление списка заказов</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="350"/>
+        <location filename="../models/susersettings.cpp" line="377"/>
         <source>refreshTime</source>
         <translation>Период автообновления (секунд)</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="351"/>
+        <location filename="../models/susersettings.cpp" line="378"/>
         <source>issuedColor</source>
         <translation>Выданные в результатах поиска</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="352"/>
+        <location filename="../models/susersettings.cpp" line="379"/>
         <source>defOffice</source>
         <translation>Офис по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="353"/>
+        <location filename="../models/susersettings.cpp" line="380"/>
         <source>defEmployee</source>
         <translation>Сотрудник по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="354"/>
+        <location filename="../models/susersettings.cpp" line="381"/>
         <source>defStatus</source>
         <translation>Статус по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="355"/>
+        <location filename="../models/susersettings.cpp" line="382"/>
         <source>defWsFilter</source>
         <translation>Режим</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="356"/>
+        <location filename="../models/susersettings.cpp" line="383"/>
         <source>autosavePartList</source>
         <translation>Автосохранение списка работ и деталей</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="357"/>
+        <location filename="../models/susersettings.cpp" line="384"/>
         <source>autosaveDiagResult</source>
         <translation>Автосохранение результатов диагностики</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="358"/>
+        <location filename="../models/susersettings.cpp" line="385"/>
         <source>preferRegular</source>
         <translation>Окно клиентов, сначала постоянные</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="359"/>
+        <location filename="../models/susersettings.cpp" line="386"/>
         <source>groupStoreItems</source>
         <translation>Группировать товары по артикулу</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="360"/>
+        <location filename="../models/susersettings.cpp" line="387"/>
         <source>defStore</source>
         <translation>Склад по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="361"/>
+        <location filename="../models/susersettings.cpp" line="388"/>
         <source>xlsC1</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="362"/>
+        <location filename="../models/susersettings.cpp" line="389"/>
         <source>xlsC2</source>
         <translation>Кол-во</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="363"/>
+        <location filename="../models/susersettings.cpp" line="390"/>
         <source>xlsC3</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="364"/>
+        <location filename="../models/susersettings.cpp" line="391"/>
         <source>xlsC4</source>
         <translation>Описание в Интернет-магазине</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="365"/>
+        <location filename="../models/susersettings.cpp" line="392"/>
         <source>xlsC14</source>
         <translation>Заголовок в Интернет-магазине</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="366"/>
+        <location filename="../models/susersettings.cpp" line="393"/>
         <source>xlsC6</source>
         <translation>Серийный номер</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="367"/>
+        <location filename="../models/susersettings.cpp" line="394"/>
         <source>xlsC5</source>
         <translation>Партномер</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="368"/>
+        <location filename="../models/susersettings.cpp" line="395"/>
         <source>xlsC7</source>
         <translation>Стоимость</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="369"/>
+        <location filename="../models/susersettings.cpp" line="396"/>
         <source>xlsC8</source>
         <translation>Розница</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="370"/>
+        <location filename="../models/susersettings.cpp" line="397"/>
         <source>xlsC9</source>
         <translation>Опт</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="371"/>
+        <location filename="../models/susersettings.cpp" line="398"/>
         <source>xlsC10</source>
         <translation>Опт 2</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="372"/>
+        <location filename="../models/susersettings.cpp" line="399"/>
         <source>xlsC11</source>
         <translation>Опт 3</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="373"/>
+        <location filename="../models/susersettings.cpp" line="400"/>
         <source>xlsC12</source>
         <translation>Цена для сервиса</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="374"/>
+        <location filename="../models/susersettings.cpp" line="401"/>
         <source>xlsC15</source>
         <translation>Примечание</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="375"/>
+        <location filename="../models/susersettings.cpp" line="402"/>
         <source>xlsC13</source>
         <translation>Ячейка</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="376"/>
+        <location filename="../models/susersettings.cpp" line="403"/>
         <source>workspaceRepairs</source>
         <translation>Ремонты</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="377"/>
+        <location filename="../models/susersettings.cpp" line="404"/>
         <source>workspaceItems</source>
         <translation>Товары</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="378"/>
+        <location filename="../models/susersettings.cpp" line="405"/>
         <source>workspaceMode</source>
         <translation>Режим главного окна</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="379"/>
+        <location filename="../models/susersettings.cpp" line="406"/>
         <source>defaultPaymentSystem</source>
         <translation>Платёжная система по умолчанию</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="380"/>
+        <location filename="../models/susersettings.cpp" line="407"/>
         <source>alternateRowsBackground</source>
         <translation>Чередующиеся строки</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="383"/>
+        <location filename="../models/susersettings.cpp" line="410"/>
         <source>ColumnD</source>
         <translation>Колонка D</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="383"/>
+        <location filename="../models/susersettings.cpp" line="410"/>
         <source>ColumnE</source>
         <translation>Колонка E</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="383"/>
+        <location filename="../models/susersettings.cpp" line="410"/>
         <source>ColumnB</source>
         <translation>Колонка B</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="384"/>
+        <location filename="../models/susersettings.cpp" line="411"/>
         <source>ColumnF</source>
         <translation>Колонка F</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="384"/>
+        <location filename="../models/susersettings.cpp" line="411"/>
         <source>ColumnG</source>
         <translation>Колонка G</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="384"/>
+        <location filename="../models/susersettings.cpp" line="411"/>
         <source>ColumnH</source>
         <translation>Колонка H</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="384"/>
+        <location filename="../models/susersettings.cpp" line="411"/>
         <source>ColumnI</source>
         <translation>Колонка I</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="384"/>
+        <location filename="../models/susersettings.cpp" line="411"/>
         <source>ColumnJ</source>
         <translation>Колонка J</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="385"/>
+        <location filename="../models/susersettings.cpp" line="412"/>
         <source>ColumnK</source>
         <translation>Колонка K</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="385"/>
+        <location filename="../models/susersettings.cpp" line="412"/>
         <source>ColumnL</source>
         <translation>Колонка L</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="385"/>
+        <location filename="../models/susersettings.cpp" line="412"/>
         <source>ColumnM</source>
         <translation>Колонка M</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="385"/>
+        <location filename="../models/susersettings.cpp" line="412"/>
         <source>ColumnO</source>
         <translation>Колонка O</translation>
     </message>
     <message>
-        <location filename="../models/susersettings.cpp" line="386"/>
+        <location filename="../models/susersettings.cpp" line="413"/>
         <source>NoColumn</source>
         <translation>нет</translation>
     </message>
@@ -5282,46 +5447,46 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>materialsTable</name>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="320"/>
+        <location filename="../widgets/scartridgecard.cpp" line="335"/>
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="155"/>
-        <location filename="../widgets/scartridgecard.cpp" line="321"/>
+        <location filename="../widgets/scartridgecard.cpp" line="166"/>
+        <location filename="../widgets/scartridgecard.cpp" line="336"/>
         <source>Count</source>
         <translation>Кол-во/вес</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="156"/>
-        <location filename="../widgets/scartridgecard.cpp" line="322"/>
+        <location filename="../widgets/scartridgecard.cpp" line="167"/>
+        <location filename="../widgets/scartridgecard.cpp" line="337"/>
         <source>Price</source>
         <translation>Цена</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="157"/>
-        <location filename="../widgets/scartridgecard.cpp" line="323"/>
+        <location filename="../widgets/scartridgecard.cpp" line="168"/>
+        <location filename="../widgets/scartridgecard.cpp" line="338"/>
         <source>PriceWork</source>
         <translation>Стоимость работы</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="324"/>
+        <location filename="../widgets/scartridgecard.cpp" line="339"/>
         <source>Summ</source>
         <translation>Итого</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="327"/>
+        <location filename="../widgets/scartridgecard.cpp" line="342"/>
         <source>SalarySumm</source>
         <translation>Ставка</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="158"/>
-        <location filename="../widgets/scartridgecard.cpp" line="325"/>
+        <location filename="../widgets/scartridgecard.cpp" line="169"/>
+        <location filename="../widgets/scartridgecard.cpp" line="340"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="326"/>
+        <location filename="../widgets/scartridgecard.cpp" line="341"/>
         <source>Articul</source>
         <translation>Артикул</translation>
     </message>
@@ -5367,47 +5532,47 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>sparePartsTable</name>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>UID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Наименование</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Кол-во</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Доступно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Цена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Место</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Серийный номер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1056"/>
+        <location filename="../tabsale.cpp" line="1079"/>
         <source>Гарантия</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5495,7 +5660,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="14"/>
+        <location filename="../tabcashmoveexch.cpp" line="207"/>
         <source>Перемещение денег</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5505,17 +5670,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="297"/>
+        <location filename="../tabcashmoveexch.cpp" line="311"/>
         <source>курс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="303"/>
+        <location filename="../tabcashmoveexch.cpp" line="317"/>
         <source>комиссия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="352"/>
+        <location filename="../tabcashmoveexch.cpp" line="366"/>
         <source>Проведёно</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5544,7 +5709,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../tabcashoperation.ui" line="206"/>
-        <location filename="../tabcashoperation.cpp" line="141"/>
+        <location filename="../tabcashoperation.cpp" line="142"/>
         <source>Плательщик</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5619,62 +5784,77 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="68"/>
+        <location filename="../tabcashoperation.cpp" line="69"/>
         <source>Приходный кассовый ордер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="75"/>
+        <location filename="../tabcashoperation.cpp" line="76"/>
         <source>Расходный кассовый ордер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="116"/>
+        <location filename="../tabcashoperation.cpp" line="117"/>
         <source>Ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="118"/>
+        <location filename="../tabcashoperation.cpp" line="119"/>
         <source>Счёт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="120"/>
+        <location filename="../tabcashoperation.cpp" line="121"/>
         <source>Документ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="139"/>
+        <location filename="../tabcashoperation.cpp" line="140"/>
         <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="304"/>
+        <location filename="../tabcashoperation.cpp" line="306"/>
         <source>Баланс клиента №%1 пополнен на %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="308"/>
+        <location filename="../tabcashoperation.cpp" line="310"/>
         <source>С баланса клиента №%1 списано %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="427"/>
+        <location filename="../tabcashoperation.cpp" line="385"/>
+        <source>Новый ПКО</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.cpp" line="386"/>
+        <source>Новый РКО</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.cpp" line="387"/>
+        <source>Кассовый ордер №%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.cpp" line="432"/>
         <source>Открыть</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="509"/>
+        <location filename="../tabcashoperation.cpp" line="513"/>
         <source>Баланс клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="510"/>
+        <location filename="../tabcashoperation.cpp" line="514"/>
         <source>Баланс клиента не включен. Включить?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="783"/>
+        <location filename="../tabcashoperation.cpp" line="790"/>
         <source>Проведён</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5718,7 +5898,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../tabclient.cpp" line="37"/>
-        <source>Клиент</source>
+        <source>Клиент %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5780,27 +5960,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabclients.cpp" line="26"/>
-        <source>Navigation Выбор клиента</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tabclients.cpp" line="29"/>
-        <source>Navigation Клиенты</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tabclients.cpp" line="38"/>
+        <location filename="../tabclients.cpp" line="37"/>
         <source>источник обращения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabclients.cpp" line="60"/>
+        <location filename="../tabclients.cpp" line="59"/>
         <source>Выбрать клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabclients.cpp" line="62"/>
+        <location filename="../tabclients.cpp" line="61"/>
         <source>Клиенты</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5810,59 +5980,214 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../tabprintdialog.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../tabprintdialog.ui" line="22"/>
         <location filename="../tabprintdialog.ui" line="30"/>
-        <location filename="../tabprintdialog.cpp" line="150"/>
+        <location filename="../tabprintdialog.cpp" line="153"/>
         <source>Печать</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../tabprintdialog.ui" line="66"/>
         <source>сохранить PDF</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../tabprintdialog.ui" line="87"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;settings&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Свойства&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../tabprintdialog.ui" line="109"/>
         <source>страницы, напр., 5-12</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../tabprintdialog.cpp" line="151"/>
+        <location filename="../tabprintdialog.cpp" line="94"/>
+        <source>Печать %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="154"/>
         <source>Печать &lt;%1&gt; еще не реализована</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../tabprintdialog.cpp" line="276"/>
+        <location filename="../tabprintdialog.cpp" line="577"/>
+        <source>new_rep</source>
+        <translation>квитанции</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="578"/>
+        <source>pko</source>
+        <translation>ПКО</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="579"/>
+        <source>reject</source>
+        <translation>акта отказа</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="580"/>
+        <source>rko</source>
+        <translation>РКО</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="581"/>
+        <source>sticker1</source>
+        <translation>стикера</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="582"/>
+        <source>sticker2</source>
+        <translation>стикера</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="583"/>
+        <source>sticker3</source>
+        <translation>стикера</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="584"/>
+        <source>rep_label</source>
+        <translation>стикера</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="585"/>
+        <source>warranty</source>
+        <translation>гарантийного талона</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="586"/>
+        <source>works</source>
+        <translation>акта выполненных работ</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="587"/>
+        <source>diag</source>
+        <translation>акта диагностики</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="588"/>
+        <source>pn</source>
+        <translation>ПН</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="589"/>
+        <source>rn</source>
+        <translation>РН</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="590"/>
+        <source>lost</source>
+        <translation>акта утери квитанции</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="591"/>
+        <source>price1</source>
+        <translation>ценника</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="592"/>
+        <source>invoice0</source>
+        <translation>счета</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="593"/>
+        <source>invoice1</source>
+        <translation>счета</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="594"/>
+        <source>invoice2</source>
+        <translation>счета</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="595"/>
+        <source>invoice3</source>
+        <translation>счета</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="596"/>
+        <source>vatinvoice0</source>
+        <translation>счета</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="597"/>
+        <source>p_list0</source>
+        <translation>товарной накладной</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="598"/>
+        <source>w_list0</source>
+        <translation>наряда</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="599"/>
+        <source>new_cartridge</source>
+        <translation>квитанции</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="600"/>
+        <source>sticker_cartridge</source>
+        <translation>стикера</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="601"/>
+        <source>issue_cartridge</source>
+        <translation>акта (заправки)</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="602"/>
+        <source>slip</source>
+        <translation>слип-чека</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="603"/>
+        <source>move</source>
+        <translation>накладной перемещения</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="604"/>
+        <source>buyout</source>
+        <translation>закупочного акта</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="605"/>
+        <source>repairs</source>
+        <translation>списка ремонтов</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="606"/>
+        <source>cartridges</source>
+        <translation>списка картриджей</translation>
+    </message>
+    <message>
+        <location filename="../tabprintdialog.cpp" line="279"/>
         <source>Печать квитанции к ремонту №%1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../tabprintdialog.cpp" line="277"/>
+        <location filename="../tabprintdialog.cpp" line="280"/>
         <source>Печать стикеров к ремонту №%1 в кол-ве %2шт.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../tabprintdialog.cpp" line="320"/>
+        <location filename="../tabprintdialog.cpp" line="323"/>
         <source>Не удалось вызвать драйвер принтера</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../tabprintdialog.cpp" line="412"/>
+        <location filename="../tabprintdialog.cpp" line="415"/>
         <source>Размер страницы отчета больше размера страницы принтера</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../tabprintdialog.cpp" line="484"/>
+        <location filename="../tabprintdialog.cpp" line="487"/>
         <source>\(перенаправлено \d\)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5963,37 +6288,37 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabreceptcartridge.cpp" line="93"/>
+        <location filename="../tabreceptcartridge.cpp" line="94"/>
         <source>организация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabreceptcartridge.cpp" line="94"/>
+        <location filename="../tabreceptcartridge.cpp" line="95"/>
         <source>офис</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabreceptcartridge.cpp" line="96"/>
+        <location filename="../tabreceptcartridge.cpp" line="97"/>
         <source>назначить инженером</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabreceptcartridge.cpp" line="98"/>
+        <location filename="../tabreceptcartridge.cpp" line="99"/>
         <source>тип оплаты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabreceptcartridge.cpp" line="261"/>
+        <location filename="../tabreceptcartridge.cpp" line="263"/>
         <source>картридж</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabreceptcartridge.cpp" line="451"/>
+        <location filename="../tabreceptcartridge.cpp" line="468"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabreceptcartridge.cpp" line="452"/>
+        <location filename="../tabreceptcartridge.cpp" line="469"/>
         <source>Нельзя принять картриджи разных клиентов вместе.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6022,7 +6347,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../tabrepair.ui" line="131"/>
-        <location filename="../tabrepair.ui" line="1500"/>
+        <location filename="../tabrepair.ui" line="1513"/>
         <source>Клиент</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6147,216 +6472,224 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="773"/>
+        <location filename="../tabrepair.ui" line="729"/>
+        <source>Задолженность получена</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabrepair.ui" line="783"/>
         <source>Сводка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="808"/>
+        <location filename="../tabrepair.ui" line="818"/>
         <source>Комплектность</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="821"/>
+        <location filename="../tabrepair.ui" line="831"/>
         <source>Неисправность</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="850"/>
+        <location filename="../tabrepair.ui" line="860"/>
         <source>Состояние</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="906"/>
+        <location filename="../tabrepair.ui" line="916"/>
         <source>Результат диагностики</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="944"/>
+        <location filename="../tabrepair.ui" line="954"/>
         <source>Сохранить результат диагностики и стоимость</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="947"/>
+        <location filename="../tabrepair.ui" line="957"/>
         <source>Сохранить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="988"/>
+        <location filename="../tabrepair.ui" line="998"/>
         <source>Работы и детали</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1034"/>
+        <location filename="../tabrepair.ui" line="1044"/>
         <source>Работа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1056"/>
+        <location filename="../tabrepair.ui" line="1066"/>
         <source>Работа из прайс-листа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1078"/>
+        <location filename="../tabrepair.ui" line="1088"/>
         <source>Запросить деталь</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1098"/>
+        <location filename="../tabrepair.ui" line="1108"/>
         <source>Сохранить список работ и деталей</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1101"/>
+        <location filename="../tabrepair.ui" line="1111"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1112"/>
+        <location filename="../tabrepair.ui" line="1122"/>
         <source>Сохранять список работ и деталей после каждого изменения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1163"/>
+        <location filename="../tabrepair.ui" line="1173"/>
         <source>Адм. правка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1193"/>
+        <location filename="../tabrepair.ui" line="1203"/>
         <source>Стоимость работ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1219"/>
+        <location filename="../tabrepair.ui" line="1229"/>
         <source>Стоимость деталей</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1245"/>
+        <location filename="../tabrepair.ui" line="1255"/>
         <source>Стоимость ремонта</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1412"/>
+        <location filename="../tabrepair.ui" line="1425"/>
         <source>Позвонить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1434"/>
+        <location filename="../tabrepair.ui" line="1447"/>
         <source>Медиа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1456"/>
+        <location filename="../tabrepair.ui" line="1469"/>
         <source>История</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1478"/>
+        <location filename="../tabrepair.ui" line="1491"/>
         <source>Администрирование</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.ui" line="1507"/>
+        <location filename="../tabrepair.ui" line="1520"/>
         <source>Выдать</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="15"/>
+        <location filename="../tabrepair.cpp" line="171"/>
         <source>Ремонт</source>
         <comment>repair tab title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="16"/>
-        <source>Navigation %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tabrepair.cpp" line="166"/>
+        <location filename="../tabrepair.cpp" line="178"/>
         <source>Данные не сохранены</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="166"/>
+        <location filename="../tabrepair.cpp" line="178"/>
         <source>Результат диагностики, согласованная сумма или список работ и деталей не сохранены!
 Сохранить перед закрытием?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="210"/>
+        <location filename="../tabrepair.cpp" line="221"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="332"/>
+        <location filename="../tabrepair.cpp" line="343"/>
         <source>было в другом СЦ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="334"/>
+        <location filename="../tabrepair.cpp" line="345"/>
         <source>данные не важны</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="336"/>
+        <location filename="../tabrepair.cpp" line="347"/>
         <source>срочный</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="338"/>
+        <location filename="../tabrepair.cpp" line="349"/>
         <source>повтор</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="340"/>
+        <location filename="../tabrepair.cpp" line="351"/>
         <source>гарантия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="342"/>
+        <location filename="../tabrepair.cpp" line="353"/>
         <source>чек при выдаче</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="344"/>
+        <location filename="../tabrepair.cpp" line="355"/>
         <source>предоплата: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="492"/>
-        <location filename="../tabrepair.cpp" line="717"/>
+        <location filename="../tabrepair.cpp" line="132"/>
+        <location filename="../tabrepair.cpp" line="507"/>
+        <location filename="../tabrepair.cpp" line="781"/>
+        <location filename="../tabrepair.cpp" line="816"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="717"/>
+        <location filename="../tabrepair.cpp" line="781"/>
+        <location filename="../tabrepair.cpp" line="816"/>
         <source>Проверьте права доступа или обратитесь к администратору</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="489"/>
+        <location filename="../tabrepair.cpp" line="504"/>
         <source>Поле с результатом диагностики не может быть пустым</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="490"/>
+        <location filename="../tabrepair.cpp" line="132"/>
+        <source>Не достаточно прав для открытия карточки чужого ремонта</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabrepair.cpp" line="505"/>
         <source>Не установлена согласованная сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="758"/>
-        <location filename="../tabrepair.h" line="122"/>
+        <location filename="../tabrepair.cpp" line="831"/>
+        <location filename="../tabrepair.h" line="123"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="758"/>
+        <location filename="../tabrepair.cpp" line="831"/>
         <source>Статус информирования клиента обновлён</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.h" line="122"/>
+        <location filename="../tabrepair.h" line="123"/>
         <source>Данные сохранены</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6394,7 +6727,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepaircartridges.cpp" line="85"/>
+        <location filename="../tabrepaircartridges.cpp" line="87"/>
         <source>Заправка картриджей</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6407,270 +6740,270 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="41"/>
+        <location filename="../tabrepairnew.ui" line="47"/>
         <source>Офис</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="57"/>
+        <location filename="../tabrepairnew.ui" line="69"/>
         <source>Организация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="70"/>
+        <location filename="../tabrepairnew.ui" line="82"/>
         <source>Срочный</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="86"/>
+        <location filename="../tabrepairnew.ui" line="98"/>
         <source>Предыдущий ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="99"/>
+        <location filename="../tabrepairnew.ui" line="111"/>
         <source>Быстрый ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="136"/>
+        <location filename="../tabrepairnew.ui" line="154"/>
         <source>Документ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="149"/>
+        <location filename="../tabrepairnew.ui" line="167"/>
         <source>Данные не важны</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="156"/>
+        <location filename="../tabrepairnew.ui" line="174"/>
         <source>Оплата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="172"/>
+        <location filename="../tabrepairnew.ui" line="196"/>
         <source>Ячейка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="185"/>
+        <location filename="../tabrepairnew.ui" line="209"/>
         <source>Было в другом СЦ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="192"/>
+        <location filename="../tabrepairnew.ui" line="216"/>
         <source>Стикеров</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="205"/>
+        <location filename="../tabrepairnew.ui" line="229"/>
         <source>Ранее было в ремонте</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="225"/>
+        <location filename="../tabrepairnew.ui" line="249"/>
         <source>Печать ПКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="238"/>
+        <location filename="../tabrepairnew.ui" line="262"/>
         <source>Гарантийный ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="257"/>
+        <location filename="../tabrepairnew.ui" line="287"/>
         <source>Тип оплаты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="267"/>
+        <location filename="../tabrepairnew.ui" line="297"/>
         <source>Из другой базы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="280"/>
+        <location filename="../tabrepairnew.ui" line="310"/>
         <source>Чек при выдаче</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="296"/>
+        <location filename="../tabrepairnew.ui" line="332"/>
         <source>Мастером назначить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="303"/>
+        <location filename="../tabrepairnew.ui" line="339"/>
         <source>GroupBox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="312"/>
+        <location filename="../tabrepairnew.ui" line="348"/>
         <source>clear&amp;&amp;randomFill</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="485"/>
+        <location filename="../tabrepairnew.ui" line="539"/>
         <source>Данные о устройстве</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="505"/>
+        <location filename="../tabrepairnew.ui" line="559"/>
         <source>Внутренние примечания</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="541"/>
+        <location filename="../tabrepairnew.ui" line="595"/>
         <source>Дополнительно для квитанции</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="405"/>
+        <location filename="../tabrepairnew.ui" line="441"/>
         <source>Устройство</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="428"/>
+        <location filename="../tabrepairnew.ui" line="470"/>
         <source>Тип</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="441"/>
+        <location filename="../tabrepairnew.ui" line="489"/>
         <source>Модель</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="454"/>
+        <location filename="../tabrepairnew.ui" line="508"/>
         <source>Производитель</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="470"/>
+        <location filename="../tabrepairnew.ui" line="524"/>
         <source>Серийный номер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="563"/>
+        <location filename="../tabrepairnew.ui" line="617"/>
         <source>Финансы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="580"/>
-        <location filename="../tabrepairnew.ui" line="757"/>
+        <location filename="../tabrepairnew.ui" line="640"/>
+        <location filename="../tabrepairnew.ui" line="841"/>
         <source>Принять</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="593"/>
+        <location filename="../tabrepairnew.ui" line="659"/>
         <source>Клиент вносит предоплату</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="621"/>
-        <location filename="../tabrepairnew.cpp" line="98"/>
+        <location filename="../tabrepairnew.ui" line="687"/>
+        <location filename="../tabrepairnew.cpp" line="102"/>
         <source>тип оплаты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="625"/>
+        <location filename="../tabrepairnew.ui" line="691"/>
         <source>New Item</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="639"/>
+        <location filename="../tabrepairnew.ui" line="711"/>
         <source>Клиент ознакомлен с возможной стоимостью</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="661"/>
+        <location filename="../tabrepairnew.ui" line="733"/>
         <source>основание</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="770"/>
+        <location filename="../tabrepairnew.ui" line="854"/>
         <source>Фотографии</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.ui" line="777"/>
+        <location filename="../tabrepairnew.ui" line="861"/>
         <source>Принять ещё</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="17"/>
-        <source>Navigation Приём в ремонт</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tabrepairnew.cpp" line="61"/>
+        <location filename="../tabrepairnew.cpp" line="64"/>
         <source>полная предоплата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="61"/>
+        <location filename="../tabrepairnew.cpp" line="64"/>
         <source>за детали</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="61"/>
+        <location filename="../tabrepairnew.cpp" line="64"/>
         <source>за часть стоимости деталей</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="61"/>
+        <location filename="../tabrepairnew.cpp" line="64"/>
         <source>за часть стоимости работ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="61"/>
+        <location filename="../tabrepairnew.cpp" line="64"/>
         <source>за диагностику</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="85"/>
+        <location filename="../tabrepairnew.cpp" line="89"/>
         <source>неисправность</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="86"/>
+        <location filename="../tabrepairnew.cpp" line="90"/>
         <source>комплектность</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="87"/>
+        <location filename="../tabrepairnew.cpp" line="91"/>
         <source>внешний вид</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="88"/>
+        <location filename="../tabrepairnew.cpp" line="92"/>
         <source>устройство</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="89"/>
+        <location filename="../tabrepairnew.cpp" line="93"/>
         <source>производитель</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="90"/>
+        <location filename="../tabrepairnew.cpp" line="94"/>
         <source>модель</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="91"/>
+        <location filename="../tabrepairnew.cpp" line="95"/>
         <source>назначить инженером</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="93"/>
+        <location filename="../tabrepairnew.cpp" line="97"/>
         <source>ячейка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="95"/>
+        <location filename="../tabrepairnew.cpp" line="99"/>
         <source>офис</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairnew.cpp" line="97"/>
+        <location filename="../tabrepairnew.cpp" line="101"/>
         <source>организация</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabrepairnew.cpp" line="287"/>
+        <source>Приём в ремонт</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6727,11 +7060,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.cpp" line="16"/>
-        <source>Navigation Ремонты</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../tabrepairs.cpp" line="81"/>
         <source>Выбрать ремонт</source>
         <translation type="unfinished"></translation>
@@ -6766,93 +7094,98 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="39"/>
+        <location filename="../tabsalary.ui" line="45"/>
         <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="87"/>
+        <location filename="../tabsalary.ui" line="99"/>
         <source>&lt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="94"/>
+        <location filename="../tabsalary.ui" line="112"/>
         <source>&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="119"/>
+        <location filename="../tabsalary.ui" line="149"/>
         <source>labelPeriod</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="160"/>
+        <location filename="../tabsalary.ui" line="190"/>
         <source>Сводка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="171"/>
+        <location filename="../tabsalary.ui" line="201"/>
         <source>Ремонты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="182"/>
+        <location filename="../tabsalary.ui" line="212"/>
         <source>Дополнительно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="193"/>
+        <location filename="../tabsalary.ui" line="223"/>
         <source>Продажи</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="204"/>
+        <location filename="../tabsalary.ui" line="234"/>
         <source>Товары на руках</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="215"/>
+        <location filename="../tabsalary.ui" line="245"/>
         <source>Выплаты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="226"/>
+        <location filename="../tabsalary.ui" line="256"/>
         <source>Принятые/выданные устройства</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="363"/>
+        <location filename="../tabsalary.ui" line="393"/>
         <source>Добавить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="385"/>
+        <location filename="../tabsalary.ui" line="415"/>
         <source>Загрузить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.ui" line="407"/>
+        <location filename="../tabsalary.ui" line="437"/>
         <source>Сохранить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="102"/>
+        <location filename="../tabsalary.cpp" line="87"/>
+        <source>Заработная плата</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabsalary.cpp" line="109"/>
         <source>Данные не сохранены</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="102"/>
+        <location filename="../tabsalary.cpp" line="109"/>
         <source>Список дополнительных начислений и списаний не сохранён!
 Сохранить перед закрытием?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="183"/>
+        <location filename="../tabsalary.cpp" line="190"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="184"/>
+        <location filename="../tabsalary.cpp" line="191"/>
         <source>Сначала нажмите кнопку Загрузить</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7057,52 +7390,52 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="92"/>
+        <location filename="../tabsale.cpp" line="94"/>
         <source>Расходная накладная %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="93"/>
+        <location filename="../tabsale.cpp" line="95"/>
         <source>Продажа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="380"/>
+        <location filename="../tabsale.cpp" line="383"/>
         <source>Цена ниже закупочной, продолжить?
 &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="412"/>
+        <location filename="../tabsale.cpp" line="415"/>
         <source>Быстрое создание клиента из формы продажи</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="498"/>
-        <location filename="../tabsale.cpp" line="499"/>
-        <location filename="../tabsale.cpp" line="500"/>
-        <location filename="../tabsale.cpp" line="506"/>
+        <location filename="../tabsale.cpp" line="501"/>
+        <location filename="../tabsale.cpp" line="502"/>
+        <location filename="../tabsale.cpp" line="503"/>
+        <location filename="../tabsale.cpp" line="509"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="629"/>
+        <location filename="../tabsale.cpp" line="632"/>
         <source>Расходная накладная №%1 распроведена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="632"/>
+        <location filename="../tabsale.cpp" line="635"/>
         <source>основание: </source>
         <comment>основание распроведения РН</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="972"/>
+        <location filename="../tabsale.cpp" line="974"/>
         <source>Резерв товара по РН №%1 снят</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="1022"/>
+        <location filename="../tabsale.cpp" line="1024"/>
         <source>Распровести расходную накладную и вернуть средства покупателю?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7153,82 +7486,82 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="29"/>
+        <location filename="../tabsettings.cpp" line="28"/>
         <source>Основные</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="30"/>
+        <location filename="../tabsettings.cpp" line="29"/>
         <source>Организация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="31"/>
+        <location filename="../tabsettings.cpp" line="30"/>
         <source>Сотрудники</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="32"/>
+        <location filename="../tabsettings.cpp" line="31"/>
         <source>Роли</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="33"/>
+        <location filename="../tabsettings.cpp" line="32"/>
         <source>Склады и ячейки</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="34"/>
+        <location filename="../tabsettings.cpp" line="33"/>
         <source>Финансы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="35"/>
+        <location filename="../tabsettings.cpp" line="34"/>
         <source>Каталог устройств</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="36"/>
+        <location filename="../tabsettings.cpp" line="35"/>
         <source>Статусы ремонта</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="37"/>
+        <location filename="../tabsettings.cpp" line="36"/>
         <source>Поля и источники обращения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="38"/>
+        <location filename="../tabsettings.cpp" line="37"/>
         <source>Шаблоны документов</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="39"/>
+        <location filename="../tabsettings.cpp" line="38"/>
         <source>Оповещения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="40"/>
+        <location filename="../tabsettings.cpp" line="39"/>
         <source>Резервное копирование</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="58"/>
+        <location filename="../tabsettings.cpp" line="57"/>
         <source>Настройки</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="143"/>
+        <location filename="../tabsettings.cpp" line="142"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="144"/>
+        <location filename="../tabsettings.cpp" line="143"/>
         <source>Не удалось сохранить настройки (ошибка %1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsettings.cpp" line="152"/>
+        <location filename="../tabsettings.cpp" line="151"/>
         <source>Настройки успешно сохранены</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7236,7 +7569,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>windowsDispatcher</name>
     <message>
-        <location filename="../windowsdispatcher.cpp" line="53"/>
+        <location filename="../windowsdispatcher.cpp" line="57"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7244,52 +7577,52 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>worksAndSparePartsTable</name>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>UID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Наименование</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Кол-во</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Доступно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Цена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Место</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Серийный номер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Гарантия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="950"/>
+        <location filename="../tabrepair.cpp" line="1034"/>
         <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>

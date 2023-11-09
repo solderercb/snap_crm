@@ -75,7 +75,7 @@ void LoginWindow::startMaintanaceTool()
     config.insert(QLatin1String("path"), QLatin1String("maintenancetool.exe"));
     config.insert(QLatin1String("repoPathArg"), updateChannel);
     auto updater = QtAutoUpdater::Updater::create(QLatin1String("qtifw"), config, qApp);
-    Q_ASSERT(updater);
+//    Q_ASSERT(updater);
     updateController = new QtAutoUpdater::UpdateController(updater, this);
     updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Ask);
 }

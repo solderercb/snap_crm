@@ -23,14 +23,14 @@ public:
     ~tabCommon();
     virtual bool tabCloseRequest();
     void setCallerPtr(QWidget *ptr){callerPtr = ptr;};
-    virtual QString tabTitle(){return "tabCommon";};
+    virtual QString tabTitle(){return "Untitled";};
     virtual QIcon* tabIcon();
 protected:
     QWidget *callerPtr = nullptr;
-    QString i_tabTitle = "Untitled";
     QIcon *i_tabIcon = nullptr;
     bool eventFilter(QObject*, QEvent*) override;
     void setCursorPositionsToZero();
+    virtual void logUserActivity();
 #ifdef QT_DEBUG
     virtual void randomFill(){};
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;

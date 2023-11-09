@@ -79,6 +79,7 @@ private:
     Ui::tabCashOperation *ui;
     SClientModel *clientModel = nullptr;
     QTimer *dateEditRefreshTimer;
+    QString m_tabTitle;
     void setWidgetsParams();
     void updateWidgets();
     bool checkInput();

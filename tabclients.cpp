@@ -11,10 +11,12 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabClients)
 {
+    m_type = type;    // инициализация до вызова любых методов
+
+    logUserActivity();
 
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
-    m_type = type;
     m_tableUpdateDelay = new QTimer();
 
     clientsTable = new STableBaseModel();
@@ -23,10 +25,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     {
         ui->buttonPrint->hide();
         ui->buttonClientNew->hide();
-        userActivityLog->appendRecord(tr("Navigation Выбор клиента"));
     }
-    else
-        userActivityLog->appendRecord(tr("Navigation Клиенты"));
 
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);

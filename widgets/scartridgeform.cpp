@@ -70,6 +70,7 @@ void SCartridgeForm::updateModels()
     if(m_repairId)
     {
         m_repair->load(m_repairId);
+        m_serialNumber = m_repair->serialNumber();
         m_cardId = m_repair->cartridge()->cardId();
         m_clientId = m_repair->clientId();
         worksAndPartsModel->repair_loadTable(m_repair->id());
@@ -87,26 +88,43 @@ void SCartridgeForm::randomFill()
 
 void SCartridgeForm::initWidgets()
 {
+    QIcon activeCheckBoxIcon;
+    activeCheckBoxIcon.addFile(QString::fromUtf8(":/icons/light/checkbox-unchecked.png"), QSize(), QIcon::Normal, QIcon::Off);
+    activeCheckBoxIcon.addFile(QString::fromUtf8(":/icons/light/checkbox-checked.png"), QSize(), QIcon::Normal, QIcon::On);
+
+    QIcon unactiveCheckBoxIcon;
+    unactiveCheckBoxIcon.addFile(QString::fromUtf8(":/icons/light/checkbox-flat-unchecked.png"), QSize(), QIcon::Normal, QIcon::Off);
+    unactiveCheckBoxIcon.addFile(QString::fromUtf8(":/icons/light/checkbox-flat-checked.png"), QSize(), QIcon::Normal, QIcon::On);
+
     initModels();
     ui->comboBoxWasEarly->setModel(cartridgeRepeatReason);
     ui->comboBoxWasEarly->setCurrentIndex(-1);
     ui->comboBoxWasEarly->disableWheelEvent(true);
+    ui->comboBoxWasEarly->view()->setMinimumWidth(230);
     ui->comboBoxPlace->setButtons("Clear");
     ui->comboBoxPlace->setModel(repairBoxesModel);
     ui->comboBoxPlace->setCurrentIndex(-1);
     ui->comboBoxPlace->disableWheelEvent(true);
+    ui->comboBoxPlace->view()->setMinimumWidth(150);
     connect(ui->comboBoxPlace, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::savePlace);
     connect(ui->comboBoxPlace, &SComboBox::buttonClicked, this, &SCartridgeForm::comboBoxPlaceButtonClickHandler);
-    ui->labelLimitReached->setVisible(checkResource());
+    ui->labelLimitReached->setVisible(prevRepairsCount() >= m_cartridgeCard->resource());
     connect(ui->toolButtonRemove, &QToolButton::clicked, this, &SCartridgeForm::removeWidget);
     ui->comboBoxState->view()->setMinimumWidth(230);
+    ui->labelRepeatWarranty->setVisible(false);
 
     if(m_repairId)
     {
-        ui->checkBoxPreagreedRefill->installEventFilter(this);
-        ui->checkBoxPreagreedChipReplace->installEventFilter(this);
-        ui->checkBoxPreagreedDrumReplace->installEventFilter(this);
-        ui->checkBoxPreagreedBladeReplace->installEventFilter(this);
+        m_lineEditStyleSheet.replace("background: #FFFFFF;", "background-color: rgba(255, 255, 255, 0);");
+        m_spinBoxStyleSheet.replace("background: #FFFFFF;", "background-color: rgba(255, 255, 255, 0);");
+        ui->lineEditSerial->setStyleSheet(m_lineEditStyleSheet);
+        ui->spinBoxRefillWeight->setStyleSheet(m_spinBoxStyleSheet);
+        ui->doubleSpinBoxPreagreedAmount->setStyleSheet(m_spinBoxStyleSheet);
+
+        initCheckBoxWidgets(unactiveCheckBoxIcon, ui->pushButtonPreagreedRefill, true, true);
+        initCheckBoxWidgets(unactiveCheckBoxIcon, ui->pushButtonPreagreedChipReplace, true, true);
+        initCheckBoxWidgets(unactiveCheckBoxIcon, ui->pushButtonPreagreedDrumReplace, true, true);
+        initCheckBoxWidgets(unactiveCheckBoxIcon, ui->pushButtonPreagreedBladeReplace, true, true);
         ui->comboBoxEngineer->setModel(engineersModel);
         ui->comboBoxEngineer->disableWheelEvent(true);
         connect(ui->comboBoxEngineer, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::comboBoxEngineerChanged);
@@ -114,14 +132,16 @@ void SCartridgeForm::initWidgets()
         ui->comboBoxState->setCurrentIndex(-1);
         ui->comboBoxState->disableWheelEvent(true);
         connect(ui->comboBoxState, qOverload<int>(&QComboBox::currentIndexChanged), this, &SCartridgeForm::stateIndexChanged);
-        ui->checkBoxRefill->installEventFilter(this);
-        ui->checkBoxChipReplace->installEventFilter(this);
-        ui->checkBoxDrumReplace->installEventFilter(this);
-        ui->checkBoxBladeReplace->installEventFilter(this);
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonRefill, false, true);
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonChipReplace, false, true);
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonDrumReplace, false, true);
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonBladeReplace, false, true);
         connect(ui->pushButtonClientCard, &QPushButton::clicked, this, &SCartridgeForm::buttonClientCardClicked);
         connect(ui->toolButtonClassicTab, &QPushButton::clicked, this, &SCartridgeForm::buttonClassicTabClicked);
         connect(ui->toolButtonCartridgeCard, &QPushButton::clicked, this, &SCartridgeForm::buttonCartridgeCardClicked);
         connect(ui->lineEditComment, &QLineEdit::editingFinished, this, &SCartridgeForm::updateComment);
+        ui->labelWasEarly->hide();
+        ui->comboBoxWasEarly->hide();
 
         initWorksMenu();
         updateHeader();
@@ -129,28 +149,40 @@ void SCartridgeForm::initWidgets()
     }
     else
     {
-        ui->pushButtonClientCard->hide();
-        ui->toolButtonClassicTab->hide();
-        ui->toolButtonCartridgeCard->hide();
-        ui->splitterRefillWeight->hide();
-        ui->splitterRefill->hide();
-        ui->splitterRealRefillWeight->hide();
-        ui->splitterDrumReplace->hide();
-        ui->splitterChipReplace->hide();
-        ui->splitterBladeReplace->hide();
-        ui->splitterState->hide();
-        ui->splitterTotalAmount->hide();
-        ui->splitterEngineer->hide();
-        ui->splitterOtherWorks->hide();
-        ui->listWidgetWorks->hide();
-        ui->listWidgetParts->hide();
+        hideWidgetsOnReceiptForm();
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonPreagreedRefill);
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonPreagreedChipReplace);
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonPreagreedDrumReplace);
+        initCheckBoxWidgets(activeCheckBoxIcon, ui->pushButtonPreagreedBladeReplace);
         ui->comboBoxWasEarly->setCurrentIndex(m_isRepeat?1:-1);
 
-        connect(ui->checkBoxPreagreedRefill, &QCheckBox::stateChanged, this, &SCartridgeForm::setRefill);
-        connect(ui->checkBoxPreagreedChipReplace, &QCheckBox::stateChanged, this, &SCartridgeForm::setChipReplace);
-        connect(ui->checkBoxPreagreedDrumReplace, &QCheckBox::stateChanged, this, &SCartridgeForm::setDrumReplace);
-        connect(ui->checkBoxPreagreedBladeReplace, &QCheckBox::stateChanged, this, &SCartridgeForm::setBladeReplace);
-        ui->checkBoxPreagreedRefill->setChecked(true);
+        connect(ui->pushButtonPreagreedRefill, &QPushButton::toggled, this, &SCartridgeForm::setRefill);
+        connect(ui->pushButtonPreagreedChipReplace, &QPushButton::toggled, this, &SCartridgeForm::setChipReplace);
+        connect(ui->pushButtonPreagreedDrumReplace, &QPushButton::toggled, this, &SCartridgeForm::setDrumReplace);
+        connect(ui->pushButtonPreagreedBladeReplace, &QPushButton::toggled, this, &SCartridgeForm::setBladeReplace);
+        ui->pushButtonPreagreedRefill->setChecked(true);
+        setRefill(true);    // почему-то при вызове метода setChecked() слот setRefill() не вызывается
+    }
+}
+
+/* Натсройка виджетов предварительно согласованных работ
+ * isFlat: 0 - форма приёма картриджей; 1 - форма работы (заправки) с картриджем
+*/
+void SCartridgeForm::initCheckBoxWidgets(const QIcon &icon, QPushButton *button, bool isFlat, bool installEventFilter)
+{
+    button->setCheckable(true);
+    button->setIcon(icon);
+    button->setStyleSheet(QString::fromUtf8("QPushButton {"
+                                            "  background-color: rgba(240, 240, 240, 0);"
+                                            "}"));
+    if(isFlat)
+    {
+        button->setFlat(true);
+    }
+
+    if(installEventFilter)
+    {
+        button->installEventFilter(this);
     }
 }
 
@@ -165,14 +197,19 @@ void SCartridgeForm::updateHeader()
 
 void SCartridgeForm::updateWidgets()
 {
-//    ui->splitterComment->hide();    // TODO: придумать где расположить поле с примечанием; поле должно быть редактируемым.
-    ui->splitterWasEarly->hide();   // TODO: ссылка на предыдущий ремонт (открытие классической карты ремонта)
+    ui->labelRepeatWarranty->setVisible(false);
+    if(m_repair->isRepeat() || m_prevRepairsCount)
+        updateLabelRepeatWarranty(tr("Повтор"));
+
+    if(m_repair->isWarranty())
+        updateLabelRepeatWarranty(tr("Гарантия"));
+
     ui->lineEditSerial->setText(m_repair->serialNumber());
     ui->lineEditSerial->setReadOnly(true);
-    ui->checkBoxPreagreedRefill->setChecked(m_repair->cartridge()->refill());
-    ui->checkBoxPreagreedChipReplace->setChecked(m_repair->cartridge()->chip());
-    ui->checkBoxPreagreedDrumReplace->setChecked(m_repair->cartridge()->drum());
-    ui->checkBoxPreagreedBladeReplace->setChecked(m_repair->cartridge()->Blade());
+    ui->pushButtonPreagreedRefill->setChecked(m_repair->cartridge()->refill());
+    ui->pushButtonPreagreedChipReplace->setChecked(m_repair->cartridge()->chip());
+    ui->pushButtonPreagreedDrumReplace->setChecked(m_repair->cartridge()->drum());
+    ui->pushButtonPreagreedBladeReplace->setChecked(m_repair->cartridge()->Blade());
     ui->spinBoxRefillWeight->setValue(m_cartridgeCard->tonerWeight());
     ui->doubleSpinBoxPreagreedAmount->setValue(m_repair->preAgreedAmount());
     ui->comboBoxWasEarly->setCurrentIndex(m_repair->isRepeat()?1:-1);
@@ -181,10 +218,10 @@ void SCartridgeForm::updateWidgets()
 
     setWidgetsParams(m_repair->state());
 
-    ui->checkBoxRefill->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Toner));
-    ui->checkBoxChipReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Chip));
-    ui->checkBoxDrumReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Drum));
-    ui->checkBoxBladeReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Blade));
+    ui->pushButtonRefill->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Toner));
+    ui->pushButtonChipReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Chip));
+    ui->pushButtonDrumReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Drum));
+    ui->pushButtonBladeReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Blade));
     ui->toolButtonOtherWorksMenu->setEnabled(worksCheckboxesEn);
     ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
     updateComboBoxEngineer(m_repair->engineer());
@@ -192,6 +229,46 @@ void SCartridgeForm::updateWidgets()
     ui->comboBoxPlace->setCurrentIndex(m_repair->boxIndex());
     ui->comboBoxPlace->setEnabled(placeComboBoxEn);
     ui->lineEditComment->setText(m_repair->extNotes());
+}
+
+/*  Скрытие виджетов, не используемых при приёме картриджа
+*/
+void SCartridgeForm::hideWidgetsOnReceiptForm()
+{
+    ui->labelRepeatWarranty->hide();
+    ui->pushButtonClientCard->hide();
+    ui->toolButtonClassicTab->hide();
+    ui->toolButtonCartridgeCard->hide();
+
+    ui->labelRefillWeight->hide();
+    ui->spinBoxRefillWeight->hide();    // в АСЦ при приёме это поле отображается, но в нём нет смысла
+    ui->labelEngineer->hide();
+    ui->comboBoxEngineer->hide();
+    ui->labelRefill->hide();
+    ui->pushButtonRefill->hide();
+    ui->labelRealRefillWeight->hide();
+    ui->spinBoxRealRefillWeight->hide();
+    ui->labelDrumReplace->hide();
+    ui->pushButtonDrumReplace->hide();
+    ui->labelChipReplace->hide();
+    ui->pushButtonChipReplace->hide();
+    ui->labelBladeReplace->hide();
+    ui->pushButtonBladeReplace->hide();
+    ui->labelState->hide();
+    ui->comboBoxState->hide();
+    ui->labelTotalAmount->hide();
+    ui->doubleSpinBoxTotalAmount->hide();
+    ui->labelOtherWorks->hide();
+    ui->toolButtonOtherWorksMenu->hide();
+
+    ui->listWidgetWorks->hide();
+    ui->listWidgetParts->hide();
+}
+
+void SCartridgeForm::updateLabelRepeatWarranty(const QString text)
+{
+    ui->labelRepeatWarranty->setText(text);
+    ui->labelRepeatWarranty->setVisible(true);
 }
 
 bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
@@ -203,32 +280,32 @@ bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
     // QEvent::MouseButtonPress
     // любое взаимодействие с дочерними виджетами
 
-    QCheckBox *checkBox = dynamic_cast<QCheckBox*>(watched);
-    if(checkBox)
+    if(event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
     {
-        if(event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
+        QPushButton *checkBoxWidget = dynamic_cast<QPushButton*>(watched);
+        if(checkBoxWidget)
         {
-            if(static_cast<QMouseEvent*>(event)->button() != Qt::MouseButton::LeftButton)
+            if(static_cast<QMouseEvent*>(event)->button() != Qt::MouseButton::LeftButton)   // Achtung! Щелчек любой кнопкой мыши, кроме левой, по любому QPushButton на форме будет проигнорирован
                 return true;
 
-            if( checkBox == ui->checkBoxPreagreedRefill ||
-                checkBox == ui->checkBoxPreagreedChipReplace ||
-                checkBox == ui->checkBoxPreagreedDrumReplace ||
-                checkBox == ui->checkBoxPreagreedBladeReplace )
+            if( checkBoxWidget == ui->pushButtonPreagreedRefill ||
+                checkBoxWidget == ui->pushButtonPreagreedDrumReplace ||
+                checkBoxWidget == ui->pushButtonPreagreedChipReplace ||
+                checkBoxWidget == ui->pushButtonPreagreedBladeReplace )
                 return true;
 
-            if(!checkBox->isEnabled())
+            if(!checkBoxWidget->isEnabled())
                 return true;
 
             int ret = 1;
-            int nSt = checkBox->checkState()?0:2;
-            if(checkBox == ui->checkBoxRefill)
+            int nSt = checkBoxWidget->isChecked()?0:2;
+            if(checkBoxWidget == ui->pushButtonRefill)
                 ret = !workAndPartHandler(SWorkModel::Type::CartridgeRefill, nSt);
-            else if(checkBox == ui->checkBoxChipReplace)
+            else if(checkBoxWidget == ui->pushButtonChipReplace)
                 ret = !workAndPartHandler(SWorkModel::Type::CartridgeChipReplace, nSt);
-            else if(checkBox == ui->checkBoxDrumReplace)
+            else if(checkBoxWidget == ui->pushButtonDrumReplace)
                 ret = !workAndPartHandler(SWorkModel::Type::CartridgeDrumReplace, nSt);
-            else if(checkBox == ui->checkBoxBladeReplace)
+            else if(checkBoxWidget == ui->pushButtonBladeReplace)
                 ret = !workAndPartHandler(SWorkModel::Type::CartridgeBladeReplace, nSt);
             return nSt?1:ret; // при добавлении работ нужно фильтровать событие, а при удалении нет
         }
@@ -256,22 +333,22 @@ bool SCartridgeForm::createRepair()
     m_repair->initCartridgeRepairModel(m_cardId);
 
     QStringList faultList;
-    if(ui->checkBoxPreagreedRefill->isChecked())
+    if(ui->pushButtonPreagreedRefill->isChecked())
     {
         faultList.append(tr("Заправка"));
         m_repair->cartridge()->setRefill(1);
     }
-    if(ui->checkBoxPreagreedChipReplace->isChecked())
+    if(ui->pushButtonPreagreedChipReplace->isChecked())
     {
         faultList.append(tr("Чип"));
         m_repair->cartridge()->setChip(1);
     }
-    if(ui->checkBoxPreagreedDrumReplace->isChecked())
+    if(ui->pushButtonPreagreedDrumReplace->isChecked())
     {
         faultList.append(tr("Фотовал"));
         m_repair->cartridge()->setDrum(1);
     }
-    if(ui->checkBoxPreagreedBladeReplace->isChecked())
+    if(ui->pushButtonPreagreedBladeReplace->isChecked())
     {
         faultList.append(tr("Ракель"));
         m_repair->cartridge()->setBlade(1);
@@ -506,7 +583,7 @@ void SCartridgeForm::doStateActions(const int stateId)
         }
 }
 
-void SCartridgeForm::updatePreagreedAmount(SCartridgeMaterialModel *material, const int state)
+void SCartridgeForm::updatePreagreedAmount(SCartridgeMaterialModel *material, const bool state)
 {
     m_amount = 0;
     preagreedAmounts.insert(material->type(), (material->price()+material->worksPrice())*(state?1:0));
@@ -522,8 +599,9 @@ void SCartridgeForm::updatePreagreedAmount(SCartridgeMaterialModel *material, co
 
 void SCartridgeForm::setDefaultStyleSheets()
 {
-    ui->lineEditSerial->setStyleSheet(commonLineEditStyleSheet);
-    ui->doubleSpinBoxPreagreedAmount->setStyleSheet(commonSpinBoxStyleSheet);
+    ui->lineEditSerial->setStyleSheet(m_lineEditStyleSheet);
+    ui->spinBoxRefillWeight->setStyleSheet(m_spinBoxStyleSheet);
+    ui->doubleSpinBoxPreagreedAmount->setStyleSheet(m_spinBoxStyleSheet);
     ui->doubleSpinBoxTotalAmount->setStyleSheet(commonSpinBoxStyleSheet);
 }
 
@@ -740,33 +818,32 @@ bool SCartridgeForm::workAndPartHandler(const int workType, const int checkboxSt
     if(checkboxState)
     {
         ret = addWorkAndPart(workType);
+        updateLists();  // при добавлении работ и деталей сигнал modelReset не емитируется
     }
     else
     {
-        ret = removeWorkAndPart(workType);
+        ret = removeWorkAndPart(workType);  // при удалении сигнал modelReset емитируется
     }
     return ret;
 }
 
-/* Проверка превышения ресурса заправок
- * Возвращает 1 если по серийному номеру было произведено больше заправок, чем задано в карточке картриджа.
+/* Запрос кол-ва предыдущих заправок
+ * Презназначен для включения индикатора о превышении ресурса и индикатора о повторной заправке, если об этом не было указано при приёмке
  * Cм. описание метода SCartridgeCardModel::resource()
 */
-bool SCartridgeForm::checkResource()
+int SCartridgeForm::prevRepairsCount()
 {
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    bool ret = 0;
 
     query->exec(QUERY_SEL_CARTRIDGE_RESOURCE(m_repairId, m_serialNumber, SWorkModel::Type::CartridgeRefill));
     if(query->first())
     {
-        if(query->value(0).toInt() >= m_cartridgeCard->resource())
-            ret = 1;
+        m_prevRepairsCount = query->value(0).toInt();
     }
 
     delete query;
 
-    return ret;
+    return m_prevRepairsCount;
 }
 
 int SCartridgeForm::checkInput()
@@ -845,28 +922,28 @@ void SCartridgeForm::saveTotalSumms()
     m_repair->commit();
 }
 
-void SCartridgeForm::setRefill(int state)
+void SCartridgeForm::setRefill(bool state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Toner);
     if(material)
         updatePreagreedAmount(material, state);
 }
 
-void SCartridgeForm::setChipReplace(int state)
+void SCartridgeForm::setChipReplace(bool state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Chip);
     if(material)
         updatePreagreedAmount(material, state);
 }
 
-void SCartridgeForm::setDrumReplace(int state)
+void SCartridgeForm::setDrumReplace(bool state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Drum);
     if(material)
         updatePreagreedAmount(material, state);
 }
 
-void SCartridgeForm::setBladeReplace(int state)
+void SCartridgeForm::setBladeReplace(bool state)
 {
     SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Blade);
     if(material)
@@ -1008,10 +1085,10 @@ void SCartridgeForm::setWorkCheckBoxChecked(const int workType)
 {
     switch(workType)
     {
-        case SWorkModel::Type::CartridgeRefill: ui->checkBoxRefill->setChecked(true); break;
-        case SWorkModel::Type::CartridgeDrumReplace: ui->checkBoxDrumReplace->setChecked(true); break;
-        case SWorkModel::Type::CartridgeChipReplace: ui->checkBoxChipReplace->setChecked(true); break;
-        case SWorkModel::Type::CartridgeBladeReplace: ui->checkBoxBladeReplace->setChecked(true); break;
+        case SWorkModel::Type::CartridgeRefill: ui->pushButtonRefill->setChecked(true); break;
+        case SWorkModel::Type::CartridgeDrumReplace: ui->pushButtonDrumReplace->setChecked(true); break;
+        case SWorkModel::Type::CartridgeChipReplace: ui->pushButtonChipReplace->setChecked(true); break;
+        case SWorkModel::Type::CartridgeBladeReplace: ui->pushButtonBladeReplace->setChecked(true); break;
         default: ;
     }
 }

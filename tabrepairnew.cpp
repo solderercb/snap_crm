@@ -13,8 +13,9 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairNew)
 {
+    logUserActivity();
+
     additionalFields = new SFieldsModel(SFieldsModel::Repair);
-    userActivityLog->appendRecord(tr("Navigation Приём в ремонт"));
 
     ui->setupUi(this);
     tabRepairNew::guiFontChanged();
@@ -82,6 +83,7 @@ void tabRepairNew::initWidgets()
 //    ui->pushButtonCashReceipt->hide();  // в АСЦ эта кнопка расположена в groupBox'е Финансы, но выполняет ту же функцию, что и кнопка Принять на панели задач внизу; почему так — загадка; прикручу к ней такой же функционал, и если что спрячу от пользователя
     ui->labelDoc->hide();       // хрен знает, что это за поле "Документ", оно не у всех пользователей отображается, а у кого отображается, не содержит ни одного эл-та. Спрячу от пользователя.
     ui->comboBoxDoc->hide();
+    ui->checkBoxIsQuick->setVisible(permissions->createQuickRepair);
 
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->comboBoxProblem->lineEdit()->setPlaceholderText(tr("неисправность"));
@@ -282,7 +284,7 @@ bool tabRepairNew::tabCloseRequest()
 
 QString tabRepairNew::tabTitle()
 {
-    return "Приём в ремонт";
+    return tr("Приём в ремонт");
 }
 
 tabRepairNew* tabRepairNew::getInstance(MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

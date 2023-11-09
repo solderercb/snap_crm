@@ -8,7 +8,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabSalary)
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    logUserActivity();
 
     // Игициализация моделей до UI
     m_userModel = new SUserModel();
@@ -48,7 +48,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     connect(ui->toolButtonLoad, &QToolButton::clicked, this, &tabSalary::loadButtonPressed);
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
-    ui->dateEditPeriod->setDate(QDate(2022,8,01));
+    ui->dateEditPeriod->setDate(QDate(2023,10,01));
     loadButtonPressed();
 #endif
     updateWidgets();
@@ -84,7 +84,7 @@ tabSalary::~tabSalary()
 
 QString tabSalary::tabTitle()
 {
-    return "Заработная плата";
+    return tr("Заработная плата");
 }
 
 QString tabSalary::periodBegin()
@@ -176,8 +176,8 @@ void tabSalary::setExtraChargesButtonsVisible(bool state)
     if(daysFromPeriodBegin >= 0 && daysToPeriodEnd >= 0)
         stateForPeriod = 1;
 
-    ui->buttonAddExtraCharge->setVisible(state && stateForPeriod);
-    ui->buttonSaveExtraChargesList->setVisible(state && stateForPeriod);
+    ui->buttonAddExtraCharge->setVisible(state && stateForPeriod && permissions->makeSalaryExtraCharge);
+    ui->buttonSaveExtraChargesList->setVisible(state && stateForPeriod && permissions->makeSalaryExtraCharge);
 }
 
 void tabSalary::buttonAddExtraChargeClicked()

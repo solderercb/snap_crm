@@ -81,7 +81,7 @@ private:
     SRepairModel *repairModel;
     SClientModel *clientModel;
     SFieldsModel *additionalFieldsModel;
-    SSortFilterProxyModel *statusesProxyModel;
+    SSortFilterProxyModel *statusesProxyModel = nullptr;
     SSaleTableModel *worksAndPartsModel;
     bool m_statusUpdateInProgress = 0;
     double works_sum, parts_sum, total_sum;
@@ -95,6 +95,7 @@ private:
     bool m_comboBoxStateEnabled = 1;
     bool m_comboBoxNotifyStatusEnabled = 1;
     bool m_outDateVisible = 0;
+    bool m_buttonDebtReceivedVisible = 0;
     SGroupBoxEventFilter *groupBoxEventFilter;
     int m_clientId = 0;
     QList<QWidget*> additionalFieldsWidgets;
@@ -121,6 +122,7 @@ private:
     void setPricesToZero();
     bool commit(const QString &notificationCaption = tr("Успешно"), const QString &notificationText = tr("Данные сохранены"));
     void initEngineer();
+    bool checkViewPermission();
 #ifdef QT_DEBUG
     void randomFill() override {};
 #endif

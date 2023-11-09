@@ -61,7 +61,7 @@
          <item row="0" column="0">
           <layout class="QVBoxLayout" name="verticalLayoutCartridges">
            <property name="spacing">
-            <number>5</number>
+            <number>8</number>
            </property>
           </layout>
          </item>

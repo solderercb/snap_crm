@@ -900,8 +900,11 @@ bool SSaleTableModel::repair_removeRows()
     for(int i = rowCount() - 1; i >= 0 && ret; i--)
     {
         if(isRowMarkedRemove(i))
-            removeRows(i, 1);
+            ret = removeRows(i, 1);
     }
+
+    if( ret && (!m_itemsPendingRemoveList->isEmpty() || !m_worksPendingRemoveList->isEmpty()) )
+        endResetModel();
 
     if(ret)
     {
@@ -909,7 +912,6 @@ bool SSaleTableModel::repair_removeRows()
         m_worksPendingRemoveList->clear();
     }
 
-    endResetModel();
     return ret;
 }
 
@@ -1258,6 +1260,9 @@ QVariant SSaleTableModel::value(const int row, const int column, const int role)
 
 void SSaleTableModel::setModelState(int state)
 {
+    if(m_modelState == state)
+        return;
+
     m_modelState = state;
     emit modelStateChanged(m_modelState);
     endResetModel();    // для перерисовки кнопок в таблице

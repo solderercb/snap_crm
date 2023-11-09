@@ -9,7 +9,7 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabReceptCartridge)
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    logUserActivity();
 
     QString query;
     QSqlQuery q(QSqlDatabase::database("connMain"));
@@ -97,7 +97,8 @@ void tabReceptCartridge::initWidgets()
     ui->comboBoxPresetEngineer->setPlaceholderText(tr("назначить инженером"));
     ui->comboBoxPresetEngineer->setButtons("Clear");
     ui->comboBoxPresetPaymentAccount->setPlaceholderText(tr("тип оплаты"));
-    ui->comboBoxModel->setButtons("Add, Edit");
+    if(permissions->editCartridgeCards)
+        ui->comboBoxModel->setButtons("Add, Edit");
 
     setDefaultStyleSheets();
 

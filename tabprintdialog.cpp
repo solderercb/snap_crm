@@ -7,12 +7,15 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, Global::Reports type) :
     tabCommon(parent),
     ui(new Ui::tabPrintDialog)
 {
+    m_reportType = type;    // инициализация до вызова любых методов
+
+//    tabCommon::logUserActivity(); // нужно вообще?
+
     ui->setupUi(this);
 
     initProgressWidget();
     logRecord = new SLogRecordModel();
 
-    m_reportType = type;
     m_printersList = QPrinterInfo::availablePrinterNames();
     ui->comboBoxPrinters->addItems(m_printersList);
 
@@ -88,7 +91,7 @@ void tabPrintDialog::setDefaultWidgetFocus()
 
 QString tabPrintDialog::tabTitle()
 {
-    return "Print";
+    return tr("Печать %1").arg(tr(Global::staticMetaObject.enumerator(Global::staticMetaObject.indexOfEnumerator("Reports")).valueToKey(m_reportType)));
 }
 
 void tabPrintDialog::paintEvent(QPaintEvent *event)
@@ -564,3 +567,42 @@ void tabPrintDialog::reportRenderFinished()
     QObject::connect(previewDelayTimer, &QTimer::timeout, this, &tabPrintDialog::showPreview);
     previewDelayTimer->start(50);
 }
+
+/* Перевод названий отчетов (заголовок вкладки предпросмотра и текст записи в таблице `users_activity`)
+ * Подставляемое значение присоединяется к "Печать ...", например "Печать квитанции", "Печать стикера"
+ * Желательно использовать короткие названия
+ */
+void tabPrintDialog::translate()
+{
+    tr("new_rep");
+    tr("pko");
+    tr("reject");
+    tr("rko");
+    tr("sticker1");
+    tr("sticker2");
+    tr("sticker3");
+    tr("rep_label");
+    tr("warranty");
+    tr("works");
+    tr("diag");
+    tr("pn");
+    tr("rn");
+    tr("lost");
+    tr("price1");
+    tr("invoice0");
+    tr("invoice1");
+    tr("invoice2");
+    tr("invoice3");
+    tr("vatinvoice0");
+    tr("p_list0");
+    tr("w_list0");
+    tr("new_cartridge");
+    tr("sticker_cartridge");
+    tr("issue_cartridge");
+    tr("slip");
+    tr("move");
+    tr("buyout");
+    tr("repairs");
+    tr("cartridges");
+}
+

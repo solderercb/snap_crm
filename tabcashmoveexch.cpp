@@ -8,10 +8,9 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabCashMoveExch)
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    logUserActivity();
 
     ui->setupUi(this);
-    i_tabTitle = tr("Перемещение денег");
     tabCashMoveExch::guiFontChanged();
     ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
 
@@ -205,7 +204,7 @@ void tabCashMoveExch::guiFontChanged()
 
 QString tabCashMoveExch::tabTitle()
 {
-    return i_tabTitle;
+    return tr("Перемещение денег");
 }
 
 void tabCashMoveExch::updateWidgets()

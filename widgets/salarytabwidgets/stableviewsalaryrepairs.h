@@ -2,7 +2,6 @@
 #define STABLEVIEWSALARYREPAIRS_H
 
 #include "../stableviewbase.h"
-#include "widgets/saletableitemdelegates.h"
 
 class STableViewSalaryRepairs : public STableViewBase
 {

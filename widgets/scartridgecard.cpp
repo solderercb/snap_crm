@@ -73,6 +73,7 @@ void SCartridgeCard::initModels()
 
 void SCartridgeCard::initWidgets()
 {
+    m_modelRW = permissions->editCartridgeCards;
     initModels();
     ui->comboBoxVendor->setModel(m_vendorsModel);
     ui->comboBoxVendor->setCurrentIndex(-1);
@@ -101,15 +102,25 @@ void SCartridgeCard::updateWidgets()
     if(m_id)
     {
         ui->pushButtonCreateSave->setText(tr("Сохранить"));
+        ui->pushButtonCreateSave->setEnabled(m_modelRW);
+        ui->pushButtonAddMaterial->setEnabled(m_modelRW);
         ui->checkBoxArchive->setVisible(true);
         ui->checkBoxArchive->setChecked(m_isArchive);
+        ui->checkBoxArchive->setEnabled(m_modelRW);
         ui->comboBoxVendor->setCurrentIndex(m_vendorsModel->rowByDatabaseID(m_cardModel->vendor()));
+        ui->comboBoxVendor->setEnabled(m_modelRW);
         ui->lineEditName->setText(m_cardModel->name());
+        ui->lineEditName->setReadOnly(!m_modelRW);
         ui->spinBoxResource->setValue(m_cardModel->resource());
+        ui->spinBoxResource->setReadOnly(!m_modelRW);
         ui->spinBoxFullWeight->setValue(m_cardModel->fullWeight());
+        ui->spinBoxFullWeight->setReadOnly(!m_modelRW);
         ui->spinBoxTonerWeight->setValue(m_cardModel->tonerWeight());
+        ui->spinBoxTonerWeight->setReadOnly(!m_modelRW);
         ui->plainTextEditNotes->setPlainText(m_cardModel->notes());
+        ui->plainTextEditNotes->setReadOnly(!m_modelRW);
         ui->comboBoxColor->setCurrentIndex(m_cardModel->color());
+        ui->comboBoxColor->setEnabled(m_modelRW);
         ui->tableViewMaterials->refresh();
         ui->pushButtonRemoveMaterial->setEnabled(false);
     }
@@ -184,7 +195,8 @@ void SCartridgeCard::setModelData()
 
 void SCartridgeCard::materialSelected(const QModelIndex &index)
 {
-    ui->pushButtonRemoveMaterial->setEnabled(index.isValid());
+    if(m_modelRW)
+        ui->pushButtonRemoveMaterial->setEnabled(index.isValid());
 }
 
 void SCartridgeCard::removeMaterial()
@@ -194,7 +206,7 @@ void SCartridgeCard::removeMaterial()
     m_materialsModel->removeRow(row);
     ui->tableViewMaterials->hideRow(row);
     ui->pushButtonRemoveMaterial->setEnabled(false);
-    ui->pushButtonAddMaterial->setEnabled(true);
+    ui->pushButtonAddMaterial->setEnabled(m_modelRW);
     m_materialsModel->findNextMaterial();
 }
 
@@ -298,8 +310,11 @@ void materialsTable::setModel(QAbstractItemModel *model)
 {
     m_model = static_cast<SCartridgeMaterialsModel*>(model);
     STableViewBase::setModel(model);
-    SCartridgeMaterialsTableItemDelegates *itemDelagates = new SCartridgeMaterialsTableItemDelegates(m_model, this);
-    setItemDelegate(itemDelagates);
+    if(permissions->editCartridgeCards)
+    {
+        SCartridgeMaterialsTableItemDelegates *itemDelagates = new SCartridgeMaterialsTableItemDelegates(m_model, this);
+        setItemDelegate(itemDelagates);
+    }
 }
 
 void materialsTable::mouseClickEvent(QMouseEvent *event)

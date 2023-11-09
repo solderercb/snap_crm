@@ -13,8 +13,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->setupUi(this);
     tabRepair::guiFontChanged();
 
-    i_tabTitle = tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
-    userActivityLog->appendRecord(tr("Navigation %1").arg(i_tabTitle));
     repairModel = new SRepairModel();
     repairModel->setId(repair_id);
     connect(repairModel, SIGNAL(modelUpdated()), this, SLOT(updateWidgets()));
@@ -123,8 +121,18 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    reloadRepairData();
-    setLock(1); // вызов этого метода должен происходить только после инициализации моделей данных
+    if(!checkViewPermission())
+    {
+        logUserActivity();
+        reloadRepairData();
+        setLock(1);
+    }
+    else
+    {
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Не достаточно прав для открытия карточки чужого ремонта"), QColor(255,255,255), QColor(245,245,245));
+        this->deleteLater();
+        return;
+    }
 
 #ifdef QT_DEBUG
     if( m_getOutButtonVisible && (repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair) )
@@ -143,6 +151,7 @@ tabRepair::~tabRepair()
 {
     setLock(0);
     delAdditionalFieldsWidgets();
+    delete statusesProxyModel;
     delete additionalFieldsModel;
     delete ui;
     delete repairModel;
@@ -152,12 +161,14 @@ tabRepair::~tabRepair()
     {
         delete m_autosaveDiagTimer;
     }
+    if(i_tabIcon)
+        delete i_tabIcon;
     p_instance.remove(repair_id);   // Обязательно блять!
 }
 
 QString tabRepair::tabTitle()
 {
-    return i_tabTitle;
+    return tr("Ремонт", "repair tab title") + " " + QString::number(repair_id);
 }
 
 bool tabRepair::tabCloseRequest()
@@ -185,7 +196,6 @@ bool tabRepair::tabCloseRequest()
 void tabRepair::reloadRepairData()
 {
     repairModel->load(repair_id);
-
     if(repairModel->clientId() != m_clientId)  // перезагрузка данных клиента только при первом вызове метода или если был изменён клиент
     {
         m_clientId = repairModel->clientId();
@@ -224,7 +234,7 @@ void tabRepair::updateWidgets()
     setInfoWidgetVisible(ui->lineEditExtPrevRepair, !repairModel->extEarly().isEmpty());
     ui->lineEditExtPrevRepair->setText(repairModel->extEarly());
     ui->lineEditOffice->setText(officesModel->getDisplayRole(repairModel->office()));
-    ui->lineEditManager->setText(allUsersModel->value(repairModel->manager(), "id", "username").toString());
+    ui->lineEditManager->setText(allUsersModel->value(repairModel->currentManager(), "id", "username").toString());
     ui->lineEditEngineer->setText(allUsersModel->value(repairModel->engineer(), "id", "username").toString());
     setInfoWidgetVisible(ui->lineEditPreagreedAmount, repairModel->isPreAgreed());
     ui->lineEditPreagreedAmount->setText(sysLocale.toCurrencyString(repairModel->preAgreedAmount()));        // TODO: заменить системное обозначение валюты на валюту заданную в таблице БД config
@@ -273,6 +283,7 @@ void tabRepair::updateWidgets()
         ui->pushButtonCreateInvoice->setHidden(true);
         ui->groupBoxCashless->setHidden(true);
     }
+    ui->pushButtonDebtReceived->setVisible(m_buttonDebtReceivedVisible);
 
     ui->comboBoxNotifyStatus->blockSignals(true);
     ui->comboBoxNotifyStatus->setCurrentIndex(repairModel->informedStatusIndex());
@@ -303,7 +314,7 @@ void tabRepair::updateWidgets()
     ui->doubleSpinBoxAmount->setReadOnly(m_summRO || modelRO);
     ui->doubleSpinBoxAmount->blockSignals(false);
     ui->pushButtonSaveDiagAmount->setEnabled(!m_summRO && !modelRO);
-    ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO);
+    ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO && permissions->addCustomWork);
     ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
     ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO && worksAndPartsModel->isUnsaved());
 //    ui->pushButtonAddWorkFromPriceList->setEnabled(!m_worksRO && !modelRO);
@@ -320,7 +331,6 @@ void tabRepair::updateWidgets()
     ui->toolButtonSaveState->setEnabled(!modelRO);
 
     worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
-//    ui->tableViewWorksAndSpareParts->resizeRowsToContents();
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled);
 }
 
@@ -375,7 +385,7 @@ void tabRepair::createAdditionalFieldsWidgets()
     i = 0;
     foreach(field, additionalFieldsModel->list())
     {
-        QLabel *label = new QLabel(field->name());
+        QLabel *label = new QLabel(field->name());  // эти объекты удаляются в методе delAdditionalFieldsWidgets()
         QLineEdit *lineEdit = new QLineEdit();
         additionalFieldsWidgets.append(label);
         additionalFieldsWidgets.append(lineEdit);
@@ -437,8 +447,8 @@ bool tabRepair::setWidgetsParams(const int stateId)
     {
         case Global::RepStateIds::Negotiation: m_summRO = 0; break;
         case Global::RepStateIds::Returned:
-        case Global::RepStateIds::ReturnedNoRepair:
-        case Global::RepStateIds::ReturnedInCredit: m_comboBoxStateEnabled = 0; m_outDateVisible = 1; m_comboBoxNotifyStatusEnabled = 0; break;
+        case Global::RepStateIds::ReturnedNoRepair: m_comboBoxStateEnabled = 0; m_outDateVisible = 1; m_comboBoxNotifyStatusEnabled = 0; Q_FALLTHROUGH();
+        case Global::RepStateIds::ReturnedInCredit: m_buttonDebtReceivedVisible = 1; break;
     }
 
     const QList<QString> actions = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Actions).toString().split('|');
@@ -459,6 +469,10 @@ bool tabRepair::setWidgetsParams(const int stateId)
 bool tabRepair::checkStateAcl(const int stateId)
 {
     const QString allowedForRoles = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Roles).toString();
+
+    if(repairModel->state() == Global::RepStateIds::GetIn && !repairModel->engineer() && !permissions->beginUnengagedRepair)
+        return 0;
+
     if(userDbData->roles.contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
     {
         return 1;
@@ -508,7 +522,12 @@ void tabRepair::saveTotalSumms()
 {
     repairModel->setRealRepairCost(worksAndPartsModel->amountTotal());
     repairModel->setPartsCost(worksAndPartsModel->amountItems());
+
+    // по идее в очереди на обновление значений в БД кроме сумм ничего не должно быть, поэтому сигналы блокируются
+    // чтобы избежать ненужной эмиссии modelReset() и как следствие вызова метода updateWidgets()
+    repairModel->blockSignals(true);
     repairModel->commit();
+    repairModel->blockSignals(false);
 }
 
 void tabRepair::createDialogIssue()
@@ -560,6 +579,50 @@ void tabRepair::initEngineer()
         return;
 
     repairModel->setEngineer(userDbData->id);
+}
+
+/*  Проверка разрешения на открытие чужих карт ремонта
+ *  Возвращает 1 если пользователь не обладает таким правом
+*/
+bool tabRepair::checkViewPermission()
+{
+    if(permissions->viewAnyRepair)
+    {
+        return 0;
+    }
+
+    bool ret = 1;
+    int role;
+    int repManager = 0;
+    int repEngineer = 0;
+    QStringList userRoles = userDbData->roles.split(',');
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+
+    query->exec(QUERY_SEL_REPAIR_MNGR_ENGR(repair_id));
+    if(query->first())
+    {
+        repManager = query->value(0).toInt();
+        repEngineer = query->value(1).toInt();
+
+        foreach(auto r, userRoles)
+        {
+            role = r.toInt();
+            switch (role)
+            {
+                case Global::UserRoles::Engineer:
+                case Global::UserRoles::SeniorEngineer: ret &= (repEngineer != 0) && (repEngineer != userDbData->id); break;    // инженер может открывать свободные ремонты и свои
+                case Global::UserRoles::Manager:
+                case Global::UserRoles::SeniorManager: ret &= (repManager != 0) && (repManager != userDbData->id); break;    // менеджер может открывать только свои ремонты
+                case Global::UserRoles::Director: ret = 0; break;
+            }
+
+            if(!ret)
+                break;
+        }
+    }
+
+    delete query;
+    return ret;
 }
 
 void tabRepair::openInvoice(int)
@@ -745,6 +808,15 @@ void tabRepair::saveState(int index)
 
 void tabRepair::setInformedStatus(int status)
 {
+    if(status != Global::ClientInformStateIds::NotSet && !permissions->setNotificationState)
+    {
+        ui->comboBoxNotifyStatus->blockSignals(true);
+        ui->comboBoxNotifyStatus->setCurrentIndex(Global::ClientInformStateIds::NotSet);
+        ui->comboBoxNotifyStatus->blockSignals(false);
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
+        return;
+    }
+
     repairModel->setInformedStatusIndex(status);
 
     if(m_groupUpdate)
@@ -885,7 +957,7 @@ void tabRepair::buttonWorksAdminEdit(bool state)
             saveSaleTableClicked();
         ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
         ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO);
-        ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO);
+        ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO && permissions->addCustomWork);
     }
 }
 
@@ -948,9 +1020,9 @@ void tabRepair::comboBoxStateIndexChanged(int index)
 
 tabRepair* tabRepair::getInstance(int rep_id, MainWindow *parent)   // singleton: одна вкладка для ремонта
 {
-if( !p_instance.contains(rep_id) )
-  p_instance.insert(rep_id, new tabRepair(rep_id, parent));
-return p_instance.value(rep_id);
+    if( !p_instance.contains(rep_id) )
+      p_instance.insert(rep_id, new tabRepair(rep_id, parent));
+    return p_instance.value(rep_id);
 }
 
 // ===============================================================================================================

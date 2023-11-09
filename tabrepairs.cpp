@@ -4,7 +4,7 @@
 #include "ui_tabrepairs.h"
 #include "com_sql_queries.h"
 #include "reports/sprintposreport.h"
-#include "tabPrintDialog.h"
+#include "tabprintdialog.h"
 //#include "mainwindow.h"
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
@@ -13,7 +13,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairs)
 {
-    userActivityLog->appendRecord(tr("Navigation Ремонты"));
+    logUserActivity();
 
     ui->setupUi(this);
     initTableRepairsMenu();

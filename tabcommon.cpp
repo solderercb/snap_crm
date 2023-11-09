@@ -60,3 +60,8 @@ void tabCommon::setCursorPositionsToZero()
     foreach(le, list)
         le->setCursorPosition(0);
 }
+
+void tabCommon::logUserActivity()
+{
+    userActivityLog->appendRecord("Navigation " + tabTitle());
+}

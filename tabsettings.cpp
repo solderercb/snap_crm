@@ -12,7 +12,7 @@ tabSettings::tabSettings(MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabSettings)
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    logUserActivity();
 
     ui->setupUi(this);
     connect(ui->pages, &SPagedInterface::updateBotToolbar, this, &tabSettings::updateBotToolbar);
@@ -23,7 +23,6 @@ tabSettings::tabSettings(MainWindow *parent) :
     ui->buttonRefresh->setEnabled(0);
 
     ui->pages->setButtonText(0, "Персональные настройки");
-//    ui->pages->switchPage(0);  // по-умолчанию страница 0
     if(permissions->editGlobalSettings)
     {
         ui->pages->addButton(tr("Основные"), QIcon(), Page::Global);

@@ -34,7 +34,7 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
             return dateTime(index);
         else if(fieldName == QString("out_date"))
             return dateTime(index);
-        else if(fieldName == QString("master") || fieldName == QString("manager"))
+        else if(fieldName == QString("master") || fieldName == QString("current_manager"))
             return userFromId(index);
         else if(fieldName == QString("box"))
             return QVariant(repairBoxesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));

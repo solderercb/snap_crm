@@ -152,6 +152,7 @@ void MainWindow::createMenu()
 
     QAction *workshop_refill = new QAction(tr("Заправка"), this);
     workshop_menu->addAction(workshop_refill);
+    workshop_refill->setVisible(comSettings->isCartridgeRepairEnabled && permissions->receptDevices);
     QObject::connect(workshop_refill,SIGNAL(triggered()),this,SLOT(createTabReceptCartridge()));
 
     QAction *workshop_price = new QAction(tr("Прайс-лист"), this);
@@ -704,7 +705,7 @@ void MainWindow::createUpdaterWidget()
     config.insert(QLatin1String("path"), QLatin1String("maintenancetool.exe"));
     config.insert(QLatin1String("repoPathArg"), comSettings->updateChannel);
     auto updater = QtAutoUpdater::Updater::create(QLatin1String("qtifw"), config, qApp);
-    Q_ASSERT(updater);
+//    Q_ASSERT(updater);
     updateController = new QtAutoUpdater::UpdateController(updater, this);
     updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Progress);
 }

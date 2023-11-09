@@ -175,7 +175,7 @@
                                                 "   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\n"\
                                                 "   t6.`phone`,\n"\
                                                 "   `box`,\n"\
-                                                "   `manager`,\n"\
+                                                "   `current_manager`,\n"\
                                                 "   '' AS 'Progress',\n"\
                                                 "   `ext_notes`,\n"\
                                                 "   t2.`name` AS 'dev_class_name',\n"\
@@ -300,6 +300,7 @@
 #define QUERY_SEL_REPAIR_PREPAYS(R)         QString("SELECT IFNULL(SUM(`summa`), 0) AS 'summa' FROM `cash_orders` WHERE `repair` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_WORKS(R)           QString("SELECT SUM(`price` * `count`) AS 'summa' FROM `works` WHERE `repair` = %1 GROUP BY `repair`;").arg((R))
 #define QUERY_SEL_REPAIR_PARTS(R)           QString("SELECT SUM(`price` * `count`) AS `summa` FROM `store_int_reserve` WHERE `state` IN (2, 3) AND `repair_id` = %1;").arg((R))
+#define QUERY_SEL_REPAIR_MNGR_ENGR(R)       QString("SELECT `current_manager`, `master` FROM workshop WHERE `id` = %1").arg((R))
 #define QUERY_SEL_REPAIR_LOCK(R)            QString("SELECT `user_lock` FROM workshop WHERE `id` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R))
 #define QUERY_SEL_ADD_FIELD(id)             QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`id` = %1;").arg((id))
