@@ -48,6 +48,8 @@ tabSettings::tabSettings(MainWindow *parent) :
 
 tabSettings::~tabSettings()
 {
+    ui->pages->disconnect();
+    disconnect();
     delete ui;
     p_instance = nullptr;
 }

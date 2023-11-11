@@ -361,28 +361,12 @@
    <header>widgets/slineedit.h</header>
    <slots>
     <signal>buttonClicked(int)</signal>
+    <signal>mouseDoubleClick()</signal>
    </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>tabWidget</sender>
-   <signal>tabCloseRequested(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>closeTab(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>104</x>
-     <y>39</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>147</x>
-     <y>19</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <designerdata>
   <property name="gridDeltaX">
    <number>5</number>

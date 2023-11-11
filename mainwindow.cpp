@@ -67,6 +67,7 @@ MainWindow::MainWindow(windowsDispatcher*) :
 
     tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)
     ui->tabWidget->tabBar()->installEventFilter(tabBarEventFilterObj);
+    connect(ui->tabWidget->tabBar(), &QTabBar::tabCloseRequested, this, &MainWindow::closeTab);
 
     this->move(0, 0);   // размер и положение окна по умолчанию
     this->resize(1366, 768);

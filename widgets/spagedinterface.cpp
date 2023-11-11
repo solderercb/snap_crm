@@ -30,7 +30,13 @@ SPagedInterface::SPagedInterface(QWidget *parent) : QWidget(parent)
 
 SPagedInterface::~SPagedInterface()
 {
+    toolboxSwitchPanel->disconnect();
+    disconnect();
     delPages();
+    delete stackedWidget;
+    delete toolboxSwitchPanel;
+    delete line;
+    delete tabLayout;
 }
 
 void SPagedInterface::addButton(const QString &caption, QIcon icon, const int id)

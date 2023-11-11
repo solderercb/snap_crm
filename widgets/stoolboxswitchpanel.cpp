@@ -84,13 +84,10 @@ void SToolboxSwitchPanel::deleteButton(int id)
 
 void SToolboxSwitchPanel::clearButtons()
 {
-    if(m_buttons.count() == 1)
-        return;
-
-    QMap<int, QCommandLinkButton*>::const_iterator i = m_buttons.constBegin();
-    ++i;    // Кнопка "Сводка" удаляется в деструкторе формы, а при вызове этого метода не из ~SToolboxSwitchPanel() её удалять не нужно
-    while(++i != m_buttons.constEnd())
-        deleteButton(i.key());
+    while(m_buttons.count() > 1)    // Кнопка "Сводка" удаляется в деструкторе формы, а при вызове этого метода не из ~SToolboxSwitchPanel() её удалять не нужно
+    {
+        deleteButton(m_buttons.lastKey());
+    }
 }
 
 void SToolboxSwitchPanel::hideButton(int buttonId)
