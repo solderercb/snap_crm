@@ -164,7 +164,7 @@ inline QString amountToWordsUA(double n)
 
         if (nPor == 0)
         {
-            s = QString::number(r[1]) + QString::number(r[0]) + capt;
+            s = QString::number(r[1]) + QString::number(r[0]) + 0x00A0 + capt;  // 0x00A0 — неразрывный пробел
             continue;
         }
 

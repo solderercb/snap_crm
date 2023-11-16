@@ -494,6 +494,56 @@ int tabPrintDialog::findPrinterIndex(const QStringList &list, const QString &pNa
         return list.indexOf(pName);
 }
 
+void tabPrintDialog::printRepairWorksReports(QList<SRepairModel *> list, bool takeOwn)
+{
+    if(list.isEmpty())
+        return;
+
+    tabPrintDialog *tab;
+
+    tab = new tabPrintDialog(MainWindow::getInstance(), Global::Reports::works);
+    tab->setRepairsList(list, takeOwn);
+    tab->startRender();
+    MainWindow::getInstance()->addTab(tab);
+}
+
+void tabPrintDialog::setRepairsList(QList<SRepairModel *> list, bool takeOwn)
+{
+    if(list.isEmpty())
+        return;
+
+    i_clientId = list.at(0)->clientId();    // Печать нескольких актов за раз возможна только при выдаче, а она может быть произведена только с ремонтами от одного клиента
+    if(!i_listSourceDataCallbackHandler)
+        i_listSourceDataCallbackHandler = new SListSourceDataCallbackHandler();
+
+    i_listSourceDataCallbackHandler->setRepairsList(list, takeOwn);
+}
+
+void tabPrintDialog::printCartridgeWorksReports(QList<SRepairModel *> list, bool takeOwn)
+{
+    if(list.isEmpty())
+        return;
+
+    SPrintPOSReport *report = new SPrintPOSReport();
+    SClientModel *client = new SClientModel();
+    client->load(list.at(0)->clientId());
+
+    report->setClientModel(client);
+    report->openPrinter(userLocalData->PosPrinter.value);
+    QList<SRepairModel*>::const_iterator i = list.constBegin();
+    while(i != list.constEnd())
+    {
+        report->addPrintJob(*i);
+        if(takeOwn)
+            delete *i;
+        i++;
+    }
+    report->closePrinter();
+
+    delete report;
+    delete client;
+}
+
 void tabPrintDialog::on_labelPrinterSettings_linkActivated(const QString&)
 {
 //    initPrinter(true);

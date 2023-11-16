@@ -87,9 +87,9 @@ inline QString amountToWordsRU(double n)
 	static QString cap3[5][3] =
 	{
 		{
-			QString::fromUtf8("копейка "), 
-			QString::fromUtf8("копейки "), 
-			QString::fromUtf8("копеек ") 
+            QString::fromUtf8("копейка"),
+            QString::fromUtf8("копейки"),
+            QString::fromUtf8("копеек")
 		},
 		{
 			QString::fromUtf8("рубль, "), 
@@ -166,7 +166,7 @@ inline QString amountToWordsRU(double n)
  
 		if (nPor == 0)
 		{
-			s = QString::number(r[1]) + QString::number(r[0]) + " " + capt;
+            s = QString::number(r[1]) + QString::number(r[0]) + 0x00A0 + capt;  // 0x00A0 — неразрывный пробел
 			continue;
 		}
 		if (nPor == 1)

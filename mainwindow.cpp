@@ -365,6 +365,18 @@ MainWindow::~MainWindow()
 #endif
 }
 
+/* Добавление вкладки, созданной в другом классе, и переключение на эту вкладку
+*/
+void MainWindow::addTab(QWidget *widget)
+{
+    tabCommon *tab = dynamic_cast<tabCommon*>(widget);
+    if(!tab)
+        return;
+
+    ui->tabWidget->addTab(tab, tab->tabTitle());
+    ui->tabWidget->setCurrentWidget(tab);
+}
+
 MainWindow* MainWindow::getInstance(windowsDispatcher *parent)   // singleton: MainWindow только один объект
 {
     if( !p_instance )
@@ -1017,13 +1029,14 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //    createTabSale(17782);
 //    if (test_scheduler_counter < 375)
 //    {
-        createTabRepairNew();
+//        createTabRepairNew();
 //        createTabReceptCartridge();
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
 //        createTabCashOperation(42268);
 //        createTabClient(143);
 //        createTabCashMoveExch();
+
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("type", Global::Reports::new_rep);
 //        report_vars.insert("repair_id", 25098);
@@ -1032,6 +1045,18 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        report_vars2.insert("type", Global::Reports::rep_label);
 //        report_vars2.insert("repair_id", 25098);
 //        createTabPrint(report_vars2);
+
+//        QList<SRepairModel *> repairsList;
+//        SRepairModel *repair;
+//        SSaleTableModel *works;
+//        repair = new SRepairModel();
+//        works = new SSaleTableModel();
+//        repair->initDemo();
+//        works->initDemo();
+//        repair->setWorksAndPartsModel(works);
+//        repairsList.append(repair);
+//        tabPrintDialog::printRepairWorksReports(repairsList, true);
+
 //    }
 //    createTabSettings();
 //    createTabSalary();

@@ -780,7 +780,6 @@ void tabRepairNew::randomFill()
     }
     else if (test_scheduler_counter == 1)
     {
-        return;
         i = deviceClassesModel->rowCount();
         ui->comboBoxDeviceClass->setCurrentIndex(QRandomGenerator::global()->bounded(i));
 //        ui->comboBoxDeviceClass->setCurrentIndex(2);

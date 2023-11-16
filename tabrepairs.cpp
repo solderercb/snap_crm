@@ -3,9 +3,7 @@
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
 #include "com_sql_queries.h"
-#include "reports/sprintposreport.h"
 #include "tabprintdialog.h"
-//#include "mainwindow.h"
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
 
@@ -135,12 +133,12 @@ void tabRepairs::initTableCartridgesMenu()
     tableCartridgesMenu = new QMenu(this);
     QAction * printReceipt = new QAction(tr("Печать квитанции"), tableCartridgesMenu);
     printReceipt->setProperty("type", MenuCartridgesActions::PrintReceipt);
-    connect(printReceipt, &QAction::triggered, this, &tabRepairs::printCartridgeReceiptReport);
+    connect(printReceipt, &QAction::triggered, this, &tabRepairs::printCartridgeReceiptReports);
     tableCartridgesMenu->addAction(printReceipt);
 
     QAction * printIssue = new QAction(tr("Печать акта"), tableCartridgesMenu);
     printIssue->setProperty("type", MenuCartridgesActions::PrintIssue);
-    connect(printIssue, &QAction::triggered, this, &tabRepairs::printCartridgeWorksReport);
+    connect(printIssue, &QAction::triggered, this, qOverload<>(&tabRepairs::printCartridgeWorksReports));
     tableCartridgesMenu->addAction(printIssue);
 }
 
@@ -320,7 +318,7 @@ void tabRepairs::tableSelectionChanged(const QItemSelection&, const QItemSelecti
     updateWidgets();
 }
 
-void tabRepairs::createDialogIssue()
+QList<SRepairModel*> tabRepairs::repairsListFromSelection()
 {
     QList<SRepairModel*> list;
     QList<int> *idsList = ui->tableView->selectedRepairsList();
@@ -336,16 +334,20 @@ void tabRepairs::createDialogIssue()
         list.append(repair);
     }
 
-    m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
-    connect(m_dialogIssue, &SDialogIssueRepair::onDelete, this, &tabRepairs::closeDialogIssue);
-
     delete idsList;
+
+    return list;
 }
 
-void tabRepairs::closeDialogIssue()
+void tabRepairs::createDialogIssue()
 {
-    m_dialogIssue->deleteRepairModels();
-    refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionReset);
+    QList<SRepairModel*> list = repairsListFromSelection();
+    m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
+    m_dialogIssue->setListOwner(true);
+    if(ui->switchTableMode->isChecked() == STableViewRepairs::ModeRepairs)
+        connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printRepairWorksReports(list, true);});
+    else
+        connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printCartridgeWorksReports(list, true);});
 }
 
 void tabRepairs::menuRequest(QPoint pos)
@@ -378,28 +380,16 @@ void tabRepairs::menuRequest(QPoint pos)
     }
 }
 
-void tabRepairs::printCartridgeReceiptReport()
+/* Слот, вызываемый из контекстного меню */
+void tabRepairs::printCartridgeReceiptReports()
 {
-    SClientModel *client = new SClientModel();
-    SRepairModel *repair = new SRepairModel();
-    SPrintPOSReport *report = new SPrintPOSReport();
-    int repairId = repairs_table->unformattedData(ui->tableView->selectionModel()->currentIndex().siblingAtColumn(STableViewRepairs::Column::ID)).toInt();
-
-    repair->load(repairId);
-    client->load(repair->clientId());
-    report->setClientModel(client);
-
-    report->openPrinter(userLocalData->PosPrinter.value);
-    report->addPrintJob(repair);
-    report->closePrinter();
-
-    delete report;
-    delete repair;
-    delete client;
+    printCartridgeWorksReports();
 }
 
-void tabRepairs::printCartridgeWorksReport()
+/* Слот, вызываемый из контекстного меню */
+void tabRepairs::printCartridgeWorksReports()
 {
-    printCartridgeReceiptReport();
+    tabPrintDialog::printCartridgeWorksReports(repairsListFromSelection(), true);
 }
+
 

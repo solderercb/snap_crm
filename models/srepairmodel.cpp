@@ -121,7 +121,7 @@ void SRepairModel::initDemo()
     i_id = 123456;
     m_isHidden = 0;
     m_title = "Моноблок (All-in-One PC) Apple iMac12,1  Mid 2011  A1311 (EMC 2428)";
-    m_clientId = 6325;
+    m_clientId = 0;
     m_type = 12345;
     m_maker = 12345;
     m_model = 12345;
@@ -154,10 +154,10 @@ void SRepairModel::initDemo()
     m_prepaidOrder = 12345;
     m_isPreAgreed = 1;
     m_isDebt = 0;
-    m_preAgreedAmount =  1000;
-    m_repairCost =  1000;
-    m_realRepairCost =  1000;
-    m_partsCost =  1000;
+    m_preAgreedAmount =  2000;
+    m_repairCost =  2000;
+    m_realRepairCost =  2000;
+    m_partsCost =  1500;
     m_fault = "не включается";
     m_complect = "компьютер-моноблок";
     m_look = "хорошее состояние";
@@ -1189,6 +1189,11 @@ QString SRepairModel::repairCostStr()
 QString SRepairModel::realRepairCostStr()
 {
     return sysLocale.toCurrencyString(realRepairCost());
+}
+
+QString SRepairModel::realRepairCostInWords()
+{
+    return amountToWords(realRepairCost(), comSettings->currencyId);
 }
 
 QString SRepairModel::partsCostStr()

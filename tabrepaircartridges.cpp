@@ -2,6 +2,7 @@
 #include "tabrepairs.h"
 #include "tabrepaircartridges.h"
 #include "ui_tabrepaircartridges.h"
+#include "tabprintdialog.h"
 
 tabRepairCartridges* tabRepairCartridges::p_instance = nullptr;
 
@@ -199,7 +200,6 @@ void tabRepairCartridges::setReadyToIssue()
 
 void tabRepairCartridges::closeTab()
 {
-    tabRepairs::refreshIfTabExists();
     this->deleteLater();
 }
 
@@ -218,13 +218,9 @@ void tabRepairCartridges::createDialogIssue()
     }
 
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
-    connect(m_dialogIssue, &SDialogIssueRepair::onDelete, this, &tabRepairCartridges::closeDialogIssue);
+    connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printCartridgeWorksReports(list, false);});
     connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepairCartridges::closeTab);
     connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::reloadRepairData);
-}
-
-void tabRepairCartridges::closeDialogIssue()
-{
 }
 
 #ifdef QT_DEBUG

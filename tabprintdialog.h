@@ -12,6 +12,7 @@
 #include <QMetaEnum>
 #include "models/slogrecordmodel.h"
 #include "widgets/sreportscommonfunctions.h"
+#include "reports/sprintposreport.h"
 //#define PRINT_DEBUG_PAGE_INFO
 
 namespace Ui {
@@ -31,6 +32,8 @@ public:
     QString tabTitle() override;
     void startRender();
     static int findPrinterIndex(const QStringList &list, const QString &pName);
+    static void printRepairWorksReports(QList<SRepairModel *> list, bool takeOwn = 0);
+    static void printCartridgeWorksReports(QList<SRepairModel*> list, bool takeOwn = 0);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
     QMap<int, int> PageSizeMap = {
@@ -103,6 +106,7 @@ private:
     void setProgressText(const QString &text);
     void updateProgressWidget();
     bool isPagesPrepared();
+    void setRepairsList(QList<SRepairModel *> list, bool takeOwn = 0);
     void translate();
 #ifdef QT_DEBUG
     void randomFill() override{};

@@ -17,7 +17,6 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
     {
         m_isCartridgeIssue = 1;
         ui->checkBoxWorksDocPrint->setText(tr("Печать чек-акта(ов)", "", m_repairsModels.size()));
-        ui->checkBoxWorksDocPrint->setEnabled(true);    // TODO: убрать когда будет реализована печать акта выполненных работа с пом. LimeReport
     }
     else
     {
@@ -79,6 +78,8 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
 
 SDialogIssueRepair::~SDialogIssueRepair()
 {
+    disconnect();
+    deleteRepairModels();
     delete ui;
 }
 
@@ -261,7 +262,14 @@ void SDialogIssueRepair::buttonIssueClicked()
 
     if(nErr)
     {
+        if(ui->checkBoxWorksDocPrint->isChecked())
+        {
+            m_isListOwner = 0;  // модели не нужно удалять, т. к. производится печать отчетов
+            emit printWorksLists();
+        }
+
         emit issueSuccessfull();
+
         tabRepairs::refreshIfTabExists();
         this->deleteLater();
     }
@@ -369,27 +377,6 @@ void SDialogIssueRepair::issueRepairs()
         if(!nErr)
             throw Global::ThrowType::QueryError;
     }
-
-    if(ui->checkBoxWorksDocPrint->isChecked())
-    {
-        if(m_isCartridgeIssue)
-            printCartridgeWorksReport();
-    }
-}
-
-void SDialogIssueRepair::printCartridgeWorksReport()
-{
-    SPrintPOSReport *posReport = new SPrintPOSReport();
-    posReport->setClientModel(m_clientModel);
-
-    posReport->openPrinter(userLocalData->PosPrinter.value);
-    QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
-    while(i != m_repairsModels.constEnd())
-    {
-        posReport->addPrintJob(*i);
-        i++;
-    }
-    posReport->closePrinter();
 }
 
 /*  Удаление моделей данных ремонтов
@@ -397,6 +384,9 @@ void SDialogIssueRepair::printCartridgeWorksReport()
 */
 void SDialogIssueRepair::deleteRepairModels()
 {
+    if(!m_isListOwner)
+        return;
+
     SRepairModel *repair;
     while(m_repairsModels.count())
     {
@@ -404,6 +394,11 @@ void SDialogIssueRepair::deleteRepairModels()
         m_repairsModels.removeLast();
         delete repair;
     }
+}
+
+void SDialogIssueRepair::setListOwner(bool state)
+{
+    m_isListOwner = state;
 }
 
 void SDialogIssueRepair::buttonCancelClicked()

@@ -28,6 +28,7 @@ private:
     bool saveTemplateToDB();
     void removeReportDataSources();
     void translate();
+    void initWorksDataSources() override;
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
@@ -41,6 +42,10 @@ public slots:
 private slots:
     void reportSaved();
     void reportOnSave(bool&);
+//    void repairsListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+//    void repairsListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
+//    void repairWorksListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+//    void repairWorksListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
 };
 
 #endif // SPAGESETTINGSDOCTEMPATEEDITOR_H

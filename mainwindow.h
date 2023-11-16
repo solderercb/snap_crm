@@ -62,6 +62,7 @@ signals:
 public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();
+    void addTab(QWidget *widget);
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2;
     uint test_scheduler_counter = 0;

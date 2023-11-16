@@ -14,6 +14,8 @@ SReportsCommonFunctions::~SReportsCommonFunctions()
 {
     if(m_repairsDemoModel)
         delete m_repairsDemoModel;
+    if(i_listSourceDataCallbackHandler)
+        delete i_listSourceDataCallbackHandler;
 }
 
 QString SReportsCommonFunctions::hash(QByteArray *data)
@@ -202,6 +204,29 @@ void SReportsCommonFunctions::initDataSources()
     }
 }
 
+void SReportsCommonFunctions::initCustomerDataSources(const int id)
+{
+    m_reportDatasouces << "customer";
+    SClientModel *clientModel = new SClientModel();
+    if(m_reportVars.isEmpty() && id == 0)
+        clientModel->initDemo();
+    else
+        clientModel->load(id);
+    LimeReport::ICallbackDatasource *customerDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(customerDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), clientModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(customerDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), clientModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+
+    m_reportDatasouces << "customerPhones";
+    SPhonesModel *clientPhonesModel = new SPhonesModel();
+    if(m_reportVars.isEmpty())
+        clientPhonesModel->initDemo();
+    else
+        clientPhonesModel->load(clientModel->id());
+    LimeReport::ICallbackDatasource *customerPhonesDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(customerPhonesDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), clientPhonesModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(customerPhonesDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), clientPhonesModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+}
+
 void SReportsCommonFunctions::initRepairDataSources()
 {
     // Источники данных для бланка приёмки такие же, как и для стикера + доп. поля
@@ -230,45 +255,28 @@ void SReportsCommonFunctions::initRepairStickerDataSources()
     QObject::connect(repairDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), repairModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
     QObject::connect(repairDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), repairModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
 
-    m_reportDatasouces << "customer";
-    SClientModel *clientModel = new SClientModel();
-    if(m_reportVars.isEmpty())
-        clientModel->initDemo();
-    else
-        clientModel->load(repairModel->clientId());
-    LimeReport::ICallbackDatasource *customerDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
-    QObject::connect(customerDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), clientModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
-    QObject::connect(customerDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), clientModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
-
-    m_reportDatasouces << "customerPhones";
-    SPhonesModel *clientPhonesModel = new SPhonesModel();
-    if(m_reportVars.isEmpty())
-        clientPhonesModel->initDemo();
-    else
-        clientPhonesModel->load(clientModel->id());
-    LimeReport::ICallbackDatasource *customerPhonesDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
-    QObject::connect(customerPhonesDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), clientPhonesModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
-    QObject::connect(customerPhonesDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), clientPhonesModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+    initCustomerDataSources(repairModel->clientId());
 }
 
 void SReportsCommonFunctions::initWorksDataSources()
 {
-    initRepairStickerDataSources();
+    if(!i_listSourceDataCallbackHandler->isRepairsListSet())
+    {
+        i_clientId = 0;
+        i_listSourceDataCallbackHandler->initDemoRepairsList();
+    }
+
+    initCustomerDataSources(i_clientId);
+
+    m_reportDatasouces << "repair";
+    LimeReport::ICallbackDatasource *repairDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(repairDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), i_listSourceDataCallbackHandler, SLOT(repairsListCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(repairDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), i_listSourceDataCallbackHandler, SLOT(repairsListCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
 
     m_reportDatasouces << "works";
-    SSaleTableModel *worksModel = new SSaleTableModel();
-    if(m_reportVars.isEmpty())
-        worksModel->initDemo();
-    else
-    {
-        if(m_reportVars.value("tableMode").toInt() == SSaleTableModel::TablesSet::WorkshopSale)
-            worksModel->repair_loadTable(m_reportVars.value("repair_id").toInt());
-        else
-            worksModel->store_loadTable(m_reportVars.value("doc_id").toInt());
-    }
     LimeReport::ICallbackDatasource *worksDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
-    QObject::connect(worksDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), worksModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
-    QObject::connect(worksDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), worksModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+    QObject::connect(worksDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), i_listSourceDataCallbackHandler, SLOT(repairWorksListCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(worksDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), i_listSourceDataCallbackHandler, SLOT(repairWorksListCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
 }
 
 void SReportsCommonFunctions::initItemStickerDataSources()
@@ -282,7 +290,7 @@ void SReportsCommonFunctions::initItemStickerDataSources()
 
     m_reportDatasouces << "demoList";
     itemsModel = new QSqlQueryModel();
-    itemsModel->setQuery("SELECT CONCAT(LPAD(store_items.`id`, 6, '0'), '-', LPAD(store_items.`articul`, 6, '0')) AS 'UID', store_items.* FROM store_items WHERE `id` IN (16466,23452);", QSqlDatabase::database("connMain"));
+    itemsModel->setQuery("SELECT CONCAT(LPAD(store_items.`id`, 6, '0'), '-', LPAD(store_items.`articul`, 6, '0')) AS 'UID', store_items.* FROM store_items LIMIT 2;", QSqlDatabase::database("connMain"));
     m_report->dataManager()->addModel(m_reportDatasouces.last(), itemsModel, true);
 }
 
@@ -313,3 +321,105 @@ void SReportsCommonFunctions::initRepairsDataSources()
     QObject::connect(repairsDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), model, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
 }
 
+/***************************************************************************************************************************************************
+*/
+SListSourceDataCallbackHandler::SListSourceDataCallbackHandler()
+{
+
+}
+
+SListSourceDataCallbackHandler::~SListSourceDataCallbackHandler()
+{
+    if(m_repairsListOwned)
+        while(!m_repairsList.isEmpty())
+        {
+            SRepairModel *m = m_repairsList.takeLast();
+            delete m;
+        }
+}
+
+void SListSourceDataCallbackHandler::setRepairsList(const QList<SRepairModel *> &list, bool takeOwn)
+{
+    if(list.isEmpty())
+        return;
+
+    m_repairsListSet = 1;
+    m_repairsList = list;
+    m_repairsListOwned = takeOwn;
+    m_repairsListItem = m_repairsList.constBegin();
+}
+
+void SListSourceDataCallbackHandler::initDemoRepairsList()
+{
+    SRepairModel *repair;
+    SSaleTableModel *works;
+    repair = new SRepairModel();
+    works = new SSaleTableModel();
+    repair->initDemo();
+    works->initDemo();
+    repair->setWorksAndPartsModel(works);
+    m_repairsList.append(repair);
+    m_repairsListSet = 1;
+    m_repairsListOwned = 1;
+    m_repairsListItem = m_repairsList.constBegin();
+}
+
+bool SListSourceDataCallbackHandler::isRepairsListSet() const
+{
+    return m_repairsListSet;
+}
+
+void SListSourceDataCallbackHandler::repairsListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
+{
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = (*m_repairsListItem)->id()?0:1; break;
+        case LimeReport::CallbackInfo::HasNext: data = (m_repairsListItem != m_repairsList.constEnd()); break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = (*m_repairsListItem)->metaObject()->property(info.index + (*m_repairsListItem)->metaObject()->propertyOffset()).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = (*m_repairsListItem)->metaObject()->property((*m_repairsListItem)->metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(*m_repairsListItem); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = (*m_repairsListItem)->metaObject()->propertyCount() - (*m_repairsListItem)->metaObject()->propertyOffset(); break;
+        case LimeReport::CallbackInfo::RowCount: data = m_repairsList.count(); break;
+    }
+    return;
+}
+
+void SListSourceDataCallbackHandler::repairsListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
+{
+    if(type == LimeReport::CallbackInfo::Next)
+    {
+        m_repairsListItem++;
+        if(m_repairsListItem == m_repairsList.constEnd())
+        {
+            m_repairsListItem--;
+            result = 0;
+            return;
+        }
+    }
+    else
+    {
+        m_repairsListItem = m_repairsList.constBegin();
+    }
+    result = 1;
+    return;
+}
+
+void SListSourceDataCallbackHandler::repairWorksListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
+{
+    SSaleTableModel *works = (*m_repairsListItem)->worksAndPartsModel();
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = works->rowCount()?0:1; break;
+        case LimeReport::CallbackInfo::HasNext: data = 0; break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = works->metaObject()->property(info.index + works->metaObject()->propertyOffset()).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = works->metaObject()->property(works->metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(works); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = works->metaObject()->propertyCount() - works->metaObject()->propertyOffset(); break;
+        case LimeReport::CallbackInfo::RowCount: data = works->rowCount(); break;
+    }
+    return;
+}
+
+void SListSourceDataCallbackHandler::repairWorksListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
+{
+    (*m_repairsListItem)->worksAndPartsModel()->reportCallbackDataChangePos(type, result);
+    return;
+}

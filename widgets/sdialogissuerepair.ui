@@ -61,7 +61,7 @@
        <item>
         <widget class="QCheckBox" name="checkBoxWorksDocPrint">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="layoutDirection">
           <enum>Qt::RightToLeft</enum>

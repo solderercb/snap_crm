@@ -55,6 +55,7 @@ class SRepairModel : public SComRecord
     Q_PROPERTY(QString preAgreedAmount READ preAgreedAmountStr)
     Q_PROPERTY(QString repairCost READ repairCostStr)
     Q_PROPERTY(QString realRepairCost READ realRepairCostStr)
+    Q_PROPERTY(QString realRepairCostWords READ realRepairCostInWords)
     Q_PROPERTY(QString partsCost READ partsCostStr)
     Q_PROPERTY(QString realWorksCost READ realWorksCostStr)
     Q_PROPERTY(QString realPartsCost READ realPartsCostStr)
@@ -317,6 +318,7 @@ private:
     QString preAgreedAmountStr();
     QString repairCostStr();
     QString realRepairCostStr();
+    QString realRepairCostInWords();
     QString partsCostStr();
     QString realWorksCostStr();
     QString realPartsCostStr();

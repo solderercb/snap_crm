@@ -137,7 +137,6 @@ private slots:
     void updateTotalSumms(const double, const double, const double);
     void saveTotalSumms();
     void createDialogIssue();
-    void closeDialogIssue();
     void openPrevRepair();
     void printStickers(int);
     void changeOffice(int);

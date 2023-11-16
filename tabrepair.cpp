@@ -2,6 +2,7 @@
 #include "appver.h"
 #include "tabrepair.h"
 #include "ui_tabrepair.h"
+#include "tabprintdialog.h"
 
 QMap<int, tabRepair*> tabRepair::p_instance;
 
@@ -536,13 +537,9 @@ void tabRepair::createDialogIssue()
 
     list.append(repairModel);
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
-    connect(m_dialogIssue, SIGNAL(onDelete()), this, SLOT(closeDialogIssue()));
-    connect(m_dialogIssue, SIGNAL(issueSuccessfull()), this, SLOT(reloadRepairData()));
-//    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepair::reloadRepairData);
-}
-
-void tabRepair::closeDialogIssue()
-{
+    connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printRepairWorksReports(list, false);});
+    connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepair::reloadRepairData);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepair::reloadRepairData);
 }
 
 void tabRepair::openPrevRepair()

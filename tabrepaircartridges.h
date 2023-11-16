@@ -44,7 +44,6 @@ public slots:
 private slots:
     void reloadRepairData();
     void createDialogIssue();
-    void closeDialogIssue();
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();
     void reloadCardModel(int id);

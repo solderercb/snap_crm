@@ -58,6 +58,7 @@ private:
     QMenu *tableCartridgesMenu = nullptr;
     void initTableRepairsMenu();
     void initTableCartridgesMenu();
+    QList<SRepairModel*> repairsListFromSelection();
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
@@ -79,10 +80,9 @@ private slots:
     void buttonPrintClicked();
     void tableSelectionChanged(const QItemSelection &, const QItemSelection &);
     void createDialogIssue();
-    void closeDialogIssue();
     void menuRequest(QPoint pos);
-    void printCartridgeReceiptReport();
-    void printCartridgeWorksReport();
+    void printCartridgeReceiptReports();
+    void printCartridgeWorksReports();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

@@ -36,7 +36,8 @@ class SSaleTableModel : public QStandardItemModel
     Q_PROPERTY(QString performer READ reportPerformer)
     Q_PROPERTY(QString worksAmount READ amountWorksLocale)
     Q_PROPERTY(QString itemsAmount READ amountItemsLocale)
-    Q_PROPERTY(QString amount READ amountTotalLocale)
+    Q_PROPERTY(double amount READ amountTotal)
+    Q_PROPERTY(QString amountStr READ amountTotalLocale)
 public:
     enum State {StoreNew = 0, StoreSold = 1, StoreReserved = 2, StoreCancelled = 3, WorkshopRW = 4, WorkshopRO = 5, WorkshopAdm = 6};
     enum class StoreOpType {Reserve = 0, Sale, Unsale, FreeReserved};

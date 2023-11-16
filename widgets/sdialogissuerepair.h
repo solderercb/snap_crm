@@ -25,6 +25,7 @@ class SDialogIssueRepair : public SModalWidget
 signals:
     void issueSuccessfull();
     void issueFailed();
+    void printWorksLists();
 public:
     explicit SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowFlags flags = Qt::WindowFlags(), QWidget *parent = nullptr);
     ~SDialogIssueRepair();
@@ -32,6 +33,7 @@ public:
     void setClientModel(SClientModel *model);
     void setSaleTableModel(SSaleTableModel *model);
     void deleteRepairModels();
+    void setListOwner(bool state);
 private:
     Ui::SDialogIssueRepair *ui;
     bool m_summsNotEq = 0;
@@ -47,6 +49,7 @@ private:
     double m_totalAmount = 0;
     double m_totalAmountToPay = 0;
     bool m_isCartridgeIssue = 0;
+    bool m_isListOwner = 0; // индикатор для удаления моделей ремонтов после закрытия диалога
     void setDefaultStyleSheets();
     void initPaymentSystems();
     bool checkInput();
@@ -54,7 +57,6 @@ private:
     void collectRepairsData();
     void setRepairReady(SRepairModel *model);
     void issueRepairs();
-    void printCartridgeWorksReport();
 private slots:
     void buttonIssueClicked();
     void buttonCancelClicked();

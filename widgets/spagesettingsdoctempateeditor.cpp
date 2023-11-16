@@ -184,6 +184,16 @@ void SPageSettingsDocTempateEditor::reportOnSave(bool&)
     saveTemplateToDB();
 }
 
+/* Дэмо-данные
+*/
+void SPageSettingsDocTempateEditor::initWorksDataSources()
+{
+    if(!i_listSourceDataCallbackHandler)
+        i_listSourceDataCallbackHandler = new SListSourceDataCallbackHandler();
+
+    SReportsCommonFunctions::initWorksDataSources();
+}
+
 #ifdef QT_DEBUG
 void SPageSettingsDocTempateEditor::randomFill()
 {

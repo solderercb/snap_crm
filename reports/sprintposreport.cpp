@@ -35,7 +35,8 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
                  << EscPosQt::EscPosPrinter::lineSpacing(24);
         *printer << EscPosQt::EscPosPrinter::PrintModes(EscPosQt::EscPosPrinter::PrintModeDoubleWidth)
           << EscPosQt::EscPosPrinter::JustificationCenter
-          << officesModel->value(userDbData->currentOffice, "id", "name").toString();
+          << officesModel->value(userDbData->currentOffice, "id", "name").toString()
+          << "\n";
 
         *printer << EscPosQt::EscPosPrinter::PrintModes()
           << companiesModel->value(userDbData->company, "id", "name").toString()
