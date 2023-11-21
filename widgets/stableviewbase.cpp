@@ -67,6 +67,21 @@ bool STableViewBase::eventFilter(QObject *object, QEvent *event)
             adoptAutosizedColumns();
         }
     }
+
+    if (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab)
+        {
+            switch(keyEvent->modifiers())
+            {
+                case Qt::ControlModifier | Qt::ShiftModifier:
+                case Qt::ControlModifier:  event->ignore(); return true;  // Ctrl+Tab и Ctrl+Shift+Tab для переключения вкладок, а не навигации по полям таблицы
+                default: ;
+            }
+        }
+    }
+
     return false;
 }
 

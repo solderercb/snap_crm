@@ -208,7 +208,7 @@ bool tabCashOperation::commit(bool repeatAfter)
         cashRegister->setCreatedDate(ui->dateEdit->date());
     else
         cashRegister->setCreatedDate(QDate::currentDate());
-    cashRegister->setAmount(ui->doubleSpinBoxAmount->value());
+    cashRegister->setAmount(amountAbsToSign(ui->doubleSpinBoxAmount->value()));
     cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
     cashRegister->setReason(ui->lineEditReason->text());    // если пользователь отредактировал автоматически сгенерированный комментарий
     cashRegister->setSkipLogRecording(m_skipAutoLogRecord);
@@ -362,13 +362,13 @@ void tabCashOperation::print()
     emit generatePrintout(report_vars);
 }
 
+/* Установка значения в поле на вкладке
+ * Используется при создании шаблонного кассового ордера и в методе randomFill
+*/
 void tabCashOperation::setAmount(const double amount)
 {
-    double l_amount = amount;
-    if(l_amount < 0)
-        l_amount = -l_amount;
-    ui->doubleSpinBoxAmount->setValue(l_amount);
-    amountChanged(amount);
+    double amountAbs = qMax(-amount, amount);
+    ui->doubleSpinBoxAmount->setValue(amountAbs);
 }
 
 void tabCashOperation::updateOrderIdLineEdit()
@@ -852,6 +852,13 @@ void tabCashOperation::buttonRevertClicked()
     emit createTabUndoOperation(tabCashOperation::RKO, data);
 }
 
+/* Преобразование абсолютного значения в значение со знаком
+*/
+double tabCashOperation::amountAbsToSign(const double amountAbs)
+{
+    return (m_orderId == Type::RKO)?-amountAbs:amountAbs;
+}
+
 /* Слот, вызываемый по сигналу spinBox'а
  * spinBox должен принимать только абсолютное знаение
 */
@@ -860,9 +867,7 @@ void tabCashOperation::amountChanged(double amountAbs)
     if(m_orderId > 0)
         return;
 
-    m_amount = amountAbs;
-    if(m_orderId == Type::RKO)
-        m_amount = -m_amount;
+    m_amount = amountAbsToSign(amountAbs);
     cashRegister->setAmount(m_amount);
     if(ui->lineEditReason->isReadOnly())
     {

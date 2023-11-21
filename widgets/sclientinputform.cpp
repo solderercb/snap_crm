@@ -23,7 +23,7 @@ SClientInputForm::~SClientInputForm()
 void SClientInputForm::initWidgets()
 {
     ui->pushButtonCreateTabClient->hide();  // кнопка открытия карточки клиента будет отображаться, только когда выбран клиент из базы
-    ui->comboBoxClientAdType->lineEdit()->setPlaceholderText(tr("источник обращения"));
+    ui->comboBoxClientAdType->setPlaceholderText(tr("источник обращения"));
     ui->comboBoxClientAdType->setButtons("Clear");
 
     setDefaultStyleSheets();

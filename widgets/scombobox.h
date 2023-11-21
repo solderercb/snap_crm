@@ -15,6 +15,8 @@ class SComboBox : public QComboBox
 {
     Q_OBJECT
     Q_PROPERTY(QString Buttons READ buttons WRITE setButtons NOTIFY buttonsChanged)
+    Q_PROPERTY(bool selectOnTab READ isSelectOnTab WRITE setSelectOnTab)    // выбор выделенного элемента выпадающего списка по Tab
+    Q_PROPERTY(bool keepCustomText READ isKeepCustomText WRITE setKeepCustomText)   // сохранить введённый текст при при нажатии Tab/Enter
 signals:
     void buttonClicked(int buttonId = 0);
     void buttonsChanged();
@@ -28,16 +30,17 @@ public:
     bool eventFilter(QObject *watched, QEvent *e) override;
     void resizeEvent(QResizeEvent*) override;
     int currentDbId();
+    void initLineEdit();
     void setEditable(bool editable);
     void showPopup() override;
     void hidePopup() override;
     QString buttons();
     void setButtons(const QString &buttons);
-    void setPlaceholderText(const QString &placeholderText);
+    void setPlaceholderText(const QString &text);
 protected:
     QAbstractItemView *listViewWidget = nullptr;
     QFontMetrics *fontMetrics;
-    SLineEdit *lineEditWidget;
+    SLineEdit *lineEditWidget = nullptr;
     virtual void retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text = QString(), bool autorep = false, ushort count = 1);
     bool ignoreFocusOut() const;
     void setIgnoreFocusOut(bool state);
@@ -53,11 +56,18 @@ private:
     QSize minSzHint;
     bool m_ignoreFocusOut = 0;
     bool m_considerCursorPosOnHide = 1;
+    uchar m_customInput = 0;
+    bool m_lineEditRO = 1;
+    bool m_selectOnTab = 1;
+    bool m_keepCustomText = 1;
     bool eventFilterComboBox(QEvent *e);
     bool eventFilterLineEdit(QEvent *e);
     bool eventFilterListView(QEvent *e);
     bool isPointInArea(const QPoint &point,  const QRect &area) const;
-
+    bool isSelectOnTab();
+    void setSelectOnTab(const bool state);
+    bool isKeepCustomText();
+    void setKeepCustomText(const bool state);
 private slots:
     void longTextHandler();
     void clearButtonPress(int);

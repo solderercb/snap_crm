@@ -34,7 +34,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     else
         ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
 
-    ui->comboBoxClientAdType->lineEdit()->setPlaceholderText(tr("источник обращения"));
+    ui->comboBoxClientAdType->setPlaceholderText(tr("источник обращения"));
     ui->comboBoxClientAdType->setButtons("Clear");
     ui->comboBoxClientAdType->setModel(clientAdTypesList);
     ui->comboBoxClientAdType->setCurrentIndex(-1);
@@ -61,6 +61,25 @@ QString tabClients::tabTitle()
         return tr("Клиенты");
 }
 
+bool tabClients::event(QEvent *event)
+{
+    if (event->type() == QEvent::ShortcutOverride)
+    {
+        // TODO: настраиваемые горячие клавиши
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+            switch(keyEvent->key())
+            {
+                // вызов метода accept() останавливает распространение события на родительские объекты (MainWindow не получит ShortcutOverride),
+                // однако, следующие за ним события keyPress и keyRelease распространяются; TODO: разобраться нужно ли их фильтровать тоже
+                case Qt::Key_F: setFocusSearchField(); event->accept(); break;
+                case Qt::Key_N: createNewClient(); event->accept(); break;
+                default: ;
+            }
+    }
+    return tabCommon::event(event);
+}
+
 tabClients* tabClients::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна
 {
     if( !p_instance[type] )
@@ -68,10 +87,10 @@ tabClients* tabClients::getInstance(bool type, MainWindow *parent)   // singleto
     return p_instance[type];
 }
 
-void tabClients::lineEditSearchSetFocus()
+void tabClients::setFocusSearchField()
 {
-//    ui->lineEditSearch->setFocusPolicy(Qt::StrongFocus);
-    ui->lineEditSearch->setFocus();
+    ui->lineEditSearch->setFocus(Qt::MouseFocusReason);
+    ui->lineEditSearch->selectAll();
 }
 
 void tabClients::refreshTable(bool preserveScrollPos, bool preserveSelection)
@@ -161,6 +180,11 @@ void tabClients::buttonRefreshClicked()
 void tabClients::autorefreshTable()
 {
     refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
+}
+
+void tabClients::createNewClient()
+{
+
 }
 
 

@@ -144,6 +144,7 @@ SSetComboBox::SSetComboBox(QWidget *parent) :
     SComboBox(parent)
 {
     setEditable(true);
+    setProperty("selectOnTab", false);
     setInsertPolicy(SComboBox::NoInsert);    // введённые пользователем не нужно добавлять в выпадающий список.
     setRowHeight(16);
     lineEditWidget->enableAutoSetCursorPositionToBegin(false);
@@ -368,6 +369,7 @@ void SSetComboBox::hidePopup()
         SComboBox::hidePopup();
     }
     setIgnorePopupHide(0);
+    updateLineEditGeometry();
 }
 
 QString SSetComboBox::version()
@@ -569,8 +571,16 @@ void SSetComboBox::updateLineEditGeometry()
 
 void SSetComboBox::updatePopupGeometry()
 {
-    if(popupWidget)
+
+
+   if(popupWidget)
         popupWidget->move(popupWidget->x(), mapToGlobal(lineEditWidget->pos()).y() + lineEditWidget->height());
+}
+
+void SSetComboBox::setCurrentIndex(int index)
+{
+    SComboBox::setCurrentIndex(index);
+    updateLineEditGeometry();
 }
 
 QString SSetComboBox::text()

@@ -59,12 +59,14 @@ private:
     void initTableRepairsMenu();
     void initTableCartridgesMenu();
     QList<SRepairModel*> repairsListFromSelection();
+    bool event(QEvent *event) override;
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
 public slots:
     void autorefreshTable();
     void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
+    void setFocusSearchField();
 private slots:
     void tableItemDoubleClick(QModelIndex);
     void tableItemClick(QModelIndex index);

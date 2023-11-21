@@ -377,6 +377,46 @@ void MainWindow::addTab(QWidget *widget)
     ui->tabWidget->setCurrentWidget(tab);
 }
 
+bool MainWindow::event(QEvent *event)
+{
+    if (event->type() == QEvent::ShortcutOverride)
+    {
+        // TODO: настраиваемые горячие клавиши
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if(!keyEvent->modifiers())
+        {
+            switch(keyEvent->key())
+            {
+                case Qt::Key_F1: createTabRepairs(); break;
+                case Qt::Key_F2: createTabStoreItems(); break;
+                case Qt::Key_F3: createTabClients(); break;
+                case Qt::Key_F4: createTabCashOrders(); break;
+//                case Qt::Key_F5: break;   // в АСЦ нет реакции на эту кнопку
+                case Qt::Key_F6: createTabTasks(); break;
+                case Qt::Key_F7: createTabSettings(); break;
+            }
+            event->accept();
+            return true;
+        }
+
+        if(keyEvent->modifiers().testFlag(Qt::ControlModifier) && keyEvent->key() == Qt::Key_W)
+        {
+            ui->tabWidget->currentWidget()->deleteLater();
+            switchToLastUsedTab();
+        }
+
+        // Если фокус на кнопке меню главного окна, то сочетания Ctrl+Tab/Ctrl+Shift+Tab не переключают вкладку, т. к. QTabWidget не является родителем
+        // этой кнопки и событие не распространяется на него
+        if( (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab) && (keyEvent->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier)) )
+        {
+            if(ui->tabWidget->count() > 0)    // Если нет открытых вкладок, то сочетание клавиш игнорируется (иначе программа падает)
+                if(QString("QToolButton").compare(MainWindow::getInstance()->focusWidget()->metaObject()->className()) == 0)
+                    ui->tabWidget->currentWidget()->setFocus();
+        }
+    }
+    return QMainWindow::event(event);
+}
+
 MainWindow* MainWindow::getInstance(windowsDispatcher *parent)   // singleton: MainWindow только один объект
 {
     if( !p_instance )
@@ -408,6 +448,7 @@ void MainWindow::createTabRepairs(int type, QWidget* caller)
     }
 
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Ремонты/Выбрать ремонт
+    subwindow->setFocusSearchField();
 }
 
 void MainWindow::createTabRepair(int repair_id)
@@ -467,6 +508,21 @@ void MainWindow::createTabReceptCartridge()
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
+}
+
+void MainWindow::createTabStoreItems()
+{
+
+}
+
+void MainWindow::createTabCashOrders()
+{
+
+}
+
+void MainWindow::createTabTasks()
+{
+
 }
 
 void MainWindow::createTabPrint(QMap<QString, QVariant> report_vars)
@@ -663,7 +719,7 @@ void MainWindow::createTabClients(int type, QWidget *caller)
     }
 
     ui->tabWidget->setCurrentWidget(subwindow);
-    subwindow->lineEditSearchSetFocus();
+    subwindow->setFocusSearchField();
 
 }
 
@@ -1036,6 +1092,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabCashOperation(42268);
 //        createTabClient(143);
 //        createTabCashMoveExch();
+//        createTabClients();
 
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("type", Global::Reports::new_rep);

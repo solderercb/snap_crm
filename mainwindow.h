@@ -43,11 +43,8 @@ class MainWindow;
 class tabBarEventFilter : public QObject
 {
     Q_OBJECT
-signals:
-
 public:
     tabBarEventFilter(QObject*);
-private:
 protected:
     bool eventFilter(QObject*, QEvent*) override;
 };
@@ -63,6 +60,7 @@ public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();
     void addTab(QWidget *widget);
+    bool event(QEvent *event) override;
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2;
     uint test_scheduler_counter = 0;
@@ -71,7 +69,7 @@ private:
     explicit MainWindow(windowsDispatcher *parent = nullptr);
     Ui::MainWindow *ui;
     static MainWindow* p_instance;
-    void closeEvent(QCloseEvent*);
+    void closeEvent(QCloseEvent*) override;
     void createMenu();
     void readGoods(const QModelIndex &index, const QString &warehouse_code);
 	void readConsignments(const QModelIndex &index, const QString &warehouse_code);
@@ -116,6 +114,9 @@ private slots:
     void createTabSettings();
     void createTabSalary();
     void createTabReceptCartridge();
+    void createTabStoreItems();
+    void createTabCashOrders();
+    void createTabTasks();
     bool closeTab(int index);
     void updateTabTitle(QWidget*);
     void updateTabIcon(QWidget*);

@@ -193,6 +193,12 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
         tableUpdateDelay->start(userDbData->refreshTime*1000);
 }
 
+void tabRepairs::setFocusSearchField()
+{
+    ui->lineEditSearch->setFocus(Qt::MouseFocusReason);
+    ui->lineEditSearch->selectAll();
+}
+
 void tabRepairs::autorefreshTable()
 {
     refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
@@ -337,6 +343,27 @@ QList<SRepairModel*> tabRepairs::repairsListFromSelection()
     delete idsList;
 
     return list;
+}
+
+bool tabRepairs::event(QEvent *event)
+{
+    if (event->type() == QEvent::ShortcutOverride)
+    {
+        // TODO: настраиваемые горячие клавиши
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+            switch(keyEvent->key())
+            {
+                // вызов метода accept() останавливает распространение события на родительские объекты (MainWindow не получит ShortcutOverride),
+                // однако, следующие за ним события keyPress и keyRelease распространяются; TODO: разобраться нужно ли их фильтровать тоже
+                case Qt::Key_F: setFocusSearchField(); event->accept(); break;
+                case Qt::Key_N: buttonReceptClicked(); event->accept(); break;
+                case Qt::Key_M: ui->switchTableMode->toggle(); event->accept(); break;
+                case Qt::Key_P: buttonPrintClicked(); break;
+                default: ;
+            }
+    }
+    return tabCommon::event(event);
 }
 
 void tabRepairs::createDialogIssue()

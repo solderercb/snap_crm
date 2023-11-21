@@ -128,7 +128,8 @@ private:
     QLineEdit *keyPressReceiver;
     int rearrangeDaughterLineEdits(int);
     void updatePopupGeometry();
-
+public slots:
+    void setCurrentIndex(int index);
 private slots:
     void comboBoxSetFocus();
     void addItem(const QString &text);

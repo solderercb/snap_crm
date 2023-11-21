@@ -26,6 +26,9 @@
        </property>
        <item row="0" column="0">
         <widget class="STableViewRepairs" name="tableView">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="selectionBehavior">
           <enum>QAbstractItemView::SelectRows</enum>
          </property>
@@ -69,6 +72,9 @@
             </property>
             <item row="0" column="0">
              <widget class="QPushButton" name="switchTableMode">
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
               <property name="toolTip">
                <string>Сохранять список работ и деталей после каждого изменения</string>
               </property>
@@ -121,6 +127,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
            <layout class="QGridLayout" name="CentralGridLayout_2">
             <item row="0" column="0">
              <widget class="QPushButton" name="pushButtonReceipt">
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
               <property name="text">
                <string>Принять</string>
               </property>
@@ -133,6 +142,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
               </property>
               <property name="text">
                <string>Параметры</string>
@@ -154,6 +166,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
             </item>
             <item row="0" column="1">
              <widget class="QPushButton" name="pushButtonRefill">
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
               <property name="text">
                <string>Заправка</string>
               </property>
@@ -163,6 +178,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
              <widget class="QPushButton" name="pushButtonRefresh">
               <property name="enabled">
                <bool>true</bool>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
               </property>
               <property name="text">
                <string>Обновить</string>
@@ -174,6 +192,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
               <property name="enabled">
                <bool>true</bool>
               </property>
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
               <property name="text">
                <string>Печать</string>
               </property>
@@ -181,6 +202,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
             </item>
             <item row="0" column="2">
              <widget class="QPushButton" name="pushButtonIssue">
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
               <property name="text">
                <string>Выдать</string>
               </property>
@@ -264,8 +288,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>pushButtonMenu</tabstop>
-  <tabstop>pushButtonRefresh</tabstop>
+  <tabstop>lineEditSearch</tabstop>
+  <tabstop>tableView</tabstop>
  </tabstops>
  <resources>
   <include location="styles/styles.qrc"/>

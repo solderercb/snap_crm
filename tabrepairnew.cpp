@@ -86,9 +86,9 @@ void tabRepairNew::initWidgets()
     ui->checkBoxIsQuick->setVisible(permissions->createQuickRepair);
 
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-    ui->comboBoxProblem->lineEdit()->setPlaceholderText(tr("неисправность"));
-    ui->comboBoxIncomingSet->lineEdit()->setPlaceholderText(tr("комплектность"));
-    ui->comboBoxExterior->lineEdit()->setPlaceholderText(tr("внешний вид"));
+    ui->comboBoxProblem->setPlaceholderText(tr("неисправность"));
+    ui->comboBoxIncomingSet->setPlaceholderText(tr("комплектность"));
+    ui->comboBoxExterior->setPlaceholderText(tr("внешний вид"));
     ui->comboBoxDeviceClass->setPlaceholderText(tr("устройство"));
     ui->comboBoxDeviceVendor->setPlaceholderText(tr("производитель"));
     ui->comboBoxDevice->lineEdit()->setPlaceholderText(tr("модель"));

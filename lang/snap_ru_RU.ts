@@ -4240,32 +4240,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableViewBase</name>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="427"/>
+        <location filename="../widgets/stableviewbase.cpp" line="442"/>
         <source>Автоширина</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="433"/>
+        <location filename="../widgets/stableviewbase.cpp" line="448"/>
         <source>Размер по содержимому</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="438"/>
+        <location filename="../widgets/stableviewbase.cpp" line="453"/>
         <source>Вписать все</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="443"/>
+        <location filename="../widgets/stableviewbase.cpp" line="458"/>
         <source>Сделать значением по умолчанию</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="448"/>
+        <location filename="../widgets/stableviewbase.cpp" line="463"/>
         <source>Скрыть</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="454"/>
+        <location filename="../widgets/stableviewbase.cpp" line="469"/>
         <source>Выбрать столбцы</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7015,47 +7015,47 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="73"/>
+        <location filename="../tabrepairs.ui" line="79"/>
         <source>Сохранять список работ и деталей после каждого изменения</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="108"/>
+        <location filename="../tabrepairs.ui" line="114"/>
         <source>labelTableMode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="125"/>
+        <location filename="../tabrepairs.ui" line="134"/>
         <source>Принять</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="158"/>
+        <location filename="../tabrepairs.ui" line="173"/>
         <source>Заправка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="168"/>
+        <location filename="../tabrepairs.ui" line="186"/>
         <source>Обновить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="178"/>
+        <location filename="../tabrepairs.ui" line="199"/>
         <source>Печать</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="138"/>
+        <location filename="../tabrepairs.ui" line="150"/>
         <source>Параметры</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="185"/>
+        <location filename="../tabrepairs.ui" line="209"/>
         <source>Выдать</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.ui" line="231"/>
+        <location filename="../tabrepairs.ui" line="255"/>
         <source>Поиск</source>
         <translation type="unfinished"></translation>
     </message>

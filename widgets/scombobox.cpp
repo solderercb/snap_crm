@@ -7,14 +7,6 @@ SComboBox::SComboBox(QWidget *parent) :
     installEventFilter(this);
     szHint = QComboBox::sizeHint();
     minSzHint = QComboBox::minimumSizeHint();
-    lineEditWidget = new SLineEdit();
-    lineEditWidget->setReadOnly(true);
-    lineEditWidget->installEventFilter(this);
-    lineEditWidget->enableAutoSetCursorPositionToBegin(false);
-    resize(size().width(), lineEditWidget->minimumSizeHint().height()+1);
-    connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::clearButtonPress);
-    connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::buttonClicked);
-    setLineEdit(lineEditWidget);
 }
 
 SComboBox::~SComboBox()
@@ -49,12 +41,12 @@ bool SComboBox::eventFilter(QObject *watched, QEvent *e)
 {
     if(watched == this)
         return eventFilterComboBox(e);
-    else if(watched == lineEditWidget)
+    else if(lineEditWidget && watched == lineEditWidget)
         return eventFilterLineEdit(e);
     else if(watched == listViewWidget)
         return eventFilterListView(e);
-    else
-        return false;
+
+    return false;
 }
 
 bool SComboBox::eventFilterComboBox(QEvent *e)
@@ -62,7 +54,9 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
     if(e->type() == QEvent::MouseButtonPress )
     {
         if(!isEnabled())
+        {
             return true;
+        }
 
         // это событие происходит только когда список не отображается
         QMouseEvent *me = static_cast<QMouseEvent*>(e);
@@ -84,11 +78,11 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
         }
     }
 
-    if(e->type() == QEvent::MouseButtonDblClick)
-    {
-        lineEditWidget->selectAll();
-        return true;
-    }
+//    if(e->type() == QEvent::MouseButtonDblClick)
+//    {
+//        lineEditWidget->selectAll();
+//        return true;
+//    }
 
     // Раскрытие списка при переключении на виджет по Tab/Shift+Tab
     if ( e->type() == QEvent::FocusIn )
@@ -102,10 +96,21 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
 
     if ( e->type() == QEvent::KeyPress )
     {
-        int key = static_cast<QKeyEvent*>(e)->key();
-        // если поле пустое, то нажатие Enter вызовет отображение раскрывающегося списка. Это для удобства работы с клавиатурой
-        if ( (key == Qt::Key_Enter || key == Qt::Key_Return) && lineEdit()->text() == "" )
+        // если поле редактируемое и пустое, то по нажатию Enter отображается выпадающий список,
+        // а если поле не редактируемое, то список также отображается по нажатию Пробел
+        bool show = 0;
+        switch (static_cast<QKeyEvent*>(e)->key())
+        {
+            case Qt::Key_Space: show = m_lineEditRO; break;
+            case Qt::Key_Enter:
+            case Qt::Key_Return: show = m_lineEditRO || (currentText() == ""); break;
+            default: ;
+        }
+        if(show)
+        {
             showPopup();
+            toggleIsPopupVisible();
+        }
     }
 
     // после переключения в другое окно список прячется
@@ -128,6 +133,9 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
 
 bool SComboBox::eventFilterLineEdit(QEvent *e)
 {
+    if(!lineEditWidget)
+        return false;
+
     if(e->type() == QEvent::MouseButtonPress)    // щелчек по LineEdit
     {
         if(!isEnabled())
@@ -147,6 +155,17 @@ bool SComboBox::eventFilterLineEdit(QEvent *e)
         setIsPopupVisible(0);
         return true;
     }
+    else if ( e->type() == QEvent::KeyPress )
+    {
+        int key = static_cast<QKeyEvent*>(e)->key();
+        // если поле пустое, то нажатие Enter вызовет отображение раскрывающегося списка. Это для удобства работы с клавиатурой
+        if ( key == Qt::Key_Space && lineEdit()->isReadOnly() )
+        {
+            e->ignore();
+            showPopup();
+        }
+    }
+
     return false;
 }
 
@@ -157,14 +176,37 @@ bool SComboBox::eventFilterListView(QEvent *e)
         return true;
     }
 
-    if (e->type() == QEvent::ShortcutOverride)
+    if (e->type() == QEvent::KeyPress)
     {
-        int key = static_cast<QKeyEvent*>(e)->key();
-        int modifiers = static_cast<QKeyEvent*>(e)->modifiers();
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
+        int key = keyEvent->key();
+        int modifiers = keyEvent->modifiers();
 
         // при выборе элемента списка клавиатурой, нужно игнорировать позицию курсора, которая учитывается в событии скрытия списка
         if( (key == Qt::Key_Return) || (key == Qt::Key_Enter) )
             setConsiderCursorPosOnHide(0);
+
+        // в lineEdit ретранслируем все нажатия кроме:
+        //      Down/Up
+        //      Enter/Return
+        //      печатных символов в режиме readOnly
+        bool retranslate = !m_lineEditRO;
+        switch(key)
+        {
+            case Qt::Key_Down:
+            case Qt::Key_Up: m_customInput = 0; Q_FALLTHROUGH();
+            case Qt::Key_Enter:
+            case Qt::Key_Return: retranslate = 0; break;
+            case Qt::Key_Tab:
+            case Qt::Key_Backtab: retranslate = 1; break;
+            case Qt::Key_Control: break;
+            default: m_customInput = 1;
+        }
+        if(retranslate)
+        {
+            retranslateKey(QEvent::KeyPress, key, (Qt::KeyboardModifiers)modifiers,
+                           keyEvent->text(), keyEvent->isAutoRepeat(), keyEvent->count());
+        }
 
         // прячем раскрывающийся список при (ИЛИ):
         //      Tab/Shift+Tab
@@ -178,25 +220,35 @@ bool SComboBox::eventFilterListView(QEvent *e)
             QComboBox::hidePopup();
             setIsPopupVisible(0);
         }
+
+        switch(key)
+        {
+            case Qt::Key_Tab:
+                if( m_selectOnTab && (!(m_keepCustomText && m_customInput) || m_lineEditRO) )
+                {
+                    setCurrentIndex(listViewWidget->currentIndex().row());
+                    break;
+                }
+            default: ;
+        }
+
+        return false;
     }
 
-    // ретрансляция нажатых клавиш (ввод значения вручную без закрытия списка)
-    if (e->type() == QEvent::KeyPress)
+    if (e->type() == QEvent::ShortcutOverride)
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(e);
         int key = keyEvent->key();
-        int modifiers = keyEvent->modifiers();
 
-        // в lineEdit ретранслируем все нажатия кроме:
-        //      Down/Up
-        //      Enter/Return
-        if( (key != Qt::Key_Down) && (key != Qt::Key_Up) &&
-            (key != Qt::Key_Enter) && (key != Qt::Key_Return) )
+        // после ввода произвольного текста и нажатия Enter в lineEdit всё равно устанавливается
+        // значение выбранного элемента списка; чтобы этого не происходило нужно отфильтровать событие
+        if( (key == Qt::Key_Return || key == Qt::Key_Enter) && m_customInput )
         {
-            retranslateKey(QEvent::KeyPress, key, (Qt::KeyboardModifiers)modifiers,
-                           keyEvent->text(), keyEvent->isAutoRepeat(), keyEvent->count());
+            hidePopup();
+            toggleIsPopupVisible();
             return true;
         }
+        return false;
     }
 
     // скрытие выпадающего списка
@@ -225,18 +277,43 @@ bool SComboBox::isPointInArea(const QPoint &point, const QRect &area) const
              point.y() > area.y() && point.y() < (area.y() + area.height()) );
 }
 
+bool SComboBox::isSelectOnTab()
+{
+    return m_selectOnTab;
+}
+
+void SComboBox::setSelectOnTab(const bool state)
+{
+    m_selectOnTab = state;
+}
+
+bool SComboBox::isKeepCustomText()
+{
+    return m_keepCustomText;
+}
+
+void SComboBox::setKeepCustomText(const bool state)
+{
+    m_keepCustomText = state;
+}
+
 void SComboBox::retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text, bool autorep, ushort count)
 {
+    QWidget *target = this;
+    if(!m_lineEditRO)   // m_lineEditRO по умолчанию 1
+        target = lineEditWidget;
+
     QKeyEvent* newEvent = new QKeyEvent(type, key, modifiers,
                                         text, autorep, count);
     QFocusEvent* focusEvent = new QFocusEvent(QEvent::FocusIn, Qt::OtherFocusReason);
-    QCoreApplication::postEvent(lineEditWidget, focusEvent);
-    QCoreApplication::postEvent(lineEditWidget, newEvent);
+    QCoreApplication::postEvent(target, focusEvent);
+    QCoreApplication::postEvent(target, newEvent);
 }
 
 void SComboBox::resizeEvent(QResizeEvent *event)
 {
-    lineEditWidget->setMinimumSize(event->size().width() - iconSize().width() - 6, lineEditWidget->minimumHeight());
+    if(lineEditWidget)
+        lineEditWidget->setMinimumSize(event->size().width() - iconSize().width() - 6, lineEditWidget->minimumHeight());
     QComboBox::resizeEvent(event);
 }
 
@@ -247,13 +324,33 @@ int SComboBox::currentDbId()
     return 0;
 }
 
+void SComboBox::initLineEdit()
+{
+    if(lineEditWidget == nullptr)
+    {
+        QString oldPlaceHolderText = placeholderText();
+        lineEditWidget = new SLineEdit();
+        lineEditWidget->enableAutoSetCursorPositionToBegin(false);
+        lineEditWidget->setPlaceholderText(oldPlaceHolderText);
+        connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::clearButtonPress);
+        connect(lineEditWidget, &SLineEdit::buttonClicked, this, &SComboBox::buttonClicked);
+    }
+}
+
 void SComboBox::setEditable(bool editable)
 {
-    lineEditWidget->setReadOnly(!editable);
-    lineEditWidget->installEventFilter(this);
-    szHint = lineEditWidget->sizeHint();
-    minSzHint = lineEditWidget->minimumSizeHint();
-    connect(lineEditWidget, &SLineEdit::editingFinished, this, &SComboBox::longTextHandler);
+    if(editable)
+    {
+        initLineEdit();
+        lineEditWidget->installEventFilter(this);
+        connect(lineEditWidget, &SLineEdit::editingFinished, this, &SComboBox::longTextHandler);
+        setLineEdit(lineEditWidget);
+    }
+    if(lineEditWidget)
+    {
+        lineEditWidget->setReadOnly(!editable);
+    }
+    m_lineEditRO = !editable;
 }
 
 void SComboBox::showPopup()
@@ -278,18 +375,30 @@ void SComboBox::hidePopup()
 
 QString SComboBox::buttons()
 {
+    if(!lineEditWidget)
+        return QString();
+
     return lineEditWidget->buttons();
 }
 
 void SComboBox::setButtons(const QString &buttons)
 {
+    setEditable(true);  // инициализация lineEdit
+    setEditable(false);
+
     lineEditWidget->setButtons(buttons);
     emit buttonsChanged();
 }
 
-void SComboBox::setPlaceholderText(const QString &placeholderText)
+void SComboBox::setPlaceholderText(const QString &text)
 {
-    lineEditWidget->setPlaceholderText(placeholderText);
+    if(!lineEditWidget)
+    {
+        QComboBox::setPlaceholderText(text);
+        return;
+    }
+
+    lineEditWidget->setPlaceholderText(text);
 }
 
 bool SComboBox::isPopupVisible() const
@@ -329,6 +438,9 @@ void SComboBox::setIgnoreFocusOut(bool state)
 
 void SComboBox::longTextHandler()
 {
+    if(!lineEditWidget)
+        return;
+
     lineEditWidget->home(false);
     if(fontMetrics->size(Qt::TextSingleLine, lineEditWidget->text()).width() > width())
         setToolTip(lineEditWidget->text());

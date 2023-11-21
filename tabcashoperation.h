@@ -104,6 +104,7 @@ private:
     void print();
     QString constructReason();
     void setAmount(const double);
+    double amountAbsToSign(const double amountAbs);
     void updateOrderIdLineEdit();
 #ifdef QT_DEBUG
     enum RandomFillerStep {OpType = 1, LinkedObj, RClient, Amount, PaymentSys, End};

@@ -29,9 +29,10 @@ signals:
 public:
     explicit tabClients(bool type = 0, MainWindow *parent = nullptr);
     static tabClients* getInstance(bool type, MainWindow *parent = nullptr);
-    void lineEditSearchSetFocus();
     ~tabClients();
     QString tabTitle() override;
+    bool event(QEvent *event) override;
+    void setFocusSearchField();
 private:
     Ui::tabClients *ui;
     static tabClients* p_instance[2];
@@ -53,6 +54,7 @@ private slots:
     void togglePropertiesPanel();
     void buttonRefreshClicked();
     void autorefreshTable();
+    void createNewClient();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};
     void test_scheduler2_handler() override{};

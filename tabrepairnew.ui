@@ -444,7 +444,7 @@
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridLayoutDevice" columnstretch="1,1,1,1">
               <item row="0" column="0">
-               <widget class="QComboBox" name="comboBoxDeviceClass">
+               <widget class="SComboBox" name="comboBoxDeviceClass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -491,7 +491,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBoxDeviceVendor">
+               <widget class="SComboBox" name="comboBoxDeviceVendor">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -910,6 +910,11 @@
    <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
+   <class>SDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">widgets/sdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets/slineedit.h</header>
@@ -917,11 +922,6 @@
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
    </slots>
-  </customwidget>
-  <customwidget>
-   <class>SDoubleSpinBox</class>
-   <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
   </customwidget>
   <customwidget>
    <class>SClientInputForm</class>
