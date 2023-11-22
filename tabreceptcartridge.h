@@ -28,6 +28,7 @@ public:
     static tabReceptCartridge* getInstance(MainWindow *parent = nullptr);
     bool tabCloseRequest() override;
     QString tabTitle() override;
+    void setFocusSerialNumber();
 private:
     Ui::tabReceptCartridge *ui;
     static tabReceptCartridge* p_instance;

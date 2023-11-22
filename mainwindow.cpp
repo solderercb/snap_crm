@@ -505,6 +505,7 @@ void MainWindow::createTabReceptCartridge()
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку
+    subwindow->setFocusSerialNumber();
     QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));

@@ -222,7 +222,7 @@
           <item row="1" column="2">
            <widget class="QLineEdit" name="lineEditSerial">
             <property name="focusPolicy">
-             <enum>Qt::TabFocus</enum>
+             <enum>Qt::StrongFocus</enum>
             </property>
            </widget>
           </item>

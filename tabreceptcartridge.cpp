@@ -78,6 +78,11 @@ QString tabReceptCartridge::tabTitle()
     return "Приём картриджей";
 }
 
+void tabReceptCartridge::setFocusSerialNumber()
+{
+    ui->lineEditSerial->setFocus();
+}
+
 void tabReceptCartridge::setDefaultStyleSheets()
 {
     ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
