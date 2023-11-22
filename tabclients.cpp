@@ -112,12 +112,17 @@ void tabClients::refreshTable(bool preserveScrollPos, bool preserveSelection)
     {
         FilterList l2;
         l2.op = FilterList::Or;
+        FilterField::Op matchFlag;
+        if(userDbData->useRegExpSearch)
+            matchFlag = FilterField::RegExp;
+        else
+            matchFlag = FilterField::Contains;
         QString str = ui->lineEditSearch->text();
-        l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)", FilterField::RegExp, str, Qt::CaseInsensitive));
-        l2.fields.append(STableViewBase::initFilterField("t1.`short_name`", FilterField::RegExp, str, Qt::CaseInsensitive));
+        l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)", matchFlag, str, Qt::CaseInsensitive));
+        l2.fields.append(STableViewBase::initFilterField("t1.`short_name`", matchFlag, str, Qt::CaseInsensitive));
         l2.fields.append(STableViewBase::initFilterField("t1.`id`", FilterField::Equals, str, Qt::CaseInsensitive));
-        l2.fields.append(STableViewBase::initFilterField("t2.`phone`", FilterField::RegExp, str, Qt::CaseInsensitive));
-        l2.fields.append(STableViewBase::initFilterField("t2.`phone_clean`", FilterField::RegExp, str, Qt::CaseInsensitive));
+        l2.fields.append(STableViewBase::initFilterField("t2.`phone`", matchFlag, str, Qt::CaseInsensitive));
+        l2.fields.append(STableViewBase::initFilterField("t2.`phone_clean`", matchFlag, str, Qt::CaseInsensitive));
         l1.childs.append(l2);
      }
 

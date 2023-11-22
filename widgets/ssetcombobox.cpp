@@ -583,6 +583,12 @@ void SSetComboBox::setCurrentIndex(int index)
     updateLineEditGeometry();
 }
 
+void SSetComboBox::setStyleSheet(const QString &styleSheet)
+{
+    QWidget::setStyleSheet(styleSheet);
+    updateLineEditGeometry();
+}
+
 QString SSetComboBox::text()
 {
     return semicolon_separated_text;

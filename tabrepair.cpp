@@ -364,17 +364,26 @@ void tabRepair::setLock(bool state)
 {
     if(repairModel->isLock())
     {
-        modelRO = 1;
-        i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
+        if(isBlockedUserOnline())
+        {
+            modelRO = 1;
+            i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
+            return;
+        }
     }
-    else
-    {
-        modelRO = 0;
-        if(i_tabIcon)
-            delete i_tabIcon;
-        i_tabIcon = nullptr;
-        repairModel->lock(state);
-    }
+
+    modelRO = 0;
+    if(i_tabIcon)
+        delete i_tabIcon;
+    i_tabIcon = nullptr;
+    repairModel->lock(state);
+}
+
+bool tabRepair::isBlockedUserOnline()
+{
+    QSqlQuery queryCheckUserOnline = QSqlQuery(QSqlDatabase::database("connMain"));
+    queryCheckUserOnline.exec(QUERY_SEL_USER_ONLINE(QSqlDatabase::database("connMain").databaseName(), repairModel->userLock()));
+    return queryCheckUserOnline.first();
 }
 
 void tabRepair::createAdditionalFieldsWidgets()
@@ -784,6 +793,7 @@ void tabRepair::saveState(int index)
     }
     catch (int type)
     {
+        m_groupUpdate = 0;
         ui->comboBoxState->blockSignals(true);
         ui->comboBoxState->setCurrentIndex(-1);
         ui->comboBoxState->blockSignals(false);
@@ -886,8 +896,6 @@ void tabRepair::saveDiagAmount()
         return;
 
     diagAmountSaved();
-    if(m_autosaveDiag)
-        m_autosaveDiagTimer->stop();
 }
 
 void tabRepair::autosaveTimeout()
@@ -904,6 +912,8 @@ void tabRepair::diagAmountSaved()
     m_diagChanged = 0;
     m_spinBoxAmountChanged = 0;
     ui->pushButtonSaveDiagAmount->setEnabled(false);
+    if(m_autosaveDiag)
+        m_autosaveDiagTimer->stop();
 }
 
 void tabRepair::buttonAddItemClicked()

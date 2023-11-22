@@ -29,6 +29,11 @@ void SClientMatch::clear()
     this->hide();
 }
 
+void SClientMatch::setClientType(int type)
+{
+    clientType = type;
+}
+
 void SClientMatch::setPhoneMask(const int index)
 {
     phoneMask = clientPhoneTypesModel->index(index, 2).data().toString().replace(QRegularExpression("[09]"), "_");   // в маске телефона меняем 0 и 9 на подчеркивание; 0 и 9 — это специальные маскировочные символы (см. справку QLineEdit, inputMask)
@@ -47,11 +52,13 @@ void SClientMatch::findClient()
             if(phoneMask.at(i) != phone.at(i))
                 enteredByUserDigits.append(phone.at(i));
         }
-    if(lastName.length() >= 3 || enteredByUserDigits.length() >= 3 )  // если пользователь ввёл более двух символов в одно из полей
+    if(lastName.length() >= 3 || enteredByUserDigits.length() >= 3 || companyName.length() >= 3 )  // если пользователь ввёл более двух символов в одно из полей
     {
         query_where.clear();
         if (lastName.length() >= 3 )
             query_where << QString("LCASE(CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) REGEXP LCASE('%1')").arg(lastName);   // условие поиска по фамилии, имени и отчеству
+        if (companyName.length() >= 3 )
+            query_where << QString("LCASE(CONCAT_WS(' ', t1.`name`, t1.`ur_name`, t1.`short_name`)) REGEXP LCASE('%1')").arg(companyName);   // условие поиска организации (тип: юр. лицо)
         if (enteredByUserDigits.length() >= 3 )
             query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(phone, enteredByUserDigits);   // условие поиска по телефонному номеру
 
@@ -72,9 +79,14 @@ void SClientMatch::findClient()
     }
 }
 
-void SClientMatch::findByLastname(const QString &text)
+void SClientMatch::findByName(const QString &text)
 {
-    lastName = text;
+    switch(clientType)
+    {
+        case NameSearchScope::LastName: lastName = text; break;
+        case NameSearchScope::Name: companyName = text; break;
+        default: companyName = text; lastName = text;
+    }
     findClient();
 }
 

@@ -20,7 +20,14 @@ SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
     SCartridgeForm(parent)
 {
     m_repairId = repairId;
-    initWidgets();
+    try
+    {
+        initWidgets();
+    }
+    catch (int)
+    {
+        m_repairId = 0;
+    }
 }
 
 SCartridgeForm::~SCartridgeForm()
@@ -67,9 +74,14 @@ void SCartridgeForm::initModels()
 
 void SCartridgeForm::updateModels()
 {
+    m_cartridgeCard->load(m_cardId);
+
     if(m_repairId)
     {
         m_repair->load(m_repairId);
+        if(!m_repair->id())
+            throw 1;
+
         m_serialNumber = m_repair->serialNumber();
         m_cardId = m_repair->cartridge()->cardId();
         m_clientId = m_repair->clientId();
@@ -77,7 +89,6 @@ void SCartridgeForm::updateModels()
         updateStatesModel(m_repair->state());
     }
 
-    m_cartridgeCard->load(m_cardId);
 }
 
 void SCartridgeForm::randomFill()

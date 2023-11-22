@@ -3,7 +3,7 @@
 SReportsCommonFunctions::SReportsCommonFunctions()
 {
     QDir path;
-    m_templatesDir = QApplication::applicationDirPath() + "/reports/";
+    m_templatesDir = SLocalSettings::appSettingsPath() + "/reports/";
     path.setPath(m_templatesDir);
     if (!path.exists())
         path.mkpath(m_templatesDir);

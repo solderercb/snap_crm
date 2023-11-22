@@ -20,21 +20,26 @@ signals:
     void clientSelected(int);
 
 public:
+    enum NameSearchScope{LastName = 0, Name = 1, Both = 2};
     explicit SClientMatch(QWidget *parent = nullptr);
     ~SClientMatch();
     void clear();
+    void setClientType(int type);
+
 private:
     Ui::SClientMatch *ui;
     SGroupBoxEventFilter *groupBoxEventFilter;
     SSqlFetchingModel* clientsMatchTable;
     QString lastName;
+    QString companyName;
     QString phone;
     QString phoneMask;
+    int clientType = 0;
     void findClient();
 
 public slots:
     void setPhoneMask(const int index);
-    void findByLastname(const QString&);
+    void findByName(const QString&);
     void findByPhone(const QString&);
     void findByPhone(const QString&, const int);
 

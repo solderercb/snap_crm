@@ -43,6 +43,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->lineEditTrack->setButtons("Apply");
     ui->widgetClientMatch->hide();
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
+    ui->widgetClientMatch->setClientType(SClientMatch::NameSearchScope::Both);
 
     ui->tableView->setModel(tableModel);
 
@@ -53,7 +54,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     connect(tableModel, SIGNAL(amountChanged(double, double, double)), this, SLOT(updateTotalSumms(double, double, double)));
     if(permissions->viewClients)
     {
-        connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
+        connect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
         connect(ui->comboBoxClientPhoneType,SIGNAL(currentIndexChanged(int)),ui->widgetClientMatch,SLOT(setPhoneMask(int)));
         connect(ui->lineEditClientPhone,SIGNAL(textEdited(QString)),this,SLOT(phoneNumberEdited(QString)));
     }

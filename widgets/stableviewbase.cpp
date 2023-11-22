@@ -867,6 +867,11 @@ void STableViewBase::clearSelection()
     QTableView::clearSelection();
 }
 
+void STableViewBase::setLayoutVariant(const SLocalSettings::SettingsVariant &layoutVariant)
+{
+    m_layoutVariant = layoutVariant;
+}
+
 /* Установка номера столбца с уникальным ID, например, номером ремонта.
  * Данный столбец используется при обновлении таблицы для сохранения положения прокрутки
  * Если столбец не задан, положение прокрутки будет изменяться на разницу количеств строк до и после обновления

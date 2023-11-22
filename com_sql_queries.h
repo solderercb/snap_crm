@@ -17,6 +17,9 @@
 #define QUERY_SEL_UPDATE_CHANNEL            QString("SELECT `value` FROM `settings` WHERE `name` = 'update_channel';")
 #define QUERY_SEL_ACTIVE_USERS(db)          QString("SELECT GROUP_CONCAT(DISTINCT `USER`) AS 'users' FROM `information_schema`.`PROCESSLIST` WHERE `DB` = '%1' AND `USER` IN (SELECT `username` FROM `%1`.`users` WHERE `is_bot` <> 1) AND `USER` NOT IN ('root', SUBSTRING_INDEX(USER(), '@', 1)) GROUP BY `DB`;")\
                                                 .arg((db))
+#define QUERY_SEL_USER_ONLINE(db, id)       QString("SELECT GROUP_CONCAT(DISTINCT `USER`) AS 'user' FROM `information_schema`.`PROCESSLIST` WHERE `DB` = '%1' AND `USER` IN (SELECT `username` FROM `%1`.`users` WHERE `id` = %2) AND `USER` NOT IN ('root', SUBSTRING_INDEX(USER(), '@', 1)) GROUP BY `DB`;")\
+                                                .arg((db))\
+                                                .arg((id))
 #define QUERY_SEL_GLOB_WAIT_TIMEOUT         QString("SELECT `VARIABLE_VALUE` FROM performance_schema.global_variables WHERE `VARIABLE_NAME` LIKE 'wait_timeout';")
 #define QUERY_SEL_ACTIVE_USERS2(timeout)    QString("SELECT GROUP_CONCAT(`username`) FROM users WHERE `last_activity` > DATE_SUB(NOW(), INTERVAL %1 SECOND);").arg(timeout)
 #define QUERY_SEL_DOC_TEMPL_CHECKSUM(doc)   QString("SELECT HEX(`checksum`) AS 'checksum' FROM `doc_templates_snap` WHERE `name` = '%1' LIMIT 1;").arg(doc)
@@ -148,7 +151,7 @@
 #define QUERY_SEL_CLIENTS_STATIC            QString(\
                                                 "SELECT\n"\
                                                 "  t1.`id`,\n"\
-                                                "  CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`) AS 'FIO',\n"\
+                                                "  IF(t1.`type`, IF(LENGTH(TRIM(t1.`name`)), t1.`name`, t1.`ur_name`), CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) AS 'FIO',\n"\
                                                 "  t1.`balance`,\n"\
                                                 "  t1.`repairs`,\n"\
                                                 "  t1.`purchases`,\n"\
@@ -172,7 +175,7 @@
                                                 "   `real_repair_cost`,\n"\
                                                 "   `in_date`,\n"\
                                                 "   `out_date`,\n"\
-                                                "   CONCAT_WS(' ', t5.surname, t5.name, t5.patronymic) AS 'client',\n"\
+                                                "   IF(t5.`type`, IF(LENGTH(TRIM(t5.`name`)), t5.`name`, t5.`ur_name`), CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)) AS 'client',\n"\
                                                 "   t6.`phone`,\n"\
                                                 "   `box`,\n"\
                                                 "   `current_manager`,\n"\

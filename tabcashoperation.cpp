@@ -42,8 +42,9 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     ui->dateEdit->setDate(QDate::currentDate());    // обязательно после подключения сигнал-слот таймера!
 
     connect(ui->lineEditClientLastName,SIGNAL(buttonClicked(int)),this,SLOT(lineEditClientLastNameButtonClickHandler(int)));
-    connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
+    connect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
     connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
+    ui->widgetClientMatch->setClientType(SClientMatch::NameSearchScope::Both);
 }
 
 tabCashOperation *tabCashOperation::getInstance(int orderId, MainWindow *parent)

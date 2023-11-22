@@ -111,6 +111,7 @@ private:
     void eventResize(QResizeEvent *);
     void fillExtraInfo();
     void setLock(bool);
+    bool isBlockedUserOnline();
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);

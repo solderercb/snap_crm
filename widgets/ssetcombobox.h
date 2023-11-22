@@ -130,6 +130,7 @@ private:
     void updatePopupGeometry();
 public slots:
     void setCurrentIndex(int index);
+    void setStyleSheet(const QString& styleSheet);
 private slots:
     void comboBoxSetFocus();
     void addItem(const QString &text);

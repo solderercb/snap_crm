@@ -273,6 +273,7 @@ void tabPrintDialog::on_pushButtonPrint_clicked()
     }
 
     m_printer->setCopyCount(ui->spinBoxCopies->value());
+    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Отправлено на печать"), QColor(212,237,242), QColor(229,244,247));
     m_previewWidget->print(m_printer);
     switch(m_reportType)
     {

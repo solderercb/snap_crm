@@ -119,7 +119,7 @@ void SPageSalarySummary::setDbRecordModelsData(const int type, const int system,
 
     created.setDate(date);  //  в случае проводки "задним числом" изменяем дату
     periodBegin.setTimeZone(QTimeZone::utc());  // в АСЦ период за который была сдалеана выплата не учитывает часовой пояс и считается с 00:00:00 до 23:59:59
-    periodEnd.setTimeZone(QTimeZone::utc());
+    periodEnd.toUTC();
     periodEnd = periodEnd.addSecs(-1);
 
     salaryModel->setType(type);

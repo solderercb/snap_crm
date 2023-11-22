@@ -92,6 +92,7 @@ class SUserSettings : public SPropertyCollection, public SDatabaseAuxiliary
     // новые параметры:
     PROPSTRUCT_CHECKBOX(int, autosavePartList, 13, usersParams.autosave_part_list)
     PROPSTRUCT_CHECKBOX(int, autosaveDiagResult, 13, usersParams.autosave_diag_result)
+    PROPSTRUCT_CHECKBOX(bool, useRegExpSearch, 13, usersParams.regexp_search_repair)
 
     PROPSTRUCT_CHECKBOX(bool, preferRegular, 14, prefer_regular)
 

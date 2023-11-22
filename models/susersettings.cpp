@@ -405,6 +405,7 @@ void SUserSettings::translate()
     tr("workspaceMode");
     tr("defaultPaymentSystem");
     tr("alternateRowsBackground");
+    tr("useRegExpSearch");
 
     // Перевод значений в выпадающем списке
     tr("ColumnA"); tr("ColumnB"); tr("ColumnC"); tr("ColumnD"); tr("ColumnE");

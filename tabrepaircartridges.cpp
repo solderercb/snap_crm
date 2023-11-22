@@ -73,9 +73,16 @@ void tabRepairCartridges::loadForms(QList<int> *list)
         if(currentList.contains(list->at(i)))
             continue;
         form = new SCartridgeForm(list->at(i));
+        if(!form->repairId())   // если не удалось загрузить данные модели ремонта (например, ремонт с таким номером не существует)
+        {
+            delete form;
+            continue;
+        }
         appendToReceptList(form);
     }
     delete list;    // этот объект больше не нужен
+    if(ui->verticalLayoutCartridges->count() == 0)
+        this->deleteLater();
 }
 
 bool tabRepairCartridges::tabCloseRequest()
@@ -192,6 +199,7 @@ void tabRepairCartridges::setReadyToIssue()
         ret &= form->model()->commit();
     }
 
+    tabRepairs::refreshIfTabExists();
     if(ret)
     {
         closeTab();
@@ -200,6 +208,7 @@ void tabRepairCartridges::setReadyToIssue()
 
 void tabRepairCartridges::closeTab()
 {
+    tabRepairs::refreshIfTabExists();
     this->deleteLater();
 }
 

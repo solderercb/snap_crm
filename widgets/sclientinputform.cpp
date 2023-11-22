@@ -34,7 +34,7 @@ void SClientInputForm::initWidgets()
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     if(permissions->viewClients)
     {
-        connect(ui->lineEditClientLastName,SIGNAL(textEdited(QString)),ui->widgetClientMatch,SLOT(findByLastname(QString)));
+        connect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
         connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
         connect(ui->phones,SIGNAL(primaryPhoneEdited(QString)),this,SLOT(primaryPhoneEdited(QString)));
     }
@@ -57,6 +57,12 @@ void SClientInputForm::changeClientType()
         ui->lineEditClientLastName->hide();    // скрываем поле "Фамилия"
         ui->lineEditClientPatronymic->hide();    // скрываем поле "Отчество"
         ui->gridLayoutClient->addWidget(ui->lineEditClientFirstName, 1, 0, 1, 3); // заменяем поле "Фамилия" самим собой, но растягиваем его по ширине на 6 столбцов (занимаем столбцы полей "Имя" и "Отчество")
+        ui->widgetClientMatch->setClientType(SClientMatch::NameSearchScope::Name);
+        if(permissions->viewClients)
+        {
+            connect(ui->lineEditClientFirstName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
+            disconnect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
+        }
     }
     else
     {
@@ -68,6 +74,12 @@ void SClientInputForm::changeClientType()
         ui->lineEditClientFirstName->setPlaceholderText(tr("Имя"));
         ui->lineEditClientLastName->show();    // показываем поле "Имя"
         ui->lineEditClientPatronymic->show();    // показываем поле "Отчество"
+        ui->widgetClientMatch->setClientType(SClientMatch::NameSearchScope::LastName);
+        if(permissions->viewClients)
+        {
+            connect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
+            disconnect(ui->lineEditClientFirstName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
+        }
     }
 }
 

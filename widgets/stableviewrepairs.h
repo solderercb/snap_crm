@@ -25,6 +25,7 @@ private:
     int m_mode = 0;
     void translateNames();
     void setColumnWidth(int column, int width) override;
+    void readLayout();
 };
 
 #endif // STABLEVIEWREPAIRS_H

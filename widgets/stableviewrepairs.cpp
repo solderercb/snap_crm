@@ -6,13 +6,6 @@ STableViewRepairs::STableViewRepairs(QWidget *parent) :
 {
     readLayout();
 
-    // в АСЦ в таблице ремонтов по умолчанию отображаются значения доп полей;
-    // при импорте файла настроек в этих столбцах будут отображаться служебные данные; возможно позже я тоже сделаю отображение данных доп. полей, а пока скрываю их.
-    for(int i = metaObject()->enumerator(metaObject()->indexOfEnumerator("Column")).keyCount(); i < i_gridLayout->$GridControl.Columns.size(); i++)
-    {
-        i_gridLayout->$GridControl.Columns[i].Visible = false;
-    }
-
     setItemDelegate(new STableViewRepairsItemDelegates());
 }
 
@@ -80,6 +73,8 @@ bool STableViewRepairs::mode()
 void STableViewRepairs::setMode(const int mode)
 {
     m_mode = mode;
+    STableViewBase::setLayoutVariant( (mode == ModeCartridges)?(SLocalSettings::SettingsVariant::CartridgesGrid):(SLocalSettings::SettingsVariant::RepairsGrid) );
+    readLayout();
 }
 
 void STableViewRepairs::translateNames()
@@ -107,5 +102,18 @@ void STableViewRepairs::setColumnWidth(int column, int width)
         m_model->setColumnWidth(column, (int)(width/m_fontMetrics->averageCharWidth()));
 
     STableViewBase::setColumnWidth(column, width);
+}
+
+void STableViewRepairs::readLayout()
+{
+    STableViewBase::readLayout();
+
+    // в АСЦ в таблице ремонтов по умолчанию отображаются значения доп полей;
+    // при импорте файла настроек в этих столбцах будут отображаться служебные данные; возможно позже я тоже сделаю отображение данных доп. полей, а пока скрываю их.
+    for(int i = metaObject()->enumerator(metaObject()->indexOfEnumerator("Column")).keyCount(); i < i_gridLayout->$GridControl.Columns.size(); i++)
+    {
+        i_gridLayout->$GridControl.Columns[i].Visible = false;
+    }
+
 }
 

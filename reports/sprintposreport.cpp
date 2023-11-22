@@ -15,6 +15,7 @@ void SPrintPOSReport::setClientModel(SClientModel *client)
     m_client = client;
 }
 
+// TODO: редактор отчета
 void SPrintPOSReport::addPrintJob(SRepairModel *repair)
 {
     if(printer)
@@ -39,9 +40,12 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
           << "\n";
 
         *printer << EscPosQt::EscPosPrinter::PrintModes()
-          << companiesModel->value(userDbData->company, "id", "name").toString()
-          << QStringLiteral(" ИНН %1\n").arg(companiesModel->value(userDbData->company, "id", "inn").toString())
-          << officesModel->value(userDbData->currentOffice, "id", "address").toString();
+                 << EscPosQt::EscPosPrinter::JustificationCenter
+                 << companiesModel->value(userDbData->company, "id", "name").toString()
+                 << "\n"
+                 << QStringLiteral("ИНН %1").arg(companiesModel->value(userDbData->company, "id", "inn").toString())
+                 << "\n"
+                 << officesModel->value(userDbData->currentOffice, "id", "address").toString();
 
         *printer << EscPosQt::EscPosPrinter::feed(1);
         *printer << EscPosQt::EscPosPrinter::PrintModes(EscPosQt::EscPosPrinter::PrintModeDoubleWidth | EscPosQt::EscPosPrinter::PrintModeEmphasized)

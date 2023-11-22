@@ -175,11 +175,17 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
 
     FilterList l2;
     l2.op = FilterList::Or;
-    l2.fields.append(STableViewBase::initFilterField("t1.`id`", FilterField::RegExp, ui->lineEditSearch->text()));
+    FilterField::Op matchFlag;
+    if(userDbData->useRegExpSearch)
+        matchFlag = FilterField::RegExp;
+    else
+        matchFlag = FilterField::Contains;
+    l2.fields.append(STableViewBase::initFilterField("t1.`id`", matchFlag, ui->lineEditSearch->text()));
     l2.fields.append(STableViewBase::initFilterField("t1.`title`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("t1.`serial_number`", FilterField::RegExp, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("t5.`short_name`", FilterField::RegExp, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)", FilterField::RegExp, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    l2.fields.append(STableViewBase::initFilterField("t1.`serial_number`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`short_name`, t5.`ur_name`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+
     l1.childs.append(l2);
 
     query_group.clear();
@@ -188,6 +194,8 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     ui->tableView->setFilter(l1);
     ui->tableView->setGrouping(query_group);
     ui->tableView->refresh(preserveScrollPos, preserveSelection);
+    if(!preserveSelection)  // при обновлении модели сигнал QItemSelectionModel::selectionChanged не генерируется
+        updateWidgets();
 
     if(userDbData->autoRefreshWorkspace)
         tableUpdateDelay->start(userDbData->refreshTime*1000);
@@ -207,6 +215,9 @@ void tabRepairs::autorefreshTable()
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
 {
     int id = repairs_table->record(item.row()).value("id").toInt();
+    if(!id)
+        return;
+
     if(ui->switchTableMode->isChecked() == STableViewRepairs::ModeRepairs)
         emit doubleClickRepair(id);
     else
@@ -227,7 +238,15 @@ void tabRepairs::tableItemClick(QModelIndex index)
 {
     if(index.column() == STableViewRepairs::Column::ClientFullName && QGuiApplication::queryKeyboardModifiers() & Qt::AltModifier)
     {
-        ui->lineEditSearch->setText(ui->tableView->model()->data(index).toString());
+        QString searchStr = ui->tableView->model()->data(index).toString();
+        if(userDbData->useRegExpSearch)
+        { // TODO: добавить все спец. символы RegExp
+            searchStr = searchStr.replace("(", "\\(").replace(")", "\\)");
+            searchStr = searchStr.replace("[", "\\[").replace("]", "\\]");
+            searchStr = searchStr.replace("^", "\\^").replace("$", "\\$");
+            searchStr = searchStr.replace("?", "\\?").replace("\\", "\\\\");
+        }
+        ui->lineEditSearch->setText(searchStr);
     }
 }
 

@@ -65,6 +65,8 @@ public:
     void resetVScrollPos();
     QModelIndexList selectionList();
     void clearSelection();
+    void setLayoutVariant(const SLocalSettings::SettingsVariant &layoutVariant);
+
 protected:
     STableBaseModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
