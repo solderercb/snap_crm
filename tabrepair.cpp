@@ -3,6 +3,7 @@
 #include "tabrepair.h"
 #include "ui_tabrepair.h"
 #include "tabprintdialog.h"
+#include "tabrepairs.h"
 
 QMap<int, tabRepair*> tabRepair::p_instance;
 
@@ -811,6 +812,7 @@ void tabRepair::saveState(int index)
     m_buttonSaveStateEnabled = 0;
 
     updateWidgets();
+    tabRepairs::refreshIfTabExists();
 }
 
 void tabRepair::setInformedStatus(int status)

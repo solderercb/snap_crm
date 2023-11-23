@@ -74,8 +74,6 @@ void SCartridgeForm::initModels()
 
 void SCartridgeForm::updateModels()
 {
-    m_cartridgeCard->load(m_cardId);
-
     if(m_repairId)
     {
         m_repair->load(m_repairId);
@@ -89,6 +87,7 @@ void SCartridgeForm::updateModels()
         updateStatesModel(m_repair->state());
     }
 
+    m_cartridgeCard->load(m_cardId);
 }
 
 void SCartridgeForm::randomFill()

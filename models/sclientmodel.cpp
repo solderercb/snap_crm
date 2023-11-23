@@ -85,7 +85,10 @@ void SClientModel::load(int id)
         }
         initBinaryOptions(clientModel);
         if(m_options&BinaryOption::BalanceEnabled)
+        {
+            deleteBalanceObj(); // при перезагрузке данных клиента объект должен быть удалён
             createBalanceObj();
+        }
 //        m_photo = ;
         m_photoId = clientModel->record(0).value("photo_id").toInt();
         m_visitSource = clientModel->record(0).value("visit_source").toInt();

@@ -383,11 +383,25 @@
           </widget>
          </item>
          <item row="6" column="0" colspan="2">
-          <widget class="QCheckBox" name="checkBoxCreditPayment">
-           <property name="text">
-            <string>Оплата с баланса</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+           <item>
+            <widget class="QCheckBox" name="checkBoxSetReturnedInCredit">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Статус ремонта будет изменён на &amp;quot;Выдано в долг&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>В долг</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxCreditPayment">
+             <property name="text">
+              <string>Оплата с баланса</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item row="7" column="0" colspan="2">
           <widget class="QCheckBox" name="checkBoxPaymentCheckout">

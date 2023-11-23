@@ -65,6 +65,7 @@ private slots:
     void textEditTextChanged();
     void paymentSystemChanged(int);
     void checkBoxInCreditToggled(bool);
+    void checkBoxSetReturnedInCreditToggled(bool);
 };
 
 #endif // SDIALOGISSUEREPAIR_H

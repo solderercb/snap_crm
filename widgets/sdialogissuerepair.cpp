@@ -37,6 +37,7 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
     connect(ui->pushButtonLooseDocPrint, SIGNAL(clicked()), this, SLOT(createLooseDoc()));
     connect(ui->comboBoxPaymentAccount, SIGNAL(currentIndexChanged(int)), this, SLOT(paymentSystemChanged(int)));
     connect(ui->checkBoxCreditPayment, SIGNAL(toggled(bool)), this, SLOT(checkBoxInCreditToggled(bool)));
+    connect(ui->checkBoxSetReturnedInCredit, &QCheckBox::toggled, this, &SDialogIssueRepair::checkBoxSetReturnedInCreditToggled);
 
     collectRepairsData();
     ui->checkBoxDiagDocPrint->setVisible(m_singleRepairWidgetsVisible);
@@ -47,6 +48,10 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
     ui->doubleSpinBoxPrepay->setVisible(m_singleRepairWidgetsVisible);
     ui->labelAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
     ui->doubleSpinBoxAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
+    // checkBox "В долг" отображается только если настроен переход "Готово к выдаче"->"Выдано в долг" и включен баланс клиента
+    ui->checkBoxSetReturnedInCredit->setVisible(m_clientModel->balanceEnabled() &&
+                                                statusesModel->value(Global::RepStateIds::Ready, Global::RepStateHeaders::Id, Global::RepStateHeaders::Contains)\
+                                                               .toString().split('|').contains(QString::number(Global::RepStateIds::ReturnedInCredit)));
     ui->checkBoxPaymentCheckout->setVisible(m_totalAmountToPay != 0);
     ui->checkBoxConfirmGetOut->setVisible(m_totalAmountToPay == 0);
     ui->labelIssuedMessage->setVisible(m_singleRepairWidgetsVisible);
@@ -215,7 +220,7 @@ void SDialogIssueRepair::buttonIssueClicked()
 
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
-    if( ui->checkBoxPaymentCheckout->isVisible() && !ui->checkBoxPaymentCheckout->isChecked())
+    if( ui->checkBoxPaymentCheckout->isVisible() && !ui->checkBoxPaymentCheckout->isChecked() && !ui->checkBoxSetReturnedInCredit->isChecked())
     {
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), tr("Подтвердите правильность ввода данных"), QColor("#FFC7AD"), QColor("#FFA477"));
         return;
@@ -256,6 +261,17 @@ void SDialogIssueRepair::buttonIssueClicked()
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
 
+        // в случае возникновения ошибки запроса нужно обновить данные моделей
+        QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
+        SRepairModel *repairModel;
+        while(i != m_repairsModels.constEnd())
+        {
+            repairModel = (*i);
+            repairModel->reload();
+            i++;
+        }
+        m_clientModel->load(m_repairsModels.at(0)->clientId());
+
         emit issueFailed();
     }
     QUERY_LOG_STOP;
@@ -292,7 +308,9 @@ void SDialogIssueRepair::issueRepairs()
 
     // TODO: проверка безналичной оплаты
 
-    if(ui->checkBoxCreditPayment->isChecked())
+    // В АСЦ если установлен checkBox "В долг", то деньги всегда списываются с баланса клиента
+    // разница лишь в проверке достаточного остатка на балансе
+    if(ui->checkBoxCreditPayment->isChecked() || ui->checkBoxSetReturnedInCredit->isChecked())
     {
         paymentAccount = -2;
         balance = 1;
@@ -303,7 +321,7 @@ void SDialogIssueRepair::issueRepairs()
         balance = paymentAccount == -2;
     }
 
-    if(balance)
+    if(balance && !ui->checkBoxSetReturnedInCredit->isChecked())
     {
         if(!m_clientModel->balanceEnough(-m_totalAmountToPay)) // проверка при выдаче нескольких ремонтов за раз с оплатой с баланса
             throw Global::ThrowType::UserCanceled;
@@ -316,10 +334,12 @@ void SDialogIssueRepair::issueRepairs()
         if(comSettings->useSimplifiedCartridgeRepair && repairModel->cartridge() && repairModel->state() == Global::RepStateIds::InWork)
             setRepairReady(repairModel);
 
-        switch (repairModel->state())
+        switch ( (ui->checkBoxSetReturnedInCredit->isChecked() << 7) | repairModel->state() )
         {
             case Global::RepStateIds::Ready: newState = Global::RepStateIds::Returned; break;
+            case (1 << 7) | Global::RepStateIds::ReadyNoRepair:
             case Global::RepStateIds::ReadyNoRepair: newState = Global::RepStateIds::ReturnedNoRepair; break;
+            case (1 << 7) | Global::RepStateIds::Ready: newState = Global::RepStateIds::ReturnedInCredit; break;
             default: throw Global::ThrowType::ConditionsError;
         }
 
@@ -449,4 +469,13 @@ void SDialogIssueRepair::checkBoxInCreditToggled(bool state)
     else
         ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(Global::PaymentSystemIds::Cash, "system_id"));
     ui->comboBoxPaymentAccount->blockSignals(false);
+}
+
+void SDialogIssueRepair::checkBoxSetReturnedInCreditToggled(bool state)
+{
+    ui->checkBoxCreditPayment->setChecked(state);
+    ui->checkBoxCreditPayment->setEnabled(!state);
+    ui->comboBoxPaymentAccount->setEnabled(!state);
+    ui->checkBoxPaymentCheckout->setChecked(false);
+    ui->checkBoxPaymentCheckout->setEnabled(!state);
 }

@@ -77,6 +77,20 @@ QString SLocalSettings::appSettingsPath()
     if (!settingsPath.exists())                 // C:/Users/<user</AppData/Local/snap/<MD5-hash>/<APP_VER>
         settingsPath.mkpath(settingsPath.path());
 
+    // Создание файла с названием, содержащим путь к исполняемому файлу
+    // Предназначено для удобства работы с файлами локильных настроек если запускаются разные версии программы (debug, release, stable и т. д.)
+    // недопустимые символы заменяются на похожие допустимые или удаляются
+    QFile appPathInfo;
+    QByteArray data;
+    data.append(appPath.toUtf8());
+    appPathInfo.setFileName(settingsPath.path() + "/../" + appPath.replace('/', "⁄").remove(':'));
+    if(!appPathInfo.exists() && appPathInfo.open(QIODevice::ReadWrite))
+    {
+        appPathInfo.resize(data.size());
+        appPathInfo.write(data);
+        appPathInfo.close();
+    }
+
     return settingsPath.path();
 }
 

@@ -218,7 +218,7 @@ void SReportsCommonFunctions::initCustomerDataSources(const int id)
 
     m_reportDatasouces << "customerPhones";
     SPhonesModel *clientPhonesModel = new SPhonesModel();
-    if(m_reportVars.isEmpty())
+    if(m_reportVars.isEmpty() && id == 0)
         clientPhonesModel->initDemo();
     else
         clientPhonesModel->load(clientModel->id());
