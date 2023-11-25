@@ -31,6 +31,8 @@ private:
     Ui::SPageSalaryRepairs *ui;
     void loadRepairData(const int id);
     void enableVScrollbarPadding(const bool state = 1);
+    void showRowsPayed(bool state = false);
+    void updateSummary();
 public slots:
     void updateModels() override;
     void updateWidgets() override;

@@ -2363,7 +2363,7 @@
     <message>
         <location filename="../widgets/spageclientsummary.ui" line="336"/>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">№ записи</translation>
     </message>
     <message>
         <location filename="../widgets/spageclientsummary.ui" line="356"/>
@@ -2559,7 +2559,8 @@
         <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="155"/>
         <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="179"/>
         <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="203"/>
-        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="255"/>
+        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="227"/>
+        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="285"/>
         <source>&lt;value&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2584,18 +2585,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="189"/>
         <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="213"/>
+        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="237"/>
         <source>Готово, но не выдано</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="227"/>
+        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="251"/>
         <source>Показывать оплаченные</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="241"/>
+        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="265"/>
+        <source>из них за картриджи</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/salarytabwidgets/spagesalaryrepairs.ui" line="189"/>
         <source>Сумма к выплате</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4228,8 +4234,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableRepairsModel</name>
     <message>
-        <location filename="../models/stablerepairsmodel.cpp" line="46"/>
-        <location filename="../models/stablerepairsmodel.cpp" line="118"/>
+        <location filename="../models/stablerepairsmodel.cpp" line="39"/>
+        <location filename="../models/stablerepairsmodel.cpp" line="113"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4285,7 +4291,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/stableviewclients.cpp" line="7"/>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">№ записи</translation>
     </message>
     <message>
         <location filename="../widgets/stableviewclients.cpp" line="7"/>
@@ -4412,376 +4418,361 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableViewSalaryExtra</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="8"/>
-        <source>Основание</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="27"/>
+        <source>ID</source>
+        <translation>№ записи</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="8"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="28"/>
+        <source>Reason</source>
+        <translation>Основание</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="8"/>
-        <source>Дата</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="29"/>
+        <source>Amount</source>
+        <translation>Сумма</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="8"/>
-        <source>Пользователь</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="30"/>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryextra.cpp" line="31"/>
+        <source>User</source>
+        <translation>Пользователь</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalaryIssued</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="20"/>
-        <source>Заказ</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="35"/>
+        <source>Id</source>
+        <translation>Заказ</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="20"/>
-        <source>Оборудование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="36"/>
+        <source>Title</source>
+        <translation>Оборудование</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="20"/>
-        <source>Стоимость ремонта</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="37"/>
+        <source>RepairCost</source>
+        <translation>Стоимость ремонта</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="20"/>
-        <source>Дата выдачи</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="38"/>
+        <source>IssueDate</source>
+        <translation>Дата выдачи</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalaryItems</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="7"/>
-        <source>UID</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="21"/>
+        <source>Name</source>
+        <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="7"/>
-        <source>Наименование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="22"/>
+        <source>Date</source>
+        <translation>Дата выдачи</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="7"/>
-        <source>Дата выдачи</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="23"/>
+        <source>Qty</source>
+        <translation>Кол-во</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="7"/>
-        <source>Кол-во</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="24"/>
+        <source>Price</source>
+        <translation>Цена</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="7"/>
-        <source>Цена</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="25"/>
+        <source>Amount</source>
+        <translation>Сумма</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="7"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="7"/>
-        <source>Статус</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryitems.cpp" line="26"/>
+        <source>State</source>
+        <translation>Статус</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalaryPayments</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>№ документа</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="21"/>
+        <source>Doc</source>
+        <translation>№ записи</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>Дата</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="22"/>
+        <source>Date</source>
+        <translation>Дата</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>Выдано</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="23"/>
+        <source>PeriodFrom</source>
+        <translation>С</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>Зачислено на баланс</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="24"/>
+        <source>PeriodTo</source>
+        <translation>По</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>Сотрудник</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="25"/>
+        <source>CashAmount</source>
+        <translation>Выплачено</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>Пользователь</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="26"/>
+        <source>BalanceAmount</source>
+        <translation>Зачислено на баланс</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>Основание</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="27"/>
+        <source>Employee</source>
+        <translation>Сотрудник</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>С</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="28"/>
+        <source>User</source>
+        <translation>Пользователь</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="7"/>
-        <source>По</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="29"/>
+        <source>Notes</source>
+        <translation>Комментарий</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalaryRecepted</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="7"/>
-        <source>Заказ</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="16"/>
+        <source>Id</source>
+        <translation>Заказ</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="7"/>
-        <source>Оборудование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="17"/>
+        <source>Title</source>
+        <translation>Оборудование</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="7"/>
-        <source>Стоимость ремонта</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="18"/>
+        <source>RepairCost</source>
+        <translation>Стоимость ремонта</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="7"/>
-        <source>Дата приёма</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryreceptedissued.cpp" line="19"/>
+        <source>ReceptDate</source>
+        <translation>Дата приёма</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalaryRepairParts</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>UID</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="16"/>
+        <source>Name</source>
+        <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>Наименование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="17"/>
+        <source>Qty</source>
+        <translation>Кол-во</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>Кол-во</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="18"/>
+        <source>Price</source>
+        <translation>Цена</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>Цена</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="19"/>
+        <source>Amount</source>
+        <translation>Сумма</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="20"/>
         <source>SN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>Гарантия</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="21"/>
+        <source>Warranty</source>
+        <translation>Гарантия</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>Прибыль</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="22"/>
+        <source>Profit</source>
+        <translation>Прибыль</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="7"/>
-        <source>Заработок</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairparts.cpp" line="23"/>
+        <source>Salary</source>
+        <translation>Заработок</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalaryRepairWorks</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>UID</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="16"/>
+        <source>Name</source>
+        <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>Наименование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="17"/>
+        <source>Qty</source>
+        <translation>Кол-во</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>Кол-во</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="18"/>
+        <source>Price</source>
+        <translation>Цена</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>Цена</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="19"/>
+        <source>Amount</source>
+        <translation>Сумма</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="20"/>
+        <source>Warranty</source>
+        <translation>Гарантия</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>Гарантия</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="21"/>
+        <source>Percent</source>
+        <translation>%</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="7"/>
-        <source>Заработок</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairworks.cpp" line="22"/>
+        <source>Salary</source>
+        <translation>Заработок</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalaryRepairs</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Заказ</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="37"/>
+        <source>Id</source>
+        <translation>Заказ</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Оборудование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="38"/>
+        <source>Title</source>
+        <translation>Оборудование</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Стоимость ремонта</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="39"/>
+        <source>RealRepCost</source>
+        <translation>Стоимость ремонта</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Работа</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="40"/>
+        <source>EmployeeWorks</source>
+        <translation>Работа</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Все детали</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="41"/>
+        <source>AllParts</source>
+        <translation>Все детали</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Детали</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="42"/>
+        <source>EmployeeParts</source>
+        <translation>Детали</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Заработок (раб.)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="43"/>
+        <source>EmployeeSalaryWorks</source>
+        <translation>Заработок (раб.)</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Заработок (ЗИП)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="44"/>
+        <source>EmployeeSalaryParts</source>
+        <translation>Заработок (ЗИП)</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="8"/>
-        <source>Дата выдачи</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalaryrepairs.cpp" line="45"/>
+        <source>IssueDate</source>
+        <translation>Дата выдачи</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalarySaleParts</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>UID</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="16"/>
+        <source>Name</source>
+        <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>Наименование</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="17"/>
+        <source>Qty</source>
+        <translation>Кол-во</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>Кол-во</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="18"/>
+        <source>Price</source>
+        <translation>Цена</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>Цена</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="19"/>
+        <source>Amount</source>
+        <translation>Сумма</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="20"/>
         <source>SN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>Гарантия</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="21"/>
+        <source>Warranty</source>
+        <translation>Гарантия</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>Прибыль</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="22"/>
+        <source>Profit</source>
+        <translation>Прибыль</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="7"/>
-        <source>Заработок</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysaleparts.cpp" line="23"/>
+        <source>Salary</source>
+        <translation>Заработок</translation>
     </message>
 </context>
 <context>
     <name>STableViewSalarySales</name>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="7"/>
-        <source>№ РН</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="16"/>
+        <source>Doc</source>
+        <translation>№ РН</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="7"/>
-        <source>Дата</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="17"/>
+        <source>Date</source>
+        <translation>Дата</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="7"/>
-        <source>Клиент</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="18"/>
+        <source>Client</source>
+        <translation>Клиент</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="7"/>
-        <source>Сумма</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="19"/>
+        <source>Amount</source>
+        <translation>Сумма</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="7"/>
-        <source>Прибыль</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="20"/>
+        <source>Profit</source>
+        <translation>Прибыль</translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="7"/>
-        <source>Заработок</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/salarytabwidgets/stableviewsalarysales.cpp" line="21"/>
+        <source>Salary</source>
+        <translation>Заработок</translation>
     </message>
 </context>
 <context>

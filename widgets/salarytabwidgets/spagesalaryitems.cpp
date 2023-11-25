@@ -37,16 +37,16 @@ void SPageSalaryItems::updateModels()
 
 void SPageSalaryItems::updateWidgets()
 {
-    int totalItemsPeaces = parentTab->m_items->total(3);
-    double totalItemsCost = parentTab->m_items->total(5);
+    int totalItemsPeaces = parentTab->m_items->total(STableSalaryItemsModel::Columns::Qty);
+    double totalItemsCost = parentTab->m_items->total(STableSalaryItemsModel::Columns::Amount);
 
     ui->labelTotalItemsByArticulValue->setText(QString::number(parentTab->m_items->rowCount()));
     ui->labelTotalItemsPeacesValue->setText(QString::number(totalItemsPeaces));
     ui->labelTotalItemsCostValue->setText(sysLocale.toString(totalItemsCost, 'f', comSettings->classicKassa?2:0));
 
-    ui->tableViewItemsSummary->setTotal(0, parentTab->m_items->rowCount());
-    ui->tableViewItemsSummary->setTotal(3, totalItemsPeaces);
-    ui->tableViewItemsSummary->setTotal(5, totalItemsCost);
+    ui->tableViewItemsSummary->setTotal(STableViewSalaryItems::Column::UID, parentTab->m_items->rowCount());
+    ui->tableViewItemsSummary->setTotal(STableViewSalaryItems::Column::Qty, totalItemsPeaces);
+    ui->tableViewItemsSummary->setTotal(STableViewSalaryItems::Column::Amount, totalItemsCost);
 
     ui->labelUsedItemsByArticulValue->setText(QString::number(parentTab->m_items->totalUsedItemsByArticul()));
     ui->labelUsedItemsPeacesValue->setText(QString::number(parentTab->m_items->totalUsedItemsPeaces()));
@@ -59,7 +59,7 @@ void SPageSalaryItems::updateWidgets()
 
 void SPageSalaryItems::tableItemsRowDoubleClicked(const QModelIndex &index)
 {
-    mainWindow->createTabSparePart(parentTab->m_items->index(index.row(), 7).data().toInt());
+    mainWindow->createTabSparePart(parentTab->m_items->index(index.row(), STableSalaryItemsModel::Columns::ItemId).data().toInt());
 }
 
 void SPageSalaryItems::tableColumnResized(int, int)
@@ -96,6 +96,6 @@ STableViewSalaryItemsSummary::STableViewSalaryItemsSummary(QWidget *parent) :
 void STableViewSalaryItemsSummary::setGridLayout(XtraSerializer *layout)
 {
     STableViewSummaryBase::setGridLayout(layout);
-    setData(0, 3, "<value>");
-    setData(0, 5, "<value>");
+    setData(0, STableViewSalaryItems::Column::Qty, "<value>");
+    setData(0, STableViewSalaryItems::Column::Amount, "<value>");
 }

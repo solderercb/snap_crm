@@ -49,7 +49,7 @@ void SPageSalarySales::updateWidgets()
     m_userModel = parentTab->m_userModel;
 
     ui->labelPercentPartsValue->setText(QString::number(m_userModel->paySale()));
-    ui->labelSalesSummValue->setText(sysLocale.toString(parentTab->m_sales->total(5), 'f', comSettings->classicKassa?2:0));
+    ui->labelSalesSummValue->setText(sysLocale.toString(parentTab->m_sales->total(STableSalarySalesModel::Columns::SalaryPart), 'f', comSettings->classicKassa?2:0));
 }
 
 void SPageSalarySales::tableSalesRowSelected(const QModelIndex &current, const QModelIndex &prev)
@@ -60,17 +60,17 @@ void SPageSalarySales::tableSalesRowSelected(const QModelIndex &current, const Q
 
 void SPageSalarySales::tableSalesRowActivated(const QModelIndex &index)
 {
-    loadDocumentData(parentTab->m_sales->index(index.row(), 0).data().toInt());
+    loadDocumentData(parentTab->m_sales->index(index.row(), STableSalarySalesModel::Columns::Id).data().toInt());
 }
 
 void SPageSalarySales::tableSalesRowDoubleClicked(const QModelIndex &index)
 {
-    mainWindow->createTabSale(parentTab->m_repairs->index(index.row(), 0).data().toInt());
+    mainWindow->createTabSale(parentTab->m_sales->index(index.row(), STableSalarySalesModel::Columns::Id).data().toInt());
 }
 
 void SPageSalarySales::tableSalePartsRowDoubleClicked(const QModelIndex &index)
 {
-    mainWindow->createTabSparePart(parentTab->m_repairs->index(index.row(), 0).data().toInt());
+    mainWindow->createTabSparePart(parentTab->m_saleParts->index(index.row(), STableSalarySalePartsModel::Columns::ItemId).data().toInt());
 }
 
 void SPageSalarySales::guiFontChanged()

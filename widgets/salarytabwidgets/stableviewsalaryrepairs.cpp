@@ -4,10 +4,8 @@
 STableViewSalaryRepairs::STableViewSalaryRepairs(QWidget *parent) :
     STableViewBase(SLocalSettings::SalaryRepairsGrid, parent)
 {
-    i_defaultColumnsWidths = {{0, 100},{1, 690},{2, 115},{3, 115},{4, 115},{5, 115},{6, 115},{7, 115},{8, 115}};
-    i_defaultHeaderLabels << tr("Заказ") << tr("Оборудование") << tr("Стоимость ремонта") << tr("Работа") << tr("Все детали") << tr("Детали") << tr("Заработок (раб.)") << tr("Заработок (ЗИП)") << tr("Дата выдачи");
     readLayout();
-    i_gridLayout->$GridControl.Columns[1].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
+    i_gridLayout->$GridControl.Columns[Column::Title].Width_marked = true;  // автоширина по умолчанию
 }
 
 STableViewSalaryRepairs::~STableViewSalaryRepairs()
@@ -28,10 +26,23 @@ void STableViewSalaryRepairs::showRowsPayed(bool state)
             showRow(i);
         else
         {
-            if(static_cast<STableSalaryRepairsModel*>(m_model)->payedSumm(i))
+            if(static_cast<STableSalaryRepairsModel*>(m_model)->paidAmount(i))
                 hideRow(i);
         }
     }
+}
+
+void STableViewSalaryRepairs::translateNames()
+{
+    tr("Id");
+    tr("Title");
+    tr("RealRepCost");
+    tr("EmployeeWorks");
+    tr("AllParts");
+    tr("EmployeeParts");
+    tr("EmployeeSalaryWorks");
+    tr("EmployeeSalaryParts");
+    tr("IssueDate");
 }
 
 void STableViewSalaryRepairs::columnResized(int column, int oldWidth, int newWidth)

@@ -4,10 +4,8 @@
 STableViewSalaryExtra::STableViewSalaryExtra(QWidget *parent) :
     STableViewBase(SLocalSettings::SalaryExtraChargesGrid, parent)
 {
-    i_defaultColumnsWidths = {{0, 60},{1, 400},{2, 60},{3, 115},{4, 150}};
-    i_defaultHeaderLabels << "ID" << tr("Основание") << tr("Сумма") << tr("Дата") << tr("Пользователь");
     readLayout();
-    i_gridLayout->$GridControl.Columns[1].Width_marked = true;  // по умолчанию автоширина столбца с основанием
+    i_gridLayout->$GridControl.Columns[Column::Reason].Width_marked = true;  // автоширина по умолчанию
 }
 
 STableViewSalaryExtra::~STableViewSalaryExtra()
@@ -22,6 +20,15 @@ XtraSerializer *STableViewSalaryExtra::gridLayout()
 void STableViewSalaryExtra::setModel(QAbstractItemModel *model)
 {
     STableViewBase::setModel(model);
+}
+
+void STableViewSalaryExtra::translateNames()
+{
+    tr("ID");
+    tr("Reason");
+    tr("Amount");
+    tr("Date");
+    tr("User");
 }
 
 void STableViewSalaryExtra::columnResized(int column, int oldWidth, int newWidth)

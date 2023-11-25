@@ -40,7 +40,7 @@ void SPageSalaryReceptedIssued::updateWidgets()
 {
     int recepted = parentTab->m_recepted->rowCount();
     int issued = parentTab->m_issued->rowCount();
-    double summReceptedIssued = parentTab->m_recepted->total(4) + parentTab->m_issued->total(4);
+    double summReceptedIssued = parentTab->m_recepted->total(STableSalaryReceptedIssued::Columns::PayDeviceIn) + parentTab->m_issued->total(STableSalaryReceptedIssued::Columns::PayDeviceOut);
     ui->labelPayForReceptValue->setText(QString::number(parentTab->m_userModel->payDeviceIn()));
     ui->labelPayForIssueValue->setText(QString::number(parentTab->m_userModel->payDeviceOut()));
     ui->labelReceptedSummaryValue->setText(QString::number(recepted));
@@ -51,7 +51,7 @@ void SPageSalaryReceptedIssued::updateWidgets()
 
 void SPageSalaryReceptedIssued::tableRepairsRowDoubleClicked(const QModelIndex &index)
 {
-    mainWindow->createTabRepair(index.model()->index(index.row(), 0).data().toInt());
+    mainWindow->createTabRepair(index.model()->index(index.row(), STableSalaryReceptedIssued::Columns::Id).data().toInt());
 }
 
 void SPageSalaryReceptedIssued::guiFontChanged()

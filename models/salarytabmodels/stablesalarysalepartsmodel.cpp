@@ -15,11 +15,11 @@ QVariant STableSalarySalePartsModel::data(const QModelIndex &item, int role) con
     {
         switch (item.column())
         {
-            case 3:
-            case 4:
-            case 7:
-            case 8: return dataLocalizedFromDouble(item);
-            case 6: return warrantyFromId(item);
+            case Columns::Price:
+            case Columns::Amount:
+            case Columns::Profit:
+            case Columns::SalaryPart: return dataLocalizedFromDouble(item);
+            case Columns::Warranty: return warrantyFromId(item);
             default: ;
         }
     }

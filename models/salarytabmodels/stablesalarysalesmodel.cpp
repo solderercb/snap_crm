@@ -14,10 +14,10 @@ QVariant STableSalarySalesModel::data(const QModelIndex &item, int role) const
     {
         switch (item.column())
         {
-            case 1: return timestampLocal(item);
-            case 3:
-            case 4:
-            case 5: return dataLocalizedFromDouble(item);
+            case Columns::Created: return timestampLocal(item);
+            case Columns::Amount:
+            case Columns::Profit:
+            case Columns::SalaryPart: return dataLocalizedFromDouble(item);
             default: ;
         }
     }

@@ -10,9 +10,9 @@ STableSalaryReceptedIssued::STableSalaryReceptedIssued(QObject *parent) : STable
 */
 QVariant STableSalaryReceptedIssued::data(const QModelIndex &item, int role) const
 {
-    if(role == Qt::DisplayRole) // ранее оплаченные сотруднику ремонты выделены зелёным
+    if(role == Qt::DisplayRole)
     {
-        if(item.column() == 2)
+        if(item.column() == Columns::RealRepairCost)
             return dataLocalizedFromDouble(item);
     }
 

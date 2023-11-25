@@ -735,7 +735,8 @@
                                                 "    t1.`sn`,                                                                                 \n"\
                                                 "    t1.`warranty`,                                                                           \n"\
                                                 "    @profit:=t1.`count`*(t1.`price`-t2.`in_price`) AS 'profit',                              \n"\
-                                                "    IF(t4.`cartridge`, '-', CAST(@profit*IF(t3.`pay_4_sale_in_repair`, t3.`pay_sale`, 0)/100 AS DECIMAL(19,4))) AS 'salary_part'  \n"\
+                                                "    IF(t4.`cartridge`, '-', CAST(@profit*IF(t3.`pay_4_sale_in_repair`, t3.`pay_sale`, 0)/100 AS DECIMAL(19,4))) AS 'salary_part', \n"\
+                                                "    t1.`item_id`                                                                             \n"\
                                                 "FROM store_int_reserve AS t1                                                                 \n"\
                                                 "LEFT JOIN store_items AS t2                                                                  \n"\
                                                 "    ON t1.`item_id` = t2.`id`                                                                \n"\
@@ -818,7 +819,8 @@
                                                 "  t1.`sn`,                                                                       \n"\
                                                 "  t1.`warranty`,                                                                 \n"\
                                                 "  @profit:=t1.`count`*(t1.`price`-t2.`in_price`) AS 'profit',                    \n"\
-                                                "  CAST(@profit*t3.`pay_sale`/100 AS DECIMAL(11,4)) AS 'salary_part'              \n"\
+                                                "  CAST(@profit*t3.`pay_sale`/100 AS DECIMAL(11,4)) AS 'salary_part',             \n"\
+                                                "  t1.`item_id`                                                                   \n"\
                                                 "FROM `store_sales` AS t1                                                         \n"\
                                                 "LEFT JOIN `store_items` AS t2                                                    \n"\
                                                 "  ON t1.`item_id` = t2.`id`                                                      \n"\

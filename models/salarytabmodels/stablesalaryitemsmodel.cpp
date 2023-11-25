@@ -15,16 +15,16 @@ QVariant STableSalaryItemsModel::data(const QModelIndex &item, int role) const
     {
         switch(item.column())
         {
-            case 2: return timestampLocal(item);
-            case 4:
-            case 5: return dataLocalizedFromDouble(item);
-            case 6: return storeItemsIntReserveStatesModel->getDisplayRole(STableBaseModel::data(item).toInt());
+            case Columns::Created: return timestampLocal(item);
+            case Columns::Price:
+            case Columns::Amount: return dataLocalizedFromDouble(item);
+            case Columns::State: return storeItemsIntReserveStatesModel->getDisplayRole(STableBaseModel::data(item).toInt());
             default: ;
         }
     }
     if(role == Qt::BackgroundRole)
     {
-        if(STableBaseModel::data(index(item.row(), 6)).toInt() == SRepairSaleItemModel::RepairLinked)
+        if(STableBaseModel::data(item.siblingAtColumn(Columns::State)).toInt() == SRepairSaleItemModel::RepairLinked)
             return QColor(144,238,144);
     }
 
@@ -36,7 +36,7 @@ int STableSalaryItemsModel::totalUsedItemsByArticul()
     int count = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        if(STableBaseModel::data(index(i, 6)).toInt() == SRepairSaleItemModel::RepairLinked)
+        if(STableBaseModel::data(index(i, Columns::State)).toInt() == SRepairSaleItemModel::RepairLinked)
             count++;
     }
     return count;
@@ -47,8 +47,8 @@ int STableSalaryItemsModel::totalUsedItemsPeaces()
     int count = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        if(STableBaseModel::data(index(i, 6)).toInt() == SRepairSaleItemModel::RepairLinked)
-            count += STableBaseModel::data(index(i, 3)).toInt();
+        if(STableBaseModel::data(index(i, Columns::State)).toInt() == SRepairSaleItemModel::RepairLinked)
+            count += STableBaseModel::data(index(i, Columns::Qty)).toInt();
     }
     return count;
 }
@@ -58,8 +58,8 @@ double STableSalaryItemsModel::totalUsedItemsCost()
     double cost = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        if(STableBaseModel::data(index(i, 6)).toInt() == SRepairSaleItemModel::RepairLinked)
-            cost += STableBaseModel::data(index(i, 5)).toDouble();
+        if(STableBaseModel::data(index(i, Columns::State)).toInt() == SRepairSaleItemModel::RepairLinked)
+            cost += STableBaseModel::data(index(i, Columns::Amount)).toDouble();
     }
     return cost;
 }
@@ -69,7 +69,7 @@ int STableSalaryItemsModel::totalUnusedItemsByArticul()
     int count = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        if(STableBaseModel::data(index(i, 6)).toInt() == SRepairSaleItemModel::EngineerBasket)
+        if(STableBaseModel::data(index(i, Columns::State)).toInt() == SRepairSaleItemModel::EngineerBasket)
             count++;
     }
     return count;
@@ -80,8 +80,8 @@ int STableSalaryItemsModel::totalUnusedItemsPeaces()
     int count = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        if(STableBaseModel::data(index(i, 6)).toInt() == SRepairSaleItemModel::EngineerBasket)
-            count += STableBaseModel::data(index(i, 3)).toInt();
+        if(STableBaseModel::data(index(i, Columns::State)).toInt() == SRepairSaleItemModel::EngineerBasket)
+            count += STableBaseModel::data(index(i, Columns::Qty)).toInt();
     }
     return count;
 }
@@ -91,8 +91,8 @@ double STableSalaryItemsModel::totalUnusedItemsCost()
     double cost = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        if(STableBaseModel::data(index(i, 6)).toInt() == SRepairSaleItemModel::EngineerBasket)
-            cost += STableBaseModel::data(index(i, 5)).toDouble();
+        if(STableBaseModel::data(index(i, Columns::State)).toInt() == SRepairSaleItemModel::EngineerBasket)
+            cost += STableBaseModel::data(index(i, Columns::Amount)).toDouble();
     }
     return cost;
 }

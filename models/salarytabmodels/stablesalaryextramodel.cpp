@@ -18,9 +18,9 @@ QVariant STableSalaryExtraModel::data(const QModelIndex &item, int role) const
     {
         switch(item.column())
         {
-            case 2: return dataLocalizedFromDouble(item);
-            case 3: return timestampLocal(item);
-            case 4: return userFromId(item);
+            case Columns::Price: return dataLocalizedFromDouble(item);
+            case Columns::PaymentDate: return timestampLocal(item);
+            case Columns::User: return userFromId(item);
             default: ;
         }
     }
@@ -33,13 +33,13 @@ QVariant STableSalaryExtraModel::data(const QModelIndex &item, int role) const
 
 Qt::ItemFlags STableSalaryExtraModel::flags(const QModelIndex &item) const
 {
-    if(SEditableBaseModel::data(index(item.row(), 0)).toInt())
+    if(SEditableBaseModel::data(item.siblingAtColumn(Columns::Id)).toInt())
         return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
     switch(item.column())
     {
-        case 1:
-        case 2: return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+        case Columns::Name:
+        case Columns::Price: return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
         default: ;
     }
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -68,14 +68,14 @@ void STableSalaryExtraModel::saveTable()
 
         for(int i = 0; i < rowCount(); i++)
         {
-            if(index(i, 0).data().toInt())
+            if(index(i, Columns::Id).data().toInt())
                 continue;
 
             additionalPayment = new SAdditionalPaymentModel();
 
-            additionalPayment->setName(SEditableBaseModel::data(index(i, 1)).toString());
-            additionalPayment->setSumm(SEditableBaseModel::data(index(i, 2)).toDouble());
-            additionalPayment->setPaymentDate(SEditableBaseModel::data(index(i, 3)).toDateTime());
+            additionalPayment->setName(SEditableBaseModel::data(index(i, Columns::Name)).toString());
+            additionalPayment->setSumm(SEditableBaseModel::data(index(i, Columns::Price)).toDouble());
+            additionalPayment->setPaymentDate(SEditableBaseModel::data(index(i, Columns::PaymentDate)).toDateTime());
             additionalPayment->setUser(userDbData->id);
             additionalPayment->setEmployee(m_employee);
             nErr = additionalPayment->commit();

@@ -11,39 +11,34 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
         return false;
 
     // TODO: изучить разницу в скорости выполнения:
-    //  1) определение нужного столбца путём вызова кучи методов
-    //  2) кэширование названий полей БД по сигналу resetModel() (слот, подключенный в классе STableBaseModel вызывается раньше слота, подключенного в классе виджета STableViewBase)
+    //  1) определение нужного столбца путём вызова кучи методов (до rev277)
+    //  2) использование enum (с rev277)
+    //  3) кэширование названий полей БД по сигналу resetModel() (слот, подключенный в классе STableBaseModel вызывается раньше слота, подключенного в классе виджета STableViewBase)
     if (role == Qt::BackgroundRole)
     {
-        QString fieldName = record(index.row()).fieldName(index.column());
-        if(fieldName == QString("status"))
+        if(index.column() == Columns::Status)
             return QColor(statusesModel->value(QSqlQueryModel::data(index, Qt::DisplayRole).toInt(), 1, 2).toString());
 
-        QString rowColor = record(index.row()).value("color").toString();
+        QString rowColor = STableBaseModel::data(index.siblingAtColumn(Columns::Color)).toString();
         if(!rowColor.isEmpty())
             return QColor(rowColor);
     }
     if (role == Qt::DisplayRole)
     {
-        QString fieldName = record(index.row()).fieldName(index.column());
-        if(fieldName == QString("status"))
-            return QVariant(statusesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
-        else if(fieldName == QString("repair_cost"))
-            return dataLocalizedFromDouble(index);
-        else if(fieldName == QString("in_date"))
-            return dateTime(index);
-        else if(fieldName == QString("out_date"))
-            return dateTime(index);
-        else if(fieldName == QString("master") || fieldName == QString("current_manager"))
-            return userFromId(index);
-        else if(fieldName == QString("box"))
-            return QVariant(repairBoxesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
-        else if(fieldName == QString("id"))
-            return QString("%1-%2").arg(record(index.row()).value("office").toString().rightJustified(3, '0')).arg(QSqlQueryModel::data(index).toString().rightJustified(6, '0'));
-        else if(fieldName == QString("client"))
-            return clientName(index);
-        else if(!permissions->viewClients &&fieldName == QString("phone"))
-            return tr("no permissions");
+        switch(index.column())
+        {
+            case Columns::Status:           return QVariant(statusesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
+            case Columns::RealRepairCost:   return dataLocalizedFromDouble(index);
+            case Columns::InDate:
+            case Columns::OutDate:          return dateTime(index);
+            case Columns::Master:
+            case Columns::CurrentManager:   return userFromId(index);
+            case Columns::Box:              return QVariant(repairBoxesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
+            case Columns::Id:               return QString("%1-%2").arg(record(index.row()).value("office").toString().rightJustified(3, '0')).arg(QSqlQueryModel::data(index).toString().rightJustified(6, '0'));
+            case Columns::Client:           return clientName(index);
+            case Columns::Phone:            if(!permissions->viewClients) return tr("no permissions");
+            default: ;
+        }
     }
     return STableBaseModel::data(index, role);
 }
@@ -81,15 +76,15 @@ void STableRepairsModel::initDemo()
         {
             switch (c)
             {
-            case 1: demoConstsForUnion.append(demoIds.at(r)); break; // № ремонта
-            case 2: demoConstsForUnion.append(demoTitles.at(r)); break; // Наименование
-            case 3: demoConstsForUnion.append(demoSNs.at(r)); break; // SN
-            case 4: demoConstsForUnion.append(demoFaults.at(r)); break; // неисправность
-            case 8: demoConstsForUnion.append(QDateTime::currentDateTime().toString("yyyy.MM.dd HH:mm")); break; // дата приёма
-            case 10: demoConstsForUnion.append(demoClients.at(r)); break; // клиент
-            case 16: demoConstsForUnion.append(QString::number(userDbData->currentOffice)); break; // офис
-            case 36: demoConstsForUnion.append(demoExtNotes.at(r)); break; // примечание
-            default: demoConstsForUnion.append("<data>");
+                case Columns::Id:           demoConstsForUnion.append(demoIds.at(r)); break;
+                case Columns::Title:        demoConstsForUnion.append(demoTitles.at(r)); break;
+                case Columns::SerialNumber: demoConstsForUnion.append(demoSNs.at(r)); break;
+                case Columns::Fault:        demoConstsForUnion.append(demoFaults.at(r)); break;
+                case Columns::InDate:       demoConstsForUnion.append(QDateTime::currentDateTime().toString("yyyy.MM.dd HH:mm")); break;
+                case Columns::Client:       demoConstsForUnion.append(demoClients.at(r)); break;
+                case Columns::Office:       demoConstsForUnion.append(QString::number(userDbData->currentOffice)); break;
+                case Columns::ExtNotes:     demoConstsForUnion.append(demoExtNotes.at(r)); break;
+                default:                    demoConstsForUnion.append("<data>");
             }
         }
         demoQuery += "\nUNION ALL\n" \
@@ -125,7 +120,7 @@ QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
         return value;
 
     // короткое имя
-    value = STableBaseModel::data(index(idx.row(), 38)).toString(); // TODO: заменить число на enum
+    value = STableBaseModel::data(index(idx.row(), Columns::ClientShortName)).toString();
     if(!value.isEmpty() && value.length() < i_columnWidths[idx.column()])
         return value;
 

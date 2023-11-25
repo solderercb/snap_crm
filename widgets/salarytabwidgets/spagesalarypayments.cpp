@@ -29,8 +29,8 @@ void SPageSalaryPayments::updateModels()
 
 void SPageSalaryPayments::updateWidgets()
 {
-    ui->tableViewPaymentsSummary->setTotal(4, parentTab->m_payments->STableBaseModel::total(4));
-    ui->tableViewPaymentsSummary->setTotal(5, parentTab->m_payments->STableBaseModel::total(5));
+    ui->tableViewPaymentsSummary->setTotal(STableViewSalaryPayments::Column::CashAmount, parentTab->m_payments->STableBaseModel::total(STableSalaryPaymentsModel::Columns::CashAmount));
+    ui->tableViewPaymentsSummary->setTotal(STableViewSalaryPayments::Column::BalanceAmount, parentTab->m_payments->STableBaseModel::total(STableSalaryPaymentsModel::Columns::BalanceAmount));
 }
 
 void SPageSalaryPayments::tableColumnResized(int, int)
@@ -47,6 +47,7 @@ STableViewSalaryPaymentsSummary::STableViewSalaryPaymentsSummary(QWidget *parent
 
 void STableViewSalaryPaymentsSummary::setGridLayout(XtraSerializer *layout)
 {
-    setData(0, 4, "<value>");
-    setData(0, 5, "<value>");
+    Q_UNUSED(layout)
+    setData(0, STableViewSalaryPayments::Column::CashAmount, "<value>");
+    setData(0, STableViewSalaryPayments::Column::BalanceAmount, "<value>");
 }

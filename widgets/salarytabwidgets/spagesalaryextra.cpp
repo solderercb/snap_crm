@@ -37,8 +37,8 @@ void SPageSalaryExtra::updateModels()
 
 void SPageSalaryExtra::updateWidgets()
 {
-    ui->tableViewExtraChargesSummary->setTotal(0, parentTab->m_extraCharges->rowCount());
-    ui->tableViewExtraChargesSummary->setTotal(2, parentTab->m_extraCharges->total(2));
+    ui->tableViewExtraChargesSummary->setTotal(STableViewSalaryExtra::Column::ID, parentTab->m_extraCharges->rowCount());
+    ui->tableViewExtraChargesSummary->setTotal(STableViewSalaryExtra::Column::Amount, parentTab->m_extraCharges->total(2));
 }
 
 void SPageSalaryExtra::tableColumnResized(int, int)
@@ -57,6 +57,6 @@ STableViewSalaryExtraSummary::STableViewSalaryExtraSummary(QWidget *parent) :
 void STableViewSalaryExtraSummary::setGridLayout(XtraSerializer *layout)
 {
     STableViewSummaryBase::setGridLayout(layout);
-    setData(0, 0, "<value>");
-    setData(0, 2, "<value>");
+    setData(0, STableViewSalaryExtra::Column::ID, "<value>");
+    setData(0, STableViewSalaryExtra::Column::Amount, "<value>");
 }

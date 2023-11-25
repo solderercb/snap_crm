@@ -3,10 +3,8 @@
 STableViewSalaryPayments::STableViewSalaryPayments(QWidget *parent) :
     STableViewBase(SLocalSettings::SalaryPaymentsGrid, parent)
 {
-    i_defaultColumnsWidths = {{0, 90},{1, 120},{2, 120},{3, 120},{4, 90},{5, 140},{6, 90},{7, 90},{8, 250}};
-    i_defaultHeaderLabels << tr("№ документа") << tr("Дата") << tr("С") << tr("По") << tr("Выдано") << tr("Зачислено на баланс") << tr("Сотрудник") << tr("Пользователь") << tr("Основание");
     readLayout();
-    i_gridLayout->$GridControl.Columns[8].Width_marked = true;  // по умолчанию автоширина столбца с основанием
+    i_gridLayout->$GridControl.Columns[Column::Notes].Width_marked = true;  // автоширина по умолчанию
 }
 
 STableViewSalaryPayments::~STableViewSalaryPayments()
@@ -16,6 +14,19 @@ STableViewSalaryPayments::~STableViewSalaryPayments()
 XtraSerializer *STableViewSalaryPayments::gridLayout()
 {
     return i_gridLayout;
+}
+
+void STableViewSalaryPayments::translateNames()
+{
+    tr("Doc");
+    tr("Date");
+    tr("PeriodFrom");
+    tr("PeriodTo");
+    tr("CashAmount");
+    tr("BalanceAmount");
+    tr("Employee");
+    tr("User");
+    tr("Notes");
 }
 
 void STableViewSalaryPayments::columnResized(int column, int oldWidth, int newWidth)

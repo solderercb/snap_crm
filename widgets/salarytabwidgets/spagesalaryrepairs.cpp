@@ -23,7 +23,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     connect(ui->tableViewRepairs, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairsRowDoubleClicked);
     connect(ui->tableViewRepairParts, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairPartsRowDoubleClicked);
     connect(ui->tableViewRepairs->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SPageSalaryRepairs::tableRepairsRowSelected);
-    connect(ui->checkBoxShowPayed, &QCheckBox::toggled, ui->tableViewRepairs, &STableViewSalaryRepairs::showRowsPayed);
+    connect(ui->checkBoxShowPayed, &QCheckBox::toggled, this, &SPageSalaryRepairs::showRowsPayed);
 }
 
 SPageSalaryRepairs::~SPageSalaryRepairs()
@@ -50,16 +50,41 @@ void SPageSalaryRepairs::enableVScrollbarPadding(const bool state)
     ui->gridLayoutRepairs->setColumnMinimumWidth(1, state*ui->tableViewRepairs->verticalScrollBar()->width());
 }
 
+void SPageSalaryRepairs::showRowsPayed(bool state)
+{
+    updateSummary();
+    ui->tableViewRepairs->showRowsPayed(state);
+}
+
+void SPageSalaryRepairs::updateSummary()
+{
+    bool excludePayed = !ui->checkBoxShowPayed->isChecked();
+    ui->tableViewRepairsSummary->setTotal(STableViewSalaryRepairs::Column::Id, parentTab->m_repairs->visibleRowCount(excludePayed));
+    for(int i = STableViewSalaryRepairs::Column::RealRepCost; i < STableViewSalaryRepairs::Column::IssueDate; i++)
+    {
+        ui->tableViewRepairsSummary->setTotal(i, parentTab->m_repairs->total(i, excludePayed));
+    }
+}
+
 void SPageSalaryRepairs::updateModels()
 {
     QStringList query_group;
+    QStringList statuses;
     query_group << "`id`";    // default GROUP part of query
 
-    // TODO: исправть числовые значения на enum'ы
+    statuses << QString::number(Global::RepStateIds::Returned);
+    statuses << QString::number(Global::RepStateIds::ReturnedNoRepair);
+    statuses << QString::number(Global::RepStateIds::ReturnedInCredit);
+    if(ui->checkBoxIncludeNotIssued->isChecked())
+    {
+        statuses << QString::number(Global::RepStateIds::Ready);
+        statuses << QString::number(Global::RepStateIds::ReadyNoRepair);
+    }
+
     ui->tableViewRepairs->setQuery(QUERY_SEL_SALARY_REPAIRS(
                                        parentTab->periodBegin(),
                                        parentTab->periodEnd(),
-                                       (ui->checkBoxIncludeNotIssued->isChecked())?"8,12,16,6,7":"8,12,16",
+                                       statuses.join(','),
                                        parentTab->employeeId()));
 
     ui->tableViewRepairs->setGrouping(query_group);
@@ -70,26 +95,21 @@ void SPageSalaryRepairs::updateModels()
 
 void SPageSalaryRepairs::updateWidgets()
 {
-    double notUssuedValue = 0;
+    double notIssuedValue = 0;
     m_userModel = parentTab->m_userModel;
     ui->labelPercentWorksValue->setText(QString::number(m_userModel->payRepair()));
     ui->labelPercentWorksQuickValue->setText(QString::number(m_userModel->payRepairQuick()));
     ui->labelPercentPartsValue->setText(QString::number(m_userModel->pay4SaleInRepair()?m_userModel->paySale():0));
     ui->labelPercentRefillValue->setText(QString::number(m_userModel->payCartridgeRefill()));
-//    ui->labelSalaryValue->setText(QString::number(m_userModel->pay...()));
-//    ui->labelNotUssuedValue->setText(QString::number(m_userModel->pay...()));
 
-    ui->tableViewRepairsSummary->setTotal(0, parentTab->m_repairs->rowCount());
-    for(int i = 2; i < 8; i++)
-    {
-        ui->tableViewRepairsSummary->setTotal(i, parentTab->m_repairs->total(i));
-    }
+    updateSummary();
     if(ui->checkBoxIncludeNotIssued->isChecked())
-        notUssuedValue = parentTab->m_repairs->notIssuedTotal(6) + parentTab->m_repairs->notIssuedTotal(7);
+        notIssuedValue = parentTab->m_repairs->notIssuedTotal(STableSalaryRepairsModel::EmployeeSalaryWorks) + parentTab->m_repairs->notIssuedTotal(STableSalaryRepairsModel::EmployeeSalaryParts);
 
-    ui->labelSalaryValue->setText(sysLocale.toString(parentTab->m_repairs->total(6, STableSalaryReceptedIssued::IncludePayed) + parentTab->m_repairs->total(7, STableSalaryReceptedIssued::IncludePayed), 'f', comSettings->classicKassa?2:0));
-    ui->labelSalaryToPayValue->setText(sysLocale.toString(parentTab->m_repairs->total(6) + parentTab->m_repairs->total(7), 'f', comSettings->classicKassa?2:0));
-    ui->labelNotUssuedValue->setText(sysLocale.toString(notUssuedValue, 'f', comSettings->classicKassa?2:0));
+    ui->labelSalaryValue->setText(sysLocale.toString(parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryWorks, STableSalaryReceptedIssued::IncludePayed) + parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryParts, STableSalaryReceptedIssued::IncludePayed), 'f', comSettings->classicKassa?2:0));
+    ui->labelSalaryCartridgesValue->setText(sysLocale.toString(parentTab->m_repairs->totalForCartridges(), 'f', comSettings->classicKassa?2:0));
+    ui->labelSalaryToPayValue->setText(sysLocale.toString(parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryWorks) + parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryParts), 'f', comSettings->classicKassa?2:0));
+    ui->labelNotIssuedValue->setText(sysLocale.toString(notIssuedValue, 'f', comSettings->classicKassa?2:0));
 }
 
 void SPageSalaryRepairs::repairsModelReset()
@@ -98,7 +118,7 @@ void SPageSalaryRepairs::repairsModelReset()
 
 void SPageSalaryRepairs::tableRepairsRowActivated(const QModelIndex &index)
 {
-    loadRepairData(parentTab->m_repairs->index(index.row(), 0).data().toInt());
+    loadRepairData(parentTab->m_repairs->index(index.row(), STableSalaryRepairsModel::Columns::Id).data().toInt());
 }
 
 void SPageSalaryRepairs::tableRepairsRowSelected(const QModelIndex &current, const QModelIndex &prev)
@@ -109,12 +129,12 @@ void SPageSalaryRepairs::tableRepairsRowSelected(const QModelIndex &current, con
 
 void SPageSalaryRepairs::tableRepairsRowDoubleClicked(const QModelIndex &index)
 {
-    mainWindow->createTabRepair(parentTab->m_repairs->index(index.row(), 0).data().toInt());
+    mainWindow->createTabRepair(parentTab->m_repairs->index(index.row(), STableSalaryRepairsModel::Columns::Id).data().toInt());
 }
 
 void SPageSalaryRepairs::tableRepairPartsRowDoubleClicked(const QModelIndex &index)
 {
-    mainWindow->createTabSparePart(parentTab->m_repairs->index(index.row(), 0).data().toInt());
+    mainWindow->createTabSparePart(parentTab->m_repairParts->index(index.row(), STableSalaryRepairPartsModel::Columns::ItemId).data().toInt());
 }
 
 void SPageSalaryRepairs::tableColumnResized(int, int)
@@ -130,13 +150,14 @@ void SPageSalaryRepairs::guiFontChanged()
     font.setPixelSize(userDbData->fontSize);
     font.setBold(true);
 
-    ui->labelNotUssuedValue->setFont(font);
+    ui->labelNotIssuedValue->setFont(font);
     ui->labelPercentPartsValue->setFont(font);
     ui->labelPercentRefillValue->setFont(font);
     ui->labelPercentWorksQuickValue->setFont(font);
     ui->labelPercentWorksValue->setFont(font);
     ui->labelSalaryToPayValue->setFont(font);
     ui->labelSalaryValue->setFont(font);
+    ui->labelSalaryCartridgesValue->setFont(font);
 }
 
 
@@ -150,9 +171,8 @@ STableViewSalaryRepairsSummary::STableViewSalaryRepairsSummary(QWidget *parent) 
 void STableViewSalaryRepairsSummary::setGridLayout(XtraSerializer *layout)
 {
     STableViewSummaryBase::setGridLayout(layout);
-    for(int i = 2; i < 8; i++)
+    for(int i = STableViewSalaryRepairs::Column::RealRepCost; i < STableViewSalaryRepairs::Column::IssueDate; i++)
     {
-        if(i == 6) continue;
         setData(0, i, "<value>");
     }
 }

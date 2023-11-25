@@ -156,7 +156,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     // TODO: компания/офис
 
     ui->tableView->setQuery(QUERY_SEL_WORKSHOP_STATIC, QSqlDatabase::database("connMain"));
-    ui->tableView->setUniqueIdColumn(1);
+    ui->tableView->setUniqueIdColumn(STableRepairsModel::Columns::Id);
     FilterList l1;
     l1.op = FilterList::And;
 

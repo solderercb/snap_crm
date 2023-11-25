@@ -11,7 +11,7 @@ double STableSalaryRepairsModel::total(int column, bool excludePayed)
     double total = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        if(excludePayed == ExcludePayed && payedSumm(i)) // ранее оплаченные сотруднику ремонты не суммируются
+        if(excludePayed == ExcludePayed && paidAmount(i)) // ранее оплаченные сотруднику ремонты не суммируются
             continue;
 
         total += unformattedData(index(i, column)).toDouble();
@@ -25,18 +25,32 @@ double STableSalaryRepairsModel::notIssuedTotal(int column)
     double total = 0;
     for(int i = 0; i < rowCount(); i++)
     {
-        switch(index(i, 9).data().toInt())
+        switch(index(i, Columns::RepState).data().toInt())
         {
-            case 8:     // TODO: заменить числа!
-            case 12:
-            case 16: continue;
+            case Global::RepStateIds::Returned:
+            case Global::RepStateIds::ReturnedNoRepair:
+            case Global::RepStateIds::ReturnedInCredit: continue;
             default: ;
         }
 
-        if(payedSumm(i)) // ранее оплаченные сотруднику ремонты не суммируются
+        if(paidAmount(i)) // ранее оплаченные сотруднику ремонты не суммируются
             continue;
 
-        total += sysLocale.toDouble(index(i, column).data().toString());
+        total += unformattedData(index(i, column)).toDouble();
+    }
+
+    return total;
+}
+
+/* Сумма за картриджи отдельной графой */
+double STableSalaryRepairsModel::totalForCartridges()
+{
+    double total = 0;
+
+    for(int i = 0; i < rowCount(); i++)
+    {
+        if(index(i, Columns::CartridgeId).data().toInt())
+            total += unformattedData(index(i, Columns::EmployeeSalaryWorks)).toDouble() + unformattedData(index(i, Columns::EmployeeSalaryParts)).toDouble();
     }
 
     return total;
@@ -55,19 +69,19 @@ QVariant STableSalaryRepairsModel::data(const QModelIndex &item, int role) const
     {
         switch (item.column())
         {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7: return dataLocalizedFromDouble(item);
-            case 8: return timestampLocal(item);
+            case Columns::RealRepCost:
+            case Columns::EmployeeWorks:
+            case Columns::AllParts:
+            case Columns::EmployeeParts:
+            case Columns::EmployeeSalaryWorks:
+            case Columns::EmployeeSalaryParts: return dataLocalizedFromDouble(item);
+            case Columns::IssueDate: return timestampLocal(item);
             default: ;
         }
     }
-    else if(role == Qt::BackgroundRole) // ранее оплаченные сотруднику ремонты выделены зелёным
+    else if(role == Qt::BackgroundRole) // ранее оплаченные сотруднику ремонты выделены серым
     {
-        if(index(item.row(), 10).data().toInt())
+        if(item.siblingAtColumn(Columns::Amount).data().toInt())
             return QColor(192,192,192);
     }
 
@@ -76,10 +90,24 @@ QVariant STableSalaryRepairsModel::data(const QModelIndex &item, int role) const
 
 int STableSalaryRepairsModel::id(const int row)
 {
-    return unformattedData(index(row, 0)).toInt();
+    return unformattedData(index(row, Columns::Id)).toInt();
 }
 
-int STableSalaryRepairsModel::payedSumm(const int row)
+int STableSalaryRepairsModel::paidAmount(const int row)
 {
-    return unformattedData(index(row, 10)).toInt();
+    return unformattedData(index(row, Columns::Amount)).toInt();
+}
+
+int STableSalaryRepairsModel::visibleRowCount(bool excludePayed)
+{
+    int visibleRows = 0;
+    for(int i = 0; i < rowCount(); i++)
+    {
+        if(excludePayed && paidAmount(i)) // ранее оплаченные сотруднику ремонты не суммируются
+            continue;
+
+        visibleRows++;
+    }
+
+    return visibleRows;
 }

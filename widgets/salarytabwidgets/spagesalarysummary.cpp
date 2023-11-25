@@ -188,7 +188,7 @@ void SPageSalarySummary::markRepairsPayed()
 //            else
                 salaryRepairsModel->setRepair(parentTab->m_repairs->id(i));
             salaryRepairsModel->setUser(parentTab->m_userModel->id());
-            salaryRepairsModel->setSumm(parentTab->m_repairs->unformattedData(i, 6).toDouble() + parentTab->m_repairs->unformattedData(i, 7).toDouble());
+            salaryRepairsModel->setSumm(parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryWorks).toDouble() + parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryParts).toDouble());
             salaryRepairsModel->setAccountingDate(periodEnd);
             salaryRepairsModel->commit();
 
@@ -353,11 +353,11 @@ void SPageSalarySummary::updateWidgets()
 {
     double monthRate = parentTab->m_userModel->salaryRate();
     double monthCharge = 0;
-    double earningWorksAndParts = parentTab->m_repairs->total(6, STableSalaryRepairsModel::IncludePayed) + parentTab->m_repairs->total(7, STableSalaryRepairsModel::IncludePayed);   // в АСЦ в поле "Заработок с ремонтов" только сумма за работы; сумма за детали в ремонтах прибавляется к сумме за проданные и отображается в поле "Заработок с продаж"
-    double earningReceptedIssued = parentTab->m_recepted->total(4) + parentTab->m_issued->total(4);
-    double earningSales = parentTab->m_sales->total(5);
-    double extraCharges = parentTab->m_extraCharges->total(2, 1);
-    double extraChargesOff = parentTab->m_extraCharges->total(2, -1);
+    double earningWorksAndParts = parentTab->m_repairs->total(STableSalaryRepairsModel::Columns::EmployeeSalaryWorks, STableSalaryRepairsModel::IncludePayed) + parentTab->m_repairs->total(STableSalaryRepairsModel::Columns::EmployeeSalaryParts, STableSalaryRepairsModel::IncludePayed);   // в АСЦ в поле "Заработок с ремонтов" только сумма за работы; сумма за детали в ремонтах прибавляется к сумме за проданные и отображается в поле "Заработок с продаж"
+    double earningReceptedIssued = parentTab->m_recepted->total(STableSalaryReceptedIssued::Columns::PayDeviceIn) + parentTab->m_issued->total(STableSalaryReceptedIssued::Columns::PayDeviceOut);
+    double earningSales = parentTab->m_sales->total(STableSalarySalesModel::Columns::SalaryPart);
+    double extraCharges = parentTab->m_extraCharges->total(STableSalaryExtraModel::Columns::Price, 1);
+    double extraChargesOff = parentTab->m_extraCharges->total(STableSalaryExtraModel::Columns::Price, -1);
     double earning = 0;
     double paymentsSubsistanceSumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Subsistance);
     double paymentsSalarySumm = parentTab->m_payments->total(STableSalaryPaymentsModel::Salary);

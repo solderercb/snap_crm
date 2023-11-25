@@ -184,14 +184,14 @@
            </widget>
           </item>
           <item row="6" column="0">
-           <widget class="QLabel" name="labelNotUssued">
+           <widget class="QLabel" name="labelSalaryToPay">
             <property name="text">
-             <string>Готово, но не выдано</string>
+             <string>Сумма к выплате</string>
             </property>
            </widget>
           </item>
           <item row="6" column="1">
-           <widget class="QLabel" name="labelNotUssuedValue">
+           <widget class="QLabel" name="labelSalaryToPayValue">
             <property name="font">
              <font>
               <pointsize>9</pointsize>
@@ -208,27 +208,51 @@
            </widget>
           </item>
           <item row="7" column="0">
-           <widget class="QLabel" name="labelIncludeNotUssued">
+           <widget class="QLabel" name="labelNotIssued">
             <property name="text">
              <string>Готово, но не выдано</string>
             </property>
            </widget>
           </item>
           <item row="7" column="1">
+           <widget class="QLabel" name="labelNotIssuedValue">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;value&gt;</string>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="labelIncludeNotUssued">
+            <property name="text">
+             <string>Готово, но не выдано</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
            <widget class="QCheckBox" name="checkBoxIncludeNotIssued">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="9" column="0">
            <widget class="QLabel" name="labelShowPayed">
             <property name="text">
              <string>Показывать оплаченные</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="9" column="1">
            <widget class="QCheckBox" name="checkBoxShowPayed">
             <property name="text">
              <string/>
@@ -236,14 +260,20 @@
            </widget>
           </item>
           <item row="5" column="0">
-           <widget class="QLabel" name="labelSalaryToPay">
+           <widget class="QLabel" name="labelSalaryCartridges">
             <property name="text">
-             <string>Сумма к выплате</string>
+             <string>из них за картриджи</string>
+            </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <property name="indent">
+             <number>20</number>
             </property>
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QLabel" name="labelSalaryToPayValue">
+           <widget class="QLabel" name="labelSalaryCartridgesValue">
             <property name="font">
              <font>
               <pointsize>9</pointsize>

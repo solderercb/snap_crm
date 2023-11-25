@@ -15,6 +15,7 @@ class STableSalaryExtraModel : public SEditableBaseModel
 signals:
     void repopulate();
 public:
+    enum Columns {Id = 0, Name = 1, Price = 2, PaymentDate = 3, User = 4};
     explicit STableSalaryExtraModel(QObject *parent = nullptr);
     QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;

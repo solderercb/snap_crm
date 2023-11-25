@@ -15,11 +15,11 @@ QVariant STableSalaryPaymentsModel::data(const QModelIndex &item, int role) cons
     {
         switch (item.column())
         {
-            case 1:
-            case 2:
-            case 3: return timestampLocal(item);
-            case 4:
-            case 5: return dataLocalizedFromDouble(item);
+            case Columns::PaymentDate:
+            case Columns::PeriodFrom:
+            case Columns::PeriodTo: return timestampLocal(item);
+            case Columns::CashAmount:
+            case Columns::BalanceAmount: return dataLocalizedFromDouble(item);
             default: ;
         }
     }
@@ -34,10 +34,10 @@ double STableSalaryPaymentsModel::total(const PaymentType type)
     double cash = 0, balance = 0;
     for(int i=0; i < rowCount(); i++)
     {
-        if(STableBaseModel::data(index(i, 7)).toInt() == type)
+        if(STableBaseModel::data(index(i, Columns::Type)).toInt() == type)
         {
-            cash = STableBaseModel::data(index(i, 4)).toDouble();
-            balance = STableBaseModel::data(index(i, 5)).toDouble();
+            cash = STableBaseModel::data(index(i, Columns::CashAmount)).toDouble();
+            balance = STableBaseModel::data(index(i, Columns::BalanceAmount)).toDouble();
             total += cash + ((balance > 0)?balance:0);  // учитываются только поступления на баланс
         }
     }
