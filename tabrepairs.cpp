@@ -11,6 +11,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabRepairs)
 {
+    m_tabType = type; // прежде всего
     logUserActivity();
 
     ui->setupUi(this);
@@ -22,7 +23,6 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     ui->pushButtonMenu->addAction(widgetAction);
 
     this->setAttribute(Qt::WA_DeleteOnClose);
-    m_tabType = type;
 
     tableUpdateDelay = new QTimer();
     repairs_table = new STableRepairsModel();
@@ -36,7 +36,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
         ui->pushButtonReceipt->hide();
 
     widgetAction->setComboBoxOfficeModel(officesModel);
-    widgetAction->setComboBoxStatusModel(statusesModel);
+    widgetAction->setComboBoxStatusModel(comSettings->repairStatuses.Model);
     widgetAction->setComboBoxEmployeeModel(usersModel);
     widgetAction->setComboBoxClientModel(clientsTypesList);
 //    widgetAction->setComboBoxXModel(repairModel);
@@ -165,7 +165,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     if ( !userDbData->displayOut && ui->lineEditSearch->text().isEmpty() )
         l1.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
     if(filterSettings->contains("status") && filterSettings->value("status") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, statusesModel->databaseIDByRow(filterSettings->value("status"))));
+        l1.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, comSettings->repairStatuses[filterSettings->value("status")].Id));
     if(filterSettings->contains("office") && filterSettings->value("office") >= 0)
         l1.fields.append(STableViewBase::initFilterField("t1.`office`", FilterField::Equals, officesModel->databaseIDByRow(filterSettings->value("office"))));
     if(filterSettings->contains("employee") && filterSettings->value("employee") >= 0)

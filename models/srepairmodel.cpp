@@ -463,21 +463,20 @@ int SRepairModel::state()
     return m_state;
 }
 
-int SRepairModel::stateIndex()
-{
-    return statusesModel->rowByDatabaseID(m_state);
-}
-
 void SRepairModel::setState(const int id)
 {
+    if(m_state == id)
+        return;
+
     m_state = id;
     i_valuesMap.insert("state", m_state);
     switch (id)
     {
         case Global::RepStateIds::GetIn: break;
         case Global::RepStateIds::Returned:
-        case Global::RepStateIds::ReturnedNoRepair: setOutDate(QDateTime::currentDateTime()); Q_FALLTHROUGH();
-        default: appendLogText(tr("Статус заказа изменён на \"%1\"").arg(statusesModel->getDisplayRole(m_state)));
+        case Global::RepStateIds::ReturnedNoRepair:
+        case Global::RepStateIds::ReturnedInCredit: setOutDate(QDateTime::currentDateTime()); Q_FALLTHROUGH();
+        default: appendLogText(tr("Статус заказа изменён на \"%1\"").arg(comSettings->repairStatuses[m_state].Name));
     }
 
     m_repairStatusLog->setStatus(m_state);
@@ -487,19 +486,14 @@ void SRepairModel::setState(const int id)
     updateLastStatusChanged();
 }
 
-void SRepairModel::setStateIndex(const int index)
+int SRepairModel::newState()
 {
-    setState(statusesModel->databaseIDByRow(index));
+    return m_newState;
 }
 
-int SRepairModel::newStateIndex()
+void SRepairModel::setNewState(const int id)
 {
-    return statusesModel->rowByDatabaseID(m_newState);
-}
-
-void SRepairModel::setNewStateIndex(const int index)
-{
-    i_valuesMap.insert("new_state", statusesModel->databaseIDByRow(index));
+    i_valuesMap.insert("new_state", id);
 }
 
 int SRepairModel::userLock()
@@ -697,11 +691,11 @@ void SRepairModel::setPrepaidSumm(const double summ)
     i_valuesMap.insert("prepaid_summ", summ);
 }
 
-double SRepairModel::realPrepaidSumm()
+double SRepairModel::paymentsAmount(const SCashRegisterModel::PaymentType type)
 {
     double summ;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    query->exec(QUERY_SEL_REPAIR_PREPAYS(i_id));
+    query->exec(QUERY_SEL_REPAIR_PAYMENTS(i_id, QString::number(type)));    // если тип не указан, то будут выбраны все записи, относящиеся к данному ремонту
     query->first();
     summ = query->value(0).toDouble();
     delete query;
@@ -1071,6 +1065,10 @@ bool SRepairModel::commit()
         setRejectReason("");
         setInDate(QDateTime::currentDateTime());
         setState(Global::RepStateIds::GetIn);
+        if(!i_valuesMap.contains("company"))
+            i_valuesMap.insert("company", userDbData->company);
+        if(!i_valuesMap.contains("office"))
+            i_valuesMap.insert("office", userDbData->currentOffice);
         if(!insert())
             throw Global::ThrowType::QueryError;
         appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
@@ -1173,7 +1171,7 @@ QString SRepairModel::prepaidSummStr()
 
 QString SRepairModel::realPrepaidSummStr()
 {
-    return sysLocale.toCurrencyString(realPrepaidSumm());
+    return sysLocale.toCurrencyString(paymentsAmount());
 }
 
 QString SRepairModel::preAgreedAmountStr()

@@ -47,7 +47,7 @@ private:
     Ui::tabRepairs *ui;
     QMap<QString, int> *filterSettings;
     static tabRepairs* p_instance[2];
-    bool m_tabType;
+    bool m_tabType = 0;
     QTableView* tableView;
     STableRepairsModel* repairs_table;
     QSqlQueryModel* cartridges_table = nullptr;

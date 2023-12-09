@@ -73,6 +73,7 @@ SOURCES += \
     models/scomsettings.cpp \
     models/sdatabaseauxiliary.cpp \
     models/seditablebasemodel.cpp \
+    models/sofficemodel.cpp \
     models/ssqlfetchingmodel.cpp \
     models/stablemodelscommonmethods.cpp \
     models/stablerepairsmodel.cpp \
@@ -236,6 +237,7 @@ HEADERS  += \
     models/scomsettingstypes.h \
     models/sdatabaseauxiliary.h \
     models/seditablebasemodel.h \
+    models/sofficemodel.h \
     models/spermissions.h \
     models/ssqlfetchingmodel.h \
     models/stablemodelscommonmethods.h \

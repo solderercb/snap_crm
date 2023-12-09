@@ -59,12 +59,9 @@ void tabRepairCartridges::loadForms(QList<int> *list)
 {
     SCartridgeForm *form;
     QList<int> currentList;
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
-    {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
 
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
+    for(auto form : existentForms())
+    {
         currentList.append(form->repairId());
     }
 
@@ -73,6 +70,7 @@ void tabRepairCartridges::loadForms(QList<int> *list)
         if(currentList.contains(list->at(i)))
             continue;
         form = new SCartridgeForm(list->at(i));
+
         if(!form->repairId())   // если не удалось загрузить данные модели ремонта (например, ремонт с таким номером не существует)
         {
             delete form;
@@ -109,7 +107,6 @@ void tabRepairCartridges::appendToReceptList(SCartridgeForm *form)
 */
 void tabRepairCartridges::updateWidgets()
 {
-    SCartridgeForm *form;
     int client = 0;
 
     m_readyButtonVisible = 0;
@@ -119,12 +116,8 @@ void tabRepairCartridges::updateWidgets()
     if(comSettings->useSimplifiedCartridgeRepair)
         m_readyButtonVisible = 1;        // кнопка видна только в упрощенном режиме работы с картриджами
 
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         formReady = form->isReady();
         m_readyButtonVisible &= formReady;
         m_issueButtonVisible &= formReady;
@@ -136,21 +129,21 @@ void tabRepairCartridges::updateWidgets()
     ui->buttonIssue->setVisible(m_issueButtonVisible);
 }
 
+const QList<SCartridgeForm *> tabRepairCartridges::existentForms()
+{
+    return ui->scrollAreaWidgetContents->findChildren<SCartridgeForm *>();
+}
+
 /* Перезагрузка данных модели из БД
 */
 void tabRepairCartridges::reloadRepairData()
 {
-    SCartridgeForm *form;
     SRepairModel *repairModel;
     SSaleTableModel *worksAndPartsModel;
     int repairId;
 
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         repairModel = form->model();
         repairId = repairModel->id();
         worksAndPartsModel = repairModel->worksAndPartsModel();
@@ -173,28 +166,18 @@ void tabRepairCartridges::closeCartridgeCardForm()
 
 void tabRepairCartridges::reloadCardModel(int)
 {
-    SCartridgeForm *form;
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         form->updateModels();
     }
 }
 
 void tabRepairCartridges::setReadyToIssue()
 {
-    SCartridgeForm *form;
     bool ret = 1;
 
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         form->model()->setState(Global::RepStateIds::Ready);
         ret &= form->model()->commit();
     }
@@ -215,14 +198,9 @@ void tabRepairCartridges::closeTab()
 void tabRepairCartridges::createDialogIssue()
 {
     QList<SRepairModel*> list;
-    SCartridgeForm *form;
 
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         list.append(form->model());
     }
 

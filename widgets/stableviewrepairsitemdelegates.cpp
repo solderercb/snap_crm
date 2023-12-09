@@ -1,4 +1,5 @@
 #include "stableviewrepairsitemdelegates.h"
+#include "models/stablerepairsmodel.h"
 
 STableViewRepairsItemDelegates::STableViewRepairsItemDelegates(QObject *parent) : STableViewBaseItemDelegates(parent)
 {
@@ -28,30 +29,35 @@ void STableViewRepairsItemDelegates::paint(QPainter *painter, const QStyleOption
 void STableViewRepairsItemDelegates::paintStatusProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     uint progressStatus = 0;
-    uint repairStatus = i_tableModel->record(index.row()).value("status").toInt();
-    uint statusTermSecons = statusesModel->value(repairStatus, 1, 7).toInt();
-    QDateTime statusChanged = QDateTime::fromString(i_tableModel->record(index.row()).value("last_status_changed").toString(), "yyyy-MM-ddThh:mm:ss.z");
+    uint repairStatus = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
+    uint statusTermSecons = comSettings->repairStatuses[repairStatus].TermsSec;
+    QDateTime statusChanged = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::LastStatusChanged)).toDateTime();
     statusChanged.setTimeZone(QTimeZone::utc());
     qint64 secondsSinceStatusChanged = statusChanged.secsTo(QDateTime::currentDateTimeUtc());
 
-    if(statusTermSecons)
-    {
-        progressStatus = qMin(100, (int)((100 * secondsSinceStatusChanged)/statusTermSecons));
-        QStyleOptionProgressBar progressBarStatus;
-        QRect r = option.rect;
-        r.setHeight( r.height()/3 );
-        progressBarStatus.rect = r;
-        progressBarStatus.textAlignment = Qt::AlignCenter;
-        progressBarStatus.minimum = 0;
-        progressBarStatus.maximum = 100;
-        progressBarStatus.progress = progressStatus;
-        progressBarStatus.textVisible = false;
-        // Qt 6 requires QStyle::State_Horizontal to be set for correctly drawing horizontal progress bar
-        progressBarStatus.state = option.state | QStyle::State_Horizontal;
+    if(statusTermSecons <= 0)   // если термин статуса не задан, что шкала прогресса 100%
+        statusTermSecons = secondsSinceStatusChanged;
 
-        paintColorizedProgressBar(&progressBarStatus, painter, option.widget);
+    switch(repairStatus)
+    {
+        case Global::RepStateIds::Returned:
+        case Global::RepStateIds::ReturnedNoRepair: break;  // прогресс выданных всегда 0
+        default: progressStatus = qMin(100, (int)((100 * secondsSinceStatusChanged)/statusTermSecons));
     }
 
+    QStyleOptionProgressBar progressBarStatus;
+    QRect r = option.rect;
+    r.setHeight( r.height()/3 );
+    progressBarStatus.rect = r;
+    progressBarStatus.textAlignment = Qt::AlignCenter;
+    progressBarStatus.minimum = 0;
+    progressBarStatus.maximum = 100;
+    progressBarStatus.progress = progressStatus;
+    progressBarStatus.textVisible = false;
+    // Qt 6 requires QStyle::State_Horizontal to be set for correctly drawing horizontal progress bar
+    progressBarStatus.state = option.state | QStyle::State_Horizontal;
+
+    paintColorizedProgressBar(&progressBarStatus, painter, option.widget);
 }
 
 // макс. значение — сумма дней всех терминов в таблице статусов (учитываются только дни, часть с часами, минутами и секундами  не учитывается)
@@ -60,24 +66,26 @@ void STableViewRepairsItemDelegates::paintStatusProgressBar(QPainter *painter, c
 void STableViewRepairsItemDelegates::paintRepairProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     uint progressRepair = 0;
-    uint repairStatus = i_tableModel->record(index.row()).value("status").toInt();
-    QDateTime inDate = QDateTime::fromString(i_tableModel->record(index.row()).value("in_date").toString(), "yyyy-MM-ddThh:mm:ss.z");
+    uint repairStatus = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
+    QDateTime inDate = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::InDate)).toDateTime();
     inDate.setTimeZone(QTimeZone::utc());
     QDateTime currentOrOutDate;
     switch (repairStatus)
     {
         case Global::RepStateIds::Returned:
         case Global::RepStateIds::ReturnedNoRepair:
-        case Global::RepStateIds::ReturnedInCredit: currentOrOutDate = QDateTime::fromString(i_tableModel->record(index.row()).value("out_date").toString(), "yyyy-MM-ddThh:mm:ss.z"); break;
-        default: currentOrOutDate = QDateTime::currentDateTimeUtc();
+        case Global::RepStateIds::ReturnedInCredit: currentOrOutDate = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::OutDate)).toDateTime(); break;
+        default: ;
     }
+    if(!currentOrOutDate.isValid())
+        currentOrOutDate = QDateTime::currentDateTimeUtc();
     currentOrOutDate.setTimeZone(QTimeZone::utc());
     qint64 secondsSinceInDate = inDate.secsTo(currentOrOutDate);
     qint64 daysSinceInDate = inDate.daysTo(currentOrOutDate);
 
-    if(repairTermSeconds)
+    if(comSettings->repairStatuses.RepairTermSec)
     {
-        progressRepair = qMin(100, (int)((100 * secondsSinceInDate)/repairTermSeconds));
+        progressRepair = qMin(100, (int)((100 * secondsSinceInDate)/comSettings->repairStatuses.RepairTermSec));
 
         QStyleOptionProgressBar progressBarRepair;
         QRect r2 = option.rect;
@@ -103,7 +111,7 @@ void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, 
         Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("i_fontMetrics not set").toLocal8Bit());
 
     STableViewBaseItemDelegates::paint(painter, option, index);
-    int status = i_tableModel->record(index.row()).value("informed_status").toInt();
+    int status = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::InformedStatus)).toInt();
 
     if(!status)
         return;

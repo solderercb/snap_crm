@@ -2,6 +2,7 @@
 #include "tabreceptcartridge.h"
 #include "ui_tabreceptcartridge.h"
 #include "tabrepairs.h"
+#include "models/sofficemodel.h"
 
 tabReceptCartridge* tabReceptCartridge::p_instance = nullptr;
 
@@ -87,7 +88,7 @@ void tabReceptCartridge::setDefaultStyleSheets()
 {
     ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
-//    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxVendor->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxModel->setStyleSheet(commonComboBoxStyleSheet);
@@ -98,27 +99,35 @@ void tabReceptCartridge::initWidgets()
 {
     ui->comboBoxCompany->setPlaceholderText(tr("организация"));
     ui->comboBoxOffice->setPlaceholderText(tr("офис"));
-    ui->comboBoxOffice->setEnabled(false);  // TODO: см. комментарий к аналогичному вызову в классе tabRepairNew
     ui->comboBoxPresetEngineer->setPlaceholderText(tr("назначить инженером"));
     ui->comboBoxPresetEngineer->setButtons("Clear");
-    ui->comboBoxPresetPaymentAccount->setPlaceholderText(tr("тип оплаты"));
     if(permissions->editCartridgeCards)
         ui->comboBoxModel->setButtons("Add, Edit");
 
     setDefaultStyleSheets();
 
     // установка моделей данных
+    // TODO: группу из comboBox для выбора компании и офиса перенести в отдельный класс;
     ui->comboBoxCompany->setModel(companiesModel);
+//    if(comSettings->isAutoSetCompanyOnRepairRecept)   // в АСЦ эта настройка, похоже, не учитывается
+        ui->comboBoxCompany->setCurrentIndex(SOfficeModel::current()->defaultCompanyIndex());
+//    else
+//        ui->comboBoxCompany->setCurrentIndex(-1);
+    ui->comboBoxCompany->setVisible(companiesModel->rowCount() > 1);
+    if(companiesModel->rowCount() == 1)
+    {
+        ui->comboBoxCompany->setVisible(false);
+    }
     ui->comboBoxOffice->setModel(officesModel);
-    if(comSettings->isAutoSetCompanyOnRepairRecept)
-        ui->comboBoxCompany->setCurrentIndex(companiesModel->rowByDatabaseID(userDbData->currentOffice));
-    else
-        ui->comboBoxCompany->setCurrentIndex(-1);
     ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->currentOffice));
+    if(officesModel->rowCount() == 1)
+    {
+        ui->comboBoxOffice->setVisible(false);
+    }
     ui->comboBoxPresetEngineer->setModel(engineersModel);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
-    ui->comboBoxPresetPaymentAccount->setCurrentIndex(-1);
+    ui->comboBoxPresetPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(0, "system_id"));
     ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
     ui->comboBoxVendor->setModel(m_vendorsModel);
     ui->comboBoxVendor->setCurrentIndex(-1);
@@ -141,8 +150,6 @@ void tabReceptCartridge::initWidgets()
 
 void tabReceptCartridge::clearWidgets()
 {
-    SCartridgeForm *form;
-
     ui->checkBoxIsHighPriority->setCheckState(Qt::Unchecked);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
@@ -150,52 +157,32 @@ void tabReceptCartridge::clearWidgets()
     ui->spinBoxQty->setValue(1);
     ui->comboBoxVendor->setCurrentIndex(-1);
     ui->comboBoxModel->setCurrentIndex(-1);
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         form->deleteLater();
     }
-}
-
-void tabReceptCartridge::setModelData()
-{
-    int preferredPaymentAccIndex;
-//    if(ui->checkBoxIsHighPriority->isChecked())
-//        repairModel->setExpressRepair(1);
-//        repairModel->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
-//    repairModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-//    repairModel->setOffice(userDbData->currentOffice);
-//    repairModel->setStartOffice(userDbData->currentOffice);
-    preferredPaymentAccIndex = ui->comboBoxPresetPaymentAccount->currentIndex();
-
-    if( preferredPaymentAccIndex >= 0)
-    {
-//        repairModel->setPaymentSystemIndex(preferredPaymentAccIndex);
-//        if(paymentSystemsModel->databaseIDByRow(preferredPaymentAccIndex, "system_id") == -1)
-//            repairModel->setIsCardPayment(1);
-    }
-//    repairModel->setVendorId(m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex()));
 }
 
 bool tabReceptCartridge::checkInput()
 {
     int error = 0;
-    SCartridgeForm *form;
 
     setDefaultStyleSheets();
 
-    if ( ui->comboBoxOffice->currentIndex() < 0 && ui->comboBoxModel->currentText() == "" )
+    if ( ui->comboBoxCompany->currentIndex() < 0)
+    {
+        ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 1;
+    }
+    if ( ui->comboBoxOffice->currentIndex() < 0)
     {
         ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheetRed);
-        error = 1;
+        error = 2;
     }
     if ( comSettings->isEngineerRequiredOnDeviceRecept && ui->comboBoxPresetEngineer->currentIndex() < 0 )
     {
         ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheetRed);
-        error = 2;
+        error = 3;
     }
 
     error = qMax(error, ui->widgetClient->checkInput());
@@ -205,12 +192,8 @@ bool tabReceptCartridge::checkInput()
         qDebug() << "Ошибка создания карточки(-ек) заправки: не заполнены общие обязательные поля (error " << error << ")";
     }
 
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         error = qMax(error, form->checkInput());
     }
 
@@ -288,15 +271,10 @@ void tabReceptCartridge::appendToReceptList()
 
 void tabReceptCartridge::updateTotalPreagreedAmount()
 {
-    SCartridgeForm *form;
     double amount = 0;
 
-    for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+    for(auto form : existentForms())
     {
-        if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-            continue;
-
-        form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
         amount += form->preargeedAmount();
     }
     ui->doubleSpinBoxTotalPreagreedAmount->setValue(amount);
@@ -330,7 +308,7 @@ void tabReceptCartridge::guiFontChanged()
 
     ui->comboBoxPresetEngineer->setFont(font);
     ui->comboBoxCompany->setFont(font);
-//    ui->comboBoxOffice->setFont(font);
+    ui->comboBoxOffice->setFont(font);
     ui->comboBoxPresetPaymentAccount->setFont(font);
     ui->comboBoxVendor->setFont(font);
     ui->comboBoxModel->setFont(font);
@@ -346,13 +324,8 @@ void tabReceptCartridge::print()
         SPrintPOSReport *report = new SPrintPOSReport();
         report->setClientModel(m_client);
         report->openPrinter(userLocalData->PosPrinter.value);
-        SCartridgeForm *form;
-        for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+        for(auto form : existentForms())
         {
-            if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-                continue;
-
-            form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
             report->addPrintJob(form->model());
         }
 
@@ -369,7 +342,12 @@ void tabReceptCartridge::print()
 //        report_vars.insert("copies", ui->spinBoxStickersCount->value());
 //        emit generatePrintout(report_vars);
 //        report_vars.clear();
-//    }
+    //    }
+}
+
+const QList<SCartridgeForm *> tabReceptCartridge::existentForms()
+{
+    return ui->scrollAreaWidgetContents->findChildren<SCartridgeForm *>();
 }
 
 #ifdef QT_DEBUG
@@ -514,7 +492,6 @@ bool tabReceptCartridge::createRepairs()
 
     bool nErr = 1;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    SCartridgeForm *form;
 
     setDefaultStyleSheets();
     m_printReport = ui->checkBoxPrintReceipt->isChecked(); // кэширование состояния
@@ -527,12 +504,8 @@ bool tabReceptCartridge::createRepairs()
         m_client = ui->widgetClient->model();
 
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-        for(int i = 0; i < ui->verticalLayoutCartridges->count(); i++)
+        for(auto form : existentForms())
         {
-            if(ui->verticalLayoutCartridges->itemAt(i)->widget() == nullptr)
-                continue;
-
-            form = static_cast<SCartridgeForm *>(ui->verticalLayoutCartridges->itemAt(i)->widget());
             form->setClientId(m_client->id());
             form->setCompanyIndex(ui->comboBoxCompany->currentIndex());
             form->setOfficeIndex(ui->comboBoxOffice->currentIndex());

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "tabcashoperation.h"
 #include "ui_tabcashoperation.h"
+#include "models/sofficemodel.h"
 
 QMap<int, tabCashOperation*> tabCashOperation::p_instance;
 
@@ -24,8 +25,11 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     ui->lineEditBalance->setReadOnly(true);
     ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
     ui->comboBoxCompany->setModel(companiesModel);
-    ui->comboBoxCompany->setCurrentIndex(companiesModel->rowByDatabaseID(userDbData->company));
-
+    if(companiesModel->rowCount() == 1)
+    {
+        ui->comboBoxCompany->setVisible(false); // в АСЦ это поле остаётся видимым даже при одной компании и офисе
+        ui->labelCompany->setVisible(false);
+    }
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
     paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
@@ -187,6 +191,7 @@ void tabCashOperation::setAmountReadOnly(bool state)
 void tabCashOperation::setDefaultStylesheets()
 {
     ui->lineEditLinkedObjCaption->setStyleSheet(commonLineEditStyleSheet);
+    ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
     ui->doubleSpinBoxAmount->setStyleSheet(commonSpinBoxStyleSheet);
     ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheet);
     ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
@@ -205,6 +210,7 @@ bool tabCashOperation::commit(bool repeatAfter)
     QUERY_LOG_START(metaObject()->className());
 
     cashRegister->setOperationType(m_orderType);
+    cashRegister->setCompanyIndex(ui->comboBoxCompany->currentIndex());
     if(permissions->createBackdatedDocuments && m_backdate)
         cashRegister->setCreatedDate(ui->dateEdit->date());
     else
@@ -431,6 +437,7 @@ void tabCashOperation::updateWidgets()
         ui->checkBoxAutoReason->setDisabled(true);
         ui->lineEditReason->setReadOnly(true);
         ui->pushButtonOpenLinkedObject->setText(tr("Открыть"));
+        ui->comboBoxCompany->setCurrentIndex(cashRegister->companyIndex());
         ui->comboBoxCompany->setEnabled(false);
         setAmountReadOnly();
         m_clientRO = ClientFieldsAccess::Denied;
@@ -448,6 +455,7 @@ void tabCashOperation::updateWidgets()
         ui->lineEditReason->setReadOnly(m_reasonRO);
         m_reason = cashRegister->constructReason(m_linkedObjIdStr);
         ui->lineEditReason->setText(m_reason);
+        ui->comboBoxCompany->setCurrentIndex(SOfficeModel::current()->defaultCompanyIndex());
         setAmountReadOnly(m_amountRO);
         ui->comboBoxPaymentAccount->setEnabled(!m_paymentAccountRO);
     }
@@ -533,6 +541,11 @@ bool tabCashOperation::checkInput()
             }
         }
     }
+    if ( ui->comboBoxCompany->currentIndex() < 0)
+    {
+        ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheetRed);
+        error |= 1<<6;
+    }
 
     if (error)
     {
@@ -567,7 +580,7 @@ void tabCashOperation::load(const int orderId)
     switch(m_linkedObjType)
     {
         case LinkedObjectType::Document: fillDocumentCreds(cashRegister->documentId()); break;
-        case LinkedObjectType::Repair: fillRepairCreds(cashRegister->repairId()); break;
+        case LinkedObjectType::Repair: fillDeviceCreds(cashRegister->repairId()); break;
         case LinkedObjectType::Invoice: fillInvoiceCreds(cashRegister->invoiceId()); break;
         default: fillClientCreds(cashRegister->client());
     }
@@ -616,7 +629,7 @@ void tabCashOperation::fillClientCreds(int clientId)
     ui->lineEditClientLastName->setFocus();
 }
 
-void tabCashOperation::fillRepairCreds(int repairId)
+void tabCashOperation::fillDeviceCreds(int repairId)
 {
     method = &SCashRegisterModel::setRepairId;
     m_linkedObjId = repairId;
@@ -625,7 +638,7 @@ void tabCashOperation::fillRepairCreds(int repairId)
     repair->load(m_linkedObjId);
     fillClientCreds(repair->clientId());
     ui->lineEditLinkedObjCaption->setText(repair->title());
-    ui->doubleSpinBoxAmount->setValue(repair->realRepairCost());
+    ui->doubleSpinBoxAmount->setValue(repair->realRepairCost() - repair->paymentsAmount());
     updateWidgets();
 }
 
@@ -662,7 +675,7 @@ void tabCashOperation::fillLinkedObj(int objId)
     switch (m_linkedObjType)
     {
         case LinkedObjectType::Document: fillDocumentCreds(objId); break;
-        case LinkedObjectType::Repair: fillRepairCreds(objId); break;
+        case LinkedObjectType::Repair: fillDeviceCreds(objId); break;
         case LinkedObjectType::Invoice: fillInvoiceCreds(objId); break;
     }
 }
@@ -904,6 +917,7 @@ void tabCashOperation::guiFontChanged()
     font.setPixelSize(userDbData->fontSize);
 
     ui->lineEditLinkedObjCaption->setFont(font);
+    ui->comboBoxCompany->setFont(font);
     ui->doubleSpinBoxAmount->setFont(font);
     ui->lineEditClientLastName->setFont(font);
     ui->comboBoxPaymentAccount->setFont(font);
@@ -972,7 +986,7 @@ void tabCashOperation::dbgRandomRepair()
 
         query->first();
         if(query->isValid())
-            fillRepairCreds(query->record().value(0).toInt());
+            fillDeviceCreds(query->record().value(0).toInt());
     }
     delete query;
 }

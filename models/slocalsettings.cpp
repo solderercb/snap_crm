@@ -302,4 +302,3 @@ QString SLocalSettings::base32StringSuitableForDirName(const QByteArray &payload
     return result;
 }
 
-                                                                                                                              

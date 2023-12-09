@@ -1,6 +1,7 @@
 #include "scartridgeform.h"
 #include "ui_scartridgeform.h"
 #include "models/scartridgematerialsmodel.h"
+#include "tabrepairs.h"
 
 SCartridgeForm::SCartridgeForm(QWidget *parent) :
     QFrame(parent),
@@ -52,7 +53,7 @@ void SCartridgeForm::initModels()
         m_cartridgeCard->setParent(m_repair);
 
         statusesProxyModel = new SSortFilterProxyModel;
-        statusesProxyModel->setSourceModel(statusesModel);
+        statusesProxyModel->setSourceModel(comSettings->repairStatuses.Model);
         statusesProxyModel->setFilterKeyColumn(Global::RepStateHeaders::Id);
         statusesProxyModel->setFilterRegularExpression("");
 
@@ -367,7 +368,7 @@ bool SCartridgeForm::createRepair()
     m_repair->setClassId(m_deviceClassId);
     m_repair->setVendorId(m_deviceVendorId);
     m_repair->setClientId(m_clientId);
-    m_repair->setFault(faultList.join(", "));
+    m_repair->setFault(""+faultList.join(", "));
     m_repair->setSerialNumber(ui->lineEditSerial->text());
     m_repair->setExtNotes(ui->lineEditComment->text());
     switch(ui->comboBoxWasEarly->currentIndex())
@@ -573,17 +574,17 @@ bool SCartridgeForm::checkData(const int stateId)
 
 void SCartridgeForm::doStateActions(const int stateId)
 {
-    QStringList stateActions = statusesProxyModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Actions).toString().split('|');
+    QList<int> stateActions = comSettings->repairStatuses[stateId].Actions;
 
     // подробное описание см. в методе tabRepair::doStateActions()
     if(stateId == Global::RepStateIds::InWork)
     {
-        stateActions << QString::number(Global::RepStateActions::SetEngineer);
+        stateActions << Global::RepStateActions::SetEngineer;
     }
 
     // TODO: этот код скопирован из метода tabRepair::doStateActions(), его нужно вынести куда-то в общий доступ
-    for(const QString &action : qAsConst(stateActions))
-        switch (action.toInt())
+    for(const int &action : qAsConst(stateActions))
+        switch (action)
         {
             case Global::RepStateActions::NoPayDiag: setPricesToZero(); break;
             case Global::RepStateActions::ResetInformedStatus: setInformedStatus(0); break;
@@ -637,7 +638,11 @@ void SCartridgeForm::setWidgetsParams(const int stateId)
 
 bool SCartridgeForm::checkStateAcl(const int stateId)
 {
-    const QString allowedForRoles = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Roles).toString();
+    if(m_repair->state() == Global::RepStateIds::GetIn && !m_repair->engineer() && !permissions->beginUnengagedRepair)
+        return 0;
+
+    const QString allowedForRoles = comSettings->repairStatuses[stateId].Roles.join('|');
+
     if(userDbData->roles.contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
     {
         return 1;
@@ -866,11 +871,11 @@ int SCartridgeForm::checkInput()
         ui->lineEditSerial->setStyleSheet(commonLineEditStyleSheetRed);
         error = 1;
     }
-    if(ui->doubleSpinBoxPreagreedAmount->value() == 0)
-    {
-        ui->doubleSpinBoxPreagreedAmount->setStyleSheet(commonSpinBoxStyleSheetRed);
-        error = 2;
-    }
+//    if(ui->doubleSpinBoxPreagreedAmount->value() == 0)
+//    {
+//        ui->doubleSpinBoxPreagreedAmount->setStyleSheet(commonSpinBoxStyleSheetRed);
+//        error = 2;
+//    }
     if (error)
     {
         qDebug() << "Ошибка создания карточки заправки: не все обязательные поля заполнены (error " << error << ")";
@@ -895,7 +900,7 @@ int SCartridgeForm::isReady()
 void SCartridgeForm::updateStatesModel(const int statusId)
 {
 
-    QString allowedStates;// = statusesProxyModel->value(statusId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Contains).toString();
+    QString allowedStates;
     switch(statusId)
     {
         case Global::RepStateIds::GetIn: allowedStates = QString::number(Global::RepStateIds::InWork); break;
@@ -911,11 +916,10 @@ void SCartridgeForm::updateStatesModel(const int statusId)
 
 void SCartridgeForm::updateStateWidget(const int statusId)
 {
-    QString activeState = statusesModel->getDisplayRole(statusId);
     ui->comboBoxState->blockSignals(true);
     ui->comboBoxState->setCurrentIndex(-1);
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-    ui->comboBoxState->setPlaceholderText(activeState);
+    ui->comboBoxState->setPlaceholderText(comSettings->repairStatuses[statusId].Name);
     updateStatesModel(statusId);
     ui->comboBoxState->blockSignals(false);
 }
@@ -1029,6 +1033,7 @@ void SCartridgeForm::saveState(int stateId)
     }
     updateWidgets();
     emit updateParentTab();
+    tabRepairs::refreshIfTabExists();
 
     m_groupUpdate = 0;
 }

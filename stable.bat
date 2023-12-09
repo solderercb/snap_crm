@@ -5,7 +5,6 @@ bottoolbarwidget.h + ^
 chooseofficewindow.h + ^
 com_sql_queries.h + ^
 loginwindow.h + ^
-mylineedit.h + ^
 repairstablemodel.h + ^
 tabclients.h + ^
 tabrepair.h + ^

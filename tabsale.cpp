@@ -2,6 +2,7 @@
 #include "appver.h"
 #include "tabsale.h"
 #include "ui_tabsale.h"
+#include "models/sofficemodel.h"
 
 QMap<int, tabSale*> tabSale::p_instance;
 
@@ -32,7 +33,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->comboBoxMoneyBackAccount->setModel(paymentSystemsModel);
     initPriceColModel();
     ui->comboBoxPriceCol->setModel(m_priceColProxyModel);
-    ui->comboBoxCompany->setModel(companiesModel);  // TODO: несколько компаний
+    ui->comboBoxCompany->setModel(companiesModel);
     ui->comboBoxClientPhoneType->setModel(clientPhoneTypesModel);
     ui->comboBoxClientPhoneType->setModelColumn(0);
     ui->comboBoxClientPhoneType->setCurrentIndex(0);
@@ -118,7 +119,6 @@ void tabSale::setDefaultStyleSheets()
     ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxMoneyBackAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPriceCol->setStyleSheet(commonComboBoxStyleSheet);
-    ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
 }
 
 void tabSale::setBalanceWidgetsVisible(bool state)
@@ -158,7 +158,6 @@ void tabSale::updateWidgets()
         ui->comboBoxPaymentAccount->setEnabled(false);
         ui->comboBoxMoneyBackAccount->setCurrentIndex(docModel->paymentSystemIndex());  // возврат на тот же счет, куда поступала оплата
         ui->comboBoxCompany->setCurrentIndex(docModel->companyIndex());
-        ui->comboBoxCompany->setEnabled(false);
         ui->spinBoxReserve->setValue(docModel->reserveDays());
         ui->spinBoxReserve->setReadOnly(true);
         ui->lineEditTrack->setText(docModel->trackingNumber());
@@ -229,6 +228,7 @@ void tabSale::updateWidgets()
             tableModel->setModelState(SSaleTableModel::StoreCancelled);
             tableModel->store_loadTable(doc_id);
             ui->lineEditTakeIn->setText(sysLocale.toString(0.00, 'f', 2));
+            ui->comboBoxCompany->setEnabled(false);
         }
         else    // если открыта проведённая РН
         {
@@ -257,6 +257,7 @@ void tabSale::updateWidgets()
             ui->lineEditTotal->setText(docModel->amountLocal());  // устанавливать суммы нужно только после заполнения таблицы
             ui->lineEditTakeIn->setReadOnly(true);
             ui->lineEditTakeIn->setText(tableModel->amountTotalLocale());  // тут применю хитрость: поля будут заполняться из разных "источников" и, в случае возврата товаров, сравниваться
+            ui->comboBoxCompany->setEnabled(false);
         }
     }
     else    // новая расходная накладная
@@ -284,7 +285,12 @@ void tabSale::updateWidgets()
         ui->comboBoxPaymentAccount->setEnabled(true);
         ui->comboBoxPriceCol->setCurrentText(priceColModel->getDisplayRole(2, 1));  // по умолчанию Розница
         ui->comboBoxPriceCol->setEnabled(true);
-        ui->comboBoxCompany->setCurrentText(companiesModel->getDisplayRole(1, 1));  // TODO: несколько компаний
+        ui->comboBoxCompany->setCurrentIndex(SOfficeModel::current()->defaultCompanyIndex());
+        if(companiesModel->rowCount() == 1)
+        {
+            ui->comboBoxCompany->setVisible(false);
+            ui->labelCompany->setVisible(false);
+        }
         ui->comboBoxCompany->setEnabled(true);
         ui->spinBoxReserve->setValue(comSettings->defaultItemReserveTime);
         ui->spinBoxReserve->setReadOnly(false);
@@ -391,6 +397,11 @@ bool tabSale::checkInput()
             }
         }
     }
+    if ( ui->comboBoxCompany->currentIndex() < 0)
+    {
+        ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 13;
+    }
 //    if ()   //
 //    {
 //        ui->->setStyleSheet(commonLineEditStyleSheetRed);
@@ -437,12 +448,13 @@ bool tabSale::createNewDoc()
 
     docModel->setType(SDocumentModel::OutInvoice);
     docModel->setState(0);
+    docModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
     docModel->setClient(clientModel->id());
+    // Выбор офиса пользователем не предусмотрен; используется текущее значение из класса userDbData
     docModel->setAmount(amount);
     docModel->setNotes(ui->lineEditComment->text());
     docModel->setPriceOption(priceCol);
     docModel->setReserveDays(reserveDays);
-
     return docModel->commit();
 }
 
@@ -653,6 +665,7 @@ bool tabSale::unSale()  // распроведение
         {
             cashRegister->setId(0); // обнулить Id, иначе будет произведён update, а не insert
             cashRegister->setOperationType(SCashRegisterModel::ExpGoods);
+            cashRegister->setCompany(docModel->company());
             cashRegister->setDocumentId(doc_id);
             cashRegister->setReason(QString("Расход денег в размере %2 - возврат за товары по РН №%1").arg(doc_id).arg(sysLocale.toCurrencyString(amount)));
             cashRegister->commit(-amount);
@@ -774,6 +787,7 @@ bool tabSale::sale()
             tableModel->store_saveTables(SSaleTableModel::StoreOpType::Sale);
             if(m_opType == SaleReserved)
             {
+                docModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
                 docModel->setAmount(amount);
                 docModel->appendLogText(QString("Расходная накладная №%1 проведена").arg(doc_id));
                 docModel->setType(SDocumentModel::OutInvoice);
@@ -792,6 +806,7 @@ bool tabSale::sale()
             else
             {
                 cashRegister->setId(0); // обнулить Id, иначе будет произведён update, а не insert
+                cashRegister->setCompanyIndex(ui->comboBoxCompany->currentIndex());
                 cashRegister->setClient(clientModel->id());
                 cashRegister->setOperationType(SCashRegisterModel::RecptGoods);
                 cashRegister->setDocumentId(doc_id);
@@ -1060,7 +1075,6 @@ void tabSale::guiFontChanged()
     ui->comboBoxPaymentAccount->setFont(font);
     ui->comboBoxMoneyBackAccount->setFont(font);
     ui->comboBoxPriceCol->setFont(font);
-    ui->comboBoxCompany->setFont(font);
 }
 
 tabSale* tabSale::getInstance(int doc_id, MainWindow *parent)

@@ -98,11 +98,27 @@ void SDocumentModel::setState(int state)
     i_valuesMap.insert("state", state);
 }
 
+int SDocumentModel::office() const
+{
+    return m_office;
+}
+
+void SDocumentModel::setOffice(int id)
+{
+    m_office = id;
+    i_valuesMap.insert("office", id);
+}
+
+void SDocumentModel::setOfficeIndex(int index)
+{
+    setOffice(officesModel->databaseIDByRow(index, "id"));
+}
+
+
 int SDocumentModel::client()
 {
     return m_client;
 }
-
 void SDocumentModel::setClient(int id)
 {
     if(id == 0)
@@ -183,6 +199,11 @@ void SDocumentModel::setCompany(int company)
 {
     m_company = company;
     i_valuesMap.insert("company", company);
+}
+
+void SDocumentModel::setCompanyIndex(int index)
+{
+    setCompany(companiesModel->databaseIDByRow(index, "id"));
 }
 
 int SDocumentModel::priceOption()
@@ -278,11 +299,10 @@ bool SDocumentModel::commit()
         i_valuesMap.insert("img1", QVariant()); // NULL
         i_valuesMap.insert("img2", QVariant());
         i_valuesMap.insert("img3", QVariant());
-#ifdef  QT_DEBUG
-        Q_ASSERT_X(userDbData->company, objectName().toLocal8Bit(), QString("company not set").toLocal8Bit());
-#endif
-        i_valuesMap.insert("company", userDbData->company);
-        i_valuesMap.insert("office", userDbData->currentOffice);
+        if(!i_valuesMap.contains("company"))
+            i_valuesMap.insert("company", userDbData->company);
+        if(!i_valuesMap.contains("office"))
+            i_valuesMap.insert("office", userDbData->currentOffice);
         i_valuesMap.insert("user", userDbData->id);
         i_valuesMap.insert("created", QDateTime::currentDateTime());
 

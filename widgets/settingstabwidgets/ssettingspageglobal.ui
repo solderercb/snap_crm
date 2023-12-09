@@ -80,7 +80,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>Региональные настроки</string>
+            <string>Региональные настройки</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="0" column="0">

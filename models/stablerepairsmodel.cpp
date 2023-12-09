@@ -17,7 +17,7 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::BackgroundRole)
     {
         if(index.column() == Columns::Status)
-            return QColor(statusesModel->value(QSqlQueryModel::data(index, Qt::DisplayRole).toInt(), 1, 2).toString());
+            return QColor(comSettings->repairStatuses[QSqlQueryModel::data(index, Qt::DisplayRole).toInt()].Color);
 
         QString rowColor = STableBaseModel::data(index.siblingAtColumn(Columns::Color)).toString();
         if(!rowColor.isEmpty())
@@ -27,7 +27,7 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
     {
         switch(index.column())
         {
-            case Columns::Status:           return QVariant(statusesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
+            case Columns::Status:           return comSettings->repairStatuses[QSqlQueryModel::data(index, Qt::DisplayRole).toInt()].Name;
             case Columns::RealRepairCost:   return dataLocalizedFromDouble(index);
             case Columns::InDate:
             case Columns::OutDate:          return dateTime(index);

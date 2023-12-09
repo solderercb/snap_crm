@@ -112,6 +112,10 @@ void tabPrintDialog::paintEvent(QPaintEvent *event)
 bool tabPrintDialog::event(QEvent *ev)
 {
     bool ret = tabCommon::event(ev);
+
+    if(!m_isReportRendered)
+        return ret;
+
     if(ev->type() == QEvent::ShowToParent)  // при переключении на вкладку нужно установить фокус на виджет (например, при печати документа, нажатием Пробел можно быстро запустить печать и не делать лишних телодвижений мышью)
     {
         setDefaultWidgetFocus();
@@ -195,6 +199,9 @@ void tabPrintDialog::showPreview()
         m_progressWidget->hide();
         ui->gridLayoutTab->setColumnStretch(1, 1);
         ui->gridLayoutTab->setColumnMinimumWidth(0, 200);
+
+        // Подключение сигнала только сейчас!
+        QObject::connect(ui->pushButtonPrint, &QPushButton::clicked, this, &tabPrintDialog::pushButtonPrintClicked);
     }
 }
 
@@ -246,7 +253,7 @@ bool tabPrintDialog::isPagesPrepared()
     return 0;
 }
 
-void tabPrintDialog::on_pushButtonPrint_clicked()
+void tabPrintDialog::pushButtonPrintClicked()
 {
     if (!ui->lineEditPagesToPrint->text().isEmpty())
     {
@@ -610,6 +617,7 @@ void tabPrintDialog::reportRenderFinished()
     selectPrinter();
 
     progressUpdateTimer->stop();
+    setDefaultWidgetFocus();
 
     // Сразу после завершения рендеринга страницы не доступны и виджет предпросмотра оказывается пустым.
     // Чтобы этого избежать был придуман костыль. С заданным интервалом производится вызов метода, заменяющего виджет

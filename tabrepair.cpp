@@ -76,7 +76,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
     additionalFieldsModel = new SFieldsModel(SFieldsModel::Repair);
     statusesProxyModel = new SSortFilterProxyModel;
-    statusesProxyModel->setSourceModel(statusesModel);
+    statusesProxyModel->setSourceModel(comSettings->repairStatuses.Model);
     worksAndPartsModel = new SSaleTableModel();
     worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
     worksAndPartsModel->setPriceColumn(SStoreItemModel::PriceOptionService);
@@ -442,14 +442,13 @@ bool tabRepair::setWidgetsParams(const int stateId)
 
     if( stateId == Global::RepStateIds::Ready || stateId == Global::RepStateIds::ReadyNoRepair )
     {
-        const QList<QString> nextStates = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Contains).toString().split('|');
-        for(const QString &nextState : nextStates)
+        for(const int nextState : (const QList<int>)comSettings->repairStatuses[stateId].Contains)
         {
-            switch (nextState.toInt())
+            switch (nextState)
             {
                 case Global::RepStateIds::Returned:
                 case Global::RepStateIds::ReturnedNoRepair:
-                case Global::RepStateIds::ReturnedInCredit: m_getOutButtonVisible = permissions->issueDevices && checkStateAcl(nextState.toInt());
+                case Global::RepStateIds::ReturnedInCredit: m_getOutButtonVisible = permissions->issueDevices && checkStateAcl(nextState);
             }
         }
     }
@@ -458,14 +457,13 @@ bool tabRepair::setWidgetsParams(const int stateId)
     {
         case Global::RepStateIds::Negotiation: m_summRO = 0; break;
         case Global::RepStateIds::Returned:
-        case Global::RepStateIds::ReturnedNoRepair: m_comboBoxStateEnabled = 0; m_outDateVisible = 1; m_comboBoxNotifyStatusEnabled = 0; Q_FALLTHROUGH();
-        case Global::RepStateIds::ReturnedInCredit: m_buttonDebtReceivedVisible = 1; break;
+        case Global::RepStateIds::ReturnedNoRepair: m_comboBoxStateEnabled = 0; m_comboBoxNotifyStatusEnabled = 0; Q_FALLTHROUGH();
+        case Global::RepStateIds::ReturnedInCredit: m_buttonDebtReceivedVisible = 1; m_outDateVisible = 1; break;
     }
 
-    const QList<QString> actions = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Actions).toString().split('|');
-    for(const QString &action : actions)
+    for(const int action : (const QList<int>)comSettings->repairStatuses[stateId].Actions)
     {
-        switch (action.toInt())
+        switch (action)
         {
             case Global::RepStateActions::EditWorksParts: m_worksRO = 0; break;
             case Global::RepStateActions::EditDiagSumm: m_diagRO = 0; m_summRO = 0; break;
@@ -479,10 +477,10 @@ bool tabRepair::setWidgetsParams(const int stateId)
  */
 bool tabRepair::checkStateAcl(const int stateId)
 {
-    const QString allowedForRoles = statusesModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Roles).toString();
-
     if(repairModel->state() == Global::RepStateIds::GetIn && !repairModel->engineer() && !permissions->beginUnengagedRepair)
         return 0;
+
+    const QString allowedForRoles = comSettings->repairStatuses[stateId].Roles.join('|');
 
     if(userDbData->roles.contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
     {
@@ -678,19 +676,18 @@ void tabRepair::tableRowDoubleClick(QModelIndex tableIndex)
 
 void tabRepair::updateStatesModel(const int stateId)
 {
-    QString allowedStates = statusesProxyModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Contains).toString();
-    QString activeState = statusesProxyModel->getDisplayRole(stateId);
+    QString allowedStates = comSettings->repairStatuses[stateId].ContainsStr.join('|');
     ui->comboBoxState->blockSignals(true);
     statusesProxyModel->setFilterRegularExpression(QString("\\b(%1)\\b").arg(allowedStates));
     ui->comboBoxState->setCurrentIndex(-1);
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
-    ui->comboBoxState->setPlaceholderText(activeState);
+    ui->comboBoxState->setPlaceholderText(comSettings->repairStatuses[stateId].Name);
     ui->comboBoxState->blockSignals(false);
 }
 
 void tabRepair::doStateActions(const int stateId)
 {
-    QStringList stateActions = statusesProxyModel->value(stateId, Global::RepStateHeaders::Id, Global::RepStateHeaders::Actions).toString().split('|');
+    QList<int> stateActions = comSettings->repairStatuses[stateId].Actions;
     switch (stateId)
     {
         case Global::RepStateIds::Returned:
@@ -705,11 +702,11 @@ void tabRepair::doStateActions(const int stateId)
     // Для статуса "Проведение диагностики" действие включено принудительно и от настроек пользователя не зависит
     if(stateId == Global::RepStateIds::Diag)
     {
-        stateActions << QString::number(Global::RepStateActions::SetEngineer);
+        stateActions << Global::RepStateActions::SetEngineer;
     }
 
-    for(const QString &action : qAsConst(stateActions))
-        switch (action.toInt())
+    for(const int &action : qAsConst(stateActions))
+        switch (action)
         {
             case Global::RepStateActions::NoPayDiag: setPricesToZero(); break;
             case Global::RepStateActions::ResetInformedStatus: if(ui->comboBoxNotifyStatus->currentIndex()) setInformedStatus(0); break;
@@ -954,6 +951,7 @@ void tabRepair::buttonWorksAdminEdit(bool state)
 {
     if(state)
     {
+        m_worksRO = 0;
         worksAndPartsModel->setModelState(SSaleTableModel::State::WorkshopAdm);
         ui->switchEditStrategy->setEnabled(true);
         ui->toolButtonSaveSaleTable->setEnabled(worksAndPartsModel->isUnsaved());
@@ -961,6 +959,7 @@ void tabRepair::buttonWorksAdminEdit(bool state)
     }
     else
     {
+        setWidgetsParams(repairModel->state()); // для восстановления значения переменной m_worksRO
         worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
         if(worksAndPartsModel->isUnsaved())
             saveSaleTableClicked();

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "tabcashmoveexch.h"
 #include "ui_tabcashmoveexch.h"
+#include "models/sofficemodel.h"
 
 tabCashMoveExch* tabCashMoveExch::p_instance;
 
@@ -24,8 +25,10 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     ui->comboBoxDstPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
     ui->comboBoxSrcOffice->setModel(officesModel);
     ui->comboBoxSrcOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
+    ui->comboBoxSrcOffice->setVisible(officesModel->rowCount() > 1);
     ui->comboBoxDstOffice->setModel(officesModel);
     ui->comboBoxDstOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
+    ui->comboBoxDstOffice->setVisible(officesModel->rowCount() > 1);
     cashRegisterSrc = new SCashRegisterModel();
     cashRegisterDst = new SCashRegisterModel();
     initCashRegisterModel();
@@ -66,20 +69,27 @@ void tabCashMoveExch::setDefaultStylesheets()
 
 bool tabCashMoveExch::commit(bool repeatAfter)
 {
+    if(!checkInput())
+        return 0;
+
+    SOfficeModel *officeSrc = new SOfficeModel();
+    SOfficeModel *officeDst = new SOfficeModel();
+
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     bool nErr = 1;
 
     QUERY_LOG_START(metaObject()->className());
 
-    if(!checkInput())
-        return 0;
-
+    officeSrc->load(officesModel->databaseIDByRow(ui->comboBoxSrcOffice->currentIndex()));
+    officeDst->load(officesModel->databaseIDByRow(ui->comboBoxDstOffice->currentIndex()));
     cashRegisterSrc->setOperationType(SCashRegisterModel::MoveCash);
     cashRegisterDst->setOperationType(SCashRegisterModel::MoveCash);
     cashRegisterSrc->setAmount(-ui->doubleSpinBoxSrcAmount->value());
     cashRegisterDst->setAmount(ui->doubleSpinBoxDstAmount->value());
-    cashRegisterSrc->setOfficeIndex(ui->comboBoxSrcOffice->currentIndex());
-    cashRegisterDst->setOfficeIndex(ui->comboBoxDstOffice->currentIndex());
+    cashRegisterSrc->setCompany(officeSrc->defaultCompany());
+    cashRegisterDst->setCompany(officeDst->defaultCompany());
+    cashRegisterSrc->setOffice(officeSrc->id());
+    cashRegisterDst->setOffice(officeDst->id());
     cashRegisterSrc->setCreatedDate(ui->dateEdit->date());
     cashRegisterDst->setCreatedDate(ui->dateEdit->date());
     cashRegisterSrc->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSrcPaymentAccount->currentIndex(), "system_id"));
@@ -131,6 +141,8 @@ bool tabCashMoveExch::commit(bool repeatAfter)
     QUERY_LOG_STOP;
 
     delete query;
+    delete officeSrc;
+    delete officeDst;
 
     if(nErr)
     {

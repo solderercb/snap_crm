@@ -762,6 +762,7 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
 
     balanceLog->setText(text);
     balanceLog->setClient(i_id);
+    // Выбор офиса пользователем не предусмотрен; используется текущее значение из класса userDbData
     i_nErr = balanceLog->commit(amount);
     double newAmount = m_balance + amount;
 
@@ -1026,11 +1027,22 @@ void SBalanceLogRecordModel::setCashOrderId(const int id)
     i_logRecord->setCashOrderId(id);
 }
 
+void SBalanceLogRecordModel::setOffice(const int id)
+{
+    i_valuesMap.insert("office", id);
+}
+
+void SBalanceLogRecordModel::setOfficeIndex(const int index)
+{
+    setOffice(officesModel->databaseIDByRow(index, "id"));
+}
+
 bool SBalanceLogRecordModel::commit(const double amount)
 {
     setDirection(amount);
     i_valuesMap.insert("uid", userDbData->id);
-    i_valuesMap.insert("office", userDbData->currentOffice);
+    if(!i_valuesMap.contains("office"))
+        i_valuesMap.insert("office", userDbData->currentOffice);
     i_valuesMap.insert("summ", amount);
     if(!i_valuesMap.contains("created"))
         i_valuesMap.insert("created", QDateTime::currentDateTime());

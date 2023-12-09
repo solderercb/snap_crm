@@ -50,8 +50,7 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
     ui->doubleSpinBoxAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
     // checkBox "В долг" отображается только если настроен переход "Готово к выдаче"->"Выдано в долг" и включен баланс клиента
     ui->checkBoxSetReturnedInCredit->setVisible(m_clientModel->balanceEnabled() &&
-                                                statusesModel->value(Global::RepStateIds::Ready, Global::RepStateHeaders::Id, Global::RepStateHeaders::Contains)\
-                                                               .toString().split('|').contains(QString::number(Global::RepStateIds::ReturnedInCredit)));
+                                                comSettings->repairStatuses[Global::RepStateIds::Ready].Contains.contains(Global::RepStateIds::ReturnedInCredit));
     ui->checkBoxPaymentCheckout->setVisible(m_totalAmountToPay != 0);
     ui->checkBoxConfirmGetOut->setVisible(m_totalAmountToPay == 0);
     ui->labelIssuedMessage->setVisible(m_singleRepairWidgetsVisible);
@@ -60,7 +59,7 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
 
     ui->doubleSpinBoxPrepay->setValue(m_totalPrepayAmount);
     ui->doubleSpinBoxAgreedAmount->setValue(m_totalAgreedAmount);
-    ui->doubleSpinBoxAlreadyPayed->setValue(m_totalPrepayAmount);  // назначение данного поля не понятно, оно вроде бы, всегда равно полю Предоплата
+    ui->doubleSpinBoxAlreadyPayed->setValue(m_totalPaymentsAmount);
     ui->doubleSpinBoxTotalAmount->setValue(m_totalAmount);
     ui->doubleSpinBoxCurrentPaymentAmount->setValue(m_totalAmountToPay);
 
@@ -99,12 +98,12 @@ void SDialogIssueRepair::initPaymentSystems()
 {
     m_paymentSystemsProxyModel = new SSortFilterProxyModel();
     m_paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
+    m_paymentSystemsProxyModel->setFilterKeyColumn(1);
     if(!m_clientModel->balanceEnabled())
     {
         m_paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
         ui->checkBoxCreditPayment->setHidden(true);
     }
-    m_paymentSystemsProxyModel->setFilterKeyColumn(1);
     ui->comboBoxPaymentAccount->setModel(m_paymentSystemsProxyModel);
     ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
 }
@@ -150,6 +149,7 @@ void SDialogIssueRepair::collectRepairsData()
     int repairId;
     double worksAndSparePartsSumm = 0;
     double prepayAmount = 0;
+    double paymentsAmount = 0;
     double repairCost = 0;
     double amountToPay = 0;
     double realRepairCost = 0;
@@ -157,9 +157,11 @@ void SDialogIssueRepair::collectRepairsData()
 
     m_rejectReasonWidgetsVisible = 0;
     m_totalPrepayAmount = 0;
+    m_totalPaymentsAmount = 0;
     m_totalAgreedAmount = 0;
     m_totalAmount = 0;
     m_totalAmountToPay = 0;
+    m_repairsWithPayment.clear();
 
     while(i != m_repairsModels.constEnd())
     {
@@ -176,9 +178,13 @@ void SDialogIssueRepair::collectRepairsData()
 
         repairCost = repairModel->repairCost();
         realRepairCost = repairModel->realRepairCost();
-        prepayAmount = repairModel->realPrepaidSumm();
+        prepayAmount = repairModel->paymentsAmount(SCashRegisterModel::PaymentType::RecptPrepayRepair); // конкретно предоплаты
+        paymentsAmount = repairModel->paymentsAmount(); // все поступления
         worksAndSparePartsSumm = worksAndSparePartsModel->amountTotal();
-        amountToPay = worksAndSparePartsSumm - prepayAmount;
+        amountToPay = worksAndSparePartsSumm - paymentsAmount;
+
+        if(amountToPay)
+            m_repairsWithPayment.insert(QString::number(repairId), amountToPay);
 
         if(!repairModel->cartridge() && repairCost != worksAndSparePartsSumm) // если сумма работ и деталей не равна согласованной, отобразится сообщение
             m_summsNotEq = 1;
@@ -198,6 +204,7 @@ void SDialogIssueRepair::collectRepairsData()
 
         m_totalAmount += worksAndSparePartsSumm;
         m_totalPrepayAmount += prepayAmount;
+        m_totalPaymentsAmount += paymentsAmount;
         m_totalAgreedAmount += repairCost;
         m_totalAmountToPay += amountToPay;
 
@@ -297,7 +304,6 @@ void SDialogIssueRepair::issueRepairs()
     int paymentAccount = 0;
     bool balance = 0;
     SCashRegisterModel *cashRegister;
-    QStringList repairsListForCashRegister;
     SRepairModel *repairModel;
     SSaleTableModel *worksAndSparePartsModel;
     SWorkshopIssuedModel *workshopIssuedModel;
@@ -312,13 +318,13 @@ void SDialogIssueRepair::issueRepairs()
     // разница лишь в проверке достаточного остатка на балансе
     if(ui->checkBoxCreditPayment->isChecked() || ui->checkBoxSetReturnedInCredit->isChecked())
     {
-        paymentAccount = -2;
+        paymentAccount = Global::PaymentSystemIds::Balance;
         balance = 1;
     }
     else
     {
-        paymentAccount = paymentSystemsModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id");
-        balance = paymentAccount == -2;
+        paymentAccount = m_paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id");
+        balance = (paymentAccount == Global::PaymentSystemIds::Balance);
     }
 
     if(balance && !ui->checkBoxSetReturnedInCredit->isChecked())
@@ -334,22 +340,24 @@ void SDialogIssueRepair::issueRepairs()
         if(comSettings->useSimplifiedCartridgeRepair && repairModel->cartridge() && repairModel->state() == Global::RepStateIds::InWork)
             setRepairReady(repairModel);
 
-        switch ( (ui->checkBoxSetReturnedInCredit->isChecked() << 7) | repairModel->state() )
+        repairId = repairModel->id();
+
+        amountToPay = m_repairsWithPayment.value(QString::number(repairId), 0);
+
+        switch ( ((amountToPay == 0) << 15) | (ui->checkBoxSetReturnedInCredit->isChecked() << 14) | repairModel->state() )
         {
+            case (1 << 15) | (1 << 14) | Global::RepStateIds::ReadyNoRepair:
+            case (1 << 15) | Global::RepStateIds::ReadyNoRepair: newState = Global::RepStateIds::ReturnedNoRepair; break;
+            case (1 << 15) | (1 << 14) | Global::RepStateIds::Ready:    // при выдаче в долг ранее оплаченных они переключаются в "Выдано клиенту"
+            case (1 << 15) | Global::RepStateIds::Ready:    // ранее оплаченные
             case Global::RepStateIds::Ready: newState = Global::RepStateIds::Returned; break;
-            case (1 << 7) | Global::RepStateIds::ReadyNoRepair:
-            case Global::RepStateIds::ReadyNoRepair: newState = Global::RepStateIds::ReturnedNoRepair; break;
-            case (1 << 7) | Global::RepStateIds::Ready: newState = Global::RepStateIds::ReturnedInCredit; break;
+            case (1 << 14) | Global::RepStateIds::Ready: newState = Global::RepStateIds::ReturnedInCredit; break;
             default: throw Global::ThrowType::ConditionsError;
         }
 
-        repairId = repairModel->id();
         workshopIssuedModel = new SWorkshopIssuedModel();
         workshopIssuedModel->setRepair(repairId);
         worksAndSparePartsModel = repairModel->worksAndPartsModel();
-        repairsListForCashRegister.append(QString::number(repairId));
-
-        amountToPay = repairModel->realRepairCost() - repairModel->prepaidSumm();
 
         if(amountToPay && balance)
         {
@@ -379,17 +387,16 @@ void SDialogIssueRepair::issueRepairs()
 
     // TODO: нужен какой-то идентификатор группы выданных картриджей (просто уникальный номер или, например, запись в таблице docs)
     //       Он будет использоваться для печати кассового чека с детализацией.
-    if(!balance)
+    if(m_totalAmountToPay && !balance)
     {
         cashRegister = new SCashRegisterModel();
 
         cashRegister->setOperationType(SCashRegisterModel::RecptRepair);
-        if(repairsListForCashRegister.count() == 1)
-            cashRegister->setRepairId(repairId);
         cashRegister->setAmount(m_totalAmountToPay);
-        cashRegister->setReason(cashRegister->constructReason(repairsListForCashRegister.join(", ")));
+        cashRegister->setReason(cashRegister->constructReason(m_repairsWithPayment.keys().join(", ")));
         cashRegister->setClient(m_clientModel->id());
         cashRegister->setSystemId(m_paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
+        // Выбор компании и офиса пользователем не предусмотрен; используются текущие значения из userDbData
         nErr = cashRegister->commit();
 
         delete cashRegister;
@@ -454,7 +461,7 @@ void SDialogIssueRepair::textEditTextChanged()
 void SDialogIssueRepair::paymentSystemChanged(int index)
 {
     ui->checkBoxCreditPayment->blockSignals(true);
-    if(paymentSystemsModel->databaseIDByRow(index, "system_id") == Global::PaymentSystemIds::Balance)
+    if(m_paymentSystemsProxyModel->databaseIDByRow(index, "system_id") == Global::PaymentSystemIds::Balance)
         ui->checkBoxCreditPayment->setChecked(true);
     else
         ui->checkBoxCreditPayment->setChecked(false);
@@ -465,9 +472,9 @@ void SDialogIssueRepair::checkBoxInCreditToggled(bool state)
 {
     ui->comboBoxPaymentAccount->blockSignals(true);
     if(state)
-        ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(Global::PaymentSystemIds::Balance, "system_id"));
+        ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(Global::PaymentSystemIds::Balance, "system_id"));
     else
-        ui->comboBoxPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(Global::PaymentSystemIds::Cash, "system_id"));
+        ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(Global::PaymentSystemIds::Cash, "system_id"));
     ui->comboBoxPaymentAccount->blockSignals(false);
 }
 

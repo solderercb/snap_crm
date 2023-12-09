@@ -126,7 +126,7 @@ class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
     PROPSTRUCT_CHECKBOX(int, salaryIncludeNotIssuedByDefault, 14, settings.salary_include_not_issued_by_default)
     PROPSTRUCT_CHECKBOX(int, newClientSmsEnabled, 14, settings.new_client_sms_enabled)
 
-    PROPSTRUCT_JSON_ARRAY(t_repairStatuses, statusesJson, statuses)
+    PROPSTRUCT_JSON_ARRAY(t_repairStatuses, repairStatuses, statuses)
 
     PROPSTRUCT_RADIOBTN(bool, exchangeTypeAuto, 21, ignore) // Настройки-»Финансы-»Операции с валютой, exchange_type
     PROPSTRUCT_COMBOBOX(int, exchangeSourceId, 21, exchange_source, 1) // Настройки-»Финансы-»Операции с валютой

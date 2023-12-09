@@ -75,8 +75,6 @@ extern SPaymentTypesModel *receiptTypesModel;
 extern SPaymentTypesModel *expenditureTypesModel;
 extern SStandardItemModel* clientsTypesList;
 extern SSqlQueryModel* clientAdTypesList;
-extern SStandardItemModel *statusesModel;
-extern qint64 repairTermSeconds;
 extern SStandardItemModel *notifyStatusesModel;
 extern SStandardItemModel *warrantyTermsModel;
 extern QMap<int, QString> *warrantyTermsMap;
@@ -107,8 +105,6 @@ extern SStandardItemModel *currencyListModel;
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;
 
-bool readStatuses(QStandardItemModel &, QJsonArray &);
-QString jsonArrayJoin(QJsonValue, const QString);
 void initSystemObjects();
 void initUserDbData();
 void initPermissions();

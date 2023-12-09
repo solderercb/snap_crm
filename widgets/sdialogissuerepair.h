@@ -45,11 +45,13 @@ private:
     QList<SRepairModel*> m_repairsModels;
     bool m_pushButtonIssueEnabled = 1;
     double m_totalPrepayAmount = 0;
+    double m_totalPaymentsAmount = 0;
     double m_totalAgreedAmount = 0;
     double m_totalAmount = 0;
     double m_totalAmountToPay = 0;
     bool m_isCartridgeIssue = 0;
     bool m_isListOwner = 0; // индикатор для удаления моделей ремонтов после закрытия диалога
+    QMap<QString, double> m_repairsWithPayment; // QString для удобства обработки
     void setDefaultStyleSheets();
     void initPaymentSystems();
     bool checkInput();

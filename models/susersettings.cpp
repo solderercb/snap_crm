@@ -100,8 +100,7 @@ void SUserSettings::load(const QString &connectionLogin)
     if(query->first())
         roles = query->value(0).toString();
 
-    // TODO: несколько компаний
-    company = 1;
+    // инициализация поля company происходит в windowsDispatcher::createMainWindow()
 
     delete query;
 

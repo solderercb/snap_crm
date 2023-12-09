@@ -136,6 +136,7 @@ void SPageSalarySummary::setDbRecordModelsData(const int type, const int system,
         cashRegister->setOperationType(SCashRegisterModel::ExpSalary);
     else
         cashRegister->setOperationType(SCashRegisterModel::ExpSubsist);
+    cashRegister->setCompany(userDbData->company);
     cashRegister->setSystemId(system);
     cashRegister->setAmount(-amount);
     cashRegister->setReason(reason);

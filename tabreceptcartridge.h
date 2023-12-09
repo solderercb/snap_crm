@@ -44,11 +44,11 @@ private:
     void setDefaultStyleSheets();
     void initWidgets();
     void clearWidgets();
-    void setModelData();
     bool checkInput();
     bool checkInputBeforeAdd();
     void appendToReceptList(SCartridgeForm *form);
     void print();
+    const QList<SCartridgeForm*> existentForms();
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif

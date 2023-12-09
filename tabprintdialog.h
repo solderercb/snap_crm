@@ -117,7 +117,7 @@ private:
 #endif
 
 private slots:
-    void on_pushButtonPrint_clicked();
+    void pushButtonPrintClicked();
     void setPrinter(const QString &printerName);
     void on_labelPrinterSettings_linkActivated(const QString &link);
     void pageSetupAccepted();

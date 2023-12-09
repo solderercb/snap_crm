@@ -86,7 +86,9 @@ public:
     int user();
     void setUser(const int);//user
     int company();
-    void setCompany(const int);//company
+    int companyIndex();
+    void setCompany(const int id);
+    void setCompanyIndex(const int index);
     int office();
     int img();
     void setImg(const int);//img

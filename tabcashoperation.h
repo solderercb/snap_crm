@@ -118,7 +118,7 @@ private:
 private slots:
     void clearClientCreds(bool);
     void fillClientCreds(int);
-    void fillRepairCreds(int);
+    void fillDeviceCreds(int);
     void fillDocumentCreds(int);
     void fillInvoiceCreds(int);
     void fillLinkedObj(int);

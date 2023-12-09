@@ -114,7 +114,8 @@ bool SCashRegisterModel::commit()
         QString q;
 
         i_valuesMap.insert("user", userDbData->id);
-        i_valuesMap.insert("company", userDbData->company);
+        if(!i_valuesMap.contains("company"))
+            i_valuesMap.insert("company", userDbData->company);
         if(!i_valuesMap.contains("office"))
             i_valuesMap.insert("office", userDbData->currentOffice);
         if(!i_valuesMap.contains("created"))
@@ -459,9 +460,19 @@ int SCashRegisterModel::company()
     return m_company;
 }
 
+int SCashRegisterModel::companyIndex()
+{
+    return companiesModel->rowByDatabaseID(m_company, "id");
+}
+
 void SCashRegisterModel::setCompany(const int company)
 {
     i_valuesMap.insert("company", company);
+}
+
+void SCashRegisterModel::setCompanyIndex(const int index)
+{
+    setCompany(companiesModel->databaseIDByRow(index, "id"));
 }
 
 int SCashRegisterModel::office()

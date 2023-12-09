@@ -4,6 +4,7 @@
 #include "tabrepairs.h"
 #include "ui_tabrepairnew.h"
 #include "com_sql_queries.h"
+#include "models/sofficemodel.h"
 
 tabRepairNew* tabRepairNew::p_instance = nullptr;
 
@@ -77,13 +78,10 @@ void tabRepairNew::initDataModels()
 
 void tabRepairNew::initWidgets()
 {
-    ui->labelPrevRepairFromOldDB->hide();   // по умолчанию поля "Предыдущий ремонт" не показываем
-    ui->lineEditPrevRepairFromOldDB->hide();
-    ui->lineEditPrevRepair->hide();
+    showLineEditPrevRepair();   // по умолчанию поля "Предыдущий ремонт" не показываем
 //    ui->pushButtonCashReceipt->hide();  // в АСЦ эта кнопка расположена в groupBox'е Финансы, но выполняет ту же функцию, что и кнопка Принять на панели задач внизу; почему так — загадка; прикручу к ней такой же функционал, и если что спрячу от пользователя
-    ui->labelDoc->hide();       // хрен знает, что это за поле "Документ", оно не у всех пользователей отображается, а у кого отображается, не содержит ни одного эл-та. Спрячу от пользователя.
-    ui->comboBoxDoc->hide();
     ui->checkBoxIsQuick->setVisible(permissions->createQuickRepair);
+    // В АСЦ поле "Документ" появляется, если удалить какой-либо виджет при редактировании левой панели. Его назначение не ясно; comboBox не содержит ни одного эл-та. В редакторе называется ReportTemplateSelectorView. Спрячу от пользователя.
 
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->comboBoxProblem->setPlaceholderText(tr("неисправность"));
@@ -92,14 +90,13 @@ void tabRepairNew::initWidgets()
     ui->comboBoxDeviceClass->setPlaceholderText(tr("устройство"));
     ui->comboBoxDeviceVendor->setPlaceholderText(tr("производитель"));
     ui->comboBoxDevice->lineEdit()->setPlaceholderText(tr("модель"));
+    ui->lineEditPrevRepair->setPlaceholderText(tr("Предыдущий ремонт"));
     ui->comboBoxPresetEngineer->setPlaceholderText(tr("назначить инженером"));
     ui->comboBoxPresetEngineer->setButtons("Clear");
     ui->comboBoxPresetPlace->setPlaceholderText(tr("ячейка"));
     ui->comboBoxPresetPlace->setButtons("Clear");
     ui->comboBoxOffice->setPlaceholderText(tr("офис"));
-    ui->comboBoxOffice->setEnabled(false);  // TODO: назначение этого эл-та в АСЦ остаётся загадкой; выбор офиса нужно реализовать на глобальном уровне, если пользователь обаладает таким правом (например, пункт в меню)
     ui->comboBoxCompany->setPlaceholderText(tr("организация"));
-    ui->comboBoxPresetPaymentAccount->setPlaceholderText(tr("тип оплаты"));
 //    ui->comboBoxPrepayAccount->setPlaceholderText(tr("тип оплаты"));
     ui->lineEditPrevRepair->setButtons("Search, DownArrow");
     ui->lineEditPrevRepair->setReadOnly(true);
@@ -109,12 +106,26 @@ void tabRepairNew::initWidgets()
 
     // установка моделей данных
     ui->comboBoxCompany->setModel(companiesModel);
+//    if(comSettings->isAutoSetCompanyOnRepairRecept)   // в АСЦ эта настройка, похоже, не учитывается
+        ui->comboBoxCompany->setCurrentIndex(SOfficeModel::current()->defaultCompanyIndex());
+//    else
+//        ui->comboBoxCompany->setCurrentIndex(-1);
+    ui->comboBoxCompany->setVisible(companiesModel->rowCount() > 1);
+    if(companiesModel->rowCount() == 1)
+    {
+        ui->comboBoxCompany->setVisible(false); // в АСЦ это поле остаётся видимым даже при одной компании и офисе
+    }
     ui->comboBoxOffice->setModel(officesModel);
     ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->currentOffice));
+    ui->comboBoxOffice->setVisible(officesModel->rowCount() > 1);
+    if(officesModel->rowCount() == 1)
+    {
+        ui->comboBoxOffice->setVisible(false);
+    }
     ui->comboBoxPresetEngineer->setModel(engineersModel);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
-    ui->comboBoxPresetPaymentAccount->setCurrentIndex(-1);
+    ui->comboBoxPresetPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(0, "system_id"));
     ui->comboBoxPrepayAccount->setModel(paymentSystemsProxyModel);
     ui->comboBoxPrepayAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
     ui->comboBoxPresetPlace->setModel(repairBoxesModel);
@@ -187,6 +198,8 @@ void tabRepairNew::getPrepayment(double summ)
     bool nErr = 1;
     int repair = repairModel->id();
     cashRegister = new SCashRegisterModel();
+    cashRegister->setCompanyIndex(ui->comboBoxCompany->currentIndex());
+    cashRegister->setOfficeIndex(ui->comboBoxOffice->currentIndex());
     cashRegister->setSystemId(paymentSystemsModel->databaseIDByRow(ui->comboBoxPrepayAccount->currentIndex(), "system_id"));
     cashRegister->setClient(clientModel->id());
     cashRegister->setOperationType(SCashRegisterModel::RecptPrepayRepair);
@@ -237,8 +250,8 @@ void tabRepairNew::setModelData()
     repairModel->setClientId(clientModel->id());
     repairModel->setSerialNumber(ui->lineEditSN->text());
     repairModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-    repairModel->setOffice(userDbData->currentOffice);
-    repairModel->setStartOffice(userDbData->currentOffice);
+    repairModel->setOfficeIndex(ui->comboBoxOffice->currentIndex());
+    repairModel->setStartOfficeIndex(ui->comboBoxOffice->currentIndex());
     repairModel->setManager(user);
     repairModel->setCurrentManager(user);
     repairModel->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
@@ -310,6 +323,7 @@ void tabRepairNew::showLineEditPrevRepair()
     else
     {
         ui->lineEditPrevRepair->hide();
+        ui->labelPrevRepairFromOldDB->hide();
         ui->lineEditPrevRepairFromOldDB->hide();
     }
 
@@ -457,7 +471,7 @@ void tabRepairNew:: setDefaultStyleSheets()
     ui->comboBoxExterior->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetPlace->setStyleSheet(commonComboBoxStyleSheet);
-//    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
+    ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPresetPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->doubleSpinBoxEstPrice->setStyleSheet(commonLineEditStyleSheet);
@@ -522,7 +536,7 @@ bool tabRepairNew::checkInput()
     if ( ui->checkBoxIsEstPrice->isChecked() )   // если установлен флаг "Клиент ознакомлен с возможной стоимостью"
         if (ui->doubleSpinBoxEstPrice->value() == ui->doubleSpinBoxEstPrice->minimum())   // соответствует ли норме введённая сумма
         {
-            ui->doubleSpinBoxEstPrice->setStyleSheet(commonLineEditStyleSheetRed);
+            ui->doubleSpinBoxEstPrice->setStyleSheet(commonSpinBoxStyleSheetRed);
             error = 17;
         }
     if ( ui->checkBoxIsPrepay->isChecked() )       // если установлен флаг "Клиент вносит предоплату"
@@ -552,6 +566,17 @@ bool tabRepairNew::checkInput()
                 error = 19;
             }
         }
+
+    if ( ui->comboBoxCompany->currentIndex() < 0)
+    {
+        ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 20;
+    }
+    if ( ui->comboBoxOffice->currentIndex() < 0)
+    {
+        ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheetRed);
+        error = 21;
+    }
 
     if (error)
     {
@@ -721,7 +746,7 @@ void tabRepairNew::guiFontChanged()
     ui->comboBoxExterior->setFont(font);
     ui->comboBoxPresetEngineer->setFont(font);
     ui->comboBoxPresetPlace->setFont(font);
-//    ui->comboBoxOffice->setFont(font);
+    ui->comboBoxOffice->setFont(font);
     ui->comboBoxCompany->setFont(font);
     ui->comboBoxPresetPaymentAccount->setFont(font);
     ui->doubleSpinBoxEstPrice->setFont(font);
@@ -833,7 +858,7 @@ void tabRepairNew::randomFill()
     {
         // в случайном порядке включаем разные флаги
         i = QRandomGenerator::global()->bounded(16384);
-        ui->checkBoxIsQuick->setChecked((i>>0)&0x01);
+        ui->checkBoxIsQuick->setChecked((i>>0)&0x01 && ui->checkBoxIsQuick->isEnabled());
         ui->checkBoxWasInOtherWorkshop->setChecked((i>>1)&0x01);
         ui->checkBoxIsHighPriority->setChecked((i>>2)&0x01);
         ui->checkBoxIsNonImportantData->setChecked((i>>3)&0x01);
@@ -841,8 +866,8 @@ void tabRepairNew::randomFill()
         ui->checkBoxIsWarranty->setChecked((i>>5)&0x01);
         ui->checkBoxIsEstPrice->setChecked((i>>6)&0x01);
         ui->checkBoxIsPrepay->setChecked((i>>7)&0x01);
-        ui->checkBoxIsCashReceiptDocNeeded->setChecked((i>>8)&0x01);
-        ui->checkBoxIsCheckNeeded->setChecked((i>>9)&0x01);
+        ui->checkBoxIsCashReceiptDocNeeded->setChecked((i>>8)&0x01 && ui->checkBoxIsCashReceiptDocNeeded->isEnabled());
+        ui->checkBoxIsCheckNeeded->setChecked((i>>9)&0x01 && ui->checkBoxIsCheckNeeded->isEnabled());
         if (ui->checkBoxWasEarlier->isChecked())
         {
             if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или берём ремонт из базы или записываем значение "из другой БД"

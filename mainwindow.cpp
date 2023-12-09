@@ -410,8 +410,20 @@ bool MainWindow::event(QEvent *event)
         if( (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab) && (keyEvent->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier)) )
         {
             if(ui->tabWidget->count() > 0)    // Если нет открытых вкладок, то сочетание клавиш игнорируется (иначе программа падает)
-                if(QString("QToolButton").compare(MainWindow::getInstance()->focusWidget()->metaObject()->className()) == 0)
+            {
+                bool b = 0;
+                QWidget *w = MainWindow::getInstance()->focusWidget();
+                if(w)
+                {
+                    if(QString("QToolButton").compare(w->metaObject()->className()) == 0)
+                        b = 1;
+                }
+                else
+                    b = 1;
+
+                if(b)
                     ui->tabWidget->currentWidget()->setFocus();
+            }
         }
     }
     return QMainWindow::event(event);

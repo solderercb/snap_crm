@@ -102,6 +102,8 @@ void SPhone::testFill(const int mask, const QString &number)
 {
     ui->comboBoxPhoneMask->setCurrentIndex(mask);
     ui->lineEditPhone->setText(number);
+    if(!ui->lineEditPhone->hasAcceptableInput())
+        ui->lineEditPhone->setText(ui->lineEditPhone->displayText().replace('_', '1'));
     numberEditFinished();
 }
 #endif

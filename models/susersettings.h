@@ -164,4 +164,4 @@ private:
     void translate();
 };
 
-#endif // SUSERSETTINGS_H)
+#endif // SUSERSETTINGS_H

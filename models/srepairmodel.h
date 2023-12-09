@@ -127,11 +127,9 @@ public:
     QString outDateTime();
     void setOutDate(const QDateTime);
     int state();
-    int stateIndex();
     void setState(const int);
-    void setStateIndex(const int);
-    int newStateIndex();
-    void setNewStateIndex(const int);
+    int newState();
+    void setNewState(const int);
     int userLock();
     void setUserLock(const QVariant);
     QDateTime lockDatetime();
@@ -166,7 +164,7 @@ public:
     void setPrepaidType(const int);
     double prepaidSumm();
     void setPrepaidSumm(const double);
-    double realPrepaidSumm();
+    double paymentsAmount(const SCashRegisterModel::PaymentType type = (SCashRegisterModel::PaymentType)0);
     int prepaidOrder();
     void setPrepaidOrder(const int);
     void addPrepay(double amount, QString reason = QString());

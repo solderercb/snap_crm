@@ -4,6 +4,7 @@
 #include "loginwindow.h"
 #include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
 #include "chooseofficewindow.h"
+#include "models/sofficemodel.h"
 
 windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject(parent)
@@ -56,17 +57,16 @@ void windowsDispatcher::connectOK()
     userDbData->updateLoginTimestamp();
     userActivityLog->appendRecord(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
 
-    // TODO: добавить разрешение выбора компании при входе
-    if (permissions->changeOffice)
-    {
+    userDbData->currentOffice = userDbData->office;
+
+    if ((permissions->changeOffice && (officesModel->rowCount() > 1)) || SOfficeModel::current()->id() == 0)
+    {   // АСЦ успешно логинится с архивным офисом в настройках сотрудника, это неправильно.
         createChooseOfficeWindow();
     }
     else
     {
-        userDbData->currentOffice = userDbData->office;
         createMainWindow();
     }
-    userDbData->company = 1;   // TODO: несколько компаний
 
     if(debugLoginOptions)
         delete debugLoginOptions;
@@ -78,8 +78,11 @@ void windowsDispatcher::createChooseOfficeWindow()
         if(debugLoginOptions->contains("office"))
         {
             userDbData->currentOffice = debugLoginOptions->value("office").toInt();
-            createMainWindow();
-            return;
+            if(SOfficeModel::current()->id())
+            {
+                createMainWindow();
+                return;
+            }
         }
 
     chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
@@ -89,9 +92,9 @@ void windowsDispatcher::createChooseOfficeWindow()
 
 void windowsDispatcher::createMainWindow()
 {
+    userDbData->company = SOfficeModel::current()->defaultCompany();
     MainWindow *windowMain = MainWindow::getInstance(this); // указатель должен объявляться именно здесь, по другому компилятор ругается
     windowMain->show();
     windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
-//    windowMain->createTabRepairNew(); // по-умолчанию создаём вкладку Ремонты
 }
 

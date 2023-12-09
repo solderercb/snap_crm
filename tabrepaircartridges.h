@@ -37,6 +37,7 @@ private:
     SDialogIssueRepair *m_dialogIssue;
     void appendToReceptList(SCartridgeForm *form);
     void updateWidgets();
+    const QList<SCartridgeForm*> existentForms();
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif

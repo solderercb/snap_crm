@@ -27,6 +27,8 @@ public:
     void setRepair(const int);
     void setDocumentId(const int);
     void setCashOrderId(const int);
+    void setOffice(const int id);
+    void setOfficeIndex(const int index);
     bool commit(const double);
     bool commit(const double, const QString &);
 private:

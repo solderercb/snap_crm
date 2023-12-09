@@ -24,6 +24,9 @@ public:
     void setType(int);
     int state();
     void setState(int);
+    int office() const;
+    void setOffice(int id);
+    void setOfficeIndex(int index);
     int client();
     void setClient(int);  // установка id клиента
     void unsetClient();
@@ -39,6 +42,7 @@ public:
     int company();
     int companyIndex();
     void setCompany(int company);
+    void setCompanyIndex(int company);
     int priceOption();
     int priceOptionIndex();
     void setPriceOption(int);
@@ -55,7 +59,6 @@ public:
     bool isValid();
     bool commit();
     QString title();
-
 private:
     int m_id = 0;
     int m_type = 0;
