@@ -119,6 +119,7 @@ SOURCES += \
     models/sphonemodel.cpp \
     models/sphonesmodel.cpp \
     reports/sprintposreport.cpp \
+    sapplication.cpp \
     tabreceptcartridge.cpp \
     tabrepaircartridges.cpp \
     tabsalary.cpp \
@@ -286,6 +287,7 @@ HEADERS  += \
     models/sphonemodel.h \
     models/sphonesmodel.h \
     reports/sprintposreport.h \
+    sapplication.h \
     tabreceptcartridge.h \
     tabrepaircartridges.h \
     tabsalary.h \

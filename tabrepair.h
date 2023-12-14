@@ -106,12 +106,12 @@ private:
     bool m_groupUpdate = 0;
     SRepairStatusLog *repairStatusLog;
     bool m_buttonSaveStateEnabled = 0;
+    QTimer *m_repairLockUpdateTimer = nullptr;
     int getFieldIdByName(const QString &, QSqlQueryModel *);
     QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
     void eventResize(QResizeEvent *);
     void fillExtraInfo();
-    void setLock(bool);
-    bool isBlockedUserOnline();
+    void setLock(bool state = 1);
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);

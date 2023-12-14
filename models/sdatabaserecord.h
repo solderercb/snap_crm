@@ -26,7 +26,7 @@ public:
     QDateTime createdUtc();
     QString created();
     void setCreated(const QDateTime &timestamp);
-
+    static bool checkSystemTime();
 protected:
     int i_id = 0;
     bool i_nErr = 1;
@@ -42,7 +42,6 @@ protected:
 private:
     int m_newId = 0;
     bool m_isIdColumnNameSet = 0;
-    bool checkSystemTime();
     bool checkObligatoryFields();
     bool checkTableName();
     void dbErrFlagHandler(bool);

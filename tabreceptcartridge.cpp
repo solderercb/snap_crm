@@ -320,7 +320,6 @@ void tabReceptCartridge::print()
     // печать чека-квитанции
     if(m_printReport)
     {
-        qDebug().nospace() << "[" << this << "] print()";
         SPrintPOSReport *report = new SPrintPOSReport();
         report->setClientModel(m_client);
         report->openPrinter(userLocalData->PosPrinter.value);

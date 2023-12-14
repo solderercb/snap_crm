@@ -127,7 +127,11 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     {
         logUserActivity();
         reloadRepairData();
-        setLock(1);
+        setLock();
+        m_repairLockUpdateTimer = new QTimer(this);
+        connect(m_repairLockUpdateTimer, &QTimer::timeout, [=]{setLock();});
+        m_repairLockUpdateTimer->setSingleShot(false);
+        m_repairLockUpdateTimer->start(10000);
     }
     else
     {
@@ -151,7 +155,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
 tabRepair::~tabRepair()
 {
-    setLock(0);
     delAdditionalFieldsWidgets();
     delete statusesProxyModel;
     delete additionalFieldsModel;
@@ -165,6 +168,8 @@ tabRepair::~tabRepair()
     }
     if(i_tabIcon)
         delete i_tabIcon;
+    if(m_repairLockUpdateTimer)
+        delete m_repairLockUpdateTimer;
     p_instance.remove(repair_id);   // Обязательно блять!
 }
 
@@ -182,16 +187,14 @@ bool tabRepair::tabCloseRequest()
         {
             return 0;
         }
-        else if (result == QMessageBox::No)
-        {
-            return 1;
-        }
-        else
+        else if (result == QMessageBox::Yes)
         {
             saveDiagAmount();
             worksAndPartsModel->repair_saveTablesStandalone();
         }
     }
+    m_repairLockUpdateTimer->stop();
+    setLock(0);
     return 1;
 }
 
@@ -354,8 +357,8 @@ void tabRepair::fillExtraInfo()
     if(repairModel->printCheck())
         ui->listWidgetExtraInfo->addItem(tr("чек при выдаче"));
     if(repairModel->isPrepaid())
-        ui->listWidgetExtraInfo->addItem(QString(tr("предоплата: %1")).arg(sysLocale.toCurrencyString(repairModel->prepaidSumm())));
-//    if(repairModel->isDebt())  // похоже не используется в АЦС
+        ui->listWidgetExtraInfo->addItem(QString(tr("предоплата: %1")).arg(sysLocale.toCurrencyString(repairModel->paymentsAmount())));
+//    if(repairModel->isDebt())  // используется вместе со статусом "Выдано в долг", но не отображается в карте ремонта
 //        ui->listWidgetExtraInfo->addItem("");
     if(ui->listWidgetExtraInfo->count())
         ui->listWidgetExtraInfo->setHidden(false);
@@ -363,28 +366,21 @@ void tabRepair::fillExtraInfo()
 
 void tabRepair::setLock(bool state)
 {
-    if(repairModel->isLock())
+    modelRO = repairModel->isLock();
+    if(state && modelRO)
     {
-        if(isBlockedUserOnline())
-        {
-            modelRO = 1;
-            i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
-            return;
-        }
+        i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
+        return;
     }
 
-    modelRO = 0;
-    if(i_tabIcon)
+    if(!state && i_tabIcon)
+    {
         delete i_tabIcon;
-    i_tabIcon = nullptr;
-    repairModel->lock(state);
-}
+        i_tabIcon = nullptr;
+    }
 
-bool tabRepair::isBlockedUserOnline()
-{
-    QSqlQuery queryCheckUserOnline = QSqlQuery(QSqlDatabase::database("connMain"));
-    queryCheckUserOnline.exec(QUERY_SEL_USER_ONLINE(QSqlDatabase::database("connMain").databaseName(), repairModel->userLock()));
-    return queryCheckUserOnline.first();
+    if(!modelRO)
+        repairModel->lock(state);
 }
 
 void tabRepair::createAdditionalFieldsWidgets()

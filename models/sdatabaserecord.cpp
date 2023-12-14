@@ -33,12 +33,11 @@ bool SDatabaseRecord::checkSystemTime()
     secDiff = date.secsTo(QDateTime::currentDateTimeUtc());
     if( secDiff > 30 || secDiff < -30 )
     {
-        i_nErr = 0;
         error = QString("[Warning] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss"));
         appLog->appendRecord(error);
+        throw Global::ThrowType::TimeError;
     }
-
-    return i_nErr;
+    return 1;
 }
 
 /*  Проверка обязательных полей (полей, не имеющих значения по умолчанию или связанных с другой таблицей)

@@ -527,6 +527,8 @@ void tabPrintDialog::setRepairsList(QList<SRepairModel *> list, bool takeOwn)
     i_listSourceDataCallbackHandler->setRepairsList(list, takeOwn);
 }
 
+/* Чек-квитанция о приёме на заправку и чек-акт отличаются только выводом на печать списка работ и деталей
+*/
 void tabPrintDialog::printCartridgeWorksReports(QList<SRepairModel *> list, bool takeOwn)
 {
     if(list.isEmpty())
@@ -541,7 +543,15 @@ void tabPrintDialog::printCartridgeWorksReports(QList<SRepairModel *> list, bool
     QList<SRepairModel*>::const_iterator i = list.constBegin();
     while(i != list.constEnd())
     {
-        report->addPrintJob(*i);
+        // Если запрошена печать чека-акта, а стоимость ремонта равна 0 (и, соответственно, список работ пуст), то такой чек не печатается вообще
+        // во всех остальных случаях производится или печать чека-акта или печать чека-квитанции
+        switch( (((*i)->realRepairCost() == 0) << 7) | (*i)->state() )
+        {
+            case (1 << 7) | Global::RepStateIds::Returned:
+            case (1 << 7) | Global::RepStateIds::ReturnedNoRepair:
+            case (1 << 7) | Global::RepStateIds::ReturnedInCredit: break;
+            default: report->addPrintJob(*i);
+        }
         if(takeOwn)
             delete *i;
         i++;

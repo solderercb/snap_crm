@@ -1,11 +1,11 @@
-#include <QApplication>
+#include "sapplication.h"
 #include <QTranslator>
 #include "windowsdispatcher.h"
 //#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    SApplication app(argc, argv);
 //    QApplication::setStyle("fusion");
     app.setFont(QFont("Segoe UI",9));  // Общий для всех виджетов шрифт (в win 7 тоже присутствует по умолчанию, но без эмоджи)
     QTextCodec *codec = QTextCodec::codecForName("UTF8");

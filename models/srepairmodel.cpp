@@ -1102,11 +1102,11 @@ bool SRepairModel::lock(bool state)
 
 bool SRepairModel::isLock()
 {
-    QUERY_EXEC(i_query, i_nErr)(QUERY_SEL_REPAIR_LOCK(i_id));
+    QUERY_EXEC(i_query, i_nErr)(QUERY_SEL_REPAIR_LOCK(QSqlDatabase::database("connMain").databaseName(), i_id));
     i_query->first();
-    if(i_query->value(0).toInt() == 0 || i_query->value(0).toInt() == userDbData->id)
-        return 0;
-    return 1;
+    if((i_query->value(0).toInt() != userDbData->id) && i_query->value(1).toInt())
+        return 1;
+    return 0;
 }
 
 QString SRepairModel::devClass()

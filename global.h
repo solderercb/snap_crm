@@ -46,7 +46,7 @@ namespace Global
                   repairs = 30, cartridges = 31,
                   not_impl = 256};
     Q_ENUM_NS(Reports)
-    enum ThrowType {Debug = 0, QueryError = 1, IntegrityError = 253, ConditionsError = 254, UserCanceled = 255};
+    enum ThrowType {Debug = 0, QueryError = 1, TimeError = 2, IntegrityError = 253, ConditionsError = 254, UserCanceled = 255};
     enum UserRoles {Admininstrator = 1, Engineer = 2, Manager = 3, Director = 4, SeniorEngineer = 5, SeniorManager = 6}; // роли по умолчанию
     Q_ENUM_NS(UserRoles)
 }

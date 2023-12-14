@@ -175,11 +175,16 @@ void tabRepairCartridges::reloadCardModel(int)
 void tabRepairCartridges::setReadyToIssue()
 {
     bool ret = 1;
+    SRepairModel *repair;
 
     for(auto form : existentForms())
     {
-        form->model()->setState(Global::RepStateIds::Ready);
-        ret &= form->model()->commit();
+        repair = form->model();
+        switch(repair->state())
+        {
+            case Global::RepStateIds::InWork: repair->setState(Global::RepStateIds::Ready); ret &= repair->commit(); break;
+            default: continue;
+        }
     }
 
     tabRepairs::refreshIfTabExists();

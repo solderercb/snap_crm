@@ -23,10 +23,12 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
         SSaleTableModel *worksAndPartsModel = nullptr;
         QModelIndex index;
 
-        if(repair->state() == Global::RepStateIds::Returned)
+        switch(repair->state())
         {
-            worksAndPartsModel = new SSaleTableModel();
-            worksAndPartsModel->repair_loadTable(repair->id());
+            case Global::RepStateIds::Returned:
+            case Global::RepStateIds::ReturnedNoRepair:
+            case Global::RepStateIds::ReturnedInCredit: worksAndPartsModel = new SSaleTableModel(); worksAndPartsModel->repair_loadTable(repair->id()); break;
+            default: ;
         }
 
         printer->startSpool("job");
@@ -101,11 +103,11 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
 
         if (worksAndPartsModel)
         {
-            *printer << QString("--------------------------------");
+            *printer << QString("--------------------------------\n");
             *printer << EscPosQt::EscPosPrinter::PrintModes(EscPosQt::EscPosPrinter::PrintModeDoubleWidth)
                      << QString("НЕФИСКАЛЬНЫЙ\n");
             *printer << EscPosQt::EscPosPrinter::PrintModes();
-            *printer << QString("--------------------------------");
+            *printer << QString("--------------------------------\n");
             *printer << EscPosQt::EscPosPrinter::feed(1);
 
             delete worksAndPartsModel;

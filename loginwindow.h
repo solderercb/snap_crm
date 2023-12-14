@@ -33,8 +33,6 @@ signals:
 public:
     explicit LoginWindow(QObject *parent = nullptr);
 	~LoginWindow();
-    void debugLogin();
-
 private:
 	Ui::LoginWindow *ui;
     QGraphicsPixmapItem *logo;
@@ -43,6 +41,7 @@ private:
     QSqlDatabase connNtfy;
     QSqlDatabase connThird;
 //    QSqlDatabase connFourth;
+    QTimer *debugLoginDelay;
     void statusBarMsg(const QString&, int delay = 2500);
     QTimer *statusBarDelay;
     SSLOptionsDialog *modalWidget;
@@ -50,12 +49,15 @@ private:
     QtAutoUpdater::UpdateController *updateController = nullptr;
     bool checkAppVer();
     int checkSchema();
+    bool checkProcessPriv();
     QStringList usersOnline();
     bool updateDB(int);
     void closeConnections();
     void debugInitLoginOptions();
     void fillConnectionParams();
     void startMaintanaceTool();
+public slots:
+    void show();
 private slots:
     void editPassword_onReturnPressed();
     void btnLoginHandler();
@@ -64,6 +66,7 @@ private slots:
     void createSSLOptionsDialog();
     void closeSSLOptionsDialog();
     void selectAscExe();
+    void debugLogin();
 };
 
 #endif // LOGINWINDOW_H

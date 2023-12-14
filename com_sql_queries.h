@@ -17,9 +17,6 @@
 #define QUERY_SEL_UPDATE_CHANNEL            QString("SELECT `value` FROM `settings` WHERE `name` = 'update_channel';")
 #define QUERY_SEL_ACTIVE_USERS(db)          QString("SELECT GROUP_CONCAT(DISTINCT `USER`) AS 'users' FROM `information_schema`.`PROCESSLIST` WHERE `DB` = '%1' AND `USER` IN (SELECT `username` FROM `%1`.`users` WHERE `is_bot` <> 1) AND `USER` NOT IN ('root', SUBSTRING_INDEX(USER(), '@', 1)) GROUP BY `DB`;")\
                                                 .arg((db))
-#define QUERY_SEL_USER_ONLINE(db, id)       QString("SELECT GROUP_CONCAT(DISTINCT `USER`) AS 'user' FROM `information_schema`.`PROCESSLIST` WHERE `DB` = '%1' AND `USER` IN (SELECT `username` FROM `%1`.`users` WHERE `id` = %2) AND `USER` NOT IN ('root', SUBSTRING_INDEX(USER(), '@', 1)) GROUP BY `DB`;")\
-                                                .arg((db))\
-                                                .arg((id))
 #define QUERY_SEL_GLOB_WAIT_TIMEOUT         QString("SELECT `VARIABLE_VALUE` FROM performance_schema.global_variables WHERE `VARIABLE_NAME` LIKE 'wait_timeout';")
 #define QUERY_SEL_ACTIVE_USERS2(timeout)    QString("SELECT GROUP_CONCAT(`username`) FROM users WHERE `last_activity` > DATE_SUB(NOW(), INTERVAL %1 SECOND);").arg(timeout)
 #define QUERY_SEL_DOC_TEMPL_CHECKSUM(doc)   QString("SELECT HEX(`checksum`) AS 'checksum' FROM `doc_templates_snap` WHERE `name` = '%1' LIMIT 1;").arg(doc)
@@ -304,7 +301,7 @@
 #define QUERY_SEL_REPAIR_WORKS(R)           QString("SELECT SUM(`price` * `count`) AS 'summa' FROM `works` WHERE `repair` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_PARTS(R)           QString("SELECT SUM(`price` * `count`) AS `summa` FROM `store_int_reserve` WHERE `state` IN (2, 3) AND `repair_id` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_MNGR_ENGR(R)       QString("SELECT `current_manager`, `master` FROM workshop WHERE `id` = %1").arg((R))
-#define QUERY_SEL_REPAIR_LOCK(R)            QString("SELECT `user_lock` FROM workshop WHERE `id` = %1;").arg((R))
+#define QUERY_SEL_REPAIR_LOCK(db, id)       QString("SELECT IFNULL(t1.`user_lock`, 0) AS 'user_id', IF(t3.`USER` IS NULL, 0, 1) AS 'is_user_online' FROM `%1`.`workshop` AS t1 LEFT JOIN `%1`.`users` AS t2 ON t1.`user_lock` = t2.`id` LEFT JOIN `information_schema`.`PROCESSLIST` AS t3 ON t2.`username` = t3.`USER` AND  t3.`DB` = '%1' WHERE t1.`id` = %2 GROUP BY t1.`id`;").arg((db)).arg((id))
 #define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R))
 #define QUERY_SEL_ADD_FIELD(id)             QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`id` = %1;").arg((id))
 #define QUERY_SEL_ITEM_ADD_FIELDS(I)        QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`item_id` = %1 ORDER BY t1.`field_id` ASC;").arg((I))

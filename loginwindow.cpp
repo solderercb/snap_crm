@@ -22,6 +22,13 @@ LoginWindow::LoginWindow(QObject*) :
     statusBarDelay = new QTimer();
     statusBarDelay->setSingleShot(true);
 
+    if(debugLoginOptions)
+    {
+        debugLoginDelay = new QTimer(); // задержка нужна, чтобы автоматически выполняемые при отладке действия гарантированно запускались после вызова QApplication::exec()
+        debugLoginDelay->setSingleShot(true);
+        connect(debugLoginDelay, &QTimer::timeout, this, &LoginWindow::debugLogin);
+    }
+
     connect(statusBarDelay, SIGNAL(timeout()), this, SLOT(clearStatusLabel()));
     connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
     connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
@@ -30,7 +37,8 @@ LoginWindow::LoginWindow(QObject*) :
     localSettings->read(userLocalData);
     if(userLocalData->FontFamily.value.isEmpty())
         userLocalData->FontFamily.value = "Segoe UI";
-    fillConnectionParams();
+    if(!debugLoginOptions)
+        fillConnectionParams();
 }
 
 LoginWindow::~LoginWindow()
@@ -78,6 +86,13 @@ void LoginWindow::startMaintanaceTool()
 //    Q_ASSERT(updater);
     updateController = new QtAutoUpdater::UpdateController(updater, this);
     updateController->start(QtAutoUpdater::UpdateController::DisplayLevel::Ask);
+}
+
+void LoginWindow::show()
+{
+    QWidget::show();
+    if(debugLoginOptions)
+        debugLoginDelay->start(100);
 }
 
 void LoginWindow::statusBarMsg(const QString &text, int delay)
@@ -137,6 +152,22 @@ int LoginWindow::checkSchema()
         return queryCheckSchema.size() + 1; // возвращаем номер патча, с которого нужно начать обновление структуры БД
 
     return 0;
+}
+
+/* Проверка привилегии PROCESS
+ * Пользователь должен обладать этой привилегией для проверки блокировки карточки ремонта
+*/
+bool LoginWindow::checkProcessPriv()
+{
+    bool ret = 0;
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    query->exec("SELECT IF(Process_priv LIKE 'Y', 1, 0) FROM mysql.user WHERE `User` = SUBSTRING_INDEX(USER(), '@', 1) AND SUBSTRING_INDEX(USER(), '@', -1) LIKE `Host`;");
+    if(query->first())
+        ret = query->value(0).toBool();
+
+    delete query;
+
+    return ret;
 }
 
 /*  Проверка активных подключений к базе
@@ -285,6 +316,7 @@ void LoginWindow::editPassword_onReturnPressed()
 void LoginWindow::debugLogin()
 {
     btnLoginHandler();
+    delete debugLoginDelay;
 }
 
 void LoginWindow::btnLoginHandler()
@@ -393,6 +425,11 @@ void LoginWindow::btnLoginHandler()
                     updateDB(0);    // обновление значения `config`.`version_snap`
                 }
 
+                SDatabaseRecord::checkSystemTime();
+
+                if(!checkProcessPriv())
+                    throw 6;
+
                 emit this->DBConnectOK();
                 this->hide();
                 this->deleteLater();
@@ -415,6 +452,15 @@ void LoginWindow::btnLoginHandler()
                     startMaintanaceTool();
                     break;
                 }
+                case 6: statusBarMsg(tr("Пользователь не обладает привилегией PROCESS")); break;
+            }
+            closeConnections();
+        }
+        catch (const Global::ThrowType err)
+        {
+            switch (err) {
+                case Global::ThrowType::TimeError: statusBarMsg(tr("Локальное время и время сервера не совпадают")); break;
+                default: statusBarMsg(tr("Необрабатанное исключение"));
             }
             closeConnections();
         }

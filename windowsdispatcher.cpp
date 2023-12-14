@@ -19,9 +19,6 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject::connect(windowLogin,SIGNAL(btnCancelClick()),this,SIGNAL(quit()));
 
     windowLogin->show();
-
-    if(debugLoginOptions)
-        windowLogin->debugLogin();
 }
 
 windowsDispatcher::~windowsDispatcher()
