@@ -465,9 +465,10 @@ int SCashRegisterModel::companyIndex()
     return companiesModel->rowByDatabaseID(m_company, "id");
 }
 
-void SCashRegisterModel::setCompany(const int company)
+void SCashRegisterModel::setCompany(const int id)
 {
-    i_valuesMap.insert("company", company);
+    m_company = id;
+    i_valuesMap.insert("company", id);
 }
 
 void SCashRegisterModel::setCompanyIndex(const int index)

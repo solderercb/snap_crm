@@ -80,6 +80,8 @@ private:
     SClientModel *clientModel = nullptr;
     QTimer *dateEditRefreshTimer;
     QString m_tabTitle;
+    QString m_side1LabelText;
+    QString m_side2LabelText;
     void setWidgetsParams();
     void updateWidgets();
     bool checkInput();

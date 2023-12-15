@@ -28,7 +28,7 @@ tabCashOperation::tabCashOperation(int order, MainWindow *parent) :
     if(companiesModel->rowCount() == 1)
     {
         ui->comboBoxCompany->setVisible(false); // в АСЦ это поле остаётся видимым даже при одной компании и офисе
-        ui->labelCompany->setVisible(false);
+        ui->labelSide1->setVisible(false);
     }
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
@@ -72,6 +72,8 @@ tabCashOperation::~tabCashOperation()
 void tabCashOperation::initPKO()
 {
     m_tabTitle = tr("Приходный кассовый ордер");
+    m_side1LabelText = tr("Получатель платежа");
+    m_side2LabelText = tr("Плательщик");
     paymentTypesModel = receiptTypesModel;
     ui->comboBoxOrderType->setModel(paymentTypesModel);
 }
@@ -79,6 +81,8 @@ void tabCashOperation::initPKO()
 void tabCashOperation::initRKO()
 {
     m_tabTitle = tr("Расходный кассовый ордер");
+    m_side1LabelText = tr("Организация-плательщик");
+    m_side2LabelText = tr("Получатель платежа");
     paymentTypesModel = expenditureTypesModel;
     ui->comboBoxOrderType->setModel(paymentTypesModel);
     m_showCheckBoxPrint = 0;
@@ -138,15 +142,9 @@ void tabCashOperation::showLinkedObject()
 
 void tabCashOperation::showClient()
 {
-    bool state = 1;
-    if(m_showClient == Client::NotVisible)
-        state = 0;
-    else if(m_showClient == Client::Employee)
-        ui->labelClient->setText(tr("Сотрудник"));
-    else
-        ui->labelClient->setText(tr("Плательщик"));
+    bool state = (m_showClient != Client::NotVisible);
 
-    ui->labelClient->setVisible(state);
+    ui->labelSide2->setVisible(state);
     ui->lineClientId->setVisible(state);
     ui->lineEditClientLastName->setVisible(state);
 
@@ -279,6 +277,7 @@ bool tabCashOperation::commit(bool repeatAfter)
     {
         if(!repeatAfter)
         {
+            m_initialOrderId = m_orderId;
             emit updateTabTitle(this);
             p_instance.remove(initial_order_id);   // Если всё ОК, то нужно заменить указатель
             p_instance.insert(m_orderId, this);    // иначе будет падать при попытке создать новую вкладку
@@ -426,6 +425,7 @@ void tabCashOperation::updateWidgets()
     setDefaultStylesheets();
     if(m_orderId > 0)
     {
+        ui->labelDate->setVisible(true);
         ui->lineEditDate->setVisible(true);
         ui->lineEditDate->setText(cashRegister->created());
         ui->dateEdit->setVisible(false);
@@ -445,6 +445,7 @@ void tabCashOperation::updateWidgets()
     }
     else
     {
+        ui->labelDate->setVisible(permissions->createBackdatedDocuments);
         ui->lineEditDate->setVisible(false);
         ui->dateEdit->setVisible(permissions->createBackdatedDocuments);
         ui->buttonSave->show();
@@ -463,6 +464,8 @@ void tabCashOperation::updateWidgets()
     ui->checkBoxPrintCheck->setVisible(m_showCheckBoxPrint);
     ui->comboBoxOrderType->setEnabled(!m_orderTypeRO);
 
+    ui->labelSide1->setText(m_side1LabelText);
+    ui->labelSide2->setText(m_side2LabelText);
     if(m_showBalance)
         ui->lineEditBalance->setText(sysLocale.toString(clientModel->balance(), 'f', 2));
     else
@@ -622,7 +625,10 @@ void tabCashOperation::fillClientCreds(int clientId)
     clientModel->load(clientId);
     m_showBalance = clientModel->balanceEnabled();
     ui->lineClientId->setText(QString::number(clientId));
-    ui->lineEditClientLastName->setText(clientModel->fullShortName());
+    if(m_showClient == Client::Employee)
+        ui->lineEditClientLastName->setText(allUsersModel->getDisplayRole(cashRegister->employee()));
+    else
+        ui->lineEditClientLastName->setText(clientModel->fullShortName());
     m_clientRO = ClientFieldsAccess::SelNClr;
     cashRegister->setClient(m_client);
     updateWidgets();
@@ -697,6 +703,7 @@ void tabCashOperation::setWidgetsParams()
     m_clientRO = ClientFieldsAccess::Full;
     m_amountRO = false;
     m_showBalance = 0;
+    m_paymentAccountRO = 0;
     m_skipAutoLogRecord = 0;
     m_reasonRO = 1;
     clearLinkedObjectFields();
@@ -719,12 +726,12 @@ void tabCashOperation::setWidgetsParams()
     case SCashRegisterModel::RecptSimple:
     case SCashRegisterModel::ExpSimple:    m_skipAutoLogRecord = 1; break;
     case SCashRegisterModel::ExpSubsist:
-    case SCashRegisterModel::ExpSalary:    m_showClient = Client::Employee; break;                  /* только просмотр; в поле клиента пишем данные сотрудника */
+    case SCashRegisterModel::ExpSalary:    m_showClient = Client::Employee; m_side2LabelText = tr("Сотрудник"); m_clientRO = ClientFieldsAccess::Denied; break;  /* только просмотр; в поле клиента пишем данные сотрудника */
     case SCashRegisterModel::AddSubCash:   m_showClient = Client::NotVisible; break;                /* только просмотр; нет полей клиента */
     case SCashRegisterModel::ExpRepair:    m_linkedObjType = LinkedObjectType::Repair; break;       /* только просмотр */
     case SCashRegisterModel::ExpGoods:     m_linkedObjType = LinkedObjectType::Document; break;     /* только просмотр */
     case SCashRegisterModel::ExpDealer:    m_clientRO = ClientFieldsAccess::Denied; break;          /* только просмотр */
-    case SCashRegisterModel::ExpRevert:    m_paymentAccountRO = 1; m_skipAutoLogRecord = 1; break;
+    case SCashRegisterModel::ExpRevert:    /*m_paymentAccountRO = 1; не помню почему не допускается выбор платёжной системы */m_skipAutoLogRecord = 1; break;
 //    case SCashRegisterModel::MoveCash:     m_showClient = Client::NotVisible; break;              /* TODO: */
     }
     if(m_orderType > SCashRegisterModel::ExpCustom)

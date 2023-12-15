@@ -114,52 +114,52 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="445"/>
+        <location filename="../loginwindow.cpp" line="458"/>
         <source>Не удалось обновить базу данных.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="446"/>
+        <location filename="../loginwindow.cpp" line="459"/>
         <source>Не удалось обновить базу данных. Есть пользователи онлайн.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="447"/>
+        <location filename="../loginwindow.cpp" line="460"/>
         <source>Попытка подключения к старой версии БД. Обратитесь к администратору.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="448"/>
+        <location filename="../loginwindow.cpp" line="461"/>
         <source>Учетная запись отключена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="451"/>
+        <location filename="../loginwindow.cpp" line="464"/>
         <source>Требуется обновление программы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="455"/>
+        <location filename="../loginwindow.cpp" line="468"/>
         <source>Пользователь не обладает привилегией PROCESS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="462"/>
+        <location filename="../loginwindow.cpp" line="475"/>
         <source>Локальное время и время сервера не совпадают</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="463"/>
+        <location filename="../loginwindow.cpp" line="476"/>
         <source>Необрабатанное исключение</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="512"/>
+        <location filename="../loginwindow.cpp" line="525"/>
         <source>Select ASC application executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="514"/>
+        <location filename="../loginwindow.cpp" line="527"/>
         <source>Executable (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5704,17 +5704,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="323"/>
+        <location filename="../tabcashmoveexch.cpp" line="324"/>
         <source>курс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="329"/>
+        <location filename="../tabcashmoveexch.cpp" line="330"/>
         <source>комиссия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="378"/>
+        <location filename="../tabcashmoveexch.cpp" line="379"/>
         <source>Проведёно</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5727,7 +5727,8 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.ui" line="88"/>
+        <location filename="../tabcashoperation.cpp" line="75"/>
+        <location filename="../tabcashoperation.cpp" line="85"/>
         <source>Получатель платежа</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5742,9 +5743,18 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.ui" line="206"/>
-        <location filename="../tabcashoperation.cpp" line="147"/>
+        <location filename="../tabcashoperation.cpp" line="76"/>
         <source>Плательщик</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.ui" line="88"/>
+        <source>side1LabelText</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.ui" line="206"/>
+        <source>side2LabelText</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5823,52 +5833,57 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="81"/>
+        <location filename="../tabcashoperation.cpp" line="83"/>
         <source>Расходный кассовый ордер</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="122"/>
+        <location filename="../tabcashoperation.cpp" line="126"/>
         <source>Ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="124"/>
+        <location filename="../tabcashoperation.cpp" line="128"/>
         <source>Счёт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="126"/>
+        <location filename="../tabcashoperation.cpp" line="130"/>
         <source>Документ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="145"/>
+        <location filename="../tabcashoperation.cpp" line="729"/>
         <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="313"/>
+        <location filename="../tabcashoperation.cpp" line="312"/>
         <source>Баланс клиента №%1 пополнен на %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="317"/>
+        <location filename="../tabcashoperation.cpp" line="84"/>
+        <source>Организация-плательщик</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.cpp" line="316"/>
         <source>С баланса клиента №%1 списано %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="392"/>
+        <location filename="../tabcashoperation.cpp" line="391"/>
         <source>Новый ПКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="393"/>
+        <location filename="../tabcashoperation.cpp" line="392"/>
         <source>Новый РКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="394"/>
+        <location filename="../tabcashoperation.cpp" line="393"/>
         <source>Кассовый ордер №%1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5878,17 +5893,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="522"/>
+        <location filename="../tabcashoperation.cpp" line="525"/>
         <source>Баланс клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="523"/>
+        <location filename="../tabcashoperation.cpp" line="526"/>
         <source>Баланс клиента не включен. Включить?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="804"/>
+        <location filename="../tabcashoperation.cpp" line="811"/>
         <source>Проведён</source>
         <translation type="unfinished"></translation>
     </message>

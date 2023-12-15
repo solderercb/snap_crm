@@ -121,9 +121,9 @@ void initGlobalModels()
     paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
     paymentSystemsModel->setObjectName("paymentSystemsModel");
 
-    receiptTypesModel = new SPaymentTypesModel(0);
+    receiptTypesModel = new SPaymentTypesModel(SPaymentTypesModel::Type::PKO);
     receiptTypesModel->setObjectName("receiptTypesModel"); // TODO: возможно, тоже нужны прокси-модели для отображения типов ПКО и РКО в соответствии с правами пользователя
-    expenditureTypesModel = new SPaymentTypesModel(1);
+    expenditureTypesModel = new SPaymentTypesModel(SPaymentTypesModel::Type::RKO);
     expenditureTypesModel->setObjectName("expenditureTypesModel");
 
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));

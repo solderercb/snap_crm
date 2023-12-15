@@ -1084,6 +1084,7 @@ bool SRepairModel::commit()
 
 bool SRepairModel::lock(bool state)
 {
+    blockSignals(true); // в данном случае отправлять сигнал об обновлении модели не нужно
     i_query->exec(QUERY_BEGIN);
     if(state)
     {
@@ -1097,6 +1098,7 @@ bool SRepairModel::lock(bool state)
     }
     i_nErr = commit();
     QUERY_COMMIT_ROLLBACK(i_query, i_nErr);
+    blockSignals(false);
     return i_nErr;
 }
 

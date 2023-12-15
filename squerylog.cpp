@@ -1,4 +1,5 @@
 #include "squerylog.h"
+#include "models/slocalsettings.h"
 
 SQueryLog::SQueryLog(QSqlQuery *q) :
     query(q)
@@ -90,7 +91,7 @@ void SQueryLog::start(const QString &className)
 {
     Q_UNUSED(className);
 #ifdef QT_DEBUG
-    setFile(QApplication::applicationDirPath() + "\\" + className + ".sql");
+    setFile(SLocalSettings::appSettingsPath() + "/" + className + ".sql");
     if(super_priv)
         truncateLog();
 #endif

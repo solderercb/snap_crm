@@ -83,9 +83,9 @@
           </widget>
          </item>
          <item row="5" column="1">
-          <widget class="QLabel" name="labelCompany">
+          <widget class="QLabel" name="labelSide1">
            <property name="text">
-            <string>Получатель платежа</string>
+            <string>side1LabelText</string>
            </property>
           </widget>
          </item>
@@ -201,9 +201,9 @@
           </layout>
          </item>
          <item row="6" column="1">
-          <widget class="QLabel" name="labelClient">
+          <widget class="QLabel" name="labelSide2">
            <property name="text">
-            <string>Плательщик</string>
+            <string>side2LabelText</string>
            </property>
           </widget>
          </item>
@@ -766,18 +766,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SClientMatch</class>
-   <extends>QWidget</extends>
-   <header>widgets/sclientmatch.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets/slineedit.h</header>
    <slots>
     <signal>buttonClicked(int)</signal>
+    <signal>mouseDoubleClick()</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>SClientMatch</class>
+   <extends>QWidget</extends>
+   <header>widgets/sclientmatch.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

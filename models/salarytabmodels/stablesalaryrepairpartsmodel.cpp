@@ -23,5 +23,10 @@ QVariant STableSalaryRepairPartsModel::data(const QModelIndex &item, int role) c
             default: ;
         }
     }
+    if(role == Qt::BackgroundRole)
+    {
+        if(item.column() == Columns::UID && STableBaseModel::data(item.siblingAtColumn(Columns::IsRealization)).toBool())
+            return QColor(100,149,237);
+    }
     return STableBaseModel::data(item, role);
 }

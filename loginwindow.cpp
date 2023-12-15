@@ -156,14 +156,27 @@ int LoginWindow::checkSchema()
 
 /* Проверка привилегии PROCESS
  * Пользователь должен обладать этой привилегией для проверки блокировки карточки ремонта
+ * Это второй вариант проверки; первый (rev0.0.0.279 от 14.12.2023) проще в плане кода, но требует привилегии SELECT для таблицы mysql
 */
 bool LoginWindow::checkProcessPriv()
 {
     bool ret = 0;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    query->exec("SELECT IF(Process_priv LIKE 'Y', 1, 0) FROM mysql.user WHERE `User` = SUBSTRING_INDEX(USER(), '@', 1) AND SUBSTRING_INDEX(USER(), '@', -1) LIKE `Host`;");
-    if(query->first())
-        ret = query->value(0).toBool();
+    QString grants;
+    int end;
+    query->exec("SHOW GRANTS;");
+    while(query->next() && !ret)
+    {
+        grants = query->value(0).toString();
+        grants.replace("GRANT ", "");
+        end = grants.indexOf(" ON *.*");
+        if(end < 0)
+            continue;
+
+        grants = grants.left(end).replace(", ", ",");
+        QStringList grantsLst = grants.split(',');
+        ret = grantsLst.contains("PROCESS") | grantsLst.contains("ALL PRIVILEGES");
+    }
 
     delete query;
 
