@@ -16,7 +16,7 @@ class t_status : public QSerializer
     QS_JSON_FIELD(QString, Color)
     QS_JSON_FIELD(QString, Terms)
     public:
-        int TermsSec;
+        qint64 TermsSec;
         QStringList ContainsStr;    // данные в таком формате нужны для фильтрации в прокси-моделях
         QStringList ActionsStr;
 
@@ -37,6 +37,9 @@ class t_status : public QSerializer
             TermsSec = statusTermDays*24*3600 + statusTermSecons;
             ContainsStr = toStringList(Contains);
             ActionsStr = toStringList(Actions);
+
+            if(Color.isEmpty())   // для вновь созданного статуса, если не был выбран цвет, в БД записывается значение null
+                Color = "#00000000";
         }
     private:
         QStringList toStringList(QList<int> intList)

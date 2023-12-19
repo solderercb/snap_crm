@@ -30,10 +30,10 @@ void STableViewRepairsItemDelegates::paintStatusProgressBar(QPainter *painter, c
 {
     uint progressStatus = 0;
     uint repairStatus = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
-    uint statusTermSecons = comSettings->repairStatuses[repairStatus].TermsSec;
+    qint64 statusTermSecons = comSettings->repairStatuses[repairStatus].TermsSec;
     QDateTime statusChanged = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::LastStatusChanged)).toDateTime();
     statusChanged.setTimeZone(QTimeZone::utc());
-    qint64 secondsSinceStatusChanged = statusChanged.secsTo(QDateTime::currentDateTimeUtc());
+    qint64 secondsSinceStatusChanged = statusChanged.secsTo(QDateTime::currentDateTimeUtc()) + 1;
 
     if(statusTermSecons <= 0)   // если термин статуса не задан, что шкала прогресса 100%
         statusTermSecons = secondsSinceStatusChanged;

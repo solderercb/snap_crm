@@ -75,6 +75,8 @@ tabPrintDialog *tabPrintDialog::create(Global::Reports type)
 
 bool tabPrintDialog::tabCloseRequest()
 {
+    if(m_reportState != ReportState::RenderingFinished)
+        return 0;
     return 1;
 }
 
@@ -103,7 +105,7 @@ void tabPrintDialog::paintEvent(QPaintEvent *event)
     // При отображении вкладки предпросмотра событие PainEvent вызывается не менее трёх раз, но т. к. достоверно неизвестно
     // точное ли это число вызовов, таймер кажется более надёжным; при каждом вызове этого метода таймер перезапускается
     // а спустя заданную задержку после последнего вызова будет произведён запуск рендеринга.
-    if(!m_isReportInitialized)
+    if(m_reportState == ReportState::New)
     {
         renderDelayTimer->start(20);
     }
@@ -113,7 +115,7 @@ bool tabPrintDialog::event(QEvent *ev)
 {
     bool ret = tabCommon::event(ev);
 
-    if(!m_isReportRendered)
+    if(m_reportState < ReportState::RenderingFinished)
         return ret;
 
     if(ev->type() == QEvent::ShowToParent)  // при переключении на вкладку нужно установить фокус на виджет (например, при печати документа, нажатием Пробел можно быстро запустить печать и не делать лишних телодвижений мышью)
@@ -163,7 +165,7 @@ void tabPrintDialog::notImplementedReport()
 
 void tabPrintDialog::initReport()
 {
-    m_isReportInitialized = 1;
+    m_reportState = ReportState::Initialized;
     QObject::connect(progressUpdateTimer, &QTimer::timeout, this, &tabPrintDialog::updateProgressWidget);
     progressUpdateTimer->start(250);
 
@@ -185,7 +187,6 @@ void tabPrintDialog::initReport()
 
     setProgressText("Renderind report");
     m_report->prepareReportPages();
-    initPrinter(false);
 }
 
 void tabPrintDialog::showPreview()
@@ -613,16 +614,17 @@ void tabPrintDialog::pageSetupAccepted()
 
 void tabPrintDialog::reportRenderStarted()
 {
-    m_isReportRendered = 0;
+    m_reportState = ReportState::RenderingInProcess;
 }
 
 void tabPrintDialog::reportRenderFinished()
 {
-    m_isReportRendered = 1;
+    m_reportState = ReportState::RenderingFinished;
     // эмуляция задержки
 //    QTime dieTime= QTime::currentTime().addSecs(2);
 //    while (QTime::currentTime() < dieTime)
 //        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    initPrinter(false);
 
     selectPrinter();
 

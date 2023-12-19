@@ -112,12 +112,14 @@ void tabRepairCartridges::updateWidgets()
     m_readyButtonVisible = 0;
     m_issueButtonVisible = 1;
     bool formReady;
+    bool nEmpty = 0;
 
     if(comSettings->useSimplifiedCartridgeRepair)
         m_readyButtonVisible = 1;        // кнопка видна только в упрощенном режиме работы с картриджами
 
     for(auto form : existentForms())
     {
+        nEmpty = 1;
         formReady = form->isReady();
         m_readyButtonVisible &= formReady;
         m_issueButtonVisible &= formReady;
@@ -125,8 +127,8 @@ void tabRepairCartridges::updateWidgets()
             m_issueButtonVisible &= 0;
         client = form->clientId();
     }
-    ui->buttonSetReadyToIssue->setVisible(m_readyButtonVisible);
-    ui->buttonIssue->setVisible(m_issueButtonVisible);
+    ui->buttonSetReadyToIssue->setVisible(m_readyButtonVisible && nEmpty);
+    ui->buttonIssue->setVisible(m_issueButtonVisible && nEmpty);
 }
 
 const QList<SCartridgeForm *> tabRepairCartridges::existentForms()
@@ -208,6 +210,9 @@ void tabRepairCartridges::createDialogIssue()
     {
         list.append(form->model());
     }
+
+    if(list.isEmpty())
+        return;
 
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
     connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printCartridgeWorksReports(list, false);});

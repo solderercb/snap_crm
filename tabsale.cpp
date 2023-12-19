@@ -326,7 +326,7 @@ bool tabSale::checkInput()
 
     if( !ui->checkBoxAnonymous->isChecked() )
     {
-        if (ui->lineEditClientLastName->text() == "")       // если не указана фамилия
+        if (ui->lineEditClientLastName->text() == "" && !clientModel->type())       // если не указана фамилия (обычный клиент; у юрика может быть пустым)
         {
             ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheetRed);
             error = 1;

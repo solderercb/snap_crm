@@ -76,6 +76,12 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
 #ifdef QT_DEBUG
 //    ui->checkBoxConfirmGetOut->setChecked(true);
 //    ui->checkBoxPaymentCheckout->setChecked(true);
+//    if(ui->checkBoxSetReturnedInCredit->isVisible() && m_clientModel->balanceEnabled())
+//        ui->checkBoxSetReturnedInCredit->setChecked(true);
+//    if(ui->checkBoxPaymentCheckout->isVisible() && ui->checkBoxPaymentCheckout->isEnabled())
+//        ui->checkBoxPaymentCheckout->setChecked(true);
+//    if(ui->checkBoxConfirmGetOut->isVisible() && ui->checkBoxConfirmGetOut->isEnabled())
+//        ui->checkBoxConfirmGetOut->setChecked(true);
 //    buttonIssueClicked();
 #endif
 }

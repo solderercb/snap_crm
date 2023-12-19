@@ -1,9 +1,9 @@
 #include "applog.h"
+#include "models/slocalsettings.h"
 
 SAppLog::SAppLog()
 {
-    QDir appDataDir = QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));   // C:/Users/user/AppData/Local
-    file.setFileName(appDataDir.path()+"/snap/snap.log");
+    file.setFileName(SLocalSettings::appSettingsPath()+"/snap.log");
 }
 
 QString SAppLog::filePath()

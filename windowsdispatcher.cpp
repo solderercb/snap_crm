@@ -12,6 +12,7 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     setObjectName("windowsDispatcherObj");
 
     debugInitSettings();
+    appLog = new SAppLog();
     appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Application start");
     LoginWindow *windowLogin = new LoginWindow(this);
 

@@ -25,7 +25,7 @@ SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
     {
         initWidgets();
     }
-    catch (int)
+    catch (...)
     {
         m_repairId = 0;
     }

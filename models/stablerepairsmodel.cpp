@@ -17,7 +17,7 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::BackgroundRole)
     {
         if(index.column() == Columns::Status)
-            return QColor(comSettings->repairStatuses[QSqlQueryModel::data(index, Qt::DisplayRole).toInt()].Color);
+            return QColor(comSettings->repairStatuses[STableBaseModel::unformattedData(index, Qt::DisplayRole).toInt()].Color);
 
         QString rowColor = STableBaseModel::data(index.siblingAtColumn(Columns::Color)).toString();
         if(!rowColor.isEmpty())

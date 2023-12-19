@@ -486,11 +486,13 @@ void MainWindow::createTabRepairCartridges(QList<int> *list)
 {
     tabRepairCartridges *subwindow = tabRepairCartridges::getInstance(list, this);
     if(ui->tabWidget->indexOf(subwindow) == -1)
+    {
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+        QObject::connect(subwindow, &tabRepairCartridges::createTabClient, this, &MainWindow::createTabClient);
+        QObject::connect(subwindow, &tabRepairCartridges::createTabRepair, this, &MainWindow::createTabRepair);
+    }
 
     ui->tabWidget->setCurrentWidget(subwindow);
-    QObject::connect(subwindow, &tabRepairCartridges::createTabClient, this, &MainWindow::createTabClient);
-    QObject::connect(subwindow, &tabRepairCartridges::createTabRepair, this, &MainWindow::createTabRepair);
 }
 
 void MainWindow::createTabRepairNew()

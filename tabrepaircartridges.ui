@@ -203,7 +203,7 @@
              <string>Установить всем картритджам в скиске статус &quot;Готово к выдаче&quot;</string>
             </property>
             <property name="text">
-             <string>Готово</string>
+             <string>Готово к выдаче</string>
             </property>
            </widget>
           </item>

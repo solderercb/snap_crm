@@ -77,11 +77,11 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
+    enum ReportState {New = 0, Initialized = 1, RenderingInProcess = 2, RenderingFinished = 3};
     Ui::tabPrintDialog *ui;
     QPrinter *m_printer = nullptr;
     QStringList m_printersList;
-    bool m_isReportRendered = 0;
-    bool m_isReportInitialized = 0;
+    int m_reportState = ReportState::New;
     QLabel *m_progressWidget = nullptr;
     QString m_progressWidgetStaticText;
     LimeReport::PreviewReportWidget *m_previewWidget = nullptr;

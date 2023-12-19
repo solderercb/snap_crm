@@ -214,7 +214,7 @@ void tabRepairs::autorefreshTable()
 
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
 {
-    int id = repairs_table->record(item.row()).value("id").toInt();
+    int id = repairs_table->unformattedData(item.siblingAtColumn(STableRepairsModel::Columns::Id)).toInt();
     if(!id)
         return;
 
@@ -246,7 +246,7 @@ void tabRepairs::tableItemClick(QModelIndex index)
             searchStr = searchStr.replace("^", "\\^").replace("$", "\\$");
             searchStr = searchStr.replace("?", "\\?").replace("\\", "\\\\");
         }
-        ui->lineEditSearch->setText(searchStr);
+        ui->lineEditSearch->setText(searchStr.replace("\\\\","\\"));
     }
 }
 

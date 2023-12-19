@@ -17,11 +17,6 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
 
     ui->setupUi(this);
     tabReceptCartridge::guiFontChanged();
-    // установка белого фона только для scrollArea (не наследуется)
-    // https://qtcentre.org/threads/14099-How-to-stop-child-widgets-from-inheriting-parent-s-StyleSheet-and-use-system-default?p=73101#post73101
-    ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents {\
-                                                    background-color: rgb(255, 255, 255);\
-                                                }");
     m_tableModel = new QStandardItemModel();
     m_vendorsModel = new SSqlQueryModel();
     m_cartridgesModel = new SSqlQueryModel();
@@ -86,6 +81,11 @@ void tabReceptCartridge::setFocusSerialNumber()
 
 void tabReceptCartridge::setDefaultStyleSheets()
 {
+    // установка фона только для scrollArea (не наследуется)
+    // https://qtcentre.org/threads/14099-How-to-stop-child-widgets-from-inheriting-parent-s-StyleSheet-and-use-system-default?p=73101#post73101
+    ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents {\
+                                                    background-color: #FFFFFF;\
+                                                }");
     ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxCompany->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheet);
@@ -186,6 +186,14 @@ bool tabReceptCartridge::checkInput()
     }
 
     error = qMax(error, ui->widgetClient->checkInput());
+
+    if(existentForms().empty())
+    {
+        ui->scrollAreaWidgetContents->setStyleSheet("#scrollAreaWidgetContents {\
+                                                        background-color: #FFD1D1;\
+                                                    }");
+        error = 4;
+    }
 
     if (error)
     {

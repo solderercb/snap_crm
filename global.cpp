@@ -56,7 +56,7 @@ QString commonSpinBoxStyleSheetRed = "QSpinBox, QDoubleSpinBox {  border: 1px so
 SStandardItemModel *rejectReasonModel = new SStandardItemModel;
 SStandardItemModel *priceColModel = new SStandardItemModel;
 SStandardItemModel *itemUnitsModel = new SStandardItemModel;
-SAppLog *appLog = new SAppLog();
+SAppLog *appLog;
 SUserActivityModel *userActivityLog;
 SStandardItemModel *clientBinaryProperties;
 QSettings *debugOptions = nullptr;
