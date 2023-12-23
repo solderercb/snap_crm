@@ -230,8 +230,8 @@ public:
     void initDemo() override;
     void initCartridgeRepairModel(const int id);
     bool isNew();
-    void setWorksAndPartsModel(SSaleTableModel *model);
-    SSaleTableModel *worksAndPartsModel() const;
+    void setBOQModel(SSaleTableModel *model);
+    SSaleTableModel *BOQModel() const;
 
 private:
     SClientModel *m_clientModel;
@@ -299,7 +299,7 @@ private:
     int m_cartridge = 0;
     int m_vendorId = 0;
     bool m_termsControl = 0;
-    SSaleTableModel *m_worksAndParts = nullptr;
+    SSaleTableModel *m_BOQModel = nullptr;  // модель данных таблицы работ и деталей
     QString devClass();
     QString vendor();
     QString device();

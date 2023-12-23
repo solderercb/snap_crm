@@ -4,7 +4,7 @@
 SQueryLog::SQueryLog(QSqlQuery *q) :
     query(q)
 {
-    query->exec("SELECT IF(Super_priv LIKE 'Y', 1, 0) FROM mysql.user WHERE `User` = SUBSTRING_INDEX(USER(), '@', 1) AND `Host` = SUBSTRING_INDEX(USER(), '@', -1);");
+    query->exec("SELECT IF(Super_priv LIKE 'Y', 1, 0) FROM mysql.user WHERE `User` = SUBSTRING_INDEX(USER(), '@', 1) AND SUBSTRING_INDEX(USER(), '@', -1) LIKE `Host`;");
 
     if(query->first())
         super_priv = query->value(0).toBool();

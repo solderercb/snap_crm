@@ -345,7 +345,10 @@ bool SSaleTableModel::addItemByUID(const int uid, const int count)
     return addItemByUID(uid, m_priceColumnId, count);
 }
 
-bool SSaleTableModel::addItemFromBasket(const int id, const int qty, const SStoreItemModel::PriceOption priceOpt)
+/* Добавление товара из корзины сотрудника
+ * Если qty не передаётся или равен нулю, добавляется всё зарезервированное кол-во
+*/
+bool SSaleTableModel::addItemFromBasket(const int id, const int qty)
 {
     QSqlQueryModel *item = nullptr;
     bool ret = 1;
@@ -360,7 +363,7 @@ bool SSaleTableModel::addItemFromBasket(const int id, const int qty, const SStor
 
             insertionRow = getItemInsertionRow();
             item = new QSqlQueryModel(this);
-            item->setQuery(QUERY_SEL_PART_FROM_BASKET(id, priceColModel->index(priceOpt, 2).data().toString(), count), QSqlDatabase::database("connMain"));
+            item->setQuery(QUERY_SEL_PART_FROM_BASKET(id, count), QSqlDatabase::database("connMain"));
             ret = insertRecord(insertionRow, item->record(0));
             if(qty) // добавление части товара из корзины сотрудника
             {
@@ -1501,17 +1504,15 @@ void SSaleTableModel::dbgAddRandomItem()
 void SSaleTableModel::dbgAddRandomItemBasket()
 {
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    int id = 0;
 
-    for(int j = 0; j < 3; j++)
+    for(int j = 0; j < 4 && id == 0; j++)   // id может быть получен не с первого раза (какая-то особенность mysql, не разобрался).
     {
         query->exec(QString("SELECT `id` FROM (SELECT ROUND(@i * RAND(), 0) AS 'rand') AS `rand` LEFT JOIN (SELECT @i := @i + 1 AS 'num', t1.`id` FROM store_int_reserve AS t1 CROSS JOIN (SELECT @i := 0) AS dummy WHERE t1.`state` = 1) AS t1 ON t1.`num` = `rand`.`rand`;"));
-        if(j<2)
-            continue;   // после обновления сервера на mysql 5.6.51 (win) пришлось чуть-чуть изменить запрос для случайного товара; также в только что открытой сессии результаты первых двух запросов будут состоять из NULL, поэтому пропускаем их
-
         query->first();
-        if(query->isValid())
-            addItemFromBasket(query->record().value(0).toInt(), 0, m_priceColumnId);
-//            addItemFromBasket(19728, 0, m_priceColumnId);
+        id = query->record().value(0).toInt();
+        if(id)
+            addItemFromBasket(id);
     }
     delete query;
 }

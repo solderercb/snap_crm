@@ -20,14 +20,14 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
 {
     if(printer)
     {
-        SSaleTableModel *worksAndPartsModel = nullptr;
+        SSaleTableModel *BOQModel = nullptr;
         QModelIndex index;
 
         switch(repair->state())
         {
             case Global::RepStateIds::Returned:
             case Global::RepStateIds::ReturnedNoRepair:
-            case Global::RepStateIds::ReturnedInCredit: worksAndPartsModel = new SSaleTableModel(); worksAndPartsModel->repair_loadTable(repair->id()); break;
+            case Global::RepStateIds::ReturnedInCredit: BOQModel = new SSaleTableModel(); BOQModel->repair_loadTable(repair->id()); break;
             default: ;
         }
 
@@ -68,7 +68,7 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
         *printer << EscPosQt::EscPosPrinter::PrintModes();
 
 
-        if (worksAndPartsModel)
+        if (BOQModel)
         {
             *printer << EscPosQt::EscPosPrinter::feed(1);
             *printer << EscPosQt::EscPosPrinter::PrintModes(EscPosQt::EscPosPrinter::PrintModeEmphasized)
@@ -77,9 +77,9 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
 
             *printer << EscPosQt::EscPosPrinter::PrintModes()
                  << EscPosQt::EscPosPrinter::JustificationLeft;
-            for(int i = 0; i < worksAndPartsModel->rowCount(); i++)
+            for(int i = 0; i < BOQModel->rowCount(); i++)
             {
-                index = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColName);
+                index = BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColName);
                 *printer << EscPosQt::EscPosPrinter::formatAs2CTable(
                                 index.data().toString(),
                                 QString("x%1  =%2") \
@@ -93,7 +93,7 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
                  << QString("ИТОГ:\n");
             *printer << EscPosQt::EscPosPrinter::PrintModes(EscPosQt::EscPosPrinter::PrintModeDoubleWidth | EscPosQt::EscPosPrinter::PrintModeDoubleHeight | EscPosQt::EscPosPrinter::PrintModeEmphasized)
                  << EscPosQt::EscPosPrinter::JustificationRight
-                 << "=" + worksAndPartsModel->amountTotalLocale() + "\n";
+                 << "=" + BOQModel->amountTotalLocale() + "\n";
 
         }
 
@@ -101,7 +101,7 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
         *printer << EscPosQt::EscPosPrinter::PrintModes()
                  << EscPosQt::EscPosPrinter::JustificationCenter;
 
-        if (worksAndPartsModel)
+        if (BOQModel)
         {
             *printer << QString("--------------------------------\n");
             *printer << EscPosQt::EscPosPrinter::PrintModes(EscPosQt::EscPosPrinter::PrintModeDoubleWidth)
@@ -110,7 +110,7 @@ void SPrintPOSReport::addPrintJob(SRepairModel *repair)
             *printer << QString("--------------------------------\n");
             *printer << EscPosQt::EscPosPrinter::feed(1);
 
-            delete worksAndPartsModel;
+            delete BOQModel;
         }
 
         *printer << QString("СПАСИБО, ЧТО ВЫБРАЛИ НАС !\n")

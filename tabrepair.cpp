@@ -17,7 +17,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
     repairModel = new SRepairModel();
     repairModel->setId(repair_id);
-    connect(repairModel, SIGNAL(modelUpdated()), this, SLOT(updateWidgets()));
     clientModel = new SClientModel();
     if(permissions->printStickers)
     {
@@ -49,12 +48,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         ui->lineEditIncomingSet->setButtons("Edit");
         connect(ui->lineEditIncomingSet, &SLineEdit::buttonClicked, this, &tabRepair::editIncomingSet);
     }
-    if(permissions->addGoodsFromWarehouse)  // Устанавливать детали со склада
-    {
-        ui->lineEditQuickAddPart->setButtons("Apply");
-        connect(ui->lineEditQuickAddPart, &SLineEdit::buttonClicked, this, &tabRepair::onReturnQuickAddPart);
-        connect(ui->lineEditQuickAddPart, &SLineEdit::returnPressed, this, &tabRepair::onReturnQuickAddPart);
-    }
     if(userDbData->autosaveDiagResult)
     {
         m_autosaveDiag = 1;
@@ -77,18 +70,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     additionalFieldsModel = new SFieldsModel(SFieldsModel::Repair);
     statusesProxyModel = new SSortFilterProxyModel;
     statusesProxyModel->setSourceModel(comSettings->repairStatuses.Model);
-    worksAndPartsModel = new SSaleTableModel();
-    worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
-    worksAndPartsModel->setPriceColumn(SStoreItemModel::PriceOptionService);
-    repairModel->setWorksAndPartsModel(worksAndPartsModel);
-    if(userDbData->autosavePartList)
-        ui->switchEditStrategy->setChecked(true);
-    else
-        ui->switchEditStrategy->setChecked(false);
-    connect(worksAndPartsModel, SIGNAL(amountChanged(double,double,double)), this, SLOT(updateTotalSumms(double,double,double)));
-    connect(worksAndPartsModel, &SSaleTableModel::addItem, this, &tabRepair::buttonAddItemClicked);
-    connect(worksAndPartsModel, &SSaleTableModel::tableDataChanged, this, &tabRepair::setSaveSaleTableEnabled);
-    connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &tabRepair::saveTotalSumms);
+    connect(repairModel, &SRepairModel::modelUpdated, this, &tabRepair::updateWidgets);
 
     ui->comboBoxPlace->setButtons("Clear");
     ui->comboBoxPlace->setModel(repairBoxesModel);
@@ -104,12 +86,8 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->comboBoxNotifyStatus->setModel(notifyStatusesModel);
     ui->comboBoxNotifyStatus->blockSignals(false);
 
-    ui->tableViewWorksAndSpareParts->setModel(worksAndPartsModel);
-    connect(ui->tableViewWorksAndSpareParts, SIGNAL(pressed(QModelIndex)), worksAndPartsModel, SLOT(indexSelected(QModelIndex)));
-    connect(ui->tableViewWorksAndSpareParts, &worksAndSparePartsTable::createTabSparePart, this, &tabRepair::createTabSparePart);
-    connect(ui->tableViewWorksAndSpareParts, &worksAndSparePartsTable::createTabSparePartReserve, this, &tabRepair::createTabSparePartReserve);
-//    ui->tableViewWorksAndSpareParts->setReadOnly(true);
-    connect(ui->pushButtonAddWork, SIGNAL(clicked()), this, SLOT(addCustomWork()));
+    ui->widgetBOQ->setRepairModel(repairModel);
+    ui->widgetBOQ->setReadOnly(true);
 
     ui->widgetComments->setParentTab(this);
     ui->widgetComments->setMode(SCommentModel::Repair);
@@ -144,12 +122,8 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     if( m_getOutButtonVisible && (repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair) )
         createDialogIssue();
     connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(reloadRepairData()));
-    connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItem);
-    connect(ui->dbgBtnAddRandomPartBasket, &QPushButton::clicked, worksAndPartsModel, &SSaleTableModel::dbgAddRandomItemBasket);
 #else
     ui->pushButtonManualUpdateRepairData->setHidden(true);
-    ui->dbgBtnAddRandomPart->setHidden(true);
-    ui->dbgBtnAddRandomPartBasket->setHidden(true);
 #endif
 }
 
@@ -161,7 +135,6 @@ tabRepair::~tabRepair()
     delete ui;
     delete repairModel;
     delete clientModel;
-    delete worksAndPartsModel;
     if(m_autosaveDiag)
     {
         delete m_autosaveDiagTimer;
@@ -180,7 +153,7 @@ QString tabRepair::tabTitle()
 
 bool tabRepair::tabCloseRequest()
 {
-    if((!m_autosaveDiag && (m_diagChanged || m_spinBoxAmountChanged)) || (!ui->switchEditStrategy->isChecked() && worksAndPartsModel->isUnsaved()))
+    if((!m_autosaveDiag && (m_diagChanged || m_spinBoxAmountChanged)) || (ui->widgetBOQ->isCommitted()))
     {
         auto result = QMessageBox::question(this, tr("Данные не сохранены"), tr("Результат диагностики, согласованная сумма или список работ и деталей не сохранены!\nСохранить перед закрытием?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
         if (result == QMessageBox::Cancel)
@@ -190,7 +163,7 @@ bool tabRepair::tabCloseRequest()
         else if (result == QMessageBox::Yes)
         {
             saveDiagAmount();
-            worksAndPartsModel->repair_saveTablesStandalone();
+            ui->widgetBOQ->commit();
         }
     }
     m_repairLockUpdateTimer->stop();
@@ -205,11 +178,9 @@ void tabRepair::reloadRepairData()
     {
         m_clientId = repairModel->clientId();
         clientModel->load(m_clientId);
-        worksAndPartsModel->setClient(m_clientId);
     }
     additionalFieldsModel->load(repair_id);
-    worksAndPartsModel->repair_loadTable(repair_id);
-    worksAndPartsModel->setIsWarranty(repairModel->isWarranty());
+    ui->widgetBOQ->load(repair_id);
     ui->widgetComments->load(repair_id);
 
     statusesProxyModel->setFilterRegularExpression("");
@@ -230,8 +201,6 @@ void tabRepair::updateWidgets()
     ui->lineEditInDate->setText(repairModel->created());
     setInfoWidgetVisible(ui->lineEditOutDate, m_outDateVisible);
     ui->lineEditOutDate->setText(repairModel->outDateTime());
-    ui->pushButtonAdmEditWorks->setVisible(m_worksRO && permissions->advEditWorkList);
-    ui->pushButtonAdmEditWorks->setChecked(false);
     ui->pushButtonGetout->setVisible(m_getOutButtonVisible && !modelRO);
     ui->buttonClientCard->setVisible(permissions->viewClients);
     ui->buttonCall->setVisible(permissions->useTelephony);
@@ -319,11 +288,6 @@ void tabRepair::updateWidgets()
     ui->doubleSpinBoxAmount->setReadOnly(m_summRO || modelRO);
     ui->doubleSpinBoxAmount->blockSignals(false);
     ui->pushButtonSaveDiagAmount->setEnabled(!m_summRO && !modelRO);
-    ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO && permissions->addCustomWork);
-    ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
-    ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO && worksAndPartsModel->isUnsaved());
-//    ui->pushButtonAddWorkFromPriceList->setEnabled(!m_worksRO && !modelRO);
-//    ui->pushButtonAdmEditWorks->setEnabled(m_worksRO && !modelRO);
 //    ui->pushButtonCreateInvoice->setEnabled(!modelRO);
 //    ui->pushButtonCreatePrepayOrder->setEnabled(!modelRO);
 //    ui->lineEditManager->setButtonsVisible(!modelRO);
@@ -335,7 +299,7 @@ void tabRepair::updateWidgets()
     ui->comboBoxState->setEnabled(m_comboBoxStateEnabled && !modelRO);
     ui->toolButtonSaveState->setEnabled(!modelRO);
 
-    worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
+    ui->widgetBOQ->updateWidgets();
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled);
 }
 
@@ -432,7 +396,7 @@ bool tabRepair::setWidgetsParams(const int stateId)
 {
     m_getOutButtonVisible = 0;
     m_comboBoxStateEnabled = 1;
-    m_worksRO = 1;
+    m_BOQModelRO = 1;
     m_diagRO = 1;
     m_summRO = 0;   // При наличии пользовательского статуса "Ожидание решения" логика данной опции не работает
 
@@ -461,10 +425,12 @@ bool tabRepair::setWidgetsParams(const int stateId)
     {
         switch (action)
         {
-            case Global::RepStateActions::EditWorksParts: m_worksRO = 0; break;
+            case Global::RepStateActions::EditWorksParts: m_BOQModelRO = 0; break;
             case Global::RepStateActions::EditDiagSumm: m_diagRO = 0; m_summRO = 0; break;
         }
     }
+
+    ui->widgetBOQ->setReadOnly(m_BOQModelRO);
 
     return 1;
 }
@@ -496,7 +462,7 @@ bool tabRepair::checkData(const int stateId)
     {
         case Global::RepStateIds::DiagFinished:
         case Global::RepStateIds::OnApprovement:
-        case Global::RepStateIds::Negotiation: if( ui->textEditDiagResult->toPlainText().isEmpty() /*|| tableWorksParts->isEmpty()*/ ) ret = 1; break;
+        case Global::RepStateIds::Negotiation: if( ui->textEditDiagResult->toPlainText().isEmpty() || ui->widgetBOQ->isEmpty() ) ret = 1; break;
         case Global::RepStateIds::IssueNotAppeared: break;
         case Global::RepStateIds::Agreed: if(ui->doubleSpinBoxAmount->value() == 0 && !repairModel->isRepeat() && !repairModel->isWarranty()) ret = 2; break;
     }
@@ -514,25 +480,6 @@ bool tabRepair::checkData(const int stateId)
     }
 
     return !ret;
-}
-
-void tabRepair::updateTotalSumms(const double, const double, const double)
-{
-    ui->lineEditTotalAmount->setText(worksAndPartsModel->amountTotalLocale());
-    ui->lineEditWorksAmount->setText(worksAndPartsModel->amountWorksLocale());
-    ui->lineEditSparePartsAmount->setText(worksAndPartsModel->amountItemsLocale());
-}
-
-void tabRepair::saveTotalSumms()
-{
-    repairModel->setRealRepairCost(worksAndPartsModel->amountTotal());
-    repairModel->setPartsCost(worksAndPartsModel->amountItems());
-
-    // по идее в очереди на обновление значений в БД кроме сумм ничего не должно быть, поэтому сигналы блокируются
-    // чтобы избежать ненужной эмиссии modelReset() и как следствие вызова метода updateWidgets()
-    repairModel->blockSignals(true);
-    repairModel->commit();
-    repairModel->blockSignals(false);
 }
 
 void tabRepair::createDialogIssue()
@@ -631,24 +578,6 @@ void tabRepair::openInvoice(int)
 
 }
 
-void tabRepair::onReturnQuickAddPart()
-{
-    if(quickAddPart(ui->lineEditQuickAddPart->text().toInt()))
-        ui->lineEditQuickAddPart->setText("");
-}
-
-/* Быстрое добавление товара по UID
- * Возвращает 0 в случае неудачи
-*/
-bool tabRepair::quickAddPart(const int uid)
-{
-    if(m_worksRO)
-        return 0;
-
-    // TODO: диалог ввода кол-ва
-    return worksAndPartsModel->addItemByUID(uid);
-}
-
 void tabRepair::editIncomingSet(int)
 {
 
@@ -662,12 +591,6 @@ void tabRepair::setAgreedAmount(int)
 void tabRepair::buttonClientClicked()
 {
     emit createTabClient(m_clientId);
-}
-
-void tabRepair::tableRowDoubleClick(QModelIndex tableIndex)
-{
-    if(worksAndPartsModel->value(tableIndex.row(), SStoreItemModel::SaleOpColumns::ColRecordType).toBool())
-        emit createTabSparePart(worksAndPartsModel->value(tableIndex.row(), SStoreItemModel::SaleOpColumns::ColItemId).toInt());
 }
 
 void tabRepair::updateStatesModel(const int stateId)
@@ -769,8 +692,7 @@ void tabRepair::saveState(int index)
     if(!m_autosaveDiag)
         saveDiagAmount();
 
-    if(worksAndPartsModel->isUnsaved())
-        saveSaleTableClicked();
+    ui->widgetBOQ->commit();
 
     int newStateId = statusesProxyModel->databaseIDByRow(index);
 
@@ -911,70 +833,6 @@ void tabRepair::diagAmountSaved()
         m_autosaveDiagTimer->stop();
 }
 
-void tabRepair::buttonAddItemClicked()
-{
-    emit createTabSelectItem(1, this);
-}
-
-void tabRepair::switchEditStrategy(bool state)
-{
-    if(state)
-    {
-        if(worksAndPartsModel->isUnsaved())
-            worksAndPartsModel->repair_saveTablesStandalone();
-        worksAndPartsModel->setEditStrategy(SSaleTableModel::OnFieldChange);
-    }
-    else
-    {
-        worksAndPartsModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
-    }
-    ui->toolButtonSaveSaleTable->setEnabled(worksAndPartsModel->isUnsaved());
-}
-
-void tabRepair::saveSaleTableClicked()
-{
-    if(worksAndPartsModel->repair_saveTablesStandalone())
-        ui->toolButtonSaveSaleTable->setEnabled(false);
-}
-
-void tabRepair::setSaveSaleTableEnabled()
-{
-    if(worksAndPartsModel->editStrategy() == SSaleTableModel::OnManualSubmit)
-        ui->toolButtonSaveSaleTable->setEnabled(true);
-}
-
-void tabRepair::buttonWorksAdminEdit(bool state)
-{
-    if(state)
-    {
-        m_worksRO = 0;
-        worksAndPartsModel->setModelState(SSaleTableModel::State::WorkshopAdm);
-        ui->switchEditStrategy->setEnabled(true);
-        ui->toolButtonSaveSaleTable->setEnabled(worksAndPartsModel->isUnsaved());
-        ui->pushButtonAddWork->setEnabled(true);
-    }
-    else
-    {
-        setWidgetsParams(repairModel->state()); // для восстановления значения переменной m_worksRO
-        worksAndPartsModel->setModelState(m_worksRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
-        if(worksAndPartsModel->isUnsaved())
-            saveSaleTableClicked();
-        ui->switchEditStrategy->setEnabled(!m_worksRO && !modelRO);
-        ui->toolButtonSaveSaleTable->setEnabled(!m_worksRO && !modelRO);
-        ui->pushButtonAddWork->setEnabled(!m_worksRO && !modelRO && permissions->addCustomWork);
-    }
-}
-
-void tabRepair::addCustomWork()
-{
-    int row = worksAndPartsModel->rowCount();
-    worksAndPartsModel->addCustomWork();
-
-    ui->tableViewWorksAndSpareParts->scrollToBottom();
-    ui->tableViewWorksAndSpareParts->setCurrentIndex(worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColName));
-    ui->tableViewWorksAndSpareParts->setFocus();
-}
-
 void tabRepair::savePlace(int index)
 {
     int currentPlace = repairModel->boxIndex();
@@ -1029,62 +887,3 @@ tabRepair* tabRepair::getInstance(int rep_id, MainWindow *parent)   // singleton
     return p_instance.value(rep_id);
 }
 
-// ===============================================================================================================
-worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) :
-    STableViewBase(SLocalSettings::RepairWorksGrid, parent)
-{
-    // столбец "Доступно" (4) скрыт
-    i_defaultColumnsWidths = {{0, 60},{1, 90},{2, 270},{3, 45},{4, 0},{5, 70},{6, 70},{7, 120},{8, 120},{9, 80},{10, 100}};
-    i_defaultHeaderLabels << tr("") << tr("UID") << tr("Наименование") << tr("Кол-во") << tr("Доступно") << tr("Цена") << tr("Сумма") << tr("Место") << tr("Серийный номер") << tr("Гарантия") << tr("Сотрудник");
-    readLayout();
-    i_gridLayout->$GridControl.Columns[2].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
-}
-
-worksAndSparePartsTable::~worksAndSparePartsTable()
-{
-}
-
-void worksAndSparePartsTable::setModel(QAbstractItemModel *model)
-{
-    m_model = static_cast<SSaleTableModel*>(model);
-    STableViewBase::setModel(model);
-    SaleTableItemDelegates *itemDelagates = new SaleTableItemDelegates(m_model, this);
-    setItemDelegate(itemDelagates);
-}
-
-void worksAndSparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    int row = currentIndex().row();
-    if(m_model->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool())
-    {
-        if(event->modifiers() == Qt::ControlModifier)
-        {
-            clearSelection();
-            selectionModel()->select(currentIndex(), QItemSelectionModel::Select);
-            emit createTabSparePart(m_model->index(row, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
-        }
-        else
-            emit createTabSparePartReserve(m_model->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
-    }
-}
-
-#if QT_VERSION >= 0x060000
-void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#else
-void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#endif
-{
-    STableViewBase::dataChanged(topLeft, bottomRight, roles);
-    if(!roles.isEmpty() && !roles.contains(Qt::DisplayRole))
-        return;
-
-    for(int row = topLeft.row(); row <= bottomRight.row(); row++)
-        for(int col = topLeft.column(); col <= bottomRight.column(); col++)
-        {
-            switch(col)
-            {
-                case SStoreItemModel::SaleOpColumns::ColName: resizeRowToContents(row); break;
-                default: /*resizeColumnToContents(col)*/;
-            }
-        }
-}

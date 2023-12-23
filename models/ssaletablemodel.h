@@ -62,7 +62,7 @@ public:
     bool addWorkByUID(const int uid, const SStoreItemModel::PriceOption priceOption);
     bool addItemByUID(const int uid, const int count = 1);
     bool addItemByUID(const int uid, const SStoreItemModel::PriceOption priceOption, const int count = 1);
-    bool addItemFromBasket(const int id, const int qty = 0, const SStoreItemModel::PriceOption priceOption = SStoreItemModel::PriceOptionService);
+    bool addItemFromBasket(const int id, const int qty = 0);
     void removeRowHandler(const int, const int);
     void buttonHandler(const int buttonNum, const int row);
     void store_markRowRemove(const int, const int);

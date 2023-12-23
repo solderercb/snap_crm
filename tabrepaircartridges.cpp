@@ -141,16 +141,16 @@ const QList<SCartridgeForm *> tabRepairCartridges::existentForms()
 void tabRepairCartridges::reloadRepairData()
 {
     SRepairModel *repairModel;
-    SSaleTableModel *worksAndPartsModel;
+    SSaleTableModel *BOQModel;
     int repairId;
 
     for(auto form : existentForms())
     {
         repairModel = form->model();
         repairId = repairModel->id();
-        worksAndPartsModel = repairModel->worksAndPartsModel();
+        BOQModel = repairModel->BOQModel();
         repairModel->load(repairId);
-        worksAndPartsModel->repair_loadTable(repairId);
+        BOQModel->repair_loadTable(repairId);
     }
 
 }

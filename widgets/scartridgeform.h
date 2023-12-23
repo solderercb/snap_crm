@@ -70,7 +70,7 @@ private:
     SQueryLog *i_queryLog;
     SRepairModel *m_repair = nullptr;
     SCartridgeCardModel *m_cartridgeCard = nullptr;
-    SSaleTableModel *worksAndPartsModel = nullptr;
+    SSaleTableModel *m_BOQModel = nullptr;
     SSortFilterProxyModel *statusesProxyModel = nullptr;
     QMap<int, double> preagreedAmounts;
     int m_repairId = 0;

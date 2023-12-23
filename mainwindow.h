@@ -94,6 +94,7 @@ public slots:
     void createTabRepairCartridges(QList<int> *list);
     void createTabSale(int doc_id = 0);
     void createTabSparePart(int);
+    void createTabSparePartReserve(int);
     void switchToLastUsedTab();
 
 private slots:
@@ -110,7 +111,6 @@ private slots:
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void createTabWarehouseItems(int type = 0, QWidget *caller = nullptr);
-    void createTabSparePartReserve(int);
     void createTabSettings();
     void createTabSalary();
     void createTabReceptCartridge();

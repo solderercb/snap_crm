@@ -348,14 +348,14 @@ QList<SRepairModel*> tabRepairs::repairsListFromSelection()
     QList<SRepairModel*> list;
     QList<int> *idsList = ui->tableView->selectedRepairsList();
     SRepairModel *repair;
-    SSaleTableModel *worksAndPartsModel;
+    SSaleTableModel *BOQModel;
 
     for(int i = 0; i < idsList->count(); i++)
     {
         repair = new SRepairModel(idsList->at(i));
-        worksAndPartsModel = new SSaleTableModel(repair);
-        worksAndPartsModel->repair_loadTable(idsList->at(i));
-        repair->setWorksAndPartsModel(worksAndPartsModel);
+        BOQModel = new SSaleTableModel(repair);
+        BOQModel->repair_loadTable(idsList->at(i));
+        repair->setBOQModel(BOQModel);
         list.append(repair);
     }
 

@@ -37,8 +37,8 @@ SCartridgeForm::~SCartridgeForm()
     delete m_cartridgeCard; // перед удалением модели m_repair
     if(m_repair)
         delete m_repair;
-    if(worksAndPartsModel)
-        delete worksAndPartsModel;
+    if(m_BOQModel)
+        delete m_BOQModel;
     if(statusesProxyModel)
         delete statusesProxyModel;
 }
@@ -57,17 +57,17 @@ void SCartridgeForm::initModels()
         statusesProxyModel->setFilterKeyColumn(Global::RepStateHeaders::Id);
         statusesProxyModel->setFilterRegularExpression("");
 
-        worksAndPartsModel = new SSaleTableModel();
-        worksAndPartsModel->setTableMode(SSaleTableModel::WorkshopSale);
-        worksAndPartsModel->setPriceColumn(SStoreItemModel::PriceOptionService);
-        connect(worksAndPartsModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
-        connect(worksAndPartsModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
-        connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);
-        connect(worksAndPartsModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateWorksActionsCheckedState);
-        worksAndPartsModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
-        worksAndPartsModel->setRepairType(SSaleTableModel::CartridgeRepair);
-        worksAndPartsModel->setCartridgeCardModel(m_cartridgeCard);
-        m_repair->setWorksAndPartsModel(worksAndPartsModel);
+        m_BOQModel = new SSaleTableModel();
+        m_BOQModel->setTableMode(SSaleTableModel::WorkshopSale);
+        m_BOQModel->setPriceColumn(SStoreItemModel::PriceOptionService);
+        connect(m_BOQModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
+        connect(m_BOQModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
+        connect(m_BOQModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);
+        connect(m_BOQModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateWorksActionsCheckedState);
+        m_BOQModel->setEditStrategy(SSaleTableModel::OnManualSubmit);
+        m_BOQModel->setRepairType(SSaleTableModel::CartridgeRepair);
+        m_BOQModel->setCartridgeCardModel(m_cartridgeCard);
+        m_repair->setBOQModel(m_BOQModel);
     }
 
     updateModels();
@@ -84,7 +84,7 @@ void SCartridgeForm::updateModels()
         m_serialNumber = m_repair->serialNumber();
         m_cardId = m_repair->cartridge()->cardId();
         m_clientId = m_repair->clientId();
-        worksAndPartsModel->repair_loadTable(m_repair->id());
+        m_BOQModel->repair_loadTable(m_repair->id());
         updateStatesModel(m_repair->state());
     }
 
@@ -563,7 +563,7 @@ bool SCartridgeForm::checkData(const int stateId)
     setDefaultStyleSheets();
     if(stateId == Global::RepStateIds::Ready)
     {
-        if(worksAndPartsModel->amountTotal() == 0)
+        if(m_BOQModel->amountTotal() == 0)
         {
             ui->doubleSpinBoxTotalAmount->setStyleSheet(commonSpinBoxStyleSheetRed);
             throw Global::ThrowType::ConditionsError;
@@ -698,22 +698,22 @@ void SCartridgeForm::updateLists()
     ui->listWidgetWorks->clear();
     ui->listWidgetParts->clear();
 
-    for(int i = 0; i < worksAndPartsModel->rowCount(); i++)
+    for(int i = 0; i < m_BOQModel->rowCount(); i++)
     {
-        recType = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
-        recName = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColName).data().toString();
-        recSumm = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColSumm).data().toString();
+        recType = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
+        recName = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColName).data().toString();
+        recSumm = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColSumm).data().toString();
         listItem = new QListWidgetItem(QString("%1 %2%3").arg(recName).arg(recSumm).arg(sysLocale.currencySymbol()));    // TODO: мультивалютность
         if(recType == SSaleTableModel::RecordType::Work)
         {
             list = ui->listWidgetWorks;
-            workType = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
+            workType = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
             setWorkCheckBoxChecked(workType);
         }
         else
         {
             list = ui->listWidgetParts;
-            itemId = worksAndPartsModel->index(i, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt();
+            itemId = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt();
             listItem->setData(Qt::UserRole, itemId);    // для открытия карточки товара при двойном клике
         }
 
@@ -765,7 +765,7 @@ bool SCartridgeForm::commit(const QString &notificationCaption, const QString &n
 // Возвращает 0 в случае ошибки.
 bool SCartridgeForm::addWorkAndPart(const int workType)
 {
-    int rowWork = worksAndPartsModel->rowCount();
+    int rowWork = m_BOQModel->rowCount();
     int rowItem = -1;
     int itemId = 0;
     SCartridgeMaterialModel *material;
@@ -788,38 +788,38 @@ bool SCartridgeForm::addWorkAndPart(const int workType)
         itemId = query.value(0).toInt();
     }
 
-    worksAndPartsModel->addCustomWork();
-    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColName), material->workName());
-    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColCount), 1);
-    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColPrice), material->worksPrice());
-    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColWorkType), workType);
-//    worksAndPartsModel->setData(worksAndPartsModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColSumm), material->worksPrice());
+    m_BOQModel->addCustomWork();
+    m_BOQModel->setData(m_BOQModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColName), material->workName());
+    m_BOQModel->setData(m_BOQModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColCount), 1);
+    m_BOQModel->setData(m_BOQModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColPrice), material->worksPrice());
+    m_BOQModel->setData(m_BOQModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColWorkType), workType);
+//    m_BOQModel->setData(m_BOQModel->index(rowWork, SStoreItemModel::SaleOpColumns::ColSumm), material->worksPrice());
 
-    rowItem = worksAndPartsModel->rowCount();
+    rowItem = m_BOQModel->rowCount();
     if(material->articul())
     {
-        worksAndPartsModel->addItemByUID(itemId, material->count());
+        m_BOQModel->addItemByUID(itemId, material->count());
 #ifdef QT_DEBUG // в методе SSaleTableModel::insertRecord() для удобства отладки устанавливается случайное кол-во; здесь это не нужно
-        worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColCount), material->count());
+        m_BOQModel->setData(m_BOQModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColCount), material->count());
 #endif
-        worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColPrice), material->price()/material->count());
-        //    worksAndPartsModel->setData(worksAndPartsModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColSumm), material->count()*material->worksPrice());
+        m_BOQModel->setData(m_BOQModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColPrice), material->price()/material->count());
+        //    m_BOQModel->setData(m_BOQModel->index(rowItem, SStoreItemModel::SaleOpColumns::ColSumm), material->count()*material->worksPrice());
     }
 
-    return worksAndPartsModel->repair_saveTablesStandalone();
+    return m_BOQModel->repair_saveTablesStandalone();
 }
 
 bool SCartridgeForm::removeWorkAndPart(const int workType)
 {
     int nErr = 1;
     int row = 0;
-    for(; row < worksAndPartsModel->rowCount(); row++)
+    for(; row < m_BOQModel->rowCount(); row++)
     {
-        if(worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt() == workType)
+        if(m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt() == workType)
             break;
     }
-    worksAndPartsModel->removeRowHandler(row, worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
-    nErr = worksAndPartsModel->repair_saveTablesStandalone();
+    m_BOQModel->removeRowHandler(row, m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
+    nErr = m_BOQModel->repair_saveTablesStandalone();
 
     return nErr;
 }
@@ -889,7 +889,7 @@ int SCartridgeForm::isReady()
 {
     switch(m_repair->state())
     {
-        case Global::RepStateIds::InWork: return (comSettings->useSimplifiedCartridgeRepair && worksAndPartsModel->rowCount());
+        case Global::RepStateIds::InWork: return (comSettings->useSimplifiedCartridgeRepair && m_BOQModel->rowCount());
         case Global::RepStateIds::Ready:
         case Global::RepStateIds::ReadyNoRepair: return 1;
     }
@@ -926,13 +926,13 @@ void SCartridgeForm::updateStateWidget(const int statusId)
 
 void SCartridgeForm::updateTotalSumms(const double, const double, const double)
 {
-    ui->doubleSpinBoxTotalAmount->setValue(worksAndPartsModel->amountTotal());
+    ui->doubleSpinBoxTotalAmount->setValue(m_BOQModel->amountTotal());
 }
 
 void SCartridgeForm::saveTotalSumms()
 {
-    m_repair->setRealRepairCost(worksAndPartsModel->amountTotal());
-    m_repair->setPartsCost(worksAndPartsModel->amountItems());
+    m_repair->setRealRepairCost(m_BOQModel->amountTotal());
+    m_repair->setPartsCost(m_BOQModel->amountItems());
     m_repair->commit();
 }
 
@@ -1123,13 +1123,13 @@ void SCartridgeForm::updateWorksActionsCheckedState()
     while(action != actions.constEnd())
     {
         (*action)->setChecked(false);
-        for(int row = 0; row < worksAndPartsModel->rowCount(); row++)
+        for(int row = 0; row < m_BOQModel->rowCount(); row++)
         {
-            recType = worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
+            recType = m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
             if(recType != SSaleTableModel::RecordType::Work)
                 continue;
 
-            workType = worksAndPartsModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
+            workType = m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
             if((*action)->property("WorkType").toInt() == workType)
             {
                 (*action)->setChecked(true);

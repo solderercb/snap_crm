@@ -150,7 +150,7 @@ bool SDialogIssueRepair::checkAmounts()
 void SDialogIssueRepair::collectRepairsData()
 {
     SRepairModel *repairModel;
-    SSaleTableModel *worksAndSparePartsModel;
+    SSaleTableModel *BOQModel;
     QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
     int repairId;
     double worksAndSparePartsSumm = 0;
@@ -174,7 +174,7 @@ void SDialogIssueRepair::collectRepairsData()
         repairModel = (*i);
 //        repairModel->reload();
         repairId = repairModel->id();
-        worksAndSparePartsModel = repairModel->worksAndPartsModel();
+        BOQModel = repairModel->BOQModel();
 
         m_singleRepairWidgetsVisible = !singleRepairWidgetsVisible;
         if(repairModel->state() == Global::RepStateIds::ReadyNoRepair)
@@ -186,7 +186,7 @@ void SDialogIssueRepair::collectRepairsData()
         realRepairCost = repairModel->realRepairCost();
         prepayAmount = repairModel->paymentsAmount(SCashRegisterModel::PaymentType::RecptPrepayRepair); // конкретно предоплаты
         paymentsAmount = repairModel->paymentsAmount(); // все поступления
-        worksAndSparePartsSumm = worksAndSparePartsModel->amountTotal();
+        worksAndSparePartsSumm = BOQModel->amountTotal();
         amountToPay = worksAndSparePartsSumm - paymentsAmount;
 
         if(amountToPay)
@@ -311,7 +311,7 @@ void SDialogIssueRepair::issueRepairs()
     bool balance = 0;
     SCashRegisterModel *cashRegister;
     SRepairModel *repairModel;
-    SSaleTableModel *worksAndSparePartsModel;
+    SSaleTableModel *BOQModel;
     SWorkshopIssuedModel *workshopIssuedModel;
     QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
     int repairId;
@@ -363,7 +363,7 @@ void SDialogIssueRepair::issueRepairs()
 
         workshopIssuedModel = new SWorkshopIssuedModel();
         workshopIssuedModel->setRepair(repairId);
-        worksAndSparePartsModel = repairModel->worksAndPartsModel();
+        BOQModel = repairModel->BOQModel();
 
         if(amountToPay && balance)
         {
@@ -379,7 +379,7 @@ void SDialogIssueRepair::issueRepairs()
             else
                 repairModel->setRejectReason(ui->textEditRejectReason->toPlainText());
         }
-        worksAndSparePartsModel->repair_saveTables(SSaleTableModel::RepairOpType::Sale);
+        BOQModel->repair_saveTables(SSaleTableModel::RepairOpType::Sale);
         repairModel->commit();
         nErr = workshopIssuedModel->commit();
 

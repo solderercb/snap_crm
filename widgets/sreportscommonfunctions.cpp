@@ -357,7 +357,7 @@ void SListSourceDataCallbackHandler::initDemoRepairsList()
     works = new SSaleTableModel();
     repair->initDemo();
     works->initDemo();
-    repair->setWorksAndPartsModel(works);
+    repair->setBOQModel(works);
     m_repairsList.append(repair);
     m_repairsListSet = 1;
     m_repairsListOwned = 1;
@@ -405,21 +405,21 @@ void SListSourceDataCallbackHandler::repairsListCallbackDataChangePos(const Lime
 
 void SListSourceDataCallbackHandler::repairWorksListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
 {
-    SSaleTableModel *works = (*m_repairsListItem)->worksAndPartsModel();
+    SSaleTableModel *BOQModel = (*m_repairsListItem)->BOQModel();
     switch (info.dataType)
     {
-        case LimeReport::CallbackInfo::IsEmpty: data = works->rowCount()?0:1; break;
+        case LimeReport::CallbackInfo::IsEmpty: data = BOQModel->rowCount()?0:1; break;
         case LimeReport::CallbackInfo::HasNext: data = 0; break;
-        case LimeReport::CallbackInfo::ColumnHeaderData: data = works->metaObject()->property(info.index + works->metaObject()->propertyOffset()).name(); break;
-        case LimeReport::CallbackInfo::ColumnData: data = works->metaObject()->property(works->metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(works); break;
-        case LimeReport::CallbackInfo::ColumnCount: data = works->metaObject()->propertyCount() - works->metaObject()->propertyOffset(); break;
-        case LimeReport::CallbackInfo::RowCount: data = works->rowCount(); break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = BOQModel->metaObject()->property(info.index + BOQModel->metaObject()->propertyOffset()).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = BOQModel->metaObject()->property(BOQModel->metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(BOQModel); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = BOQModel->metaObject()->propertyCount() - BOQModel->metaObject()->propertyOffset(); break;
+        case LimeReport::CallbackInfo::RowCount: data = BOQModel->rowCount(); break;
     }
     return;
 }
 
 void SListSourceDataCallbackHandler::repairWorksListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
 {
-    (*m_repairsListItem)->worksAndPartsModel()->reportCallbackDataChangePos(type, result);
+    (*m_repairsListItem)->BOQModel()->reportCallbackDataChangePos(type, result);
     return;
 }

@@ -410,15 +410,15 @@
                                                         .arg((uid))\
                                                         .arg((price_field_name))\
                                                         .arg((count))
-#define QUERY_SEL_PART_FROM_BASKET(uid, price_field_name, count)  QString(\
+#define QUERY_SEL_PART_FROM_BASKET(uid, count)  QString(\
                                                         "SELECT\n"\
                                                         "  `id`,\n"\
                                                         "  CONCAT(LPAD(`articul`, 6, '0'), '-', LPAD(`item_id`, 6, '0')) AS 'UID',\n"\
                                                         "  `name`,\n"\
-                                                        "  %3 AS 'count',\n"\
+                                                        "  %2 AS 'count',\n"\
                                                         "  `avail`,\n"\
-                                                        "  %2,\n"\
-                                                        "  %2*%3 AS 'summ',\n"\
+                                                        "  `price`,\n"\
+                                                        "  `price`*%2 AS 'summ',\n"\
                                                         "  `box`,\n"\
                                                         "  `sn`,\n"\
                                                         "  `warranty`,\n"\
@@ -447,7 +447,6 @@
                                                         "WHERE\n"\
                                                         "  `id` IN (%1);")\
                                                         .arg((uid))\
-                                                        .arg((price_field_name))\
                                                         .arg((count))
 
 #define QUERY_SEL_ITEM_ACTUAL_QTY(item_id)   QString(\

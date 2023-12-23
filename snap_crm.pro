@@ -192,6 +192,7 @@ SOURCES += \
     widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
     widgets/swidget.cpp \
+    widgets/sworksandparts.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
@@ -362,6 +363,7 @@ HEADERS  += \
     widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
     widgets/swidget.h \
+    widgets/sworksandparts.h \
     windowsdispatcher.h
 
 FORMS += \
@@ -406,7 +408,8 @@ FORMS += \
     widgets/spagesettingsdoctempateeditor.ui \
     widgets/sphone.ui \
     widgets/sphones.ui \
-    widgets/stoolboxswitchpanel.ui
+    widgets/stoolboxswitchpanel.ui \
+    widgets/sworksandparts.ui \
 
 RESOURCES += styles/styles.qrc
 RESOURCES += help/help.qrc

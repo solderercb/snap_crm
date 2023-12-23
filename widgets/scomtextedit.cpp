@@ -74,13 +74,15 @@ void SComTextEdit::updateHeight()
     {
         te->setMinimumHeight(textBufferRows);
 //        qDebug().nospace() << "[" << baseAbstractScrollArea << "] setFixedHeight()";
-        baseAbstractScrollArea->setFixedHeight(te->m_minimumHeightHint);
+//        baseAbstractScrollArea->setFixedHeight(te->m_minimumHeightHint);
+        baseAbstractScrollArea->setMinimumHeight(te->m_minimumHeightHint);
     }
     else if(pte)
     {
         pte->setMinimumHeight(textBufferRows);
 //        qDebug().nospace() << "[" << baseAbstractScrollArea << "] setFixedHeight()";
-        baseAbstractScrollArea->setFixedHeight(pte->m_minimumHeightHint);
+//        baseAbstractScrollArea->setFixedHeight(pte->m_minimumHeightHint);
+        baseAbstractScrollArea->setMinimumHeight(pte->m_minimumHeightHint);
     }
 
 }

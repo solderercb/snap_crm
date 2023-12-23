@@ -194,14 +194,15 @@ bool SRepairModel::isNew()
     return true;
 }
 
-void SRepairModel::setWorksAndPartsModel(SSaleTableModel *model)
+/* Установка модели данных таблицы работ и деталей */
+void SRepairModel::setBOQModel(SSaleTableModel *model)
 {
-    m_worksAndParts = model;
+    m_BOQModel = model;
 }
 
-SSaleTableModel *SRepairModel::worksAndPartsModel() const
+SSaleTableModel *SRepairModel::BOQModel() const
 {
-    return m_worksAndParts;
+    return m_BOQModel;
 }
 
 void SRepairModel::reload()

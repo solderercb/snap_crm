@@ -1125,7 +1125,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        works = new SSaleTableModel();
 //        repair->initDemo();
 //        works->initDemo();
-//        repair->setWorksAndPartsModel(works);
+//        repair->setBOQModel(works);
 //        repairsList.append(repair);
 //        tabPrintDialog::printRepairWorksReports(repairsList, true);
 

@@ -20,7 +20,7 @@
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item row="0" column="0">
-      <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,4" columnminimumwidth="300,0">
+      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,1">
        <property name="sizeConstraint">
         <enum>QLayout::SetMaximumSize</enum>
        </property>
@@ -148,6 +148,16 @@
            </property>
           </widget>
          </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="labelPrimaryPhone">
+           <property name="text">
+            <string>Основной телефон</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="lineEditPrimaryPhone"/>
+         </item>
          <item row="5" column="0">
           <widget class="QLabel" name="labelInDate">
            <property name="sizePolicy">
@@ -192,6 +202,35 @@
          </item>
          <item row="6" column="1">
           <widget class="SLineEdit" name="lineEditOutDate">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="acceptDrops">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="labelExtPrevRepair">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Предыдущий ремонт</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="SLineEdit" name="lineEditExtPrevRepair">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -400,6 +439,42 @@ QListView::item  {
            </property>
           </widget>
          </item>
+         <item row="13" column="0" colspan="2">
+          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+           <item>
+            <widget class="QLineEdit" name="lineEditColor">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="acceptDrops">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>Цвет</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="SComboBox" name="comboBoxPlace">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="insertPolicy">
+              <enum>QComboBox::NoInsert</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="14" column="0" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
@@ -544,68 +619,13 @@ QListView::item  {
            </property>
           </widget>
          </item>
-         <item row="13" column="0" colspan="2">
-          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
-           <item>
-            <widget class="QLineEdit" name="lineEditColor">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="acceptDrops">
-              <bool>false</bool>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-             <property name="placeholderText">
-              <string>Цвет</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="SComboBox" name="comboBoxPlace">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="insertPolicy">
-              <enum>QComboBox::NoInsert</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="7" column="1">
-          <widget class="SLineEdit" name="lineEditExtPrevRepair">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="acceptDrops">
+         <item row="20" column="0" colspan="2">
+          <widget class="QPushButton" name="pushButtonDebtReceived">
+           <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="labelExtPrevRepair">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
            <property name="text">
-            <string>Предыдущий ремонт</string>
+            <string>Задолженность получена</string>
            </property>
           </widget>
          </item>
@@ -689,44 +709,10 @@ QListView::item  {
            </property>
           </spacer>
          </item>
-         <item row="24" column="0">
+         <item row="23" column="0">
           <widget class="QPushButton" name="pushButtonManualUpdateRepairData">
            <property name="text">
             <string>Обновить данные</string>
-           </property>
-          </widget>
-         </item>
-         <item row="24" column="1">
-          <widget class="QPushButton" name="dbgBtnAddRandomPart">
-           <property name="text">
-            <string>Add random part</string>
-           </property>
-          </widget>
-         </item>
-         <item row="23" column="1">
-          <widget class="QPushButton" name="dbgBtnAddRandomPartBasket">
-           <property name="text">
-            <string>Add random part (basket)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLineEdit" name="lineEditPrimaryPhone"/>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="labelPrimaryPhone">
-           <property name="text">
-            <string>Основной телефон</string>
-           </property>
-          </widget>
-         </item>
-         <item row="20" column="0" colspan="2">
-          <widget class="QPushButton" name="pushButtonDebtReceived">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Задолженность получена</string>
            </property>
           </widget>
          </item>
@@ -741,7 +727,7 @@ QListView::item  {
           <number>0</number>
          </property>
          <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
+          <enum>Qt::ScrollBarAsNeeded</enum>
          </property>
          <property name="sizeAdjustPolicy">
           <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -754,11 +740,11 @@ QListView::item  {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>848</width>
+            <width>860</width>
             <height>910</height>
            </rect>
           </property>
-          <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,1,0,0" rowminimumheight="0,0,0,0,0">
+          <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,1,2,0,1">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -898,6 +884,38 @@ QListView::item  {
              </layout>
             </widget>
            </item>
+           <item row="3" column="0">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::MinimumExpanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="4" column="0">
+            <widget class="SComments" name="widgetComments" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>50</height>
+              </size>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="0">
             <widget class="QGroupBox" name="groupBoxDiagResult">
              <property name="sizePolicy">
@@ -915,7 +933,7 @@ QListView::item  {
              <property name="title">
               <string>Результат диагностики</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_10" rowminimumheight="0">
+             <layout class="QGridLayout" name="gridLayout_10">
               <property name="leftMargin">
                <number>5</number>
               </property>
@@ -960,6 +978,12 @@ QListView::item  {
                 </item>
                 <item row="0" column="0" colspan="3">
                  <widget class="STextEdit" name="textEditDiagResult">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="tabChangesFocus">
                    <bool>true</bool>
                   </property>
@@ -981,379 +1005,13 @@ QListView::item  {
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QGroupBox" name="groupBoxWorksAndSpareParts">
+            <widget class="SWorksAndParts" name="widgetBOQ" native="true">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Работы и детали</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_12">
-              <property name="leftMargin">
-               <number>5</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>5</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <property name="horizontalSpacing">
-               <number>0</number>
-              </property>
-              <property name="verticalSpacing">
-               <number>5</number>
-              </property>
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="gridLayoutWorksAndSpareParts" rowstretch="0,1,0" rowminimumheight="0,200,0">
-                <property name="spacing">
-                 <number>3</number>
-                </property>
-                <item row="0" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout_2">
-                  <item>
-                   <widget class="QPushButton" name="pushButtonAddWork">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Работа</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButtonAddWorkFromPriceList">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Работа из прайс-листа</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButtonRequestSparePart">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Запросить деталь</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="SLineEdit" name="lineEditQuickAddPart">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QToolButton" name="toolButtonSaveSaleTable">
-                    <property name="toolTip">
-                     <string>Сохранить список работ и деталей</string>
-                    </property>
-                    <property name="text">
-                     <string>...</string>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="styles/styles.qrc">
-                      <normaloff>:/icons/light/1F4BE_32.png</normaloff>:/icons/light/1F4BE_32.png</iconset>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="switchEditStrategy">
-                    <property name="toolTip">
-                     <string>Сохранять список работ и деталей после каждого изменения</string>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">QPushButton{ background-color: rgba(255, 255, 255, 0); border: none;}
-QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
-</string>
-                    </property>
-                    <property name="text">
-                     <string notr="true"/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="styles/styles.qrc">
-                      <normaloff>:/icons/light/toggle_sw_off.png</normaloff>
-                      <normalon>:/icons/light/toggle_sw_on.png</normalon>:/icons/light/toggle_sw_off.png</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>30</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                    <property name="flat">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButtonAdmEditWorks">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="text">
-                     <string>Адм. правка</string>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item row="2" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout">
-                  <property name="sizeConstraint">
-                   <enum>QLayout::SetMinimumSize</enum>
-                  </property>
-                  <item>
-                   <spacer name="horizontalSpacer_3">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="labelWorksAmount">
-                    <property name="text">
-                     <string>Стоимость работ</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEditWorksAmount">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="labelSparePartsAmount">
-                    <property name="text">
-                     <string>Стоимость деталей</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEditSparePartsAmount">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="labelTotalAmount">
-                    <property name="text">
-                     <string>Стоимость ремонта</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEditTotalAmount">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>40</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item row="1" column="0">
-                 <widget class="worksAndSparePartsTable" name="tableViewWorksAndSpareParts">
-                  <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
-                  </property>
-                  <property name="horizontalScrollBarPolicy">
-                   <enum>Qt::ScrollBarAlwaysOn</enum>
-                  </property>
-                  <property name="sizeAdjustPolicy">
-                   <enum>QAbstractScrollArea::AdjustToContents</enum>
-                  </property>
-                  <property name="alternatingRowColors">
-                   <bool>true</bool>
-                  </property>
-                  <property name="verticalScrollMode">
-                   <enum>QAbstractItemView::ScrollPerPixel</enum>
-                  </property>
-                  <property name="horizontalScrollMode">
-                   <enum>QAbstractItemView::ScrollPerPixel</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="4" column="0">
-            <widget class="SComments" name="widgetComments" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_14">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <property name="horizontalSpacing">
-               <number>0</number>
-              </property>
-              <property name="verticalSpacing">
-               <number>5</number>
-              </property>
-             </layout>
             </widget>
            </item>
           </layout>
@@ -1573,11 +1231,6 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets/slineedit.h</header>
@@ -1587,9 +1240,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    </slots>
   </customwidget>
   <customwidget>
-   <class>worksAndSparePartsTable</class>
-   <extends>QTableView</extends>
-   <header>tabrepair.h</header>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
    <class>STextEdit</class>
@@ -1605,14 +1258,18 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    <header location="global">widgets/scomments.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>SWorksAndParts</class>
+   <extends>QWidget</extends>
+   <header>widgets/sworksandparts.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>buttonMedia</tabstop>
   <tabstop>buttonClientCard</tabstop>
  </tabstops>
- <resources>
-  <include location="styles/styles.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>pushButtonGetout</sender>
@@ -1755,54 +1412,6 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
     <hint type="destinationlabel">
      <x>1172</x>
      <y>281</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>switchEditStrategy</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>tabRepair</receiver>
-   <slot>switchEditStrategy(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>827</x>
-     <y>359</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1173</x>
-     <y>362</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>toolButtonSaveSaleTable</sender>
-   <signal>clicked()</signal>
-   <receiver>tabRepair</receiver>
-   <slot>saveSaleTableClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>803</x>
-     <y>378</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1167</x>
-     <y>356</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonAdmEditWorks</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>tabRepair</receiver>
-   <slot>buttonWorksAdminEdit(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1139</x>
-     <y>367</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1169</x>
-     <y>396</y>
     </hint>
    </hints>
   </connection>
