@@ -238,6 +238,7 @@ int SRepairModel::clientId()
 
 void SRepairModel::setClientId(const int id)
 {
+    m_clientId = id;
     i_valuesMap.insert("client", id);
 }
 
@@ -524,6 +525,7 @@ bool SRepairModel::expressRepair()
 
 void SRepairModel::setExpressRepair(const bool state)
 {
+    m_expressRepair = state;
     i_valuesMap.insert("express_repair", state);
 }
 
@@ -534,6 +536,7 @@ bool SRepairModel::quickRepair()
 
 void SRepairModel::setQuickRepair(const bool state)
 {
+    m_quickRepair = state;
     i_valuesMap.insert("quick_repair", state);
 }
 
@@ -544,6 +547,7 @@ bool SRepairModel::isWarranty()
 
 void SRepairModel::setIsWarranty(const bool state)
 {
+    m_isWarranty = state;
     i_valuesMap.insert("is_warranty", state);
 }
 
@@ -912,7 +916,14 @@ QString SRepairModel::barcode()
 
 void SRepairModel::setBarcode(const QString str)
 {
+    m_barcode = str;
     i_valuesMap.insert("barcode", str);
+}
+
+void SRepairModel::genBarcode()
+{
+    // TODO: генерация правильного значения штрих-кода (в АСЦ неправильный)
+    setBarcode("01200" + QString::number(i_id).rightJustified(6, '0') + "2");
 }
 
 QString SRepairModel::rejectReason()
@@ -1073,7 +1084,11 @@ bool SRepairModel::commit()
         if(!insert())
             throw Global::ThrowType::QueryError;
         appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
+        m_repairStatusLog->setStatus(Global::RepStateIds::GetIn);
         m_repairStatusLog->setRepair(i_id);
+
+        genBarcode();
+        commit();
     }
     m_repairStatusLog->commit();
 

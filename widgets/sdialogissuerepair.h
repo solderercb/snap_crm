@@ -28,14 +28,21 @@ signals:
     void printWorksLists();
 public:
     explicit SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowFlags flags = Qt::WindowFlags(), QWidget *parent = nullptr);
+    explicit SDialogIssueRepair(QList<SRepairModel*> repairs, QWidget *parent = nullptr); // контруктор для быстрого ремонта (без диалогового окна)
     ~SDialogIssueRepair();
     void setRepairModel(SRepairModel *model);
     void setClientModel(SClientModel *model);
     void setSaleTableModel(SSaleTableModel *model);
     void deleteRepairModels();
     void setListOwner(bool state);
+    void setPayFromBalance(bool state = true);
+    void setIssuingInCredit(bool state);
+    void setPaymentSystemId(int id);
+    void issueRepairs();
 private:
-    Ui::SDialogIssueRepair *ui;
+    enum StateSwitchConditionBits {BitAmountZero = 15, BitInCredit = 14, BitQuickRepair = 13};
+    enum StateSwitchConditions {AmountZero = (1 << BitAmountZero), InCredit = (1 << BitInCredit), QuickRepair = (1 << BitQuickRepair)};
+    Ui::SDialogIssueRepair *ui = nullptr;
     bool m_summsNotEq = 0;
     bool m_balanceNotEnough = 1;
     bool m_singleRepairWidgetsVisible = 1;
@@ -51,14 +58,20 @@ private:
     double m_totalAmountToPay = 0;
     bool m_isCartridgeIssue = 0;
     bool m_isListOwner = 0; // индикатор для удаления моделей ремонтов после закрытия диалога
+    bool m_isPayFromBalance = 0;
+    bool m_isIssuingInCredit = 0;
+    int m_paymentSystemId = 0;
+    QString m_rejectReason;
     QMap<QString, double> m_repairsWithPayment; // QString для удобства обработки
     void setDefaultStyleSheets();
+    void initWidgets();
+    void updateWidgets();
     void initPaymentSystems();
     bool checkInput();
     bool checkAmounts();
     void collectRepairsData();
     void setRepairReady(SRepairModel *model);
-    void issueRepairs();
+    void getWidgetsValues();
 private slots:
     void buttonIssueClicked();
     void buttonCancelClicked();
@@ -67,7 +80,7 @@ private slots:
     void textEditTextChanged();
     void paymentSystemChanged(int);
     void checkBoxInCreditToggled(bool);
-    void checkBoxSetReturnedInCreditToggled(bool);
+    void checkBoxIssueInCreditToggled(bool);
 };
 
 #endif // SDIALOGISSUEREPAIR_H

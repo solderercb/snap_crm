@@ -12,8 +12,16 @@ SModalWidget::SModalWidget(QWidget *parent, Qt::WindowFlags flags) :
     setWindowModality(Qt::WindowModal);
 }
 
+SModalWidget::SModalWidget(QWidget *parent, State state) :
+    SWidget(parent)
+{
+    if(state == Hidden)
+        hide();
+}
+
 SModalWidget::~SModalWidget()
 {
-    delete background;
+    if(background)
+        delete background;
     emit onDelete();
 }

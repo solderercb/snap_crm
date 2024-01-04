@@ -82,7 +82,6 @@ private:
     bool m_diagChanged = 0;
     bool m_spinBoxAmountChanged = 0;
     bool m_groupUpdate = 0;
-    SRepairStatusLog *repairStatusLog;
     bool m_buttonSaveStateEnabled = 0;
     QTimer *m_repairLockUpdateTimer = nullptr;
     int getFieldIdByName(const QString &, QSqlQueryModel *);

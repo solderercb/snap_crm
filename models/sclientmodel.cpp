@@ -799,6 +799,10 @@ bool SClientModel::updateBalance(const double amount, const QString &text, const
     return i_nErr;
 }
 
+/* Проверка достаточности средств на балансе
+ * Используется при выдаче ремонта или продаже товара с оплатой с баланса
+ * Возвращает 1 если средсв достаточно или пользователь подтвердил "уход в минус"
+*/
 bool SClientModel::balanceEnough(const double amount)
 {
     if( amount < 0 && m_balance >= -amount )
@@ -850,7 +854,10 @@ bool SClientModel::updateRepairs(const int val)
     if(i_id == 0)
         return 1;
 
-    setRepairs(repairs()+val);
+    QUERY_EXEC(i_query, i_nErr)(QString("SELECT `repairs` FROM `clients` WHERE `id` = %1;").arg(i_id));
+    i_query->first();
+    m_repairs = i_query->value(0).toInt();
+    setRepairs(m_repairs + val);
     commit();
 
     if(!i_nErr)

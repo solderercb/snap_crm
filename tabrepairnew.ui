@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1090</width>
     <height>768</height>
    </rect>
   </property>
@@ -29,19 +29,6 @@
          <property name="sizeConstraint">
           <enum>QLayout::SetFixedSize</enum>
          </property>
-         <item row="2" column="2">
-          <widget class="QCheckBox" name="checkBoxIsHighPriority">
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
          <item row="10" column="0" colspan="3">
           <widget class="QComboBox" name="comboBoxCompany">
            <property name="sizePolicy">
@@ -58,27 +45,67 @@
            </property>
           </widget>
          </item>
-         <item row="13" column="0" colspan="2">
-          <widget class="QLabel" name="labelIsCashReceiptDocNeeded">
-           <property name="enabled">
-            <bool>false</bool>
+         <item row="11" column="0" colspan="3">
+          <widget class="QComboBox" name="comboBoxOffice">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <property name="text">
-            <string>Печать ПКО</string>
-           </property>
-          </widget>
-         </item>
-         <item row="14" column="2">
-          <widget class="QSpinBox" name="spinBoxStickersCount">
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
+           <property name="editable">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QLabel" name="labelIsNonImportantData">
+         <item row="17" column="0">
+          <widget class="QLabel" name="labelPaymentAccount">
            <property name="text">
-            <string>Данные не важны</string>
+            <string>Оплата</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="2">
+          <widget class="QCheckBox" name="checkBoxIsCheckNeeded">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="17" column="1" colspan="2">
+          <widget class="QComboBox" name="comboBoxPresetPaymentAccount">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Предпочитаемая форма оплаты</string>
+           </property>
+           <property name="editable">
+            <bool>false</bool>
+           </property>
+           <property name="currentText">
+            <string/>
+           </property>
+           <property name="currentIndex">
+            <number>-1</number>
            </property>
           </widget>
          </item>
@@ -87,6 +114,19 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QCheckBox" name="checkBoxIsNonImportantData">
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -111,15 +151,28 @@
            </property>
           </widget>
          </item>
-         <item row="15" column="0">
-          <widget class="QLabel" name="labelPaymentAccount">
+         <item row="4" column="2">
+          <widget class="QCheckBox" name="checkBoxWasEarlier">
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
            <property name="text">
-            <string>Оплата</string>
+            <string/>
            </property>
           </widget>
          </item>
-         <item row="4" column="2">
-          <widget class="QCheckBox" name="checkBoxWasEarlier">
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="labelWasInOtherWorkshop">
+           <property name="text">
+            <string>Было в другом СЦ</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QCheckBox" name="checkBoxWasInOtherWorkshop">
            <property name="focusPolicy">
             <enum>Qt::ClickFocus</enum>
            </property>
@@ -159,124 +212,30 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0" colspan="2">
-          <widget class="QLabel" name="labelIsWarranty">
-           <property name="text">
-            <string>Гарантийный ремонт</string>
-           </property>
-          </widget>
-         </item>
-         <item row="14" column="0" colspan="2">
-          <widget class="QLabel" name="labelStickersCount">
-           <property name="text">
-            <string>Стикеров</string>
-           </property>
-          </widget>
-         </item>
-         <item row="15" column="1" colspan="2">
-          <widget class="QComboBox" name="comboBoxPresetPaymentAccount">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>Предпочитаемая форма оплаты</string>
-           </property>
-           <property name="editable">
-            <bool>false</bool>
-           </property>
-           <property name="currentText">
-            <string/>
-           </property>
-           <property name="currentIndex">
-            <number>-1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="0" colspan="3">
-          <widget class="QComboBox" name="comboBoxOffice">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="editable">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QLabel" name="labelIsHighPriority">
-           <property name="text">
-            <string>Срочный</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QCheckBox" name="checkBoxWasInOtherWorkshop">
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QLabel" name="labelWasInOtherWorkshop">
-           <property name="text">
-            <string>Было в другом СЦ</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="labelIsQuick">
+         <item row="12" column="0" colspan="2">
+          <widget class="QLabel" name="labelIsCheckNeeded">
            <property name="enabled">
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Быстрый ремонт</string>
+            <string>Чек при выдаче</string>
            </property>
           </widget>
          </item>
-         <item row="16" column="0" colspan="3">
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
+         <item row="3" column="0" colspan="2">
+          <widget class="QLabel" name="labelIsNonImportantData">
+           <property name="text">
+            <string>Данные не важны</string>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
+          </widget>
          </item>
-         <item row="12" column="2">
-          <widget class="QCheckBox" name="checkBoxIsCheckNeeded">
+         <item row="13" column="0" colspan="2">
+          <widget class="QLabel" name="labelIsCashReceiptDocNeeded">
            <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
            <property name="text">
-            <string/>
+            <string>Печать ПКО</string>
            </property>
           </widget>
          </item>
@@ -284,35 +243,6 @@
           <widget class="QLabel" name="labelWasEarlier">
            <property name="text">
             <string>Ранее было в ремонте</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QCheckBox" name="checkBoxIsQuick">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="2">
-          <widget class="QCheckBox" name="checkBoxIsNonImportantData">
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="text">
-            <string/>
            </property>
           </widget>
          </item>
@@ -332,13 +262,52 @@
            </property>
           </widget>
          </item>
-         <item row="12" column="0" colspan="2">
-          <widget class="QLabel" name="labelIsCheckNeeded">
-           <property name="enabled">
-            <bool>false</bool>
+         <item row="2" column="2">
+          <widget class="QCheckBox" name="checkBoxIsHighPriority">
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
            </property>
            <property name="text">
-            <string>Чек при выдаче</string>
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="0" colspan="2">
+          <widget class="QLabel" name="labelQuickRepairPrintBOQ">
+           <property name="text">
+            <string>Акт выполненных работ</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QCheckBox" name="checkBoxIsQuick">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="2">
+          <widget class="QCheckBox" name="checkBoxQuickRepairPrintBOQ">
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -359,37 +328,6 @@
            <property name="text">
             <string/>
            </property>
-          </widget>
-         </item>
-         <item row="17" column="0" colspan="3">
-          <widget class="QGroupBox" name="groupBoxDebugPanel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title">
-            <string>DEBUG</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_10">
-            <item row="0" column="0">
-             <widget class="QPushButton" name="pushButtonDbgRandomFill">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::ClickFocus</enum>
-              </property>
-              <property name="text">
-               <string>clear&amp;&amp;randomFill</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </widget>
          </item>
          <item row="7" column="0" colspan="3">
@@ -425,17 +363,41 @@
            </item>
           </layout>
          </item>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <layout class="QGridLayout" name="gridLayoutMainPanel" rowstretch="0,0,0,0,0,0">
-         <item row="5" column="0">
-          <spacer name="verticalSpacer_2">
+         <item row="19" column="0" colspan="3">
+          <widget class="QGroupBox" name="groupBoxDebugPanel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>DEBUG</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="pushButtonDbgRandomFill">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
+              <property name="text">
+               <string>clear&amp;&amp;randomFill</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="18" column="0" colspan="3">
+          <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -445,61 +407,82 @@
            </property>
           </spacer>
          </item>
-         <item row="1" column="0">
-          <widget class="SDeviceMatch" name="widgetDeviceMatch" native="true">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>500</height>
-            </size>
+         <item row="2" column="0" colspan="2">
+          <widget class="QLabel" name="labelIsHighPriority">
+           <property name="text">
+            <string>Срочный</string>
            </property>
-           <layout class="QGridLayout" name="gridLayout_9">
-            <property name="leftMargin">
-             <number>5</number>
-            </property>
-            <property name="topMargin">
-             <number>5</number>
-            </property>
-            <property name="rightMargin">
-             <number>5</number>
-            </property>
-            <property name="bottomMargin">
-             <number>5</number>
-            </property>
-            <property name="spacing">
-             <number>5</number>
-            </property>
-           </layout>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="SClientInputForm" name="widgetClient" native="true">
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="labelIsQuick">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Быстрый ремонт</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="2">
+          <widget class="QSpinBox" name="spinBoxStickersCount">
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="2">
+          <widget class="QLabel" name="labelIsWarranty">
+           <property name="text">
+            <string>Гарантийный ремонт</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="0" colspan="2">
+          <widget class="QLabel" name="labelStickersCount">
+           <property name="text">
+            <string>Стикеров</string>
+           </property>
+          </widget>
+         </item>
+         <item row="16" column="0" colspan="2">
+          <widget class="QLabel" name="labelQuickRepairPrintWarrantyDoc">
+           <property name="text">
+            <string>Гарантийный талон</string>
+           </property>
+          </widget>
+         </item>
+         <item row="16" column="2">
+          <widget class="QCheckBox" name="checkBoxQuickRepairPrintWarrantyDoc">
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::RightToLeft</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <layout class="QGridLayout" name="gridLayoutMainPanel" rowstretch="0,0,0,0,0,0,0">
+         <item row="1" column="0">
+          <widget class="SDeviceMatch" name="widgetDeviceMatch" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
              <height>500</height>
             </size>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <property name="leftMargin">
-             <number>5</number>
-            </property>
-            <property name="topMargin">
-             <number>5</number>
-            </property>
-            <property name="rightMargin">
-             <number>5</number>
-            </property>
-            <property name="bottomMargin">
-             <number>5</number>
-            </property>
-            <property name="spacing">
-             <number>5</number>
-            </property>
-           </layout>
           </widget>
          </item>
          <item row="0" column="0">
@@ -684,7 +667,23 @@
            </layout>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="6" column="0">
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::MinimumExpanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="5" column="0">
           <widget class="QGroupBox" name="groupBoxFinances">
            <property name="title">
             <string>Финансы</string>
@@ -696,7 +695,7 @@
                <enum>QLayout::SetDefaultConstraint</enum>
               </property>
               <item row="1" column="4">
-               <widget class="QPushButton" name="pushButtonCashReceipt">
+               <widget class="QPushButton" name="pushButtonReceiptAndClose1">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -857,9 +856,106 @@
                 </property>
                </widget>
               </item>
+              <item row="2" column="0" colspan="5">
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <widget class="QLabel" name="labelQuickRepairAmount">
+                  <property name="text">
+                   <string>К оплате</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="SDoubleSpinBox" name="doubleSpinBoxQuickRepairAmount">
+                  <property name="maximum">
+                   <double>999999.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxQuickRepairConfirmPayment">
+                  <property name="text">
+                   <string>Деньги получены</string>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxQuickRepairPayFromBalance">
+                  <property name="text">
+                   <string>С баланса</string>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxQuickRepairIssueInCredit">
+                  <property name="text">
+                   <string>В долг</string>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonQuickRepairIssue1">
+                  <property name="text">
+                   <string>Выдать</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
              </layout>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="SClientInputForm" name="widgetClient" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>500</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="SWorksAndParts" name="widgetQuickRepairBOQ" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>50</height>
+            </size>
+           </property>
           </widget>
          </item>
         </layout>
@@ -884,14 +980,14 @@
         <item row="1" column="0">
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="0" column="0">
-           <layout class="QGridLayout" name="LeftGridLayout_2" columnstretch="0">
+           <layout class="QGridLayout" name="LeftGridLayout" columnstretch="0">
             <property name="sizeConstraint">
              <enum>QLayout::SetFixedSize</enum>
             </property>
            </layout>
           </item>
           <item row="0" column="1">
-           <spacer name="horizontalSpacer_1">
+           <spacer name="horizontalSpacerLeft">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -907,16 +1003,23 @@
            </spacer>
           </item>
           <item row="0" column="2">
-           <layout class="QGridLayout" name="CentralGridLayout_2">
+           <layout class="QGridLayout" name="CentralGridLayout">
             <item row="0" column="3">
-             <widget class="QPushButton" name="CentnerButton3_2">
+             <widget class="QPushButton" name="pushButtonReceiptAndClose2">
               <property name="text">
                <string>Принять</string>
               </property>
              </widget>
             </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="pushButtonReceipt">
+              <property name="text">
+               <string>Принять ещё</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="1">
-             <widget class="QPushButton" name="CentnerButton1_2">
+             <widget class="QPushButton" name="pushButtonAddPhoto">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -928,17 +1031,17 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="CentnerButton2_2">
+            <item row="0" column="4">
+             <widget class="QPushButton" name="pushButtonQuickRepairIssue2">
               <property name="text">
-               <string>Принять ещё</string>
+               <string>Выдать</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item row="0" column="3">
-           <spacer name="horizontalSpacer_2">
+           <spacer name="horizontalSpacerRight">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -951,7 +1054,7 @@
            </spacer>
           </item>
           <item row="0" column="4">
-           <layout class="QGridLayout" name="RightGridLayout_2">
+           <layout class="QGridLayout" name="RightGridLayout">
             <property name="sizeConstraint">
              <enum>QLayout::SetFixedSize</enum>
             </property>
@@ -978,11 +1081,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header location="global">widgets/sdoublespinbox.h</header>
@@ -995,6 +1093,17 @@
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SWorksAndParts</class>
+   <extends>QWidget</extends>
+   <header>widgets/sworksandparts.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>SClientInputForm</class>
@@ -1031,8 +1140,8 @@
   <tabstop>comboBoxPrepayReason</tabstop>
   <tabstop>doubleSpinBoxPrepaySumm</tabstop>
   <tabstop>comboBoxPrepayAccount</tabstop>
-  <tabstop>CentnerButton2_2</tabstop>
-  <tabstop>CentnerButton3_2</tabstop>
+  <tabstop>pushButtonReceipt</tabstop>
+  <tabstop>pushButtonReceiptAndClose2</tabstop>
   <tabstop>checkBoxIsQuick</tabstop>
   <tabstop>checkBoxWasInOtherWorkshop</tabstop>
   <tabstop>checkBoxIsHighPriority</tabstop>
@@ -1045,8 +1154,8 @@
   <tabstop>checkBoxIsCheckNeeded</tabstop>
   <tabstop>checkBoxIsCashReceiptDocNeeded</tabstop>
   <tabstop>spinBoxStickersCount</tabstop>
-  <tabstop>CentnerButton1_2</tabstop>
-  <tabstop>pushButtonCashReceipt</tabstop>
+  <tabstop>pushButtonAddPhoto</tabstop>
+  <tabstop>pushButtonReceiptAndClose1</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -1089,7 +1198,7 @@
    <slot>showLineEditPrevRepair()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>263</x>
+     <x>229</x>
      <y>100</y>
     </hint>
     <hint type="destinationlabel">
@@ -1105,7 +1214,7 @@
    <slot>showLineEditPrevRepair()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>263</x>
+     <x>229</x>
      <y>119</y>
     </hint>
     <hint type="destinationlabel">
@@ -1147,7 +1256,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>CentnerButton3_2</sender>
+   <sender>pushButtonReceiptAndClose2</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairNew</receiver>
    <slot>createRepairClose()</slot>
@@ -1163,7 +1272,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>CentnerButton2_2</sender>
+   <sender>pushButtonReceipt</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairNew</receiver>
    <slot>createRepair()</slot>
@@ -1185,8 +1294,8 @@
    <slot>enablePrepayWidgets(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>506</x>
-     <y>261</y>
+     <x>500</x>
+     <y>340</y>
     </hint>
     <hint type="destinationlabel">
      <x>1021</x>
@@ -1195,14 +1304,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButtonCashReceipt</sender>
+   <sender>pushButtonReceiptAndClose1</sender>
    <signal>clicked()</signal>
    <receiver>tabRepairNew</receiver>
    <slot>createRepairClose()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1000</x>
-     <y>264</y>
+     <x>1066</x>
+     <y>340</y>
     </hint>
     <hint type="destinationlabel">
      <x>1019</x>
@@ -1217,8 +1326,8 @@
    <slot>preferredPaymentSystemChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>263</x>
-     <y>365</y>
+     <x>229</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1233,12 +1342,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>501</x>
-     <y>226</y>
+     <x>500</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>708</x>
-     <y>227</y>
+     <x>786</x>
+     <y>311</y>
     </hint>
    </hints>
   </connection>

@@ -5,6 +5,7 @@
 #include "ui_tabrepairnew.h"
 #include "com_sql_queries.h"
 #include "models/sofficemodel.h"
+#include "tabprintdialog.h"
 
 tabRepairNew* tabRepairNew::p_instance = nullptr;
 
@@ -23,6 +24,7 @@ tabRepairNew::tabRepairNew(MainWindow *parent) :
 
     this->setWindowTitle("Приём в ремонт");
     this->setAttribute(Qt::WA_DeleteOnClose);
+
 #ifdef QT_DEBUG
     main_window_test_scheduler = parent->test_scheduler;
     main_window_test_scheduler2 = parent->test_scheduler2;
@@ -74,6 +76,10 @@ void tabRepairNew::initDataModels()
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
     paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
     paymentSystemsProxyModel->setFilterKeyColumn(1);
+
+    clientModel = ui->widgetClient->model();
+    connect(clientModel, &SClientModel::modelUpdated, [=]{updateWidgets();});
+    setQuickRepair(0);
 }
 
 void tabRepairNew::initWidgets()
@@ -140,12 +146,16 @@ void tabRepairNew::initWidgets()
     ui->comboBoxExterior->setModel(classExteriorsModel);
     ui->comboBoxPrepayReason->setModel(prepayReasonsModel);
     ui->comboBoxPrepayReason->setCurrentIndex(-1);
-    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
+    ui->widgetQuickRepairBOQ->switchEditStrategy(0);
 
     connect(ui->lineEditSN,SIGNAL(textEdited(QString)),ui->widgetDeviceMatch,SLOT(findBySN(QString)));
     connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
     connect(ui->widgetClient, &SClientInputForm::createTabClient, this, &tabRepairNew::createTabClient);
     connect(ui->widgetClient, &SClientInputForm::createTabSelectExistingClient, this, &tabRepairNew::relayCreateTabSelectExistingClient);
+    connect(ui->checkBoxIsQuick, &QCheckBox::toggled, this, &tabRepairNew::quickRepairToggled);
+    connect(ui->pushButtonQuickRepairIssue1, &QCheckBox::clicked, this, &tabRepairNew::issueQuickRepair);
+    connect(ui->pushButtonQuickRepairIssue2, &QCheckBox::clicked, this, &tabRepairNew::issueQuickRepair);
+    connect(ui->widgetQuickRepairBOQ, &SWorksAndParts::amountUpdated, [=](const double value){ui->doubleSpinBoxQuickRepairAmount->setValue(value);});
 
     // TODO: настройка минимальных сумм в параметрах программы
     if(comSettings->classicKassa)
@@ -158,6 +168,8 @@ void tabRepairNew::initWidgets()
         ui->doubleSpinBoxEstPrice->setMinimum(1.00);
         ui->doubleSpinBoxPrepaySumm->setMinimum(1.00);
     }
+
+    updateWidgets();
 }
 
 void tabRepairNew::clearWidgets()
@@ -179,7 +191,7 @@ void tabRepairNew::clearWidgets()
     ui->checkBoxIsCheckNeeded->setCheckState(Qt::Unchecked);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPlace->setCurrentIndex(-1);
-    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
+    ui->spinBoxStickersCount->setValue(comSettings->printRepairStickers?comSettings->defaultRepairStickersQty:0);
     ui->lineEditExtNotes->setText("");
     ui->lineEditInsideComment->setText("");
     ui->checkBoxIsEstPrice->setCheckState(Qt::Unchecked);
@@ -191,6 +203,9 @@ void tabRepairNew::clearWidgets()
     ui->comboBoxDeviceClass->setCurrentIndex(-1);
     ui->comboBoxDeviceVendor->setCurrentIndex(-1);
     ui->comboBoxDevice->setCurrentIndex(-1);
+
+    setQuickRepair(0);
+    updateWidgets();
 }
 
 void tabRepairNew::getPrepayment(double summ)
@@ -200,7 +215,7 @@ void tabRepairNew::getPrepayment(double summ)
     cashRegister = new SCashRegisterModel();
     cashRegister->setCompanyIndex(ui->comboBoxCompany->currentIndex());
     cashRegister->setOfficeIndex(ui->comboBoxOffice->currentIndex());
-    cashRegister->setSystemId(paymentSystemsModel->databaseIDByRow(ui->comboBoxPrepayAccount->currentIndex(), "system_id"));
+    cashRegister->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPrepayAccount->currentIndex(), "system_id"));
     cashRegister->setClient(clientModel->id());
     cashRegister->setOperationType(SCashRegisterModel::RecptPrepayRepair);
     cashRegister->setRepairId(repair);
@@ -254,7 +269,7 @@ void tabRepairNew::setModelData()
     repairModel->setStartOfficeIndex(ui->comboBoxOffice->currentIndex());
     repairModel->setManager(user);
     repairModel->setCurrentManager(user);
-    repairModel->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
+    repairModel->setEngineer(m_isQuick?user:engineersModel->databaseIDByRow(ui->comboBoxPresetEngineer->currentIndex()));
     repairModel->setFault(ui->comboBoxProblem->currentText());
     repairModel->setComplect(ui->comboBoxIncomingSet->currentText());
     repairModel->setLook(ui->comboBoxExterior->currentText());
@@ -286,7 +301,70 @@ void tabRepairNew::setModelData()
         if(paymentSystemsModel->databaseIDByRow(preferredPaymentAccIndex, "system_id") == -1)
             repairModel->setIsCardPayment(1);
     }
+}
 
+void tabRepairNew::updateWidgets()
+{
+    ui->widgetQuickRepairBOQ->setReadOnly(!m_isQuick);
+    ui->widgetQuickRepairBOQ->setVisible(m_isQuick);
+    ui->checkBoxQuickRepairConfirmPayment->setVisible(m_isQuick);
+    ui->checkBoxQuickRepairPayFromBalance->setVisible(m_isQuick && clientModel->balanceEnabled());
+    // checkBox "В долг" отображается только если настроен переход "Готово к выдаче"->"Выдано в долг" и включен баланс клиента
+    ui->checkBoxQuickRepairIssueInCredit->setVisible(m_isQuick && clientModel->balanceEnabled() &&
+                                                     comSettings->repairStatuses[Global::RepStateIds::Ready].Contains.contains(Global::RepStateIds::ReturnedInCredit));
+    ui->labelQuickRepairAmount->setVisible(m_isQuick);
+    ui->doubleSpinBoxQuickRepairAmount->setVisible(m_isQuick);
+    ui->pushButtonQuickRepairIssue1->setVisible(m_isQuick);
+    ui->pushButtonQuickRepairIssue2->setVisible(m_isQuick);
+    ui->labelQuickRepairPrintBOQ->setVisible(m_isQuick);
+    ui->checkBoxQuickRepairPrintBOQ->setVisible(m_isQuick);
+    ui->labelQuickRepairPrintWarrantyDoc->setVisible(m_isQuick);
+    ui->checkBoxQuickRepairPrintWarrantyDoc->setVisible(m_isQuick);
+    ui->labelIsCheckNeeded->setText(m_checkBoxIsCheckNeededText);
+
+    ui->pushButtonReceipt->setVisible(!m_isQuick);
+    ui->pushButtonReceiptAndClose1->setVisible(!m_isQuick);
+    ui->pushButtonReceiptAndClose2->setVisible(!m_isQuick);
+    ui->checkBoxIsEstPrice->setVisible(!m_isQuick);
+    ui->doubleSpinBoxEstPrice->setVisible(!m_isQuick);
+    ui->checkBoxIsPrepay->setVisible(!m_isQuick);
+    ui->comboBoxPrepayReason->setVisible(!m_isQuick);
+    ui->doubleSpinBoxPrepaySumm->setVisible(!m_isQuick);
+    ui->comboBoxPrepayAccount->setVisible(!m_isQuick);
+    ui->comboBoxPresetEngineer->setVisible(!m_isQuick);
+    ui->comboBoxPresetPlace->setVisible(!m_isQuick);
+
+    ui->widgetQuickRepairBOQ->updateWidgets();
+    ui->spinBoxStickersCount->setValue(m_isQuick?0:(comSettings->printRepairStickers?comSettings->defaultRepairStickersQty:0));
+}
+
+void tabRepairNew::updateWidgetsOnQuickRepairToggled()
+{
+    // снять галочку с checkBox с включенным свойством AutoExclusive смог только так:
+    ui->checkBoxQuickRepairConfirmPayment->setCheckable(false);
+    ui->checkBoxQuickRepairConfirmPayment->setCheckable(true);
+    ui->checkBoxQuickRepairIssueInCredit->setCheckable(false);
+    ui->checkBoxQuickRepairIssueInCredit->setCheckable(true);
+    ui->checkBoxQuickRepairPayFromBalance->setCheckable(false);
+    ui->checkBoxQuickRepairPayFromBalance->setCheckable(true);
+
+    ui->checkBoxIsEstPrice->setChecked(false);
+    ui->doubleSpinBoxEstPrice->setValue(0);
+    ui->checkBoxIsPrepay->setChecked(false);
+    ui->doubleSpinBoxPrepaySumm->setValue(0);
+    ui->comboBoxPrepayAccount->setCurrentIndex(-1);
+    ui->comboBoxPrepayReason->setCurrentIndex(-1);
+    ui->comboBoxPresetEngineer->setCurrentIndex(-1);
+    ui->comboBoxPresetPlace->setCurrentIndex(-1);
+    ui->checkBoxQuickRepairPrintWarrantyDoc->setChecked(false);
+    ui->checkBoxQuickRepairPrintBOQ->setChecked(false);
+
+}
+
+void tabRepairNew::setQuickRepair(const int state)
+{
+    m_isQuick = state?1:0;
+    m_checkBoxIsCheckNeededText = m_isQuick?tr("Распечатать кассовый чек"):tr("Чек при выдаче");
 }
 
 bool tabRepairNew::tabCloseRequest()
@@ -334,7 +412,7 @@ void tabRepairNew::enablePrepayWidgets(bool state)
     ui->comboBoxPrepayReason->setEnabled(state);
     ui->doubleSpinBoxPrepaySumm->setEnabled(state);
     ui->comboBoxPrepayAccount->setEnabled(state);
-    ui->pushButtonCashReceipt->setEnabled(state);
+    ui->pushButtonReceiptAndClose1->setEnabled(state);
 }
 
 void tabRepairNew::changeDeviceClass(int index)
@@ -481,6 +559,9 @@ void tabRepairNew:: setDefaultStyleSheets()
     ui->lineEditPrevRepair->setStyleSheet(commonLineEditStyleSheet);
 }
 
+/* Проверка введённых данных
+ * Возвращает 0 если данные корректны
+*/
 bool tabRepairNew::checkInput()
 {
     int error = 0;
@@ -549,12 +630,12 @@ bool tabRepairNew::checkInput()
         if (ui->comboBoxPrepayAccount->currentIndex() < 0)      // опязательно должен быть выбран счёт
         {
             ui->comboBoxPrepayAccount->setStyleSheet(commonComboBoxStyleSheetRed);
-            error = 18;
+            error = 19;
         }
         if ( ui->doubleSpinBoxPrepaySumm->value() == 0 )   // соответствует ли норме введённая сумма
         {
             ui->doubleSpinBoxPrepaySumm->setStyleSheet(commonLineEditStyleSheetRed);
-            error = 18;
+            error = 20;
         }
     }
     if ( ui->checkBoxWasEarlier->isChecked() ) // если установлен флаг "Ранее было в ремонте", то обязательно должен быть указан номер ремонта; однако, это не касается гарантийного ремонта
@@ -581,10 +662,43 @@ bool tabRepairNew::checkInput()
     if (error)
     {
         qDebug() << "Ошибка создания карты ремонта: не все обязательные поля заполнены (error " << error << ")";
-        return false;
+        return true;
     }
 
-    return true;
+    return false;
+}
+
+/* Проверка введённых данных в режиме Быстрый ремонт
+ * Возвращает 0 если данные корректны
+*/
+bool tabRepairNew::quickRepairCheckInput()
+{
+    QString errMsg;
+    int error = 0;
+
+    if(checkInput())
+        return true;
+
+    if(!(ui->checkBoxQuickRepairConfirmPayment->isChecked() || ui->checkBoxQuickRepairIssueInCredit->isChecked() || ui->checkBoxQuickRepairPayFromBalance->isChecked()))
+    {
+        error = 1;
+        errMsg = tr("Подтвердите выдачу");
+    }
+
+    if(ui->widgetQuickRepairBOQ->isEmpty())
+    {
+        error = 2;
+        errMsg = tr("Список работ пуст");
+    }
+
+    if (error)
+    {
+        qDebug() << "Ошибка создания быстрого ремонта ремонта (error " << error << ": " << errMsg << ")";
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), errMsg, QColor("#FFC7AD"), QColor("#FFA477"));
+        return true;
+    }
+
+    return false;
 }
 
 /*  Поиск имеющейся модели устройства в списке или создание новой.
@@ -626,13 +740,15 @@ int tabRepairNew::createDeviceModel()
 */
 bool tabRepairNew::createRepair()
 {
-    if(!checkInput())
-        return false; // 1 — OK, 0 - ошибка
+    if(checkInput())
+        return false;
 
     bool nErr = 1;
     int repair;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    m_stickersCount = ui->spinBoxStickersCount->value();
     repairModel = new SRepairModel(this);
+    ui->widgetQuickRepairBOQ->linkWithRepairModel(repairModel);
 
     setDefaultStyleSheets();
 
@@ -667,8 +783,24 @@ bool tabRepairNew::createRepair()
         {
             double prepaySumm = sysLocale.toDouble(ui->doubleSpinBoxPrepaySumm->text());
             repairModel->addPrepay(prepaySumm, ui->comboBoxPrepayReason->currentText());
-            getPrepayment(sysLocale.toDouble(ui->doubleSpinBoxPrepaySumm->text()));
+            getPrepayment(ui->doubleSpinBoxPrepaySumm->value());
             repairModel->commit();
+        }
+
+        if(m_isQuick)
+        {
+            SDialogIssueRepair *dialogIssue;
+
+            m_quickRepairIssueList.clear();
+            repairModel->BOQModel()->repair_saveTables(SSaleTableModel::RepairOpType::Link);
+
+            m_quickRepairIssueList.append(repairModel);
+            dialogIssue = new SDialogIssueRepair(m_quickRepairIssueList, this);   // Диалоговое окно не отображается
+            dialogIssue->setPayFromBalance(ui->checkBoxQuickRepairPayFromBalance->isChecked());
+            dialogIssue->setIssuingInCredit(ui->checkBoxQuickRepairIssueInCredit->isChecked());
+            dialogIssue->setPaymentSystemId(paymentSystemsModel->databaseIDByRow(ui->comboBoxPresetPaymentAccount->currentIndex(), "system_id"));
+            dialogIssue->issueRepairs();
+            dialogIssue->deleteLater();
         }
 
 #ifdef QT_DEBUG
@@ -693,6 +825,10 @@ bool tabRepairNew::createRepair()
         else
             QUERY_COMMIT_ROLLBACK(query, nErr);
     }
+    catch(...)
+    {
+        nErr = 0;
+    }
 
     QUERY_LOG_STOP;
 
@@ -704,7 +840,8 @@ bool tabRepairNew::createRepair()
         // TODO: обработка списка совпадений устройств (табл. tasks, type == 5)
     }
 
-    delete repairModel;
+    ui->widgetQuickRepairBOQ->linkWithRepairModel(nullptr);
+
     delete query;
     return nErr;
 }
@@ -719,6 +856,18 @@ void tabRepairNew::createRepairClose()
         else
             m_closePending = 0;
     }
+}
+
+void tabRepairNew::issueQuickRepair()
+{
+    if(quickRepairCheckInput())
+        return;
+
+    if(ui->checkBoxQuickRepairPayFromBalance->isChecked() && !ui->checkBoxQuickRepairIssueInCredit->isChecked())
+        if(!clientModel->balanceEnough(-ui->doubleSpinBoxQuickRepairAmount->value()))
+            return;
+
+    createRepairClose();
 }
 
 void tabRepairNew::preferredPaymentSystemChanged(int)
@@ -756,33 +905,67 @@ void tabRepairNew::guiFontChanged()
     ui->lineEditPrevRepair->setFont(font);
 }
 
+void tabRepairNew::quickRepairToggled(const int state)
+{
+    setQuickRepair(state);
+    updateWidgetsOnQuickRepairToggled();
+    updateWidgets();
+
+#ifdef QT_DEBUG
+    if (state)
+    {
+        ui->widgetQuickRepairBOQ->dbgAddWork();
+        ui->checkBoxQuickRepairConfirmPayment->setChecked(true);
+    }
+    else
+    {
+        ui->widgetQuickRepairBOQ->clearTable();
+    }
+#endif
+
+}
+
 void tabRepairNew::print(int repair)
 {
     QMap<QString, QVariant> report_vars;
-    // печать квитанции
-    if(comSettings->printRepairReceptDoc)
+
+    if(m_isQuick)   // для быстрого ремонта печать акта выполненных работ
     {
-        report_vars.insert("type", Global::Reports::new_rep);
+        if(ui->checkBoxQuickRepairPrintBOQ->isChecked())
+        {
+            tabPrintDialog::printRepairWorksReports(m_quickRepairIssueList, true);
+        }
+        //        if(ui->checkBoxQuickRepairPrintWarrantyDoc->isChecked())
+//            tabPrintDialog::printRepairWorksReports(list, false);
+    }
+    else  // для обычного ремонта печать квитанции
+    {
+        if(comSettings->printRepairReceptDoc)
+        {
+            report_vars.insert("type", Global::Reports::new_rep);
+            report_vars.insert("repair_id", repair);
+            emit generatePrintout(report_vars);
+            report_vars.clear();
+        }
+    }
+
+    // печать стикеров для любого типа ремонта
+    if(m_stickersCount > 0)
+    {
+        report_vars.insert("type", Global::Reports::rep_label);
         report_vars.insert("repair_id", repair);
+        report_vars.insert("copies", m_stickersCount);
         emit generatePrintout(report_vars);
         report_vars.clear();
     }
 
-    // печать стикеров
-    if(comSettings->printRepairStickers)
-    {
-        report_vars.insert("type", Global::Reports::rep_label);
-        report_vars.insert("repair_id", repair);
-        report_vars.insert("copies", ui->spinBoxStickersCount->value());
-        emit generatePrintout(report_vars);
-        report_vars.clear();
-    }
     // печать ПКО
     if(ui->checkBoxIsCashReceiptDocNeeded->isChecked())
     {
-        report_vars.insert("type", Global::Reports::pko);
-        emit generatePrintout(report_vars);
-        report_vars.clear();
+//        report_vars.insert("type", Global::Reports::pko);
+//        report_vars.insert("order_id", repair);
+//        emit generatePrintout(report_vars);
+//        report_vars.clear();
     }
 }
 
@@ -864,8 +1047,8 @@ void tabRepairNew::randomFill()
         ui->checkBoxIsNonImportantData->setChecked((i>>3)&0x01);
         ui->checkBoxWasEarlier->setChecked((i>>4)&0x01);
         ui->checkBoxIsWarranty->setChecked((i>>5)&0x01);
-        ui->checkBoxIsEstPrice->setChecked((i>>6)&0x01);
-        ui->checkBoxIsPrepay->setChecked((i>>7)&0x01);
+        ui->checkBoxIsEstPrice->setChecked((i>>6)&0x01 && !ui->checkBoxIsQuick->isChecked());
+        ui->checkBoxIsPrepay->setChecked((i>>7)&0x01 && !ui->checkBoxIsQuick->isChecked());
         ui->checkBoxIsCashReceiptDocNeeded->setChecked((i>>8)&0x01 && ui->checkBoxIsCashReceiptDocNeeded->isEnabled());
         ui->checkBoxIsCheckNeeded->setChecked((i>>9)&0x01 && ui->checkBoxIsCheckNeeded->isEnabled());
         if (ui->checkBoxWasEarlier->isChecked())
@@ -899,7 +1082,6 @@ void tabRepairNew::randomFill()
             i = paymentSystemsModel->rowCount();
             ui->comboBoxPrepayAccount->setCurrentIndex(QRandomGenerator::global()->bounded(i));
         }
-
     }
     else if (test_scheduler_counter == 11)
     {

@@ -200,6 +200,7 @@ public:
     void setWarrantyDays(const int);
     QString barcode();
     void setBarcode(const QString);
+    void genBarcode();
     QString rejectReason();
     void setRejectReason(const QString);
     int informedStatusIndex();

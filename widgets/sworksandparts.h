@@ -36,16 +36,22 @@ private slots:
 class SWorksAndParts : public QWidget
 {
     Q_OBJECT
-
+signals:
+    void amountUpdated(const double amount);
 public:
     explicit SWorksAndParts(QWidget *parent = nullptr);
     ~SWorksAndParts();
-    void setRepairModel(SRepairModel *model);
+    void setRepairId(const int id);
+    void linkWithRepairModel(SRepairModel *model);
     void setReadOnly(bool state = true);
     bool isCommitted();
     void commit();
     void load(const int repair);
     bool isEmpty();
+    void clearTable();
+#ifdef QT_DEBUG
+    void dbgAddWork();
+#endif
 private:
     Ui::SWorksAndParts *ui;
     SSaleTableModel *m_model = nullptr;
@@ -55,13 +61,13 @@ private:
     int m_clientId = 0;
 public slots:
     void updateWidgets();
+    void switchEditStrategy(bool);
 private slots:
     void addCustomWork();
     void onReturnQuickAddPart();
     bool quickAddPart(const int uid);
-    void updateTotalSumms(const double, const double, const double);
-    void saveTotalSumms();
-    void switchEditStrategy(bool);
+    void updateAmounts(const double, const double, const double);
+    void saveAmounts();
     void saveSaleTableClicked();
     void setSaveSaleTableEnabled();
     void buttonWorksAdminEdit(bool state);

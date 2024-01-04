@@ -162,7 +162,7 @@ void SWorkModel::setWarranty(const int warranty, const QVariant oldValue)
 
     if(!oldValue.toString().isEmpty())
         logText = tr("Срок гарантии на работу \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1), warrantyTermsModel->getDisplayRole(warranty, 1));
-    else if(i_id)
+    else if(i_id || (!i_id && warranty != 0) )   // первое изменение срока гарантии при автосохранении списка или установка срока гарантии до первого сохранения списка
         logText = tr("Срок гарантии на работу \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
     else
         logText = tr("Срок гарантии на работу \"%1\" установлен по умолчанию (\"%2\")").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));

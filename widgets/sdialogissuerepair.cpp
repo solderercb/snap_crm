@@ -10,61 +10,14 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
 {
     ui->setupUi(this);
     setWindowModality(Qt::WindowModal);
-    ui->doubleSpinBoxTotalAmount->setMinimum(-9999999.990000);
-    setDefaultStyleSheets();
     m_repairsModels = repairs;
-    if(m_repairsModels.first()->cartridge())    // если картридж, то
-    {
-        m_isCartridgeIssue = 1;
-        ui->checkBoxWorksDocPrint->setText(tr("Печать чек-акта(ов)", "", m_repairsModels.size()));
-    }
-    else
-    {
-        ui->checkBoxWorksDocPrint->setText(tr("Печать акта(ов) выполненных работ", "", m_repairsModels.size()));
-    }
+
     m_clientModel = new SClientModel();
     m_clientModel->load(repairs.at(0)->clientId());
     initPaymentSystems();
-
-    ui->checkBoxWorksDocPrint->setChecked(comSettings->printWorksList && !(m_clientModel->options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular)));
-    ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
-    ui->comboBoxRejectReason->setModel(rejectReasonModel);
-    ui->comboBoxRejectReason->setCurrentIndex(-1);
-    connect(ui->comboBoxRejectReason, SIGNAL(currentTextChanged(QString)), this, SLOT(otheRejectReasonShow(QString)));
-    connect(ui->textEditRejectReason, SIGNAL(textChanged()), this, SLOT(textEditTextChanged()));
-    connect(ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(buttonCancelClicked()));
-    connect(ui->pushButtonIssue, SIGNAL(clicked()), this, SLOT(buttonIssueClicked()));
-    connect(ui->pushButtonLooseDocPrint, SIGNAL(clicked()), this, SLOT(createLooseDoc()));
-    connect(ui->comboBoxPaymentAccount, SIGNAL(currentIndexChanged(int)), this, SLOT(paymentSystemChanged(int)));
-    connect(ui->checkBoxCreditPayment, SIGNAL(toggled(bool)), this, SLOT(checkBoxInCreditToggled(bool)));
-    connect(ui->checkBoxSetReturnedInCredit, &QCheckBox::toggled, this, &SDialogIssueRepair::checkBoxSetReturnedInCreditToggled);
-
+    initWidgets();
     collectRepairsData();
-    ui->checkBoxDiagDocPrint->setVisible(m_singleRepairWidgetsVisible);
-    ui->pushButtonLooseDocPrint->setVisible(m_singleRepairWidgetsVisible);
-    ui->comboBoxRejectReason->setVisible(m_singleRepairWidgetsVisible && m_rejectReasonWidgetsVisible);
-    ui->textEditRejectReason->setVisible(false);
-    ui->labelPrepay->setVisible(m_singleRepairWidgetsVisible);
-    ui->doubleSpinBoxPrepay->setVisible(m_singleRepairWidgetsVisible);
-    ui->labelAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
-    ui->doubleSpinBoxAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
-    // checkBox "В долг" отображается только если настроен переход "Готово к выдаче"->"Выдано в долг" и включен баланс клиента
-    ui->checkBoxSetReturnedInCredit->setVisible(m_clientModel->balanceEnabled() &&
-                                                comSettings->repairStatuses[Global::RepStateIds::Ready].Contains.contains(Global::RepStateIds::ReturnedInCredit));
-    ui->checkBoxPaymentCheckout->setVisible(m_totalAmountToPay != 0);
-    ui->checkBoxConfirmGetOut->setVisible(m_totalAmountToPay == 0);
-    ui->labelIssuedMessage->setVisible(m_singleRepairWidgetsVisible);
-    if(m_singleRepairWidgetsVisible)
-        ui->labelIssuedMessage->setText(repairs.at(0)->issuedMsg());
-
-    ui->doubleSpinBoxPrepay->setValue(m_totalPrepayAmount);
-    ui->doubleSpinBoxAgreedAmount->setValue(m_totalAgreedAmount);
-    ui->doubleSpinBoxAlreadyPayed->setValue(m_totalPaymentsAmount);
-    ui->doubleSpinBoxTotalAmount->setValue(m_totalAmount);
-    ui->doubleSpinBoxCurrentPaymentAmount->setValue(m_totalAmountToPay);
-
-    ui->pushButtonIssue->setEnabled(m_pushButtonIssueEnabled);
-
+    updateWidgets();
     show();
 
     if (!m_pushButtonIssueEnabled)
@@ -76,8 +29,8 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
 #ifdef QT_DEBUG
 //    ui->checkBoxConfirmGetOut->setChecked(true);
 //    ui->checkBoxPaymentCheckout->setChecked(true);
-//    if(ui->checkBoxSetReturnedInCredit->isVisible() && m_clientModel->balanceEnabled())
-//        ui->checkBoxSetReturnedInCredit->setChecked(true);
+//    if(ui->checkBoxIssueInCredit->isVisible() && m_clientModel->balanceEnabled())
+//        ui->checkBoxIssueInCredit->setChecked(true);
 //    if(ui->checkBoxPaymentCheckout->isVisible() && ui->checkBoxPaymentCheckout->isEnabled())
 //        ui->checkBoxPaymentCheckout->setChecked(true);
 //    if(ui->checkBoxConfirmGetOut->isVisible() && ui->checkBoxConfirmGetOut->isEnabled())
@@ -86,11 +39,21 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
 #endif
 }
 
+SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel *> repairs, QWidget *parent) :
+    SModalWidget(parent, SModalWidget::State::Hidden)
+{
+    m_repairsModels = repairs;
+    m_clientModel = new SClientModel();
+    m_clientModel->load(repairs.at(0)->clientId());
+    collectRepairsData();
+}
+
 SDialogIssueRepair::~SDialogIssueRepair()
 {
     disconnect();
     deleteRepairModels();
-    delete ui;
+    if(ui)
+        delete ui;
 }
 
 void SDialogIssueRepair::setDefaultStyleSheets()
@@ -98,6 +61,65 @@ void SDialogIssueRepair::setDefaultStyleSheets()
     ui->comboBoxRejectReason->setStyleSheet(commonComboBoxStyleSheet);
     ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheet);
     ui->textEditRejectReason->setStyleSheet(commonTextEditStyleSheet);
+}
+
+void SDialogIssueRepair::initWidgets()
+{
+    ui->doubleSpinBoxTotalAmount->setMinimum(-9999999.990000);
+    setDefaultStyleSheets();
+
+    if(m_repairsModels.first()->cartridge())    // если картридж, то
+    {
+        m_isCartridgeIssue = 1;
+        ui->checkBoxWorksDocPrint->setText(tr("Печать чек-акта(ов)", "", m_repairsModels.size()));
+    }
+    else
+    {
+        ui->checkBoxWorksDocPrint->setText(tr("Печать акта(ов) выполненных работ", "", m_repairsModels.size()));
+    }
+
+    ui->checkBoxWorksDocPrint->setChecked(comSettings->printWorksList && !(m_clientModel->options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular)));
+    ui->comboBoxRejectReason->setModel(rejectReasonModel);
+    ui->comboBoxRejectReason->setCurrentIndex(-1);
+    ui->comboBoxPaymentAccount->setModel(m_paymentSystemsProxyModel);
+    ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
+    connect(ui->comboBoxRejectReason, SIGNAL(currentTextChanged(QString)), this, SLOT(otheRejectReasonShow(QString)));
+    connect(ui->textEditRejectReason, SIGNAL(textChanged()), this, SLOT(textEditTextChanged()));
+    connect(ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(buttonCancelClicked()));
+    connect(ui->pushButtonIssue, SIGNAL(clicked()), this, SLOT(buttonIssueClicked()));
+    connect(ui->pushButtonLooseDocPrint, SIGNAL(clicked()), this, SLOT(createLooseDoc()));
+    connect(ui->comboBoxPaymentAccount, SIGNAL(currentIndexChanged(int)), this, SLOT(paymentSystemChanged(int)));
+    connect(ui->checkBoxPayFromBalance, &QCheckBox::toggled, this, &SDialogIssueRepair::checkBoxInCreditToggled);
+    connect(ui->checkBoxIssueInCredit, &QCheckBox::toggled, this, &SDialogIssueRepair::checkBoxIssueInCreditToggled);
+}
+
+void SDialogIssueRepair::updateWidgets()
+{
+    ui->checkBoxDiagDocPrint->setVisible(m_singleRepairWidgetsVisible);
+    ui->pushButtonLooseDocPrint->setVisible(m_singleRepairWidgetsVisible);
+    ui->comboBoxRejectReason->setVisible(m_singleRepairWidgetsVisible && m_rejectReasonWidgetsVisible);
+    ui->textEditRejectReason->setVisible(false);
+    ui->labelPrepay->setVisible(m_singleRepairWidgetsVisible);
+    ui->doubleSpinBoxPrepay->setVisible(m_singleRepairWidgetsVisible);
+    ui->labelAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
+    ui->doubleSpinBoxAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
+    ui->checkBoxPayFromBalance->setVisible(m_clientModel->balanceEnabled());
+    // checkBox "В долг" отображается только если настроен переход "Готово к выдаче"->"Выдано в долг" и включен баланс клиента
+    ui->checkBoxIssueInCredit->setVisible(m_clientModel->balanceEnabled() &&
+                                                comSettings->repairStatuses[Global::RepStateIds::Ready].Contains.contains(Global::RepStateIds::ReturnedInCredit));
+    ui->checkBoxPaymentCheckout->setVisible(m_totalAmountToPay != 0);
+    ui->checkBoxConfirmGetOut->setVisible(m_totalAmountToPay == 0);
+    ui->labelIssuedMessage->setVisible(m_singleRepairWidgetsVisible);
+    if(m_singleRepairWidgetsVisible)
+        ui->labelIssuedMessage->setText(m_repairsModels.first()->issuedMsg());
+
+    ui->doubleSpinBoxPrepay->setValue(m_totalPrepayAmount);
+    ui->doubleSpinBoxAgreedAmount->setValue(m_totalAgreedAmount);
+    ui->doubleSpinBoxAlreadyPayed->setValue(m_totalPaymentsAmount);
+    ui->doubleSpinBoxTotalAmount->setValue(m_totalAmount);
+    ui->doubleSpinBoxCurrentPaymentAmount->setValue(m_totalAmountToPay);
+
+    ui->pushButtonIssue->setEnabled(m_pushButtonIssueEnabled);
 }
 
 void SDialogIssueRepair::initPaymentSystems()
@@ -108,29 +130,53 @@ void SDialogIssueRepair::initPaymentSystems()
     if(!m_clientModel->balanceEnabled())
     {
         m_paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
-        ui->checkBoxCreditPayment->setHidden(true);
     }
-    ui->comboBoxPaymentAccount->setModel(m_paymentSystemsProxyModel);
-    ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
 }
 
+/*  Проверка введённых пользователем данных и соответствия сумм
+ *  Возвращает 0 если всё ОК
+*/
 bool SDialogIssueRepair::checkInput()
 {
+    int error = 0;
+    QString errMsg;
+
     setDefaultStyleSheets();
     if(ui->comboBoxRejectReason->isVisible() && ui->comboBoxRejectReason->currentIndex() == -1)
     {
         ui->comboBoxRejectReason->setStyleSheet(commonComboBoxStyleSheetRed);
-        return 0;
+        error |= 1 << 0;
     }
     if(ui->textEditRejectReason->isVisible() && ui->textEditRejectReason->toPlainText() == "")
     {
         ui->textEditRejectReason->setStyleSheet(commonTextEditStyleSheetRed);
-        return 0;
+        error |= 1 << 1;
+    }
+    if( ui->checkBoxPaymentCheckout->isVisible() && !ui->checkBoxPaymentCheckout->isChecked() && !ui->checkBoxIssueInCredit->isChecked())
+    {
+        errMsg = tr("Подтвердите правильность ввода данных");
+        error |= 1 << 2;
+    }
+    if( ui->checkBoxConfirmGetOut->isVisible() && !ui->checkBoxConfirmGetOut->isChecked())
+    {
+        // TODO: подумать над заменой уведомления на окраску чекбокса в красный
+        errMsg = tr("Подтвердите выдачу");
+        error |= 1 << 3;
     }
 
-    return 1;
+    error |= checkAmounts() << 4;
+
+    if(error)
+        qDebug().nospace() << "[" << this << "] checkInput() | error: " << error;
+    if(!errMsg.isEmpty())
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), errMsg, QColor("#FFC7AD"), QColor("#FFA477"));
+
+    return error;
 }
 
+/* Проверка соответствия согласованной(-ых) суммы и суммы за работы и детали
+ * Возвращает 1 если суммы не совпадают или если на балансе клиента недостаточно денег и пользователь прервал выдачу
+*/
 bool SDialogIssueRepair::checkAmounts()
 {
     if(m_summsNotEq)
@@ -141,10 +187,16 @@ bool SDialogIssueRepair::checkAmounts()
                                                                     QMessageBox::No);
         if (resBtn == QMessageBox::No)
         {
-            return 0;
+            return 1;
         }
     }
-    return 1;
+
+    if(m_isPayFromBalance && !m_isIssuingInCredit)
+    {
+        return !m_clientModel->balanceEnough(-m_totalAmountToPay);
+    }
+
+    return 0;
 }
 
 void SDialogIssueRepair::collectRepairsData()
@@ -228,31 +280,17 @@ void SDialogIssueRepair::buttonIssueClicked()
 {
     bool nErr = 1;
 
-    if(!checkInput())
+    getWidgetsValues();
+
+    if(checkInput())
         return;
 
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
 
-    if( ui->checkBoxPaymentCheckout->isVisible() && !ui->checkBoxPaymentCheckout->isChecked() && !ui->checkBoxSetReturnedInCredit->isChecked())
-    {
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), tr("Подтвердите правильность ввода данных"), QColor("#FFC7AD"), QColor("#FFA477"));
-        return;
-    }
-    if( ui->checkBoxConfirmGetOut->isVisible() && !ui->checkBoxConfirmGetOut->isChecked())
-    {
-        // TODO: подумать над заменой уведомления на окраску чекбокса в красный
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), tr("Подтвердите выдачу"), QColor("#FFC7AD"), QColor("#FFA477"));
-        return;
-    }
-    if(!checkAmounts())
-    {
-        return;
-    }
     QUERY_LOG_START(parent()->metaObject()->className());
     try
     {
         QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-
         issueRepairs();
 #ifdef QT_DEBUG
 //        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
@@ -307,8 +345,6 @@ void SDialogIssueRepair::buttonIssueClicked()
 void SDialogIssueRepair::issueRepairs()
 {
     bool nErr = 1;
-    int paymentAccount = 0;
-    bool balance = 0;
     SCashRegisterModel *cashRegister;
     SRepairModel *repairModel;
     SSaleTableModel *BOQModel;
@@ -319,25 +355,6 @@ void SDialogIssueRepair::issueRepairs()
     double amountToPay;
 
     // TODO: проверка безналичной оплаты
-
-    // В АСЦ если установлен checkBox "В долг", то деньги всегда списываются с баланса клиента
-    // разница лишь в проверке достаточного остатка на балансе
-    if(ui->checkBoxCreditPayment->isChecked() || ui->checkBoxSetReturnedInCredit->isChecked())
-    {
-        paymentAccount = Global::PaymentSystemIds::Balance;
-        balance = 1;
-    }
-    else
-    {
-        paymentAccount = m_paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id");
-        balance = (paymentAccount == Global::PaymentSystemIds::Balance);
-    }
-
-    if(balance && !ui->checkBoxSetReturnedInCredit->isChecked())
-    {
-        if(!m_clientModel->balanceEnough(-m_totalAmountToPay)) // проверка при выдаче нескольких ремонтов за раз с оплатой с баланса
-            throw Global::ThrowType::UserCanceled;
-    }
 
     while(i != m_repairsModels.constEnd() && m_pushButtonIssueEnabled)
     {
@@ -350,14 +367,18 @@ void SDialogIssueRepair::issueRepairs()
 
         amountToPay = m_repairsWithPayment.value(QString::number(repairId), 0);
 
-        switch ( ((amountToPay == 0) << 15) | (ui->checkBoxSetReturnedInCredit->isChecked() << 14) | repairModel->state() )
+        switch ( ((amountToPay == 0) << BitAmountZero) | (m_isIssuingInCredit << BitInCredit) | (repairModel->quickRepair() << BitQuickRepair) | repairModel->state() )
         {
-            case (1 << 15) | (1 << 14) | Global::RepStateIds::ReadyNoRepair:
-            case (1 << 15) | Global::RepStateIds::ReadyNoRepair: newState = Global::RepStateIds::ReturnedNoRepair; break;
-            case (1 << 15) | (1 << 14) | Global::RepStateIds::Ready:    // при выдаче в долг ранее оплаченных они переключаются в "Выдано клиенту"
-            case (1 << 15) | Global::RepStateIds::Ready:    // ранее оплаченные
-            case Global::RepStateIds::Ready: newState = Global::RepStateIds::Returned; break;
-            case (1 << 14) | Global::RepStateIds::Ready: newState = Global::RepStateIds::ReturnedInCredit; break;
+            case Global::RepStateIds::ReadyNoRepair:    // выдача без ремонта с оплатой (например, оплата диагностики)
+            case Global::RepStateIds::ReadyNoRepair | AmountZero:
+            case Global::RepStateIds::ReadyNoRepair | AmountZero | InCredit: newState = Global::RepStateIds::ReturnedNoRepair; break;
+            case Global::RepStateIds::GetIn | QuickRepair:
+            case Global::RepStateIds::Ready:
+            case Global::RepStateIds::Ready | QuickRepair:  // этот вариант на тот случай, если в каком-то ремонте по ошибке установлена галочка "Быстрый ремонт" (например, из-за косяков предыдущих ревизий)
+            case Global::RepStateIds::Ready | AmountZero:
+            case Global::RepStateIds::Ready | AmountZero | InCredit: newState = Global::RepStateIds::Returned; break; // при выдаче в долг ранее оплаченных они переключаются в "Выдано клиенту"
+            case Global::RepStateIds::GetIn | InCredit | QuickRepair:
+            case Global::RepStateIds::Ready | InCredit: newState = Global::RepStateIds::ReturnedInCredit; break;
             default: throw Global::ThrowType::ConditionsError;
         }
 
@@ -365,20 +386,14 @@ void SDialogIssueRepair::issueRepairs()
         workshopIssuedModel->setRepair(repairId);
         BOQModel = repairModel->BOQModel();
 
-        if(amountToPay && balance)
+        if(amountToPay && m_isPayFromBalance)
         {
             m_clientModel->updateBalance(-amountToPay, tr("Списание %1 за ремонт №%2").arg(sysLocale.toCurrencyString(amountToPay)).arg(repairId));
         }
 
         repairModel->setBoxIndex(-1);
         repairModel->setState(newState);
-        if(ui->comboBoxRejectReason->isVisible())
-        {
-            if(ui->comboBoxRejectReason->currentIndex() != rejectReasonModel->property("other_reject_reason").toInt())
-                repairModel->setRejectReason(ui->comboBoxRejectReason->currentText());
-            else
-                repairModel->setRejectReason(ui->textEditRejectReason->toPlainText());
-        }
+        repairModel->setRejectReason(m_rejectReason);
         BOQModel->repair_saveTables(SSaleTableModel::RepairOpType::Sale);
         repairModel->commit();
         nErr = workshopIssuedModel->commit();
@@ -393,15 +408,17 @@ void SDialogIssueRepair::issueRepairs()
 
     // TODO: нужен какой-то идентификатор группы выданных картриджей (просто уникальный номер или, например, запись в таблице docs)
     //       Он будет использоваться для печати кассового чека с детализацией.
-    if(m_totalAmountToPay && !balance)
+    if(m_totalAmountToPay && !m_isPayFromBalance)
     {
         cashRegister = new SCashRegisterModel();
 
         cashRegister->setOperationType(SCashRegisterModel::RecptRepair);
+        if(m_repairsModels.count() == 1)
+            cashRegister->setRepairId(repairId);
         cashRegister->setAmount(m_totalAmountToPay);
         cashRegister->setReason(cashRegister->constructReason(m_repairsWithPayment.keys().join(", ")));
         cashRegister->setClient(m_clientModel->id());
-        cashRegister->setSystemId(m_paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id"));
+        cashRegister->setSystemId(m_paymentSystemId);
         // Выбор компании и офиса пользователем не предусмотрен; используются текущие значения из userDbData
         nErr = cashRegister->commit();
 
@@ -409,6 +426,61 @@ void SDialogIssueRepair::issueRepairs()
 
         if(!nErr)
             throw Global::ThrowType::QueryError;
+    }
+}
+
+/* Установка платёжной системы
+ * Данный метод используется при выдаче ремонта без отображения диалогового окна
+ * Приоритет метода ниже, чем setPayFromBalance или setIssuingInCredit
+*/
+void SDialogIssueRepair::setPaymentSystemId(int id)
+{
+    if(m_isPayFromBalance || m_isIssuingInCredit)
+        return;
+
+    m_paymentSystemId = id;
+}
+
+void SDialogIssueRepair::setPayFromBalance(bool state)
+{
+    m_isPayFromBalance = state;
+    if(state)
+        m_paymentSystemId = Global::PaymentSystemIds::Balance;
+}
+
+void SDialogIssueRepair::setIssuingInCredit(bool state)
+{
+    m_isIssuingInCredit = state;
+    if(state)
+        setPayFromBalance();
+}
+
+/* Сбор параметров выдачи
+ * Данный метод используется при выдаче ремонта с отображением диалогового окна
+*/
+void SDialogIssueRepair::getWidgetsValues()
+{
+    m_isIssuingInCredit = ui->checkBoxIssueInCredit->isChecked();
+
+    // если установлен checkBox "В долг", то деньги всегда списываются с баланса клиента
+    // разница лишь в проверке достаточного остатка на балансе
+    if(ui->checkBoxPayFromBalance->isChecked() || m_isIssuingInCredit)
+    {
+        m_paymentSystemId = Global::PaymentSystemIds::Balance;
+        m_isPayFromBalance = 1;
+    }
+    else
+    {
+        m_paymentSystemId = m_paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id");
+        m_isPayFromBalance = (m_paymentSystemId == Global::PaymentSystemIds::Balance);
+    }
+
+    if(ui->comboBoxRejectReason->isVisible())
+    {
+        if(ui->comboBoxRejectReason->currentIndex() != rejectReasonModel->property("other_reject_reason").toInt())
+            m_rejectReason = ui->comboBoxRejectReason->currentText();
+        else
+            m_rejectReason = ui->textEditRejectReason->toPlainText();
     }
 }
 
@@ -433,7 +505,6 @@ void SDialogIssueRepair::setListOwner(bool state)
 {
     m_isListOwner = state;
 }
-
 void SDialogIssueRepair::buttonCancelClicked()
 {
     this->deleteLater();
@@ -466,12 +537,12 @@ void SDialogIssueRepair::textEditTextChanged()
 
 void SDialogIssueRepair::paymentSystemChanged(int index)
 {
-    ui->checkBoxCreditPayment->blockSignals(true);
+    ui->checkBoxPayFromBalance->blockSignals(true);
     if(m_paymentSystemsProxyModel->databaseIDByRow(index, "system_id") == Global::PaymentSystemIds::Balance)
-        ui->checkBoxCreditPayment->setChecked(true);
+        ui->checkBoxPayFromBalance->setChecked(true);
     else
-        ui->checkBoxCreditPayment->setChecked(false);
-    ui->checkBoxCreditPayment->blockSignals(false);
+        ui->checkBoxPayFromBalance->setChecked(false);
+    ui->checkBoxPayFromBalance->blockSignals(false);
 }
 
 void SDialogIssueRepair::checkBoxInCreditToggled(bool state)
@@ -484,10 +555,10 @@ void SDialogIssueRepair::checkBoxInCreditToggled(bool state)
     ui->comboBoxPaymentAccount->blockSignals(false);
 }
 
-void SDialogIssueRepair::checkBoxSetReturnedInCreditToggled(bool state)
+void SDialogIssueRepair::checkBoxIssueInCreditToggled(bool state)
 {
-    ui->checkBoxCreditPayment->setChecked(state);
-    ui->checkBoxCreditPayment->setEnabled(!state);
+    ui->checkBoxPayFromBalance->setChecked(state);
+    ui->checkBoxPayFromBalance->setEnabled(!state);
     ui->comboBoxPaymentAccount->setEnabled(!state);
     ui->checkBoxPaymentCheckout->setChecked(false);
     ui->checkBoxPaymentCheckout->setEnabled(!state);

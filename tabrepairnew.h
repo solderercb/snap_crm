@@ -54,15 +54,20 @@ private:
     QSqlQueryModel* classProblemsModel;
     QSqlQueryModel* classIncomingSetsModel;
     QSqlQueryModel* classExteriorsModel;
-    SClientModel *clientModel;
+    SClientModel *clientModel = nullptr;
     SFieldsModel *additionalFields;
     QStandardItemModel* prepayReasonsModel;
     int m_client = 0;
     int m_prevRepair = 0;
     bool m_closePending = 0;
+    bool m_isQuick = 0;
+    QString m_checkBoxIsCheckNeededText;
+    QList<SRepairModel*> m_quickRepairIssueList;
+    bool m_stickersCount = 0;
     void setDefaultStyleSheets();
     void getDevices();
     bool checkInput();
+    bool quickRepairCheckInput();
     int deviceId();
     int createDeviceModel();
     void print(int);
@@ -72,6 +77,9 @@ private:
     void getPrepayment(double summ);
     void saveInternalComment();
     void setModelData();
+    void updateWidgets();
+    void updateWidgetsOnQuickRepairToggled();
+    void setQuickRepair(const int state);
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
@@ -87,9 +95,11 @@ private slots:
     void lineEditSNClearHandler(int);
     bool createRepair();
     void createRepairClose();
+    void issueQuickRepair();
     void preferredPaymentSystemChanged(int);
     void relayCreateTabSelectExistingClient(int, QWidget *caller);
     void guiFontChanged() override;
+    void quickRepairToggled(const int state);
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

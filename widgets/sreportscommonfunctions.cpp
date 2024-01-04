@@ -343,6 +343,15 @@ void SListSourceDataCallbackHandler::setRepairsList(const QList<SRepairModel *> 
     if(list.isEmpty())
         return;
 
+    if(takeOwn)
+    {
+        for(auto *repair : list)
+        {
+            repair->setParent(this);
+            repair->BOQModel()->setParent(this);
+        }
+    }
+
     m_repairsListSet = 1;
     m_repairsList = list;
     m_repairsListOwned = takeOwn;
@@ -353,8 +362,8 @@ void SListSourceDataCallbackHandler::initDemoRepairsList()
 {
     SRepairModel *repair;
     SSaleTableModel *works;
-    repair = new SRepairModel();
-    works = new SSaleTableModel();
+    repair = new SRepairModel(this);
+    works = new SSaleTableModel(this);
     repair->initDemo();
     works->initDemo();
     repair->setBOQModel(works);

@@ -86,7 +86,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->comboBoxNotifyStatus->setModel(notifyStatusesModel);
     ui->comboBoxNotifyStatus->blockSignals(false);
 
-    ui->widgetBOQ->setRepairModel(repairModel);
+    ui->widgetBOQ->linkWithRepairModel(repairModel);
     ui->widgetBOQ->setReadOnly(true);
 
     ui->widgetComments->setParentTab(this);
