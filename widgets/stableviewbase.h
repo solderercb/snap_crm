@@ -24,8 +24,8 @@ typedef struct FilterList FilterList;
 
 struct FilterField
 {
-    enum Op {Equals = 1<<0, Contains = 1<<1, StartsWith = 1<<2, EndsWith = 1<<3, RegExp = 1<<4, RegularExpression = 1<<5, Wildcard = 1<<6,
-             NoOp = 1<<7, Null = 1<<8,
+    enum Op {Equals = 1, Contains, StartsWith, EndsWith, RegExp, RegularExpression, Wildcard, More, MoreEq, Less, LessEq,
+             NoOp, Null,
              NotMark = 1<<9 };
     QString column;
     Op operation;

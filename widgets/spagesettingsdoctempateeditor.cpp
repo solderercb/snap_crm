@@ -194,6 +194,14 @@ void SPageSettingsDocTempateEditor::initWorksDataSources()
     SReportsCommonFunctions::initWorksDataSources();
 }
 
+void SPageSettingsDocTempateEditor::initTechReportDataSources()
+{
+    if(!i_listSourceDataCallbackHandler)
+        i_listSourceDataCallbackHandler = new SListSourceDataCallbackHandler();
+
+    SReportsCommonFunctions::initTechReportDataSources();
+}
+
 #ifdef QT_DEBUG
 void SPageSettingsDocTempateEditor::randomFill()
 {

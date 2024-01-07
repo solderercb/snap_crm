@@ -16,6 +16,7 @@ public:
     QDateTime timestampLocal(const QModelIndex &index) const;
     double total(int column, int sign = 0);
     QString dataLocalizedFromDouble(const QModelIndex &item) const;
+    QString companyFromId(const QModelIndex &item) const;
     QString userFromId(const QModelIndex &item) const;
     QString warrantyFromId(const QModelIndex &item) const;
     QVariant data(const int row, const int column, int role = Qt::DisplayRole) const;

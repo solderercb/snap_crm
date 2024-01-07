@@ -52,6 +52,11 @@ QString STableModelsCommonMethods::dataLocalizedFromDouble(const QModelIndex &it
     return sysLocale.toString(derivedModel->data(item, Qt::DisplayRole | 0x0100).toDouble(), 'f', comSettings->classicKassa?2:0);
 }
 
+QString STableModelsCommonMethods::companyFromId(const QModelIndex &item) const
+{
+    return companiesModel->getDisplayRole(derivedModel->data(item, Qt::DisplayRole | 0x0100).toInt());
+}
+
 QString STableModelsCommonMethods::userFromId(const QModelIndex &item) const
 {
     return usersModel->getDisplayRole(derivedModel->data(item, Qt::DisplayRole | 0x0100).toInt());

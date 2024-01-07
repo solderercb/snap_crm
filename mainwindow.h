@@ -96,7 +96,7 @@ public slots:
     void createTabSparePart(int);
     void createTabSparePartReserve(int);
     void switchToLastUsedTab();
-
+    void createTabTechReports();
 private slots:
     void reactivateCallerTab(QWidget *);
     void reactivateTabRepairNew(int);

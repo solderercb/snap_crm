@@ -104,6 +104,8 @@ SOURCES += \
     models/sstandarditemmodel.cpp \
     models/sstoreitemmodel.cpp \
     models/sstoresaleitemmodel.cpp \
+    models/stabletechreportsmodel.cpp \
+    models/stechreportmodel.cpp \
     models/suseractivitymodel.cpp \
     models/susermodel.cpp \
     models/susersettings.cpp \
@@ -124,6 +126,7 @@ SOURCES += \
     tabrepaircartridges.cpp \
     tabsalary.cpp \
     tabsettings.cpp \
+    tabtechreports.cpp \
     widgets/salarytabwidgets/spagesalaryextra.cpp \
     widgets/salarytabwidgets/spagesalaryitems.cpp \
     widgets/salarytabwidgets/spagesalarypayments.cpp \
@@ -166,6 +169,7 @@ SOURCES += \
     tabsale.cpp \
     widgets/spagedinterface.cpp \
     widgets/spagesettingsdoctempateeditor.cpp \
+    widgets/speriodselector.cpp \
     widgets/sreportscommonfunctions.cpp \
     widgets/stableviewbase.cpp \
     widgets/stableviewbaseitemdelegates.cpp \
@@ -188,6 +192,7 @@ SOURCES += \
     widgets/splaintextedit.cpp \
     widgets/ssetcombobox.cpp \
     widgets/stableviewsummarybase.cpp \
+    widgets/stableviewtechreports.cpp \
     widgets/stabpage.cpp \
     widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
@@ -272,6 +277,8 @@ HEADERS  += \
     models/sstandarditemmodel.h \
     models/sstoreitemmodel.h \
     models/sstoresaleitemmodel.h \
+    models/stabletechreportsmodel.h \
+    models/stechreportmodel.h \
     models/suseractivitymodel.h \
     models/susermodel.h \
     models/susersettings.h \
@@ -293,6 +300,7 @@ HEADERS  += \
     tabrepaircartridges.h \
     tabsalary.h \
     tabsettings.h \
+    tabtechreports.h \
     widgets/salarytabwidgets/spagesalaryextra.h \
     widgets/salarytabwidgets/spagesalaryitems.h \
     widgets/salarytabwidgets/spagesalarypayments.h \
@@ -336,6 +344,7 @@ HEADERS  += \
     tabsale.h \
     widgets/spagedinterface.h \
     widgets/spagesettingsdoctempateeditor.h \
+    widgets/speriodselector.h \
     widgets/sreportscommonfunctions.h \
     widgets/stableviewbaseitemdelegates.h \
     widgets/stableviewclients.h \
@@ -359,6 +368,7 @@ HEADERS  += \
     widgets/splaintextedit.h \
     widgets/ssetcombobox.h \
     widgets/stableviewsummarybase.h \
+    widgets/stableviewtechreports.h \
     widgets/stabpage.h \
     widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
@@ -378,6 +388,7 @@ FORMS += \
     tabrepaircartridges.ui \
     tabsalary.ui \
     tabsettings.ui \
+    tabtechreports.ui \
     widgets/salarytabwidgets/spagesalaryextra.ui \
     widgets/salarytabwidgets/spagesalaryitems.ui \
     widgets/salarytabwidgets/spagesalarypayments.ui \
@@ -406,6 +417,7 @@ FORMS += \
     widgets/scomments.ui \
     widgets/sdevicematch.ui \
     widgets/spagesettingsdoctempateeditor.ui \
+    widgets/speriodselector.ui \
     widgets/sphone.ui \
     widgets/sphones.ui \
     widgets/stoolboxswitchpanel.ui \

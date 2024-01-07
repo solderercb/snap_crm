@@ -8,7 +8,7 @@
 #define APP_MAJOR 0
 #define APP_MINOR 0
 #define APP_PATCH 0
-#define APP_COMMIT 284
+#define APP_COMMIT 285
 
 #define FILE_VER                    APP_MAJOR,APP_MINOR,APP_PATCH,APP_COMMIT    // обязательно запятые!
 #define PRODUCT_VER                 FILE_VER

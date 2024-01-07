@@ -27,7 +27,7 @@ public:
                       EmployeesReportGrid, VisitSourceGrid, StatusChecksGrid, EmployeeActivityGrid, FFRSalaryGrid,
                       TasksGrid,
                       CartridgeMaterialsGrid,
-                      ClientsMatchGrid, RepairsMatchGrid};
+                      ClientsMatchGrid, RepairsMatchGrid, TechReportsGrid};
     Q_ENUM(SettingsVariant)
     enum Operation {SaveFile = 0, ReadFile};
     static QString appSettingsPath();

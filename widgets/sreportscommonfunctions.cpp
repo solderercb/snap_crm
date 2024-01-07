@@ -198,6 +198,7 @@ void SReportsCommonFunctions::initDataSources()
 //        case Global::Reports::slip: ; break;
 //        case Global::Reports::move: ; break;
 //        case Global::Reports::buyout: ; break;
+        case Global::Reports::tech_report: initTechReportDataSources(); break;
         case Global::Reports::repairs:
         case Global::Reports::cartridges: initRepairsDataSources(); break;
         default: notImplementedReport(); return;
@@ -321,6 +322,19 @@ void SReportsCommonFunctions::initRepairsDataSources()
     QObject::connect(repairsDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), model, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
 }
 
+void SReportsCommonFunctions::initTechReportDataSources()
+{
+    if(!i_listSourceDataCallbackHandler->isTechReportsListSet())
+    {
+        i_listSourceDataCallbackHandler->initDemoTechReportsList();
+    }
+
+    m_reportDatasouces << "report";
+    LimeReport::ICallbackDatasource *techReportDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(techReportDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), i_listSourceDataCallbackHandler, SLOT(techReportListCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(techReportDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), i_listSourceDataCallbackHandler, SLOT(techReportListCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+}
+
 /***************************************************************************************************************************************************
 */
 SListSourceDataCallbackHandler::SListSourceDataCallbackHandler()
@@ -358,6 +372,26 @@ void SListSourceDataCallbackHandler::setRepairsList(const QList<SRepairModel *> 
     m_repairsListItem = m_repairsList.constBegin();
 }
 
+void SListSourceDataCallbackHandler::setTechReportsList(const QList<STechReportModel *> &list, bool takeOwn)
+{
+    if(list.isEmpty())
+        return;
+
+    if(takeOwn)
+    {
+        for(auto *repair : list)
+        {
+            repair->setParent(this);
+        }
+    }
+
+    m_techReportsListSet = 1;
+    m_techReportsList = list;
+    m_techReportsListOwned = takeOwn;
+    m_techReportsListItem = m_techReportsList.constBegin();
+
+}
+
 void SListSourceDataCallbackHandler::initDemoRepairsList()
 {
     SRepairModel *repair;
@@ -376,6 +410,27 @@ void SListSourceDataCallbackHandler::initDemoRepairsList()
 bool SListSourceDataCallbackHandler::isRepairsListSet() const
 {
     return m_repairsListSet;
+}
+
+bool SListSourceDataCallbackHandler::isTechReportsListSet() const
+{
+    return m_techReportsListSet;
+}
+
+void SListSourceDataCallbackHandler::initDemoTechReportsList()
+{
+    STechReportModel *report;
+    report = new STechReportModel();
+    report->initDemo();
+    m_techReportsList.append(report);
+
+    report = new STechReportModel();
+    report->initDemo();
+    m_techReportsList.append(report);
+
+    m_techReportsListSet = 1;
+    m_techReportsListOwned = 1;
+    m_techReportsListItem = m_techReportsList.constBegin();
 }
 
 void SListSourceDataCallbackHandler::repairsListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
@@ -430,5 +485,40 @@ void SListSourceDataCallbackHandler::repairWorksListCallbackData(const LimeRepor
 void SListSourceDataCallbackHandler::repairWorksListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
 {
     (*m_repairsListItem)->BOQModel()->reportCallbackDataChangePos(type, result);
+    return;
+}
+
+void SListSourceDataCallbackHandler::techReportListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
+{
+    switch (info.dataType)
+    {
+        case LimeReport::CallbackInfo::IsEmpty: data = (*m_techReportsListItem)->id()?0:1; break;
+        case LimeReport::CallbackInfo::HasNext: data = (m_techReportsListItem != m_techReportsList.constEnd()); break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = (*m_techReportsListItem)->metaObject()->property(info.index + (*m_techReportsListItem)->metaObject()->propertyOffset()).name(); break;
+        case LimeReport::CallbackInfo::ColumnData: data = (*m_techReportsListItem)->metaObject()->property((*m_techReportsListItem)->metaObject()->indexOfProperty(info.columnName.toLocal8Bit()) ).read(*m_techReportsListItem); break;
+        case LimeReport::CallbackInfo::ColumnCount: data = (*m_techReportsListItem)->metaObject()->propertyCount() - (*m_techReportsListItem)->metaObject()->propertyOffset(); break;
+        case LimeReport::CallbackInfo::RowCount: data = m_techReportsList.count(); break;
+    }
+    return;
+
+}
+
+void SListSourceDataCallbackHandler::techReportListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result)
+{
+    if(type == LimeReport::CallbackInfo::Next)
+    {
+        m_techReportsListItem++;
+        if(m_techReportsListItem == m_techReportsList.constEnd())
+        {
+            m_techReportsListItem--;
+            result = 0;
+            return;
+        }
+    }
+    else
+    {
+        m_techReportsListItem = m_techReportsList.constBegin();
+    }
+    result = 1;
     return;
 }

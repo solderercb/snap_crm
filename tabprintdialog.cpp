@@ -528,6 +528,17 @@ void tabPrintDialog::setRepairsList(QList<SRepairModel *> list, bool takeOwn)
     i_listSourceDataCallbackHandler->setRepairsList(list, takeOwn);
 }
 
+void tabPrintDialog::setTechReportsList(QList<STechReportModel *> list, bool takeOwn)
+{
+    if(list.isEmpty())
+        return;
+
+    if(!i_listSourceDataCallbackHandler)
+        i_listSourceDataCallbackHandler = new SListSourceDataCallbackHandler();
+
+    i_listSourceDataCallbackHandler->setTechReportsList(list, takeOwn);
+}
+
 /* Чек-квитанция о приёме на заправку и чек-акт отличаются только выводом на печать списка работ и деталей
 */
 void tabPrintDialog::printCartridgeWorksReports(QList<SRepairModel *> list, bool takeOwn)
@@ -561,6 +572,20 @@ void tabPrintDialog::printCartridgeWorksReports(QList<SRepairModel *> list, bool
 
     delete report;
     delete client;
+}
+
+void tabPrintDialog::printTechReports(QList<STechReportModel *> list, bool takeOwn)
+{
+    if(list.isEmpty())
+        return;
+
+    tabPrintDialog *tab;
+
+    tab = new tabPrintDialog(MainWindow::getInstance(), Global::Reports::tech_report);
+    tab->setTechReportsList(list, takeOwn);
+    tab->startRender();
+    MainWindow::getInstance()->addTab(tab);
+
 }
 
 void tabPrintDialog::on_labelPrinterSettings_linkActivated(const QString&)

@@ -181,7 +181,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     else
         matchFlag = FilterField::Contains;
     l2.fields.append(STableViewBase::initFilterField("t1.`id`", matchFlag, ui->lineEditSearch->text()));
-    l2.fields.append(STableViewBase::initFilterField("t1.`title`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    l2.fields.append(STableViewBase::initFilterField("t1.`title`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
     l2.fields.append(STableViewBase::initFilterField("t1.`serial_number`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
     l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`short_name`, t5.`ur_name`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
     l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));

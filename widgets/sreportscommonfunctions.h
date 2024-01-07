@@ -19,6 +19,8 @@
 #include "models/sfieldsmodel.h"
 #include "models/ssaletablemodel.h"
 #include "models/stablerepairsmodel.h"
+#include "models/stabletechreportsmodel.h"
+#include "models/stechreportmodel.h"
 
 /* Класс для обработки callback-сигналов объекта LimeReport::ICallbackDatasource
  * Необходим как прокладка, поскольку класс SReportsCommonFunctions не заявлен как Q_OBJECT и не
@@ -31,18 +33,27 @@ public:
     explicit SListSourceDataCallbackHandler();
     ~SListSourceDataCallbackHandler();
     void setRepairsList(const QList<SRepairModel *> &list, bool takeOwn = 0);
+    void setTechReportsList(const QList<STechReportModel *> &list, bool takeOwn = 0);
     void initDemoRepairsList();
     bool isRepairsListSet() const;
+    bool isTechReportsListSet() const;
+    void initDemoTechReportsList();
 private:
     bool m_repairsListOwned = 0;
     bool m_repairsListSet = 0;
     QList<SRepairModel*> m_repairsList;
     QList<SRepairModel*>::const_iterator m_repairsListItem;
+    bool m_techReportsListOwned = 0;
+    bool m_techReportsListSet = 0;
+    QList<STechReportModel*> m_techReportsList;
+    QList<STechReportModel*>::const_iterator m_techReportsListItem;
 public slots:
     void repairsListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
     void repairsListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
     void repairWorksListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
     void repairWorksListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
+    void techReportListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
+    void techReportListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
 };
 
 class SReportsCommonFunctions
@@ -76,6 +87,7 @@ protected:
     virtual void initItemStickerDataSources();
     virtual void initPKODataSources();
     virtual void initRepairsDataSources();
+    virtual void initTechReportDataSources();
     virtual void notImplementedReport(){};
 private:
     STableRepairsModel *m_repairsDemoModel = nullptr;

@@ -633,6 +633,10 @@ QString STableViewBase::formatFilterField(const FilterField &field)
                 result = "%1 = %2";
             break;
         }
+        case FilterField::More:     result = "%1 > %2"; break;
+        case FilterField::MoreEq:   result = "%1 >= %2"; break;
+        case FilterField::Less:     result = "%1 < %2"; break;
+        case FilterField::LessEq:   result = "%1 <= %2"; break;
         case FilterField::StartsWith:
         case FilterField::EndsWith:
         case FilterField::Wildcard:
@@ -673,6 +677,7 @@ QString STableViewBase::formatFilterField(const FilterField &field)
         case FilterField::Contains: escFilterString.prepend("%");  Q_FALLTHROUGH();
         case FilterField::StartsWith: escFilterString.append("%"); break;
         case FilterField::EndsWith:  escFilterString.prepend("%"); break;
+        default: break;
     }
 
     QSqlField f;
@@ -686,12 +691,6 @@ QString STableViewBase::formatFilterField(const FilterField &field)
         escFilterColumn = QString("LCASE(%1)").arg(escFilterColumn);
         escFilterString = QString("LCASE(%1)").arg(escFilterString);
     }
-//    if (m_filterFlags & Qt::MatchStartsWith || Qt::MatchEndsWith || Qt::MatchWildcard)
-//    {
-//        escFilterString = escFilterString.replace("", "");
-//        // if (m_filterFlags & Qt::MatchWildcard)
-//        escFilterString = escFilterString.replace("*", "");
-//    }
 
     result = result.replace("%1", escFilterColumn).replace("%2", escFilterString);
     return result;

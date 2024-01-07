@@ -17,6 +17,7 @@
 #include "tabcashmoveexch.h"
 #include "tabsettings.h"
 #include "tabsalary.h"
+#include "tabtechreports.h"
 #include "widgets/slineedit.h"
 #include "com_sql_queries.h"
 
@@ -164,6 +165,11 @@ void MainWindow::createMenu()
     workshop_menu->addAction(workshop_editor);
     workshop_editor->setEnabled(false);
 //    workshop_editor->setVisible(permissions->)   // TODO
+
+    QAction *techReports = new QAction(tr("Акты технического состояния"), this);
+    workshop_menu->addAction(techReports);
+    techReports->setVisible(permissions->workWithTechReports);
+    connect(techReports, &QAction::triggered, this, &MainWindow::createTabTechReports);
 
     QToolButton* workshop_button = new QToolButton();
     workshop_button->setMenu(workshop_menu);
@@ -683,6 +689,18 @@ void MainWindow::switchToLastUsedTab()
 {
     if(!tabList.isEmpty())
         ui->tabWidget->setCurrentWidget(tabList.last());
+}
+
+void MainWindow::createTabTechReports()
+{
+    tabTechReports *subwindow = tabTechReports::getInstance(this);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+
+//        QObject::connect(subwindow, &tabRepairs::doubleClickRepair, this, &MainWindow::createTabRepair);
+
+    ui->tabWidget->setCurrentWidget(subwindow);
+//    subwindow->setFocusSearchField();
 }
 
 void MainWindow::createTabSale(int doc_id)

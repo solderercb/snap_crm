@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QMetaEnum>
 #include "models/slogrecordmodel.h"
+#include "models/stechreportmodel.h"
 #include "widgets/sreportscommonfunctions.h"
 #include "reports/sprintposreport.h"
 //#define PRINT_DEBUG_PAGE_INFO
@@ -34,6 +35,7 @@ public:
     static int findPrinterIndex(const QStringList &list, const QString &pName);
     static void printRepairWorksReports(QList<SRepairModel *> list, bool takeOwn = 0);
     static void printCartridgeWorksReports(QList<SRepairModel*> list, bool takeOwn = 0);
+    static void printTechReports(QList<STechReportModel*> list, bool takeOwn = 0);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
     QMap<int, int> PageSizeMap = {
@@ -107,6 +109,7 @@ private:
     void updateProgressWidget();
     bool isPagesPrepared();
     void setRepairsList(QList<SRepairModel *> list, bool takeOwn = 0);
+    void setTechReportsList(QList<STechReportModel *> list, bool takeOwn = 0);
     void translate();
 #ifdef QT_DEBUG
     void randomFill() override{};

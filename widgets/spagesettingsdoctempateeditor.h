@@ -29,6 +29,7 @@ private:
     void removeReportDataSources();
     void translate();
     void initWorksDataSources() override;
+    void initTechReportDataSources() override;
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
