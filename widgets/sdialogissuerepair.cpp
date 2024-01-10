@@ -393,7 +393,8 @@ void SDialogIssueRepair::issueRepairs()
 
         repairModel->setBoxIndex(-1);
         repairModel->setState(newState);
-        repairModel->setRejectReason(m_rejectReason);
+        if(!m_rejectReason.isEmpty())
+            repairModel->setRejectReason(m_rejectReason);
         BOQModel->repair_saveTables(SSaleTableModel::RepairOpType::Sale);
         repairModel->commit();
         nErr = workshopIssuedModel->commit();

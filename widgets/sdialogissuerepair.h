@@ -61,7 +61,7 @@ private:
     bool m_isPayFromBalance = 0;
     bool m_isIssuingInCredit = 0;
     int m_paymentSystemId = 0;
-    QString m_rejectReason;
+    QString m_rejectReason = "";
     QMap<QString, double> m_repairsWithPayment; // QString для удобства обработки
     void setDefaultStyleSheets();
     void initWidgets();
