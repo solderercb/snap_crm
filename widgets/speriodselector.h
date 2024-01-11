@@ -24,12 +24,13 @@ public:
     ~SPeriodSelector();
     QString periodBegin();
     void setPeriodBegin(const QDateTime &dateTime);
-    void setPeriodBegin(const QDate &date);
+    void setPeriodBegin(const QDate date);
     QString periodEnd();
     void setPeriodEnd(const QDateTime &dateTime);
     void setPeriodEnd(const QDate &date);
     void setPeriod(const QDateTime &begin, const QDateTime &end);
     void setPeriod(const QDateTime &time, const MovingInterval interval);
+    int movingInterval();
     void setMovingInterval(const MovingInterval interval);
     void setPeriodEndWidgetEditable(const bool state = true);
     void setDefaultPeriodButtonVisible(const bool state = true);
@@ -41,8 +42,8 @@ private:
     Ui::SPeriodSelector *ui;
     MovingInterval m_movingInterval = Day;      // Интервал по умолчанию
     MovingInterval m_movingIntervalOverride;    // Изменённый интервал по умолчанию
-    QDate m_periodBegin;
-    QDate m_periodEnd;
+    QDate m_periodBegin;    // Начало периода в локальном часовом поясе
+    QDate m_periodEnd;      // Конец периода в локальном часовом поясе; отображаемая дата на 1 день раньше
     bool m_isPeriodAjustable = 1;
     QMenu *m_intervalMenu;
     QSignalMapper *m_signalMapper;
@@ -57,9 +58,10 @@ private slots:
     void periodEndChanged(const QDate date);
     void movePrevPeriod();
     void moveNextPeriod();
-    void setDefaultPeriod();
     void intervalMenuActionClick(int id);
     void intervalMenuRequest(const QPoint &pos);
+public slots:
+    void setDefaultPeriod();
 };
 
 #endif // SPERIODSELECTOR_H

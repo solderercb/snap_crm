@@ -33,6 +33,7 @@ tabTechReports::tabTechReports(MainWindow *parent) :
     refreshTable();
 
     ui->widgetPeriodSelector->setMovingInterval(SPeriodSelector::Year);
+    ui->widgetPeriodSelector->setDefaultPeriod();
     connect(ui->widgetPeriodSelector, &SPeriodSelector::refreshButtonClicked, this, &tabTechReports::buttonRefreshClicked);
 }
 

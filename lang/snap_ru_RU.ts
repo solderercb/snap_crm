@@ -3207,61 +3207,71 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.ui" line="78"/>
-        <location filename="../widgets/speriodselector.ui" line="92"/>
-        <location filename="../widgets/speriodselector.ui" line="109"/>
-        <location filename="../widgets/speriodselector.ui" line="126"/>
+        <location filename="../widgets/speriodselector.ui" line="55"/>
+        <source>с 00:00:00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/speriodselector.ui" line="80"/>
+        <source>до 23:59:59</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/speriodselector.ui" line="96"/>
+        <location filename="../widgets/speriodselector.ui" line="110"/>
+        <location filename="../widgets/speriodselector.ui" line="127"/>
+        <location filename="../widgets/speriodselector.ui" line="144"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.ui" line="106"/>
-        <location filename="../widgets/speriodselector.ui" line="123"/>
+        <location filename="../widgets/speriodselector.ui" line="124"/>
+        <location filename="../widgets/speriodselector.ui" line="141"/>
         <source>С начала месяца</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="158"/>
+        <location filename="../widgets/speriodselector.cpp" line="165"/>
         <source>С начала текущей недели</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="160"/>
+        <location filename="../widgets/speriodselector.cpp" line="167"/>
         <source>С начала текущего месяца</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="161"/>
+        <location filename="../widgets/speriodselector.cpp" line="168"/>
         <source>С начала текущего квартала</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="162"/>
+        <location filename="../widgets/speriodselector.cpp" line="169"/>
         <source>С начала текущего года</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="292"/>
+        <location filename="../widgets/speriodselector.cpp" line="299"/>
         <source>Day</source>
         <translation>День</translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="293"/>
+        <location filename="../widgets/speriodselector.cpp" line="300"/>
         <source>Week</source>
         <translation>Неделя</translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="294"/>
+        <location filename="../widgets/speriodselector.cpp" line="301"/>
         <source>Month</source>
         <translation>Месяц</translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="295"/>
+        <location filename="../widgets/speriodselector.cpp" line="302"/>
         <source>Quarter</source>
         <translation>Квартал</translation>
     </message>
     <message>
-        <location filename="../widgets/speriodselector.cpp" line="296"/>
+        <location filename="../widgets/speriodselector.cpp" line="303"/>
         <source>Year</source>
         <translation>Год</translation>
     </message>
@@ -5675,6 +5685,49 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>Widget</name>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="20"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="110"/>
+        <source>только мои заказы</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="168"/>
+        <source>все статусы</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="360"/>
+        <source>Применить</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="100"/>
+        <source>все сотрудники</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="80"/>
+        <source>все клиенты</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="51"/>
+        <source>-нет-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/srepairstablefiltermenu.ui" line="90"/>
+        <source>офис</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>chooseOfficeWindow</name>
     <message>
         <location filename="../chooseofficewindow.ui" line="14"/>
@@ -5765,44 +5818,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../widgets/scartridgecard.cpp" line="341"/>
         <source>Articul</source>
         <translation>Артикул</translation>
-    </message>
-</context>
-<context>
-    <name>popupm</name>
-    <message>
-        <location filename="../models/repairtablefiltermenu.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/repairtablefiltermenu.ui" line="23"/>
-        <source>только мои заказы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/repairtablefiltermenu.ui" line="33"/>
-        <source>все статусы</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/repairtablefiltermenu.ui" line="43"/>
-        <source>все сотрудники</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/repairtablefiltermenu.ui" line="53"/>
-        <source>все клиенты</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/repairtablefiltermenu.ui" line="63"/>
-        <source>-нет-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../models/repairtablefiltermenu.ui" line="73"/>
-        <source>офис</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7302,28 +7317,33 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.cpp" line="79"/>
+        <location filename="../tabrepairs.cpp" line="81"/>
         <source>Выбрать ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.cpp" line="81"/>
-        <location filename="../tabrepairs.cpp" line="103"/>
+        <location filename="../tabrepairs.cpp" line="83"/>
+        <location filename="../tabrepairs.cpp" line="106"/>
         <source>Ремонты</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.cpp" line="101"/>
+        <location filename="../tabrepairs.cpp" line="104"/>
         <source>Картриджи</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.cpp" line="134"/>
+        <location filename="../tabrepairs.cpp" line="113"/>
+        <source>Работает фильтр (кнопка Параметры)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabrepairs.cpp" line="149"/>
         <source>Печать квитанции</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepairs.cpp" line="139"/>
+        <location filename="../tabrepairs.cpp" line="154"/>
         <source>Печать акта</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7846,7 +7866,7 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../tabtechreports.cpp" line="48"/>
+        <location filename="../tabtechreports.cpp" line="49"/>
         <source>Акты тех. состояния</source>
         <translation></translation>
     </message>

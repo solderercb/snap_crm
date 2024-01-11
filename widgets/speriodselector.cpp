@@ -16,8 +16,8 @@ SPeriodSelector::SPeriodSelector(QWidget *parent) :
     connect(ui->toolButtonRefresh, &QToolButton::clicked, this, &SPeriodSelector::refreshButtonClicked);
 
     setMovingInterval(MovingInterval::Day);
-    ui->dateEditPeriodBegin->setDate(QDate::currentDate());
-    ui->dateEditPeriodEnd->setDate(QDate::currentDate());
+    ui->dateEditPeriodBegin->setDate(QDate());
+    ui->dateEditPeriodEnd->setDate(QDate());
 }
 
 SPeriodSelector::~SPeriodSelector()
@@ -53,9 +53,10 @@ void SPeriodSelector::setPeriodBegin(const QDateTime &dateTime)
 }
 
 /* Установка даты начала периода
- * Передаваемое значение должно соответствовать локальному времени для корректного отображения
+ * Значение передаётся в виджет и должно соответствовать локальному
+ * Началом периода будет 00 часов 00 минут 00 секунд 000мсек переданной даты
 */
-void SPeriodSelector::setPeriodBegin(const QDate &date)
+void SPeriodSelector::setPeriodBegin(const QDate date)
 {
     ui->dateEditPeriodBegin->setDate(date);
 }
@@ -73,11 +74,12 @@ QString SPeriodSelector::periodEnd()
 */
 void SPeriodSelector::setPeriodEnd(const QDateTime &dateTime)
 {
-    m_periodEnd = dateTime.toLocalTime().date();
+    setPeriodEnd(dateTime.toLocalTime().date().addDays(-1));
 }
 
 /* Установка даты конца периода
- * Передаваемое значение должно соответствовать локальному времени для корректного отображения
+ * Значение передаётся в виджет и должно соответствовать локальному
+ * Концом периода будет 23 часа 59 минут 59 секунд 999мсек переданной даты
 */
 void SPeriodSelector::setPeriodEnd(const QDate &date)
 {
@@ -105,6 +107,11 @@ void SPeriodSelector::setPeriod(const QDateTime &time, const MovingInterval inte
     m_isPeriodAjustable = backup;
 }
 
+int SPeriodSelector::movingInterval()
+{
+    return (int)m_movingInterval;
+}
+
 /* Установка периода по умолчанию
  * В соответствии со значением в переменной m_movingInterval
  * производится установка значений в виджетах QDateEdit
@@ -115,7 +122,7 @@ void SPeriodSelector::setDefaultPeriod()
 {
     QDate date;
 
-    if(m_isPeriodAjustable)
+    if(m_isPeriodAjustable || !m_periodBegin.isValid())
         date = QDate::currentDate();
     else
         date = m_periodBegin;
@@ -126,8 +133,8 @@ void SPeriodSelector::setDefaultPeriod()
         case MovingInterval::Week: m_periodBegin = date.addDays(-date.dayOfWeek() + 1); m_periodEnd = m_periodBegin.addDays(6); break;
         case MovingInterval::Day:
         case MovingInterval::Month: m_periodBegin = QDate(date.year(), date.month(), 1); m_periodEnd = m_periodBegin.addDays(date.daysInMonth() - 1); break;
-        case MovingInterval::Quarter: m_periodEnd = lastDateOfQuarter(m_periodBegin); m_periodBegin = firstDateOfQuarter(m_periodBegin); break;
-        case MovingInterval::Year: m_periodBegin = QDate(m_periodBegin.year(), 1, 1); m_periodEnd = QDate(m_periodBegin.year(), 12, 31); break;
+        case MovingInterval::Quarter: m_periodEnd = lastDateOfQuarter(date); m_periodBegin = firstDateOfQuarter(date); break;
+        case MovingInterval::Year: m_periodBegin = QDate(date.year(), 1, 1); m_periodEnd = QDate(date.year(), 12, 31); break;
         default: break;
     }
     ui->dateEditPeriodBegin->setDate(m_periodBegin);
@@ -254,7 +261,7 @@ void SPeriodSelector::movePeriod(const int direction)
         case MovingInterval::Week: newPeriodBegin = m_periodBegin.addDays(direction*7); newPeriodEnd = m_periodEnd.addDays(direction*7); break;
         case MovingInterval::Month: newPeriodBegin = m_periodBegin.addMonths(direction); newPeriodEnd = m_periodEnd.addMonths(direction); break;
         case MovingInterval::Quarter: newPeriodBegin = m_periodBegin.addMonths(direction*3); newPeriodEnd = m_periodEnd.addMonths(direction*3); break;
-        case MovingInterval::Year: newPeriodBegin = QDate(m_periodBegin.year() + direction, 1, 1); newPeriodEnd = QDate(m_periodBegin.year() + direction, 12, 31); break;
+        case MovingInterval::Year: newPeriodBegin = QDate(m_periodBegin.year() + direction, 1, 1); newPeriodEnd = QDate(m_periodEnd.year() + direction, 12, 31); break;
         default: break;
     }
     ui->dateEditPeriodBegin->setDate(newPeriodBegin);
@@ -298,14 +305,16 @@ void SPeriodSelector::translate()
 
 void SPeriodSelector::periodBeginChanged(const QDate date)
 {
-    m_periodBegin = date;
+    Q_UNUSED(date)
+    m_periodBegin = ui->dateEditPeriodBegin->date();
     if(!m_isPeriodAjustable)
         setDefaultPeriod();
 }
 
 void SPeriodSelector::periodEndChanged(const QDate date)
 {
-    m_periodEnd = date;
+    Q_UNUSED(date)
+    m_periodEnd = ui->dateEditPeriodEnd->date();
 }
 
 void SPeriodSelector::movePrevPeriod()

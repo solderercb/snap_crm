@@ -30,7 +30,7 @@ public:
     SRepairModel *model();
     void initModels();
     void initWidgets();
-    void initCheckBoxWidgets(const QIcon &icon, QPushButton *putton, bool isFlat = 0, bool installEventFilter = 0);
+    void initCheckBoxWidgets(const QIcon &icon, QPushButton *button, bool isFlat = 0, bool installEventFilter = 0);
     bool createRepair();
     bool updateRepair();
     int repairId();

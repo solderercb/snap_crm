@@ -24,9 +24,9 @@ typedef struct FilterList FilterList;
 
 struct FilterField
 {
-    enum Op {Equals = 1, Contains, StartsWith, EndsWith, RegExp, RegularExpression, Wildcard, More, MoreEq, Less, LessEq,
-             NoOp, Null,
-             NotMark = 1<<9 };
+    enum Op {NotMark=1, // values representing operation must be even
+             Equals=2, Contains=4, StartsWith=6, EndsWith=8, RegExp=10, RegularExpression=12, Wildcard=14, More=16, MoreEq=18, Less=20, LessEq=22,
+             NoOp=24, Null=26 };
     QString column;
     Op operation;
     QVariant value;
@@ -39,6 +39,7 @@ struct FilterList
     QList<FilterField> fields;
     QList<FilterList> childs;
     bool op = And;
+    bool Not = 0;
 };
 
 class STableViewBase : public QTableView
@@ -60,6 +61,7 @@ public:
     void setFilter(const FilterList &filter);
     void filter(const FilterList &filter);
     static FilterField initFilterField(const QString &column, FilterField::Op matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
+    static FilterField initFilterField(const QString &column, int matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
     void setGrouping(const QStringList &grouping);
     void setUniqueIdColumn(int uniqueIdColumn);
     void resetVScrollPos();

@@ -15,7 +15,7 @@
 #include <QTimer>
 #include "tabcommon.h"
 #include "models/stablerepairsmodel.h"
-#include "models/repairtablefiltermenu.h"
+#include "widgets/srepairstablefiltermenu.h"
 #include "widgets/stableviewbase.h"
 #include "widgets/sdialogissuerepair.h"
 
@@ -45,7 +45,7 @@ private:
 //    enum MenuRepairsActions{};
     enum MenuCartridgesActions{PrintReceipt = 0, PrintIssue};
     Ui::tabRepairs *ui;
-    QMap<QString, int> *filterSettings;
+    SRepairsTableFilterMenu::Filter *tableFilter;
     static tabRepairs* p_instance[2];
     bool m_tabType = 0;
     QTableView* tableView;

@@ -31,8 +31,10 @@
     <file>light/toggle_sw_off.png</file>
     <file>light/mode_sw_left.png</file>
     <file>light/mode_sw_right.png</file>
+    <file>light/checkbox-excl.png</file>
     <file>light/checkbox-checked.png</file>
     <file>light/checkbox-unchecked.png</file>
+    <file>light/checkbox-flat-excl.png</file>
     <file>light/checkbox-flat-checked.png</file>
     <file>light/checkbox-flat-unchecked.png</file>
   </qresource>

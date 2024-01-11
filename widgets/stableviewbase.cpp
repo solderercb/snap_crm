@@ -590,7 +590,7 @@ QString STableViewBase::formatFilterGroup(const FilterList &filter)
         {
             subCond = formatFilterGroup(*i);
             if(!subCond.isEmpty())
-                cond << QString("(%1)").arg(subCond);
+                cond << QString("%2(%1)").arg(subCond).arg((*i).Not?"NOT ":"");
             i++;
         }
     }
@@ -614,7 +614,9 @@ QString STableViewBase::formatFilterField(const FilterField &field)
 {
     if (field.column.isEmpty())
         return QString();
-    if (field.operation != FilterField::NoOp && field.operation != FilterField::Null && field.value.toString().isEmpty())
+    if ((field.operation & ~FilterField::NotMark) != FilterField::NoOp
+         && (field.operation & ~FilterField::NotMark) != FilterField::Null
+         && field.value.toString().isEmpty())
         return QString();
 
     QSqlDriver* driver = m_db.driver();
@@ -658,7 +660,10 @@ QString STableViewBase::formatFilterField(const FilterField &field)
         }
         case FilterField::NoOp:
         {
-            return escFilterColumn;
+            if(field.operation & FilterField::NotMark)
+                return "NOT " + escFilterColumn;
+            else
+                return escFilterColumn;
             break;
         }
         case FilterField::Null:
@@ -965,6 +970,11 @@ FilterField STableViewBase::initFilterField(const QString &column, FilterField::
     f.caseSensitivity = caseSensitivity;
 
     return f;
+}
+
+FilterField STableViewBase::initFilterField(const QString &column, int matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity)
+{
+    return initFilterField(column, (FilterField::Op)matchFlag, value, caseSensitivity);
 }
 
 void STableViewBase::setGrouping(const QStringList &grouping)

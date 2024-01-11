@@ -105,6 +105,9 @@ int SAbstractItemModel::rowByDatabaseID(int id, QString searchField)
 */
 int SAbstractItemModel::databaseIDByRow(int row, int column)
 {
+    if(row == -1)
+        return -1;
+
     return abstractItemModel->index(row, column).data().toInt();
 }
 
@@ -113,7 +116,7 @@ int SAbstractItemModel::databaseIDByRow(int row, int column)
 int SAbstractItemModel::databaseIDByRow(int row, QString field)
 {
     int column = getFieldIdByName(field);
-    return abstractItemModel->index(row, column).data().toInt();
+    return databaseIDByRow(row, column);
 }
 
 /*  Установка порядкового номера столбца в котором содержатся литеральные представления элементов модели

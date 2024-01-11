@@ -77,7 +77,6 @@ SOURCES += \
     models/ssqlfetchingmodel.cpp \
     models/stablemodelscommonmethods.cpp \
     models/stablerepairsmodel.cpp \
-    models/repairtablefiltermenu.cpp \
     models/stablebasemodel.cpp \
     models/sabstractitemmodel.cpp \
     models/scommentmodel.cpp \
@@ -148,6 +147,7 @@ SOURCES += \
     widgets/scartridgematerialstableitemdelegates.cpp \
     widgets/scartridgecard.cpp \
     widgets/sclientinputform.cpp \
+    widgets/sdateedit.cpp \
     widgets/sdoublespinbox.cpp \
     widgets/settingstabwidgets/ssettingspagebase.cpp \
     widgets/settingstabwidgets/ssettingspageglobal.cpp \
@@ -156,6 +156,7 @@ SOURCES += \
     widgets/settingstabwidgets/stableviewpermissions.cpp \
     widgets/smodalwidget.cpp \
     widgets/spageclientsummary.cpp \
+    widgets/srepairstablefiltermenu.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
     tabcashoperation.cpp \
@@ -249,7 +250,6 @@ HEADERS  += \
     models/ssqlfetchingmodel.h \
     models/stablemodelscommonmethods.h \
     models/stablerepairsmodel.h \
-    models/repairtablefiltermenu.h \
     models/stablebasemodel.h \
     models/sabstractitemmodel.h \
     models/scommentmodel.h \
@@ -322,6 +322,7 @@ HEADERS  += \
     widgets/scartridgematerialstableitemdelegates.h \
     widgets/scartridgecard.h \
     widgets/sclientinputform.h \
+    widgets/sdateedit.h \
     widgets/sdoublespinbox.h \
     widgets/settingstabwidgets/ssettingspagebase.h \
     widgets/settingstabwidgets/ssettingspageglobal.h \
@@ -330,6 +331,7 @@ HEADERS  += \
     widgets/settingstabwidgets/stableviewpermissions.h \
     widgets/smodalwidget.h \
     widgets/spageclientsummary.h \
+    widgets/srepairstablefiltermenu.h \
     squerylog.h \
     stable.h \
     tabcashmoveexch.h \
@@ -381,7 +383,6 @@ FORMS += \
     chooseofficewindow.ui \
     loginwindow.ui \
     mainwindow.ui \
-    models/repairtablefiltermenu.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
     tabreceptcartridge.ui \
@@ -403,6 +404,7 @@ FORMS += \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \
     widgets/settingstabwidgets/ssettingspageuser.ui \
     widgets/spageclientsummary.ui \
+    widgets/srepairstablefiltermenu.ui \
     tabcashmoveexch.ui \
     tabcashoperation.ui \
     tabclient.ui \

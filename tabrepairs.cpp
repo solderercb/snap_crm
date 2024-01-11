@@ -18,9 +18,9 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     initTableRepairsMenu();
     initTableCartridgesMenu();
 
-    filterSettings = new QMap<QString, int>;
-    repairTableFilterMenu *widgetAction = new repairTableFilterMenu(this);
-    ui->pushButtonMenu->addAction(widgetAction);
+    tableFilter = new SRepairsTableFilterMenu::Filter;
+    SRepairsTableFilterMenu *tableFilterMenu = new SRepairsTableFilterMenu(this);
+    ui->pushButtonMenu->addAction(tableFilterMenu);
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -35,19 +35,20 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     if(!permissions->receptDevices || type == 1)
         ui->pushButtonReceipt->hide();
 
-    widgetAction->setComboBoxOfficeModel(officesModel);
-    widgetAction->setComboBoxStatusModel(comSettings->repairStatuses.Model);
-    widgetAction->setComboBoxEmployeeModel(usersModel);
-    widgetAction->setComboBoxClientModel(clientsTypesList);
-//    widgetAction->setComboBoxXModel(repairModel);
-    widgetAction->setFilterSettings(filterSettings);
+    if(companiesModel->rowCount() > 1)
+        tableFilterMenu->setComboBoxOfficeModel(officesModel);
+    tableFilterMenu->setComboBoRepairStateModel(comSettings->repairStatuses.Model);
+    tableFilterMenu->setComboBoxEmployeeModel(usersModel);
+    tableFilterMenu->setComboBoxClientsCatModel(clientsTypesList);
+//    tableFilterMenu->setComboBoxRfuModel(model);
+    tableFilterMenu->setFilterSettings(tableFilter);
 
     if(m_tabType == SelectRepair)
         ui->switchTableMode->setChecked(STableViewRepairs::ModeRepairs);
     else
         ui->switchTableMode->setChecked((userDbData->defWsFilter == WorkshopFilter::CartridgesOnly)?STableViewRepairs::ModeCartridges:STableViewRepairs::ModeRepairs);
 
-    connect(widgetAction, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
+    connect(tableFilterMenu, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
     connect(ui->pushButtonReceipt, &QPushButton::clicked, this, &tabRepairs::buttonReceptClicked);
     connect(ui->pushButtonRefill, &QPushButton::clicked, this, &tabRepairs::buttonRefillClicked);
     connect(ui->pushButtonIssue, &QPushButton::clicked, this, &tabRepairs::buttonIssueClicked);
@@ -71,6 +72,7 @@ tabRepairs::~tabRepairs()
     p_instance[this->m_tabType] = nullptr;   // Обязательно блять!
     delete ui;
     delete tableUpdateDelay;
+    delete tableFilter;
 }
 
 QString tabRepairs::tabTitle()
@@ -85,6 +87,7 @@ void tabRepairs::updateWidgets()
 {
     bool visibility = m_tabType == Type::Workshop;
     bool hasSelection = ui->tableView->selectionModel()->hasSelection();
+    QString filterActiveIndicatorTooltip;
 
     ui->switchTableMode->setVisible(visibility);
     ui->labelTableMode->setVisible(visibility);
@@ -103,6 +106,18 @@ void tabRepairs::updateWidgets()
         ui->labelTableMode->setText(tr("Ремонты"));
 
     ui->tableView->setAlternatingRowColors(userDbData->alternateRowsBackground);
+
+    if(tableFilter->filterActive)
+    {
+        ui->widgetIsFilterActive->setStyleSheet("background-color: rgb(255, 127, 0);");
+        filterActiveIndicatorTooltip = tr("Работает фильтр (кнопка Параметры)");
+    }
+    else
+    {
+        ui->widgetIsFilterActive->setStyleSheet("");
+        filterActiveIndicatorTooltip = QString();
+    }
+    ui->widgetIsFilterActive->setToolTip(filterActiveIndicatorTooltip);
 }
 
 tabRepairs* tabRepairs::getInstance(bool type, MainWindow *parent)   // singleton: вкладка каждого типа может быть только одна
@@ -155,38 +170,93 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     // TODO: нужно уйти от жестко заданных имён/алиасов таблиц
     // TODO: компания/офис
 
+    bool displayOutOverride = userDbData->displayOut;
     ui->tableView->setQuery(QUERY_SEL_WORKSHOP_STATIC, QSqlDatabase::database("connMain"));
     ui->tableView->setUniqueIdColumn(STableRepairsModel::Columns::Id);
     FilterList l1;
     l1.op = FilterList::And;
 
+    if(tableFilter->repairState >= 0)
+    {
+        QList<int> additionalStates;
+        FilterList repairState;
+        repairState.op = FilterList::Or;
+        repairState.Not = tableFilter->repairStateNot;
+        switch(tableFilter->repairState)
+        {
+            case Global::RepStateIds::Ready:
+            case Global::RepStateIds::ReadyNoRepair:
+                additionalStates.append(Global::RepStateIds::Ready);
+                additionalStates.append(Global::RepStateIds::ReadyNoRepair); break;
+            case Global::RepStateIds::Returned:
+            case Global::RepStateIds::ReturnedNoRepair:
+            case Global::RepStateIds::ReturnedInCredit:
+                displayOutOverride = 1;         // при выборе статуса, соответствующего выданному, отображение выданных, заданное в персональных настройках пользователя, игнорируется
+                additionalStates.append(Global::RepStateIds::Returned);
+                additionalStates.append(Global::RepStateIds::ReturnedNoRepair);
+                additionalStates.append(Global::RepStateIds::ReturnedInCredit); break;
+            default: additionalStates.append(tableFilter->repairState); break;
+        }
+        for(auto state : additionalStates)
+            repairState.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, comSettings->repairStatuses[state].Id));
+        l1.childs.append(repairState);
+    }
+
     l1.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, (ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges)));
     l1.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, 1));
-    if ( !userDbData->displayOut && ui->lineEditSearch->text().isEmpty() )
+    if ( !displayOutOverride && ui->lineEditSearch->text().isEmpty() )
         l1.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
-    if(filterSettings->contains("status") && filterSettings->value("status") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, comSettings->repairStatuses[filterSettings->value("status")].Id));
-    if(filterSettings->contains("office") && filterSettings->value("office") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`office`", FilterField::Equals, officesModel->databaseIDByRow(filterSettings->value("office"))));
-    if(filterSettings->contains("employee") && filterSettings->value("employee") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, usersModel->databaseIDByRow(filterSettings->value("employee"))));
-    if(filterSettings->contains("client") && filterSettings->value("client") >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t5." + clientsTypesList->item(filterSettings->value("client"), 2)->text(), FilterField::NoOp, ""));
+    if(tableFilter->office >= 0)
+        l1.fields.append(STableViewBase::initFilterField("t1.`office`", FilterField::Equals | tableFilter->officeNot, tableFilter->office));
+    if(tableFilter->clientsCat >= 0)
+        l1.fields.append(STableViewBase::initFilterField("t5." + clientsTypesList->item(tableFilter->clientsCat, 2)->text(), FilterField::NoOp | tableFilter->clientsCatNot, ""));
 
-    FilterList l2;
-    l2.op = FilterList::Or;
-    FilterField::Op matchFlag;
-    if(userDbData->useRegExpSearch)
-        matchFlag = FilterField::RegExp;
-    else
-        matchFlag = FilterField::Contains;
-    l2.fields.append(STableViewBase::initFilterField("t1.`id`", matchFlag, ui->lineEditSearch->text()));
-    l2.fields.append(STableViewBase::initFilterField("t1.`title`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("t1.`serial_number`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`short_name`, t5.`ur_name`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    if(tableFilter->onlyCurrentUsersRepairs)
+    {
+        FilterList onlyCurrentUsersRepairs;
+        onlyCurrentUsersRepairs.op = FilterList::Or;
+        onlyCurrentUsersRepairs.Not = tableFilter->onlyCurrentUsersRepairsNot;
+        onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`current_manager`", FilterField::Equals, userDbData->id));
+        onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, userDbData->id));
+        l1.childs.append(onlyCurrentUsersRepairs);
+    }
 
-    l1.childs.append(l2);
+    if(tableFilter->employee >= 0)
+    {
+        FilterList employee;
+        employee.op = FilterList::Or;
+        employee.Not = tableFilter->employeeNot;
+        employee.fields.append(STableViewBase::initFilterField("t1.`current_manager`", FilterField::Equals, tableFilter->employee));
+        employee.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, tableFilter->employee));
+        l1.childs.append(employee);
+    }
+
+    FilterList period;
+    period.op = FilterList::And;
+    period.Not = tableFilter->periodNot;
+    if(!tableFilter->periodBegin.isEmpty())
+        period.fields.append(STableViewBase::initFilterField("t1.`in_date`", FilterField::More, tableFilter->periodBegin));
+    if(!tableFilter->periodEnd.isEmpty())
+        period.fields.append(STableViewBase::initFilterField("t1.`in_date`", FilterField::Less, tableFilter->periodEnd));
+    l1.childs.append(period);
+
+    if(!ui->lineEditSearch->text().isEmpty())
+    {
+        QString what = ui->lineEditSearch->text();
+        FilterList searchText;
+        searchText.op = FilterList::Or;
+        FilterField::Op matchFlag;
+        if(userDbData->useRegExpSearch)
+            matchFlag = FilterField::RegExp;
+        else
+            matchFlag = FilterField::Contains;
+        searchText.fields.append(STableViewBase::initFilterField("t1.`id`", matchFlag, what));
+        searchText.fields.append(STableViewBase::initFilterField("t1.`title`", matchFlag, what, Qt::CaseInsensitive));
+        searchText.fields.append(STableViewBase::initFilterField("t1.`serial_number`", matchFlag, what, Qt::CaseInsensitive));
+        searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`short_name`, t5.`ur_name`)", matchFlag, what, Qt::CaseInsensitive));
+        searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)", matchFlag, what, Qt::CaseInsensitive));
+        l1.childs.append(searchText);
+    }
 
     query_group.clear();
     query_group << "`id`";    // default GROUP part of query

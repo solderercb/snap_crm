@@ -41,9 +41,18 @@
       <number>2</number>
      </property>
      <item>
-      <widget class="QDateEdit" name="dateEditPeriodBegin">
+      <widget class="SDateEdit" name="dateEditPeriodBegin">
        <property name="enabled">
         <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>85</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>с 00:00:00</string>
        </property>
        <property name="buttonSymbols">
         <enum>QAbstractSpinBox::NoButtons</enum>
@@ -57,9 +66,18 @@
       </widget>
      </item>
      <item>
-      <widget class="QDateEdit" name="dateEditPeriodEnd">
+      <widget class="SDateEdit" name="dateEditPeriodEnd">
        <property name="enabled">
         <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>85</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>до 23:59:59</string>
        </property>
        <property name="buttonSymbols">
         <enum>QAbstractSpinBox::NoButtons</enum>
@@ -135,6 +153,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SDateEdit</class>
+   <extends>QDateEdit</extends>
+   <header>widgets/sdateedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../styles/styles.qrc"/>
  </resources>
