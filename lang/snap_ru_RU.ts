@@ -3832,52 +3832,52 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="434"/>
+        <location filename="../models/srepairmodel.cpp" line="437"/>
         <source>Результат диагностики изменён на &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="481"/>
+        <location filename="../models/srepairmodel.cpp" line="484"/>
         <source>Статус заказа изменён на &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="632"/>
+        <location filename="../models/srepairmodel.cpp" line="635"/>
         <source>Заказаз-наряд %1 изъят из ячейки &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="640"/>
+        <location filename="../models/srepairmodel.cpp" line="643"/>
         <source>Заказаз-наряд %1 перемещён в ячейку &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="642"/>
+        <location filename="../models/srepairmodel.cpp" line="645"/>
         <source>Заказаз-наряд %1 помещён в ячейку &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="730"/>
+        <location filename="../models/srepairmodel.cpp" line="733"/>
         <source>Предоплата в размере %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="735"/>
+        <location filename="../models/srepairmodel.cpp" line="738"/>
         <source>Возврат предоплаты в размере %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="781"/>
+        <location filename="../models/srepairmodel.cpp" line="784"/>
         <source>Стоимость ремонта в результатах диагностики изменёна на %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="948"/>
+        <location filename="../models/srepairmodel.cpp" line="951"/>
         <source>Статус информирования клиента изменён на &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="1086"/>
+        <location filename="../models/srepairmodel.cpp" line="1089"/>
         <source>Устройство принято в ремонт №%1</source>
         <translation type="unfinished"></translation>
     </message>

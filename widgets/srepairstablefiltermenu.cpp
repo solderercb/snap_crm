@@ -158,16 +158,22 @@ void SRepairsTableFilterMenu::slotHidden()
             m_filter->onlyCurrentUsersRepairs = ui->checkBoxOnlyCurrentUsersRepairs->isChecked();
 
             m_filter->officeNot = ui->pushButtonOfficeNot->isChecked();
-            if (officeModelBuf)
+            if (officeModelBuf && ui->comboBoxOffice->currentIndex() >= 0)
                 m_filter->office = officeModelBuf->databaseIDByRow(ui->comboBoxOffice->currentIndex());
+            else
+                m_filter->office = -1;
 
             m_filter->repairStateNot = ui->pushButtonRepairStateNot->isChecked();
-            if (repairStateModelBuf)
+            if (repairStateModelBuf && ui->comboBoxRepairState->currentIndex() >= 0)
                 m_filter->repairState = repairStateModelBuf->databaseIDByRow(ui->comboBoxRepairState->currentIndex());
+            else
+                m_filter->repairState = -1;
 
             m_filter->employeeNot = ui->pushButtonEmployeeNot->isChecked();
-            if (employeeModelBuf)
+            if (employeeModelBuf && ui->comboBoxEmployee->currentIndex() >= 0)
                 m_filter->employee = employeeModelBuf->databaseIDByRow(ui->comboBoxEmployee->currentIndex());
+            else
+                m_filter->employee = -1;
 
             m_filter->clientsCatNot = ui->pushButtonClientsCatNot->isChecked();
             if (clientsCatModelBuf)

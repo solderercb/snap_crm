@@ -106,7 +106,7 @@ int SAbstractItemModel::rowByDatabaseID(int id, QString searchField)
 int SAbstractItemModel::databaseIDByRow(int row, int column)
 {
     if(row == -1)
-        return -1;
+        return 0;
 
     return abstractItemModel->index(row, column).data().toInt();
 }

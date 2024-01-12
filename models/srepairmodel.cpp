@@ -413,7 +413,10 @@ void SRepairModel::setEngineer(const int id)
 void SRepairModel::setEngineerIndex(const int index)
 {
     if(index == -1)
+    {
         setEngineer(0);
+        return;
+    }
     setEngineer(engineersModel->databaseIDByRow(index));
 }
 
