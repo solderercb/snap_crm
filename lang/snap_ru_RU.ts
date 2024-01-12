@@ -3867,17 +3867,22 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="784"/>
+        <location filename="../models/srepairmodel.cpp" line="773"/>
+        <source>Предварительная стоимость ремонта: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../models/srepairmodel.cpp" line="785"/>
         <source>Стоимость ремонта в результатах диагностики изменёна на %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="951"/>
+        <location filename="../models/srepairmodel.cpp" line="952"/>
         <source>Статус информирования клиента изменён на &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="1089"/>
+        <location filename="../models/srepairmodel.cpp" line="1090"/>
         <source>Устройство принято в ремонт №%1</source>
         <translation type="unfinished"></translation>
     </message>

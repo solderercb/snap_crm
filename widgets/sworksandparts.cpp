@@ -206,7 +206,7 @@ void SWorksAndParts::buttonWorksAdminEdit(bool state)
 {
     if(state)
     {
-        m_modelAdmEdit = 0;
+        m_modelAdmEdit = 1;
         m_model->setModelState(SSaleTableModel::State::WorkshopAdm);
         ui->switchEditStrategy->setEnabled(true);
         ui->toolButtonSaveSaleTable->setEnabled(m_model->isUnsaved());
@@ -214,7 +214,7 @@ void SWorksAndParts::buttonWorksAdminEdit(bool state)
     }
     else
     {
-        m_modelAdmEdit = 1;
+        m_modelAdmEdit = 0;
         m_model->setModelState(m_modelAdmEdit?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
         if(m_model->isUnsaved())
             saveSaleTableClicked();

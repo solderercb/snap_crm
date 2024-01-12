@@ -770,6 +770,7 @@ void SRepairModel::setPreAgreedAmount(const double summ)
 {
     m_preAgreedAmount = summ;
     i_valuesMap.insert("pre_agreed_amount", summ);
+    appendLogText(tr("Предварительная стоимость ремонта: %1").arg(sysLocale.toCurrencyString(summ)));
 }
 
 double SRepairModel::repairCost()
@@ -1086,7 +1087,7 @@ bool SRepairModel::commit()
             i_valuesMap.insert("office", userDbData->currentOffice);
         if(!insert())
             throw Global::ThrowType::QueryError;
-        appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id));
+        appendLogText(tr("Устройство принято в ремонт №%1").arg(i_id), "!");
         m_repairStatusLog->setStatus(Global::RepStateIds::GetIn);
         m_repairStatusLog->setRepair(i_id);
 

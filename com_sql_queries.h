@@ -684,6 +684,7 @@
                                                 "          )                                                                                                                                                           \n"\
                                                 "          OR                                                                                                                                                          \n"\
                                                 "          ( g1t7.`id` IS NOT NULL                                                                                                                                     \n"\
+                                                "            AND (g1t2.`filter1`  = 1 OR g1t2.`filter1` IS NULL)                                                                                                       \n"\
                                                 "            AND g1t7.`accounting_date` > '%1'                                                                                                                         \n"\
                                                 "            AND g1t7.`accounting_date` < '%2' ))                                                                                                                      \n"\
                                                 "        AND g1t3.`user` = %4                                                                                                                                          \n"\

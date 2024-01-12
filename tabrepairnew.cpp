@@ -285,7 +285,7 @@ void tabRepairNew::setModelData()
     if(ui->checkBoxIsEstPrice->isChecked())
     {
         repairModel->setIsPreAgreed(1);
-        repairModel->setPreAgreedAmount(sysLocale.toDouble(ui->doubleSpinBoxEstPrice->text()));
+        repairModel->setPreAgreedAmount(ui->doubleSpinBoxEstPrice->value());
     }
     if(ui->checkBoxIsNonImportantData->isChecked())
         repairModel->setCanFormat(1);
