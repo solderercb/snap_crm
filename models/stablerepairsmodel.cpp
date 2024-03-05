@@ -1,8 +1,11 @@
 #include "stablerepairsmodel.h"
 #include "widgets/stableviewrepairs.h"
 
-STableRepairsModel::STableRepairsModel(QObject *parent) : STableBaseModel(parent)
+STableRepairsModel::STableRepairsModel(QObject *parent) :
+    SSqlFetchingModel(parent),
+    STableModelsCommonMethods(parent)
 {
+    m_sqlFetchingModel = this;
 }
 
 QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
@@ -13,13 +16,12 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
     // TODO: изучить разницу в скорости выполнения:
     //  1) определение нужного столбца путём вызова кучи методов (до rev277)
     //  2) использование enum (с rev277)
-    //  3) кэширование названий полей БД по сигналу resetModel() (слот, подключенный в классе STableBaseModel вызывается раньше слота, подключенного в классе виджета STableViewBase)
     if (role == Qt::BackgroundRole)
     {
         if(index.column() == Columns::Status)
-            return QColor(comSettings->repairStatuses[STableBaseModel::unformattedData(index, Qt::DisplayRole).toInt()].Color);
+            return QColor(comSettings->repairStatuses[unformattedData(index, Qt::DisplayRole).toInt()].Color);
 
-        QString rowColor = STableBaseModel::data(index.siblingAtColumn(Columns::Color)).toString();
+        QString rowColor = SSqlFetchingModel::data(index.siblingAtColumn(Columns::Color)).toString();
         if(!rowColor.isEmpty())
             return QColor(rowColor);
     }
@@ -27,20 +29,20 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
     {
         switch(index.column())
         {
-            case Columns::Status:           return comSettings->repairStatuses[QSqlQueryModel::data(index, Qt::DisplayRole).toInt()].Name;
+            case Columns::Status:           return comSettings->repairStatuses[unformattedData(index, Qt::DisplayRole).toInt()].Name;
             case Columns::RealRepairCost:   return dataLocalizedFromDouble(index);
             case Columns::InDate:
             case Columns::OutDate:          return dateTime(index);
             case Columns::Master:
             case Columns::CurrentManager:   return userFromId(index);
-            case Columns::Box:              return QVariant(repairBoxesModel->getDisplayRole(QSqlQueryModel::data(index, role).toInt()));
-            case Columns::Id:               return QString("%1-%2").arg(record(index.row()).value("office").toString().rightJustified(3, '0')).arg(QSqlQueryModel::data(index).toString().rightJustified(6, '0'));
+            case Columns::Box:              return QVariant(repairBoxesModel->getDisplayRole(unformattedData(index, role).toInt()));
+            case Columns::Id:               return QString("%1-%2").arg(unformattedData(index.siblingAtColumn(Columns::Office)).toString().rightJustified(3, '0')).arg(unformattedData(index).toString().rightJustified(6, '0'));
             case Columns::Client:           return clientName(index);
             case Columns::Phone:            if(!permissions->viewClients) return tr("no permissions");
             default: ;
         }
     }
-    return STableBaseModel::data(index, role);
+    return SSqlFetchingModel::data(index, role);
 }
 
 Qt::ItemFlags STableRepairsModel::flags(const QModelIndex &index) const
@@ -67,12 +69,12 @@ void STableRepairsModel::initDemo()
     demoQuery.replace(re, "\n");
     demoQuery  += " WHERE t1.`id` IS NULL";
 
-    QSqlQueryModel::setQuery(demoQuery, QSqlDatabase::database("connMain"));
+    SSqlFetchingModel::setQuery(demoQuery, QSqlDatabase::database("connMain"));
 
     for(int r = 0; r < demoIds.count(); r++)
     {
         demoConstsForUnion.clear();
-        for(int c = 0; c < query().record().count(); c++)
+        for(int c = 0; c < columnCount(); c++)
         {
             switch (c)
             {
@@ -91,7 +93,7 @@ void STableRepairsModel::initDemo()
                      "SELECT '" + demoConstsForUnion.join("', '") + "'";
     }
 
-    QSqlQueryModel::setQuery(demoQuery, QSqlDatabase::database("connMain"));
+    SSqlFetchingModel::setQuery(demoQuery, QSqlDatabase::database("connMain"));
 }
 
 void STableRepairsModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
@@ -100,8 +102,8 @@ void STableRepairsModel::reportCallbackData(const LimeReport::CallbackInfo &info
     {
         case LimeReport::CallbackInfo::IsEmpty: data = 0; break;
         case LimeReport::CallbackInfo::HasNext: data = 0; break;
-        case LimeReport::CallbackInfo::ColumnHeaderData: data = query().record().fieldName(info.index).toLatin1(); break;
-        case LimeReport::CallbackInfo::ColumnData: data = index(info.index, field(info.columnName)).data(); break;
+        case LimeReport::CallbackInfo::ColumnHeaderData: data = columnName(info.index); break;
+        case LimeReport::CallbackInfo::ColumnData: data = index(info.index, columnIndex(info.columnName)).data(); break;
         case LimeReport::CallbackInfo::ColumnCount: data = columnCount(); break;
         case LimeReport::CallbackInfo::RowCount: data = rowCount(); break;
     }
@@ -115,16 +117,16 @@ QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
     QString value;
 
     // полное имя (название организации)
-    value = STableBaseModel::data(idx).toString();
+    value = SSqlFetchingModel::data(idx).toString();
     if(value.length() < i_columnWidths[idx.column()])
         return value;
 
     // короткое имя
-    value = STableBaseModel::data(index(idx.row(), Columns::ClientShortName)).toString();
+    value = SSqlFetchingModel::data(index(idx.row(), Columns::ClientShortName)).toString();
     if(!value.isEmpty() && value.length() < i_columnWidths[idx.column()])
         return value;
 
-    return STableBaseModel::data(idx);
+    return SSqlFetchingModel::data(idx);
 }
 
 QVariant STableRepairsModel::dateTime(const QModelIndex &idx) const

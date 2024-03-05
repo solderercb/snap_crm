@@ -63,7 +63,9 @@ void SClientMatch::findClient()
             query_where << QString("IFNULL(t2.`phone`, '') LIKE '%1' OR IFNULL(t2.`phone_clean`, '') REGEXP '%2'").arg(phone, enteredByUserDigits);   // условие поиска по телефонному номеру
 
         query = QUERY_SEL_CLIENT_MATCH.arg((query_where.count()>0?"AND (" + query_where.join(" OR ") + ")":""));
-        clientsMatchTable->setQuery(query, QSqlDatabase::database("connMain"));
+        ui->tableViewClientMatch->setQuery(query, QSqlDatabase::database("connMain"));
+        ui->tableViewClientMatch->refresh();
+
         // TODO: сортировка таблицы совпадений
         if (clientsMatchTable->rowCount() > 0)
         {
@@ -131,6 +133,16 @@ void matchingClientsTable::setModel(QAbstractItemModel *model)
     STableViewBase::setModel(model);
 //    matchingClientsTableItemDelegates *itemDelagates = new matchingClientsTableItemDelegates(m_model, this);
 //    setItemDelegate(itemDelagates);
+}
+
+void matchingClientsTable::clearModel()
+{
+    m_model->clear();
+}
+
+void matchingClientsTable::setModelQuery(const QString &query, const QSqlDatabase &database)
+{
+    m_model->setQuery(query, database);
 }
 
 void matchingClientsTable::translateNames()

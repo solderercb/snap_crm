@@ -7,10 +7,11 @@
 #include <QColor>
 #include <QStandardItemModel>
 #include <QStandardItem>
-#include "models/stablebasemodel.h"
+#include "models/ssqlfetchingmodel.h"
+#include "models/stablemodelscommonmethods.h"
 #include "global.h"
 
-class STableRepairsModel : public STableBaseModel
+class STableRepairsModel : public SSqlFetchingModel, public STableModelsCommonMethods
 {
     Q_OBJECT
 public:
@@ -19,6 +20,7 @@ public:
                   Device = 17, Office = 18, State = 19, NewState = 20, UserLock = 21, LockDatetime = 22, QuickRepair = 23, ThirsPartySc = 24,
                   LastSave = 25, LastStatusChanged = 26, WarrantyDays = 27, Color = 28, Early = 29, ExtEarly = 30, IssuedMsg = 31,
                   VendorId = 32, Termscontrol = 33, Hidden = 34, Company = 35, InformedStatus = 36, ClientId = 37, ClientShortName = 38};
+    Q_ENUM(Columns)
     explicit STableRepairsModel(QObject *parent = nullptr);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;

@@ -3,6 +3,7 @@
 
 #include "stableviewbase.h"
 #include <QWidget>
+#include "models/stablerepairsmodel.h"
 #include "stableviewrepairsitemdelegates.h"
 
 class STableViewRepairs : public STableViewBase
@@ -19,13 +20,21 @@ public:
     ~STableViewRepairs();
     QList<int> *selectedRepairsList();
     bool selectedCanBeIssued();
+    void setModel(QAbstractItemModel *model) override;
     bool mode();
     void setMode(const int mode);
 private:
+    STableRepairsModel *m_model = nullptr;
     int m_mode = 0;
     void translateNames();
     void setColumnWidth(int column, int width) override;
     void readLayout();
+    void clearModel() override;
+    void setModelQuery(const QString &query, const QSqlDatabase &database) override;
+    int modelColumnCount() override;
+private slots:
+    void vsp_rangeChanged(const int min, const int max) override;
+    void hsp_rangeChanged(const int min, const int max) override;
 };
 
 #endif // STABLEVIEWREPAIRS_H

@@ -50,9 +50,8 @@ private:
     bool m_tabType = 0;
     QTableView* tableView;
     STableRepairsModel* repairs_table;
-    QSqlQueryModel* cartridges_table = nullptr;
+    STableRepairsModel* cartridges_table = nullptr;
     QStringList query_group;
-    QTimer *tableUpdateDelay;
     SDialogIssueRepair *m_dialogIssue;
     QMenu *tableRepairsMenu = nullptr;
     QMenu *tableCartridgesMenu = nullptr;
@@ -60,11 +59,11 @@ private:
     void initTableCartridgesMenu();
     QList<SRepairModel*> repairsListFromSelection();
     bool event(QEvent *event) override;
+    void constructQueryClause();
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
 public slots:
-    void autorefreshTable();
     void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
     void setFocusSearchField();
 private slots:
@@ -74,7 +73,6 @@ private slots:
     void lineEditSearchReturnPressed();
     void tableModeChanged(bool mode);
     void filterMenuClosed();
-    void tableLayoutChanged(int,int,int);
     void buttonReceptClicked();
     void buttonRefillClicked();
     void buttonIssueClicked();

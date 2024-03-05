@@ -65,6 +65,12 @@ bool STableViewRepairs::selectedCanBeIssued()
     return en;
 }
 
+void STableViewRepairs::setModel(QAbstractItemModel *model)
+{
+    m_model = static_cast<STableRepairsModel*>(model);
+    STableViewBase::setModel(model);
+}
+
 bool STableViewRepairs::mode()
 {
     return m_mode;
@@ -117,3 +123,48 @@ void STableViewRepairs::readLayout()
 
 }
 
+void STableViewRepairs::clearModel()
+{
+    if(!m_model)
+        return;
+
+    m_model->clear();
+}
+
+void STableViewRepairs::setModelQuery(const QString &query, const QSqlDatabase &database)
+{
+    if(!m_model)
+        return;
+
+    m_model->setQuery(query, database);
+}
+
+void STableViewRepairs::vsp_rangeChanged(const int min, const int max)
+{
+    if(max == 0)    // после очистки модели ничего не делаем
+        return;
+
+    while(model()->rowCount() < i_vspOldRowCount && (i_vspValue || hasSavedSelection()))
+    {
+        m_model->fetchMore(i_vspOldRowCount - model()->rowCount(), QModelIndex());
+        return;
+    }
+    if(verticalScrollBar()->maximum() - i_vspValue < userDbData->rowHeight)
+    {
+        m_model->fetchMore(QModelIndex());
+    }
+    STableViewBase::vsp_rangeChanged(min, max);
+}
+
+void STableViewRepairs::hsp_rangeChanged(const int min, const int max)
+{
+    STableViewBase::hsp_rangeChanged(min, max);
+}
+
+
+int STableViewRepairs::modelColumnCount()
+{
+    if(!m_model)
+        return 0;
+    return m_model->columnCount();
+}

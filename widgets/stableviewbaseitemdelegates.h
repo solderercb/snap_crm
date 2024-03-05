@@ -40,7 +40,7 @@ public:
     bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
     bool event(QEvent *) override;
     bool eventFilter(QObject *, QEvent *) override;
-    void setTableModel(STableBaseModel*);
+    virtual void setTableModel(QAbstractItemModel *model);
     void setFontMetrics(const QFont &font);
 protected:
     // for painting progressbar with stylesheet option, a dummy progress bar is required (ref qBittorent project)

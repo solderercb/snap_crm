@@ -4,8 +4,7 @@ SEditableBaseModel::SEditableBaseModel(QObject *parent, QSqlDatabase db):
     QSqlTableModel(parent, db),
     STableModelsCommonMethods(parent)
 {
-    derivedModel = this;
-    connect(this, &SEditableBaseModel::modelReset, this, &SEditableBaseModel::slotModelReset);
+    m_sqlQueryModel = this;
 }
 
 QVariant SEditableBaseModel::data(const QModelIndex &item, int role) const
@@ -24,9 +23,4 @@ QString SEditableBaseModel::selectStatement() const
 void SEditableBaseModel::setSelectStatement(const QString &statement)
 {
     m_selectStatement = statement;
-}
-
-void SEditableBaseModel::slotModelReset()
-{
-    STableModelsCommonMethods::cashFieldsNames();
 }

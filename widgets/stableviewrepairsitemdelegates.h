@@ -4,6 +4,7 @@
 #include "stableviewbaseitemdelegates.h"
 #include <QObject>
 #include <QPainter>
+#include "models/stablerepairsmodel.h"
 
 class STableViewRepairsItemDelegates : public STableViewBaseItemDelegates
 {
@@ -15,6 +16,9 @@ public:
     void paintStatusProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void paintRepairProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void paintClientInformStatus(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void setTableModel(QAbstractItemModel *model) override;
+private:
+    STableRepairsModel *i_tableModel;
 };
 
 #endif // STABLEVIEWREPAIRSITEMDELEGATES_H

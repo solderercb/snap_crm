@@ -1,29 +1,35 @@
 #include "ssqlfetchingmodel.h"
+#include "qsqldriver.h"
 
 SSqlFetchingModel::SSqlFetchingModel(QObject *parent) : QStandardItemModel(parent)
 {
+    m_proxyQuery = new QSqlQuery();
 }
 
 SSqlFetchingModel::~SSqlFetchingModel()
 {
+    if(m_proxyQuery)
+        delete m_proxyQuery;
 }
 
 void SSqlFetchingModel::setQuery(const QString &query, const QSqlDatabase &db)
 {
-    clear();
-    QRegularExpression re("( +\n)|((;?) +$)|(;$)");  // удаление пробелов-заполнителей в конце строк, а также точки с запятой в конце запроса (при наличии ; не будет работать сортировка)
-
     m_query = query;
-    m_query.replace(re, "\n");
 
-    m_db = db;
-
-    m_proxyQuery = new QSqlQuery(m_db);
+    if(!m_db.isValid() || db.connectionName().compare(m_db.connectionName()) != 0)
+    {
+        m_db = db;
+        *m_proxyQuery = QSqlQuery(m_db.driver()->createResult());
+    }
 
     queryRowCount();
 
-    if(canFetchMore(QModelIndex()))
-        fetchMore(QModelIndex());
+    fetchMore(QModelIndex());
+}
+
+QVariant SSqlFetchingModel::data(const QModelIndex &item, int role) const
+{
+    return QStandardItemModel::data(item, role & 0xFF);
 }
 
 int SSqlFetchingModel::rowCount(const QModelIndex&) const
@@ -31,9 +37,17 @@ int SSqlFetchingModel::rowCount(const QModelIndex&) const
     return m_rowCount;
 }
 
-void SSqlFetchingModel::fetchMore(const QModelIndex&)
+void SSqlFetchingModel::fetchMore(const QModelIndex &parent)
 {
-    QString query = QString("%1 LIMIT %2, %3").arg(m_query).arg(m_rowCount).arg(m_fetchSize);
+    fetchMore(m_fetchSize, parent);
+}
+
+void SSqlFetchingModel::fetchMore(const int fetchSize, const QModelIndex &parent)
+{
+    if(!canFetchMore(parent))
+        return;
+
+    QString query = QString("%1 LIMIT %2, %3").arg(m_query).arg(m_rowCount).arg(fetchSize);
 
     m_proxyQuery->exec(query);
     copyRowsFromSource();
@@ -41,7 +55,7 @@ void SSqlFetchingModel::fetchMore(const QModelIndex&)
 
 bool SSqlFetchingModel::canFetchMore(const QModelIndex&) const
 {
-    if(m_rowCount < m_wholeRowCount)
+    if(!m_query.isEmpty() && m_rowCount < m_wholeRowCount)
         return true;
 
     return false;
@@ -76,17 +90,14 @@ bool SSqlFetchingModel::removeRows(int row, int count, const QModelIndex &parent
 void SSqlFetchingModel::clear()
 {
     beginResetModel();
+    QStandardItemModel::blockSignals(true);
     QStandardItemModel::removeRows(0, QStandardItemModel::rowCount());
+    m_rowCount = 0;
     QStandardItemModel::removeColumns(0, QStandardItemModel::columnCount());
-    m_rowCount = QStandardItemModel::rowCount();
-    m_columnCount = QStandardItemModel::columnCount();
+    m_columnCount = 0;
     m_wholeRowCount = 0;
-    m_query = "";
-    if(m_proxyQuery)
-    {
-        delete m_proxyQuery;
-        m_proxyQuery = nullptr;
-    }
+    m_query = QString();
+    QStandardItemModel::blockSignals(false);
     endResetModel();
 }
 
