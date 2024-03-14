@@ -157,6 +157,7 @@ protected slots:
     void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>()) override;
 #endif
     void verticalScrollbarValueChanged(int value) override;
+    void horizontalScrollbarValueChanged(int value) override;
     virtual void vsp_rangeChanged(const int min, const int max);
     virtual void hsp_rangeChanged(const int min, const int max);
 private slots:

@@ -72,6 +72,7 @@ QModelIndex STableModelsCommonMethods::index_(const int row, const int column) c
 
     return QModelIndex();
 }
+
 QVariant STableModelsCommonMethods::data(const int row, const int column, int role) const
 {
     if(m_sqlQueryModel)

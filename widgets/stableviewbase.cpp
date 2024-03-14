@@ -452,6 +452,18 @@ void STableViewBase::verticalScrollbarValueChanged(int value)
         restoreSelection();
 }
 
+void STableViewBase::horizontalScrollbarValueChanged(int value)
+{
+    Q_UNUSED(value);
+    // При прокрутке максимально вправо также вызываются методы canFetchMore и fetchMore
+    // (см. qtbase\src\widgets\itemviews\qabstractitemview.cpp)
+    // с пом. значения -1 вызов fetchMore блокируется, но остальные действия выполнятся
+#if QT_VERSION >= 0x060602
+    qWarning("file:///%s:%i: %s", __FILE__, __LINE__, "Attention! Source code of Qt of versions newer than 6.6.2 must be reviewed to avoid improper work");
+#endif
+    QTableView::horizontalScrollbarValueChanged(-1);
+}
+
 void STableViewBase::horizontalHeaderSectionClicked(const int logicalIndex)
 {
     if(m_autorefreshTimer)
@@ -898,7 +910,7 @@ void STableViewBase::vScrollCorrection()
 
 void STableViewBase::vsp_rangeChanged(const int min, const int max)
 {
-    if(max == 0)
+    if(max == 0 || !verticalScrollBar()->isVisible())
         return;
 
     restoreVScrollPos();
@@ -1134,7 +1146,7 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
     if(preserveScrollPos)
         saveScrollPos();
 
-//    verticalScrollBar()->setValue(0);
+    verticalScrollBar()->setValue(0);
     clearModel();
 
     if(m_queryConditionsChanged)
