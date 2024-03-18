@@ -10,6 +10,10 @@ STableBaseModel::STableBaseModel(QObject *parent):
     m_sqlQueryModel = this;
 }
 
+STableBaseModel::~STableBaseModel()
+{
+}
+
 void STableBaseModel::setQuery(const QString &query, const QSqlDatabase &db)
 {
     beginResetModel();

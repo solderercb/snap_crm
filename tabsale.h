@@ -40,6 +40,8 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 private:
     SSaleTableModel *m_model = nullptr;
+    void clearModel() override;
+    void setModelQuery(const QString &query, const QSqlDatabase &database) override;
 };
 
 class tabSale : public tabCommon

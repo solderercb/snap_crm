@@ -4375,32 +4375,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableViewBase</name>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="520"/>
+        <location filename="../widgets/stableviewbase.cpp" line="513"/>
         <source>Автоширина</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="526"/>
+        <location filename="../widgets/stableviewbase.cpp" line="519"/>
         <source>Размер по содержимому</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="531"/>
+        <location filename="../widgets/stableviewbase.cpp" line="524"/>
         <source>Вписать все</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="536"/>
+        <location filename="../widgets/stableviewbase.cpp" line="529"/>
         <source>Сделать значением по умолчанию</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="541"/>
+        <location filename="../widgets/stableviewbase.cpp" line="534"/>
         <source>Скрыть</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="547"/>
+        <location filename="../widgets/stableviewbase.cpp" line="540"/>
         <source>Выбрать столбцы</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5748,32 +5748,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>matchingClientsTable</name>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="150"/>
+        <location filename="../widgets/sclientmatch.cpp" line="170"/>
         <source>FullName</source>
         <translation>ФИО</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="151"/>
+        <location filename="../widgets/sclientmatch.cpp" line="171"/>
         <source>Balance</source>
         <translation>Баланс</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="152"/>
+        <location filename="../widgets/sclientmatch.cpp" line="172"/>
         <source>Repairs</source>
         <translation>Ремонтов</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="153"/>
+        <location filename="../widgets/sclientmatch.cpp" line="173"/>
         <source>Purchases</source>
         <translation>Покупок</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="154"/>
+        <location filename="../widgets/sclientmatch.cpp" line="174"/>
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="155"/>
+        <location filename="../widgets/sclientmatch.cpp" line="175"/>
         <source>PrimaryPhone</source>
         <translation>Основной телефон</translation>
     </message>

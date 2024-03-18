@@ -160,11 +160,3 @@ void STableViewRepairs::hsp_rangeChanged(const int min, const int max)
 {
     STableViewBase::hsp_rangeChanged(min, max);
 }
-
-
-int STableViewRepairs::modelColumnCount()
-{
-    if(!m_model)
-        return 0;
-    return m_model->columnCount();
-}

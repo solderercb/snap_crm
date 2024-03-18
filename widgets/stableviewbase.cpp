@@ -57,7 +57,7 @@ void STableViewBase::resizeEvent(QResizeEvent *event)
 */
 void STableViewBase::setModel(QAbstractItemModel *model)
 {
-    m_model = static_cast<STableBaseModel*>(model);
+    m_model = static_cast<QSqlQueryModel*>(model);
     QTableView::setModel(model);
     if(i_itemDelegates)
         i_itemDelegates->setTableModel(m_model);
@@ -149,7 +149,7 @@ void STableViewBase::resizeColumnsToContents()
 
 void STableViewBase::applyGridlayout()
 {
-    if(!modelColumnCount())
+    if(!m_model || !m_model->columnCount())
         return;
 
     horizontalHeader()->setStretchLastSection(false);
@@ -299,7 +299,7 @@ void STableViewBase::readLayout()
 
 void STableViewBase::saveLayout()
 {
-    if(!modelColumnCount() || !i_gridLayout)
+    if(!m_model || !m_model->columnCount() || !i_gridLayout)
         return;
 
     int size = i_gridLayout->$GridControl.Columns.size();
@@ -390,28 +390,21 @@ void STableViewBase::layoutChanged(int, int, int)
     m_layoutSaveTimer->start(1000);
 }
 
-int STableViewBase::modelColumnCount()
-{
-    if(!m_model)
-        return 0;
-    return m_model->columnCount();
-}
-
 void STableViewBase::reset()
 {
     int i;
-    int columnsCount = modelColumnCount();
-    if(!columnsCount)
+    int columnCount = m_model->columnCount();
+    if(!columnCount)
         return;
 
     int layoutColumnCount = i_gridLayout->$GridControl.Columns.size();
 
-    for(i = 0; i < layoutColumnCount && i < columnsCount; i++)
+    for(i = 0; i < layoutColumnCount && i < columnCount; i++)
     {
         if(i_gridLayout->$GridControl.Columns[i].Visible)
             m_model->setHeaderData(i, Qt::Horizontal, i_gridLayout->$GridControl.Columns[i].FieldName);
     }
-    for(i = layoutColumnCount; i < columnsCount; i++)
+    for(i = layoutColumnCount; i < columnCount; i++)
     {   // столбцы, не описанные в файле настроек, — служебные; их необходимо скрыть
         horizontalHeader()->hideSection(i);
     }
@@ -1035,11 +1028,10 @@ bool STableViewBase::initHeaders()
 /* Очистка модели данных
  * По умолчанию используется модель типа STableBaseModel
  * В случае использования модели другого типа необходимо переопределить этот метод
+ * TODO: Возможно нужно сделать метод полностью виртуальным.
 */
 void STableViewBase::clearModel()
 {
-    // TODO: Нужно сделать метод полностью виртуальным. Если в наследующем классе будет исопльзоваться модель данных отличная от STableViewBase
-    // и этот метод не будет переопределён, то программа будет падать!
     m_model->clear();
 }
 

@@ -72,7 +72,7 @@ public:
     void delayedRefresh(const int msec);
 protected:
     static const QRegularExpression queryPrepareRegexpPattern;
-    STableBaseModel *m_model = nullptr;
+    QSqlQueryModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
     SLocalSettings::SettingsVariant m_layoutVariant = SLocalSettings::RepairsGrid;
     XtraSerializer *i_gridLayout;
@@ -117,7 +117,6 @@ protected:
     virtual void clearModel();
     virtual void setModelQuery(const QString &query, const QSqlDatabase &database);
     virtual void layoutChanged(int,int,int);
-    virtual int modelColumnCount();
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;

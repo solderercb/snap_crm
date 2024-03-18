@@ -118,20 +118,28 @@ void SSqlFetchingModel::fetchMore(const int fetchSize, const QModelIndex &parent
     if(!canFetchMore(parent))
         return;
 
-    beginInsertRows(parent, m_rowCount, m_rowCount+fetchSize);
     QString query = QString("%1 LIMIT %2, %3").arg(m_query).arg(m_rowCount).arg(fetchSize);
     QSqlQuery *part = new QSqlQuery(m_db.driver()->createResult());
+    int rows = 0;
 
     part->exec(query);
+    rows = part->size();
+    if(rows == 0)
+    {
+        m_atEnd = 1;
+        return;
+    }
+
+    beginInsertRows(parent, m_rowCount, m_rowCount + rows);
     if(m_sqlQueries.isEmpty())
     {
         m_rec = part->record();
         m_columnCount = m_rec.count();
     }
     m_sqlQueries.insert(m_rowCount, part);
-    m_rowCount += part->size();
+    m_rowCount += rows;
     endInsertRows();
-    if(part->size() < fetchSize)
+    if(rows < fetchSize)
         m_atEnd = 1;
 }
 

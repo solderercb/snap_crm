@@ -24,9 +24,9 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    repairs_table = new STableRepairsModel();
+    repairs_table = new STableRepairsModel(this);
     if(comSettings->isCartridgeRepairEnabled)
-        cartridges_table = new STableRepairsModel();
+        cartridges_table = new STableRepairsModel(this);
 
     ui->tableView->setModel(repairs_table);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);

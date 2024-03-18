@@ -36,7 +36,6 @@ private:
     QString phoneMask;
     int clientType = 0;
     void findClient();
-
 public slots:
     void setPhoneMask(const int index);
     void findByName(const QString&);
