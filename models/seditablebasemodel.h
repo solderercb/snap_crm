@@ -15,8 +15,6 @@ public:
     virtual void setSelectStatement(const QString &statement);
 private:
     QString m_selectStatement;
-private slots:
-    void slotModelReset();
 };
 
 #endif // SEDITABLEBASEMODEL_H

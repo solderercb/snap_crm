@@ -127,7 +127,7 @@ private slots:
     void spinBoxAmountChanged(double);
     void spinBoxAmountEditingFinished();
     void saveDiagAmount();
-    void autosaveTimeout();
+    void autosaveDiagAmount();
     void diagAmountSaved();
     void savePlace(int index);
     void comboBoxPlaceButtonClickHandler(int id);

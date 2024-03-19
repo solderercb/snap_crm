@@ -1,5 +1,6 @@
 #include "stableviewrepairsitemdelegates.h"
 #include "models/stablerepairsmodel.h"
+#include "widgets/stableviewrepairs.h"
 
 STableViewRepairsItemDelegates::STableViewRepairsItemDelegates(QObject *parent) : STableViewBaseItemDelegates(parent)
 {
@@ -11,12 +12,12 @@ STableViewRepairsItemDelegates::~STableViewRepairsItemDelegates()
 
 void STableViewRepairsItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if(index.column() == i_tableModel->field("Progress"))
+    if(index.column() == STableViewRepairs::Column::Progress)
     {
         paintStatusProgressBar(painter, option, index);
         paintRepairProgressBar(painter, option, index);
     }
-    else if(index.column() == i_tableModel->field("id"))
+    else if(index.column() == STableViewRepairs::Column::ID)
         paintClientInformStatus(painter, option, index);
     else
         STableViewBaseItemDelegates::paint(painter, option, index);
@@ -135,5 +136,10 @@ void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, 
     painter->save();
     painter->fillRect(rect, QBrush(color));
     painter->restore();
+}
+
+void STableViewRepairsItemDelegates::setTableModel(QAbstractItemModel *model)
+{
+    i_tableModel = static_cast<STableRepairsModel*>(model);
 }
 

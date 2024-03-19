@@ -45,7 +45,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="matchingClientsTable" name="tableViewClientMatch">
+       <widget class="matchingClientsTable" name="tableView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -120,7 +120,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>tableViewClientMatch</sender>
+   <sender>tableView</sender>
    <signal>doubleClicked(QModelIndex)</signal>
    <receiver>SClientMatch</receiver>
    <slot>clientMatchTableDoubleClicked(QModelIndex)</slot>

@@ -211,9 +211,9 @@ void STableViewBaseItemDelegates::setModelDataFromDoubleSpinBox(QWidget *editor,
     model->setData(index, sb->value(), Qt::EditRole);
 }
 
-void STableViewBaseItemDelegates::setTableModel(STableBaseModel *model)
+void STableViewBaseItemDelegates::setTableModel(QAbstractItemModel *model)
 {
-    i_tableModel = model;
+    i_tableModel = static_cast<STableBaseModel*>(model);
 }
 
 void STableViewBaseItemDelegates::setFontMetrics(const QFont &font)

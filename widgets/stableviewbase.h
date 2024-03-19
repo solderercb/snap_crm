@@ -52,7 +52,7 @@ public:
     explicit STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent = nullptr);
     ~STableViewBase();
     void resizeEvent(QResizeEvent*) override;
-    void setModel(QAbstractItemModel *model) override;
+    virtual void setModel(QAbstractItemModel *model) override;
     bool eventFilter(QObject *object, QEvent *event) override;
     void setItemDelegate(STableViewBaseItemDelegates *delegate);
 
@@ -68,9 +68,11 @@ public:
     QModelIndexList selectionList();
     void clearSelection();
     void setLayoutVariant(const SLocalSettings::SettingsVariant &layoutVariant);
-
+    void enableAutorefresh(const int msec);
+    void delayedRefresh(const int msec);
 protected:
-    STableBaseModel *m_model = nullptr;
+    static const QRegularExpression queryPrepareRegexpPattern;
+    QSqlQueryModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
     SLocalSettings::SettingsVariant m_layoutVariant = SLocalSettings::RepairsGrid;
     XtraSerializer *i_gridLayout;
@@ -82,6 +84,12 @@ protected:
     int m_autosizedColumnsSummaryDefaultWidth = 0;
     QMenu *horizontalHeaderMenu = nullptr;
     STableViewBaseItemDelegates *i_itemDelegates = nullptr;
+    int i_vspValue = 0; // vsp and hsp — Vertical Scroll Position and Horisontal Scroll Position
+    int i_hspValue = 0;
+    int i_vspTopVisibleRow;
+    QVariant i_vspTopVisibleRowUniqueId;
+    int i_vspOldRowCount;
+    QTimer *m_autorefreshTimer = nullptr;
     int sizeHintForColumn(int column) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     void resizeColumnToContents(int column);
@@ -98,31 +106,41 @@ protected:
     void initHorizontalHeaderMenu();
     void deleteHorizontalHeaderMenu();
     void resetRowVisibility();
-    int calculateVScrollOffset(const int rowScrollBeforeUpdate, const QVariant uniqueId);
-    void saveScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate);
-    void restoreScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate);
+    void vScrollCorrection();
+    void saveScrollPos();
+    virtual void restoreVScrollPos();
+    virtual void restoreHScrollPos();
     void saveSelection();
+    bool hasSavedSelection();
     void restoreSelection();
     bool initHeaders();
+    virtual void clearModel();
+    virtual void setModelQuery(const QString &query, const QSqlDatabase &database);
+    virtual void layoutChanged(int,int,int);
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
+    QString m_constQuery;
     QString m_query;
     int m_sortColumn;
     Qt::SortOrder m_sortOrder;
-    FilterList *m_filter = nullptr;
+    QString m_queryConditions;
+    bool m_queryConditionsChanged;
     QStringList *m_grouping = nullptr;
-    int m_modelColumnsCount = 0;
     int m_uniqueIdColumn = -1;
     QList<QVariant> m_selectionList;
-    QTimer *layoutSaveDelay;
+    QTimer *m_layoutSaveTimer = nullptr;
+    int m_autorefreshTimeout = 0;
+    int m_restoreSelectionTrig = 0;
     void clearFilter();
     void clearGrouping();
     QString formatFilterGroup(const FilterList &filter);
     QString formatFilterField(const FilterField &field);
     int columnByName(const QString &name);
-    void clearSorting();
     int visibleWidth();
+    void createAutorefreshTimer();
+    void deleteAutorefreshTimer();
+    void prepareQuery();
 public slots:
     void reset() override;
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс
@@ -137,7 +155,13 @@ protected slots:
 #else
     void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>()) override;
 #endif
+    void verticalScrollbarValueChanged(int value) override;
+    void horizontalScrollbarValueChanged(int value) override;
+    virtual void vsp_rangeChanged(const int min, const int max);
+    virtual void hsp_rangeChanged(const int min, const int max);
 private slots:
+    void autorefreshTable();
+    void horizontalHeaderSectionClicked(const int logicalIndex);
     void orderChanged(int logicalIndex, Qt::SortOrder order);
     void horizontalHeaderMenuRequest(const QPoint &pos) const;
     void toggleAutoWidth(bool state);

@@ -24,13 +24,14 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    tableUpdateDelay = new QTimer();
-    repairs_table = new STableRepairsModel();
+    repairs_table = new STableRepairsModel(this);
     if(comSettings->isCartridgeRepairEnabled)
-        cartridges_table = new STableRepairsModel();
+        cartridges_table = new STableRepairsModel(this);
 
     ui->tableView->setModel(repairs_table);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->tableView->setQuery(QUERY_SEL_WORKSHOP_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setUniqueIdColumn(STableRepairsModel::Columns::Id);
 
     if(!permissions->receptDevices || type == 1)
         ui->pushButtonReceipt->hide();
@@ -55,14 +56,9 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabRepairs::buttonRefreshClicked);
     connect(ui->pushButtonPrint, &QPushButton::clicked, this, &tabRepairs::buttonPrintClicked);
 
-    connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionMoved, this, &tabRepairs::tableLayoutChanged);
-    connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionResized, this, &tabRepairs::tableLayoutChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &tabRepairs::tableSelectionChanged);
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &tabRepairs::menuRequest);
     connect(ui->tableView, &QTableView::clicked, this, &tabRepairs::tableItemClick);
-    connect(tableUpdateDelay, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
-    tableUpdateDelay->setSingleShot(true);
-
     refreshTable();
     updateWidgets();
 }
@@ -71,7 +67,6 @@ tabRepairs::~tabRepairs()
 {
     p_instance[this->m_tabType] = nullptr;   // Обязательно блять!
     delete ui;
-    delete tableUpdateDelay;
     delete tableFilter;
 }
 
@@ -157,24 +152,15 @@ void tabRepairs::initTableCartridgesMenu()
     tableCartridgesMenu->addAction(printIssue);
 }
 
-/* Обновление модели данных для таблицы ремонтов с учетом фильтров.
- * При первом запуске модель содержит только текущие ремонты.
- * При включении ЛЮБОГО фильтра (будь то текстовый поиск или фильтр по
- * категориям из всплывающего меню) будут отображаться в том числе и
- * выданные ремонты
- * preserveScrollPos - флаг указывающий на необходимость сохранить текущюю позицию прокрутки, по умолчанию сохр.
- * preserveSelection - флаг указывающий на необходимость сохранить текущее выделение, по умолчанию не сохр.
-*/
-void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
+void tabRepairs::constructQueryClause()
 {
     // TODO: нужно уйти от жестко заданных имён/алиасов таблиц
     // TODO: компания/офис
 
+    FilterList list;
     bool displayOutOverride = userDbData->displayOut;
-    ui->tableView->setQuery(QUERY_SEL_WORKSHOP_STATIC, QSqlDatabase::database("connMain"));
-    ui->tableView->setUniqueIdColumn(STableRepairsModel::Columns::Id);
-    FilterList l1;
-    l1.op = FilterList::And;
+
+    list.op = FilterList::And;
 
     if(tableFilter->repairState >= 0)
     {
@@ -199,17 +185,17 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
         }
         for(auto state : additionalStates)
             repairState.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, comSettings->repairStatuses[state].Id));
-        l1.childs.append(repairState);
+        list.childs.append(repairState);
     }
 
-    l1.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, (ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges)));
-    l1.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, 1));
+    list.fields.append(STableViewBase::initFilterField("t2.`refill`", FilterField::Equals, (ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges)));
+    list.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, 1));
     if ( !displayOutOverride && ui->lineEditSearch->text().isEmpty() )
-        l1.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
+        list.fields.append(STableViewBase::initFilterField("`out_date`", FilterField::Null, ""));
     if(tableFilter->office >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t1.`office`", FilterField::Equals | tableFilter->officeNot, tableFilter->office));
+        list.fields.append(STableViewBase::initFilterField("t1.`office`", FilterField::Equals | tableFilter->officeNot, tableFilter->office));
     if(tableFilter->clientsCat >= 0)
-        l1.fields.append(STableViewBase::initFilterField("t5." + clientsTypesList->item(tableFilter->clientsCat, 2)->text(), FilterField::NoOp | tableFilter->clientsCatNot, ""));
+        list.fields.append(STableViewBase::initFilterField("t5." + clientsTypesList->item(tableFilter->clientsCat, 2)->text(), FilterField::NoOp | tableFilter->clientsCatNot, ""));
 
     if(tableFilter->onlyCurrentUsersRepairs)
     {
@@ -218,7 +204,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
         onlyCurrentUsersRepairs.Not = tableFilter->onlyCurrentUsersRepairsNot;
         onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`current_manager`", FilterField::Equals, userDbData->id));
         onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, userDbData->id));
-        l1.childs.append(onlyCurrentUsersRepairs);
+        list.childs.append(onlyCurrentUsersRepairs);
     }
 
     if(tableFilter->employee >= 0)
@@ -228,7 +214,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
         employee.Not = tableFilter->employeeNot;
         employee.fields.append(STableViewBase::initFilterField("t1.`current_manager`", FilterField::Equals, tableFilter->employee));
         employee.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, tableFilter->employee));
-        l1.childs.append(employee);
+        list.childs.append(employee);
     }
 
     FilterList period;
@@ -238,7 +224,7 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
         period.fields.append(STableViewBase::initFilterField("t1.`in_date`", FilterField::More, tableFilter->periodBegin));
     if(!tableFilter->periodEnd.isEmpty())
         period.fields.append(STableViewBase::initFilterField("t1.`in_date`", FilterField::Less, tableFilter->periodEnd));
-    l1.childs.append(period);
+    list.childs.append(period);
 
     if(!ui->lineEditSearch->text().isEmpty())
     {
@@ -255,31 +241,43 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
         searchText.fields.append(STableViewBase::initFilterField("t1.`serial_number`", matchFlag, what, Qt::CaseInsensitive));
         searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`short_name`, t5.`ur_name`)", matchFlag, what, Qt::CaseInsensitive));
         searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)", matchFlag, what, Qt::CaseInsensitive));
-        l1.childs.append(searchText);
+        searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t6.`phone`, t6.`phone_clean`)", matchFlag, what));
+        searchText.fields.append(STableViewBase::initFilterField("`ext_notes`", matchFlag, what));
+        list.childs.append(searchText);
     }
 
     query_group.clear();
     query_group << "`id`";    // default GROUP part of query
 
-    ui->tableView->setFilter(l1);
+    static_cast<STableRepairsModel*>(ui->tableView->model())->setFetchSize(displayOutOverride?40:300);
+    ui->tableView->setFilter(list);
     ui->tableView->setGrouping(query_group);
+}
+
+/* Обновление модели данных для таблицы ремонтов с учетом фильтров.
+ * При первом запуске модель содержит только текущие ремонты.
+ * При включении ЛЮБОГО фильтра (будь то текстовый поиск или фильтр по
+ * категориям из всплывающего меню) будут отображаться в том числе и
+ * выданные ремонты
+ * preserveScrollPos - флаг указывающий на необходимость сохранить текущюю позицию прокрутки, по умолчанию сохр.
+ * preserveSelection - флаг указывающий на необходимость сохранить текущее выделение, по умолчанию не сохр.
+*/
+void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
+{
+    constructQueryClause();
+
     ui->tableView->refresh(preserveScrollPos, preserveSelection);
     if(!preserveSelection)  // при обновлении модели сигнал QItemSelectionModel::selectionChanged не генерируется
         updateWidgets();
 
     if(userDbData->autoRefreshWorkspace)
-        tableUpdateDelay->start(userDbData->refreshTime*1000);
+        ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
 }
 
 void tabRepairs::setFocusSearchField()
 {
     ui->lineEditSearch->setFocus(Qt::MouseFocusReason);
     ui->lineEditSearch->selectAll();
-}
-
-void tabRepairs::autorefreshTable()
-{
-    refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
 }
 
 void tabRepairs::tableItemDoubleClick(QModelIndex item)
@@ -327,8 +325,8 @@ void tabRepairs::lineEditSearchTextChanged(QString)
 {
     ui->tableView->clearSelection();
     ui->tableView->resetVScrollPos();
-    tableUpdateDelay->stop();
-    tableUpdateDelay->start(350);
+    constructQueryClause();
+    ui->tableView->delayedRefresh(350);
 }
 
 void tabRepairs::lineEditSearchReturnPressed()
@@ -362,15 +360,6 @@ void tabRepairs::tableModeChanged(bool mode)
 void tabRepairs::filterMenuClosed()
 {
     refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
-}
-
-/*  Перезапуск таймера автообновления
- *  После изменения размера или положения столбца, нужно сначала сохранить новые параметры и только потом обновлять таблицу
-*/
-void tabRepairs::tableLayoutChanged(int, int, int)
-{
-    if(userDbData->autoRefreshWorkspace)
-        tableUpdateDelay->start(1200);  // сохранение параметров происходит с задержкой 1000мс, автообновление чуть позже
 }
 
 void tabRepairs::buttonReceptClicked()

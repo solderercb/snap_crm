@@ -35,12 +35,15 @@
          <property name="verticalScrollMode">
           <enum>QAbstractItemView::ScrollPerPixel</enum>
          </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
+         <property name="horizontalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
          </property>
          <property name="wordWrap">
           <bool>false</bool>
          </property>
+         <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+          <bool>true</bool>
+         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
@@ -322,8 +325,8 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
      <y>732</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1020</x>
-     <y>723</y>
+     <x>1017</x>
+     <y>725</y>
     </hint>
    </hints>
   </connection>
@@ -356,22 +359,6 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
     <hint type="destinationlabel">
      <x>353</x>
      <y>2</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonRefresh</sender>
-   <signal>clicked()</signal>
-   <receiver>tabRepairs</receiver>
-   <slot>refreshTable()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>469</x>
-     <y>742</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>4</x>
-     <y>713</y>
     </hint>
    </hints>
   </connection>

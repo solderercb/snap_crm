@@ -1,10 +1,11 @@
 #include "stableviewbase.h"
 #include "models/ssaletablemodel.h"
 
+const QRegularExpression STableViewBase::queryPrepareRegexpPattern = QRegularExpression("( +\n)|((;?) +$)|(;$)");
+
 STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent) :
     QTableView(parent), m_layoutVariant(layoutVariant)
 {
-    layoutSaveDelay = new QTimer();
     m_fontMetrics = new QFontMetrics(this->font());
     i_gridLayout = new XtraSerializer();
     i_gridLayout->$GridControl.Columns.resize(0);
@@ -20,18 +21,18 @@ STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QW
     horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     horizontalHeader()->setHighlightSections(false);
     connect(horizontalHeader(), &QHeaderView::customContextMenuRequested, this, &STableViewBase::horizontalHeaderMenuRequest);
-    connect(horizontalHeader(),&QHeaderView::sortIndicatorChanged, this, &STableViewBase::orderChanged);
+    connect(horizontalHeader(),&QHeaderView::sectionClicked, this, &STableViewBase::horizontalHeaderSectionClicked);
 
     connect(this->horizontalHeader(),SIGNAL(sectionResized(int,int,int)), this, SLOT(columnResized(int,int,int)));
     connect(this->horizontalHeader(),SIGNAL(sectionMoved(int,int,int)), this, SLOT(sectionMoved(int,int,int)));
-    QObject::connect(layoutSaveDelay, SIGNAL(timeout()), this, SLOT(saveLayout()));
-    layoutSaveDelay->setSingleShot(true);
+    connect(this->verticalScrollBar(), &QScrollBar::rangeChanged, this, &STableViewBase::vsp_rangeChanged);
+    connect(this->horizontalScrollBar(), &QScrollBar::rangeChanged, this, &STableViewBase::hsp_rangeChanged);
 }
 
 STableViewBase::~STableViewBase()
 {
     disconnect(userDbData, &SUserSettings::rowHeightChanged, this, &STableViewBase::applyGuiSettings);
-    saveLayout();
+    saveLayout();   // удаление объекта таймера происходит в этом методе
     delete m_fontMetrics;
     delete i_gridLayout;
     clearFilter();
@@ -39,7 +40,8 @@ STableViewBase::~STableViewBase()
     deleteHorizontalHeaderMenu();
     if(i_itemDelegates)
         delete i_itemDelegates;
-    delete layoutSaveDelay;
+    if(m_autorefreshTimer)
+        delete m_autorefreshTimer;
 }
 
 void STableViewBase::resizeEvent(QResizeEvent *event)
@@ -49,9 +51,13 @@ void STableViewBase::resizeEvent(QResizeEvent *event)
 //    applyGridlayout();
 }
 
+/* Установка модели данных
+ * По умолчанию используется модель класса STableBaseModel
+ * В случае использования модели другого класса необходимо переопределить этот метод
+*/
 void STableViewBase::setModel(QAbstractItemModel *model)
 {
-    m_model = static_cast<STableBaseModel*>(model);
+    m_model = static_cast<QSqlQueryModel*>(model);
     QTableView::setModel(model);
     if(i_itemDelegates)
         i_itemDelegates->setTableModel(m_model);
@@ -60,12 +66,14 @@ void STableViewBase::setModel(QAbstractItemModel *model)
 
 bool STableViewBase::eventFilter(QObject *object, QEvent *event)
 {
-    if(QString("QScrollBar").compare(object->metaObject()->className()) == 0)
+    if(event->type() == QEvent::Show && QString("QScrollBar").compare(object->metaObject()->className()) == 0)
     {
-        if(static_cast<QScrollBar *>(object)->orientation() == Qt::Vertical && event->type() == QEvent::Show)
+        if(static_cast<QScrollBar *>(object)->orientation() == Qt::Vertical)
         {
             adoptAutosizedColumns();
         }
+
+        return false;
     }
 
     if (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress)
@@ -80,6 +88,8 @@ bool STableViewBase::eventFilter(QObject *object, QEvent *event)
                 default: ;
             }
         }
+
+        return false;
     }
 
     return false;
@@ -139,6 +149,9 @@ void STableViewBase::resizeColumnsToContents()
 
 void STableViewBase::applyGridlayout()
 {
+    if(!m_model || !m_model->columnCount())
+        return;
+
     horizontalHeader()->setStretchLastSection(false);
     QMap<int, int> visualIndexes;
     int i;
@@ -170,6 +183,8 @@ void STableViewBase::applyGridlayout()
     {
         horizontalHeader()->moveSection(horizontalHeader()->visualIndex(visualIndexes[i]), i);
     }
+
+    restoreHScrollPos();
 
 //    adoptAutosizedColumns();
 }
@@ -284,10 +299,11 @@ void STableViewBase::readLayout()
 
 void STableViewBase::saveLayout()
 {
-    if(m_modelColumnsCount == 0)
+    if(!m_model || !m_model->columnCount() || !i_gridLayout)
         return;
 
-    for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
+    int size = i_gridLayout->$GridControl.Columns.size();
+    for(int i = 0; i < size; i++)
     {
         i_gridLayout->$GridControl.Columns[i].ActualWidth = columnWidth(i);
         i_gridLayout->$GridControl.Columns[i].Visible = !horizontalHeader()->isSectionHidden(i);
@@ -314,13 +330,26 @@ void STableViewBase::saveLayout()
     }
 
     localSettings->save(i_gridLayout, m_layoutVariant);
+
+    if(m_layoutSaveTimer)
+    {
+        disconnect(m_layoutSaveTimer, SIGNAL(timeout()), this, SLOT(saveLayout()));
+        delete m_layoutSaveTimer;
+        m_layoutSaveTimer = nullptr;
+    }
+
+    if(m_autorefreshTimeout)
+        m_autorefreshTimer->start(m_autorefreshTimeout);
 }
 
 // TODO: этот метод вызывается очень много раз если не выключен параметр horizontalHeaderStretchLastSection
 void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
 {
+    bool lc = 0;
     if(column < i_gridLayout->$GridControl.Columns.size())
     {
+        lc = (i_gridLayout->$GridControl.Columns[column].ActualWidth != newWidth)
+             || ((newWidth > 0)^i_gridLayout->$GridControl.Columns[column].Visible);
         if(newWidth == 0)
         {
             i_gridLayout->$GridControl.Columns[column].Visible = false;
@@ -336,26 +365,46 @@ void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
     QTableView::columnResized(column, oldWidth, newWidth);
 //    verticalHeader()->resizeSections(QHeaderView::ResizeToContents); // ЭТО ДОЛГО!!!
 
-    layoutSaveDelay->start(1000);
+    if(lc)
+        layoutChanged(0, 0, 0);
 }
 
-void STableViewBase::sectionMoved(int, int, int)
+void STableViewBase::sectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
 {
-    layoutSaveDelay->start(1000);
+    bool lc = i_gridLayout->$GridControl.Columns[logicalIndex].VisibleIndex != newVisualIndex;
+    if(lc)
+        layoutChanged(0, 0, 0);
+}
+
+void STableViewBase::layoutChanged(int, int, int)
+{
+    if(m_autorefreshTimer)
+        m_autorefreshTimer->stop();
+
+    if(!m_layoutSaveTimer)
+    {
+        m_layoutSaveTimer = new QTimer();
+        m_layoutSaveTimer->setSingleShot(true);
+        QObject::connect(m_layoutSaveTimer, SIGNAL(timeout()), this, SLOT(saveLayout()));
+    }
+    m_layoutSaveTimer->start(1000);
 }
 
 void STableViewBase::reset()
 {
     int i;
-    m_modelColumnsCount = m_model->columnCount();
+    int columnCount = m_model->columnCount();
+    if(!columnCount)
+        return;
+
     int layoutColumnCount = i_gridLayout->$GridControl.Columns.size();
 
-    for(i = 0; i < layoutColumnCount && i < m_modelColumnsCount; i++)
+    for(i = 0; i < layoutColumnCount && i < columnCount; i++)
     {
         if(i_gridLayout->$GridControl.Columns[i].Visible)
             m_model->setHeaderData(i, Qt::Horizontal, i_gridLayout->$GridControl.Columns[i].FieldName);
     }
-    for(i = layoutColumnCount; i < m_modelColumnsCount; i++)
+    for(i = layoutColumnCount; i < columnCount; i++)
     {   // столбцы, не описанные в файле настроек, — служебные; их необходимо скрыть
         horizontalHeader()->hideSection(i);
     }
@@ -386,31 +435,53 @@ void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &
     }
 }
 
+void STableViewBase::verticalScrollbarValueChanged(int value)
+{
+    bool flag = (verticalScrollBar()->maximum() > 0 && verticalScrollBar()->maximum() == value && !i_vspValue); // с пом. условия !i_vspValue фильтруются автообновления
+    if(flag)
+        saveSelection();
+    QTableView::verticalScrollbarValueChanged(value);
+    if(flag)
+        restoreSelection();
+}
+
+void STableViewBase::horizontalScrollbarValueChanged(int value)
+{
+    Q_UNUSED(value);
+    // При прокрутке максимально вправо также вызываются методы canFetchMore и fetchMore
+    // (см. qtbase\src\widgets\itemviews\qabstractitemview.cpp)
+    // с пом. значения -1 вызов fetchMore блокируется, но остальные действия выполнятся
+#if QT_VERSION >= 0x060602
+    qWarning("file:///%s:%i: %s", __FILE__, __LINE__, "Attention! Source code of Qt of versions newer than 6.6.2 must be reviewed to avoid improper work");
+#endif
+    QTableView::horizontalScrollbarValueChanged(-1);
+}
+
+void STableViewBase::horizontalHeaderSectionClicked(const int logicalIndex)
+{
+    if(m_autorefreshTimer)
+        m_autorefreshTimer->stop();
+    orderChanged(logicalIndex, Qt::AscendingOrder);
+}
+
 void STableViewBase::orderChanged(int logicalIndex, Qt::SortOrder order)
 {
     Q_UNUSED(order);
-    if(!isSortingEnabled())
-        return;
 
     if(m_sortColumn == -1 || m_sortColumn != logicalIndex)
+    {
+        m_sortColumn = logicalIndex;
         m_sortOrder = Qt::AscendingOrder;
+    }
     else if(m_sortOrder == Qt::AscendingOrder)
         m_sortOrder = Qt::DescendingOrder;
     else
     {
-        clearSorting();
-        return;
+        m_sortColumn = -1;
+        horizontalHeader()->setSortIndicator(m_sortColumn, Qt::AscendingOrder);
     }
 
-    m_sortColumn = logicalIndex;
-
-    this->refresh();
-}
-
-void STableViewBase::clearSorting()
-{
-    m_sortColumn = -1;
-    horizontalHeader()->setSortIndicator(m_sortColumn, Qt::AscendingOrder);
+    prepareQuery();
     this->refresh();
 }
 
@@ -553,29 +624,81 @@ void STableViewBase::showColumnChooser()
 
 }
 
+/* Передача запроса, используемого для получения данных.
+ * Вызов этого метода не обновляет модель данных; для обновления нужно вызвать метод refresh().
+ * Запрос query может быть полным (содержащим условия), а может быть частичным, к которому при вызове методов
+ * setFilter(), setGrouping() и orderChanged() будут добавлены соответствующие условия.
+*/
 void STableViewBase::setQuery(const QString& query, const QSqlDatabase& db)
 {
-    m_query = query;
+    m_constQuery = query;
+    m_constQuery = m_constQuery.replace(queryPrepareRegexpPattern, "\n");
     m_db = db;
 
     clearFilter();
     clearGrouping();
+    prepareQuery();
+}
+
+/* Добавление к статичной части запроса условий
+*/
+void STableViewBase::prepareQuery()
+{
+    m_queryConditionsChanged = 1;
+    m_query = m_constQuery;
+
+    if(!m_queryConditions.isEmpty())
+        m_query.append("\nWHERE " + m_queryConditions);
+
+    if(m_grouping)
+        m_query.append(m_grouping->count()>0?"\nGROUP BY " + m_grouping->join(", "):"");
+
+    if (m_sortColumn >= 0)
+    {
+        QString orderClause;
+        int field = m_sortColumn + 1; // нумерация полей в запросе с 1
+        orderClause = QString("\nORDER BY %1 %2").arg(field).arg((m_sortOrder == Qt::AscendingOrder)?"ASC":"DESC");
+        m_query.append(orderClause);
+    }
+
+#ifdef QT_DEBUG
+//    m_query.append(" LIMIT 1000");
+#endif
+
+    //    qDebug().nospace().noquote() << "[" << this << "] prepareQuery() | \r\n" << m_query;
 }
 
 void STableViewBase::setFilter(const FilterList &filter)
 {
-    if(m_filter)
-        delete m_filter;
-
-    m_filter = new FilterList;
-    *m_filter = filter;
+    QString newFilter = formatFilterGroup(filter);
+    if(m_queryConditions.compare(newFilter))
+    {
+        m_queryConditions = newFilter;
+        prepareQuery();
+    }
 }
 
 void STableViewBase::clearFilter()
 {
-    if(m_filter)
-        delete m_filter;
-    m_filter = nullptr;
+    QString oldFilter = m_queryConditions;
+    m_queryConditions.clear();
+    if(!oldFilter.isEmpty())
+        prepareQuery();
+}
+
+void STableViewBase::setGrouping(const QStringList &grouping)
+{
+    clearGrouping();
+    m_grouping = new QStringList(grouping);
+    prepareQuery();
+}
+
+void STableViewBase::clearGrouping()
+{
+    if(m_grouping)
+        delete m_grouping;
+    m_grouping = nullptr;
+    prepareQuery();
 }
 
 QString STableViewBase::formatFilterGroup(const FilterList &filter)
@@ -710,22 +833,43 @@ int STableViewBase::columnByName(const QString &name)
     return -1;
 }
 
+void STableViewBase::saveScrollPos()
+{
+    int scrollMode = verticalScrollMode();
+    QModelIndex index;
+    i_vspValue = verticalScrollBar()->value();
+    i_hspValue = horizontalScrollBar()->value();
+
+    if(scrollMode == QAbstractItemView::ScrollMode::ScrollPerPixel)
+    {
+        index = indexAt(QPoint(i_vspValue, 0));
+    }
+    else
+    {
+        index = model()->index(i_vspValue, 0);
+    }
+    i_vspOldRowCount = model()->rowCount();
+    i_vspTopVisibleRow = index.row();
+    i_vspTopVisibleRowUniqueId = index.siblingAtColumn(m_uniqueIdColumn).data();
+}
+
 /* Вычисление смещения положения вертикальной полосы прокрутки.
  * Предназначена для случаев, если изменилось кол-во строк в модели данных таблицы после обновления
- * rowScrollBeforeUpdate - положение полосы прокрутки до обновления модели данных (всегда измеряется в строках)
- * uniqueId - ID записи (например, номер ремонта) для поиска размера смещения прокрутки
 */
-int STableViewBase::calculateVScrollOffset(const int rowScrollBeforeUpdate, const QVariant uniqueId)
+void STableViewBase::vScrollCorrection()
 {
+    if(m_uniqueIdColumn < 0 || model()->rowCount() == i_vspOldRowCount)
+        return;
+
     int scrollMode = verticalScrollMode();
     QModelIndex indexUpper, indexLower;
     int rowAtScroll, rowUpper, rowLower;
     int scrollOffsetUp = 0, scrollOffsetDown = 0;
 
-    rowAtScroll = rowScrollBeforeUpdate;
+    rowAtScroll = i_vspTopVisibleRow;
 
-    if(model()->index(rowAtScroll, m_uniqueIdColumn).data() == uniqueId)
-        return 0;
+    if(model()->index(rowAtScroll, m_uniqueIdColumn).data() == i_vspTopVisibleRowUniqueId)
+        return;
 
     rowUpper = rowAtScroll - 1;
     rowLower = rowAtScroll + 1;
@@ -735,58 +879,60 @@ int STableViewBase::calculateVScrollOffset(const int rowScrollBeforeUpdate, cons
         {
             indexUpper = model()->index(rowUpper, m_uniqueIdColumn);
             scrollOffsetUp -= scrollMode?rowHeight(rowUpper):1;
-            if(model()->index(rowUpper, m_uniqueIdColumn).data() == uniqueId)
-                return scrollOffsetUp;
+            if(model()->index(rowUpper, m_uniqueIdColumn).data() == i_vspTopVisibleRowUniqueId)
+            {
+                i_vspValue += scrollOffsetUp;
+                return;
+            }
             rowUpper--;
+
         }
         if(rowLower < model()->rowCount())
         {
             indexLower = model()->index(rowLower, m_uniqueIdColumn);
             scrollOffsetDown += scrollMode?rowHeight(rowLower - 1):1;
-            if(model()->index(rowLower, m_uniqueIdColumn).data() == uniqueId)
-                return scrollOffsetDown;
+            if(model()->index(rowLower, m_uniqueIdColumn).data() == i_vspTopVisibleRowUniqueId)
+            {
+                i_vspValue += scrollOffsetDown;
+                return;
+            }
             rowLower++;
         }
     }
-
-    return 0; // если строка с уникальным id не будет найдена
 }
 
-void STableViewBase::saveScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate)
+void STableViewBase::vsp_rangeChanged(const int min, const int max)
 {
-    int scrollMode = verticalScrollMode();
-    QModelIndex index;
-//    int topVisibleRowOffset;
-    rowCountBeforeUpdate = model()->rowCount();
-    vScrollValue = verticalScrollBar()->value();
-    hScrollValue = horizontalScrollBar()->value();
-    if(scrollMode == QAbstractItemView::ScrollMode::ScrollPerPixel)
-    {
-        index = indexAt(QPoint(vScrollValue, 0));
-        topVisibleRow = index.row();
-//        topVisibleRowOffset = rowViewportPosition(topVisibleRow);     // смещение строки; только в режиме прокрутки по пиксельно
-    }
-    else
-    {
-        index = model()->index(vScrollValue, 0);
-        topVisibleRow = index.row();
-    }
-    topVisibleRowUniqueId = index.siblingAtColumn(m_uniqueIdColumn).data();
+    if(max == 0 || !verticalScrollBar()->isVisible())
+        return;
+
+    restoreVScrollPos();
 }
 
-void STableViewBase::restoreScrollPos(int &vScrollValue, int &hScrollValue, int &topVisibleRow, QVariant &topVisibleRowUniqueId, int &rowCountBeforeUpdate)
+void STableViewBase::restoreVScrollPos()
 {
-    if(m_uniqueIdColumn >= 0 && model()->rowCount() != rowCountBeforeUpdate)
+    if(i_vspValue > 0)
     {
-        vScrollValue += calculateVScrollOffset(topVisibleRow, topVisibleRowUniqueId);
+        vScrollCorrection();
+        verticalScrollBar()->setValue(i_vspValue);
     }
 
-    verticalScrollBar()->setValue(vScrollValue);
-    // На момент обновления гориз. полоса прокрутки еще не отрисована и максимальное значение верт. полосы меньше на высоту горизонтальной.
-    // Чтобы после обновления самая нижняя строка не перекрывалась гориз. полосой производим прокрутку вниз
-    if(vScrollValue >= verticalScrollBar()->maximum())
-        scrollToBottom();
-    horizontalScrollBar()->setValue(hScrollValue);
+    i_vspValue = 0;
+
+    restoreSelection();
+}
+
+void STableViewBase::hsp_rangeChanged(const int min, const int max)
+{
+}
+
+void STableViewBase::restoreHScrollPos()
+{
+    if(i_hspValue <= 0 || horizontalScrollBar()->maximum() == 0)
+        return;
+
+    horizontalScrollBar()->setValue(i_hspValue);
+    i_hspValue = 0;
 }
 
 void STableViewBase::resetVScrollPos()
@@ -809,6 +955,7 @@ QModelIndexList STableViewBase::selectionList()
 */
 void STableViewBase::saveSelection()
 {
+    m_restoreSelectionTrig = 0;
     if(selectionBehavior() != QAbstractItemView::SelectRows)
         return;
 
@@ -818,12 +965,27 @@ void STableViewBase::saveSelection()
     }
 }
 
+bool STableViewBase::hasSavedSelection()
+{
+    return !m_selectionList.isEmpty();
+}
+
 /* Восстановление выделенных строк из ранее сохранённого списка
  * Только при режиме выбора строк целиком
 */
 void STableViewBase::restoreSelection()
 {
+    // Метод вызывается из двух мест, а порядок вызова может изменяться,
+    // поэтому, чтобы восстановление работало корректно, используется примитивный фильтр
+    m_restoreSelectionTrig++;
+    if(m_restoreSelectionTrig != 2)
+        return;
+    m_restoreSelectionTrig = 0;
+
     if(selectionBehavior() != QAbstractItemView::SelectRows)
+        return;
+
+    if(m_selectionList.size() == 0)
         return;
 
     QVariant data;
@@ -863,6 +1025,25 @@ bool STableViewBase::initHeaders()
     return 1;
 }
 
+/* Очистка модели данных
+ * По умолчанию используется модель типа STableBaseModel
+ * В случае использования модели другого типа необходимо переопределить этот метод
+ * TODO: Возможно нужно сделать метод полностью виртуальным.
+*/
+void STableViewBase::clearModel()
+{
+    m_model->clear();
+}
+
+/* Обновление модели данных
+ * По умолчанию используется модель типа STableBaseModel
+ * В случае использования модели другого типа необходимо переопределить этот метод
+*/
+void STableViewBase::setModelQuery(const QString &query, const QSqlDatabase &database)
+{
+    m_model->setQuery(query, database);
+}
+
 /*  Очистка списка выделенных строк
 */
 void STableViewBase::clearSelection()
@@ -874,6 +1055,60 @@ void STableViewBase::clearSelection()
 void STableViewBase::setLayoutVariant(const SLocalSettings::SettingsVariant &layoutVariant)
 {
     m_layoutVariant = layoutVariant;
+}
+
+void STableViewBase::createAutorefreshTimer()
+{
+    if(!m_autorefreshTimer)
+    {
+        m_autorefreshTimer = new QTimer();
+        connect(m_autorefreshTimer, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
+        m_autorefreshTimer->setSingleShot(true);
+    }
+}
+
+void STableViewBase::deleteAutorefreshTimer()
+{
+    m_autorefreshTimeout = 0;
+    if(m_autorefreshTimer)
+    {
+        disconnect(m_autorefreshTimer, SIGNAL(timeout()), this, SLOT(autorefreshTable()));
+        delete m_autorefreshTimer;
+        m_autorefreshTimer = nullptr;
+    }
+}
+
+/*  (Пере-)запуск или остановка автообновления таблицы
+*/
+void STableViewBase::enableAutorefresh(const int msec)
+{
+    if(msec <= 0)
+    {
+        deleteAutorefreshTimer();
+        return;
+    }
+
+    m_autorefreshTimeout = msec;
+    createAutorefreshTimer();
+    m_autorefreshTimer->start(m_autorefreshTimeout);
+}
+
+/*  Однократное обновление таблицы с заданной задержкой msec
+ *  Может быть использован при текстовом поиске
+*/
+void STableViewBase::delayedRefresh(const int msec)
+{
+    createAutorefreshTimer();
+    m_autorefreshTimer->start(msec);
+}
+
+void STableViewBase::autorefreshTable()
+{
+    refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
+    if(m_autorefreshTimeout)
+        m_autorefreshTimer->start(m_autorefreshTimeout);
+    else
+        deleteAutorefreshTimer();
 }
 
 /* Установка номера столбца с уникальным ID, например, номером ремонта.
@@ -900,51 +1135,27 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
     if(preserveSelection)
         saveSelection();
 
-    QString query = m_query;
-    int rowCountBeforeUpdate;
-    int vScrollValue;
-    int hScrollValue;
-    int topVisibleRow;
-    QVariant topVisibleRowUniqueId;
-
     if(preserveScrollPos)
-        saveScrollPos(vScrollValue, hScrollValue, topVisibleRow, topVisibleRowUniqueId, rowCountBeforeUpdate);
+        saveScrollPos();
 
-    m_model->clear();
+    verticalScrollBar()->setValue(0);
+    clearModel();
 
-    QRegularExpression re("( +\n)|((;?) +$)");  // удаление пробелов-заполнителей в конце строк, а также точки с запятой в конце запроса (при наличии ; не будет работать сортировка)
-    query.replace(re, "\n");
-
-    if(m_filter)
+    if(m_queryConditionsChanged)
     {
-        QString f = formatFilterGroup(*m_filter);
-        if(!f.isEmpty())
-            query.append("\nWHERE " + f);
+        i_vspOldRowCount = 0;
+        i_vspValue = 0;
+        m_queryConditionsChanged = 0;
     }
 
-    if(m_grouping)
-        query.append(m_grouping->count()>0?"\nGROUP BY " + m_grouping->join(", "):"");
-
+    setModelQuery(m_query, QSqlDatabase::database("connMain"));
     if (m_sortColumn >= 0)
     {
-        QString orderClause;
-        int field = m_sortColumn + 1; // нумерация полей в запросе с 1
-        orderClause = QString("\nORDER BY %1 %2").arg(field).arg((m_sortOrder == Qt::AscendingOrder)?"ASC":"DESC");
-        query.append(orderClause);
+        horizontalHeader()->blockSignals(true);
+        horizontalHeader()->setSortIndicator(m_sortColumn, m_sortOrder);
+        horizontalHeader()->blockSignals(false);
     }
-
-#ifdef QT_DEBUG
-//    query.append(" LIMIT 1000");
-#endif
-
-    m_model->setQuery(query, QSqlDatabase::database("connMain"));
-//    qDebug().nospace().noquote() << "[" << this << "] () | \r\n" << query;
-
-    if(preserveScrollPos)
-        restoreScrollPos(vScrollValue, hScrollValue, topVisibleRow, topVisibleRowUniqueId, rowCountBeforeUpdate);
-
-    if(preserveSelection)
-        restoreSelection();
+    restoreSelection();
 }
 
 void STableViewBase::applyGuiSettings()
@@ -975,18 +1186,5 @@ FilterField STableViewBase::initFilterField(const QString &column, FilterField::
 FilterField STableViewBase::initFilterField(const QString &column, int matchFlag, const QVariant &value, Qt::CaseSensitivity caseSensitivity)
 {
     return initFilterField(column, (FilterField::Op)matchFlag, value, caseSensitivity);
-}
-
-void STableViewBase::setGrouping(const QStringList &grouping)
-{
-    clearGrouping();
-    m_grouping = new QStringList(grouping);
-}
-
-void STableViewBase::clearGrouping()
-{
-    if(m_grouping)
-        delete m_grouping;
-    m_grouping = nullptr;
 }
 

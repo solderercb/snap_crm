@@ -19,7 +19,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     this->setAttribute(Qt::WA_DeleteOnClose);
     m_tableUpdateDelay = new QTimer();
 
-    clientsTable = new STableBaseModel();
+    clientsTable = new STableBaseModel(this);
     ui->tableView->setModel(clientsTable);
     if (type == 1)
     {

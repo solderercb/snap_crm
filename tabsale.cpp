@@ -1120,6 +1120,23 @@ void sparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+/* Пустышка
+ * Необходима для избежания потенциальных сбоев при вызове метода в родительском классе
+*/
+void sparePartsTable::clearModel()
+{
+
+}
+
+/* Пустышка
+ * Необходима для избежания потенциальных сбоев при вызове метода в родительском классе
+*/
+void sparePartsTable::setModelQuery(const QString &query, const QSqlDatabase &database)
+{
+    Q_UNUSED(query)
+    Q_UNUSED(database)
+}
+
 #ifdef QT_DEBUG
 void tabSale::randomFill()
 {

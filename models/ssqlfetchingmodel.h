@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QDebug>
 
-class SSqlFetchingModel : public QStandardItemModel
+class SSqlFetchingModel : public QSqlQueryModel
 {
     Q_OBJECT
 public:
@@ -14,27 +14,33 @@ public:
     ~SSqlFetchingModel();
     int fetchSize() const;
     void setFetchSize(int fetchSize);
-    void clear();
+    void clear() override;
     void setQuery(const QString &query, const QSqlDatabase &db = QSqlDatabase());
-
-    // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    void fetchMore(const QModelIndex &parent = QModelIndex());
-    bool canFetchMore(const QModelIndex &parent = QModelIndex()) const;
-    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    QModelIndex parent(const QModelIndex &child) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex sibling(int row, int column, const QModelIndex &idx) const override;
+    bool hasIndex(int row, int column, const QModelIndex &parent = QModelIndex()) const;//    inline QModelIndex createIndex(int row, int column, void *data = nullptr) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    void fetchMore(const QModelIndex &parent = QModelIndex()) override;
+    void fetchMore(const int fetchSize, const QModelIndex &parent = QModelIndex());
+    bool canFetchMore(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 private:
     QString m_query;
     QSqlDatabase m_db;
-    QSqlQuery *m_proxyQuery = nullptr;
     int m_rowCount = 0;
     int m_columnCount = 0;
-    int m_wholeRowCount = 0;
+    bool m_atEnd = 1;
     int m_fetchSize = 30;
+    QVarLengthArray<int, 10> rowOffsets; // used to calculate indexInQuery of rows
+//    QVarLengthArray<int, 56> colOffsets; // used to calculate indexInQuery of columns
+    QMap<int, QSqlQuery*> m_sqlQueries;
+    QSqlQuery *m_queryPointer;
+    int m_queryKey = 0;
+    QSqlRecord m_rec;
     void queryRowCount();
-    void copyRowsFromSource();
+    int queryPointer(const int row) const;
+    QModelIndex indexInQuery(const QModelIndex &item) const override;
 public:
 };
 

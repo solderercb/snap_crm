@@ -53,7 +53,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         m_autosaveDiag = 1;
         m_autosaveDiagTimer = new QTimer();
         m_autosaveDiagTimer->setSingleShot(true);
-        QObject::connect(m_autosaveDiagTimer, SIGNAL(timeout()), this, SLOT(autosaveTimeout()));
+        QObject::connect(m_autosaveDiagTimer, SIGNAL(timeout()), this, SLOT(autosaveDiagAmount()));
     }
     if(userDbData->saveStateOnClose)
     {
@@ -71,6 +71,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     statusesProxyModel = new SSortFilterProxyModel;
     statusesProxyModel->setSourceModel(comSettings->repairStatuses.Model);
     connect(repairModel, &SRepairModel::modelUpdated, this, &tabRepair::updateWidgets);
+    connect(repairModel, &SRepairModel::modelUpdated, this, [=]{modelRO = repairModel->isLock();});
 
     ui->comboBoxPlace->setButtons("Clear");
     ui->comboBoxPlace->setModel(repairBoxesModel);
@@ -330,7 +331,6 @@ void tabRepair::fillExtraInfo()
 
 void tabRepair::setLock(bool state)
 {
-    modelRO = repairModel->isLock();
     if(state && modelRO)
     {
         i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
@@ -773,7 +773,7 @@ void tabRepair::diagChanged()
 void tabRepair::diagEditFinished()  // слот вызывается при потере фокуса
 {
     if(m_autosaveDiag)
-        saveDiagAmount();
+        autosaveDiagAmount();
 }
 
 void tabRepair::spinBoxAmountChanged(double)
@@ -789,7 +789,7 @@ void tabRepair::spinBoxAmountChanged(double)
 void tabRepair::spinBoxAmountEditingFinished()  // слот вызывается при потере фокуса или нажатии Enter
 {
     if(m_autosaveDiag)
-        saveDiagAmount();
+        autosaveDiagAmount();
 }
 
 void tabRepair::saveDiagAmount()
@@ -815,7 +815,7 @@ void tabRepair::saveDiagAmount()
     diagAmountSaved();
 }
 
-void tabRepair::autosaveTimeout()
+void tabRepair::autosaveDiagAmount()
 {
     QTextCursor tc = ui->textEditDiagResult->textCursor();
     int pos = tc.position();

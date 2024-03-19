@@ -36,7 +36,6 @@ private:
     QString phoneMask;
     int clientType = 0;
     void findClient();
-
 public slots:
     void setPhoneMask(const int index);
     void findByName(const QString&);
@@ -59,6 +58,8 @@ public:
     explicit matchingClientsTable(QWidget *parent = nullptr);
     ~matchingClientsTable();
     void setModel(QAbstractItemModel *model) override;
+    void clearModel() override;
+    void setModelQuery(const QString &query, const QSqlDatabase &database) override;
 private:
     SSqlFetchingModel *m_model = nullptr;
     void translateNames();
