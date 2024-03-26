@@ -357,7 +357,7 @@ void LoginWindow::btnLoginHandler()
     hash.addData(ui->editPassword->text().toUtf8(), ui->editPassword->text().length());
 //    qDebug() << hash.result().toHex();
 
-    connOptions << ("MYSQL_OPT_RECONNECT=1");
+    connOptions << ("MYSQL_OPT_RECONNECT=1") << "MYSQL_OPT_CONNECT_TIMEOUT=3";
     if(ui->checkBoxSSL->isChecked())
     {
         connOptions << QString("SSL_KEY=%1").arg(userLocalData->SSLKey.value);

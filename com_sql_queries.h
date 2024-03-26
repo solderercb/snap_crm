@@ -34,7 +34,7 @@
 #define QUERY_SEL_USERS_SALARY_TAXES        QString("SELECT `username`, `id`,  `salary_rate`,  `pay_day`,  `pay_day_off`,  `pay_repair`,  `pay_repair_quick`,  `pay_sale`,  `pay_repair_q_sale`,  `pay_cartridge_refill`,  `pay_device_in`,  `pay_device_out`,  `pay_4_sale_in_repair` FROM `users` WHERE `state` = 1 AND  `is_bot` = 0;")
 #define QUERY_SEL_MANAGERS                  QString("SELECT `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (3, 6) GROUP BY t1.`id`;")
 #define QUERY_SEL_ENGINEERS                 QString("SELECT `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (2, 5) GROUP BY t1.`id`;")
-#define QUERY_SEL_ITEM_BOXES(warehouse)     QString("SELECT `name`, `id`, `places`, `color` FROM `boxes` WHERE `store_id` = %1 AND `non_items` = 0 ORDER BY `name`;").arg((warehouse))
+#define QUERY_SEL_ITEM_BOXES(office)        QString("SELECT t1.`name`, t1.`id`, t1.`places`, t1.`color` FROM `boxes` AS t1 LEFT JOIN `stores` AS t2 ON t1.`store_id` = t2.`id` WHERE t2.`office` = %1 AND t1.`non_items` = 0 ORDER BY t1.`name`;").arg((office))
 #define QUERY_SEL_REPAIR_BOXES              QString("SELECT `name`, `id`,`places`, `color` FROM `boxes` WHERE `non_items` = 1 ORDER BY `name`;")
 #define QUERY_SEL_PAYMENT_SYSTEMS           QString("SELECT `name`, `system_id`, `system_data`, `id` FROM `payment_systems` WHERE `is_enable` = 1 ORDER BY `name`;")
 #define QUERY_SEL_PAYMENT_TYPE(id)          QString("SELECT `name`, `id`,  `type`,  `client`,  `periodic`,  `pay_date`,  `def_summ`,  `reason`,  `is_archive`,  `updated_at`,  `payment_system` FROM `payment_types` WHERE `id` = %1;").arg((id))
@@ -380,8 +380,8 @@
 #define QUERY_SEL_PART_FOR_SALE(uid, price_field_name, count)  QString(\
                                                         "SELECT\n"\
                                                         "  0 AS 'id',\n"\
-                                                        "  CONCAT(LPAD(articul, 6, '0'), '-', LPAD(id, 6, '0')) AS 'UID',\n"\
-                                                        "  `name`,\n"\
+                                                        "  CONCAT(LPAD(articul, 6, '0'), '-', LPAD(t1.`id`, 6, '0')) AS 'UID',\n"\
+                                                        "  t1.`name`,\n"\
                                                         "  %3 AS 'count',\n"\
                                                         "  `count` - `reserved` AS 'avail',\n"\
                                                         "  %2 AS 'price',\n"\
@@ -394,7 +394,7 @@
                                                         "  `return_percent`,\n"\
                                                         "  0 AS 'state',\n"\
                                                         "  NULL  AS 'notes',\n"\
-                                                        "  `id` AS 'item_id',\n"\
+                                                        "  t1.`id` AS 'item_id',\n"\
                                                         "  `in_price`,\n"\
                                                         "  0 AS 'obj_id',\n"\
                                                         "  `dealer`,\n"\
@@ -402,11 +402,14 @@
                                                         "  NULL AS 'created',\n"\
                                                         "  NULL AS 'work_id',\n"\
                                                         "  1 AS 'is_item',\n"\
-                                                        "  NULL AS 'work_type'\n"\
+                                                        "  NULL AS 'work_type',\n"\
+                                                        "  t2.`office`\n"\
                                                         "FROM\n"\
-                                                        "  store_items\n"\
+                                                        "  store_items AS t1\n"\
+                                                        "  LEFT JOIN stores AS t2\n"\
+                                                        "    ON t1.`store` = t2.`id`\n"\
                                                         "WHERE\n"\
-                                                        "  `id` IN (%1);")\
+                                                        "  t1.`id` IN (%1);")\
                                                         .arg((uid))\
                                                         .arg((price_field_name))\
                                                         .arg((count))

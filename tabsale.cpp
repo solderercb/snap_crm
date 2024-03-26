@@ -586,8 +586,8 @@ void tabSale::selectPriceCol(int index)
 
 void tabSale::addItemByUID()
 {
-    tableModel->addItemByUID(ui->lineEditAddByUID->text().toInt());
-    ui->lineEditAddByUID->setText("");
+    if(tableModel->addItemByUID(ui->lineEditAddByUID->text().toInt()))
+        ui->lineEditAddByUID->setText("");
 }
 
 void tabSale::print()

@@ -1443,16 +1443,16 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.cpp" line="131"/>
         <location filename="../widgets/sclientinputform.cpp" line="132"/>
         <location filename="../widgets/sclientinputform.cpp" line="133"/>
-        <location filename="../widgets/sclientinputform.cpp" line="138"/>
+        <location filename="../widgets/sclientinputform.cpp" line="134"/>
         <location filename="../widgets/sclientinputform.cpp" line="139"/>
+        <location filename="../widgets/sclientinputform.cpp" line="140"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sclientinputform.cpp" line="196"/>
+        <location filename="../widgets/sclientinputform.cpp" line="197"/>
         <source>Быстрое создание клиента из формы приёма в ремонт</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4034,44 +4034,50 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SSaleTableModel</name>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="315"/>
+        <location filename="../models/ssaletablemodel.cpp" line="320"/>
         <source>Повтор</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="316"/>
+        <location filename="../models/ssaletablemodel.cpp" line="321"/>
         <source>&quot;%1&quot; (UID %2) уже добавлен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="321"/>
+        <location filename="../models/ssaletablemodel.cpp" line="329"/>
         <source>Товар отсутствует</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="322"/>
+        <location filename="../models/ssaletablemodel.cpp" line="330"/>
         <source>Запрошенное кол-во товара &quot;%1&quot; (UID %2) не доступно для продажи</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="326"/>
-        <location filename="../models/ssaletablemodel.cpp" line="380"/>
+        <location filename="../models/ssaletablemodel.cpp" line="336"/>
+        <location filename="../models/ssaletablemodel.cpp" line="347"/>
+        <location filename="../models/ssaletablemodel.cpp" line="402"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="327"/>
-        <location filename="../models/ssaletablemodel.cpp" line="381"/>
+        <location filename="../models/ssaletablemodel.cpp" line="337"/>
+        <location filename="../models/ssaletablemodel.cpp" line="403"/>
         <source>Не выбрана работа. Укажите работу в которой была использована деталь</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="732"/>
+        <location filename="../models/ssaletablemodel.cpp" line="348"/>
+        <source>Товар числится на складе другого офиса</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../models/ssaletablemodel.cpp" line="754"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="732"/>
+        <location filename="../models/ssaletablemodel.cpp" line="754"/>
         <source>Список работ и деталей сохранён</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5748,32 +5754,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>matchingClientsTable</name>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="170"/>
+        <location filename="../widgets/sclientmatch.cpp" line="173"/>
         <source>FullName</source>
         <translation>ФИО</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="171"/>
+        <location filename="../widgets/sclientmatch.cpp" line="174"/>
         <source>Balance</source>
         <translation>Баланс</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="172"/>
+        <location filename="../widgets/sclientmatch.cpp" line="175"/>
         <source>Repairs</source>
         <translation>Ремонтов</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="173"/>
+        <location filename="../widgets/sclientmatch.cpp" line="176"/>
         <source>Purchases</source>
         <translation>Покупок</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="174"/>
+        <location filename="../widgets/sclientmatch.cpp" line="177"/>
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../widgets/sclientmatch.cpp" line="175"/>
+        <location filename="../widgets/sclientmatch.cpp" line="178"/>
         <source>PrimaryPhone</source>
         <translation>Основной телефон</translation>
     </message>
@@ -6065,27 +6071,27 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.ui" line="596"/>
+        <location filename="../tabcashoperation.ui" line="579"/>
         <source>Примечание</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.ui" line="679"/>
+        <location filename="../tabcashoperation.ui" line="662"/>
         <source>Печать</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.ui" line="701"/>
+        <location filename="../tabcashoperation.ui" line="684"/>
         <source>Провести</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.ui" line="708"/>
+        <location filename="../tabcashoperation.ui" line="691"/>
         <source>Возвратный</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.ui" line="715"/>
+        <location filename="../tabcashoperation.ui" line="698"/>
         <source>Провести ещё</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6115,7 +6121,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="729"/>
+        <location filename="../tabcashoperation.cpp" line="401"/>
+        <source>ПКО №%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.cpp" line="403"/>
+        <source>РКО №%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tabcashoperation.cpp" line="741"/>
         <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6135,37 +6151,37 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="391"/>
+        <location filename="../tabcashoperation.cpp" line="394"/>
         <source>Новый ПКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="392"/>
+        <location filename="../tabcashoperation.cpp" line="395"/>
         <source>Новый РКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="393"/>
+        <location filename="../tabcashoperation.cpp" line="406"/>
         <source>Кассовый ордер №%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="439"/>
+        <location filename="../tabcashoperation.cpp" line="451"/>
         <source>Открыть</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="525"/>
+        <location filename="../tabcashoperation.cpp" line="537"/>
         <source>Баланс клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="526"/>
+        <location filename="../tabcashoperation.cpp" line="538"/>
         <source>Баланс клиента не включен. Включить?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="811"/>
+        <location filename="../tabcashoperation.cpp" line="824"/>
         <source>Проведён</source>
         <translation type="unfinished"></translation>
     </message>

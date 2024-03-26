@@ -12,7 +12,7 @@ public:
     enum OpOnItem { Nop = 0, Sale = 1, Reserve = 2, SaleReserved = 3, SaleRepair = 4, Unsale = 5, Free = 6, WriteOff = 7, CancelWriteOff = 8, UnsaleRepair = 9, ReserveRepair = 10 };
     enum QtyField { Count = 0, Sold = 1, Reserved = 2 };
     enum SaleMode {Store = 1, Repair = 2};
-    enum SaleOpColumns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColUser, ColRealization, ColRetPercent, ColState, ColNotes, ColItemId, ColInPrice, ColObjId, ColDealer, ColBuyer, ColCreated, ColWorkId, ColRecordType, ColWorkType};
+    enum SaleOpColumns {ColId = 0, ColUID, ColName, ColCount, ColAvail, ColPrice, ColSumm, ColBox, ColSN, ColWarranty, ColUser, ColRealization, ColRetPercent, ColState, ColNotes, ColItemId, ColInPrice, ColObjId, ColDealer, ColBuyer, ColCreated, ColWorkId, ColRecordType, ColWorkType, ColOffice};
     Q_ENUM(SaleOpColumns)
     enum PriceOption {PriceOptionService = 1, PriceOptionRetail = 2, PriceOptionWholesale = 3, PriceOptionWholesale2 = 4, PriceOptionWholesale3 = 5, PriceOptionWarranty = 255};
     Q_ENUM(PriceOption)

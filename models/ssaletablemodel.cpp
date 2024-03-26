@@ -277,7 +277,6 @@ bool SSaleTableModel::addWorkByUID(const int uid, const SStoreItemModel::PriceOp
 bool SSaleTableModel::addItemByUID(const int uid, const SStoreItemModel::PriceOption priceOption, const int count)
 {
     QSqlQueryModel *item = nullptr;
-    int row = -1;
     bool ret = 1;
     int rowItemAlreadyInList;
 
@@ -288,43 +287,65 @@ bool SSaleTableModel::addItemByUID(const int uid, const SStoreItemModel::PriceOp
             item = new QSqlQueryModel(this);
             rowItemAlreadyInList = isItemAlreadyInList(uid);
             if(m_tableMode == TablesSet::StoreSale && rowItemAlreadyInList >= 0)
-                throw 0;
+                throw AddItemException::AlreadyAdded;
 
             item->setQuery(QUERY_SEL_PART_FOR_SALE(uid, priceColModel->value(priceOption, "id", "dbColumn").toString(), count), QSqlDatabase::database("connMain"));
-            if(count > item->record(0).value("avail").toInt())
-                throw 1;
+            const QSqlRecord &record = item->record(0);
+
+            if(count > record.value(SStoreItemModel::SaleOpColumns::ColAvail).toInt())
+                throw AddItemException::NotAvailable;
+
+            if(record.value(SStoreItemModel::SaleOpColumns::ColOffice).toInt() != userDbData->currentOffice)
+                throw AddItemException::ForeignWarehouse;
 
             if(m_tableMode == TablesSet::StoreSale)
             {
-                ret = appendRecord(item->record(0));
+                ret = appendRecord(record);
             }
             else
             {
                 if(m_currentIndex == -1 && rowCount())  // если не выбрана строка и таблица не пуста
-                    throw 2;
+                    throw AddItemException::NotLinked;
 
-                ret = insertRecord(getItemInsertionRow(), item->record(0));
+                ret = insertRecord(getItemInsertionRow(), record);
             }
         }
-        catch (int exception)
+        catch (AddItemException exception)
         {
+            const QSqlRecord &record = item->record(0);
             QString msgCaption, msgText;
-            if(exception == 0)
+            if(exception == AddItemException::AlreadyAdded)
             {
                 qDebug() << QString("товар UID %1 уже добавлен").arg(uid);
                 msgCaption = tr("Повтор");
-                msgText = tr("\"%1\" (UID %2) уже добавлен").arg(value(rowItemAlreadyInList, SStoreItemModel::SaleOpColumns::ColName).toString()).arg(uid);
+                msgText = tr("\"%1\" (UID %2) уже добавлен")
+                              .arg(value(rowItemAlreadyInList, SStoreItemModel::SaleOpColumns::ColName).toString())
+                              .arg(uid);
             }
-            else if(exception == 1)
+            else if(exception == AddItemException::NotAvailable)
             {
-                qDebug() << QString("Запрошенное кол-во товара UID %1 не доступно").arg(item->record(0).value("UID").toString());
+                qDebug() << QString("Запрошенное кол-во товара UID %1 не доступно")
+                                .arg(record.value(SStoreItemModel::SaleOpColumns::ColUID).toString());
                 msgCaption = tr("Товар отсутствует");
-                msgText = tr("Запрошенное кол-во товара \"%1\" (UID %2) не доступно для продажи").arg(value(row, SStoreItemModel::SaleOpColumns::ColName).toString()).arg(value(row, SStoreItemModel::SaleOpColumns::ColUID).toString());
+                msgText = tr("Запрошенное кол-во товара \"%1\" (UID %2) не доступно для продажи").arg(
+                              record.value(SStoreItemModel::SaleOpColumns::ColName).toString(),
+                              record.value(SStoreItemModel::SaleOpColumns::ColUID).toString());
             }
-            else if(exception == 2)
+            else if(exception == AddItemException::NotLinked)
             {
                 msgCaption = tr("Информация");
                 msgText = tr("Не выбрана работа. Укажите работу в которой была использована деталь");
+            }
+            else if(exception == AddItemException::ForeignWarehouse)
+            {
+                QString debugText = QString("Запрошенный товар UID %1 числится на складе другого офиса: %2, офис пользователя: %3")
+                                        .arg(record.value(SStoreItemModel::SaleOpColumns::ColUID).toString())
+                                        .arg(record.value(SStoreItemModel::SaleOpColumns::ColOffice).toInt())
+                                        .arg(userDbData->currentOffice);
+                appLog->appendRecord(debugText);
+                qDebug() << debugText;
+                msgCaption = tr("Информация");
+                msgText = tr("Товар числится на складе другого офиса");
             }
 
             shortlivedNotification *newPopup = new shortlivedNotification(this, msgCaption, msgText, QColor(255,255,255), QColor(245,245,245));
@@ -339,6 +360,7 @@ bool SSaleTableModel::addItemByUID(const int uid, const SStoreItemModel::PriceOp
 
 /*  Добавление товара по id
  *  Это перегруженный метод; товар добавляется с ценой, заданной при вызове метода setPriceColumn()
+ *  возвращает 0 в случае неудачи
  */
 bool SSaleTableModel::addItemByUID(const int uid, const int count)
 {

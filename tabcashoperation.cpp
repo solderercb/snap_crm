@@ -383,15 +383,27 @@ void tabCashOperation::updateOrderIdLineEdit()
     ui->lineEditOrderNum->setStyleSheet("QLineEdit { background: #90EE90;}");   // светло-зелёный
 }
 
+
 QString tabCashOperation::tabTitle()
 {
-    switch (m_initialOrderId)
+    if(m_orderId <= 0)
     {
-        case 0:
-        case tabCashOperation::PKO: return tr("Новый ПКО");
-        case tabCashOperation::RKO: return tr("Новый РКО");
-        default: return tr("Кассовый ордер №%1").arg(m_orderId);
+        switch(m_initialOrderId)
+        {
+            case 0:
+            case tabCashOperation::PKO: return tr("Новый ПКО");
+            case tabCashOperation::RKO: return tr("Новый РКО");
+        }
     }
+    else
+    {
+        if(m_amount > 0)
+            return tr("ПКО №%1").arg(m_orderId);
+        else
+            return tr("РКО №%1").arg(m_orderId);
+    }
+
+    return tr("Кассовый ордер №%1").arg(m_orderId);
 }
 
 void tabCashOperation::prepareTemplate(QMap<int, QVariant> data)
@@ -808,7 +820,8 @@ void tabCashOperation::buttonSaveMoreClicked()
     if(!commit(1))
         return;
 
-    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Проведён"), tabTitle(), QColor(214,239,220), QColor(229,245,234));
+    QString text = tabTitle().append(" на сумму %1").arg(cashRegister->amountStr());
+    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Проведён"), text, QColor(214,239,220), QColor(229,245,234));
     m_orderId = m_initialOrderId;
 //    ui->comboBoxOrderType->setCurrentIndex(-1);
     clearLinkedObjectFields();

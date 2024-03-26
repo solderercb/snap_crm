@@ -27,6 +27,9 @@ void SClientMatch::clear()
 {
     clientsMatchTable->clear();
     this->hide();
+    lastName = QString();
+    companyName = QString();
+    phone = QString();
 }
 
 void SClientMatch::setClientType(int type)

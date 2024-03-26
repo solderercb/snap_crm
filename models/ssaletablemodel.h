@@ -47,6 +47,7 @@ public:
     enum TablesSet {StoreSale = 0, WorkshopSale = 1};
     enum RepairType {RegularRepair = 0, CartridgeRepair};
     enum EditStrategy {OnFieldChange = 0, OnRowChange = 1, OnManualSubmit = 2, Nop = 0x55AA};
+    enum AddItemException {AlreadyAdded = 0, NotAvailable = 1, ForeignWarehouse = 2, NotLinked = 3};
     explicit SSaleTableModel(QObject *parent = nullptr);
     ~SSaleTableModel();
     QVariant value(const int, const int, const int role = Qt::DisplayRole) const;

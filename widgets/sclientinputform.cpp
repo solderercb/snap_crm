@@ -106,6 +106,7 @@ void SClientInputForm::clearClientCreds(bool keepCoincidenceShown)
     clientModel->clear();
     ui->pushButtonCreateTabClient->hide();
     ui->listWidgetClientOptions->clear();
+    ui->widgetClientMatch->clear();
 
     if (!keepCoincidenceShown)
         ui->widgetClientMatch->clear();
