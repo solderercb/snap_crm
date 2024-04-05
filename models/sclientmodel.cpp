@@ -227,6 +227,9 @@ void SClientModel::clear()
     m_purchases = 0;
     m_token = "";
     i_createdUtc = QDateTime();
+    m_balance = 0;
+    m_shortName = QString();
+    deleteBalanceObj();
 
     m_phones->reset();
 
@@ -434,11 +437,11 @@ int SClientModel::options()
 /*  Список свойств клиента, которые необходимо отображать в карточке ремонта
  *  или в графе с данными клиента при приёме в ремонт (в QListWidget)
 */
-QStringList SClientModel::optionsList(bool shortForm)
+QStringList SClientModel::optionsList(int format)
 {
     int col = 0;
     bool skip;
-    if(shortForm)
+    if(format == OptionsOutputForm::Short)
         col = 3;
     QStringList list;
     for(int i = 0; i < clientBinaryProperties->rowCount(); i++)
@@ -750,6 +753,7 @@ void SClientModel::deleteBalanceObj()
 {
     if(balanceLog)
         delete balanceLog;
+    balanceLog = nullptr;
 }
 
 bool SClientModel::updateBalance(const double amount, const QString &text)

@@ -226,8 +226,10 @@ void tabPrintDialog::setProgressText(const QString &text)
         return;
 
     QFontMetrics fm(m_progressWidget->font());
+    int windowWidth = MainWindow::getInstance()->width();
+//    int windowWidth = QApplication::activeWindow()->width(); // Оставлю для истории: это приводит к падению, если вызов происходит, когда окно программы не в фокусе
     m_progressWidgetStaticText = text;
-    m_progressWidget->setIndent((QApplication::activeWindow()->width() - ui->gridLayoutTab->columnMinimumWidth(0) - fm.size(Qt::TextSingleLine, m_progressWidgetStaticText + "   ").width())/2);
+    m_progressWidget->setIndent((windowWidth - ui->gridLayoutTab->columnMinimumWidth(0) - fm.size(Qt::TextSingleLine, m_progressWidgetStaticText + "   ").width())/2);
     updateProgressWidget();
 }
 
@@ -662,6 +664,8 @@ void tabPrintDialog::reportRenderFinished()
     previewDelayTimer = new QTimer();
     QObject::connect(previewDelayTimer, &QTimer::timeout, this, &tabPrintDialog::showPreview);
     previewDelayTimer->start(50);
+
+    emit renderFinished();
 }
 
 /* Перевод названий отчетов (заголовок вкладки предпросмотра и текст записи в таблице `users_activity`)

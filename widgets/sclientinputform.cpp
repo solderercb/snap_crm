@@ -139,7 +139,9 @@ void SClientInputForm::fillClientCreds(int id)
     ui->lineEditClientAddress->setText(permissions->viewClients?clientModel->address():tr("no permissions"));
     ui->lineEditClientEmail->setText(permissions->viewClients?clientModel->email():tr("no permissions"));
     ui->pushButtonCreateTabClient->setVisible(permissions->viewClients);
-    ui->listWidgetClientOptions->addItems(clientModel->optionsList(1));
+    ui->listWidgetClientOptions->addItems(clientModel->optionsList(SClientModel::OptionsOutputForm::Short));
+    if(clientModel->balanceEnabled())
+        ui->listWidgetClientOptions->addItems(QStringList("бал. "+sysLocale.toString(clientModel->balance(), 'f', 2)));
 
 }
 

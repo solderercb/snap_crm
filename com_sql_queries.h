@@ -377,11 +377,22 @@
                                                         "  (`document_id` = %1);")\
                                                         .arg((id))
                                                         
+#define QUERY_SEL_PART_WAREHOUSE(uid)                   QString(\
+                                                        "SELECT\n"\
+                                                        "  t2.`office`\n"\
+                                                        "FROM\n"\
+                                                        "  store_items AS t1\n"\
+                                                        "  LEFT JOIN stores AS t2\n"\
+                                                        "    ON t1.`store` = t2.`id`\n"\
+                                                        "WHERE\n"\
+                                                        "  t1.`id` IN (%1);")\
+                                                        .arg((uid))
+
 #define QUERY_SEL_PART_FOR_SALE(uid, price_field_name, count)  QString(\
                                                         "SELECT\n"\
                                                         "  0 AS 'id',\n"\
-                                                        "  CONCAT(LPAD(articul, 6, '0'), '-', LPAD(t1.`id`, 6, '0')) AS 'UID',\n"\
-                                                        "  t1.`name`,\n"\
+                                                        "  CONCAT(LPAD(articul, 6, '0'), '-', LPAD(id, 6, '0')) AS 'UID',\n"\
+                                                        "  `name`,\n"\
                                                         "  %3 AS 'count',\n"\
                                                         "  `count` - `reserved` AS 'avail',\n"\
                                                         "  %2 AS 'price',\n"\
@@ -394,7 +405,7 @@
                                                         "  `return_percent`,\n"\
                                                         "  0 AS 'state',\n"\
                                                         "  NULL  AS 'notes',\n"\
-                                                        "  t1.`id` AS 'item_id',\n"\
+                                                        "  `id` AS 'item_id',\n"\
                                                         "  `in_price`,\n"\
                                                         "  0 AS 'obj_id',\n"\
                                                         "  `dealer`,\n"\
@@ -402,14 +413,11 @@
                                                         "  NULL AS 'created',\n"\
                                                         "  NULL AS 'work_id',\n"\
                                                         "  1 AS 'is_item',\n"\
-                                                        "  NULL AS 'work_type',\n"\
-                                                        "  t2.`office`\n"\
+                                                        "  NULL AS 'work_type'\n"\
                                                         "FROM\n"\
-                                                        "  store_items AS t1\n"\
-                                                        "  LEFT JOIN stores AS t2\n"\
-                                                        "    ON t1.`store` = t2.`id`\n"\
+                                                        "  store_items\n"\
                                                         "WHERE\n"\
-                                                        "  t1.`id` IN (%1);")\
+                                                        "  `id` IN (%1);")\
                                                         .arg((uid))\
                                                         .arg((price_field_name))\
                                                         .arg((count))

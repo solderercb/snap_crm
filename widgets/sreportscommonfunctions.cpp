@@ -308,8 +308,13 @@ void SReportsCommonFunctions::initRepairsDataSources()
     {
         model = reinterpret_cast<STableRepairsModel*>(*i++);
         if(model)
+        {
+            while(model->canFetchMore())
+                model->fetchMore(1000);
             break;
+        }
     }
+
     if(!model)
     {
         m_repairsDemoModel = new STableRepairsModel();

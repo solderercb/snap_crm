@@ -392,7 +392,22 @@ void tabRepairs::buttonRefreshClicked()
 
 void tabRepairs::buttonPrintClicked()
 {
+    ui->tableView->enableAutorefresh(0);
     tabPrintDialog *tab = tabPrintDialog::create(ui->tableView->mode()?(Global::Reports::cartridges):(Global::Reports::repairs));
+    if(userDbData->autoRefreshWorkspace)
+    {
+#if QT_VERSION >= 0x060000
+        connect(tab, &tabPrintDialog::renderFinished, this, [=]{
+            ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
+        }, Qt::SingleShotConnection);
+#else
+        auto con = QSharedPointer<QMetaObject::Connection>::create();
+        *con = QObject::connect(tab, &tabPrintDialog::renderFinished, this, [con, this]{
+            QObject::disconnect(*con);
+            ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
+        });
+#endif
+    }
     tab->addDataModel(repairs_table);
     tab->startRender();
 }

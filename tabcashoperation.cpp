@@ -285,9 +285,11 @@ bool tabCashOperation::commit(bool repeatAfter)
             m_orderTypeRO = 1;
             m_showCheckBoxPrint = 0;
             ui->widgetClientMatch->hide();
-            updateWidgets();
         }
+        else
+            m_orderId = m_initialOrderId;
 
+        updateWidgets();
         if(ui->checkBoxPrintCheck->isChecked())
             print();
     }
@@ -622,7 +624,9 @@ void tabCashOperation::clearClientCreds(bool)
 {
     m_client = 0;
     clientModel->clear();
-    m_showBalance = 0;
+    if(m_orderType != SCashRegisterModel::PaymentType::ExpBalance &&
+        m_orderType != SCashRegisterModel::PaymentType::RecptBalance)
+        m_showBalance = 0;
     ui->lineClientId->clear();
     ui->lineEditClientLastName->clear();
     m_clientRO = ClientFieldsAccess::Full;
@@ -635,7 +639,9 @@ void tabCashOperation::fillClientCreds(int clientId)
     clearClientCreds(false);
     m_client = clientId;
     clientModel->load(clientId);
-    m_showBalance = clientModel->balanceEnabled();
+    m_showBalance = clientModel->balanceEnabled() ||
+                    (m_orderType == SCashRegisterModel::PaymentType::ExpBalance) ||
+                    (m_orderType == SCashRegisterModel::PaymentType::RecptBalance);
     ui->lineClientId->setText(QString::number(clientId));
     if(m_showClient == Client::Employee)
         ui->lineEditClientLastName->setText(allUsersModel->getDisplayRole(cashRegister->employee()));
@@ -941,6 +947,7 @@ void tabCashOperation::guiFontChanged()
     ui->doubleSpinBoxAmount->setFont(font);
     ui->lineEditClientLastName->setFont(font);
     ui->comboBoxPaymentAccount->setFont(font);
+    ui->dummyForRowHeight->setFont(font);
 }
 
 #ifdef QT_DEBUG

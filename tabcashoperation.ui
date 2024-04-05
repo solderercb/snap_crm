@@ -28,193 +28,81 @@
      <item row="1" column="0">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
        <item>
-        <layout class="QGridLayout" name="centerGridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="1,0,0" columnminimumwidth="0,0,500">
+        <layout class="QGridLayout" name="centerGridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="1,0,0,0" columnminimumwidth="0,150,140,340">
          <property name="spacing">
           <number>5</number>
          </property>
-         <item row="3" column="2">
-          <widget class="QLineEdit" name="lineEditDate">
-           <property name="readOnly">
-            <bool>true</bool>
+         <item row="1" column="0">
+          <widget class="QLabel" name="dummyForRowHeight">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgba(255, 255, 255, 0);</string>
+           </property>
+           <property name="text">
+            <string>dummyForHeight</string>
+           </property>
+           <property name="margin">
+            <number>4</number>
            </property>
           </widget>
          </item>
-         <item row="4" column="2">
-          <widget class="QDateEdit" name="dateEdit">
-           <property name="frame">
-            <bool>true</bool>
-           </property>
-           <property name="showGroupSeparator" stdset="0">
-            <bool>false</bool>
-           </property>
-           <property name="dateTime">
-            <datetime>
-             <hour>0</hour>
-             <minute>0</minute>
-             <second>0</second>
-             <year>2000</year>
-             <month>1</month>
-             <day>1</day>
-            </datetime>
-           </property>
-           <property name="maximumDateTime">
-            <datetime>
-             <hour>23</hour>
-             <minute>59</minute>
-             <second>59</second>
-             <year>2029</year>
-             <month>12</month>
-             <day>31</day>
-            </datetime>
-           </property>
-           <property name="minimumDateTime">
-            <datetime>
-             <hour>0</hour>
-             <minute>0</minute>
-             <second>0</second>
-             <year>2000</year>
-             <month>1</month>
-             <day>1</day>
-            </datetime>
-           </property>
-           <property name="calendarPopup">
-            <bool>true</bool>
+         <item row="8" column="1">
+          <widget class="QLabel" name="labelSumm">
+           <property name="text">
+            <string>Сумма</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="4" column="1">
           <widget class="QLabel" name="labelSide1">
            <property name="text">
             <string>side1LabelText</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QComboBox" name="comboBoxOrderType">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+         <item row="1" column="1">
+          <widget class="QLabel" name="labelOfLinkedObject">
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
-          </widget>
-         </item>
-         <item row="6" column="2">
-          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,10">
-           <property name="sizeConstraint">
-            <enum>QLayout::SetFixedSize</enum>
-           </property>
-           <item>
-            <widget class="QLineEdit" name="lineClientId">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>135</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="SLineEdit" name="lineEditClientLastName">
-             <property name="minimumSize">
-              <size>
-               <width>280</width>
-               <height>0</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="10" column="2">
-          <widget class="QCheckBox" name="checkBoxAutoReason">
            <property name="text">
-            <string>Автозаполнение основания платежа</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
+            <string>Документ:</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item row="7" column="0" rowspan="5">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QLabel" name="labelOrderNum">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <property name="text">
-              <string>Номер:</string>
-             </property>
-             <property name="margin">
-              <number>3</number>
-             </property>
-             <property name="indent">
-              <number>0</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEditOrderNum">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_3">
+            <spacer name="verticalSpacer">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
-               <height>20</height>
+               <width>20</width>
+               <height>40</height>
               </size>
              </property>
             </spacer>
            </item>
           </layout>
          </item>
-         <item row="6" column="1">
-          <widget class="QLabel" name="labelSide2">
-           <property name="text">
-            <string>side2LabelText</string>
+         <item row="5" column="3">
+          <widget class="SLineEdit" name="lineEditClientLastName">
+           <property name="minimumSize">
+            <size>
+             <width>280</width>
+             <height>0</height>
+            </size>
            </property>
           </widget>
          </item>
-         <item row="5" column="2">
-          <widget class="QComboBox" name="comboBoxCompany">
-           <property name="insertPolicy">
-            <enum>QComboBox::NoInsert</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="2">
+         <item row="11" column="3">
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -227,28 +115,122 @@
            </property>
           </spacer>
          </item>
-         <item row="8" column="1">
-          <widget class="QLabel" name="labelSumm">
-           <property name="text">
-            <string>Сумма</string>
+         <item row="0" column="2" colspan="2">
+          <widget class="QComboBox" name="comboBoxOrderType">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
           </widget>
          </item>
-         <item row="1" column="2">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item row="3" column="1">
+          <widget class="QLabel" name="labelDate">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Дата/время создания</string>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+           <property name="indent">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLabel" name="labelBalance">
+           <property name="text">
+            <string>Баланс</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2" colspan="2">
+          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
            <item>
-            <widget class="QLineEdit" name="lineEditLinkedObjId">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+            <widget class="QDateEdit" name="dateEdit">
+             <property name="frame">
+              <bool>true</bool>
              </property>
-             <property name="styleSheet">
-              <string notr="true"/>
+             <property name="showGroupSeparator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dateTime">
+              <datetime>
+               <hour>21</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>1999</year>
+               <month>12</month>
+               <day>31</day>
+              </datetime>
+             </property>
+             <property name="maximumDateTime">
+              <datetime>
+               <hour>20</hour>
+               <minute>59</minute>
+               <second>59</second>
+               <year>2029</year>
+               <month>12</month>
+               <day>31</day>
+              </datetime>
+             </property>
+             <property name="minimumDateTime">
+              <datetime>
+               <hour>21</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>1999</year>
+               <month>12</month>
+               <day>31</day>
+              </datetime>
+             </property>
+             <property name="calendarPopup">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditDate">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="9" column="2" colspan="2">
+          <widget class="QCheckBox" name="checkBoxPrintCheck">
+           <property name="text">
+            <string>Печать кассового чека</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="labelOrderType">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>Тип оплаты:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="4">
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <widget class="QLineEdit" name="lineEditLinkedObjCaption">
              <property name="sizePolicy">
@@ -277,148 +259,7 @@
            </item>
           </layout>
          </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="Line" name="line_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QWidget" name="widgetPaddingForLayout" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>10</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>10</width>
-             <height>23</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="labelOrderType">
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
-           <property name="text">
-            <string>Тип оплаты:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="2">
-          <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-           <property name="sizeConstraint">
-            <enum>QLayout::SetMinAndMaxSize</enum>
-           </property>
-           <item>
-            <widget class="QLineEdit" name="lineEditBalance">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>135</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="8" column="2">
-          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
-           <property name="sizeConstraint">
-            <enum>QLayout::SetMinAndMaxSize</enum>
-           </property>
-           <item>
-            <widget class="QDoubleSpinBox" name="doubleSpinBoxAmount">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>135</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="buttonSymbols">
-              <enum>QAbstractSpinBox::NoButtons</enum>
-             </property>
-             <property name="specialValueText">
-              <string notr="true"/>
-             </property>
-             <property name="correctionMode">
-              <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-             </property>
-             <property name="keyboardTracking">
-              <bool>true</bool>
-             </property>
-             <property name="prefix">
-              <string notr="true"/>
-             </property>
-             <property name="suffix">
-              <string notr="true"/>
-             </property>
-             <property name="maximum">
-              <double>9999999.990000000223517</double>
-             </property>
-             <property name="stepType">
-              <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="12" column="2">
+         <item row="12" column="2" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,1,0">
            <item>
             <spacer name="horizontalSpacer_6">
@@ -484,90 +325,216 @@
            </item>
           </layout>
          </item>
-         <item row="7" column="1">
-          <widget class="QLabel" name="labelBalance">
-           <property name="text">
-            <string>Баланс</string>
+         <item row="7" column="3">
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
          </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="labelOfLinkedObject">
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
-           <property name="text">
-            <string>Документ:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="2">
-          <widget class="QCheckBox" name="checkBoxPrintCheck">
-           <property name="text">
-            <string>Печать кассового чека</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1" rowspan="2" alignment="Qt::AlignTop">
-          <widget class="QLabel" name="labelDate">
+         <item row="7" column="2">
+          <widget class="QLineEdit" name="lineEditBalance">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text">
-            <string>Дата/время создания</string>
+           <property name="minimumSize">
+            <size>
+             <width>135</width>
+             <height>0</height>
+            </size>
            </property>
-           <property name="margin">
-            <number>3</number>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
            </property>
-           <property name="indent">
-            <number>0</number>
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="6" column="0" rowspan="6">
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item row="10" column="2" colspan="2">
+          <widget class="QCheckBox" name="checkBoxAutoReason">
+           <property name="text">
+            <string>Автозаполнение основания платежа</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="2">
+          <widget class="QDoubleSpinBox" name="doubleSpinBoxAmount">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>135</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::NoButtons</enum>
+           </property>
+           <property name="specialValueText">
+            <string notr="true"/>
+           </property>
+           <property name="correctionMode">
+            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+           </property>
+           <property name="keyboardTracking">
+            <bool>true</bool>
+           </property>
+           <property name="prefix">
+            <string notr="true"/>
+           </property>
+           <property name="suffix">
+            <string notr="true"/>
+           </property>
+           <property name="maximum">
+            <double>9999999.990000000223517</double>
+           </property>
+           <property name="stepType">
+            <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2" colspan="2">
+          <widget class="QComboBox" name="comboBoxCompany">
+           <property name="insertPolicy">
+            <enum>QComboBox::NoInsert</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLineEdit" name="lineEditLinkedObjId">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
+          <widget class="QLineEdit" name="lineClientId">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>135</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="labelSide2">
+           <property name="text">
+            <string>side2LabelText</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
-            <widget class="SClientMatch" name="widgetClientMatch" native="true">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
+            <widget class="QLabel" name="labelOrderNum">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>10</height>
-              </size>
+             <property name="styleSheet">
+              <string notr="true"/>
              </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>500</height>
-              </size>
+             <property name="text">
+              <string>Номер:</string>
+             </property>
+             <property name="margin">
+              <number>3</number>
+             </property>
+             <property name="indent">
+              <number>0</number>
              </property>
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer">
+            <widget class="QLineEdit" name="lineEditOrderNum">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
-               <height>40</height>
+               <width>40</width>
+               <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
           </layout>
+         </item>
+         <item row="6" column="1" colspan="3">
+          <widget class="SClientMatch" name="widgetClientMatch" native="true">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>10</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>500</height>
+            </size>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -766,8 +733,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>comboBoxOrderType</tabstop>
-  <tabstop>lineEditClientLastName</tabstop>
-  <tabstop>doubleSpinBoxAmount</tabstop>
   <tabstop>checkBoxPrintCheck</tabstop>
   <tabstop>checkBoxAutoReason</tabstop>
   <tabstop>comboBoxPaymentAccount</tabstop>
@@ -776,14 +741,8 @@
   <tabstop>buttonSave</tabstop>
   <tabstop>buttonSaveMore</tabstop>
   <tabstop>pushButtonOpenLinkedObject</tabstop>
-  <tabstop>dateEdit</tabstop>
-  <tabstop>comboBoxCompany</tabstop>
   <tabstop>lineEditOrderNum</tabstop>
-  <tabstop>lineEditLinkedObjId</tabstop>
   <tabstop>lineEditLinkedObjCaption</tabstop>
-  <tabstop>lineEditDate</tabstop>
-  <tabstop>lineClientId</tabstop>
-  <tabstop>lineEditBalance</tabstop>
   <tabstop>buttonRevert</tabstop>
   <tabstop>buttonPrint</tabstop>
  </tabstops>

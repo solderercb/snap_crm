@@ -6,7 +6,7 @@ SModalWidget::SModalWidget(QWidget *parent, Qt::WindowFlags flags) :
 {
     background = new QWidget(parent);
     background->setStyleSheet("QWidget { background: rgba(154, 154, 154, 128);}");
-    background->resize(QApplication::activeWindow()->size());
+    background->resize(MainWindow::getInstance()->size());
     background->setVisible(true);
 
     setWindowModality(Qt::WindowModal);

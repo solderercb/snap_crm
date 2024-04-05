@@ -121,6 +121,8 @@ void SPhonesModel::clear()
         m_phonesList.removeLast();
         delete phone;
     }
+    m_client = 0;
+    m_updated = 0;
 }
 
 bool SPhonesModel::isUpdated()

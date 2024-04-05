@@ -23,6 +23,8 @@ class tabPrintDialog;
 class tabPrintDialog : public tabCommon, public SReportsCommonFunctions
 {
     Q_OBJECT
+signals:
+    void renderFinished();
 public:
     enum BelongReportsList {NotInList, InList};
     explicit tabPrintDialog(MainWindow *parent, Global::Reports type = Global::Reports::not_impl);

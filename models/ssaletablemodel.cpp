@@ -282,6 +282,7 @@ bool SSaleTableModel::addItemByUID(const int uid, const SStoreItemModel::PriceOp
 
     if(m_modelState == SSaleTableModel::StoreNew || m_modelState == SSaleTableModel::StoreReserved || m_modelState == SSaleTableModel::WorkshopRW || m_modelState == SSaleTableModel::WorkshopAdm )
     {
+        int partInOffice = -1;
         try
         {
             item = new QSqlQueryModel(this);
@@ -295,7 +296,11 @@ bool SSaleTableModel::addItemByUID(const int uid, const SStoreItemModel::PriceOp
             if(count > record.value(SStoreItemModel::SaleOpColumns::ColAvail).toInt())
                 throw AddItemException::NotAvailable;
 
-            if(record.value(SStoreItemModel::SaleOpColumns::ColOffice).toInt() != userDbData->currentOffice)
+            QSqlQuery checkWarehouse(QSqlDatabase::database("connMain"));
+            checkWarehouse.exec(QUERY_SEL_PART_WAREHOUSE(uid));
+            checkWarehouse.first();
+            partInOffice = checkWarehouse.record().value(0).toInt();
+            if(partInOffice != userDbData->currentOffice)
                 throw AddItemException::ForeignWarehouse;
 
             if(m_tableMode == TablesSet::StoreSale)
@@ -340,7 +345,7 @@ bool SSaleTableModel::addItemByUID(const int uid, const SStoreItemModel::PriceOp
             {
                 QString debugText = QString("Запрошенный товар UID %1 числится на складе другого офиса: %2, офис пользователя: %3")
                                         .arg(record.value(SStoreItemModel::SaleOpColumns::ColUID).toString())
-                                        .arg(record.value(SStoreItemModel::SaleOpColumns::ColOffice).toInt())
+                                        .arg(partInOffice)
                                         .arg(userDbData->currentOffice);
                 appLog->appendRecord(debugText);
                 qDebug() << debugText;

@@ -85,6 +85,7 @@ signals:
 public:
     enum BinaryOption{Company = 1, Regular = 2, Broker = 4, IgnoreCalls = 8, PreferCashless = 16, TakeLong = 32, Supplier = 64, SaleOrReturn = 128, BalanceEnabled = 256, Bad = 512, Archived = 1024};
     enum EditStrategy { OnFieldChange, OnManualSubmit };
+    enum OptionsOutputForm {Standard = 1, Short = 2};
     explicit SClientModel(int id = 0, QObject *parent = nullptr);
     ~SClientModel();
     bool isNew();
@@ -127,7 +128,7 @@ public:
     QString notes();
     void setNotes(const QString&);
     int options();
-    QStringList optionsList(bool shortForm = 0);
+    QStringList optionsList(int format = OptionsOutputForm::Standard);
     bool isSupplier();
     bool isGivesItemsForSale();
     bool isArchived();

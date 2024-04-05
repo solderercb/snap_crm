@@ -124,6 +124,11 @@ void SSqlFetchingModel::fetchMore(const int fetchSize, const QModelIndex &parent
 
     part->exec(query);
     rows = part->size();
+    if(m_sqlQueries.isEmpty())
+    {
+        m_rec = part->record();
+        m_columnCount = m_rec.count();
+    }
     if(rows == 0)
     {
         m_atEnd = 1;
@@ -131,11 +136,6 @@ void SSqlFetchingModel::fetchMore(const int fetchSize, const QModelIndex &parent
     }
 
     beginInsertRows(parent, m_rowCount, m_rowCount + rows);
-    if(m_sqlQueries.isEmpty())
-    {
-        m_rec = part->record();
-        m_columnCount = m_rec.count();
-    }
     m_sqlQueries.insert(m_rowCount, part);
     m_rowCount += rows;
     endInsertRows();

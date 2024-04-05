@@ -66,7 +66,8 @@ void SComTextEdit::updateHeight()
 
 //    qDebug().nospace() << "[" << this << "] SComTextEdit::updateHeight() | *te: " << te << "; *pte: " << pte;
 
-    textBufferForHeightCalc->setTextWidth(baseAbstractScrollArea->QAbstractScrollArea::width() - 2*baseAbstractScrollArea->verticalScrollBar()->width());
+    int sbw = baseAbstractScrollArea->verticalScrollBar()->isVisible()?2*baseAbstractScrollArea->verticalScrollBar()->width():baseAbstractScrollArea->verticalScrollBar()->sizeHint().width();
+    textBufferForHeightCalc->setTextWidth(baseAbstractScrollArea->QAbstractScrollArea::width() - sbw);
     textBufferForHeightCalc->setPlainText(text);
     int textBufferRows = textBufferForHeightCalc->size().toSize().height()/textBufferFontMetrics->height();
 

@@ -93,6 +93,15 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->widgetComments->setParentTab(this);
     ui->widgetComments->setMode(SCommentModel::Repair);
 
+    // Узкая полоса прокрутки; стиль задаётся здесь, т. к. если задать его в ui-файле он будет унаследован дочерними виджетами
+    QString styleSheet = "\
+        QScrollBar:vertical{  background-color: rgba(0,0,0,30);  width: 8px;  margin: 21px 0 21px 0;}\
+        QScrollBar::handle:vertical{  background-color: rgba(0,0,0,50);  min-height: 25px;}\
+        QScrollBar::add-line:vertical{  border: 1px solid rgba(200, 200, 200, 195);	background-color: rgba(200, 200, 200, 127);  height: 20px;  subcontrol-position: bottom;  subcontrol-origin: margin;}\
+        QScrollBar::sub-line:vertical{  border: 1px solid rgba(200, 200, 200, 195);  background-color: rgba(200, 200, 200, 127);  height: 20px;  subcontrol-position: top;  subcontrol-origin: margin;}";
+    ui->leftScrollArea->verticalScrollBar()->setStyleSheet(styleSheet);
+    ui->rightScrollArea->verticalScrollBar()->setStyleSheet(styleSheet);
+
     // сворачивание групп элементов (ну как в АСЦ чтобы). TODO: Отключено, т. к. требует доработки класса SGroupBoxEventFilter
 //    groupBoxEventFilter = new SGroupBoxEventFilter(this);
 //    ui->groupBoxDeviceSummary->installEventFilter(groupBoxEventFilter);
@@ -195,7 +204,7 @@ void tabRepair::updateWidgets()
     ui->lineEditRepairId->setText(QString::number(repair_id));
     ui->lineEditDevice->setText(repairModel->title());
     ui->lineEditSN->setText(repairModel->serialNumber());
-    ui->lineEditClient->setText(permissions->viewClients?clientModel->fullLongName():tr("no permissions"));
+    ui->textEditClient->setPlainText(permissions->viewClients?clientModel->fullLongName():tr("no permissions"));
     ui->labelPrimaryPhone->setVisible(permissions->viewClients);
     ui->lineEditPrimaryPhone->setVisible(permissions->viewClients);
     ui->lineEditPrimaryPhone->setText(clientModel->phones()->primaryStr());
@@ -387,7 +396,7 @@ void tabRepair::setInfoWidgetVisible(QWidget *field, bool state)
 {
     // TODO: нужно сделать скрытие пары виджетов с удалением их из layout, т. к. пустая строка увеличивает зазор между видимыми виджетами
     QWidget *label;
-    label = ui->formLayout->labelForField(field);
+    label = ui->leftScrollAreaFormLayout->labelForField(field);
     field->setVisible(state);
     label->setVisible(state);
 }

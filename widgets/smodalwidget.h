@@ -4,6 +4,7 @@
 #include "widgets/swidget.h"
 #include "global.h"
 #include "shortlivednotification.h"
+#include "mainwindow.h"
 
 class SModalWidget : public SWidget
 {
