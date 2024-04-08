@@ -437,17 +437,15 @@ void STableViewBase::dataChanged(const QModelIndex &topLeft, const QModelIndex &
 
 void STableViewBase::verticalScrollbarValueChanged(int value)
 {
-    bool flag = (verticalScrollBar()->maximum() > 0 && verticalScrollBar()->maximum() == value && !i_vspValue); // с пом. условия !i_vspValue фильтруются автообновления
-    if(flag)
-        saveSelection();
+    restartAutorefreshTimer();  // чтобы во время прокрутки не срабатывало автообновление таблицы и интерфейс не подвисал
     QTableView::verticalScrollbarValueChanged(value);
-    if(flag)
-        restoreSelection();
 }
 
 void STableViewBase::horizontalScrollbarValueChanged(int value)
 {
     Q_UNUSED(value);
+
+    restartAutorefreshTimer();
     // При прокрутке максимально вправо также вызываются методы canFetchMore и fetchMore
     // (см. qtbase\src\widgets\itemviews\qabstractitemview.cpp)
     // с пом. значения -1 вызов fetchMore блокируется, но остальные действия выполнятся
@@ -903,23 +901,31 @@ void STableViewBase::vScrollCorrection()
 
 void STableViewBase::vsp_rangeChanged(const int min, const int max)
 {
-    if(max == 0 || !verticalScrollBar()->isVisible())
+    if(max == 0)
         return;
 
+    restartAutorefreshTimer();
+    while(model()->rowCount() < i_vspOldRowCount && (i_vspValue || hasSavedSelection()))
+    {
+        fetchMore(QModelIndex());
+        return;
+    }
+    if(verticalScrollBar()->maximum() - i_vspValue < userDbData->rowHeight)
+    {
+        fetchMore(QModelIndex());
+    }
     restoreVScrollPos();
 }
 
 void STableViewBase::restoreVScrollPos()
 {
-    if(i_vspValue > 0)
+    if(i_vspValue >= 0)
     {
         vScrollCorrection();
         verticalScrollBar()->setValue(i_vspValue);
     }
 
-    i_vspValue = 0;
-
-    restoreSelection();
+    i_vspValue = -1;
 }
 
 void STableViewBase::hsp_rangeChanged(const int min, const int max)
@@ -955,7 +961,6 @@ QModelIndexList STableViewBase::selectionList()
 */
 void STableViewBase::saveSelection()
 {
-    m_restoreSelectionTrig = 0;
     if(selectionBehavior() != QAbstractItemView::SelectRows)
         return;
 
@@ -963,6 +968,8 @@ void STableViewBase::saveSelection()
     {
         m_selectionList.append(index.data());
     }
+    m_currentIndexRow = currentIndex().row();
+    m_currentIndexColumn = currentIndex().column();
 }
 
 bool STableViewBase::hasSavedSelection()
@@ -975,13 +982,6 @@ bool STableViewBase::hasSavedSelection()
 */
 void STableViewBase::restoreSelection()
 {
-    // Метод вызывается из двух мест, а порядок вызова может изменяться,
-    // поэтому, чтобы восстановление работало корректно, используется примитивный фильтр
-    m_restoreSelectionTrig++;
-    if(m_restoreSelectionTrig != 2)
-        return;
-    m_restoreSelectionTrig = 0;
-
     if(selectionBehavior() != QAbstractItemView::SelectRows)
         return;
 
@@ -1003,6 +1003,15 @@ void STableViewBase::restoreSelection()
         }
     }
     selectionModel()->select(selection, QItemSelectionModel::Select);
+
+    // При восстановлении текущего индекса также изменяется значение скролла; однако, посылка/обработка сигнала
+    // происходит в разное время (предположительно, зависит от события Paint), из-за чего после автообновления
+    // таблицы положение восстанавливается неправильно если таблица не на виду (например, пользователь переключился
+    // на другую вкладку). Чтобы положение восстанавливалось всегда сигналы блокируются.
+    selectionModel()->blockSignals(true);
+    selectionModel()->setCurrentIndex(model()->index(m_currentIndexRow, m_currentIndexColumn), QItemSelectionModel::Rows);
+    selectionModel()->blockSignals(false);
+
     m_selectionList.clear();    // если вдруг в списке остались элементы
 }
 
@@ -1042,6 +1051,11 @@ void STableViewBase::clearModel()
 void STableViewBase::setModelQuery(const QString &query, const QSqlDatabase &database)
 {
     m_model->setQuery(query, database);
+}
+
+void STableViewBase::fetchMore(const QModelIndex &parent)
+{
+    m_model->fetchMore(QModelIndex());
 }
 
 /*  Очистка списка выделенных строк
@@ -1102,6 +1116,18 @@ void STableViewBase::delayedRefresh(const int msec)
     m_autorefreshTimer->start(msec);
 }
 
+/*  Перезапуск таймера автообновления таблицы.
+ *  Может быть полезен, например, при дозагрузке данных (fetchMore) или
+ *  при при прокрутке таблицы — автообновление не будет "накладываться"
+ *  и интерфейс программы не будет подвисать.
+ *  TODO: но правльно будет реализовать асинхронную загрузку и обновление
+*/
+void STableViewBase::restartAutorefreshTimer()
+{
+    if(m_autorefreshTimeout > 0)
+        m_autorefreshTimer->start(m_autorefreshTimeout);
+}
+
 void STableViewBase::autorefreshTable()
 {
     refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
@@ -1126,6 +1152,9 @@ void STableViewBase::setUniqueIdColumn(int uniqueIdColumn)
 */
 void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
 {
+    if(QApplication::queryKeyboardModifiers() & (Qt::ControlModifier | Qt::ShiftModifier))
+        return;
+
     if (m_query.isEmpty() || (!m_db.isValid()))
         return;
 
@@ -1144,7 +1173,7 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
     if(m_queryConditionsChanged)
     {
         i_vspOldRowCount = 0;
-        i_vspValue = 0;
+        i_vspValue = -1;
         m_queryConditionsChanged = 0;
     }
 

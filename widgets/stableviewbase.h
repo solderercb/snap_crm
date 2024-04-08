@@ -70,6 +70,7 @@ public:
     void setLayoutVariant(const SLocalSettings::SettingsVariant &layoutVariant);
     void enableAutorefresh(const int msec);
     void delayedRefresh(const int msec);
+    void restartAutorefreshTimer();
 protected:
     static const QRegularExpression queryPrepareRegexpPattern;
     QSqlQueryModel *m_model = nullptr;
@@ -116,6 +117,7 @@ protected:
     bool initHeaders();
     virtual void clearModel();
     virtual void setModelQuery(const QString &query, const QSqlDatabase &database);
+    virtual void fetchMore(const QModelIndex &parent);
     virtual void layoutChanged(int,int,int);
 private:
     QFile m_layoutSettingsFileName;
@@ -129,6 +131,8 @@ private:
     QStringList *m_grouping = nullptr;
     int m_uniqueIdColumn = -1;
     QList<QVariant> m_selectionList;
+    int m_currentIndexRow = -1;
+    int m_currentIndexColumn = -1;
     QTimer *m_layoutSaveTimer = nullptr;
     int m_autorefreshTimeout = 0;
     int m_restoreSelectionTrig = 0;

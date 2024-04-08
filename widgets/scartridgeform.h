@@ -95,6 +95,7 @@ private:
     int m_prevRepairsCount = 0;
     QString m_lineEditStyleSheet = commonLineEditStyleSheet;
     QString m_spinBoxStyleSheet = commonSpinBoxStyleSheet;
+    bool m_initDone = 0;
     void updateHeader();
     void updateWidgets();
     void hideWidgetsOnReceiptForm();

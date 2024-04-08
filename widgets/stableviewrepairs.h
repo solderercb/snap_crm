@@ -31,9 +31,7 @@ private:
     void readLayout();
     void clearModel() override;
     void setModelQuery(const QString &query, const QSqlDatabase &database) override;
-private slots:
-    void vsp_rangeChanged(const int min, const int max) override;
-    void hsp_rangeChanged(const int min, const int max) override;
+    void fetchMore(const QModelIndex &parent) override;
 };
 
 #endif // STABLEVIEWREPAIRS_H

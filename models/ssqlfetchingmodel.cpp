@@ -113,6 +113,7 @@ void SSqlFetchingModel::fetchMore(const QModelIndex &parent)
     fetchMore(m_fetchSize, parent);
 }
 
+//  TODO: реализовать асинхронную загрузку
 void SSqlFetchingModel::fetchMore(const int fetchSize, const QModelIndex &parent)
 {
     if(!canFetchMore(parent))

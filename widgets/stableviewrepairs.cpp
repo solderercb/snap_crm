@@ -120,7 +120,6 @@ void STableViewRepairs::readLayout()
     {
         i_gridLayout->$GridControl.Columns[i].Visible = false;
     }
-
 }
 
 void STableViewRepairs::clearModel()
@@ -139,24 +138,10 @@ void STableViewRepairs::setModelQuery(const QString &query, const QSqlDatabase &
     m_model->setQuery(query, database);
 }
 
-void STableViewRepairs::vsp_rangeChanged(const int min, const int max)
+/*  Переопределённый метод
+ *  Загружает недостающие данные за один запрос
+*/
+void STableViewRepairs::fetchMore(const QModelIndex &parent)
 {
-    if(max == 0)    // после очистки модели ничего не делаем
-        return;
-
-    while(model()->rowCount() < i_vspOldRowCount && (i_vspValue || hasSavedSelection()))
-    {
-        m_model->fetchMore(i_vspOldRowCount - model()->rowCount(), QModelIndex());
-        return;
-    }
-    if(verticalScrollBar()->maximum() - i_vspValue < userDbData->rowHeight)
-    {
-        m_model->fetchMore(QModelIndex());
-    }
-    STableViewBase::vsp_rangeChanged(min, max);
-}
-
-void STableViewRepairs::hsp_rangeChanged(const int min, const int max)
-{
-    STableViewBase::hsp_rangeChanged(min, max);
+    m_model->fetchMore(i_vspOldRowCount - model()->rowCount(), parent);
 }

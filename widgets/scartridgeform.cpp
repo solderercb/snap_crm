@@ -174,6 +174,7 @@ void SCartridgeForm::initWidgets()
         ui->pushButtonPreagreedRefill->setChecked(true);
         setRefill(true);    // почему-то при вызове метода setChecked() слот setRefill() не вызывается
     }
+    m_initDone = 1;
 }
 
 /* Натсройка виджетов предварительно согласованных работ
@@ -293,6 +294,9 @@ bool SCartridgeForm::eventFilter(QObject *watched, QEvent *event)
 
     if(event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
     {
+        if(!m_initDone)     // Если инициализация моделей и виджетов не выполнена, то обработка событий не должна выполняться
+            return false;
+
         QPushButton *checkBoxWidget = dynamic_cast<QPushButton*>(watched);
         if(checkBoxWidget)
         {
