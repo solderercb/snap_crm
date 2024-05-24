@@ -24,7 +24,9 @@ private:
     Ui::tabTechReports *ui;
     STableTechReportsModel *m_tableModel;
     QTimer *tableUpdateDelay;
+    QStringList query_group;
     QList<STechReportModel*> reportsListFromSelection();
+    void constructQueryClause();
 private slots:
     void buttonRefreshClicked();
     void lineEditSearchTextChanged(QString);

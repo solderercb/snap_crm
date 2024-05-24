@@ -837,7 +837,10 @@ bool SCartridgeForm::workAndPartHandler(const int workType, const int checkboxSt
     if(checkboxState)
     {
         ret = addWorkAndPart(workType);
-        updateLists();  // при добавлении работ и деталей сигнал modelReset не емитируется
+
+        // при добавлении работ и деталей сигнал modelReset не эмитируется
+        updateLists();
+        updateWorksActionsCheckedState();
     }
     else
     {

@@ -59,6 +59,9 @@ QVariant SSqlFetchingModel::data(const QModelIndex &item, int role) const
     if (!item.isValid())
         return QVariant();
 
+    if((role&0xFF) == Qt::ToolTipRole)
+        return data(item, Qt::DisplayRole);
+
     if ((role&0xFF) & ~(Qt::DisplayRole | Qt::EditRole))
         return QVariant();
 

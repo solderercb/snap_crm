@@ -12,6 +12,7 @@ class STableBaseModel : public QSqlQueryModel, public STableModelsCommonMethods
 {
     Q_OBJECT
 public:
+    static const QRegularExpression queryPrepareRegexpPattern;
     explicit STableBaseModel(QObject *parent = nullptr);
     ~STableBaseModel();
     void setQuery(const QString &query, const QSqlDatabase &db = QSqlDatabase());

@@ -47,6 +47,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->widgetClientMatch->setClientType(SClientMatch::NameSearchScope::Both);
 
     ui->tableView->setModel(tableModel);
+    ui->tableView->viewport()->installEventFilter(new QToolTipper(ui->tableView));
 
 //    connect(ui->lineEditAddByUID, SIGNAL(returnPressed()), this, SLOT(addItemByUID()));    // подключены в дизайнере
 //    connect(ui->buttonReserve, SIGNAL(clicked()), this, SLOT(reserveButtonClicked()));    // подключены в дизайнере

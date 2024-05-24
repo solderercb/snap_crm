@@ -7,6 +7,12 @@ STableViewTechReports::STableViewTechReports(QWidget *parent) :
     readLayout();
 }
 
+void STableViewTechReports::setModel(QAbstractItemModel *model)
+{
+    m_model = static_cast<STableTechReportsModel*>(model);
+    STableViewBase::setModel(model);
+}
+
 QList<int> *STableViewTechReports::selectedReportsList()
 {
     QList<int> *list = new QList<int>();
@@ -16,6 +22,30 @@ QList<int> *STableViewTechReports::selectedReportsList()
         list->append(model->unformattedData(index).toInt());
     }
     return list;
+}
+
+void STableViewTechReports::setColumnWidth(int column, int width)
+{
+    if(m_model)
+        m_model->setColumnWidth(column, (int)(width/m_fontMetrics->averageCharWidth()));
+
+    STableViewBase::setColumnWidth(column, width);
+}
+
+void STableViewTechReports::clearModel()
+{
+    if(!m_model)
+        return;
+
+    m_model->clear();
+}
+
+void STableViewTechReports::setModelQuery(const QString &query, const QSqlDatabase &database)
+{
+    if(!m_model)
+        return;
+
+    m_model->setQuery(query, database);
 }
 
 void STableViewTechReports::translateNames()
@@ -28,7 +58,7 @@ void STableViewTechReports::translateNames()
     tr("Device");
     tr("InvNumber");
     tr("SerialNumber");
-    tr("ProductionData");
+    tr("ProductionDate");
     tr("PurchaseDate");
     tr("InitCost");
     tr("ResidualCost");

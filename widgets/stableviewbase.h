@@ -19,6 +19,7 @@
 #include "widgets/stableviewgridlayout.h"
 #include "stableviewbaseitemdelegates.h"
 #include "models/stablebasemodel.h"
+#include "widgets/qtooltipper.h"
 
 typedef struct FilterList FilterList;
 
@@ -72,7 +73,6 @@ public:
     void delayedRefresh(const int msec);
     void restartAutorefreshTimer();
 protected:
-    static const QRegularExpression queryPrepareRegexpPattern;
     QSqlQueryModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
     SLocalSettings::SettingsVariant m_layoutVariant = SLocalSettings::RepairsGrid;

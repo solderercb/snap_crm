@@ -407,8 +407,9 @@ bool MainWindow::event(QEvent *event)
 
         if(keyEvent->modifiers().testFlag(Qt::ControlModifier) && keyEvent->key() == Qt::Key_W)
         {
-            ui->tabWidget->currentWidget()->deleteLater();
+            int tabId = ui->tabWidget->tabBar()->currentIndex();
             switchToLastUsedTab();
+            ui->tabWidget->tabBar()->tabCloseRequested(tabId);
         }
 
         // Если фокус на кнопке меню главного окна, то сочетания Ctrl+Tab/Ctrl+Shift+Tab не переключают вкладку, т. к. QTabWidget не является родителем
@@ -1126,6 +1127,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabClient(143);
 //        createTabCashMoveExch();
 //        createTabClients();
+//        createTabTechReports();
 
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("type", Global::Reports::new_rep);

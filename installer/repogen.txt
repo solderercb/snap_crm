@@ -1,0 +1,32 @@
+Usage: repogen.exe [options] repository-dir
+
+Options:
+  -p|--packages dir         The directory containing the available packages.
+                            This entry can be given multiple times.
+  --repository dir          The directory containing the available repository.
+                            This entry can be given multiple times.
+  -e|--exclude p1,...,pn    Exclude the given packages.
+  -i|--include p1,...,pn    Include the given packages and their dependencies
+                            from the repository.
+  --ignore-translations     Do not use any translation
+  --ignore-invalid-packages Ignore all invalid packages instead of aborting.
+  --ignore-invalid-repositories Ignore all invalid repositories instead of aborting.
+  -s|--sha-update p1,...,pn List of packages which are updated using
+                            content sha1 instead of version number.
+  -r|--remove               Force removing target directory if existent.
+  --update                  Update a set of existing components (defined by
+                            --include or --exclude) in the repository
+  --update-new-components   Update a set of existing components (defined by
+                            --include or --exclude) in the repository with all new components
+  -v|--verbose              Verbose output
+  --unite-metadata          Combine all metadata into one 7z. This speeds up metadata
+                            download phase.
+  --component-metadata      Creates one metadata 7z per component.
+  --af|--archive-format 7z|qbsp
+                            Set the format used when packaging new component data archives. If
+                            you omit this option the 7z format will be used as a default.
+  --ac|--compression 0,1,3,5,7,9
+                            Sets the compression level used when packaging new data archives.
+
+Example:
+  repogen.exe -p ../examples/packages repository/

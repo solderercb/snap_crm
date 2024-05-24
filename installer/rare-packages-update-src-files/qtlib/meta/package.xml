@@ -2,7 +2,8 @@
 <Package>
 	<DisplayName>библиотеки Qt</DisplayName>
 	<Description>необходимые для работы библиотеки Qt</Description>
-  <Version>5.15.4</Version>
-  <ReleaseDate>2022-05-11</ReleaseDate>
+  <Version>5.15.10</Version>
+  <ReleaseDate>2023-07-01</ReleaseDate>
   <Default>true</Default>
+  <Script>dummy</Script>
 </Package>

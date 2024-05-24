@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QString>
 #include <QDate>
+#include <QDateTime>
 #include "sdevmdlmodel.h"
 #include "sclientmodel.h"
 #include "ssaletablemodel.h"
@@ -233,7 +234,7 @@ public:
     bool isNew();
     void setBOQModel(SSaleTableModel *model);
     SSaleTableModel *BOQModel() const;
-
+    int lockTimeout();
 private:
     SClientModel *m_clientModel;
     SRepairStatusLog *m_repairStatusLog;

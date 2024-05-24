@@ -205,6 +205,15 @@ SSaleTableModel *SRepairModel::BOQModel() const
     return m_BOQModel;
 }
 
+/* Период блокировки карточки ремонта в секундах
+ * Время блокировки в поле `workshop`.`lock_datetime` должно обновляться с заданным периодом;
+ * если по какой-то причине метка времени была установлена давно (больше периода), то карточка не считается заблокированной
+*/
+int SRepairModel::lockTimeout()
+{
+    return 30;
+}
+
 void SRepairModel::reload()
 {
     load(i_id);
@@ -1126,9 +1135,16 @@ bool SRepairModel::isLock()
 {
     QUERY_EXEC(i_query, i_nErr)(QUERY_SEL_REPAIR_LOCK(QSqlDatabase::database("connMain").databaseName(), i_id));
     i_query->first();
-    if((i_query->value(0).toInt() != userDbData->id) && i_query->value(1).toInt())
-        return 1;
-    return 0;
+    if(i_query->value(0).toInt() == userDbData->id) // имеется запись о блокировке, но пользователь совпадает
+        return 0;
+
+    if(!i_query->value(1).toInt()) // пользователь не совпадает, но он оффлайн
+        return 0;
+
+    if(utcToLocal(i_query->value(2).toDateTime()).secsTo(QDateTime::currentDateTime()) > (lockTimeout() + 3))   // время блокировки плюс некоторый запас на отправку запроса и получение данных
+        return 0;
+
+    return 1;
 }
 
 QString SRepairModel::devClass()

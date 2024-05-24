@@ -53,23 +53,6 @@
            <property name="whatsThis">
             <string/>
            </property>
-           <layout class="QGridLayout" name="gridLayoutClientMatch">
-            <property name="leftMargin">
-             <number>5</number>
-            </property>
-            <property name="topMargin">
-             <number>5</number>
-            </property>
-            <property name="rightMargin">
-             <number>5</number>
-            </property>
-            <property name="bottomMargin">
-             <number>5</number>
-            </property>
-            <property name="spacing">
-             <number>5</number>
-            </property>
-           </layout>
           </widget>
          </item>
          <item>
@@ -862,18 +845,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SClientMatch</class>
-   <extends>QWidget</extends>
-   <header>widgets/sclientmatch.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets/slineedit.h</header>
    <slots>
     <signal>buttonClicked(int)</signal>
+    <signal>mouseDoubleClick()</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>SClientMatch</class>
+   <extends>QWidget</extends>
+   <header>widgets/sclientmatch.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>sparePartsTable</class>

@@ -3,6 +3,8 @@
 #include <QtSql>
 #include <QString>
 
+const QRegularExpression STableBaseModel::queryPrepareRegexpPattern = QRegularExpression("( +\n)|((;?) +$)|(;$)");
+
 STableBaseModel::STableBaseModel(QObject *parent):
     QSqlQueryModel(parent),
     STableModelsCommonMethods(parent)
@@ -27,5 +29,13 @@ void STableBaseModel::setQuery(const QString &query, const QSqlDatabase &db)
 
 QVariant STableBaseModel::data(const QModelIndex &item, int role) const
 {
+    if (!item.isValid())
+        return QVariant();
+
+    if(role == Qt::ToolTipRole)
+    {
+        return data(item, Qt::DisplayRole);
+    }
+
     return QSqlQueryModel::data(item, role & 0xFF);
 }

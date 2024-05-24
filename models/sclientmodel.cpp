@@ -173,6 +173,19 @@ void SClientModel::setEmployeeId(const int id)
     i_valuesMap.insert("employee", id);
 }
 
+/* Состояние флага "Акт выполненных работ" по умолчанию.
+ * Метод используется на вкладке Приём в ремонт (быстрый ремонт) и в диалоге выдачи устройства.
+ * Состояние флага зависит от настройки печати по умолчанию (Настройки -» Основные -» Печать документов по умолчанию) и
+ * от параметров карточки клиента: для постоянных клиентов, клиентов с включенным балансом и организаций он по умолчанию выключен.
+*/
+bool SClientModel::printBOQDefaultState()
+{
+    // TODO: возможно, стоит добавить дополнительную настройку для включения этого т. н. расширенного режима
+    // TODO: возможно, стоит добавить дополнительное свойство в карточку клиента, указывающее на обязательную печать Акта вып. работ
+    //       (например, большинству постоянных клиентов акт не нужен, но есть один особый клиент, которому он нужен обязательно)
+    return comSettings->printWorksList && !(options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular));
+}
+
 void SClientModel::clear()
 {
     i_id = 0;
@@ -291,7 +304,7 @@ QString SClientModel::fullLongName()
     QString ret;
     if(m_type)
     {
-        if(m_firstName.isEmpty())
+        if(!m_urName.isEmpty())
             ret = m_urName;
         else
             ret = m_firstName;

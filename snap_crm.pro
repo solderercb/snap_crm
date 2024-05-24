@@ -126,6 +126,7 @@ SOURCES += \
     tabsalary.cpp \
     tabsettings.cpp \
     tabtechreports.cpp \
+    widgets/qtooltipper.cpp \
     widgets/salarytabwidgets/spagesalaryextra.cpp \
     widgets/salarytabwidgets/spagesalaryitems.cpp \
     widgets/salarytabwidgets/spagesalarypayments.cpp \
@@ -301,6 +302,7 @@ HEADERS  += \
     tabsalary.h \
     tabsettings.h \
     tabtechreports.h \
+    widgets/qtooltipper.h \
     widgets/salarytabwidgets/spagesalaryextra.h \
     widgets/salarytabwidgets/spagesalaryitems.h \
     widgets/salarytabwidgets/spagesalarypayments.h \

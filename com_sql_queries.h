@@ -145,20 +145,24 @@
                                                 "        LCASE(t1.`value`) REGEXP LCASE('%2')\n"\
                                                 "      )")
 
-#define QUERY_SEL_CLIENTS_STATIC            QString(\
-                                                "SELECT\n"\
-                                                "  t1.`id`,\n"\
-                                                "  IF(t1.`type`, IF(LENGTH(TRIM(t1.`name`)), t1.`name`, t1.`ur_name`), CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) AS 'FIO',\n"\
-                                                "  t1.`balance`,\n"\
-                                                "  t1.`repairs`,\n"\
-                                                "  t1.`purchases`,\n"\
-                                                "  IF(t1.`type` = 1, 'Ю', '') AS 'type',\n"\
-                                                "  IFNULL(t2.`phone`, '') AS 'phone',\n"\
-                                                "  IFNULL(t1.`email`, '') AS 'email'\n"\
-                                                "FROM `clients` AS t1\n"\
-                                                "LEFT JOIN `tel` AS t2\n"\
-                                                "ON t1.`id` = t2.`customer`\n"\
-                                                "  AND t2.`type` = 1")   // Здесь не должно быть точки с запятой!
+#define QUERY_SEL_CLIENTS_STATIC            QString(                                                                           \
+                                                "SELECT                                                                     \n"\
+                                                "  t1.`id`,                                                                 \n"\
+                                                "  IF(t1.`type`,                                                            \n"\
+                                                "     IF(LENGTH(TRIM(t1.`ur_name`)), t1.`ur_name`, t1.`name`),              \n"\
+                                                "     CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)) AS 'FIO',   \n"\
+                                                "  t1.`balance`,                                                            \n"\
+                                                "  t1.`repairs`,                                                            \n"\
+                                                "  t1.`purchases`,                                                          \n"\
+                                                "  IF(t1.`type` = 1, 'Ю', '') AS 'type',                                    \n"\
+                                                "  IFNULL(t2.`phone`, '') AS 'phone',                                       \n"\
+                                                "  IFNULL(t1.`email`, '') AS 'email',                                       \n"\
+                                                "  t1.`state`                                                               \n"\
+                                                "FROM `clients` AS t1                                                       \n"\
+                                                "LEFT JOIN `tel` AS t2                                                      \n"\
+                                                "ON t1.`id` = t2.`customer`                                                 \n"\
+                                                "  AND t2.`type` = 1                                                          "\
+                                            )
 
 #define QUERY_SEL_WORKSHOP_STATIC           QString(\
                                                 "SELECT\n"\
@@ -172,7 +176,7 @@
                                                 "   `real_repair_cost`,\n"\
                                                 "   `in_date`,\n"\
                                                 "   `out_date`,\n"\
-                                                "   IF(t5.`type`, IF(LENGTH(TRIM(t5.`name`)), t5.`name`, t5.`ur_name`), CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)) AS 'client',\n"\
+                                                "   IF(t5.`type`, IF(LENGTH(TRIM(t5.`ur_name`)), t5.`ur_name`, t5.`name`), CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)) AS 'client',\n"\
                                                 "   t6.`phone`,\n"\
                                                 "   `box`,\n"\
                                                 "   `current_manager`,\n"\
@@ -301,7 +305,7 @@
 #define QUERY_SEL_REPAIR_WORKS(R)           QString("SELECT SUM(`price` * `count`) AS 'summa' FROM `works` WHERE `repair` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_PARTS(R)           QString("SELECT SUM(`price` * `count`) AS `summa` FROM `store_int_reserve` WHERE `state` IN (2, 3) AND `repair_id` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_MNGR_ENGR(R)       QString("SELECT `current_manager`, `master` FROM workshop WHERE `id` = %1").arg((R))
-#define QUERY_SEL_REPAIR_LOCK(db, id)       QString("SELECT IFNULL(t1.`user_lock`, 0) AS 'user_id', IF(t3.`USER` IS NULL, 0, 1) AS 'is_user_online' FROM `%1`.`workshop` AS t1 LEFT JOIN `%1`.`users` AS t2 ON t1.`user_lock` = t2.`id` LEFT JOIN `information_schema`.`PROCESSLIST` AS t3 ON t2.`username` = t3.`USER` AND  t3.`DB` = '%1' WHERE t1.`id` = %2 GROUP BY t1.`id`;").arg((db)).arg((id))
+#define QUERY_SEL_REPAIR_LOCK(db, id)       QString("SELECT IFNULL(t1.`user_lock`, 0) AS 'user_id', IF(t3.`USER` IS NULL, 0, 1) AS 'is_user_online', t1.`lock_datetime` FROM `%1`.`workshop` AS t1 LEFT JOIN `%1`.`users` AS t2 ON t1.`user_lock` = t2.`id` LEFT JOIN `information_schema`.`PROCESSLIST` AS t3 ON t2.`username` = t3.`USER` AND  t3.`DB` = '%1' WHERE t1.`id` = %2 GROUP BY t1.`id`;").arg((db)).arg((id))
 #define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R))
 #define QUERY_SEL_ADD_FIELD(id)             QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`id` = %1;").arg((id))
 #define QUERY_SEL_ITEM_ADD_FIELDS(I)        QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`item_id` = %1 ORDER BY t1.`field_id` ASC;").arg((I))
@@ -919,6 +923,33 @@
                                                 .arg(date2)\
                                                 .arg(user),\
                                                 QSqlDatabase::database("connMain")
+
+#define QUERY_SEL_TECH_REPORTS_STATIC           QString(                                                                              \
+                                                "SELECT                                                                            \n"\
+                                                "  t1.`id`,                                                                        \n"\
+                                                "  t1.`num`,                                                                       \n"\
+                                                "  t1.`created`,                                                                   \n"\
+                                                "  t1.`user`,                                                                      \n"\
+                                                "  t1.`company`,                                                                   \n"\
+                                                "  IF(t2.`type`,                                                                   \n"\
+                                                "     IF(LENGTH(TRIM(t2.`ur_name`)), t2.`ur_name`, t2.`name`),                     \n"\
+                                                "     CONCAT_WS(' ', t2.`surname`, t2.`name`, t2.`patronymic`)) AS 'client',       \n"\
+                                                "  t1.`device`,                                                                    \n"\
+                                                "  t1.`inventory_number`,                                                          \n"\
+                                                "  t1.`serial_number`,                                                             \n"\
+                                                "  CONVERT(t1.`production_date`, CHAR) AS 'production_date',                       \n"\
+                                                "  CONVERT(t1.`purchase_date`, CHAR) AS 'purchase_date',                           \n"\
+                                                "  t1.`initial_cost`,                                                              \n"\
+                                                "  t1.`residual_cost`,                                                             \n"\
+                                                "  t1.`fault`,                                                                     \n"\
+                                                "  t1.`diagnostic_result`,                                                         \n"\
+                                                "  t1.`conclusion`,                                                                \n"\
+                                                "  t1.`notes`,                                                                     \n"\
+                                                "  t2.`short_name` AS 'client_short_name'                                          \n"\
+                                                "FROM `tech_reports` AS t1                                                         \n"\
+                                                "LEFT JOIN `clients` AS t2                                                         \n"\
+                                                "  ON t1.`client` = t2.`id`                                                          "\
+                                                )
 
 #define QUERY_UPD_CLIENT_PURCHASES(id, num)      QString("UPDATE `clients` SET `purchases`=`purchases`+(%2) WHERE `id` = %1;").arg((id)).arg((num))
 #define QUERY_UPD_CLIENT_REPAIRS(id)      QString("UPDATE `clients` SET `repairs`=`repairs`+1 WHERE `id` = %1;").arg((id))

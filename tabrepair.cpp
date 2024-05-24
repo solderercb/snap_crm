@@ -119,7 +119,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         m_repairLockUpdateTimer = new QTimer(this);
         connect(m_repairLockUpdateTimer, &QTimer::timeout, [=]{setLock();});
         m_repairLockUpdateTimer->setSingleShot(false);
-        m_repairLockUpdateTimer->start(10000);
+        m_repairLockUpdateTimer->start(repairModel->lockTimeout()*1000);
     }
     else
     {

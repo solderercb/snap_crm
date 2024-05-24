@@ -100,6 +100,7 @@ private slots:
     void relayCreateTabSelectExistingClient(int, QWidget *caller);
     void guiFontChanged() override;
     void quickRepairToggled(const int state);
+    void updateCheckBoxQuickRepairPrintBOQ();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Package>
+	<DisplayName>библиотеки Qt</DisplayName>
+	<Description>необходимые для работы библиотеки Qt</Description>
+  <Version>5.15.10</Version>
+  <ReleaseDate>2023-06-07</ReleaseDate>
+  <Default>true</Default>
+</Package>

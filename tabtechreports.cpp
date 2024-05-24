@@ -25,8 +25,10 @@ tabTechReports::tabTechReports(MainWindow *parent) :
     connect(tableUpdateDelay, &QTimer::timeout, this, &tabTechReports::buttonRefreshClicked);
     tableUpdateDelay->setSingleShot(true);
 
-    m_tableModel = new STableTechReportsModel();
+    m_tableModel = new STableTechReportsModel(this);
     ui->tableView->setModel(m_tableModel);
+    ui->tableView->setQuery(QUERY_SEL_TECH_REPORTS_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setUniqueIdColumn(STableTechReportsModel::Columns::Id);
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabTechReports::buttonRefreshClicked);
     connect(ui->pushButtonPrint, &QPushButton::clicked, this, &tabTechReports::buttonPrintClicked);
     connect(ui->lineEditSearch, &QLineEdit::textChanged, this, &tabTechReports::lineEditSearchTextChanged);
@@ -39,7 +41,6 @@ tabTechReports::tabTechReports(MainWindow *parent) :
 
 tabTechReports::~tabTechReports()
 {
-    delete m_tableModel;
     delete ui;
     p_instance = nullptr;
 }
@@ -76,42 +77,47 @@ void tabTechReports::lineEditSearchTextChanged(QString)
 {
     ui->tableView->clearSelection();
     ui->tableView->resetVScrollPos();
-    tableUpdateDelay->stop();
-    tableUpdateDelay->start(350);
+    constructQueryClause();
+    ui->tableView->delayedRefresh(350);
+}
+
+void tabTechReports::constructQueryClause()
+{
+    FilterList list;
+    list.op = FilterList::And;
+
+    list.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, companiesModel->databaseIDByRow(ui->comboBoxCompany->currentIndex())));
+
+    FilterList searchText;
+    searchText.op = FilterList::Or;
+
+    searchText.fields.append(STableViewBase::initFilterField("t1.`num`", FilterField::Contains, ui->lineEditSearch->text()));
+    searchText.fields.append(STableViewBase::initFilterField("t1.`device`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    searchText.fields.append(STableViewBase::initFilterField("t1.`inventory_number`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    searchText.fields.append(STableViewBase::initFilterField("t1.`serial_number`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`short_name`, t2.`ur_name`)", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+    searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`surname`, t2.`name`, t2.`patronymic`)", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+
+    FilterList period;
+    period.op = FilterList::And;
+
+    period.fields.append(STableViewBase::initFilterField("t1.`created`", FilterField::MoreEq, ui->widgetPeriodSelector->periodBegin()));
+    period.fields.append(STableViewBase::initFilterField("t1.`created`", FilterField::Less, ui->widgetPeriodSelector->periodEnd()));
+
+    list.childs.append(searchText);
+    list.childs.append(period);
+
+    query_group.clear();
+
+    ui->tableView->setFilter(list);
+    ui->tableView->setGrouping(query_group);
+
 }
 
 void tabTechReports::refreshTable(bool preserveScrollPos, bool preserveSelection)
 {
-    ui->tableView->setQuery("SELECT t1.`id`, t1.`num`, t1.`created`, t1.`user`, t1.`company`, IF(t2.`type`, IF(LENGTH(TRIM(t2.`name`)), t2.`name`, t2.`ur_name`), CONCAT_WS(' ', t2.`surname`, t2.`name`, t2.`patronymic`)) AS 'client', t1.`device`, t1.`inventory_number`, t1.`serial_number`, CONVERT(t1.`production_date`, CHAR) AS 'production_date', CONVERT(t1.`purchase_date`, CHAR) AS 'purchase_date', t1.`initial_cost`, t1.`residual_cost`, t1.`fault`, t1.`diagnostic_result`, t1.`conclusion`, t1.`notes` FROM `tech_reports` AS t1 LEFT JOIN `clients` AS t2 ON t1.`client` = t2.`id`", QSqlDatabase::database("connMain"));
-    ui->tableView->setUniqueIdColumn(STableTechReportsModel::Columns::Id);
+    constructQueryClause();
 
-    FilterList l1;
-    l1.op = FilterList::Or;
-
-    FilterList l2;
-    l2.op = FilterList::Or;
-
-    l2.fields.append(STableViewBase::initFilterField("t1.`num`", FilterField::Contains, ui->lineEditSearch->text()));
-    l2.fields.append(STableViewBase::initFilterField("t1.`device`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("t1.`inventory_number`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("t1.`serial_number`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`short_name`, t2.`ur_name`)", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`surname`, t2.`name`, t2.`patronymic`)", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-
-    FilterList l3;
-    l3.op = FilterList::And;
-
-    l3.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, companiesModel->databaseIDByRow(ui->comboBoxCompany->currentIndex())));
-    l3.fields.append(STableViewBase::initFilterField("t1.`created`", FilterField::MoreEq, ui->widgetPeriodSelector->periodBegin()));
-    l3.fields.append(STableViewBase::initFilterField("t1.`created`", FilterField::Less, ui->widgetPeriodSelector->periodEnd()));
-
-    l1.childs.append(l2);
-    l1.childs.append(l3);
-
-//    query_group.clear();
-//    ui->tableView->setGrouping(query_group);
-
-    ui->tableView->setFilter(l1);
     ui->tableView->refresh(preserveScrollPos, preserveSelection);
 
 //    if(!preserveSelection)  // при обновлении модели сигнал QItemSelectionModel::selectionChanged не генерируется

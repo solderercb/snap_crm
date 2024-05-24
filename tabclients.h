@@ -39,7 +39,7 @@ private:
     bool m_type;
     STableBaseModel* clientsTable;
     QStringList query_group;
-    QTimer *m_tableUpdateDelay;
+    void constructQueryClause();
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
@@ -53,7 +53,6 @@ private slots:
     void lineEditSearchReturnPressed();
     void togglePropertiesPanel();
     void buttonRefreshClicked();
-    void autorefreshTable();
     void createNewClient();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override{};

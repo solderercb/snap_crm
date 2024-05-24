@@ -335,6 +335,7 @@ void tabRepairNew::updateWidgets()
     ui->comboBoxPresetPlace->setVisible(!m_isQuick);
 
     ui->widgetQuickRepairBOQ->updateWidgets();
+    updateCheckBoxQuickRepairPrintBOQ();
     ui->spinBoxStickersCount->setValue(m_isQuick?0:(comSettings->printRepairStickers?comSettings->defaultRepairStickersQty:0));
 }
 
@@ -357,8 +358,21 @@ void tabRepairNew::updateWidgetsOnQuickRepairToggled()
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPlace->setCurrentIndex(-1);
     ui->checkBoxQuickRepairPrintWarrantyDoc->setChecked(false);
-    ui->checkBoxQuickRepairPrintBOQ->setChecked(false);
+    updateCheckBoxQuickRepairPrintBOQ();
+}
 
+/* Установка состояния флага "Акт выполненных работ"
+ * Описание алгоритма см. в SClientModel::printBOQDefaultState()
+*/
+void tabRepairNew::updateCheckBoxQuickRepairPrintBOQ()
+{
+    if(!ui->checkBoxIsQuick->isChecked())
+    {
+        ui->checkBoxQuickRepairPrintBOQ->setChecked(false);
+        return;
+    }
+
+    ui->checkBoxQuickRepairPrintBOQ->setChecked(clientModel->printBOQDefaultState());
 }
 
 void tabRepairNew::setQuickRepair(const int state)
@@ -969,6 +983,9 @@ void tabRepairNew::print(int repair)
     }
 }
 
+/* Автозаполнение данных клиента
+ * Этот метод вызывается при двойном клике по строке на вкладке "Выбрать клиента"
+*/
 void tabRepairNew::fillClientCreds(const int id)
 {
     ui->widgetClient->fillClientCreds(id);

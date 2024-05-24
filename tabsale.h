@@ -23,6 +23,7 @@
 #include "widgets/tabsalesettingsmenu.h"
 #include "widgets/shortlivednotification.h"
 #include "widgets/stableviewbase.h"
+#include "widgets/qtooltipper.h"
 
 namespace Ui {
 class tabSale;

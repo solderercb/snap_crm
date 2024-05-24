@@ -78,7 +78,7 @@ void SDialogIssueRepair::initWidgets()
         ui->checkBoxWorksDocPrint->setText(tr("Печать акта(ов) выполненных работ", "", m_repairsModels.size()));
     }
 
-    ui->checkBoxWorksDocPrint->setChecked(comSettings->printWorksList && !(m_clientModel->options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular)));
+    ui->checkBoxWorksDocPrint->setChecked(m_clientModel->printBOQDefaultState());
     ui->comboBoxRejectReason->setModel(rejectReasonModel);
     ui->comboBoxRejectReason->setCurrentIndex(-1);
     ui->comboBoxPaymentAccount->setModel(m_paymentSystemsProxyModel);

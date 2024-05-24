@@ -65,8 +65,7 @@ void STableRepairsModel::initDemo()
     QStringList demoConstsForUnion;
 
     demoQuery = QUERY_SEL_WORKSHOP_STATIC;   // названия полей в отчете
-    QRegularExpression re("( +\n)|((;?) +$)");  // удаление пробелов-заполнителей в конце строк, а также точки с запятой в конце запроса (при наличии ; не будет работать сортировка)
-    demoQuery.replace(re, "\n");
+    demoQuery.replace(STableBaseModel::queryPrepareRegexpPattern, "\n");
     demoQuery  += " WHERE t1.`id` IS NULL";
 
     SSqlFetchingModel::setQuery(demoQuery, QSqlDatabase::database("connMain"));
@@ -115,15 +114,16 @@ QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
         return tr("no permissions");
 
     QString value;
+    int width = i_columnWidths[idx.column()];
 
     // полное имя (название организации)
     value = SSqlFetchingModel::data(idx).toString();
-    if(value.length() < i_columnWidths[idx.column()])
+    if(value.length() < width)
         return value;
 
     // короткое имя
     value = SSqlFetchingModel::data(index(idx.row(), Columns::ClientShortName)).toString();
-    if(!value.isEmpty() && value.length() < i_columnWidths[idx.column()])
+    if(!value.isEmpty() && value.length() < width)
         return value;
 
     return SSqlFetchingModel::data(idx);

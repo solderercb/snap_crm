@@ -17,10 +17,12 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
-    m_tableUpdateDelay = new QTimer();
 
     clientsTable = new STableBaseModel(this);
     ui->tableView->setModel(clientsTable);
+    ui->tableView->setQuery(QUERY_SEL_CLIENTS_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setUniqueIdColumn(0);
+    ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
     if (type == 1)
     {
         ui->buttonPrint->hide();
@@ -40,8 +42,6 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     ui->comboBoxClientAdType->setCurrentIndex(-1);
 
     connect(ui->buttonRefreshTable, &QPushButton::clicked, this, &tabClients::buttonRefreshClicked);
-    connect(m_tableUpdateDelay, &QTimer::timeout, this, &tabClients::autorefreshTable);
-    m_tableUpdateDelay->setSingleShot(true);
 
     refreshTable();
 }
@@ -50,7 +50,6 @@ tabClients::~tabClients()
 {
     p_instance[this->m_type] = nullptr;   // Обязательно блять!
     delete ui;
-    delete m_tableUpdateDelay;
 }
 
 QString tabClients::tabTitle()
@@ -93,61 +92,61 @@ void tabClients::setFocusSearchField()
     ui->lineEditSearch->selectAll();
 }
 
-void tabClients::refreshTable(bool preserveScrollPos, bool preserveSelection)
+void tabClients::constructQueryClause()
 {
-    ui->tableView->setQuery(QUERY_SEL_CLIENTS_STATIC, QSqlDatabase::database("connMain"));
-    ui->tableView->setUniqueIdColumn(0);
-    FilterList l1;
-    l1.op = FilterList::And;
+    FilterList list;
+    list.op = FilterList::And;
 
-    l1.fields.append(STableViewBase::initFilterField("t1." + clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text(), FilterField::NoOp, 1));  // категория клиентов
+    list.fields.append(STableViewBase::initFilterField("t1." + clientsTypesList->item(ui->listViewClientsType->currentIndex().row(), 2)->text(), FilterField::NoOp, 1));  // категория клиентов
     if(!ui->checkBoxShowArchived->isChecked())
-        l1.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, "1"));
-    // TODO: создать свой ComboBox с кнопкой 🗙
+      list.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, "1"));
     if (ui->comboBoxClientAdType->currentIndex() >= 0 )
-        l1.fields.append(STableViewBase::initFilterField("`visit_source`", FilterField::Equals, clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString()));
-
+      list.fields.append(STableViewBase::initFilterField("`visit_source`", FilterField::Equals, clientAdTypesList->index(ui->comboBoxClientAdType->currentIndex(), 1).data().toString()));
 
     if (ui->lineEditSearch->text().length() > 0)    // только если строка поиска не пуста
     {
-        FilterList l2;
-        l2.op = FilterList::Or;
-        FilterField::Op matchFlag;
-        if(userDbData->useRegExpSearch)
+      FilterList searchText;
+      searchText.op = FilterList::Or;
+      FilterField::Op matchFlag;
+      if(userDbData->useRegExpSearch)
             matchFlag = FilterField::RegExp;
-        else
+      else
             matchFlag = FilterField::Contains;
-        QString str = ui->lineEditSearch->text();
-        l2.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)", matchFlag, str, Qt::CaseInsensitive));
-        l2.fields.append(STableViewBase::initFilterField("t1.`short_name`", matchFlag, str, Qt::CaseInsensitive));
-        l2.fields.append(STableViewBase::initFilterField("t1.`id`", FilterField::Equals, str, Qt::CaseInsensitive));
-        l2.fields.append(STableViewBase::initFilterField("t2.`phone`", matchFlag, str, Qt::CaseInsensitive));
-        l2.fields.append(STableViewBase::initFilterField("t2.`phone_clean`", matchFlag, str, Qt::CaseInsensitive));
-        l1.childs.append(l2);
-     }
+      QString str = ui->lineEditSearch->text();
+      searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)", matchFlag, str, Qt::CaseInsensitive));
+      searchText.fields.append(STableViewBase::initFilterField("t1.`short_name`", matchFlag, str, Qt::CaseInsensitive));
+      searchText.fields.append(STableViewBase::initFilterField("t1.`id`", FilterField::Equals, str, Qt::CaseInsensitive));
+      searchText.fields.append(STableViewBase::initFilterField("t2.`phone`", matchFlag, str, Qt::CaseInsensitive));
+      searchText.fields.append(STableViewBase::initFilterField("t2.`phone_clean`", matchFlag, str, Qt::CaseInsensitive));
+      list.childs.append(searchText);
+    }
 
     query_group.clear();
     query_group << "`id`";    // default GROUP part of query
 
-    ui->tableView->setFilter(l1);
+    ui->tableView->setFilter(list);
     ui->tableView->setGrouping(query_group);
+
+}
+
+void tabClients::refreshTable(bool preserveScrollPos, bool preserveSelection)
+{
+    constructQueryClause();
+
     ui->tableView->refresh(preserveScrollPos, preserveSelection);
     ui->labelClientsCounter->setText(QString::number(clientsTable->rowCount()));
-
-    m_tableUpdateDelay->stop();
-    m_tableUpdateDelay->start(10000);
 }
 
 void tabClients::clientTypeChanged(QModelIndex)
 {
 //    qDebug() << "clientTypeChanged(QModelIndex): item1 =" << clientsTypesList->index(index.row(), 0).data() << ", item2 = " << clientsTypesList->index(index.row(), 1).data() << "item3 = " << clientsTypesList->index(index.row(), 2).data();
-    refreshTable();
+    refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
 }
 
 void tabClients::clientAdvertisingChanged(int)
 {
 //    qDebug() << "SLOT clientAdvertisingChanged(int index), index = " << ui->comboBoxClientAdType->currentIndex();
-    refreshTable();
+    refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
 }
 
 void tabClients::tableItemDoubleClick(QModelIndex item)
@@ -163,8 +162,10 @@ void tabClients::tableItemDoubleClick(QModelIndex item)
 void tabClients::lineEditSearchTextChanged(QString)
 {   // задержка поиска; запрос к базе будет выполняться после каждого введённого символа и при быстром наборе текста прога тормозит
 //    qDebug() << "SLOT tabClients::lineEditSearchTextChanged(QString search_str), search_str = " << search_str;
-    m_tableUpdateDelay->stop();
-    m_tableUpdateDelay->start(350);
+    ui->tableView->clearSelection();
+    ui->tableView->resetVScrollPos();
+    constructQueryClause();
+    ui->tableView->delayedRefresh(350);
 }
 
 void tabClients::lineEditSearchReturnPressed()
@@ -180,11 +181,6 @@ void tabClients::togglePropertiesPanel()
 void tabClients::buttonRefreshClicked()
 {
     refreshTable(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
-}
-
-void tabClients::autorefreshTable()
-{
-    refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
 }
 
 void tabClients::createNewClient()

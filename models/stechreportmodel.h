@@ -7,6 +7,8 @@
 
 class STechReportModel : public SComRecord
 {
+    friend class STableTechReportsModel;
+
     Q_OBJECT
     Q_PROPERTY(int id READ id)
     Q_PROPERTY(QString num READ num)
@@ -79,10 +81,10 @@ private:
     QString m_notes;
     SClientModel *m_clientModel;
     void fillEmptyField(QString &field);
-    QString dateToString(const int &year, const int &month, const int &day);
-    int yearFromString(const QString &date);
-    int monthFromString(const QString &date);
-    int dayFromString(const QString &date);
+    static QString dateToString(const int &year, const int &month, const int &day);
+    static int yearFromString(const QString &date);
+    static int monthFromString(const QString &date);
+    static int dayFromString(const QString &date);
     QString productionDate();
     QString purchaseDate();
     QString reportInitialCost();

@@ -1,7 +1,4 @@
 #include "stableviewbase.h"
-#include "models/ssaletablemodel.h"
-
-const QRegularExpression STableViewBase::queryPrepareRegexpPattern = QRegularExpression("( +\n)|((;?) +$)|(;$)");
 
 STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent) :
     QTableView(parent), m_layoutVariant(layoutVariant)
@@ -15,6 +12,7 @@ STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QW
 
     applyGuiSettings();
     verticalHeader()->hide();
+    viewport()->installEventFilter(new QToolTipper(this));
     connect(userDbData, &SUserSettings::rowHeightChanged, this, &STableViewBase::applyGuiSettings);
     horizontalHeader()->setMinimumSectionSize(15);
     horizontalHeader()->setSectionsMovable(true);
@@ -630,7 +628,7 @@ void STableViewBase::showColumnChooser()
 void STableViewBase::setQuery(const QString& query, const QSqlDatabase& db)
 {
     m_constQuery = query;
-    m_constQuery = m_constQuery.replace(queryPrepareRegexpPattern, "\n");
+    m_constQuery = m_constQuery.replace(STableBaseModel::queryPrepareRegexpPattern, "\n");
     m_db = db;
 
     clearFilter();
@@ -663,7 +661,7 @@ void STableViewBase::prepareQuery()
 //    m_query.append(" LIMIT 1000");
 #endif
 
-    //    qDebug().nospace().noquote() << "[" << this << "] prepareQuery() | \r\n" << m_query;
+//    qDebug().nospace().noquote() << "[" << this << "] prepareQuery() | \r\n" << m_query;
 }
 
 void STableViewBase::setFilter(const FilterList &filter)
@@ -1152,7 +1150,7 @@ void STableViewBase::setUniqueIdColumn(int uniqueIdColumn)
 */
 void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
 {
-    if(QApplication::queryKeyboardModifiers() & (Qt::ControlModifier | Qt::ShiftModifier))
+    if(preserveSelection & (QApplication::queryKeyboardModifiers() & (Qt::ControlModifier | Qt::ShiftModifier)))
         return;
 
     if (m_query.isEmpty() || (!m_db.isValid()))

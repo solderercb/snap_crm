@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Package>
+	<DisplayName>библиотеки QtAutoUpdater</DisplayName>
+	<Description>необходимы для проверки наличия и скачивания обновлений</Description>
+  <Version>3.0.0</Version>
+  <ReleaseDate>2023-09-26</ReleaseDate>
+  <Default>true</Default>
+</Package>

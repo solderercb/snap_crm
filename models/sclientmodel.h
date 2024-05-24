@@ -224,6 +224,7 @@ public:
     void initDemo() override;
     int employeeId();
     void setEmployeeId(const int id);
+    bool printBOQDefaultState();
 private:
     bool nIntegrityErr = 1;
     bool m_standAlone = 0;
