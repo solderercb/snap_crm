@@ -88,7 +88,17 @@ void SCartridgeForm::updateModels()
         updateStatesModel(m_repair->state());
     }
 
+    updateCardModel();
+}
+
+void SCartridgeForm::updateCardModel()
+{
     m_cartridgeCard->load(m_cardId);
+    if(m_repairId)
+    {
+        updateWorksCheckBoxes();
+        updateWorksMenu();
+    }
 }
 
 void SCartridgeForm::randomFill()
@@ -154,7 +164,6 @@ void SCartridgeForm::initWidgets()
         ui->labelWasEarly->hide();
         ui->comboBoxWasEarly->hide();
 
-        initWorksMenu();
         updateHeader();
         updateWidgets();
     }
@@ -203,7 +212,17 @@ void SCartridgeForm::updateHeader()
     ui->labelTitle->setText(QString("%1 [%2]").arg(m_repair->id()).arg(m_repair->title()));
 
     SClientModel *client = new SClientModel(m_repair->clientId());
-    ui->pushButtonClientCard->setText(client->fullLongName());
+    QString name = client->fullLongName();
+    if(this->fontMetrics().horizontalAdvance(name) > 400)   // TODO: заменить жестко заданное значение
+    {
+        if(client->type() && !client->shortName().isEmpty() )
+            name = client->shortName();
+        else if(!client->type())
+            name = client->fullShortName();
+        else
+            ui->pushButtonClientCard->setMaximumWidth(400);
+    }
+    ui->pushButtonClientCard->setText(name);
     delete client;  // TODO: модель нужна только для получения ФИО; подумать над более оптимальным способом.
 }
 
@@ -230,17 +249,24 @@ void SCartridgeForm::updateWidgets()
 
     setWidgetsParams(m_repair->state());
 
-    ui->pushButtonRefill->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Toner));
-    ui->pushButtonChipReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Chip));
-    ui->pushButtonDrumReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Drum));
-    ui->pushButtonBladeReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Blade));
-    ui->toolButtonOtherWorksMenu->setEnabled(worksCheckboxesEn);
     ui->comboBoxEngineer->setEnabled(engineerComboBoxEn && (permissions->setRepairEngineer || permissions->beginUnengagedRepair));
     updateComboBoxEngineer(m_repair->engineer());
     ui->doubleSpinBoxTotalAmount->setValue(m_repair->realRepairCost());
     ui->comboBoxPlace->setCurrentIndex(m_repair->boxIndex());
     ui->comboBoxPlace->setEnabled(placeComboBoxEn);
     ui->lineEditComment->setText(m_repair->extNotes());
+}
+
+void SCartridgeForm::updateWorksCheckBoxes()
+{
+    if(m_repairId)
+    {
+        ui->pushButtonRefill->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Toner));
+        ui->pushButtonChipReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Chip));
+        ui->pushButtonDrumReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Drum));
+        ui->pushButtonBladeReplace->setEnabled(worksCheckboxesEn && m_cartridgeCard->isMaterialSet(SCartridgeMaterialModel::Blade));
+        ui->toolButtonOtherWorksMenu->setEnabled(worksCheckboxesEn);
+    }
 }
 
 /*  Скрытие виджетов, не используемых при приёме картриджа
@@ -1097,10 +1123,24 @@ void SCartridgeForm::initWorksMenu()
     if(works_menu->actions().count())
     {
         ui->toolButtonOtherWorksMenu->setMenu(works_menu);
+
         updateWorksActionsCheckedState();
     }
     else
         ui->toolButtonOtherWorksMenu->setDisabled(true);
+}
+
+void SCartridgeForm::updateWorksMenu()
+{
+    if(!m_repairId)
+        return;
+
+    QMenu *menu = ui->toolButtonOtherWorksMenu->menu();
+
+    initWorksMenu();
+
+    if(menu)
+        delete menu;
 }
 
 void SCartridgeForm::setWorkCheckBoxChecked(const int workType)

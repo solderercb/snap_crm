@@ -150,6 +150,7 @@ public slots:
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс
     virtual void refresh(bool preserveScrollPos = ScrollPosReset, bool preserveSelection = SelectionReset);
     virtual void applyGuiSettings();
+    void hideColumn(const int col);
 protected slots:
     void saveLayout();
     virtual void columnResized(int column, int oldWidth, int newWidth);

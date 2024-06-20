@@ -847,7 +847,7 @@
     </message>
     <message>
         <location filename="../widgets/scartridgecard.ui" line="149"/>
-        <location filename="../widgets/scartridgecard.cpp" line="131"/>
+        <location filename="../widgets/scartridgecard.cpp" line="132"/>
         <source>Создать</source>
         <translation type="unfinished"></translation>
     </message>
@@ -877,47 +877,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="104"/>
+        <location filename="../widgets/scartridgecard.cpp" line="105"/>
         <source>Сохранить</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="163"/>
+        <location filename="../widgets/scartridgecard.cpp" line="164"/>
         <source>Не указано: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="173"/>
+        <location filename="../widgets/scartridgecard.cpp" line="174"/>
         <source>Ошибка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="238"/>
+        <location filename="../widgets/scartridgecard.cpp" line="239"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="238"/>
+        <location filename="../widgets/scartridgecard.cpp" line="239"/>
         <source>Данные сохранены</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="283"/>
+        <location filename="../widgets/scartridgecard.cpp" line="285"/>
         <source>Black</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="284"/>
+        <location filename="../widgets/scartridgecard.cpp" line="286"/>
         <source>Cyan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="285"/>
+        <location filename="../widgets/scartridgecard.cpp" line="287"/>
         <source>Magenta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="286"/>
+        <location filename="../widgets/scartridgecard.cpp" line="288"/>
         <source>Yellow</source>
         <translation type="unfinished"></translation>
     </message>
@@ -925,7 +925,7 @@
 <context>
     <name>SCartridgeCardModel</name>
     <message>
-        <location filename="../models/scartridgecardmodel.cpp" line="62"/>
+        <location filename="../models/scartridgecardmodel.cpp" line="61"/>
         <source>Не удалось инициализировать модель SCartridgeCardModel ремонта №%1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -998,21 +998,21 @@
     <message>
         <location filename="../widgets/scartridgeform.ui" line="429"/>
         <location filename="../widgets/scartridgeform.ui" line="464"/>
-        <location filename="../widgets/scartridgeform.cpp" line="363"/>
+        <location filename="../widgets/scartridgeform.cpp" line="389"/>
         <source>Фотовал</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../widgets/scartridgeform.ui" line="480"/>
         <location filename="../widgets/scartridgeform.ui" line="677"/>
-        <location filename="../widgets/scartridgeform.cpp" line="358"/>
+        <location filename="../widgets/scartridgeform.cpp" line="384"/>
         <source>Чип</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../widgets/scartridgeform.ui" line="629"/>
         <location filename="../widgets/scartridgeform.ui" line="864"/>
-        <location filename="../widgets/scartridgeform.cpp" line="368"/>
+        <location filename="../widgets/scartridgeform.cpp" line="394"/>
         <source>Ракель</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1064,59 +1064,59 @@
     <message>
         <location filename="../widgets/scartridgeform.ui" line="832"/>
         <location filename="../widgets/scartridgeform.ui" line="896"/>
-        <location filename="../widgets/scartridgeform.cpp" line="353"/>
+        <location filename="../widgets/scartridgeform.cpp" line="379"/>
         <source>Заправка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="214"/>
+        <location filename="../widgets/scartridgeform.cpp" line="233"/>
         <source>Повтор</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="217"/>
+        <location filename="../widgets/scartridgeform.cpp" line="236"/>
         <source>Гарантия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="673"/>
+        <location filename="../widgets/scartridgeform.cpp" line="699"/>
         <source>Статус информирования клиента обновлён</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="785"/>
+        <location filename="../widgets/scartridgeform.cpp" line="811"/>
         <source>Ошибка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="786"/>
+        <location filename="../widgets/scartridgeform.cpp" line="812"/>
         <source>Кол-во больше наличия, списание не возможно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="1024"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1050"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="1024"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1050"/>
         <source>Проверьте права доступа или обратитесь к администратору</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="1073"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1099"/>
         <source>Примечание сохранено</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="673"/>
-        <location filename="../widgets/scartridgeform.cpp" line="1073"/>
-        <location filename="../widgets/scartridgeform.h" line="115"/>
+        <location filename="../widgets/scartridgeform.cpp" line="699"/>
+        <location filename="../widgets/scartridgeform.cpp" line="1099"/>
+        <location filename="../widgets/scartridgeform.h" line="117"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.h" line="115"/>
+        <location filename="../widgets/scartridgeform.h" line="117"/>
         <source>Данные сохранены</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5795,46 +5795,46 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>materialsTable</name>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="335"/>
+        <location filename="../widgets/scartridgecard.cpp" line="337"/>
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="166"/>
-        <location filename="../widgets/scartridgecard.cpp" line="336"/>
+        <location filename="../widgets/scartridgecard.cpp" line="167"/>
+        <location filename="../widgets/scartridgecard.cpp" line="338"/>
         <source>Count</source>
         <translation>Кол-во/вес</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="167"/>
-        <location filename="../widgets/scartridgecard.cpp" line="337"/>
+        <location filename="../widgets/scartridgecard.cpp" line="168"/>
+        <location filename="../widgets/scartridgecard.cpp" line="339"/>
         <source>Price</source>
         <translation>Цена</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="168"/>
-        <location filename="../widgets/scartridgecard.cpp" line="338"/>
+        <location filename="../widgets/scartridgecard.cpp" line="169"/>
+        <location filename="../widgets/scartridgecard.cpp" line="340"/>
         <source>PriceWork</source>
         <translation>Стоимость работы</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="339"/>
+        <location filename="../widgets/scartridgecard.cpp" line="341"/>
         <source>Summ</source>
         <translation>Итого</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="342"/>
+        <location filename="../widgets/scartridgecard.cpp" line="344"/>
         <source>SalarySumm</source>
         <translation>Ставка</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="169"/>
-        <location filename="../widgets/scartridgecard.cpp" line="340"/>
+        <location filename="../widgets/scartridgecard.cpp" line="170"/>
+        <location filename="../widgets/scartridgecard.cpp" line="342"/>
         <source>Name</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgecard.cpp" line="341"/>
+        <location filename="../widgets/scartridgecard.cpp" line="343"/>
         <source>Articul</source>
         <translation>Артикул</translation>
     </message>

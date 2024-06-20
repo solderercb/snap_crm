@@ -30,16 +30,8 @@ SCartridgeCard::SCartridgeCard(const int id, const int vendorIndex, Qt::WindowFl
 SCartridgeCard::~SCartridgeCard()
 {
     delete ui;
-    if(m_vendorsModel)
-        delete m_vendorsModel;
-    if(m_cardModel)
-        delete m_cardModel;
-    if(m_materialsModel)
-        delete m_materialsModel;
     if(m_photo)
         delete m_photo;
-    if(m_cartridgeColors)
-        delete m_cartridgeColors;
 }
 
 void SCartridgeCard::load(const int id)
@@ -62,13 +54,14 @@ void SCartridgeCard::initModels()
         return;
     m_deviceClassId = q.value(0).toInt();
     query = QUERY_SEL_DEVICE_MAKERS(q.value(1).toString());
-    m_vendorsModel = new SSqlQueryModel();
+    m_vendorsModel = new SSqlQueryModel(this);
     m_vendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
 
-    m_cardModel = new SCartridgeCardModel();
-    m_materialsModel = new SCartridgeMaterialsModel();
+    m_cardModel = new SCartridgeCardModel(this);
+    m_materialsModel = new SCartridgeMaterialsModel(this);
     connect(m_materialsModel, &SCartridgeMaterialsModel::noFurtherMaterialAddition, ui->pushButtonAddMaterial, &QPushButton::setDisabled);
     m_cartridgeColors = colorsList();
+    m_cartridgeColors->setParent(this);
 }
 
 void SCartridgeCard::initWidgets()
@@ -275,6 +268,7 @@ bool SCartridgeCard::commit()
 
 void SCartridgeCard::closeForm()
 {
+    ui->pushButtonCancel->setDisabled(true);
     this->deleteLater();
 }
 

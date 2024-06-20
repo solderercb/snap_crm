@@ -10,8 +10,7 @@ SCartridgeCardModel::SCartridgeCardModel(QObject *parent) : SComRecord(parent)
 
 SCartridgeCardModel::~SCartridgeCardModel()
 {
-    while(!m_materials.isEmpty())
-        m_materials.remove(m_materials.lastKey());
+    removeMaterials();
 }
 
 int SCartridgeCardModel::id()
@@ -69,12 +68,25 @@ void SCartridgeCardModel::initMaterials()
     QSqlQuery query(QSqlDatabase::database("connMain"));
     SCartridgeMaterialModel *material;
 
+    removeMaterials();
     query.exec(QString("SELECT `id` FROM `materials` WHERE `card_id` = %1;").arg(i_id));
     while(query.next())
     {
         material = new SCartridgeMaterialModel();
         material->load(query.value(0).toInt());
         m_materials.insert(material->type(), material);
+    }
+}
+
+void SCartridgeCardModel::removeMaterials()
+{
+    SCartridgeMaterialModel *material;
+
+    while(!m_materials.isEmpty())
+    {
+        material = m_materials.last();
+        m_materials.remove(m_materials.lastKey());
+        delete material;
     }
 }
 

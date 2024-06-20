@@ -17,6 +17,7 @@ public:
     void load(const int id);
     void loadError();
     void initMaterials();
+    void removeMaterials();
     bool commit();
     QString name();
     void setName(const QString&);

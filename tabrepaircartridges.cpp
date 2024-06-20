@@ -170,7 +170,7 @@ void tabRepairCartridges::reloadCardModel(int)
 {
     for(auto form : existentForms())
     {
-        form->updateModels();
+        form->updateCardModel();
     }
 }
 

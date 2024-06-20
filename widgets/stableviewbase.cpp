@@ -609,10 +609,15 @@ void STableViewBase::setDefault()
     i_gridLayout->$GridControl.Columns[col].Width = i_gridLayout->$GridControl.Columns[col].ActualWidth;
 }
 
+void STableViewBase::hideColumn(const int col)
+{
+    horizontalHeader()->hideSection(col);
+
+}
+
 void STableViewBase::hideColumn()
 {
-    int col = horizontalHeaderMenu->property("column").toInt();
-    horizontalHeader()->hideSection(col);
+    hideColumn(horizontalHeaderMenu->property("column").toInt());
 }
 
 void STableViewBase::showColumnChooser()

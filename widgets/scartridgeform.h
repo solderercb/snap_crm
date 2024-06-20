@@ -64,6 +64,7 @@ public:
     int checkInput();
     int isReady();
     void updateModels();
+    void updateCardModel();
     void randomFill();
 private:
     Ui::SCartridgeForm *ui;
@@ -98,6 +99,7 @@ private:
     bool m_initDone = 0;
     void updateHeader();
     void updateWidgets();
+    void updateWorksCheckBoxes();
     void hideWidgetsOnReceiptForm();
     void updateLabelRepeatWarranty(const QString text);
     void updateStatesModel(const int statusId);
@@ -136,6 +138,7 @@ private slots:
     void buttonCartridgeCardClicked();
     void updateComment();
     void initWorksMenu();
+    void updateWorksMenu();
     void setWorkCheckBoxChecked(const int workType);
     void updateWorksActionsCheckedState();
     void guiFontChanged();

@@ -41,7 +41,7 @@ QVariant STableTechReportsModel::clientName(const QModelIndex &idx) const
 
     // короткое имя
     value = STableBaseModel::data(idx.siblingAtColumn(Columns::ClientShortName)).toString();
-    if(!value.isEmpty() && value.length() < width)
+    if(!value.isEmpty())
         return value;
 
     return STableBaseModel::data(idx);

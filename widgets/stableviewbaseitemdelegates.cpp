@@ -61,7 +61,7 @@ bool STableViewBaseItemDelegates::editorEvent(QEvent *event, QAbstractItemModel 
 #else
             int clickX = e->localPos().x();
 #endif
-            clickX -= option.rect.x();  // коррекция координаты X курсора для случая когда пиктограммы уходят зя левый край виджета
+            clickX -= option.rect.x();  // коррекция координаты X курсора для случая когда пиктограммы уходят за левый край виджета
 
         }
         else

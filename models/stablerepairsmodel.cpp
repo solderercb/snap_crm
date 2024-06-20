@@ -123,7 +123,7 @@ QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
 
     // короткое имя
     value = SSqlFetchingModel::data(index(idx.row(), Columns::ClientShortName)).toString();
-    if(!value.isEmpty() && value.length() < width)
+    if(!value.isEmpty())
         return value;
 
     return SSqlFetchingModel::data(idx);

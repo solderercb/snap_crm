@@ -66,7 +66,7 @@ void SCartridgeMaterialsModel::setDefaultTonerWeight(const int weight)
 
 bool SCartridgeMaterialsModel::removeRow(const int row, const QModelIndex&)
 {
-    if(removeRows(row, materialsTable::Column::Type)) // сначала удаление, потом установка значения -1
+    if(removeRows(row, 1)) // сначала удаление, потом установка значения -1
     {
         setData(index(row, materialsTable::Column::Type), -1, Qt::EditRole);
         return 1;
