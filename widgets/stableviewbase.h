@@ -72,6 +72,8 @@ public:
     void enableAutorefresh(const int msec);
     void delayedRefresh(const int msec);
     void restartAutorefreshTimer();
+    Qt::SortOrder sortOrder();
+    int sortSection();
 protected:
     QSqlQueryModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
@@ -119,6 +121,7 @@ protected:
     virtual void setModelQuery(const QString &query, const QSqlDatabase &database);
     virtual void fetchMore(const QModelIndex &parent);
     virtual void layoutChanged(int,int,int);
+    void undoToggleSortIndicator();
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
@@ -151,6 +154,7 @@ public slots:
     virtual void refresh(bool preserveScrollPos = ScrollPosReset, bool preserveSelection = SelectionReset);
     virtual void applyGuiSettings();
     void hideColumn(const int col);
+    void toggleOrder(int logicalIndex);
 protected slots:
     void saveLayout();
     virtual void columnResized(int column, int oldWidth, int newWidth);
@@ -164,10 +168,9 @@ protected slots:
     void horizontalScrollbarValueChanged(int value) override;
     virtual void vsp_rangeChanged(const int min, const int max);
     virtual void hsp_rangeChanged(const int min, const int max);
+    virtual void horizontalHeaderSectionClicked(const int logicalIndex);
 private slots:
     void autorefreshTable();
-    void horizontalHeaderSectionClicked(const int logicalIndex);
-    void orderChanged(int logicalIndex, Qt::SortOrder order);
     void horizontalHeaderMenuRequest(const QPoint &pos) const;
     void toggleAutoWidth(bool state);
     void fitContent();

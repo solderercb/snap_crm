@@ -17,6 +17,7 @@ class SCartridgeCard;
 class materialsTable : public STableViewBase
 {
     Q_OBJECT
+    friend class SCartridgeCard;
 signals:
     void tonerWeightChanged(int weight);
 public:
@@ -28,8 +29,11 @@ public:
     ~materialsTable();
     void setModel(QAbstractItemModel *model) override;
     void mouseClickEvent(QMouseEvent *event);
+    void clearModel() override;
+    void setModelQuery(const QString &query, const QSqlDatabase &database) override;
 private:
     SCartridgeMaterialsModel *m_model = nullptr;
+    int m_cardId;
     void translateNames();
 private slots:
 #if QT_VERSION >= 0x060000
@@ -37,6 +41,7 @@ private slots:
 #else
     void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>()) override;
 #endif
+    void horizontalHeaderSectionClicked(const int logicalIndex) override;
 };
 
 class SCartridgeCard : public SModalWidget
@@ -52,6 +57,7 @@ public:
     explicit SCartridgeCard(const int id, const int vendorIndex, Qt::WindowFlags flags, QWidget *parent = nullptr);
     ~SCartridgeCard();
     void load(const int id);
+    void setCardId(const int id);
     void initModels();
     void initWidgets();
     void updateWidgets();
@@ -76,6 +82,7 @@ private:
     SSqlQueryModel* m_vendorsModel = nullptr;
     SStandardItemModel *m_cartridgeColors = nullptr;
     void setModelData();
+    QString cartridgeName();
     void translateNames();
 private slots:
     void materialSelected(const QModelIndex &index);
@@ -83,6 +90,7 @@ private slots:
     void setTonerWeight(const int weight);
     bool commit();
     void closeForm();
+    void sortMaterials(const int column);
 };
 
 #endif // SCARTRIDGECARD_H

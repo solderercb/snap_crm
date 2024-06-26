@@ -17,10 +17,31 @@ QString SEditableBaseModel::selectStatement() const
     if(m_selectStatement.isEmpty())
         return QSqlTableModel::selectStatement();
 
-    return QString("%1 %2 %3 %4").arg(m_selectStatement, "WHERE ", filter(), orderByClause());
+    QString qr = m_selectStatement;
+    QString wh = filter();
+    QString ord = orderByClause();
+    if(!wh.isEmpty())
+        qr.append("WHERE " + wh);
+    if(!ord.isEmpty())
+        qr.append("\r\n" + ord);
+
+    return qr;
 }
 
 void SEditableBaseModel::setSelectStatement(const QString &statement)
 {
     m_selectStatement = statement;
+}
+
+void SEditableBaseModel::clear()
+{
+    beginResetModel();
+
+    /* Вызов родительского метода clear() в т. ч. очистит название таблицы, первичный ключ и названия полей
+    * из-за чего не будет возможно редактирвоание (будут выводится сообщения об ошибке запроса); поэтому
+    * производим отмену изменений.
+    * TODO: нужно придумать что-то более элегантное, т. к. это — костыль
+    */
+    QSqlTableModel::revertAll();
+    endResetModel();
 }

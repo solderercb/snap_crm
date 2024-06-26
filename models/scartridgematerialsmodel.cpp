@@ -49,6 +49,11 @@ Qt::ItemFlags SCartridgeMaterialsModel::flags(const QModelIndex &item) const
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
+int SCartridgeMaterialsModel::cardId()
+{
+    return m_cardId;
+}
+
 bool SCartridgeMaterialsModel::appendRow()
 {
     if (insertRow(rowCount()))
@@ -77,8 +82,6 @@ bool SCartridgeMaterialsModel::removeRow(const int row, const QModelIndex&)
 void SCartridgeMaterialsModel::setCardId(const int id)
 {
     m_cardId = id;
-    setSelectStatement(QUERY_SEL_CARTRIDGE_MATERIALS);
-    setFilter(QString("`card_id` = %1").arg(m_cardId));
 }
 
 bool SCartridgeMaterialsModel::commit()

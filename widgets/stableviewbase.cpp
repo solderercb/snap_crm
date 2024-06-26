@@ -457,13 +457,28 @@ void STableViewBase::horizontalHeaderSectionClicked(const int logicalIndex)
 {
     if(m_autorefreshTimer)
         m_autorefreshTimer->stop();
-    orderChanged(logicalIndex, Qt::AscendingOrder);
+    toggleOrder(logicalIndex);
 }
 
-void STableViewBase::orderChanged(int logicalIndex, Qt::SortOrder order)
+Qt::SortOrder STableViewBase::sortOrder()
 {
-    Q_UNUSED(order);
+    return m_sortOrder;
+}
 
+int STableViewBase::sortSection()
+{
+    return m_sortColumn;
+}
+
+/* Установка предыдущего состояния индикатора сортировки.
+*/
+void STableViewBase::undoToggleSortIndicator()
+{
+    horizontalHeader()->setSortIndicator(sortSection(), sortOrder());
+}
+
+void STableViewBase::toggleOrder(int logicalIndex)
+{
     if(m_sortColumn == -1 || m_sortColumn != logicalIndex)
     {
         m_sortColumn = logicalIndex;
@@ -471,12 +486,12 @@ void STableViewBase::orderChanged(int logicalIndex, Qt::SortOrder order)
     }
     else if(m_sortOrder == Qt::AscendingOrder)
         m_sortOrder = Qt::DescendingOrder;
-    else
+    else    // m_sortColumn >=0 && m_sortOrder == Qt::DescendingOrder
     {
         m_sortColumn = -1;
-        horizontalHeader()->setSortIndicator(m_sortColumn, Qt::AscendingOrder);
     }
 
+    horizontalHeader()->setSortIndicator(m_sortColumn, m_sortOrder);
     prepareQuery();
     this->refresh();
 }
@@ -628,7 +643,7 @@ void STableViewBase::showColumnChooser()
 /* Передача запроса, используемого для получения данных.
  * Вызов этого метода не обновляет модель данных; для обновления нужно вызвать метод refresh().
  * Запрос query может быть полным (содержащим условия), а может быть частичным, к которому при вызове методов
- * setFilter(), setGrouping() и orderChanged() будут добавлены соответствующие условия.
+ * setFilter(), setGrouping() и toggleOrder() будут добавлены соответствующие условия.
 */
 void STableViewBase::setQuery(const QString& query, const QSqlDatabase& db)
 {

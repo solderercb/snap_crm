@@ -39,8 +39,18 @@ void SCartridgeCard::load(const int id)
     m_id = id;
 
     m_cardModel->load(m_id);
-    m_materialsModel->setCardId(m_id);
-    m_materialsModel->select();
+    setCardId(m_id);
+}
+
+void SCartridgeCard::setCardId(const int id)
+{
+    m_materialsModel->setCardId(id);
+
+    FilterList list;
+    list.op = FilterList::Op::And;
+
+    list.fields.append(STableViewBase::initFilterField("`card_id`", FilterField::Equals, id));
+    ui->tableViewMaterials->setFilter(list);
 }
 
 void SCartridgeCard::initModels()
@@ -80,6 +90,7 @@ void SCartridgeCard::initWidgets()
     ui->spinBoxTonerWeight->setMaximum(500);
     ui->comboBoxColor->setModel(m_cartridgeColors);
     ui->comboBoxColor->setCurrentIndex(-1);
+    ui->tableViewMaterials->setQuery(QUERY_SEL_CARTRIDGE_MATERIALS, QSqlDatabase::database("connMain"));
 
     connect(ui->tableViewMaterials, &materialsTable::clicked, this, &SCartridgeCard::materialSelected);
     connect(ui->tableViewMaterials, &materialsTable::tonerWeightChanged, this, &SCartridgeCard::setTonerWeight);
@@ -88,6 +99,7 @@ void SCartridgeCard::initWidgets()
     connect(ui->spinBoxTonerWeight, qOverload<int>(&QSpinBox::valueChanged), m_materialsModel, &SCartridgeMaterialsModel::setDefaultTonerWeight);
     connect(ui->pushButtonCreateSave, &QPushButton::clicked, this, &SCartridgeCard::commit);
     connect(ui->pushButtonCancel, &QPushButton::clicked, this, &SCartridgeCard::closeForm);
+    connect(ui->tableViewMaterials->horizontalHeader(), &QHeaderView::sectionClicked, this, &SCartridgeCard::sortMaterials);
 }
 
 void SCartridgeCard::updateWidgets()
@@ -149,6 +161,12 @@ bool SCartridgeCard::checkInput()
             if(!m_materialsModel->index(i, materialsTable::Column::PriceWork).data().isValid()) throw 3;
             if(m_materialsModel->index(i, materialsTable::Column::Name).data().toString().isEmpty()) throw 4;
         }
+
+        if(m_materialsModel->rowCount() == 0)
+            throw 5;
+
+        if(ui->lineEditName->text().isEmpty())
+            throw 6;
     }
     catch (int err)
     {
@@ -160,6 +178,8 @@ bool SCartridgeCard::checkInput()
             case 2: errMsg = QString("%1 %2").arg(notSet, materialsTable::tr("Price")); break;
             case 3: errMsg = QString("%1 %2").arg(notSet, materialsTable::tr("PriceWork")); break;
             case 4: errMsg = QString("%1 %2").arg(notSet, materialsTable::tr("Name")); break;
+            case 5: errMsg = tr("Таблица материалов пуста"); break;
+            case 6: errMsg = tr("Не указана модель картриджа"); break;
             default: errMsg = "";
         }
         shortlivedNotification *newPopup = new shortlivedNotification(this,
@@ -253,6 +273,7 @@ bool SCartridgeCard::commit()
     if(!m_id)
     {
         m_id = m_cardModel->id();
+        setCardId(m_id);
         emit newCardCreated(m_id);
     }
     else
@@ -270,6 +291,44 @@ void SCartridgeCard::closeForm()
 {
     ui->pushButtonCancel->setDisabled(true);
     this->deleteLater();
+}
+
+/*  Обработка щелчка по секции заголовка таблицы материалов.
+*/
+void SCartridgeCard::sortMaterials(const int column)
+{
+    if(!m_id)
+        return;
+
+    if(m_materialsModel->isDirty())
+    {
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, cartridgeName(),
+                                                                    tr("Для применения сортировки требуется сохранить изменения. Сохранить?\n"),
+                                                                    QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::Yes);
+        switch (resBtn)
+        {
+            case QMessageBox::Yes:
+                if(!commit())
+                {
+                    ui->tableViewMaterials->undoToggleSortIndicator();
+                    return;
+                }
+                break;
+            case QMessageBox::No: break;
+            default: ui->tableViewMaterials->undoToggleSortIndicator(); return;
+        }
+    }
+
+    ui->tableViewMaterials->toggleOrder(column);
+}
+
+/* Название картриджа.
+ * Метод возвращает объединённые в одну строку брэнд и модель.
+*/
+QString SCartridgeCard::cartridgeName()
+{
+    return ui->comboBoxVendor->currentText() + " " + ui->lineEditName->text();
 }
 
 void SCartridgeCard::translateNames()
@@ -324,6 +383,17 @@ void materialsTable::mouseClickEvent(QMouseEvent *event)
 */
 }
 
+void materialsTable::clearModel()
+{
+    m_model->clear();
+}
+
+void materialsTable::setModelQuery(const QString &query, const QSqlDatabase &database)
+{
+    m_model->setSelectStatement(query);
+    m_model->select();
+}
+
 void materialsTable::translateNames()
 {
     tr("Type");
@@ -355,4 +425,18 @@ void materialsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &
                 default: /*resizeColumnToContents(col)*/;
             }
         }
+}
+
+/* Переопределённый слот, вызываемый по клику на секцию заголовка таблицы.
+ * В редактируемой модели не сохранённые данные будут утеряны при клике,
+ * т. к. при этом выполняется запрос SELECT.
+ * Проверка наличия изменений и обработка клика производится в другом слоте;
+ * т. к. результат проверки непредсказуем, а индикатор сортировки уже изменён
+ * (внутренним образом в Qt), то скрываем его, чтобы не путать пользователя.
+*/
+void materialsTable::horizontalHeaderSectionClicked(const int logicalIndex)
+{
+    Q_UNUSED(logicalIndex)
+
+    horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
 }

@@ -129,6 +129,7 @@ void tabReceptCartridge::initWidgets()
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxPresetPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(0, "system_id"));
     ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
+    ui->comboBoxVendor->setButtons("Clear");
     ui->comboBoxVendor->setModel(m_vendorsModel);
     ui->comboBoxVendor->setCurrentIndex(-1);
     ui->comboBoxModel->setModel(m_cartridgesModel);

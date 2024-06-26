@@ -120,6 +120,8 @@ private:
     bool workAndPartHandler(const int workType, const int state);
     int prevRepairsCount();
     void saveState(int);
+public slots:
+    void removeWidget();
 private slots:
     void updateTotalSumms(const double, const double, const double);
     void saveTotalSumms();
@@ -132,7 +134,6 @@ private slots:
     void comboBoxPlaceButtonClickHandler(int id);
     void comboBoxEngineerChanged(int);
     void stateIndexChanged(int);
-    void removeWidget();
     void buttonClientCardClicked();
     void buttonClassicTabClicked();
     void buttonCartridgeCardClicked();

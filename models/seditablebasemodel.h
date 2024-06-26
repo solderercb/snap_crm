@@ -13,6 +13,7 @@ public:
     QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
     virtual QString selectStatement() const override;
     virtual void setSelectStatement(const QString &statement);
+    virtual void clear() override;
 private:
     QString m_selectStatement;
 };

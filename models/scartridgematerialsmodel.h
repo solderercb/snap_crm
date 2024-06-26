@@ -19,11 +19,12 @@ public:
     static SStandardItemModel *materialsList();
     QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(const QModelIndex &item) const override;
+    int cardId();
     void setCardId(const int id);
     bool removeRow(const int row, const QModelIndex &parent = QModelIndex());
     int findNextMaterial(const int targetRow = -1);
 private:
-    int m_cardId;
+    int m_cardId = 0;
     QSqlIndex m_primaryKey;
     int m_defaultTonerWeight = 100;
     void translateNames();

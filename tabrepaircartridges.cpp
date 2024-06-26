@@ -42,6 +42,13 @@ tabRepairCartridges::tabRepairCartridges(QList<int> *list, MainWindow *parent) :
 
 tabRepairCartridges::~tabRepairCartridges()
 {
+    QList<SCartridgeForm*> list = existentForms();
+    QList<SCartridgeForm*>::const_iterator it = list.constBegin();
+    while(it != list.constEnd())
+    {
+        (*it)->removeWidget();
+        it++;
+    }
     delete ui;
     p_instance = nullptr;   // Обязательно блять!
 }

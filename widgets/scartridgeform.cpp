@@ -1073,6 +1073,7 @@ void SCartridgeForm::saveState(int stateId)
 
 void SCartridgeForm::removeWidget()
 {
+    updateComment();
     this->deleteLater();
 }
 
@@ -1094,7 +1095,15 @@ void SCartridgeForm::buttonCartridgeCardClicked()
 
 void SCartridgeForm::updateComment()
 {
-    m_repair->setExtNotes(ui->lineEditComment->text());
+    if(!m_repairId)
+        return;
+
+    QString text = ui->lineEditComment->text();
+
+    if(text.compare(m_repair->extNotes()) == 0)
+        return;
+
+    m_repair->setExtNotes(text);
     if(m_repair->commit())
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Примечание сохранено"), QColor(214,239,220), QColor(229,245,234));
 }
