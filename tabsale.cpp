@@ -20,7 +20,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     clientModel = new SClientModel();
     cashRegister = new SCashRegisterModel();
 
-    tableModel->setTableMode(SSaleTableModel::TablesSet::StoreSale);
+    tableModel->setMode(SSaleTableModel::TablesSet::StoreSale);
     params = new int;
     *params = 0;
     *params |= comSettings->printOutInvoice?tabSaleSettingsMenu::PrintDoc:0;
@@ -78,8 +78,6 @@ tabSale::~tabSale()
     p_instance.remove(doc_id);   // Обязательно блять!
     delete params;
     delete widgetAction;
-    delete tableModel;
-//    delete itemDelagates;
     delete clientModel;
     delete cashRegister;
     delete docModel;
@@ -142,7 +140,7 @@ void tabSale::updateWidgets()
     setDefaultStyleSheets();
     if(doc_id)
     {
-        tableModel->setModelState(SSaleTableModel::StoreSold);
+        tableModel->setState(SSaleTableModel::StoreSold);
         docModel->load(doc_id);
         if(!docModel->isValid())
             return;
@@ -182,7 +180,7 @@ void tabSale::updateWidgets()
 
         if(m_docState == SDocumentModel::ItemsReserved)
         {
-            tableModel->setModelState(SSaleTableModel::StoreReserved);
+            tableModel->setState(SSaleTableModel::StoreReserved);
             m_opType = SaleReserved;    // это флаг для функции sale()
             ui->comboBoxPaymentAccount->setEnabled(true);
             ui->comboBoxPriceCol->setEnabled(true);
@@ -226,7 +224,7 @@ void tabSale::updateWidgets()
             ui->buttonSale->hide();
             ui->labelTrack->hide();
             ui->lineEditTrack->hide();
-            tableModel->setModelState(SSaleTableModel::StoreCancelled);
+            tableModel->setState(SSaleTableModel::StoreCancelled);
             tableModel->store_loadTable(doc_id);
             ui->lineEditTakeIn->setText(sysLocale.toString(0.00, 'f', 2));
             ui->comboBoxCompany->setEnabled(false);
@@ -253,7 +251,7 @@ void tabSale::updateWidgets()
             {
                 ui->groupBoxAdm->hide();
             }
-            tableModel->setModelState(SSaleTableModel::StoreSold);
+            tableModel->setState(SSaleTableModel::StoreSold);
             tableModel->store_loadTable(doc_id);
             ui->lineEditTotal->setText(docModel->amountLocal());  // устанавливать суммы нужно только после заполнения таблицы
             ui->lineEditTakeIn->setReadOnly(true);
@@ -307,7 +305,7 @@ void tabSale::updateWidgets()
         ui->pushButtonClientCredsClearAll->setEnabled(true);
         ui->pushButtonClientFromDB->setEnabled(permissions->viewClients);
 
-        tableModel->setModelState(SSaleTableModel::StoreNew);
+        tableModel->setState(SSaleTableModel::StoreNew);
 
 #ifdef QT_DEBUG
         test_scheduler_counter = 0;
@@ -528,7 +526,7 @@ void tabSale::fillClientCreds(int id)
     ui->comboBoxClientAdType->setEnabled(false);
     ui->checkBoxAnonymous->setChecked(false);
 
-    if(tableModel->modelState() == SSaleTableModel::StoreNew)
+    if(tableModel->state() == SSaleTableModel::StoreNew)
         ui->comboBoxPriceCol->setCurrentIndex(clientModel->priceColumnIndex());
     ui->comboBoxClientAdType->setCurrentIndex(clientModel->adTypeIndex());
     if(clientModel->options() & SClientModel::BalanceEnabled)
@@ -581,7 +579,7 @@ void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
 
 void tabSale::selectPriceCol(int index)
 {
-    if(tableModel->modelState() == SSaleTableModel::State::StoreNew || tableModel->modelState() == SSaleTableModel::State::StoreReserved)
+    if(tableModel->state() == SSaleTableModel::State::StoreNew || tableModel->state() == SSaleTableModel::State::StoreReserved)
         tableModel->setPriceColumn((SStoreItemModel::PriceOption)m_priceColProxyModel->databaseIDByRow(index));
 }
 
@@ -1085,59 +1083,6 @@ tabSale* tabSale::getInstance(int doc_id, MainWindow *parent)
     return p_instance.value(doc_id);
 }
 
-/******************************************************************************************************************************************************
- *
- */
-sparePartsTable::sparePartsTable(QWidget *parent) :
-    STableViewBase(SLocalSettings::SaleItemsGrid, parent)
-{
-    i_defaultColumnsWidths = {{0, 60},{1, 90},{2, 270},{3, 45},{4, 60},{5, 70},{6, 70},{7, 120},{8, 120},{9, 80}};
-    i_defaultHeaderLabels << tr("") << tr("UID") << tr("Наименование") << tr("Кол-во") << tr("Доступно") << tr("Цена") << tr("Сумма") << tr("Место") << tr("Серийный номер") << tr("Гарантия");
-    readLayout();
-    i_gridLayout->$GridControl.Columns[2].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
-}
-
-sparePartsTable::~sparePartsTable()
-{
-}
-
-void sparePartsTable::setModel(QAbstractItemModel *model)
-{
-    m_model = static_cast<SSaleTableModel*>(model);
-    STableViewBase::setModel(model);
-    SaleTableItemDelegates *itemDelagates = new SaleTableItemDelegates(m_model, this);
-    setItemDelegate(itemDelagates);
-}
-
-void sparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    Q_UNUSED(event);
-    int row = currentIndex().row();
-    if(m_model->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool())
-    {
-        clearSelection();
-        selectionModel()->select(currentIndex(), QItemSelectionModel::Select);
-        emit createTabSparePart(m_model->index(row, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
-    }
-}
-
-/* Пустышка
- * Необходима для избежания потенциальных сбоев при вызове метода в родительском классе
-*/
-void sparePartsTable::clearModel()
-{
-
-}
-
-/* Пустышка
- * Необходима для избежания потенциальных сбоев при вызове метода в родительском классе
-*/
-void sparePartsTable::setModelQuery(const QString &query, const QSqlDatabase &database)
-{
-    Q_UNUSED(query)
-    Q_UNUSED(database)
-}
-
 #ifdef QT_DEBUG
 void tabSale::randomFill()
 {
@@ -1236,7 +1181,7 @@ void tabSale::createTestPanel()
 
 void tabSale::test_scheduler_handler()  //
 {
-    if(tableModel->modelState() == 0)
+    if(tableModel->state() == 0)
         randomFill();
 }
 

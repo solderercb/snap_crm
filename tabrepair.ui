@@ -976,7 +976,7 @@ QListView::item  {
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="SWorksAndParts" name="widgetBOQ" native="true">
+          <widget class="SBillOfQuantities" name="widgetBOQ" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -1228,9 +1228,9 @@ QListView::item  {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>SWorksAndParts</class>
+   <class>SBillOfQuantities</class>
    <extends>QWidget</extends>
-   <header>widgets/sworksandparts.h</header>
+   <header>widgets/sbillofquantities.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

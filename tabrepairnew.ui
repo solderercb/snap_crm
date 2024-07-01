@@ -949,7 +949,7 @@
           </widget>
          </item>
          <item row="4" column="0">
-          <widget class="SWorksAndParts" name="widgetQuickRepairBOQ" native="true">
+          <widget class="SBillOfQuantities" name="widgetQuickRepairBOQ" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -1100,9 +1100,9 @@
    <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
-   <class>SWorksAndParts</class>
+   <class>SBillOfQuantities</class>
    <extends>QWidget</extends>
-   <header>widgets/sworksandparts.h</header>
+   <header>widgets/sbillofquantities.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

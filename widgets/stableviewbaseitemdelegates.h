@@ -37,7 +37,7 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
+    virtual bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
     bool event(QEvent *) override;
     bool eventFilter(QObject *, QEvent *) override;
     virtual void setTableModel(QAbstractItemModel *model);
@@ -53,9 +53,6 @@ protected:
 //    QStyle *i_style;
     void initProgressBarsStyles();
     void paintColorizedProgressBar(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget = nullptr) const;
-
-private:
-    mutable bool m_autoDropDownList;
     QLineEdit* createLineEdit(QWidget*, QAbstractItemModel *) const;
     void setLineEditData(QWidget *editor, const QString&) const;
     void setModelDataFromLineEdit(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
@@ -68,6 +65,8 @@ private:
     QDoubleSpinBox* createDoubleSpinBox(QWidget*, const QModelIndex&) const;
     void setDoubleSpinBoxData(QWidget *editor, const double) const;
     void setModelDataFromDoubleSpinBox(QWidget*, QAbstractItemModel*, const QModelIndex&) const;
+private:
+    mutable bool m_autoDropDownList;
 private slots:
 };
 

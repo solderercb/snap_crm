@@ -30,9 +30,9 @@ void STableViewRepairsItemDelegates::paint(QPainter *painter, const QStyleOption
 void STableViewRepairsItemDelegates::paintStatusProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     uint progressStatus = 0;
-    uint repairStatus = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
+    uint repairStatus = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
     qint64 statusTermSecons = comSettings->repairStatuses[repairStatus].TermsSec;
-    QDateTime statusChanged = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::LastStatusChanged)).toDateTime();
+    QDateTime statusChanged = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::LastStatusChanged)).toDateTime();
     statusChanged.setTimeZone(QTimeZone::utc());
     qint64 secondsSinceStatusChanged = statusChanged.secsTo(QDateTime::currentDateTimeUtc()) + 1;
 
@@ -67,15 +67,15 @@ void STableViewRepairsItemDelegates::paintStatusProgressBar(QPainter *painter, c
 void STableViewRepairsItemDelegates::paintRepairProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     uint progressRepair = 0;
-    uint repairStatus = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
-    QDateTime inDate = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::InDate)).toDateTime();
+    uint repairStatus = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
+    QDateTime inDate = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::InDate)).toDateTime();
     inDate.setTimeZone(QTimeZone::utc());
     QDateTime currentOrOutDate;
     switch (repairStatus)
     {
         case Global::RepStateIds::Returned:
         case Global::RepStateIds::ReturnedNoRepair:
-        case Global::RepStateIds::ReturnedInCredit: currentOrOutDate = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::OutDate)).toDateTime(); break;
+        case Global::RepStateIds::ReturnedInCredit: currentOrOutDate = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::OutDate)).toDateTime(); break;
         default: ;
     }
     if(!currentOrOutDate.isValid())
@@ -112,7 +112,7 @@ void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, 
         Q_ASSERT_X(0, objectName().toLocal8Bit(), QString("i_fontMetrics not set").toLocal8Bit());
 
     STableViewBaseItemDelegates::paint(painter, option, index);
-    int status = i_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::InformedStatus)).toInt();
+    int status = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::InformedStatus)).toInt();
 
     if(!status)
         return;
@@ -140,6 +140,6 @@ void STableViewRepairsItemDelegates::paintClientInformStatus(QPainter *painter, 
 
 void STableViewRepairsItemDelegates::setTableModel(QAbstractItemModel *model)
 {
-    i_tableModel = static_cast<STableRepairsModel*>(model);
+    m_tableModel = static_cast<STableRepairsModel*>(model);
 }
 

@@ -83,7 +83,7 @@ Qt::ItemFlags SSaleTableModel::flags(const QModelIndex &index) const
     int condition;
     if( m_modelState == State::StoreNew || m_modelState == State::StoreReserved || m_modelState == State::WorkshopRW || m_modelState == State::WorkshopAdm )   // у вкладки будет дополнительный режим — правка резерва (в АСЦ такого вроде не было)
     {
-        condition = this->index(index.row(), SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() << 7 | m_tableMode << 6 | index.column();
+        condition = recordType(index.row()) << 7 | m_tableMode << 6 | index.column();
         switch (condition)
         {
             case SSaleTableModel::RecordType::Work << 7 | SSaleTableModel::WorkshopSale << 6 | SStoreItemModel::SaleOpColumns::ColName:
@@ -417,8 +417,9 @@ bool SSaleTableModel::addItemFromBasket(const int id, const int qty)
     return ret;
 }
 
-void SSaleTableModel::removeRowHandler(const int row, const int db_id)
+void SSaleTableModel::removeRow(const int row)
 {
+    int db_id = index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt();
     if(m_tableMode == TablesSet::StoreSale)
     {
         if(m_modelState == SSaleTableModel::StoreNew)   // в режиме создания новой РН просто удаляем строки из модели
@@ -434,20 +435,6 @@ void SSaleTableModel::removeRowHandler(const int row, const int db_id)
 
     emit amountChanged(amountTotal(), m_amountItems, m_amountWorks);
     endResetModel();    // генерация сигнала modelReset() нужна для корректной раскраски строки, помеченной на удаление
-}
-
-void SSaleTableModel::buttonHandler(const int buttonNum, const int row)
-{
-    // действия при прямой продаже и в карте ремонта разные; формируем уникальный идентификатор
-    int action = m_tableMode << 8 | index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt() << 4 | buttonNum;
-    switch(action)
-    {
-        case (StoreSale << 8    | RecordType::Item << 4 | 1):
-        case (WorkshopSale << 8 | RecordType::Work << 4 | 0):
-        case (WorkshopSale << 8 | RecordType::Item << 4 | 1): removeRowHandler(row, index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt()); break; // кнопка "удалить"
-        case (WorkshopSale << 8 | RecordType::Work << 4 | 2): emit addItem(); break; // кнопка "добавить деталь"
-        case (StoreSale << 8    | 2): ; break; // нет действия
-    }
 }
 
 /* Удаление или пометка на удаление строки в режиме продажи: частичный возврат или частичная отмена
@@ -485,13 +472,12 @@ void SSaleTableModel::store_markRowRemove(const int row, const int db_id)
 int SSaleTableModel::repair_markRowRemove(const int row, const int db_id)
 {
     int newState;
-    int recordType = index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
     QMap<int, int> *pendingRemoveList;
-    if(recordType == RecordType::Work)   // сначала обрабатываем записи о товарах привязанных к удаляемой работе
+    if(recordType(row) == RecordType::Work)   // сначала обрабатываем записи о товарах привязанных к удаляемой работе
     {
         pendingRemoveList = m_worksPendingRemoveList;
         int i = row + 1;
-        while(i < rowCount() && index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == RecordType::Item)
+        while(i < rowCount() && recordType(i) == RecordType::Item)
         {
             i = repair_markRowRemove(i, index(i, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
         }
@@ -563,7 +549,7 @@ void SSaleTableModel::setPriceColumn(const SStoreItemModel::PriceOption id)
 */
 bool SSaleTableModel::store_loadTable(const int doc_id)
 {
-    setTableMode(TablesSet::StoreSale);
+    setMode(TablesSet::StoreSale);
     setDocumentId(doc_id);
     if(m_modelState == State::StoreSold)
         m_queryData->setQuery(QUERY_SEL_ITEMS_IN_DOC(m_objId), QSqlDatabase::database("connMain"));
@@ -670,7 +656,7 @@ bool SSaleTableModel::repair_saveTables()
         if(!index(i, SStoreItemModel::SaleOpColumns::ColObjId).data().toInt())
             setData(index(i, SStoreItemModel::SaleOpColumns::ColObjId), m_objId);
 
-        if(index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == RecordType::Work)
+        if(recordType(i) == RecordType::Work)
         {
 
             SWorkModel *work = repair_work(i);
@@ -772,7 +758,7 @@ bool SSaleTableModel::repair_saveTables(RepairOpType operation)
     ret = repair_saveTables();   // если по каким-либо причинам таблица не сохранена
     for(int i = 0; i < rowCount() && ret; i++)
     {
-        if(index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool() == RecordType::Work)
+        if(recordType(i) == RecordType::Work)
             continue;
 
         SRepairSaleItemModel *itm = repair_item(i);
@@ -1038,7 +1024,7 @@ void SSaleTableModel::store_markAllItemsToRemove(StoreOpType type)
             if(index(i, SStoreItemModel::SaleOpColumns::ColState).data().toBool())  // возвращённые ранее пропускаем; касается только простых продаж
                 continue;
 
-        removeRowHandler(i, index(i, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
+        removeRow(i);
     }
 }
 
@@ -1060,12 +1046,12 @@ SWorkModel *SSaleTableModel::repair_work(const int rownum)
     return item;
 }
 
-int SSaleTableModel::tableMode()
+int SSaleTableModel::mode()
 {
     return m_tableMode;
 }
 
-void SSaleTableModel::setTableMode(const TablesSet mode)
+void SSaleTableModel::setMode(const TablesSet mode)
 {
     m_tableMode = mode;
     if(mode == TablesSet::StoreSale)
@@ -1178,10 +1164,18 @@ int SSaleTableModel::getParentWorkRow(const int itemRow)
     return i;
 }
 
-bool SSaleTableModel::recordType(const int row)
+bool SSaleTableModel::recordType(const int row) const
 {
-
     return index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool();
+}
+
+/* Возвращает id работы
+ * Для обычного ремонта id = 0
+ * Для заправок картриджей id >= 1
+*/
+int SSaleTableModel::workType(const int row) const
+{
+    return index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
 }
 
 void SSaleTableModel::clearChangedFlagForAllField()
@@ -1253,7 +1247,7 @@ double SSaleTableModel::amountTotal()
             continue;
 
         summ = value(i, SStoreItemModel::SaleOpColumns::ColSumm).toDouble();
-        if(value(i, SStoreItemModel::SaleOpColumns::ColRecordType).toBool())
+        if(recordType(i))
             m_amountItems += summ;
         else
             m_amountWorks += summ;
@@ -1288,17 +1282,16 @@ QVariant SSaleTableModel::value(const int row, const int column, const int role)
     return QStandardItemModel::data(index(row, column), role);
 }
 
-void SSaleTableModel::setModelState(int state)
+void SSaleTableModel::setState(int state)
 {
     if(m_modelState == state)
         return;
 
     m_modelState = state;
-    emit modelStateChanged(m_modelState);
     endResetModel();    // для перерисовки кнопок в таблице
 }
 
-int SSaleTableModel::modelState()
+int SSaleTableModel::state()
 {
     return m_modelState;
 }

@@ -27,7 +27,7 @@
        <item row="0" column="1">
         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
          <item>
-          <widget class="sparePartsTable" name="tableView">
+          <widget class="STableViewBOQStore" name="tableView">
            <property name="sizeAdjustPolicy">
             <enum>QAbstractScrollArea::AdjustToContents</enum>
            </property>
@@ -860,9 +860,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>sparePartsTable</class>
+   <class>STableViewBOQStore</class>
    <extends>QTableView</extends>
-   <header>tabsale.h</header>
+   <header>widgets/stableviewboqstore.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

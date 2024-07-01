@@ -19,7 +19,7 @@
 #include "models/scashregistermodel.h"
 #include "models/sclientmodel.h"
 #include "models/sphonemodel.h"
-#include "widgets/saletableitemdelegates.h"
+#include "widgets/stableviewboqitemdelegates.h"
 #include "widgets/tabsalesettingsmenu.h"
 #include "widgets/shortlivednotification.h"
 #include "widgets/stableviewbase.h"
@@ -28,22 +28,6 @@
 namespace Ui {
 class tabSale;
 }
-
-class sparePartsTable : public STableViewBase
-{
-    Q_OBJECT
-signals:
-    void createTabSparePart(int);
-public:
-    explicit sparePartsTable(QWidget *parent = nullptr);
-    ~sparePartsTable();
-    void setModel(QAbstractItemModel *model) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
-private:
-    SSaleTableModel *m_model = nullptr;
-    void clearModel() override;
-    void setModelQuery(const QString &query, const QSqlDatabase &database) override;
-};
 
 class tabSale : public tabCommon
 {
@@ -127,7 +111,7 @@ private slots:
     void logButtonClicked();
     void unSaleButtonClicked();
     void paymentSystemChanged(int);
-    void guiFontChanged();
+    void guiFontChanged() override;
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;
     void test_scheduler2_handler() override;

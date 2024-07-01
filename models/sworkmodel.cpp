@@ -58,7 +58,7 @@ void SWorkModel::setUser(const int id, const QVariant oldValue)
     else
         logText = tr("Исполнителем работы \"%1\" назначен %2").arg(m_name, usersModel->getDisplayRole(id, 1));
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     appendLogText(logText);
@@ -102,7 +102,7 @@ void SWorkModel::setName(const QString name, const QVariant oldValue)
     else if(i_id)   // для новой произвольной работы или работы из прайс-листа запись в журнал не нужна
         logText = tr("Название работы изменено на \"%1\"").arg(name);
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     appendLogText(logText);
@@ -124,7 +124,7 @@ void SWorkModel::setPrice(const double price, const QVariant oldValue)
     else if(i_id)
         logText = tr("Стоимость работы \"%1\" установлена %1").arg(m_name, sysLocale.toCurrencyString(price));
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     appendLogText(logText);
@@ -141,7 +141,7 @@ void SWorkModel::setCount(const int count, const QVariant oldValue)
     SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
     QString logText = tr("Кол-во \"%1\" изменёно с %2 на %3").arg(m_name).arg(oldValue.toInt()).arg(count);
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     if(oldValue.isValid())
@@ -167,7 +167,7 @@ void SWorkModel::setWarranty(const int warranty, const QVariant oldValue)
     else
         logText = tr("Срок гарантии на работу \"%1\" установлен по умолчанию (\"%2\")").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     appendLogText(logText);
@@ -238,7 +238,7 @@ bool SWorkModel::remove()
     SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
     QString logText = tr("Удалена работа \"%1\" стоимостью %2").arg(m_name, sysLocale.toCurrencyString(m_price));
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     i_logRecord->setText(logText);

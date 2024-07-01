@@ -1,38 +1,39 @@
-#include "mainwindow.h"
-#include "sworksandparts.h"
-#include "ui_sworksandparts.h"
+#include "sbillofquantities.h"
+#include "ui_sbillofquantities.h"
 
-SWorksAndParts::SWorksAndParts(QWidget *parent) :
+SBillOfQuantities::SBillOfQuantities(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::SWorksAndParts)
+    ui(new Ui::SBillOfQuantities)
 {
     ui->setupUi(this);
 
     m_model = new SSaleTableModel(this);
-    m_model->setTableMode(SSaleTableModel::WorkshopSale);
+    STableViewBOQItemDelegates *itemDelagates = new STableViewBOQItemDelegates(m_model, ui->tableViewBOQ);
+    m_model->setMode(SSaleTableModel::WorkshopSale);
     m_model->setPriceColumn(SStoreItemModel::PriceOptionService); // по умолчанию цена для сервиса
 
     if(permissions->addGoodsFromWarehouse)  // Устанавливать детали со склада
     {
         ui->lineEditQuickAddPart->setButtons("Apply");
-        connect(ui->lineEditQuickAddPart, &SLineEdit::buttonClicked, this, &SWorksAndParts::onReturnQuickAddPart);
-        connect(ui->lineEditQuickAddPart, &SLineEdit::returnPressed, this, &SWorksAndParts::onReturnQuickAddPart);
+        connect(ui->lineEditQuickAddPart, &SLineEdit::buttonClicked, this, &SBillOfQuantities::onReturnQuickAddPart);
+        connect(ui->lineEditQuickAddPart, &SLineEdit::returnPressed, this, &SBillOfQuantities::onReturnQuickAddPart);
     }
 
-    connect(ui->switchEditStrategy, &QPushButton::toggled, this, &SWorksAndParts::switchEditStrategy);
-    connect(ui->toolButtonSaveSaleTable, &QToolButton::clicked, this, &SWorksAndParts::saveSaleTableClicked);
-    connect(ui->pushButtonAdmEditWorks, &QPushButton::clicked, this, &SWorksAndParts::buttonWorksAdminEdit);
-    connect(m_model, &SSaleTableModel::amountChanged, this, &SWorksAndParts::updateAmounts);
-    connect(m_model, &SSaleTableModel::tableSaved, this, &SWorksAndParts::saveAmounts);
-    connect(m_model, &SSaleTableModel::addItem, this, &SWorksAndParts::buttonAddItemClicked);
-    connect(m_model, &SSaleTableModel::tableDataChanged, this, &SWorksAndParts::setSaveSaleTableEnabled);
-    connect(ui->pushButtonAddWork, &QPushButton::clicked, this, &SWorksAndParts::addCustomWork);
+    connect(ui->switchEditStrategy, &QPushButton::toggled, this, &SBillOfQuantities::switchEditStrategy);
+    connect(ui->toolButtonSaveSaleTable, &QToolButton::clicked, this, &SBillOfQuantities::saveSaleTableClicked);
+    connect(ui->pushButtonAdmEditWorks, &QPushButton::clicked, this, &SBillOfQuantities::buttonWorksAdminEdit);
+    connect(m_model, &SSaleTableModel::amountChanged, this, &SBillOfQuantities::updateAmounts);
+    connect(m_model, &SSaleTableModel::tableSaved, this, &SBillOfQuantities::saveAmounts);
+    connect(m_model, &SSaleTableModel::tableDataChanged, this, &SBillOfQuantities::setSaveSaleTableEnabled);
+    connect(ui->pushButtonAddWork, &QPushButton::clicked, this, &SBillOfQuantities::addCustomWork);
 
     if(!userDbData->autosavePartList)    // установка состояния должна выполняться после соединения сигналов и слотов
         m_model->setEditStrategy(SSaleTableModel::OnManualSubmit);
 
-    ui->tableViewWorksAndSpareParts->setModel(m_model);
-    connect(ui->tableViewWorksAndSpareParts, &worksAndSparePartsTable::pressed, m_model, &SSaleTableModel::indexSelected);
+    ui->tableViewBOQ->setModel(m_model);
+    ui->tableViewBOQ->setItemDelegate(itemDelagates);
+    connect(itemDelagates, &STableViewBOQItemDelegates::addItem, this, &SBillOfQuantities::buttonAddItemClicked);
+    connect(ui->tableViewBOQ, &STableViewBOQWorkshop::pressed, m_model, &SSaleTableModel::indexSelected);
 
 #ifdef QT_DEBUG
     connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, m_model, &SSaleTableModel::dbgAddRandomItem);
@@ -45,13 +46,13 @@ SWorksAndParts::SWorksAndParts(QWidget *parent) :
     updateWidgets();
 }
 
-SWorksAndParts::~SWorksAndParts()
+SBillOfQuantities::~SBillOfQuantities()
 {
     m_repairModel = nullptr;
     delete ui;
 }
 
-void SWorksAndParts::setRepairId(const int id)
+void SBillOfQuantities::setRepairId(const int id)
 {
     m_model->setRepairId(id);
 }
@@ -60,27 +61,27 @@ void SWorksAndParts::setRepairId(const int id)
  * При передаче nullptr связь не разрывается, но внутренний указатель
  * на модель данных ремонта обновляется для правильной работы других методов
 */
-void SWorksAndParts::linkWithRepairModel(SRepairModel *model)
+void SBillOfQuantities::linkWithRepairModel(SRepairModel *model)
 {
     m_repairModel = model;
     if(model)
     {
         m_repairModel->setBOQModel(m_model);
-        connect(m_repairModel, &SRepairModel::modelUpdated, this, &SWorksAndParts::repairModelUpdated);
+        connect(m_repairModel, &SRepairModel::modelUpdated, this, &SBillOfQuantities::repairModelUpdated);
     }
 }
 
-void SWorksAndParts::setReadOnly(bool state)
+void SBillOfQuantities::setReadOnly(bool state)
 {
     m_modelRO = state;
 }
 
-bool SWorksAndParts::isCommitted()
+bool SBillOfQuantities::isCommitted()
 {
     return !ui->switchEditStrategy->isChecked() && m_model->isUnsaved();
 }
 
-void SWorksAndParts::commit()
+void SBillOfQuantities::commit()
 {
     if(!m_model->isUnsaved())
         return;
@@ -88,23 +89,23 @@ void SWorksAndParts::commit()
     m_model->repair_saveTablesStandalone();
 }
 
-void SWorksAndParts::load(const int repair)
+void SBillOfQuantities::load(const int repair)
 {
     m_model->repair_loadTable(repair);
 }
 
-bool SWorksAndParts::isEmpty()
+bool SBillOfQuantities::isEmpty()
 {
     return (m_model->rowCount() == 0);
 }
 
-void SWorksAndParts::clearTable()
+void SBillOfQuantities::clearTable()
 {
     if(!m_repairModel || !m_repairModel->id())
         m_model->removeRows(0, m_model->rowCount());
 }
 
-void SWorksAndParts::updateWidgets()
+void SBillOfQuantities::updateWidgets()
 {
     ui->pushButtonAddWork->setEnabled((!m_modelRO || m_modelAdmEdit) && permissions->addCustomWork);
 //    ui->pushButtonAddWorkFromPriceList->setEnabled(!m_modelRO || m_modelAdmEdit);
@@ -116,20 +117,20 @@ void SWorksAndParts::updateWidgets()
     ui->switchEditStrategy->setChecked(m_model->editStrategy() == SSaleTableModel::OnFieldChange || m_model->editStrategy() == SSaleTableModel::OnRowChange);
     ui->pushButtonAdmEditWorks->setVisible(permissions->advEditWorkList && m_repairModel && m_repairModel->id() && m_modelRO);
     ui->pushButtonAdmEditWorks->setChecked(false);
-    m_model->setModelState((m_modelRO && !m_modelAdmEdit)?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
+    m_model->setState((m_modelRO && !m_modelAdmEdit)?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
 }
 
-void SWorksAndParts::addCustomWork()
+void SBillOfQuantities::addCustomWork()
 {
     int row = m_model->rowCount();
     m_model->addCustomWork();
 
-    ui->tableViewWorksAndSpareParts->scrollToBottom();
-    ui->tableViewWorksAndSpareParts->setCurrentIndex(m_model->index(row, SStoreItemModel::SaleOpColumns::ColName));
-    ui->tableViewWorksAndSpareParts->setFocus();
+    ui->tableViewBOQ->scrollToBottom();
+    ui->tableViewBOQ->setCurrentIndex(m_model->index(row, SStoreItemModel::SaleOpColumns::ColName));
+    ui->tableViewBOQ->setFocus();
 }
 
-void SWorksAndParts::onReturnQuickAddPart()
+void SBillOfQuantities::onReturnQuickAddPart()
 {
     if(quickAddPart(ui->lineEditQuickAddPart->text().toInt()))
         ui->lineEditQuickAddPart->setText("");
@@ -138,7 +139,7 @@ void SWorksAndParts::onReturnQuickAddPart()
 /* Быстрое добавление товара по UID
  * Возвращает 0 в случае неудачи
 */
-bool SWorksAndParts::quickAddPart(const int uid)
+bool SBillOfQuantities::quickAddPart(const int uid)
 {
     if(m_modelRO && !m_modelAdmEdit)
         return 0;
@@ -147,7 +148,7 @@ bool SWorksAndParts::quickAddPart(const int uid)
     return m_model->addItemByUID(uid);
 }
 
-void SWorksAndParts::updateAmounts(const double, const double, const double)
+void SBillOfQuantities::updateAmounts(const double, const double, const double)
 {
     ui->lineEditTotalAmount->setText(m_model->amountTotalLocale());
     ui->lineEditWorksAmount->setText(m_model->amountWorksLocale());
@@ -155,7 +156,7 @@ void SWorksAndParts::updateAmounts(const double, const double, const double)
     emit amountUpdated(m_model->amountTotal());
 }
 
-void SWorksAndParts::saveAmounts()
+void SBillOfQuantities::saveAmounts()
 {
     if(!m_repairModel)
         return;
@@ -173,7 +174,7 @@ void SWorksAndParts::saveAmounts()
     m_repairModel->blockSignals(false);
 }
 
-void SWorksAndParts::switchEditStrategy(bool state)
+void SBillOfQuantities::switchEditStrategy(bool state)
 {
     if(state)
     {
@@ -190,24 +191,24 @@ void SWorksAndParts::switchEditStrategy(bool state)
     updateWidgets();
 }
 
-void SWorksAndParts::saveSaleTableClicked()
+void SBillOfQuantities::saveSaleTableClicked()
 {
     if(m_model->repair_saveTablesStandalone())
         ui->toolButtonSaveSaleTable->setEnabled(false);
 }
 
-void SWorksAndParts::setSaveSaleTableEnabled()
+void SBillOfQuantities::setSaveSaleTableEnabled()
 {
     if(m_model->editStrategy() == SSaleTableModel::OnManualSubmit)
         ui->toolButtonSaveSaleTable->setEnabled(true);
 }
 
-void SWorksAndParts::buttonWorksAdminEdit(bool state)
+void SBillOfQuantities::buttonWorksAdminEdit(bool state)
 {
     if(state)
     {
         m_modelAdmEdit = 1;
-        m_model->setModelState(SSaleTableModel::State::WorkshopAdm);
+        m_model->setState(SSaleTableModel::State::WorkshopAdm);
         ui->switchEditStrategy->setEnabled(true);
         ui->toolButtonSaveSaleTable->setEnabled(m_model->isUnsaved());
         ui->pushButtonAddWork->setEnabled(true);
@@ -215,7 +216,7 @@ void SWorksAndParts::buttonWorksAdminEdit(bool state)
     else
     {
         m_modelAdmEdit = 0;
-        m_model->setModelState(m_modelAdmEdit?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
+        m_model->setState(m_modelAdmEdit?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
         if(m_model->isUnsaved())
             saveSaleTableClicked();
         ui->switchEditStrategy->setEnabled(!m_modelAdmEdit);
@@ -224,12 +225,13 @@ void SWorksAndParts::buttonWorksAdminEdit(bool state)
     }
 }
 
-void SWorksAndParts::buttonAddItemClicked()
+void SBillOfQuantities::buttonAddItemClicked()
 {
+    qDebug().nospace() << "[" << this << "] buttonAddItemClicked() | Not yet implemented";
     //        emit createTabSelectItem(1, this);
 }
 
-void SWorksAndParts::repairModelUpdated()
+void SBillOfQuantities::repairModelUpdated()
 {
     m_model->setRepairId(m_repairModel->id());
     if(m_repairModel->clientId() != m_clientId)  // перезагрузка данных клиента только при первом вызове метода или если был изменён клиент
@@ -241,70 +243,10 @@ void SWorksAndParts::repairModelUpdated()
 }
 
 #ifdef QT_DEBUG
-void SWorksAndParts::dbgAddWork()
+void SBillOfQuantities::dbgAddWork()
 {
     addCustomWork();
-    m_model->setData(ui->tableViewWorksAndSpareParts->currentIndex().siblingAtColumn(SStoreItemModel::ColName), "repair");
-    m_model->setData(ui->tableViewWorksAndSpareParts->currentIndex().siblingAtColumn(SStoreItemModel::ColPrice), 123);
+    m_model->setData(ui->tableViewBOQ->currentIndex().siblingAtColumn(SStoreItemModel::ColName), "repair");
+    m_model->setData(ui->tableViewBOQ->currentIndex().siblingAtColumn(SStoreItemModel::ColPrice), 123);
 }
 #endif
-
-// ===============================================================================================================
-worksAndSparePartsTable::worksAndSparePartsTable(QWidget *parent) :
-    STableViewBase(SLocalSettings::RepairWorksGrid, parent)
-{
-    // столбец "Доступно" (4) скрыт
-    i_defaultColumnsWidths = {{0, 60},{1, 90},{2, 270},{3, 45},{4, 0},{5, 70},{6, 70},{7, 120},{8, 120},{9, 80},{10, 100}};
-    i_defaultHeaderLabels << tr("") << tr("UID") << tr("Наименование") << tr("Кол-во") << tr("Доступно") << tr("Цена") << tr("Сумма") << tr("Место") << tr("Серийный номер") << tr("Гарантия") << tr("Сотрудник");
-    readLayout();
-    i_gridLayout->$GridControl.Columns[2].Width_marked = true;  // по умолчанию автоширина столбца с наименованием
-}
-
-worksAndSparePartsTable::~worksAndSparePartsTable()
-{
-}
-
-void worksAndSparePartsTable::setModel(QAbstractItemModel *model)
-{
-    m_model = static_cast<SSaleTableModel*>(model);
-    STableViewBase::setModel(model);
-    SaleTableItemDelegates *itemDelagates = new SaleTableItemDelegates(m_model, this);
-    setItemDelegate(itemDelagates);
-}
-
-void worksAndSparePartsTable::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    int row = currentIndex().row();
-    if(m_model->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toBool())
-    {
-        if(event->modifiers() == Qt::ControlModifier)
-        {
-            clearSelection();
-            selectionModel()->select(currentIndex(), QItemSelectionModel::Select);
-            MainWindow::getInstance()->createTabSparePart(m_model->index(row, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
-        }
-        else
-            MainWindow::getInstance()->createTabSparePartReserve(m_model->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
-    }
-}
-
-#if QT_VERSION >= 0x060000
-void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
-#else
-void worksAndSparePartsTable::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-#endif
-{
-    STableViewBase::dataChanged(topLeft, bottomRight, roles);
-    if(!roles.isEmpty() && !roles.contains(Qt::DisplayRole))
-        return;
-
-    for(int row = topLeft.row(); row <= bottomRight.row(); row++)
-        for(int col = topLeft.column(); col <= bottomRight.column(); col++)
-        {
-            switch(col)
-            {
-                case SStoreItemModel::SaleOpColumns::ColName: resizeRowToContents(row); break;
-                default: /*resizeColumnToContents(col)*/;
-            }
-        }
-}

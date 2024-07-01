@@ -51,12 +51,14 @@ public:
     explicit SSaleTableModel(QObject *parent = nullptr);
     ~SSaleTableModel();
     QVariant value(const int, const int, const int role = Qt::DisplayRole) const;
-    void setModelState(int state);
-    int modelState();
+    void setState(int state);
+    int state();
     void setQuery(const QString&, const QSqlDatabase &db = QSqlDatabase());
     QVariant data(const QModelIndex&, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex&, const QVariant&, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex&) const override;
+    bool recordType(const int row) const;
+    int workType(const int row) const;
     bool insertRecord(int, const QSqlRecord &, const int recType = RecordType::Item);
     bool appendRecord(const QSqlRecord&);
     int isItemAlreadyInList(int);
@@ -64,8 +66,7 @@ public:
     bool addItemByUID(const int uid, const int count = 1);
     bool addItemByUID(const int uid, const SStoreItemModel::PriceOption priceOption, const int count = 1);
     bool addItemFromBasket(const int id, const int qty = 0);
-    void removeRowHandler(const int, const int);
-    void buttonHandler(const int buttonNum, const int row);
+    void removeRow(const int);
     void store_markRowRemove(const int, const int);
     int repair_markRowRemove(const int, const int);
     QMap<int, int>* getPendingRemoveList();
@@ -107,8 +108,8 @@ public:
     SStoreSaleItemModel* store_item(const int);
     SRepairSaleItemModel* repair_item(const int);
     SWorkModel* repair_work(const int);
-    int tableMode();
-    void setTableMode(const TablesSet mode = TablesSet::StoreSale);
+    int mode();
+    void setMode(const TablesSet mode = TablesSet::StoreSale);
     int visibleColumnIndex(const int);
     int editStrategy();
     void setEditStrategy(const int);
@@ -138,8 +139,6 @@ signals:
     void tableDataChanged();
     void tableSaved();
     void amountChanged(double, double, double);
-    void modelStateChanged(int);
-    void addItem();
 private:
     QSqlQueryModel *m_queryData;
     int m_modelState = 0; // 0 - новая РН (всё редактируется, строки удаляются); 1 - проведённая РН (не редактируется, строки помечаются серым); 2 - резерв (всё редактируется, строки помечаются серым); 3 - распроведённая РН или снятый резерв (не редактируется, кнопок в первом столбце нет)
@@ -167,7 +166,6 @@ private:
     int m_hiddenColumns = 0x000FF810;
     int getItemInsertionRow();
     int getParentWorkRow(const int itemRow);
-    bool recordType(const int row);
     void clearChangedFlagForAllField();
     int activeRowCount() const;
 

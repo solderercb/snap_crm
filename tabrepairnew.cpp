@@ -155,7 +155,7 @@ void tabRepairNew::initWidgets()
     connect(ui->checkBoxIsQuick, &QCheckBox::toggled, this, &tabRepairNew::quickRepairToggled);
     connect(ui->pushButtonQuickRepairIssue1, &QCheckBox::clicked, this, &tabRepairNew::issueQuickRepair);
     connect(ui->pushButtonQuickRepairIssue2, &QCheckBox::clicked, this, &tabRepairNew::issueQuickRepair);
-    connect(ui->widgetQuickRepairBOQ, &SWorksAndParts::amountUpdated, [=](const double value){ui->doubleSpinBoxQuickRepairAmount->setValue(value);});
+    connect(ui->widgetQuickRepairBOQ, &SBillOfQuantities::amountUpdated, [=](const double value){ui->doubleSpinBoxQuickRepairAmount->setValue(value);});
 
     // TODO: настройка минимальных сумм в параметрах программы
     if(comSettings->classicKassa)

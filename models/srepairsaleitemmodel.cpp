@@ -170,7 +170,7 @@ void SRepairSaleItemModel::setRepairId(const int id)
 
         logText = tr("Добавлен товар \"%1\" стоимостью %2 в кол-ве %3ед").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(count);
 
-        if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+        if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
             logText.prepend("[A] ");
 
         appendLogText(logText, "!itemAdded");
@@ -206,7 +206,7 @@ void SRepairSaleItemModel::setPrice(const double price, const QVariant oldValue)
     SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
     QString logText = tr("Стоимость товара \"%1\" изменена с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toDouble()), sysLocale.toCurrencyString(price));
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     if(oldValue.isValid())  // возможность изменять цену товара должна быть доступна только при административной правке
@@ -230,7 +230,7 @@ void SRepairSaleItemModel::setSN(const QString sn, const QVariant oldValue)
     else if (i_id && !sn.isEmpty())
         logText = tr("Серийный номер товара \"%1\" установлен \"%2\"").arg(m_name, sn);
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     appendLogText(logText);
@@ -252,7 +252,7 @@ void SRepairSaleItemModel::setWarranty(const int warranty, const QVariant oldVal
     else
         logText = tr("Срок гарантии на товар \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     appendLogText(logText, QString::number(SStoreItemModel::SaleOpColumns::ColWarranty)); // disambiguation здесь нужен для установки порядка записей в журнал
@@ -317,7 +317,7 @@ bool SRepairSaleItemModel::unlinkRepair()
     SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
     QString logText = tr("Удален товар \"%1\" стоимостью %2 в кол-ве %3ед.").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_count);
 
-    if(model->modelState() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
+    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
         logText.prepend("[A] ");
 
     setState(State::EngineerBasket);

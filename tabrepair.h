@@ -25,7 +25,7 @@
 #include "models/sfieldsmodel.h"
 #include "models/ssortfilterproxymodel.h"
 #include "models/ssaletablemodel.h"
-#include "widgets/saletableitemdelegates.h"
+#include "widgets/stableviewboqitemdelegates.h"
 
 namespace Ui {
 class tabRepair;

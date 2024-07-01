@@ -1,46 +1,24 @@
-#ifndef SWORKSANDPARTS_H
-#define SWORKSANDPARTS_H
+#ifndef SBILLOFQUANTITIES_H
+#define SBILLOFQUANTITIES_H
 
 #include <QWidget>
 #include "models/srepairmodel.h"
 #include "models/ssaletablemodel.h"
-#include "widgets/stableviewbase.h"
-#include "widgets/saletableitemdelegates.h"
+#include "widgets/stableviewboqworkshop.h"
+#include "widgets/stableviewboqitemdelegates.h"
 
 namespace Ui {
-class SWorksAndParts;
+class SBillOfQuantities;
 }
 
-class worksAndSparePartsTable : public STableViewBase
-{
-    Q_OBJECT
-
-signals:
-    void createTabSparePart(int);
-    void createTabSparePartReserve(int);
-public:
-    explicit worksAndSparePartsTable(QWidget *parent = nullptr);
-    ~worksAndSparePartsTable();
-    void setModel(QAbstractItemModel *model) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
-private:
-    SSaleTableModel *m_model = nullptr;
-private slots:
-#if QT_VERSION >= 0x060000
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QList<int> &roles = QList<int>()) override;
-#else
-    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int> &roles = QVector<int>()) override;
-#endif
-};
-
-class SWorksAndParts : public QWidget
+class SBillOfQuantities : public QWidget
 {
     Q_OBJECT
 signals:
     void amountUpdated(const double amount);
 public:
-    explicit SWorksAndParts(QWidget *parent = nullptr);
-    ~SWorksAndParts();
+    explicit SBillOfQuantities(QWidget *parent = nullptr);
+    ~SBillOfQuantities();
     void setRepairId(const int id);
     void linkWithRepairModel(SRepairModel *model);
     void setReadOnly(bool state = true);
@@ -53,7 +31,7 @@ public:
     void dbgAddWork();
 #endif
 private:
-    Ui::SWorksAndParts *ui;
+    Ui::SBillOfQuantities *ui;
     SSaleTableModel *m_model = nullptr;
     SRepairModel *m_repairModel = nullptr;
     bool m_modelRO = 1;
@@ -75,4 +53,4 @@ private slots:
     void repairModelUpdated();
 };
 
-#endif // SWORKSANDPARTS_H
+#endif // SBILLOFQUANTITIES_H

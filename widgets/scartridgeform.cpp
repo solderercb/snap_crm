@@ -58,7 +58,7 @@ void SCartridgeForm::initModels()
         statusesProxyModel->setFilterRegularExpression("");
 
         m_BOQModel = new SSaleTableModel();
-        m_BOQModel->setTableMode(SSaleTableModel::WorkshopSale);
+        m_BOQModel->setMode(SSaleTableModel::WorkshopSale);
         m_BOQModel->setPriceColumn(SStoreItemModel::PriceOptionService);
         connect(m_BOQModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
         connect(m_BOQModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
@@ -721,7 +721,6 @@ void SCartridgeForm::updateLists()
     QString recSumm;
     int itemId = 0;
     int workType;
-    int recType;
     QListWidget *list;
     QListWidgetItem *listItem;
 
@@ -730,11 +729,10 @@ void SCartridgeForm::updateLists()
 
     for(int i = 0; i < m_BOQModel->rowCount(); i++)
     {
-        recType = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
         recName = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColName).data().toString();
         recSumm = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColSumm).data().toString();
         listItem = new QListWidgetItem(QString("%1 %2%3").arg(recName).arg(recSumm).arg(sysLocale.currencySymbol()));    // TODO: мультивалютность
-        if(recType == SSaleTableModel::RecordType::Work)
+        if(m_BOQModel->recordType(i) == SSaleTableModel::RecordType::Work)
         {
             list = ui->listWidgetWorks;
             workType = m_BOQModel->index(i, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
@@ -848,7 +846,7 @@ bool SCartridgeForm::removeWorkAndPart(const int workType)
         if(m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt() == workType)
             break;
     }
-    m_BOQModel->removeRowHandler(row, m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
+    m_BOQModel->removeRow(row);
     nErr = m_BOQModel->repair_saveTablesStandalone();
 
     return nErr;
@@ -1173,20 +1171,16 @@ void SCartridgeForm::updateWorksActionsCheckedState()
     if(actions.isEmpty())
         return;
 
-    int recType;
-    int workType;
     QList<QAction*>::const_iterator action = actions.constBegin();
     while(action != actions.constEnd())
     {
         (*action)->setChecked(false);
         for(int row = 0; row < m_BOQModel->rowCount(); row++)
         {
-            recType = m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColRecordType).data().toInt();
-            if(recType != SSaleTableModel::RecordType::Work)
+            if(m_BOQModel->recordType(row) != SSaleTableModel::RecordType::Work)
                 continue;
 
-            workType = m_BOQModel->index(row, SStoreItemModel::SaleOpColumns::ColWorkType).data().toInt();
-            if((*action)->property("WorkType").toInt() == workType)
+            if((*action)->property("WorkType").toInt() == m_BOQModel->workType(row))
             {
                 (*action)->setChecked(true);
                 return;

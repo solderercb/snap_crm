@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SWorksAndParts</class>
- <widget class="QWidget" name="SWorksAndParts">
+ <class>SBillOfQuantities</class>
+ <widget class="QWidget" name="SBillOfQuantities">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -329,7 +329,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
          </layout>
         </item>
         <item row="1" column="0">
-         <widget class="worksAndSparePartsTable" name="tableViewWorksAndSpareParts">
+         <widget class="STableViewBOQWorkshop" name="tableViewBOQ">
           <property name="focusPolicy">
            <enum>Qt::TabFocus</enum>
           </property>
@@ -365,9 +365,9 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
    </slots>
   </customwidget>
   <customwidget>
-   <class>worksAndSparePartsTable</class>
+   <class>STableViewBOQWorkshop</class>
    <extends>QTableView</extends>
-   <header>widgets/sworksandparts.h</header>
+   <header>widgets/stableviewboqworkshop.h</header>
   </customwidget>
  </customwidgets>
  <resources>

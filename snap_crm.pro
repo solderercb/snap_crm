@@ -144,6 +144,7 @@ SOURCES += \
     widgets/salarytabwidgets/stableviewsalaryrepairs.cpp \
     widgets/salarytabwidgets/stableviewsalarysaleparts.cpp \
     widgets/salarytabwidgets/stableviewsalarysales.cpp \
+    widgets/sbillofquantities.cpp \
     widgets/scartridgeform.cpp \
     widgets/scartridgematerialstableitemdelegates.cpp \
     widgets/scartridgecard.cpp \
@@ -175,12 +176,14 @@ SOURCES += \
     widgets/sreportscommonfunctions.cpp \
     widgets/stableviewbase.cpp \
     widgets/stableviewbaseitemdelegates.cpp \
+    widgets/stableviewboqitemdelegates.cpp \
+    widgets/stableviewboqstore.cpp \
+    widgets/stableviewboqworkshop.cpp \
     widgets/stableviewclients.cpp \
     widgets/stableviewclientsitemdelegates.cpp \
     widgets/stableviewrepairsitemdelegates.cpp \
     widgets/stableviewrepairs.cpp \
     widgets/sdialogissuerepair.cpp \
-    widgets/saletableitemdelegates.cpp \
     widgets/sclientmatch.cpp \
     widgets/scombobox.cpp \
     widgets/scomments.cpp \
@@ -199,7 +202,6 @@ SOURCES += \
     widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
     widgets/swidget.cpp \
-    widgets/sworksandparts.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
@@ -320,6 +322,7 @@ HEADERS  += \
     widgets/salarytabwidgets/stableviewsalaryrepairs.h \
     widgets/salarytabwidgets/stableviewsalarysaleparts.h \
     widgets/salarytabwidgets/stableviewsalarysales.h \
+    widgets/sbillofquantities.h \
     widgets/scartridgeform.h \
     widgets/scartridgematerialstableitemdelegates.h \
     widgets/scartridgecard.h \
@@ -351,6 +354,9 @@ HEADERS  += \
     widgets/speriodselector.h \
     widgets/sreportscommonfunctions.h \
     widgets/stableviewbaseitemdelegates.h \
+    widgets/stableviewboqitemdelegates.h \
+    widgets/stableviewboqstore.h \
+    widgets/stableviewboqworkshop.h \
     widgets/stableviewclients.h \
     widgets/stableviewclientsitemdelegates.h \
     widgets/stableviewrepairsitemdelegates.h \
@@ -358,7 +364,6 @@ HEADERS  += \
     widgets/stableviewbase.h \
     widgets/stableviewrepairs.h \
     widgets/sdialogissuerepair.h \
-    widgets/saletableitemdelegates.h \
     widgets/sclientmatch.h \
     widgets/scombobox.h \
     widgets/scomments.h \
@@ -377,7 +382,6 @@ HEADERS  += \
     widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
     widgets/swidget.h \
-    widgets/sworksandparts.h \
     windowsdispatcher.h
 
 FORMS += \
@@ -399,6 +403,7 @@ FORMS += \
     widgets/salarytabwidgets/spagesalaryrepairs.ui \
     widgets/salarytabwidgets/spagesalarysales.ui \
     widgets/salarytabwidgets/spagesalarysummary.ui \
+    widgets/sbillofquantities.ui \
     widgets/scartridgeform.ui \
     widgets/scartridgecard.ui \
     widgets/sclientinputform.ui \
@@ -425,7 +430,6 @@ FORMS += \
     widgets/sphone.ui \
     widgets/sphones.ui \
     widgets/stoolboxswitchpanel.ui \
-    widgets/sworksandparts.ui \
 
 RESOURCES += styles/styles.qrc
 RESOURCES += help/help.qrc

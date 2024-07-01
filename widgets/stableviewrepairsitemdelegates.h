@@ -18,7 +18,7 @@ public:
     void paintClientInformStatus(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setTableModel(QAbstractItemModel *model) override;
 private:
-    STableRepairsModel *i_tableModel;
+    STableRepairsModel *m_tableModel;
 };
 
 #endif // STABLEVIEWREPAIRSITEMDELEGATES_H
