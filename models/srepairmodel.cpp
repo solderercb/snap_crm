@@ -459,12 +459,12 @@ void SRepairModel::setInDate(const QDateTime timestamp)
 
 QString SRepairModel::outDate()
 {
-    return utcToLocal(m_outDate).toString("dd.MM.yyyy");
+    return localDateTime(m_outDate).toString("dd.MM.yyyy");
 }
 
 QString SRepairModel::outDateTime()
 {
-    return utcToLocal(m_outDate).toString("dd.MM.yyyy hh:mm:ss");
+    return localDateTime(m_outDate).toString("dd.MM.yyyy hh:mm:ss");
 }
 
 void SRepairModel::setOutDate(const QDateTime timestamp)
@@ -1141,7 +1141,7 @@ bool SRepairModel::isLock()
     if(!i_query->value(1).toInt()) // пользователь не совпадает, но он оффлайн
         return 0;
 
-    if(utcToLocal(i_query->value(2).toDateTime()).secsTo(QDateTime::currentDateTime()) > (lockTimeout() + 3))   // время блокировки плюс некоторый запас на отправку запроса и получение данных
+    if(localDateTime(i_query->value(2).toDateTime()).secsTo(QDateTime::currentDateTime()) > (lockTimeout() + 3))   // время блокировки плюс некоторый запас на отправку запроса и получение данных
         return 0;
 
     return 1;

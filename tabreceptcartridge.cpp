@@ -129,6 +129,7 @@ void tabReceptCartridge::initWidgets()
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxPresetPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(0, "system_id"));
     ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
+    ui->widgetClient->setClientsTabDefaultCategory(SClientModel::Categories::Regulars);
     ui->comboBoxVendor->setButtons("Clear");
     ui->comboBoxVendor->setModel(m_vendorsModel);
     ui->comboBoxVendor->setCurrentIndex(-1);
@@ -137,8 +138,6 @@ void tabReceptCartridge::initWidgets()
     ui->checkBoxPrintReceipt->setChecked(comSettings->printCartridgeReceptDoc);
 
 //    connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
-    connect(ui->widgetClient, &SClientInputForm::createTabClient, this, &tabReceptCartridge::createTabClient);
-    connect(ui->widgetClient, &SClientInputForm::createTabSelectExistingClient, this, &tabReceptCartridge::relayCreateTabSelectExistingClient);
     connect(ui->comboBoxVendor, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVendor(int)));
     connect(ui->pushButtonAdd, &QPushButton::clicked, this, qOverload<>(&tabReceptCartridge::appendToReceptList));
     connect(ui->buttonRecept, &QPushButton::clicked, this, &tabReceptCartridge::createRepairs);
@@ -408,11 +407,6 @@ void tabReceptCartridge::randomFill()
 }
 #endif
 
-void tabReceptCartridge::fillClientCreds(const int id)
-{
-    ui->widgetClient->fillClientCreds(id);
-}
-
 void tabReceptCartridge::changeVendor(int index)
 {
     Q_UNUSED(index);
@@ -463,7 +457,7 @@ void tabReceptCartridge::findAndAddBySerial()
         return;
     }
 
-    fillClientCreds(q.value("client").toInt());
+    ui->widgetClient->fillClientCreds(q.value("client").toInt());
 
     SCartridgeForm *form = new SCartridgeForm();
     form->setDeviceClassId(q.value("type").toInt());
@@ -487,11 +481,6 @@ void tabReceptCartridge::dbgRandomFillClicked()
     randomFill();
 }
 #endif
-
-void tabReceptCartridge::relayCreateTabSelectExistingClient(int, QWidget*)
-{
-    emit createTabSelectExistingClient(1, this);
-}
 
 bool tabReceptCartridge::createRepairs()
 {

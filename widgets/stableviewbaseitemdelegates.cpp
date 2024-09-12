@@ -4,6 +4,7 @@
 STableViewBaseItemDelegates::STableViewBaseItemDelegates(QObject *parent) :
     QStyledItemDelegate(parent)
 {
+    connect(&constEmitter, &ConstEmitter::comboBoxIndexChanged, this, &STableViewBaseItemDelegates::comboBoxIndexChanged);
     installEventFilter(this);
     initProgressBarsStyles();
 }
@@ -142,6 +143,9 @@ QComboBox *STableViewBaseItemDelegates::createComboBox(QWidget *parent, QAbstrac
         cb->setEditable(false);
         cb->setModel(model);
         cb->setCurrentIndex(-1);
+
+        // автосохранение данных и закрытие комбобокса при выборе элемента в списке
+        connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int){emit constEmitter.comboBoxIndexChanged(cb);});
         return cb;
 }
 
@@ -243,6 +247,16 @@ void STableViewBaseItemDelegates::initProgressBarsStyles()
     i_dummyYellowProgressBar.setStyleSheet(QString(i_dummyProgressBarStyleSheet).replace("%1", PROGRESSBAR_YELLOW));
     i_dummyOrangeProgressBar.setStyleSheet(QString(i_dummyProgressBarStyleSheet).replace("%1", PROGRESSBAR_ORANGE));
     i_dummyRedProgressBar.setStyleSheet(QString(i_dummyProgressBarStyleSheet).replace("%1", PROGRESSBAR_RED));
+}
+
+void STableViewBaseItemDelegates::paintProgressBar(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget) const
+{
+    Q_UNUSED(widget);
+    painter->save();
+
+    i_dummyGreenProgressBar.style()->drawControl(QStyle::CE_ProgressBar, option, painter, &i_dummyGreenProgressBar);
+
+    painter->restore();
 }
 
 void STableViewBaseItemDelegates::paintColorizedProgressBar(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget) const

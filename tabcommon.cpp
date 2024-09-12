@@ -6,7 +6,6 @@ tabCommon::tabCommon(MainWindow *p) :
 {
     installEventFilter(this);
     connect(this, &tabCommon::tabClosed, p, &MainWindow::switchToLastUsedTab);
-    connect(userDbData, &SUserSettings::fontSizeChanged, this, &tabCommon::guiFontChanged);
 #ifdef QT_DEBUG
     test_scheduler = new QTimer();
     test_scheduler->setSingleShot(true);
@@ -35,6 +34,12 @@ tabCommon::~tabCommon()
 bool tabCommon::tabCloseRequest()
 {
     return 1;
+}
+
+void tabCommon::setTabTitle(const QString &title)
+{
+    i_tabTitle = title;
+    emit updateTabTitle(this);
 }
 
 QIcon *tabCommon::tabIcon()

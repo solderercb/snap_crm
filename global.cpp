@@ -4,6 +4,7 @@
 #include "models/scartridgematerialsmodel.h"
 #include "models/sstoreitemmodel.h"
 #include "models/sofficemodel.h"
+#include "models/stableclientsmodel.h"
 
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
@@ -27,7 +28,7 @@ SSqlQueryModel *repairBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *paymentSystemsModel = new SSqlQueryModel;
 SPaymentTypesModel *receiptTypesModel;
 SPaymentTypesModel *expenditureTypesModel;
-SStandardItemModel* clientsTypesList = new SStandardItemModel;
+SStandardItemModel* clientsTypesList;
 SSqlQueryModel* clientAdTypesList = new SSqlQueryModel;
 SStandardItemModel *notifyStatusesModel = new SStandardItemModel();
 SStandardItemModel *warrantyTermsModel = new SStandardItemModel();
@@ -49,8 +50,16 @@ QString commonLineEditStyleSheet = "QLineEdit {  border: 1px solid gray;  paddin
 QString commonLineEditStyleSheetRed = "QLineEdit {  border: 1px solid red;  padding: 1px 1px 1px 3px; background: #FFD1D1;}";
 QString commonTextEditStyleSheet = "QTextEdit {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
 QString commonTextEditStyleSheetRed = "QTextEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
-QString commonDateEditStyleSheet = "QDateEdit {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
-QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
+QString commonDateEditStyleSheet = "QDateEdit {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}\
+        QDateEdit::drop-down {  border: 0px;}\
+        QDateEdit::down-arrow{  image: url(:/icons/light/down-arrow.png);  width: 16px;  height: 20px;}\
+        QDateEdit:!editable:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
+        QDateEdit::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
+QString commonDateEditStyleSheetRed = "QDateEdit {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}\
+        QDateEdit::drop-down {  border: 0px;}\
+        QDateEdit::down-arrow{  image: url(:/icons/light/down-arrow.png);  width: 16px;  height: 20px;}\
+        QDateEdit:!editable:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}\
+        QDateEdit::down-arrow:hover{  border: 1px solid #0078D7;  background-color: #E5F1FB;}";
 QString commonSpinBoxStyleSheet = "QSpinBox, QDoubleSpinBox {  border: 1px solid gray;  padding: 1px 18px 1px 3px; background: #FFFFFF;}";
 QString commonSpinBoxStyleSheetRed = "QSpinBox, QDoubleSpinBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 SStandardItemModel *rejectReasonModel = new SStandardItemModel;
@@ -129,15 +138,7 @@ void initGlobalModels()
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
     clientAdTypesList->setObjectName("clientAdTypesList");
 
-    QVector<QString> clientTypesList = {QObject::tr("Все клиенты"), QObject::tr("Организации"), QObject::tr("Посредники"), QObject::tr("Поставщики"), QObject::tr("Постоянные клиенты"), QObject::tr("Проблемные клиенты"), QObject::tr("Реализаторы")};
-    QVector<QString> clientTypesQueryFilterList = {"`type` IN (0, 1)", "`type` = 1", "`is_agent` = 1", "`is_dealer` = 1", "`is_regular` = 1", "`is_bad` = 1", "`is_realizator` = 1"};
-    for (int i=0; i<clientTypesList.size(); i++)
-    {
-        QList<QStandardItem*> *clientTypeSelector = new QList<QStandardItem*>();
-        *clientTypeSelector << new QStandardItem(clientTypesList.at(i)) << new QStandardItem(QString::number(i)) << new QStandardItem(clientTypesQueryFilterList.at(i));
-        clientsTypesList->appendRow(*clientTypeSelector);
-    }
-    clientsTypesList->setObjectName("clientsTypesList");
+    clientsTypesList = SClientModel::categoriesList();
 
     QVector<QString> notifyStatusesList = {"---", QObject::tr("Клиент оповещён"), QObject::tr("Клиент не отвечает"), QObject::tr("Клиент не доступен"), QObject::tr("Не оповещён прочее")};
     for (int i=0; i<notifyStatusesList.size(); i++)

@@ -23,11 +23,13 @@ public:
     ~tabCommon();
     virtual bool tabCloseRequest();
     void setCallerPtr(QWidget *ptr){callerPtr = ptr;};
-    virtual QString tabTitle(){return "Untitled";};
+    virtual void setTabTitle(const QString &title);
+    virtual QString tabTitle(){return i_tabTitle;};
     virtual QIcon* tabIcon();
 protected:
     QWidget *callerPtr = nullptr;
     QIcon *i_tabIcon = nullptr;
+    QString i_tabTitle = "Untitled";
     bool eventFilter(QObject*, QEvent*) override;
     void setCursorPositionsToZero();
     virtual void logUserActivity();
@@ -41,8 +43,6 @@ protected slots:
     virtual void test_scheduler_handler(){};
     virtual void test_scheduler2_handler(){};
 #endif
-private slots:
-    virtual void guiFontChanged(){};
 };
 
 

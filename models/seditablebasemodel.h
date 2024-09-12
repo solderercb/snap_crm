@@ -14,8 +14,13 @@ public:
     virtual QString selectStatement() const override;
     virtual void setSelectStatement(const QString &statement);
     virtual void clear() override;
+protected:
+    bool insertRowIntoTable(const QSqlRecord &values) override;
 private:
     QString m_selectStatement;
+public Q_SLOTS:
+    bool submit() override;
+    bool submitAll();
 };
 
 #endif // SEDITABLEBASEMODEL_H

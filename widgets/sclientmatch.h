@@ -7,6 +7,7 @@
 #include "sgroupboxeventfilter.h"
 #include "stableviewbase.h"
 #include "models/ssqlfetchingmodel.h"
+#include "models/sclientmodel.h"
 
 namespace Ui {
 class SClientMatch;
@@ -25,7 +26,8 @@ public:
     ~SClientMatch();
     void clear();
     void setClientType(int type);
-
+    void setCategory(int category);
+    void setEnabled(bool state = true);
 private:
     Ui::SClientMatch *ui;
     SGroupBoxEventFilter *groupBoxEventFilter;
@@ -35,6 +37,8 @@ private:
     QString phone;
     QString phoneMask;
     int clientType = 0;
+    int m_category = SClientModel::Categories::All;
+    bool m_enabled = 1;
     void findClient();
 public slots:
     void setPhoneMask(const int index);

@@ -27,7 +27,7 @@ struct FilterField
 {
     enum Op {NotMark=1, // values representing operation must be even
              Equals=2, Contains=4, StartsWith=6, EndsWith=8, RegExp=10, RegularExpression=12, Wildcard=14, More=16, MoreEq=18, Less=20, LessEq=22,
-             NoOp=24, Null=26 };
+             NoOp=24, Null=26, InSet=28 };
     QString column;
     Op operation;
     QVariant value;
@@ -74,6 +74,8 @@ public:
     void restartAutorefreshTimer();
     Qt::SortOrder sortOrder();
     int sortSection();
+    void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
+    void commitData(QWidget *editor) override;
 protected:
     QSqlQueryModel *m_model = nullptr;
     QFontMetrics *m_fontMetrics;
@@ -84,22 +86,25 @@ protected:
     QStringList i_defaultHeaderLabels;
     QMap<int, int> m_autosizedColumns;
     int m_autosizedColumnsSummaryActualWidth = 0;
-    int m_autosizedColumnsSummaryDefaultWidth = 0;
+        int m_autosizedColumnsSummaryDefaultWidth = 0;
     QMenu *horizontalHeaderMenu = nullptr;
     STableViewBaseItemDelegates *i_itemDelegates = nullptr;
+    int m_sortColumn;
+    Qt::SortOrder m_sortOrder;
     int i_vspValue = 0; // vsp and hsp — Vertical Scroll Position and Horisontal Scroll Position
     int i_hspValue = 0;
     int i_vspTopVisibleRow;
     QVariant i_vspTopVisibleRowUniqueId;
     int i_vspOldRowCount;
     QTimer *m_autorefreshTimer = nullptr;
+    bool m_delayedRefreshPending = 0;
     int sizeHintForColumn(int column) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     void resizeColumnToContents(int column);
     int columnSizeByContents(int column);
     void resizeColumnsToContents();
     void applyGridlayout();
-    void applySorting();
+    void initSorting();
     void initAutosizedColumns();
     void adoptAutosizedColumns();
     virtual void setColumnWidth(int column, int width);
@@ -117,18 +122,24 @@ protected:
     bool hasSavedSelection();
     void restoreSelection();
     bool initHeaders();
+    void setDatabase(const QSqlDatabase &database);
+    QString formatFilterGroup(const FilterList &filter);
+    QString formatFilterField(const FilterField &field);
     virtual void clearModel();
     virtual void setModelQuery(const QString &query, const QSqlDatabase &database);
     virtual void fetchMore(const QModelIndex &parent);
     virtual void layoutChanged(int,int,int);
     void undoToggleSortIndicator();
+    void setSorting(const int logicalIndex, const Qt::SortOrder order);
+    virtual void applySorting();
+    void keyPressEvent(QKeyEvent *event) override;
+    virtual void selectionToArray(const QModelIndexList &selection, QMap<int, QMap<int, QModelIndex>> &array);
+    void copyToClipboard(QMap<int, QMap<int, QModelIndex>> &items) const;
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
     QString m_constQuery;
     QString m_query;
-    int m_sortColumn;
-    Qt::SortOrder m_sortOrder;
     QString m_queryConditions;
     bool m_queryConditionsChanged;
     QStringList *m_grouping = nullptr;
@@ -141,8 +152,6 @@ private:
     int m_restoreSelectionTrig = 0;
     void clearFilter();
     void clearGrouping();
-    QString formatFilterGroup(const FilterList &filter);
-    QString formatFilterField(const FilterField &field);
     int columnByName(const QString &name);
     int visibleWidth();
     void createAutorefreshTimer();
@@ -169,6 +178,9 @@ protected slots:
     virtual void vsp_rangeChanged(const int min, const int max);
     virtual void hsp_rangeChanged(const int min, const int max);
     virtual void horizontalHeaderSectionClicked(const int logicalIndex);
+    void cutToClipboard();
+    void copyToClipboard();
+    void pasteFromClipboard();
 private slots:
     void autorefreshTable();
     void horizontalHeaderMenuRequest(const QPoint &pos) const;

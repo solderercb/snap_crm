@@ -23,9 +23,22 @@
 #define PROGRESSBAR_ORANGE  "#FFA500"
 #define PROGRESSBAR_RED     "#E44747"
 
+/* Для отправки сигнала из const метода нужен вспомогательный класс
+ * Решение найдено на https://stackoverflow.com/a/5787589/22660723
+*/
+class ConstEmitter: public QObject
+{
+   Q_OBJECT
+   friend class STableViewBaseItemDelegates;
+signals:
+    void comboBoxIndexChanged(QComboBox *widget, QAbstractItemDelegate::EndEditHint hint = QAbstractItemDelegate::NoHint);
+};
+
 class STableViewBaseItemDelegates : public QStyledItemDelegate
 {
     Q_OBJECT
+signals:
+    void comboBoxIndexChanged(QComboBox *widget, QAbstractItemDelegate::EndEditHint hint = QAbstractItemDelegate::NoHint);
 public:
     enum PixmapType {RemoveWork = 1, Work, AddPart, RemovePart, Part};
     STableViewBaseItemDelegates(QObject *parent = nullptr);
@@ -51,7 +64,9 @@ protected:
     QString i_dummyProgressBarStyleSheet;
     QFontMetrics *i_fontMetrics = nullptr;
 //    QStyle *i_style;
+    mutable ConstEmitter constEmitter;
     void initProgressBarsStyles();
+    void paintProgressBar(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget = nullptr) const;
     void paintColorizedProgressBar(const QStyleOptionProgressBar *option, QPainter *painter, const QWidget *widget = nullptr) const;
     QLineEdit* createLineEdit(QWidget*, QAbstractItemModel *) const;
     void setLineEditData(QWidget *editor, const QString&) const;

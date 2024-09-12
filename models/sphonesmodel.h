@@ -43,6 +43,7 @@ private:
     QList<SPhoneModel*> m_removeList;
     SPhoneModel* sqlRecordHandler(const QSqlRecord &phone = QSqlRecord());
     SLogRecordModel *logRecord = nullptr;
+    SPhoneModel *m_newPrimaryPhone = nullptr;
     int m_client = 0;
     bool m_updated = false;
     qsizetype m_reportPhoneIndex = -1;

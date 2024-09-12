@@ -31,15 +31,13 @@ class tabRepairNew : public tabCommon
 
 signals:
     void createTabSelectPrevRepair(int, QWidget *);
-    void createTabSelectExistingClient(int, QWidget *);
-    void createTabClient(int);
     void generatePrintout(QMap<QString, QVariant>);
 
 public:
     explicit tabRepairNew(MainWindow *parent = nullptr);
     static tabRepairNew* getInstance(MainWindow *parent = nullptr);
     ~tabRepairNew();
-    virtual bool tabCloseRequest();
+    virtual bool tabCloseRequest() override;
     QString tabTitle() override;
 private:
     Ui::tabRepairNew *ui;
@@ -97,7 +95,6 @@ private slots:
     void createRepairClose();
     void issueQuickRepair();
     void preferredPaymentSystemChanged(int);
-    void relayCreateTabSelectExistingClient(int, QWidget *caller);
     void guiFontChanged() override;
     void quickRepairToggled(const int state);
     void updateCheckBoxQuickRepairPrintBOQ();

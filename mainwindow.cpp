@@ -383,6 +383,25 @@ void MainWindow::addTab(QWidget *widget)
     ui->tabWidget->setCurrentWidget(tab);
 }
 
+/* Добавление вкладки правее указанной позиции
+*/
+void MainWindow::insertTab(QWidget *tab, int rightOf)
+{
+    tabCommon *t = dynamic_cast<tabCommon*>(tab);
+    int tabIndex = rightOf;
+
+    if(tabIndex == -1)
+        tabIndex = ui->tabWidget->currentIndex() + 1;
+
+    if (ui->tabWidget->indexOf(tab) == -1) // Если такой вкладки еще нет
+    {
+        ui->tabWidget->insertTab(tabIndex, tab, t->tabTitle());
+    }
+
+    connect(t, &tabCommon::updateTabTitle, this, &MainWindow::updateTabTitle);
+    ui->tabWidget->setCurrentWidget(tab);
+}
+
 bool MainWindow::event(QEvent *event)
 {
     if (event->type() == QEvent::ShortcutOverride)
@@ -512,8 +531,6 @@ void MainWindow::createTabRepairNew()
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку Приём в ремонт
     QObject::connect(subwindow,SIGNAL(createTabSelectPrevRepair(int,QWidget*)), this, SLOT(createTabRepairs(int,QWidget*)));
-    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
-    QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 }
 
@@ -527,8 +544,6 @@ void MainWindow::createTabReceptCartridge()
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
     ui->tabWidget->setCurrentWidget(subwindow); // Переключаемся на вкладку
     subwindow->setFocusSerialNumber();
-    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
-    QObject::connect(subwindow,SIGNAL(createTabClient(int)), this, SLOT(createTabClient(int)));
     QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
 }
 
@@ -578,7 +593,6 @@ void MainWindow::createTabCashOperation(int orderId, QMap<int, QVariant> data)
     tabCashOperation *subwindow = tabCashOperation::getInstance(orderId, this);
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
         ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
-    QObject::connect(subwindow,SIGNAL(createTabSelectExistingClient(int,QWidget*)), this, SLOT(createTabClients(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectRepair(int,QWidget*)), this, SLOT(createTabRepairs(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectDocument(int,QWidget*)), this, SLOT(createTabDocuments(int,QWidget*)));
     QObject::connect(subwindow,SIGNAL(createTabSelectInvoice(int,QWidget*)), this, SLOT(createTabInvoices(int,QWidget*)));
@@ -730,6 +744,7 @@ void MainWindow::createTabClients(int type, QWidget *caller)
         return;
 
     tabClients *subwindow = tabClients::getInstance(type, this);
+    subwindow->disconnect();
     if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет
     {
         if(caller)  // если передан параметр, то вставляем её сразу после вызывающей
@@ -742,6 +757,10 @@ void MainWindow::createTabClients(int type, QWidget *caller)
     {
         //
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabClient(int)));
+        if (userDbData->preferRegular)
+            subwindow->setCategory(SClientModel::Categories::Regulars);
+        else
+            subwindow->setCategory(SClientModel::Categories::All);
     }
     else
     {
@@ -755,6 +774,19 @@ void MainWindow::createTabClients(int type, QWidget *caller)
     ui->tabWidget->setCurrentWidget(subwindow);
     subwindow->setFocusSearchField();
 
+}
+
+QWidget *MainWindow::createTabClients(QWidget *callerTab)
+{
+    if(!permissions->viewClients)
+        return nullptr;
+
+    tabClients *subwindow = tabClients::getInstance(1, this);
+    subwindow->disconnect();
+    insertTab(subwindow, ui->tabWidget->indexOf(callerTab) + 1);
+    subwindow->setFocusSearchField();
+
+    return subwindow;
 }
 
 void MainWindow::createTabClient(int id)
@@ -781,6 +813,7 @@ bool MainWindow::closeTab(int index)
         if (!tab.tabCloseRequest())   // Перед закрытием  вкладки нужно проверить нет ли несохранённых данных
             return 0;
     }
+    switchToLastUsedTab();
     delete w;
     return 1;
 }

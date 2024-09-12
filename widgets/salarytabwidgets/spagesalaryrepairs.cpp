@@ -17,12 +17,9 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     ui->tableViewRepairWorks->setModel(parentTab->m_repairWorks);
     ui->tableViewRepairParts->setModel(parentTab->m_repairParts);
 
-    connect(ui->tableViewRepairs, &STableViewSalaryRepairs::pressed, this, &SPageSalaryRepairs::tableRepairsRowActivated);
-    connect(ui->tableViewRepairs, &STableViewSalaryRepairs::clicked, this, &SPageSalaryRepairs::tableRepairsRowActivated);
-    connect(ui->tableViewRepairs, &STableViewSalaryRepairs::activated, this, &SPageSalaryRepairs::tableRepairsRowActivated);
     connect(ui->tableViewRepairs, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairsRowDoubleClicked);
-    connect(ui->tableViewRepairParts, &STableViewSalaryRepairs::doubleClicked, this, &SPageSalaryRepairs::tableRepairPartsRowDoubleClicked);
     connect(ui->tableViewRepairs->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SPageSalaryRepairs::tableRepairsRowSelected);
+    connect(ui->tableViewRepairParts, &STableViewSalaryRepairParts::doubleClicked, this, &SPageSalaryRepairs::tableRepairPartsRowDoubleClicked);
     connect(ui->checkBoxShowPayed, &QCheckBox::toggled, this, &SPageSalaryRepairs::showRowsPayed);
 }
 

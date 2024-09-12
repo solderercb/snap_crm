@@ -147,12 +147,13 @@ SSetComboBox::SSetComboBox(QWidget *parent) :
     setProperty("selectOnTab", false);
     setInsertPolicy(SComboBox::NoInsert);    // введённые пользователем не нужно добавлять в выпадающий список.
     setRowHeight(16);
+    setKeepListShown(true);
+    disableWheelEvent(true);
     lineEditWidget->enableAutoSetCursorPositionToBegin(false);
     daughterLineEditHeight = fontMetrics->height();     // высота дочерних lineEdit по умолчанию будет рассчитываться по размеру шрифта
     defaultComboBoxHeight = this->height();      // = 22; этот размер базовый, используется при перестановке дочерних LineEdit
 
     proxyModel = new SSortFilterProxyModel(this);
-    connect( this, SIGNAL(activated(int)), this, SLOT(activatedHandler(int)) );
     connect( lineEditWidget, SIGNAL(textEdited(QString)), this, SLOT(updateProxyModelFilter(QString)) );
     connect( lineEditWidget, SIGNAL(editingFinished()), this, SLOT(parentLineEditEditingFinished()) );
 
@@ -172,33 +173,8 @@ SSetComboBox::~SSetComboBox()
     // TODO: проверить не остаётся ли в памяти чего-то ненужного
 }
 
-void SSetComboBox::setEditable(bool editable)
-{
-    SComboBox::setEditable(editable);
-    keyPressReceiver = lineEditWidget;
-}
-
 bool SSetComboBox::eventFilter(QObject *watched, QEvent *event)
 {
-    if(watched == listViewWidget)
-    {
-        if(event->type() == QEvent::Show)
-        {
-            updatePopupGeometry();
-            setIgnorePopupHide(1);
-        }
-        if(event->type() == QEvent::Enter)   //
-            setIgnorePopupHide(1);
-        if(event->type() == QEvent::Leave)
-            setIgnorePopupHide(0);
-        if(event->type() == QEvent::ShortcutOverride)
-        {
-            int key = static_cast<QKeyEvent*>(event)->key();
-            if( (key == Qt::Key_Enter || key == Qt::Key_Return) )
-                setIgnorePopupHide(1);
-        }
-    }
-
     if ( event->type() == QEvent::KeyPress )
     {
         int key = static_cast<QKeyEvent*>(event)->key();
@@ -225,20 +201,22 @@ bool SSetComboBox::eventFilter(QObject *watched, QEvent *event)
             addItem(lineEditWidget->text());
     }
 
+    return SComboBox::eventFilter(watched, event);
+}
+
+bool SSetComboBox::eventFilterListView(QEvent *e)
+{
     // после добавления дочернего эл-та курсор в родительском lineEdit перестаёт мигать
     // чтобы это исправить эмулируется нажатие клавиши. Фильтрация этих событий проблему не решает.
     // Событие KeyRelease происходит при выборе эл-та клавиатурой, а событие Timer при выборе мышью).
     // Может позже найдётся решение проще.
-    if ( watched == listViewWidget && (event->type() == QEvent::KeyRelease || event->type() == QEvent::Timer) )
+    if ( isPreserveLineEditFocus() && (e->type() == QEvent::KeyRelease || e->type() == QEvent::Timer) )
     {
         QKeyEvent *emu = new QKeyEvent(QEvent::KeyPress, Qt::Key_Control, Qt::NoModifier);
         QCoreApplication::postEvent(listViewWidget, emu);
     }
 
-    if(SComboBox::eventFilter(watched, event))
-        return true;
-
-    return false;
+    return SComboBox::eventFilterListView(e);
 }
 
 void SSetComboBox::setModel(QAbstractItemModel *model)
@@ -350,24 +328,12 @@ void SSetComboBox::deleteDaughterLineEditOnKeyPress(int key)
 void SSetComboBox::showPopup()
 {
     SComboBox::showPopup();
-    keyPressReceiver = lineEditWidget;
-    if(!popupWidget)
-    {
-        popupWidget = this->findChild<QFrame*>();
-    }
+    setRetranslatedKeyReceiver(lineEditWidget);
 }
 
 void SSetComboBox::hidePopup()
 {
-    if(!ignorePopupHide())
-    {
-        // TODO: разобраться в глюке; Qt v5.15.4;
-        // В этом классе, в отличие от родительского SComboBox, при щелчке мышью в области lineEdit
-        // список скрывается, но последующих событий MouseButtonPress и MouseButtonRelease не происходит.
-        // Поэтому выключаем учет положения курсора, как буд-то произошел щелчёк за пределами comboBox.
-        setConsiderCursorPosOnHide(0);
-        SComboBox::hidePopup();
-    }
+    SComboBox::hidePopup();
     setIgnorePopupHide(0);
     updateLineEditGeometry();
 }
@@ -419,17 +385,19 @@ void SSetComboBox::addItem(const QString &text)
             int start = text.indexOf('<');
             int end = text.indexOf('>');
 
-            dLineEdit->setFocus();
-            dLineEdit->setSelection(start, end - start + 1);
-            keyPressReceiver = dLineEdit;
+            setPreserveLineEditFocus(false);
+            setRetranslatedKeyReceiver(dLineEdit);
             setIgnorePopupHide(0);
             hidePopup();
+            lineEditWidget->clearFocus();
+            dLineEdit->setFocus();
+            dLineEdit->setSelection(start, end - start + 1);
         }
     }
 
 }
 
-void SSetComboBox::activatedHandler(int index)
+void SSetComboBox::rowActivated(int index)
 {
     // После выбора элемента указателем раскрывающийся список прячется, а нужно чтобы он продолжал отображаться
     // Дополнительное условие: список не должен вновь отображаться, если была выбрана пустая строка;
@@ -444,6 +412,8 @@ void SSetComboBox::activatedHandler(int index)
         setIgnorePopupHide(0);
         hidePopup();
     }
+
+    SComboBox::rowActivated(index);
 }
 
 /*
@@ -479,7 +449,7 @@ void SSetComboBox::deleteDaughterLineEdit(daughterLineEdit *widget)
     rearrangeDaughterLineEdits(this->width());
 
 //    setIsPopupVisible(0);
-    keyPressReceiver = lineEditWidget;
+    setRetranslatedKeyReceiver(lineEditWidget);
 }
 
 void SSetComboBox::parentLineEditEditingFinished()
@@ -564,17 +534,8 @@ void SSetComboBox::updateLineEditGeometry()
                              this->geometry().height() - parentLineEditFrameSize * 2);
     //                                                                                          ^
     //                                                                          это ширина кнопки "v" comboBox'а
-    updatePopupGeometry();
     currentDaughterLineEditPosition.setBottom(this->geometry().height() - currentDaughterLineEditPosition.top() - daughterLineEditFrameHeight - parentLineEditFrameSize - daughterLineEditFrameSize );
     lineEditWidget->setTextMargins(currentDaughterLineEditPosition);
-}
-
-void SSetComboBox::updatePopupGeometry()
-{
-
-
-   if(popupWidget)
-        popupWidget->move(popupWidget->x(), mapToGlobal(lineEditWidget->pos()).y() + lineEditWidget->height());
 }
 
 void SSetComboBox::setCurrentIndex(int index)
@@ -637,35 +598,16 @@ void SSetComboBox::setSizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Po
 
 void SSetComboBox::resizeEvent(QResizeEvent*)
 {
-
     if ( !(eventTrigger & SSetComboBox::MinimumHeightUpdated))   // если событие вызвано не установкой мин. высоты (а, например, изменением размера окна)
     {
         setMinimumHeight( rearrangeDaughterLineEdits(this->width()) );  // пересчитываем минимальную требуемую высоту
     }
     // при изменении размера нужно изменить размер lineEdit'а
     updateLineEditGeometry();
+    updatePopupGeometry();
 
     eventTrigger &= ~(SSetComboBox::MinimumHeightUpdated);   // всегда очищаем флаг; повторно вызывать rearrange не нужно
 
-}
-
-void SSetComboBox::retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text, bool autorep, ushort count)
-{
-    QKeyEvent* newEvent = new QKeyEvent(type, key, modifiers,
-                                        text, autorep, count);
-    QFocusEvent* focusEvent = new QFocusEvent(QEvent::FocusIn, Qt::OtherFocusReason);
-    QCoreApplication::postEvent(keyPressReceiver, focusEvent);
-    QCoreApplication::postEvent(keyPressReceiver, newEvent);
-}
-
-bool SSetComboBox::ignorePopupHide() const
-{
-    return m_ignorePopupHide;
-}
-
-void SSetComboBox::setIgnorePopupHide(bool state)
-{
-    m_ignorePopupHide = state;
 }
 
 #ifdef QT_DEBUG

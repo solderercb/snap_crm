@@ -7,6 +7,9 @@ SPeriodSelector::SPeriodSelector(QWidget *parent) :
 {
     ui->setupUi(this);
     initIntervalSelectionMenu();
+    ui->dateEditPeriodBegin->setAllowBackDate(true);
+    ui->dateEditPeriodEnd->setAllowBackDate(true);
+    ui->dateEditPeriodEnd->setAllowFutureDate(true);
     connect(ui->dateEditPeriodBegin, &QDateEdit::dateChanged, this, &SPeriodSelector::periodBeginChanged);
     connect(ui->dateEditPeriodEnd, &QDateEdit::dateChanged, this, &SPeriodSelector::periodEndChanged);
     connect(ui->toolButtonMovePrevPeriod, &QToolButton::clicked, this, &SPeriodSelector::movePrevPeriod);

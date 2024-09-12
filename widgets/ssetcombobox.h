@@ -77,7 +77,6 @@ public:
     explicit SSetComboBox(QWidget *parent = nullptr);
     ~SSetComboBox();
     void setModel(QAbstractItemModel*);
-    void setEditable(bool);
     void setGeometry(int, int, int, int);
     void setGeometry(const QRect &);
     void setRowHeight(int);
@@ -99,8 +98,6 @@ public:
     QString version();
     void showPopup() override;
     void hidePopup() override;
-    bool ignorePopupHide() const;
-    void setIgnorePopupHide(bool state);
 #ifdef QT_DEBUG
     void addRandomItem();
 #endif
@@ -108,7 +105,6 @@ public:
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void resizeEvent(QResizeEvent *) override;
-    void retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text = QString(), bool autorep = false, ushort count = 1) override;
 private:
     enum resizeEventTrigger{MinimumHeightUpdated = 1};
     SSortFilterProxyModel *proxyModel;
@@ -123,18 +119,15 @@ private:
     daughterLineEdit *dLineEdit;
     int eventTrigger = 0;
     QString semicolon_separated_text;
-    bool m_ignorePopupHide = 0;
-    QWidget *popupWidget = nullptr;
-    QLineEdit *keyPressReceiver;
     int rearrangeDaughterLineEdits(int);
-    void updatePopupGeometry();
+    bool eventFilterListView(QEvent *e) override;
 public slots:
     void setCurrentIndex(int index);
     void setStyleSheet(const QString& styleSheet);
 private slots:
     void comboBoxSetFocus();
     void addItem(const QString &text);
-    void activatedHandler(int);
+    void rowActivated(int) override;
     void updateProxyModelFilter(const QString &text);
     void daughterLineEditTextChanged();
     void deleteDaughterLineEdit(daughterLineEdit *widget);

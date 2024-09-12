@@ -1,26 +1,26 @@
 #ifndef SCLIENTINPUTFORM_H
 #define SCLIENTINPUTFORM_H
 
-#include <QWidget>
+#include "widgets/sclientinputformbase.h"
 #include "models/sclientmodel.h"
 
 namespace Ui {
 class SClientInputForm;
 }
 
-class SClientInputForm : public QWidget
+class SClientInputForm : public SClientInputFormBase
 {
     Q_OBJECT
-signals:
-    void createTabSelectExistingClient(int, QWidget *);
-    void createTabClient(int);
 public:
     explicit SClientInputForm(QWidget *parent = nullptr);
     ~SClientInputForm();
     void commit();
-    void randomFill();
     int checkInput();
     SClientModel* model();
+    void setMatchWidgetFilter(int category) override;
+#ifdef QT_DEBUG
+    void randomFill();
+#endif
 private:
     Ui::SClientInputForm *ui;
     SClientModel *clientModel;
@@ -31,10 +31,13 @@ private:
 public slots:
     void clearClientCreds(bool keepCoincidenceShown = true);
     void fillClientCreds(int);
+    void fillCreds(int) override;
 private slots:
     void buttonSelectExistingClientClicked();
     void buttonCreateTabClientClicked();
     void changeClientType();
+    void lastNameChanged(const QString &text);
+    void firstNameChanged(const QString &text);
     void primaryPhoneEdited(QString);
     void guiFontChanged();
 };

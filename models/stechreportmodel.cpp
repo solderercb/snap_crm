@@ -71,7 +71,7 @@ void STechReportModel::setNum(const QString &num)
 
 QString STechReportModel::created()
 {
-    return utcToLocal(createdUtc()).toString("yyyy-MM-dd hh:mm:ss");
+    return localDateTime(createdUtc()).toString("yyyy-MM-dd hh:mm:ss");
 }
 
 const int& STechReportModel::user()

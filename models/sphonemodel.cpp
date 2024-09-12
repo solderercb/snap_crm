@@ -66,6 +66,9 @@ QString SPhoneModel::phone()
 
 void SPhoneModel::setPhone(const QString &phone)
 {
+    if(!m_phone.compare(phone))
+        return;
+
     i_valuesMap.insert("phone", phone);
     i_valuesMap.insert("phone_clean", cleanPhone(phone));
     if(i_id)

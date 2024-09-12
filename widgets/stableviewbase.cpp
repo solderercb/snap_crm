@@ -1,4 +1,6 @@
 #include "stableviewbase.h"
+#include <QClipboard>
+#include <QMimeData>
 
 STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent) :
     QTableView(parent), m_layoutVariant(layoutVariant)
@@ -98,6 +100,7 @@ void STableViewBase::setItemDelegate(STableViewBaseItemDelegates *delegate)
     i_itemDelegates = delegate;
     QTableView::setItemDelegate(i_itemDelegates);
     i_itemDelegates->setFontMetrics(this->font());
+    connect(i_itemDelegates, &STableViewBaseItemDelegates::comboBoxIndexChanged, [=](QComboBox *widget, QAbstractItemDelegate::EndEditHint hint){this->commitData(widget); this->closeEditor(widget, hint);});
 }
 
 int STableViewBase::sizeHintForColumn(int column) const
@@ -187,7 +190,7 @@ void STableViewBase::applyGridlayout()
 //    adoptAutosizedColumns();
 }
 
-void STableViewBase::applySorting()
+void STableViewBase::initSorting()
 {
     if (i_gridLayout->$GridControl.SortInfo.size())
     {
@@ -292,7 +295,7 @@ void STableViewBase::readLayout()
     }
 
     applyGridlayout();
-    applySorting();
+    initSorting();
 }
 
 void STableViewBase::saveLayout()
@@ -460,6 +463,87 @@ void STableViewBase::horizontalHeaderSectionClicked(const int logicalIndex)
     toggleOrder(logicalIndex);
 }
 
+void STableViewBase::cutToClipboard()
+{
+    copyToClipboard();
+    qDebug() << "[" << this << "] () | data copied; removing not implemented";
+}
+
+/* Преобразование QModelIndexList в двумерный массив QModelIndex
+ * Метод может быть переопределён в наследующих классах, например, для исключения ненужных толбцов.
+ * По умолчанию пропускаются скрытые столбцы.
+ * Кроме этого, производится упорядочивание, т. к. если ячейки были выделены с использованием клавиши Ctrl,
+ * то в selection они будут представлены в порядке выбора;
+*/
+void STableViewBase::selectionToArray(const QModelIndexList &selection, QMap<int, QMap<int, QModelIndex>> &array)
+{
+    for(auto index : selection)
+    {
+        if(horizontalHeader()->isSectionHidden(index.column()))
+            continue;
+        array[index.row()][index.column()] = index;
+    }
+}
+
+/* Формирование данных для буфера обмена
+ * Данные передаются в следующих форматах:
+ *      text/plain
+ *      application/x-qt-windows-mime;value="CSV"
+*/
+void STableViewBase::copyToClipboard(QMap<int, QMap<int, QModelIndex> > &items) const
+{
+    if(items.isEmpty())
+        return;
+
+    QStringList mimeCSVfull;
+    QStringList mimeTextFull;
+    QMap<int, QMap<int, QModelIndex>>::ConstIterator i = items.constBegin();
+    while(i != items.constEnd())
+    {
+        QMap<int, QModelIndex>::ConstIterator j = i->constBegin();
+        QStringList mimeRow;
+        while(j != i->constEnd())
+        {
+            mimeRow << j->data().toString();
+            j++;
+        }
+        mimeCSVfull << mimeRow.join(';');
+        mimeTextFull << mimeRow.join('\t');
+        i++;
+    }
+
+    QMimeData *mime = new QMimeData();
+    mime->setData("application/x-qt-windows-mime;value=\"CSV\"", mimeCSVfull.join("\r\n").toLocal8Bit());
+    mime->setText(mimeTextFull.join('\n'));
+    qApp->clipboard()->setMimeData(mime);
+
+}
+
+void STableViewBase::copyToClipboard()
+{
+    if(!selectionModel()->hasSelection())
+        return;
+
+    QModelIndexList selection = selectionModel()->selectedIndexes();
+    QMap<int, QMap<int, QModelIndex>> array;
+
+    selectionToArray(selection, array);
+    copyToClipboard(array);
+}
+
+void STableViewBase::pasteFromClipboard()
+{
+    if(!(currentIndex().flags()&Qt::ItemIsEditable))
+        return;
+
+    const QMimeData *mimeData = qApp->clipboard()->mimeData();
+
+    if (!mimeData || !mimeData->hasText())
+        return;
+
+    model()->setData(currentIndex(), mimeData->text());
+}
+
 Qt::SortOrder STableViewBase::sortOrder()
 {
     return m_sortOrder;
@@ -477,6 +561,49 @@ void STableViewBase::undoToggleSortIndicator()
     horizontalHeader()->setSortIndicator(sortSection(), sortOrder());
 }
 
+void STableViewBase::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
+{
+    QAbstractItemView::closeEditor(editor, hint);
+}
+
+void STableViewBase::commitData(QWidget *editor)
+{
+    QAbstractItemView::commitData(editor);
+}
+
+void STableViewBase::applySorting()
+{
+    horizontalHeader()->setSortIndicator(m_sortColumn, m_sortOrder);
+    prepareQuery();
+    this->refresh();
+}
+
+void STableViewBase::keyPressEvent(QKeyEvent *event)
+{
+    if (event->matches(QKeySequence::Cut))
+    {
+        cutToClipboard();
+    }
+    else if (event->matches(QKeySequence::Copy))
+    {
+        copyToClipboard();
+    }
+    else if (event->matches(QKeySequence::Paste))
+    {
+        pasteFromClipboard();
+    }
+    else
+        QTableView::keyPressEvent(event);
+}
+
+void STableViewBase::setSorting(const int logicalIndex, const Qt::SortOrder order)
+{
+    m_sortColumn = logicalIndex;
+    m_sortOrder = order;
+
+    applySorting();
+}
+
 void STableViewBase::toggleOrder(int logicalIndex)
 {
     if(m_sortColumn == -1 || m_sortColumn != logicalIndex)
@@ -491,9 +618,7 @@ void STableViewBase::toggleOrder(int logicalIndex)
         m_sortColumn = -1;
     }
 
-    horizontalHeader()->setSortIndicator(m_sortColumn, m_sortOrder);
-    prepareQuery();
-    this->refresh();
+    applySorting();
 }
 
 int STableViewBase::visibleWidth()
@@ -640,6 +765,11 @@ void STableViewBase::showColumnChooser()
 
 }
 
+void STableViewBase::setDatabase(const QSqlDatabase &database)
+{
+    m_db = database;
+}
+
 /* Передача запроса, используемого для получения данных.
  * Вызов этого метода не обновляет модель данных; для обновления нужно вызвать метод refresh().
  * Запрос query может быть полным (содержащим условия), а может быть частичным, к которому при вызове методов
@@ -649,7 +779,7 @@ void STableViewBase::setQuery(const QString& query, const QSqlDatabase& db)
 {
     m_constQuery = query;
     m_constQuery = m_constQuery.replace(STableBaseModel::queryPrepareRegexpPattern, "\n");
-    m_db = db;
+    setDatabase(db);
 
     clearFilter();
     clearGrouping();
@@ -729,7 +859,7 @@ QString STableViewBase::formatFilterGroup(const FilterList &filter)
         {
             subCond = formatFilterGroup(*i);
             if(!subCond.isEmpty())
-                cond << QString("%2(%1)").arg(subCond).arg((*i).Not?"NOT ":"");
+                cond << QString("%2(%1)").arg(subCond, ((*i).Not?"NOT ":""));
             i++;
         }
     }
@@ -758,7 +888,7 @@ QString STableViewBase::formatFilterField(const FilterField &field)
          && field.value.toString().isEmpty())
         return QString();
 
-    QSqlDriver* driver = m_db.driver();
+    QSqlDriver* driver = QSqlDatabase::database().driver();
     QString result;
     QString escFilterString = field.value.toString();
     QString escFilterColumn = field.column;
@@ -811,6 +941,15 @@ QString STableViewBase::formatFilterField(const FilterField &field)
                 result = "%1 IS NOT NULL";
             else
                 result = "%1 IS NULL";
+            break;
+        }
+        // TODO: придумать обработчик QVariantList для операции InSet
+        case FilterField::InSet: // значение фильтра должно быть представлено в виде значений через запятую
+        {
+            if(field.operation & FilterField::NotMark)
+                result = "%1 NOT IN (" + escFilterString + ")";
+            else
+                result = "%1 IN (" + escFilterString + ")";
             break;
         }
         default: return QString(); // unhandled filterflag
@@ -1068,7 +1207,7 @@ void STableViewBase::clearModel()
 */
 void STableViewBase::setModelQuery(const QString &query, const QSqlDatabase &database)
 {
-    m_model->setQuery(query, database);
+    m_model->setQuery(QSqlQuery(query, database));
 }
 
 void STableViewBase::fetchMore(const QModelIndex &parent)
@@ -1131,6 +1270,7 @@ void STableViewBase::enableAutorefresh(const int msec)
 void STableViewBase::delayedRefresh(const int msec)
 {
     createAutorefreshTimer();
+    m_delayedRefreshPending = 1;
     m_autorefreshTimer->start(msec);
 }
 
@@ -1148,7 +1288,14 @@ void STableViewBase::restartAutorefreshTimer()
 
 void STableViewBase::autorefreshTable()
 {
-    refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
+    if(m_delayedRefreshPending)
+    {
+        refresh(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+        m_delayedRefreshPending = 0;
+    }
+    else
+        refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
+
     if(m_autorefreshTimeout)
         m_autorefreshTimer->start(m_autorefreshTimeout);
     else

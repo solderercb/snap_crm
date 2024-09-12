@@ -14,8 +14,6 @@ class SPhoneModel : public SComRecord
     Q_OBJECT
 signals:
     void markedPrimary(SPhoneModel*);
-    void modelUpdated();
-
 public:
     enum Types {Additional = 0, Primary = 1};
     enum Messengers {Viber = 1, Telegram = 2, Whatsapp = 4};

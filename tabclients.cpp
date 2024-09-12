@@ -4,6 +4,7 @@
 #include "ui_tabclients.h"
 #include "mainwindow.h"
 #include "com_sql_queries.h"
+#include "models/sclientmodel.h"
 
 tabClients* tabClients::p_instance[] = {nullptr,nullptr};
 
@@ -18,7 +19,12 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    clientsTable = new STableBaseModel(this);
+    if(m_type)
+        i_tabTitle = tr("Выбрать клиента");
+    else
+        i_tabTitle = tr("Клиенты");
+
+    clientsTable = new STableClientsModel(this);
     ui->tableView->setModel(clientsTable);
     ui->tableView->setQuery(QUERY_SEL_CLIENTS_STATIC, QSqlDatabase::database("connMain"));
     ui->tableView->setUniqueIdColumn(0);
@@ -31,10 +37,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
     ui->listViewClientsType->setModel(clientsTypesList);
     ui->listViewClientsType->setModelColumn(0);
-    if (userDbData->preferRegular)
-        ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(4, 0));
-    else
-        ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(0, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
+    ui->listViewClientsType->setCurrentIndex(clientsTypesList->index(SClientModel::Categories::All, 0));    // по умолчанию выбираем одну из категорий; обязательно! иначе будет вылетать при сборке условия в updateTableWidget()
 
     ui->comboBoxClientAdType->setPlaceholderText(tr("источник обращения"));
     ui->comboBoxClientAdType->setButtons("Clear");
@@ -50,14 +53,6 @@ tabClients::~tabClients()
 {
     p_instance[this->m_type] = nullptr;   // Обязательно блять!
     delete ui;
-}
-
-QString tabClients::tabTitle()
-{
-    if(m_type)
-        return tr("Выбрать клиента");
-    else
-        return tr("Клиенты");
 }
 
 bool tabClients::event(QEvent *event)
@@ -77,6 +72,13 @@ bool tabClients::event(QEvent *event)
             }
     }
     return tabCommon::event(event);
+}
+
+void tabClients::setCategory(int category)
+{
+    QModelIndex index = clientsTypesList->index(category, 0);
+    ui->listViewClientsType->setCurrentIndex(index);
+    clientTypeChanged(index);
 }
 
 tabClients* tabClients::getInstance(bool type, MainWindow *parent)   // singleton: вкладка приёма в ремонт может быть только одна

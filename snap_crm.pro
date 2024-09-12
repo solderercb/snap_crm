@@ -4,18 +4,18 @@
 #
 #-------------------------------------------------
 
-QT	+= core gui
+QT      += core gui
 QT      += widgets
-QT	+= sql
+QT      += sql
 QT      += printsupport
 QT      += xml
 QT      += qml
 CONFIG(debug, debug|release){
-    QT      += testlib
+    QT  += testlib
 }
 
 greaterThan(QT_MAJOR_VERSION, 5){
-    QT += core5compat
+    QT  += core5compat
 }
 
 CONFIG += c++17
@@ -74,6 +74,7 @@ SOURCES += \
     models/sdatabaseauxiliary.cpp \
     models/seditablebasemodel.cpp \
     models/sofficemodel.cpp \
+    models/stableclientsmodel.cpp \
     models/ssqlfetchingmodel.cpp \
     models/stablemodelscommonmethods.cpp \
     models/stablerepairsmodel.cpp \
@@ -149,6 +150,8 @@ SOURCES += \
     widgets/scartridgematerialstableitemdelegates.cpp \
     widgets/scartridgecard.cpp \
     widgets/sclientinputform.cpp \
+    widgets/sclientinputformbase.cpp \
+    widgets/sclientselectform.cpp \
     widgets/sdateedit.cpp \
     widgets/sdoublespinbox.cpp \
     widgets/settingstabwidgets/ssettingspagebase.cpp \
@@ -249,6 +252,7 @@ HEADERS  += \
     models/sdatabaseauxiliary.h \
     models/seditablebasemodel.h \
     models/sofficemodel.h \
+    models/stableclientsmodel.h \
     models/spermissions.h \
     models/ssqlfetchingmodel.h \
     models/stablemodelscommonmethods.h \
@@ -327,6 +331,8 @@ HEADERS  += \
     widgets/scartridgematerialstableitemdelegates.h \
     widgets/scartridgecard.h \
     widgets/sclientinputform.h \
+    widgets/sclientinputformbase.h \
+    widgets/sclientselectform.h \
     widgets/sdateedit.h \
     widgets/sdoublespinbox.h \
     widgets/settingstabwidgets/ssettingspagebase.h \
@@ -407,6 +413,7 @@ FORMS += \
     widgets/scartridgeform.ui \
     widgets/scartridgecard.ui \
     widgets/sclientinputform.ui \
+    widgets/sclientselectform.ui \
     widgets/settingstabwidgets/ssettingspageglobal.ui \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \
     widgets/settingstabwidgets/ssettingspageuser.ui \
@@ -452,6 +459,8 @@ RCC_DIR        = $${OUT_PWD}/$${BUILD_TYPE}/rcc
 !exists(3rdparty/outpwd.tmp){
     system("copy NUL 3rdparty\\outpwd.tmp")    # пустышка на случай отсутствия файла
 }
+
+QMAKE_POST_LINK += chcp 65001 $$escape_expand(\\n\\t)
 
 include(3rdparty/3rdparty-common.pri)
 
@@ -521,7 +530,6 @@ DEST = $$OUT_PWD/$${BUILD_TYPE}/lang
 win32:TRANSLATIONS_PATH ~= s,/,\\,g
 win32:DEST ~= s,/,\\,g
 
-QMAKE_POST_LINK += chcp 65001 >nul 2>&1 $$escape_expand(\\n\\t)
 !exists($${DEST}){
    system("mkdir $$DEST")
 }

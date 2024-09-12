@@ -18,9 +18,6 @@ class tabReceptCartridge : public tabCommon
 {
     Q_OBJECT
 signals:
-//    void createTabSelectPrevRepair(int, QWidget *);
-    void createTabSelectExistingClient(int, QWidget *);
-    void createTabClient(int);
     void generatePrintout(QMap<QString, QVariant>);
 public:
     explicit tabReceptCartridge(MainWindow *parent = nullptr);
@@ -53,12 +50,10 @@ private:
     void randomFill() override;
 #endif
 public slots:
-    void fillClientCreds(const int);
     void changeVendor(int index);
     void serialTextEdited(QString text);
     void findAndAddBySerial();
 private slots:
-    void relayCreateTabSelectExistingClient(int, QWidget *caller);
     bool createRepairs();
     void createRepairsAndClose();
     void comboBoxModelButtonClickHandler(int);

@@ -13,6 +13,7 @@
 #include <QTimer>
 #include "mainwindow.h"
 #include "tabcommon.h"
+#include "models/stableclientsmodel.h"
 #include "widgets/stableviewbase.h"
 
 namespace Ui {
@@ -30,14 +31,14 @@ public:
     explicit tabClients(bool type = 0, MainWindow *parent = nullptr);
     static tabClients* getInstance(bool type, MainWindow *parent = nullptr);
     ~tabClients();
-    QString tabTitle() override;
     bool event(QEvent *event) override;
+    void setCategory(int category);
     void setFocusSearchField();
 private:
     Ui::tabClients *ui;
     static tabClients* p_instance[2];
     bool m_type;
-    STableBaseModel* clientsTable;
+    STableClientsModel* clientsTable;
     QStringList query_group;
     void constructQueryClause();
 #ifdef QT_DEBUG

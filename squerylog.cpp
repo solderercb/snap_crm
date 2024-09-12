@@ -17,6 +17,17 @@ SQueryLog::SQueryLog() :
 {
 }
 
+SQueryLog::SQueryLog(QSqlDatabase db) :
+    SQueryLog(new QSqlQuery(db))
+{
+}
+
+SQueryLog::~SQueryLog()
+{
+    if(loggingActive)
+        stop();
+}
+
 void SQueryLog::setFile(const QString &filename)
 {
     file.setFileName(filename);
@@ -91,15 +102,27 @@ void SQueryLog::start(const QString &className)
 {
     Q_UNUSED(className);
 #ifdef QT_DEBUG
+    loggingActive = 1;
     setFile(SLocalSettings::appSettingsPath() + "/" + className + ".sql");
     if(super_priv)
         truncateLog();
 #endif
 }
 
+/* Включение журналирования запросов для указанного соединения.
+ * Возвращаемый указатель предназначен для выключения журналирования.
+*/
+SQueryLog *SQueryLog::start(QSqlDatabase db, const QString &className)
+{
+    SQueryLog *log = new SQueryLog(db);
+    log->start(className);
+    return log;
+}
+
 void SQueryLog::stop()
 {
 #ifdef QT_DEBUG
     saveLog();
+    loggingActive = 0;
 #endif
 }

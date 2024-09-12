@@ -29,7 +29,7 @@ QWidget *STableViewBOQItemDelegates::createEditor(QWidget *parent, const QStyleO
         case SStoreItemModel::SaleOpColumns::ColUser:
             return createComboBox(parent, usersModel); break;
         default:
-            return QStyledItemDelegate::createEditor(parent, option, index);
+            return STableViewBaseItemDelegates::createEditor(parent, option, index);
     }
 }
 
@@ -45,7 +45,7 @@ void STableViewBOQItemDelegates::setEditorData(QWidget *editor, const QModelInde
         case SStoreItemModel::SaleOpColumns::ColUser:
             setComboBoxData(editor, index.data().toString()); return;
         default:
-            setLineEditData(editor, index.data().toString());
+            STableViewBaseItemDelegates::setEditorData(editor, index);
     }
 }
 
@@ -61,7 +61,7 @@ void STableViewBOQItemDelegates::setModelData(QWidget *editor, QAbstractItemMode
         case SStoreItemModel::SaleOpColumns::ColUser:
             setModelDataFromComboBox(editor, model, index); return;
         default:
-            QStyledItemDelegate::setModelData(editor, model, index);
+            STableViewBaseItemDelegates::setModelData(editor, model, index);
     }
 }
 

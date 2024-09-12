@@ -8,6 +8,8 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QFocusEvent>
+#include <QResizeEvent>
+#include <QTimer>
 #include <QDebug>
 #include "slineedit.h"
 
@@ -17,6 +19,7 @@ class SComboBox : public QComboBox
     Q_PROPERTY(QString Buttons READ buttons WRITE setButtons NOTIFY buttonsChanged)
     Q_PROPERTY(bool selectOnTab READ isSelectOnTab WRITE setSelectOnTab)    // выбор выделенного элемента выпадающего списка по Tab
     Q_PROPERTY(bool keepCustomText READ isKeepCustomText WRITE setKeepCustomText)   // сохранить введённый текст при при нажатии Tab/Enter
+    Q_PROPERTY(bool keepListShown READ isKeepListShown WRITE setKeepListShown)   // сохранить введённый текст при при нажатии Tab/Enter
 signals:
     void buttonClicked(int buttonId = 0);
     void buttonsChanged();
@@ -32,42 +35,57 @@ public:
     int currentDbId();
     void initLineEdit();
     void setEditable(bool editable);
-    void showPopup() override;
-    void hidePopup() override;
+    virtual void showPopup() override;
+    virtual void hidePopup() override;
     QString buttons();
     void setButtons(const QString &buttons);
     void setPlaceholderText(const QString &text);
+    virtual void updatePopupGeometry();
+    void startPopupShowIntervalTimer();
+    void setPopupShowIntervalObserved();
+    void setListRowHeight(const int height);
+    void applyGuiSettings();
 protected:
     QAbstractItemView *listViewWidget = nullptr;
     QFontMetrics *fontMetrics;
     SLineEdit *lineEditWidget = nullptr;
+    QWidget *popupWidget = nullptr;
     virtual void retranslateKey(QEvent::Type type, int key, Qt::KeyboardModifiers modifiers, const QString &text = QString(), bool autorep = false, ushort count = 1);
-    bool ignoreFocusOut() const;
-    void setIgnoreFocusOut(bool state);
-    bool considerCursorPosOnHide() const;
-    void setConsiderCursorPosOnHide(bool state);
+    bool isPreserveLineEditFocus() const;
+    void setPreserveLineEditFocus(bool state);
     bool isPopupVisible() const;
     void setIsPopupVisible(bool state);
-    void toggleIsPopupVisible();
+    bool ignorePopupHide() const;
+    void setIgnorePopupHide(bool state);
+    void setRetranslatedKeyReceiver(QWidget *widget);
+    virtual bool eventFilterComboBox(QEvent *e);
+    virtual bool eventFilterLineEdit(QEvent *e);
+    virtual bool eventFilterListView(QEvent *e);
+    bool isKeepListShown();
+    void setKeepListShown(const bool state);
 private:
     bool wheelEventOn = 1;
     bool m_isPopupVisible = 0;
     QSize szHint;
     QSize minSzHint;
-    bool m_ignoreFocusOut = 0;
-    bool m_considerCursorPosOnHide = 1;
+    bool m_preserveLineEditFocus = 0;
     uchar m_customInput = 0;
     bool m_lineEditRO = 1;
     bool m_selectOnTab = 1;
     bool m_keepCustomText = 1;
-    bool eventFilterComboBox(QEvent *e);
-    bool eventFilterLineEdit(QEvent *e);
-    bool eventFilterListView(QEvent *e);
+    bool m_keepListShown = 0;
+    bool m_ignorePopupHide = 0;
+    QWidget *m_retranslatedKeyReceiver = nullptr;
+    bool m_popupShowIntervalObserved = 1;
+    int m_listRowHeight = 15;
     bool isPointInArea(const QPoint &point,  const QRect &area) const;
     bool isSelectOnTab();
     void setSelectOnTab(const bool state);
     bool isKeepCustomText();
     void setKeepCustomText(const bool state);
+    void applyListViewRowHeight();
+protected slots:
+    virtual void rowActivated(int);
 private slots:
     void longTextHandler();
     void clearButtonPress(int);

@@ -32,9 +32,20 @@ void SClientMatch::clear()
     phone = QString();
 }
 
+/* TODO: нужно изменить название метода на setNameScope */
 void SClientMatch::setClientType(int type)
 {
     clientType = type;
+}
+
+void SClientMatch::setCategory(int category)
+{
+    m_category = category;
+}
+
+void SClientMatch::setEnabled(bool state)
+{
+    m_enabled = state;
 }
 
 void SClientMatch::setPhoneMask(const int index)
@@ -57,6 +68,8 @@ void SClientMatch::findClient()
         }
 
     whereClause.fields.append(STableViewBase::initFilterField("`state`", FilterField::Equals, 1));
+    if(m_category != SClientModel::Categories::All)
+         whereClause.fields.append(STableViewBase::initFilterField(clientsTypesList->item(m_category, 2)->text(), FilterField::NoOp, 1));  // категория клиентов
 
     FilterField::Op matchFlag;
     if(userDbData->useRegExpSearch)
@@ -106,6 +119,9 @@ void SClientMatch::findClient()
 
 void SClientMatch::findByName(const QString &text)
 {
+    if(!m_enabled)
+        return;
+
     switch(clientType)
     {
         case NameSearchScope::LastName: lastName = text; break;

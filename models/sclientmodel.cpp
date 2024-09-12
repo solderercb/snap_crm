@@ -31,6 +31,32 @@ SClientModel::~SClientModel()
     deleteBalanceObj();
 }
 
+SStandardItemModel *SClientModel::categoriesList()
+{
+    SStandardItemModel *list;
+    QMetaEnum types = SClientModel::staticMetaObject.enumerator(SClientModel::staticMetaObject.indexOfEnumerator("Categories"));
+    QVector<QString> clientTypesQueryFilterList = {"`type` IN (0, 1)",
+                                                   "`type` = 1",
+                                                   "`is_agent` = 1",
+                                                   "`is_dealer` = 1",
+                                                   "`is_regular` = 1",
+                                                   "`is_bad` = 1",
+                                                   "`is_realizator` = 1"};
+
+    Q_ASSERT_X(types.keyCount() == clientTypesQueryFilterList.count(), "SClientModel::categoriesList()", "count not match");
+
+    list = SStandardItemModel::modelFromEnum(types, tr);
+    list->setColumnCount(3);
+    for(int i = 0; i < list->rowCount(); i++)
+    {
+        list->setData(list->index(i, 2), clientTypesQueryFilterList.at(i));
+    }
+    list->setObjectName("clientsCategoriesList");
+//    list->setObjectName("clientsTypesList");
+
+    return list;
+}
+
 bool SClientModel::isNew()
 {
     if(i_id)
@@ -1082,4 +1108,15 @@ bool SBalanceLogRecordModel::commit(const double amount, const QString &text)
     setText(text);
     commit(amount);
     return i_nErr;
+}
+
+void SClientModel::translateNames()
+{
+    tr("All");
+    tr("Companies");
+    tr("Brokers");
+    tr("Suppliers");
+    tr("Regulars");
+    tr("Problematic");
+    tr("Resellers");
 }

@@ -22,8 +22,7 @@ public:
     explicit SDatabaseRecord(QObject *parent = nullptr);
     ~SDatabaseRecord();
     int lastInsertId();
-    QDateTime utcToLocal(QDateTime timestamp);
-    QDateTime createdUtc();
+    virtual QDateTime createdUtc();
     QString created();
     void setCreated(const QDateTime &timestamp);
     static bool checkSystemTime();
@@ -39,12 +38,13 @@ protected:
     bool update();
     bool del();
     QString i_idColumnName;
+    virtual bool commit();
+    virtual void dbErrFlagHandler(bool);
 private:
     int m_newId = 0;
     bool m_isIdColumnNameSet = 0;
     bool checkObligatoryFields();
     bool checkTableName();
-    void dbErrFlagHandler(bool);
 signals:
 
 };

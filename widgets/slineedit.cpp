@@ -144,8 +144,10 @@ void SLineEdit::keyPressEvent(QKeyEvent *event)
 void SLineEdit::focusInEvent(QFocusEvent *e)
 {
     QLineEdit::focusInEvent(e);
-    if(m_autoSetCursorPositionToBegin && e->reason() != Qt::ActiveWindowFocusReason)
-        QLineEdit::setCursorPosition(m_lastCursorPosition);
+    if(m_autoSetCursorPositionToBegin && e->reason() == Qt::PopupFocusReason)
+        return;
+
+    QLineEdit::setCursorPosition(m_lastCursorPosition);
 }
 
 void SLineEdit::focusOutEvent(QFocusEvent *e)

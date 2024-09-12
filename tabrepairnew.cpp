@@ -140,6 +140,7 @@ void tabRepairNew::initWidgets()
     ui->comboBoxDeviceClass->setCurrentIndex(-1);
     ui->comboBoxDeviceVendor->setModel(deviceVendorsModel);
     ui->comboBoxDevice->setModel(devicesModel);
+    ui->widgetClient->setClientsTabDefaultCategory(SClientModel::Categories::Regulars);
     ui->comboBoxProblem->setModel(classProblemsModel);
     ui->comboBoxProblem->setCurrentIndex(-1);
     ui->comboBoxIncomingSet->setModel(classIncomingSetsModel);
@@ -150,8 +151,6 @@ void tabRepairNew::initWidgets()
 
     connect(ui->lineEditSN,SIGNAL(textEdited(QString)),ui->widgetDeviceMatch,SLOT(findBySN(QString)));
     connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
-    connect(ui->widgetClient, &SClientInputForm::createTabClient, this, &tabRepairNew::createTabClient);
-    connect(ui->widgetClient, &SClientInputForm::createTabSelectExistingClient, this, &tabRepairNew::relayCreateTabSelectExistingClient);
     connect(ui->checkBoxIsQuick, &QCheckBox::toggled, this, &tabRepairNew::quickRepairToggled);
     connect(ui->pushButtonQuickRepairIssue1, &QCheckBox::clicked, this, &tabRepairNew::issueQuickRepair);
     connect(ui->pushButtonQuickRepairIssue2, &QCheckBox::clicked, this, &tabRepairNew::issueQuickRepair);
@@ -887,11 +886,6 @@ void tabRepairNew::issueQuickRepair()
 void tabRepairNew::preferredPaymentSystemChanged(int)
 {
     // при установке модели данных автоматически устанавливается индекс 0 и в модель ремонта устанавливается предпочитаемый тип оплаты, что есть неправильно
-}
-
-void tabRepairNew::relayCreateTabSelectExistingClient(int, QWidget*)
-{
-    emit createTabSelectExistingClient(1, this);
 }
 
 void tabRepairNew::guiFontChanged()

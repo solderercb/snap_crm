@@ -14,10 +14,13 @@ class SQueryLog
 public:
     SQueryLog(QSqlQuery*);
     SQueryLog();
+    explicit SQueryLog(QSqlDatabase db);
+    ~SQueryLog();
     void setFile(const QString&);
     bool truncateLog();
     bool saveLog();
     void start(const QString &className);
+    static SQueryLog* start(QSqlDatabase db, const QString &className);
     void stop();
 private:
     QSqlQuery *query;
@@ -25,6 +28,7 @@ private:
     QString generalLog;
     QString logOutput;
     bool super_priv;
+    bool loggingActive = 0;
 };
 
 #endif // QUERYLOG_H

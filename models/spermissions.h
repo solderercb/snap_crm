@@ -130,6 +130,7 @@ public:
     void setAll(const int state);
     bool isModelChanged();
     int currentRole();
+    int permissionId(const char *name);
 protected:
     int rowToPropertyId(const QModelIndex &index) const;
     int rowToPermissionId(const QModelIndex &index) const;
@@ -281,6 +282,14 @@ inline bool SPermissions::isModelChanged()
 inline int SPermissions::currentRole()
 {
     return m_currentRole;
+}
+
+inline int SPermissions::permissionId(const char *name)
+{
+    int id = metaObject()->indexOfProperty(name) - 1;
+    Q_ASSERT_X(id != -1, "SPermissions::permissionId(const char *name)", QString("unknown permission %1").arg(name).toLocal8Bit());
+
+    return id;
 }
 
 inline int SPermissions::rowToPropertyId(const QModelIndex &index) const

@@ -27,6 +27,8 @@ int SCashRegisterModel::id()
 void SCashRegisterModel::setId(const int id)
 {
     i_id = id;
+
+    // TODO: этот метод предназначен для сброса id в нуль; при этом, вероятно, нужно очистить кэш, а также сборосить в умолчания все переменные
 }
 
 void SCashRegisterModel::load()
@@ -226,7 +228,8 @@ void SCashRegisterModel::setReason(const QString &text)
 {
     m_reason = text;
     i_valuesMap.insert("notes", text);
-    i_logRecord->setText(text);
+    if(!m_skipLogRecording)
+        i_logRecord->setText(text);
 }
 
 /*  Код валюты

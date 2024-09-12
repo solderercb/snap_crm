@@ -15,7 +15,7 @@ public:
     // типы записей для не входящие ни в какие группы (`logs`.`group` = NULL); Doc = 5 в АСЦ не использовался
     enum RecordTypes{ACP = 1, Client = 2, Repair = 3, User = 4, Doc = 5, Part = 6, PartRequest = 8};
     explicit SLogRecordModel(QObject *parent = nullptr);
-    bool commit();
+    bool commit() override;
     bool commit(const QString &);
     void setText(const QString &);
     void setClient(int);

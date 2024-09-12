@@ -40,6 +40,27 @@ void SComRecord::removeLogText(const QString &key)
     i_logTexts->remove(key);
 }
 
+bool SComRecord::commit()
+{
+    SDatabaseRecord::commit();
+    i_nErr &= commitLogs();
+    return i_nErr;
+}
+
+/* Переопределённый метод
+ * TODO: Это временное решение; метод будет удалён после переработки всех наследующих
+ * классов; ранее при вызове сеттера новое значение записывалось в кэш i_valuesMap, а после
+ * успешного выполнения запроса к БД кэш очищался. В тех случаях, когда требовалось получить
+ * новое значение до выполнения запроса, обновлялась также приватная переменная. Это
+ * требовало более тщательного контроля при разработке и могло приводить к разным ошибкам и
+ * сбоям. Новая схема работает по аналогии с кэшем в QSqlTableModel, а переопределённый
+ * метод позволит в каждом отдельном классе управлять очисткой i_valuesMap.
+*/
+void SComRecord::dbErrFlagHandler(bool flushCache)
+{
+    SDatabaseRecord::dbErrFlagHandler(flushCache);
+}
+
 bool SComRecord::commitLogs()
 {
     QString logText;
@@ -49,7 +70,7 @@ bool SComRecord::commitLogs()
         i_nErr &= i_logRecord->commit();
         if(!i_nErr)
         {
-            return 0;
+            throw Global::ThrowType::QueryError;
         }
     }
 

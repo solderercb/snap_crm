@@ -26,6 +26,8 @@ public:
     void removeLogText(const QString &disambiguation);
     virtual void initDemo(){};
 protected:
+    virtual bool commit() override;
+    virtual void dbErrFlagHandler(bool flushCache = true) override;
     bool commitLogs();
     void initQueryFields(const QList<QStandardItem *> &record);
     virtual void setQueryField(const int, const QVariant, const QVariant){};

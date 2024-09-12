@@ -1,8 +1,9 @@
 #include "sclientinputform.h"
 #include "ui_sclientinputform.h"
+#include "tabclients.h"
 
 SClientInputForm::SClientInputForm(QWidget *parent) :
-    QWidget(parent),
+    SClientInputFormBase(parent),
     ui(new Ui::SClientInputForm)
 {
     ui->setupUi(this);
@@ -34,7 +35,8 @@ void SClientInputForm::initWidgets()
     ui->comboBoxClientAdType->setCurrentIndex(-1);
     if(permissions->viewClients)
     {
-        connect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
+        connect(ui->lineEditClientFirstName, &QLineEdit::textEdited, this, &SClientInputForm::firstNameChanged);
+        connect(ui->lineEditClientLastName, &QLineEdit::textEdited, this, &SClientInputForm::lastNameChanged);
         connect(ui->widgetClientMatch,SIGNAL(clientSelected(int)),this,SLOT(fillClientCreds(int)));
         connect(ui->phones,SIGNAL(primaryPhoneEdited(QString)),this,SLOT(primaryPhoneEdited(QString)));
     }
@@ -48,7 +50,6 @@ void SClientInputForm::initWidgets()
 
 void SClientInputForm::changeClientType()
 {
-
     if(ui->checkBoxClientType->checkState())
     {
         ui->groupBoxClient->setTitle(tr("Клиент (юридическое лицо)"));
@@ -58,11 +59,6 @@ void SClientInputForm::changeClientType()
         ui->lineEditClientPatronymic->hide();    // скрываем поле "Отчество"
         ui->gridLayoutClient->addWidget(ui->lineEditClientFirstName, 1, 0, 1, 3); // заменяем поле "Фамилия" самим собой, но растягиваем его по ширине на 6 столбцов (занимаем столбцы полей "Имя" и "Отчество")
         ui->widgetClientMatch->setClientType(SClientMatch::NameSearchScope::Name);
-        if(permissions->viewClients)
-        {
-            connect(ui->lineEditClientFirstName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
-            disconnect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
-        }
     }
     else
     {
@@ -75,12 +71,23 @@ void SClientInputForm::changeClientType()
         ui->lineEditClientLastName->show();    // показываем поле "Имя"
         ui->lineEditClientPatronymic->show();    // показываем поле "Отчество"
         ui->widgetClientMatch->setClientType(SClientMatch::NameSearchScope::LastName);
-        if(permissions->viewClients)
-        {
-            connect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
-            disconnect(ui->lineEditClientFirstName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
-        }
     }
+}
+
+void SClientInputForm::lastNameChanged(const QString &text)
+{
+    if(ui->checkBoxClientType->checkState())
+        return;
+
+    ui->widgetClientMatch->findByName(text);
+}
+
+void SClientInputForm::firstNameChanged(const QString &text)
+{
+    if(!ui->checkBoxClientType->checkState())
+        return;
+
+    ui->widgetClientMatch->findByName(text);
 }
 
 void SClientInputForm::clearClientCreds(bool keepCoincidenceShown)
@@ -143,6 +150,11 @@ void SClientInputForm::fillClientCreds(int id)
     if(clientModel->balanceEnabled())
         ui->listWidgetClientOptions->addItems(QStringList("бал. "+sysLocale.toString(clientModel->balance(), 'f', 2)));
 
+}
+
+void SClientInputForm::fillCreds(int id)
+{
+    fillClientCreds(id);    // TODO: требуется переработать механизм выбора клиента на новый вариант, аналогичный разработанному на вкладке создания кассового ордера
 }
 
 int SClientInputForm::checkInput()
@@ -227,8 +239,7 @@ void SClientInputForm::commit()
 
 void SClientInputForm::primaryPhoneEdited(QString number)
 {
-    if(permissions->viewClients)
-        ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
+    ui->widgetClientMatch->findByPhone(number, ui->phones->primary()->maskIndex());
 }
 
 void SClientInputForm::guiFontChanged()
@@ -247,12 +258,25 @@ void SClientInputForm::guiFontChanged()
 
 void SClientInputForm::buttonCreateTabClientClicked()
 {
-    emit createTabClient(m_client);
+    MainWindow *mw = MainWindow::getInstance();
+    mw->createTabClient(m_client);
 }
 
 void SClientInputForm::buttonSelectExistingClientClicked()
 {
-    emit createTabSelectExistingClient(1, this);
+    MainWindow *mw = MainWindow::getInstance();
+    tabClients *clientsTab = nullptr;
+    SWidget *parentTab = findParentTab();
+    clientsTab = static_cast<tabClients *>(mw->createTabClients(parentTab));
+    if(clientsTab)
+    {
+        QObject::connect(clientsTab, &tabClients::doubleClicked, this, [=](int id){fillClientCreds(id);});
+        QObject::connect(clientsTab, &tabClients::activateCaller, mw, &MainWindow::reactivateCallerTab);
+        ui->widgetClientMatch->clear();
+        clientsTab->setTabTitle(i_clientsTabTitle);
+        clientsTab->setCategory(i_clientsTabDefaultCategory);
+        clientsTab->setCallerPtr(parentTab);
+    }
 }
 
 #ifdef QT_DEBUG
@@ -263,11 +287,7 @@ void SClientInputForm::randomFill()
 //        return;
     if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или выбираем из уже имеющихся клиентов или создаём нового
     {
-        fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
-        if (ui->lineEditClientLastName->text() == "")
-            fillClientCreds(QRandomGenerator::global()->bounded(7538)); // если попался id несуществующего клиета
-        else if (ui->lineEditClientLastName->text() == "")
-            fillClientCreds(QRandomGenerator::global()->bounded(7538)); // и еще раз, на всякий пожарный
+        fillClientCreds(QRandomGenerator::global()->bounded(randomClientIdFromDB()));
     }
     else    // ввод данных из тестового списка
     {
@@ -310,4 +330,9 @@ void SClientInputForm::setDefaultStyleSheets()
     ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheet);
     ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheet);
     ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheet);
+}
+
+void SClientInputForm::setMatchWidgetFilter(int category)
+{
+    ui->widgetClientMatch->setCategory(category);
 }

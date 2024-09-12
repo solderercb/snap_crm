@@ -1,6 +1,48 @@
 #include "sdatabaseauxiliary.h"
 #include "global.h"
 
+QDate SDatabaseAuxiliary::localDate(const QDate &utcDate)
+{
+    return localDateTime(utcDate.startOfDay(QTimeZone::utc())).date();
+}
+
+QDate SDatabaseAuxiliary::localDate(const QVariant &utcDate)
+{
+    return localDate(utcDate.toDate());
+}
+
+QDate SDatabaseAuxiliary::utcDate(const QDate &localDate)
+{
+    return utcDateTime(localDate.startOfDay()).date();
+}
+
+QDate SDatabaseAuxiliary::utcDate(const QVariant &localDate)
+{
+    return utcDate(localDate.toDate());
+}
+
+QDateTime SDatabaseAuxiliary::localDateTime(QDateTime utcDateTime)
+{
+    utcDateTime.setTimeZone(QTimeZone::utc());
+    return utcDateTime.toLocalTime();
+}
+
+QDateTime SDatabaseAuxiliary::localDateTime(const QVariant &utcDateTime)
+{
+    return localDateTime(utcDateTime.toDateTime());
+}
+
+QDateTime SDatabaseAuxiliary::utcDateTime(QDateTime localDateTime)
+{
+    localDateTime.setTimeZone(QTimeZone::systemTimeZone());
+    return localDateTime.toUTC();
+}
+
+QDateTime SDatabaseAuxiliary::utcDateTime(const QVariant &localDateTime)
+{
+    return utcDateTime(localDateTime.toDateTime());
+}
+
 void SDatabaseAuxiliary::errorToLog(const QString &className, const QString &errorText)
 {
     QString error;
@@ -74,5 +116,17 @@ void SDatabaseAuxiliary::fieldsUpdFormatter()
     {
         fields.append('`' + i.key() + "` = " + fieldValueHandler(i.value()));
     }
+}
+
+/*  Возвращает или кэшированное значение поля текущей записи БД
+ *  или значение из переменной, ссылка на которую передана вторым параметром, если
+ *  кэшированного значения нет.
+*/
+QVariant SDatabaseAuxiliary::cachedValue(const QString &fieldName, const QVariant &uncashedValue)
+{
+    if(i_valuesMap.contains(fieldName))
+        return i_valuesMap.value(fieldName);
+
+    return uncashedValue;
 }
 

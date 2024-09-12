@@ -60,6 +60,7 @@ public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();
     void addTab(QWidget *widget);
+    void insertTab(QWidget *tab, int rightOf = -1);
     bool event(QEvent *event) override;
 #ifdef QT_DEBUG
     QTimer *test_scheduler, *test_scheduler2;
@@ -91,17 +92,18 @@ public slots:
     void createTabRepairs(int type = 0, QWidget *caller = nullptr);    // Этот слот public, т. к. может создаваться по-умолчанию при запуске приложения.
     void createTabRepairNew();  // Этот слот public только для debug'а, в релизе нужно сделать его private
     void createTabRepair(int);
+    void createTabClients(int type = 0, QWidget *caller = nullptr);
+    QWidget *createTabClients(QWidget *callerTab);
+    void createTabClient(int);
     void createTabRepairCartridges(QList<int> *list);
     void createTabSale(int doc_id = 0);
     void createTabSparePart(int);
     void createTabSparePartReserve(int);
     void switchToLastUsedTab();
     void createTabTechReports();
-private slots:
     void reactivateCallerTab(QWidget *);
+private slots:
     void reactivateTabRepairNew(int);
-    void createTabClients(int type = 0, QWidget *caller = nullptr);
-    void createTabClient(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
     void createTabCashOperations();
     void createTabCashOperation( int, QMap<int, QVariant> data = QMap<int, QVariant>() );

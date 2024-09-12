@@ -84,12 +84,6 @@ bool SDatabaseRecord::checkTableName()
     return i_nErr;
 }
 
-QDateTime SDatabaseRecord::utcToLocal(QDateTime timestamp)
-{
-    timestamp.setTimeZone(QTimeZone::utc());
-    return timestamp.toLocalTime();
-}
-
 QDateTime SDatabaseRecord::createdUtc()
 {
     return i_createdUtc;
@@ -97,7 +91,7 @@ QDateTime SDatabaseRecord::createdUtc()
 
 QString SDatabaseRecord::created()
 {
-    return utcToLocal(i_createdUtc).toString("dd.MM.yyyy hh:mm:ss");
+    return localDateTime(createdUtc()).toString("dd.MM.yyyy hh:mm:ss");
 }
 
 /* Дефолтный метод установки метки времени для записи в таблице.
@@ -219,6 +213,23 @@ bool SDatabaseRecord::del()
     //    qDebug().noquote() << q;
     QUERY_EXEC(i_query,i_nErr)(q);
     dbErrFlagHandler(false);
+
+    return i_nErr;
+}
+
+bool SDatabaseRecord::commit()
+{
+    if(i_id)
+    {
+        update();
+    }
+    else
+    {
+        insert();
+    }
+
+    if(!i_nErr)
+        throw Global::ThrowType::QueryError;
 
     return i_nErr;
 }

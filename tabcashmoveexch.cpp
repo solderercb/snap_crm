@@ -23,12 +23,16 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
     ui->comboBoxSrcPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
     ui->comboBoxDstPaymentAccount->setModel(paymentSystemsProxyModel);
     ui->comboBoxDstPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
+
+    bool officeVisible = officesModel->rowCount() > 1;
+    ui->labelOffice->setVisible(officeVisible);
     ui->comboBoxSrcOffice->setModel(officesModel);
     ui->comboBoxSrcOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
-    ui->comboBoxSrcOffice->setVisible(officesModel->rowCount() > 1);
+    ui->comboBoxSrcOffice->setVisible(officeVisible);
     ui->comboBoxDstOffice->setModel(officesModel);
     ui->comboBoxDstOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
-    ui->comboBoxDstOffice->setVisible(officesModel->rowCount() > 1);
+    ui->comboBoxDstOffice->setVisible(officeVisible);
+
     cashRegisterSrc = new SCashRegisterModel();
     cashRegisterDst = new SCashRegisterModel();
     initCashRegisterModel();

@@ -45,3 +45,18 @@ void SEditableBaseModel::clear()
     QSqlTableModel::revertAll();
     endResetModel();
 }
+
+bool SEditableBaseModel::insertRowIntoTable(const QSqlRecord &values)
+{
+    return QSqlTableModel::insertRowIntoTable(values);
+}
+
+bool SEditableBaseModel::submit()
+{
+    return QSqlTableModel::submit();
+}
+
+bool SEditableBaseModel::submitAll()
+{
+    return QSqlTableModel::submitAll();
+}
