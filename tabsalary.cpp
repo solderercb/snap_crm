@@ -43,6 +43,7 @@ tabSalary::tabSalary(MainWindow *parent) :
 
     connect(ui->buttonAddExtraCharge, &QPushButton::clicked, this, &tabSalary::buttonAddExtraChargeClicked);
     connect(ui->buttonSaveExtraChargesList, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::saveTable);
+    connect(ui->dateEditPeriod, &QDateEdit::dateChanged, this, [=](const QDate&){loadButtonPressed();});
     connect(ui->toolButtonPrevPeriod, &QToolButton::clicked, this, &tabSalary::prevPeriod);
     connect(ui->toolButtonNextPeriod, &QToolButton::clicked, this, &tabSalary::nextPeriod);
     connect(ui->toolButtonLoad, &QToolButton::clicked, this, &tabSalary::loadButtonPressed);

@@ -334,7 +334,7 @@
         <item row="9" column="0">
          <widget class="QLabel" name="labelSubsistence">
           <property name="text">
-           <string>Аванс</string>
+           <string>Выдано авансом</string>
           </property>
          </widget>
         </item>
@@ -363,7 +363,7 @@
         <item row="10" column="0">
          <widget class="QLabel" name="labelPayed">
           <property name="toolTip">
-           <string>Сумма включает выплаты и записи на баланс</string>
+           <string>Сумма выплат и зачислений на баланс</string>
           </property>
           <property name="text">
            <string>Было выплачено (?)</string>
@@ -784,7 +784,10 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxSubsistenceSumm">
+           <widget class="SDoubleSpinBox" name="doubleSpinBoxSubsistenceSumm">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>

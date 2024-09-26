@@ -41,8 +41,15 @@ void STableViewSummaryBase::setData(const int row, const int column, QVariant va
     setData(m_dataModel->index(row, column), value);
 }
 
+/* Отображение суммы в строке итогов с учетом настройки "Работа с копейками" (по умолчанию).
+ * В отдельных случаях сумма может отображаться с дробной частью.
+*/
+void STableViewSummaryBase::setTotal(int column, double value, int decimals)
+{
+    setTotal(column, STableModelsCommonMethods::dataLocalizedFromDouble(value, decimals));
+}
 
-void STableViewSummaryBase::setTotal(int column, double value)
+void STableViewSummaryBase::setTotal(int column, QVariant value)
 {
     m_dataModel->setData(m_dataModel->index(0, column), value);
 }

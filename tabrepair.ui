@@ -961,7 +961,7 @@ QListView::item  {
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QDoubleSpinBox" name="doubleSpinBoxAmount">
+               <widget class="SDoubleSpinBox" name="doubleSpinBoxAmount">
                 <property name="buttonSymbols">
                  <enum>QAbstractSpinBox::NoButtons</enum>
                 </property>
@@ -1199,6 +1199,11 @@ QListView::item  {
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>SDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">widgets/sdoublespinbox.h</header>
+  </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>

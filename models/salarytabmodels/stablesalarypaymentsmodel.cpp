@@ -18,12 +18,24 @@ QVariant STableSalaryPaymentsModel::data(const QModelIndex &item, int role) cons
             case Columns::PaymentDate:
             case Columns::PeriodFrom:
             case Columns::PeriodTo: return timestampLocal(item);
-            case Columns::CashAmount:
-            case Columns::BalanceAmount: return dataLocalizedFromDouble(item);
+            case Columns::CashAmount: return dataLocalizedFromDouble(item);
+            case Columns::BalanceAmount: return balanceChangeValue(item);
             default: ;
         }
     }
     return STableBaseModel::data(item, role);
+}
+
+/* Форматирование записи о зачислении на баланс или списании с него
+ * Метод добавляет "+" к зачислениям
+*/
+QString STableSalaryPaymentsModel::balanceChangeValue(const QModelIndex &item) const
+{
+    double value = unformattedData(item, Qt::DisplayRole).toDouble();
+    if(value > 0)
+        return "+" + dataLocalizedFromDouble(value);
+
+    return dataLocalizedFromDouble(value);
 }
 
 /* Сумма выплаченных денег и записанных на баланс разниц
@@ -38,7 +50,10 @@ double STableSalaryPaymentsModel::total(const PaymentType type)
         {
             cash = STableBaseModel::data(index(i, Columns::CashAmount)).toDouble();
             balance = STableBaseModel::data(index(i, Columns::BalanceAmount)).toDouble();
-            total += cash + ((balance > 0)?balance:0);  // учитываются только поступления на баланс
+            if(cash == 0 && balance < 0)
+                total += balance;
+            else
+                total += cash + balance;
         }
     }
 

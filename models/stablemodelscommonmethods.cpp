@@ -42,9 +42,19 @@ double STableModelsCommonMethods::total(int column, int sign)
         return totalNegative;
 }
 
+QString STableModelsCommonMethods::dataLocalizedFromDouble(const double value, const int decimals)
+{
+    return sysLocale.toString(value, 'f', decimals);
+}
+
+QString STableModelsCommonMethods::dataLocalizedFromDouble(const double value) const
+{
+    return dataLocalizedFromDouble(value, comSettings->classicKassa?2:0);
+}
+
 QString STableModelsCommonMethods::dataLocalizedFromDouble(const QModelIndex &item) const
 {
-    return sysLocale.toString(unformattedData(item, Qt::DisplayRole).toDouble(), 'f', comSettings->classicKassa?2:0);
+    return dataLocalizedFromDouble(unformattedData(item, Qt::DisplayRole).toDouble(), comSettings->classicKassa?2:0);
 }
 
 QString STableModelsCommonMethods::companyFromId(const QModelIndex &item) const

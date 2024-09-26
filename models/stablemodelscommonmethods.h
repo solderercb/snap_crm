@@ -15,6 +15,8 @@ public:
     QDateTime timestampUtc(const QModelIndex &index) const;
     QDateTime timestampLocal(const QModelIndex &index) const;
     double total(int column, int sign = 0);
+    static QString dataLocalizedFromDouble(const double value, const int decimals);
+    QString dataLocalizedFromDouble(const double value) const;
     QString dataLocalizedFromDouble(const QModelIndex &item) const;
     QString companyFromId(const QModelIndex &item) const;
     QString userFromId(const QModelIndex &item) const;

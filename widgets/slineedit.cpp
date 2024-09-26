@@ -144,16 +144,31 @@ void SLineEdit::keyPressEvent(QKeyEvent *event)
 void SLineEdit::focusInEvent(QFocusEvent *e)
 {
     QLineEdit::focusInEvent(e);
-    if(m_autoSetCursorPositionToBegin && e->reason() == Qt::PopupFocusReason)
-        return;
+    switch(e->reason())
+    {
+        case Qt::OtherFocusReason:
+        case Qt::PopupFocusReason: return;
+        default: ;
+    }
 
-    QLineEdit::setCursorPosition(m_lastCursorPosition);
+    if(m_autoSetCursorPositionToBegin && selectedText().isEmpty())
+        QLineEdit::setCursorPosition(m_lastCursorPosition);
 }
 
 void SLineEdit::focusOutEvent(QFocusEvent *e)
 {
     m_lastCursorPosition = QLineEdit::cursorPosition();
-    if(m_autoSetCursorPositionToBegin && e->reason() != Qt::ActiveWindowFocusReason)
+    switch(e->reason())
+    {
+        case Qt::ActiveWindowFocusReason:
+        case Qt::PopupFocusReason:
+        case Qt::ShortcutFocusReason:
+        case Qt::MenuBarFocusReason:
+        case Qt::OtherFocusReason: return;
+        default: ;
+    }
+
+    if(m_autoSetCursorPositionToBegin)
         QLineEdit::setCursorPosition(0);
     QLineEdit::focusOutEvent(e);
 }

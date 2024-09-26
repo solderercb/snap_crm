@@ -2861,13 +2861,17 @@
     </message>
     <message>
         <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="337"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="698"/>
-        <source>Аванс</source>
+        <source>Выдано авансом</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="366"/>
-        <source>Сумма включает выплаты и записи на баланс</source>
+        <source>Сумма выплат и зачислений на баланс</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="698"/>
+        <source>Аванс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2958,89 +2962,89 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="814"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.ui" line="817"/>
         <source>Выплата аванса сотруднику</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="46"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="48"/>
         <source>Выбрать</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="48"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="50"/>
         <source>Баланс сотрудника не включен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="49"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="51"/>
         <source>Для зачисления разницы на баланс сотрудника необходимо указать или создать карточку клиента-сотрудника. Создать автоматически?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="65"/>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="80"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="67"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="82"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="66"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="68"/>
         <source>У вас недостаточно прав. Обратитесь к администратору.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="81"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="83"/>
         <source>Сумма выплаты не соответствует значению в поле &quot;Итого к оплате&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="99"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="101"/>
         <source>Быстрое создание клиента при выплате заработной платы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="152"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="156"/>
         <source>Баланс сотрудника</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="153"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="157"/>
         <source>Записать старое значение баланса в новом формате?
 Сумма будет прибавлена или вычтена если была выбрана карточка существующего клиента (не рекомендуется, см. справку).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="244"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="251"/>
         <source>Выплата заработной платы за период с %1 по %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="276"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="283"/>
         <source>Карточка сотрудника-клиента успешно создана или связана</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="281"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="288"/>
         <source>Преобразование данных о сумме на балансе сотрудника из формата программы АСЦ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="300"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="308"/>
         <source>Списание средств с баланса сотрудника-клиента при выплате заработной платы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="302"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="310"/>
         <source>Зачисление разницы заработка и выплаченной суммы на баланс сотрудника-клиента</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="319"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="327"/>
         <source>Ошибка выполнения запроса</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="336"/>
+        <location filename="../widgets/salarytabwidgets/spagesalarysummary.cpp" line="344"/>
         <source>Проведено</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4969,7 +4973,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="26"/>
         <source>BalanceAmount</source>
-        <translation>Зачислено на баланс</translation>
+        <translation>Баланс</translation>
     </message>
     <message>
         <location filename="../widgets/salarytabwidgets/stableviewsalarypayments.cpp" line="27"/>
@@ -6078,102 +6082,102 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="47"/>
+        <location filename="../tabcashmoveexch.ui" line="261"/>
         <source>Офис</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="63"/>
+        <location filename="../tabcashmoveexch.ui" line="328"/>
         <source>Оплата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="79"/>
+        <location filename="../tabcashmoveexch.ui" line="358"/>
         <source>Сумма</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="268"/>
+        <location filename="../tabcashmoveexch.ui" line="36"/>
         <source>Номера РКО и ПКО:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="314"/>
+        <location filename="../tabcashmoveexch.ui" line="89"/>
         <source>Перемещение</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="324"/>
+        <location filename="../tabcashmoveexch.ui" line="99"/>
         <source>Обмен</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="363"/>
+        <location filename="../tabcashmoveexch.ui" line="290"/>
         <source>»</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="402"/>
+        <location filename="../tabcashmoveexch.ui" line="416"/>
         <source>Курс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="476"/>
+        <location filename="../tabcashmoveexch.ui" line="478"/>
         <source>1/x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="505"/>
+        <location filename="../tabcashmoveexch.ui" line="588"/>
         <source>Примечание</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="535"/>
+        <location filename="../tabcashmoveexch.ui" line="132"/>
         <source>Дата/время создания</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="651"/>
+        <location filename="../tabcashmoveexch.ui" line="554"/>
         <source>Автозаполнение основания платежа</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="661"/>
+        <location filename="../tabcashmoveexch.ui" line="564"/>
         <source>Печать ПКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="727"/>
+        <location filename="../tabcashmoveexch.ui" line="667"/>
         <source>Провести ещё</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.ui" line="749"/>
+        <location filename="../tabcashmoveexch.ui" line="689"/>
         <source>Провести</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="219"/>
+        <location filename="../tabcashmoveexch.cpp" line="223"/>
         <source>Перемещение денег</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="182"/>
+        <location filename="../tabcashmoveexch.cpp" line="186"/>
         <source>обмен валют</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="324"/>
+        <location filename="../tabcashmoveexch.cpp" line="328"/>
         <source>курс</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="330"/>
+        <location filename="../tabcashmoveexch.cpp" line="334"/>
         <source>комиссия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashmoveexch.cpp" line="379"/>
+        <location filename="../tabcashmoveexch.cpp" line="383"/>
         <source>Проведёно</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6186,8 +6190,8 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="107"/>
-        <location filename="../tabcashoperation.cpp" line="116"/>
+        <location filename="../tabcashoperation.cpp" line="110"/>
+        <location filename="../tabcashoperation.cpp" line="119"/>
         <source>Получатель платежа</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6202,7 +6206,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="108"/>
+        <location filename="../tabcashoperation.cpp" line="111"/>
         <source>Плательщик</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6282,87 +6286,87 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="164"/>
+        <location filename="../tabcashoperation.cpp" line="167"/>
         <source>Ремонт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="166"/>
+        <location filename="../tabcashoperation.cpp" line="169"/>
         <source>Счёт</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="168"/>
+        <location filename="../tabcashoperation.cpp" line="171"/>
         <source>Документ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="462"/>
+        <location filename="../tabcashoperation.cpp" line="465"/>
         <source>ПКО №%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="464"/>
+        <location filename="../tabcashoperation.cpp" line="467"/>
         <source>РКО №%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="798"/>
+        <location filename="../tabcashoperation.cpp" line="801"/>
         <source>Сотрудник</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="359"/>
+        <location filename="../tabcashoperation.cpp" line="362"/>
         <source>Баланс клиента №%1 пополнен на %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="115"/>
+        <location filename="../tabcashoperation.cpp" line="118"/>
         <source>Организация-плательщик</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="220"/>
+        <location filename="../tabcashoperation.cpp" line="223"/>
         <source>Поступление оплаты в размере %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="363"/>
+        <location filename="../tabcashoperation.cpp" line="366"/>
         <source>С баланса клиента №%1 списано %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="455"/>
+        <location filename="../tabcashoperation.cpp" line="458"/>
         <source>Новый ПКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="456"/>
+        <location filename="../tabcashoperation.cpp" line="459"/>
         <source>Новый РКО</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="467"/>
+        <location filename="../tabcashoperation.cpp" line="470"/>
         <source>Кассовый ордер №%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="513"/>
+        <location filename="../tabcashoperation.cpp" line="516"/>
         <source>Открыть</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="949"/>
+        <location filename="../tabcashoperation.cpp" line="952"/>
         <source>Платёжная система изменена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="953"/>
+        <location filename="../tabcashoperation.cpp" line="956"/>
         <source>Ошибка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabcashoperation.cpp" line="856"/>
+        <location filename="../tabcashoperation.cpp" line="859"/>
         <source>Проведён</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7628,28 +7632,28 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="87"/>
+        <location filename="../tabsalary.cpp" line="88"/>
         <source>Заработная плата</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="109"/>
+        <location filename="../tabsalary.cpp" line="110"/>
         <source>Данные не сохранены</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="109"/>
+        <location filename="../tabsalary.cpp" line="110"/>
         <source>Список дополнительных начислений и списаний не сохранён!
 Сохранить перед закрытием?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="190"/>
+        <location filename="../tabsalary.cpp" line="191"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsalary.cpp" line="191"/>
+        <location filename="../tabsalary.cpp" line="192"/>
         <source>Сначала нажмите кнопку Загрузить</source>
         <translation type="unfinished"></translation>
     </message>

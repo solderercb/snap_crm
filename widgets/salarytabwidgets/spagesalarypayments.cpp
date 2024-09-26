@@ -47,7 +47,7 @@ STableViewSalaryPaymentsSummary::STableViewSalaryPaymentsSummary(QWidget *parent
 
 void STableViewSalaryPaymentsSummary::setGridLayout(XtraSerializer *layout)
 {
-    Q_UNUSED(layout)
+    STableViewSummaryBase::setGridLayout(layout);
     setData(0, STableViewSalaryPayments::Column::CashAmount, "<value>");
     setData(0, STableViewSalaryPayments::Column::BalanceAmount, "<value>");
 }

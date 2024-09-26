@@ -420,7 +420,7 @@
           </layout>
          </item>
          <item row="7" column="2">
-          <widget class="QDoubleSpinBox" name="doubleSpinBoxAmount">
+          <widget class="SDoubleSpinBox" name="doubleSpinBoxAmount">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -652,6 +652,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>SDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">widgets/sdoublespinbox.h</header>
+  </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
