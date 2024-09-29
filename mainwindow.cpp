@@ -18,6 +18,8 @@
 #include "tabsettings.h"
 #include "tabsalary.h"
 #include "tabtechreports.h"
+#include "modules/purchasemanager/tabmanager.h"
+#include "modules/purchasemanager/tabrequest.h"
 #include "widgets/slineedit.h"
 #include "com_sql_queries.h"
 
@@ -199,8 +201,8 @@ void MainWindow::createMenu()
 
     QAction *purchase_manager = new QAction(tr("Менеджер закупок"), this);
     goods_menu->addAction(purchase_manager);
-    purchase_manager->setEnabled(false);
     purchase_manager->setVisible(permissions->enableSparepartRequestManager);
+    connect(purchase_manager, &QAction::triggered, this, &MainWindow::createTabPurchaseManager);
 
     QAction *store_manager = new QAction(tr("Управление складом"), this);
     goods_menu->addAction(store_manager);
@@ -718,6 +720,22 @@ void MainWindow::createTabTechReports()
 //    subwindow->setFocusSearchField();
 }
 
+void MainWindow::createTabPurchaseManager()
+{
+    tabPurchaseManager *subwindow = tabPurchaseManager::getInstance(this);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+
+    ui->tabWidget->setCurrentWidget(subwindow);
+}
+
+QWidget *MainWindow::createTabPartRequest(const int id)
+{
+    tabPartRequest *subwindow = tabPartRequest::getInstance(id, this);
+    insertTab(subwindow);
+    return subwindow;
+}
+
 void MainWindow::createTabSale(int doc_id)
 {
     if(!permissions->saleGoods)
@@ -1161,6 +1179,10 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabCashMoveExch();
 //        createTabClients();
 //        createTabTechReports();
+        createTabPurchaseManager();
+        tabPartRequest *tpr = static_cast<tabPartRequest*>(createTabPartRequest(0));
+//        tpr->setRepair(39699);
+//        tpr->setClient(1952);
 
 //        QMap<QString, QVariant> report_vars;
 //        report_vars.insert("type", Global::Reports::new_rep);

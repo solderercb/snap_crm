@@ -9,6 +9,11 @@ SEditableBaseModel::SEditableBaseModel(QObject *parent, QSqlDatabase db):
 
 QVariant SEditableBaseModel::data(const QModelIndex &item, int role) const
 {
+    if(role == Qt::ToolTipRole)
+    {
+        return data(item, Qt::DisplayRole);
+    }
+
     return QSqlTableModel::data(item, role & 0xFF);
 }
 

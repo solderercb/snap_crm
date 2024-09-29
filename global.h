@@ -21,6 +21,7 @@
 #include "models/ssqlquerymodel.h"
 #include "models/spaymenttypesmodel.h"
 #include "models/spermissions.h"
+#include "models/ssortfilterproxymodel.h"
 #ifdef QT_DEBUG
 #include "clients4test.h"
 #endif
@@ -68,6 +69,7 @@ extern QMap<int, QString> *allUsersMap;
 extern SSqlQueryModel *usersModel;
 extern SSqlQueryModel *usersSalaryTaxesModel;
 extern SSqlQueryModel *managersModel;
+extern SSqlQueryModel *partRequestManagersModel;
 extern SSqlQueryModel *engineersModel;
 extern SSqlQueryModel *itemBoxesModel;
 extern SSqlQueryModel *repairBoxesModel;
@@ -102,6 +104,8 @@ extern QVector<QWidget*> tabList;
 extern SStandardItemModel *cartridgeRepeatReason;
 extern SStandardItemModel *cartridgeMaterialsListModel;
 extern SStandardItemModel *currencyListModel;
+extern SStandardItemModel *partRequestStatesListModel;
+extern SStandardItemModel *partRequestPrioritiesListModel;
 
 //extern QSqlQueryModel *Model;
 //extern QSqlQueryModel *Model;

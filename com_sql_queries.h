@@ -33,6 +33,7 @@
 #define QUERY_SEL_USERS                     QString("SELECT `username`, `id`,  `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` WHERE `state` = 1 AND  `is_bot` = 0;")
 #define QUERY_SEL_USERS_SALARY_TAXES        QString("SELECT `username`, `id`,  `salary_rate`,  `pay_day`,  `pay_day_off`,  `pay_repair`,  `pay_repair_quick`,  `pay_sale`,  `pay_repair_q_sale`,  `pay_cartridge_refill`,  `pay_device_in`,  `pay_device_out`,  `pay_4_sale_in_repair` FROM `users` WHERE `state` = 1 AND  `is_bot` = 0;")
 #define QUERY_SEL_MANAGERS                  QString("SELECT `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (3, 6) GROUP BY t1.`id`;")
+#define QUERY_SEL_PRT_RQST_MANAGERS(permId) QString("SELECT t1.`username`, t1.`id` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.id = t2.user_id LEFT JOIN `permissions_roles` AS t3 ON t2.`role_id` = t3.`role_id` WHERE t3.`permission_id` = %1 GROUP BY t1.`id`;").arg((permId))
 #define QUERY_SEL_ENGINEERS                 QString("SELECT `username`, t1.`id`, `name`,  `surname`,  `patronymic`, `office`, `inform_comment`, `inform_status` FROM `users` AS t1 LEFT JOIN `roles_users` AS t2 ON t1.`id` = t2.`user_id` WHERE t1.`state` = 1 AND t2.role_id IN (2, 5) GROUP BY t1.`id`;")
 #define QUERY_SEL_ITEM_BOXES(office)        QString("SELECT t1.`name`, t1.`id`, t1.`places`, t1.`color` FROM `boxes` AS t1 LEFT JOIN `stores` AS t2 ON t1.`store_id` = t2.`id` WHERE t2.`office` = %1 AND t1.`non_items` = 0 ORDER BY t1.`name`;").arg((office))
 #define QUERY_SEL_REPAIR_BOXES              QString("SELECT `name`, `id`,`places`, `color` FROM `boxes` WHERE `non_items` = 1 ORDER BY `name`;")
@@ -950,6 +951,168 @@
                                                 "LEFT JOIN `clients` AS t2                                                         \n"\
                                                 "  ON t1.`client` = t2.`id`                                                          "\
                                                 )
+
+#define QUERY_SEL_PARTS_REQUESTS_NO_GROUPING    QString(                                                                              \
+                                                "SELECT                                                                            \n"\
+                                                "  NULL AS 'group',                                                                \n"\
+                                                "  '' AS 'count',                                                                  \n"\
+                                                "  NULL AS 'id',                                                                   \n"\
+                                                "  0 AS 'C'                                                                          "\
+                                                )
+
+#define QUERY_SEL_PARTS_REQUESTS_GROUP_CLIENT   QString(                                                                              \
+                                                "SELECT                                                                            \n"\
+                                                "  NULL AS 'group',                                                                \n"\
+                                                "  NULL AS 'sel',                                                                  \n"\
+                                                "  '' AS 'count',                                                                  \n"\
+                                                "  NULL AS 'id',                                                                   \n"\
+                                                "  0 AS 'C'                                                                        \n"\
+                                                "UNION ALL                                                                         \n"\
+                                                "SELECT                                                                            \n"\
+                                                "  IF( t3.`type`,                                                                  \n"\
+                                                "    IF( LENGTH(TRIM(t3.`ur_name`)),                                               \n"\
+                                                "      t3.`ur_name`,                                                               \n"\
+                                                "      t3.`name`                                                                   \n"\
+                                                "    ),                                                                            \n"\
+                                                "    CONCAT_WS(' ',                                                                \n"\
+                                                "              t3.`surname`,                                                       \n"\
+                                                "              t3.`name`,                                                          \n"\
+                                                "              t3.`patronymic`)                                                    \n"\
+                                                "  ) AS 'group',                                                                   \n"\
+                                                "  NULL AS 'sel',                                                                  \n"\
+                                                "  SUM(1) AS 'count',                                                              \n"\
+                                                "  `client` AS 'id',                                                               \n"\
+                                                "  1                                                                               \n"\
+                                                "FROM                                                                              \n"\
+                                                "  `parts_request` AS t1                                                           \n"\
+                                                "  LEFT JOIN `parts_request_employees` AS t2                                       \n"\
+                                                "    ON t1.`id` = t2.`request`                                                     \n"\
+                                                "  LEFT JOIN `clients` AS t3                                                       \n"\
+                                                "    ON t1.`client` = t3.`id`                                                      \n"\
+                                                "WHERE                                                                             \n"\
+                                                "  `client` IS NOT NULL                                                            \n"\
+                                                "GROUP BY `client`;                                                                  "\
+                                                )
+
+#define QUERY_SEL_PARTS_REQUESTS_GROUP_FIELD(field) QString(                                                                              \
+                                                "SELECT                                                                            \n"\
+                                                "  NULL AS 'group',                                                                \n"\
+                                                "  NULL AS 'sel',                                                                  \n"\
+                                                "  '' AS 'count',                                                                  \n"\
+                                                "  NULL AS 'id',                                                                   \n"\
+                                                "  0 AS 'C'                                                                        \n"\
+                                                "UNION ALL                                                                         \n"\
+                                                "SELECT                                                                            \n"\
+                                                "  `%1` AS 'group',                                                                \n"\
+                                                "  NULL AS 'sel',                                                                  \n"\
+                                                "  SUM(1) AS 'count',                                                              \n"\
+                                                "  `%1` AS 'id',                                                                   \n"\
+                                                "  1                                                                               \n"\
+                                                "FROM                                                                              \n"\
+                                                "  `parts_request` AS t1                                                           \n"\
+                                                "  LEFT JOIN `parts_request_employees` AS t2                                       \n"\
+                                                "    ON t1.`id` = t2.`request`                                                     \n"\
+                                                "WHERE                                                                             \n"\
+                                                "  `%1` IS NOT NULL                                                                \n"\
+                                                "GROUP BY `%1`;                                                                      "\
+                                                ).arg((field))
+
+#define QUERY_SEL_PARTS_REQUESTS_GROUPS_SUPPLIER QString(                                                                                              \
+                                                "SELECT                                                                                             \n"\
+                                                "  NULL AS 'group',                                                                                 \n"\
+                                                "  NULL AS 'sel',                                                                                   \n"\
+                                                "  NULL AS 'count',                                                                                 \n"\
+                                                "  NULL AS 'id',                                                                                    \n"\
+                                                "  0 AS 'C'                                                                                         \n"\
+                                                "UNION                                                                                              \n"\
+                                                "SELECT DISTINCT                                                                                    \n"\
+                                                "  IF(t4.`id` IS NULL,                                                                              \n"\
+                                                "     IFNULL(t6.`ur_name`, CONCAT_WS(' ', t6.`surname`, t6.`name`, t6.`patronymic`)),               \n"\
+                                                "     IF(t4.`supplier_id` IS NULL,                                                                  \n"\
+                                                "        t4.`supplier_url`,                                                                         \n"\
+                                                "        IFNULL(t5.`ur_name`, CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)))) AS 'group',   \n"\
+                                                "  SUM(IFNULL(t4.`select`, 0)) AS 'sel',                                                            \n"\
+                                                "  IF(t1.`dealer` IS NOT NULL OR t4.`supplier_id` IS NOT NULL OR t4.`supplier_url` IS NOT NULL, COUNT(DISTINCT t1.`id`), NULL) AS 'count',  \n"\
+                                                "  IF(t4.`supplier_id` IS NOT NULL OR t4.`supplier_url` IS NOT NULL, t4.`supplier_id`, t1.`dealer`) AS 'id',    \n"\
+                                                "  IF(t1.`dealer` IS NOT NULL OR t4.`supplier_id` IS NOT NULL OR t4.`supplier_url` IS NOT NULL, 1, 0) AS 'C'  \n"\
+                                                "FROM                                                                                               \n"\
+                                                "  `parts_request` AS t1                                                                            \n"\
+                                                "  LEFT JOIN `parts_request_employees` AS t2                                                        \n"\
+                                                "    ON t1.`id` = t2.`request`                                                                      \n"\
+                                                "  LEFT JOIN `parts_request_suppliers` AS t4                                                        \n"\
+                                                "    ON t1.`id` = t4.`request_id`                                                                   \n"\
+                                                "  LEFT JOIN `clients` AS t5                                                                        \n"\
+                                                "    ON t4.`supplier_id` = t5.`id`                                                                  \n"\
+                                                "  LEFT JOIN `clients` AS t6                                                                        \n"\
+                                                "    ON t1.`dealer` = t6.`id`                                                                       \n"\
+                                                "WHERE                                                                                              \n"\
+                                                "  (t1.`dealer` IS NOT NULL OR t4.`supplier_id` IS NOT NULL OR t4.`supplier_url` IS NOT NULL)       \n"\
+                                                "GROUP BY                                                                                           \n"\
+                                                "  `group`;                                                                                           "\
+                                                )
+
+#define QUERY_SEL_PART_REQUEST(requestId)       QString(                                                                                               \
+                                                "SELECT                                                                                             \n"\
+                                                "  `id`,                                                                                            \n"\
+                                                "  `request_time`,                                                                                  \n"\
+                                                "  `from_user`,                                                                                     \n"\
+                                                "  `repair`,                                                                                        \n"\
+                                                "  `client`,                                                                                        \n"\
+                                                "  `state`,                                                                                         \n"\
+                                                "  `end_date`,                                                                                      \n"\
+                                                "  `plan_end_date`,                                                                                 \n"\
+                                                "  `summ`,                                                                                          \n"\
+                                                "  `tracking`,                                                                                      \n"\
+                                                "  `item_id`,                                                                                       \n"\
+                                                "  `item_name`,                                                                                     \n"\
+                                                "  `notes`,                                                                                         \n"\
+                                                "  `url`,                                                                                           \n"\
+                                                "  `pririty`,                                                                                       \n"\
+                                                "  `count`,                                                                                         \n"\
+                                                "  `dealer`                                                                                         \n"\
+                                                "FROM `parts_request`                                                                               \n"\
+                                                "WHERE `id` = %1;                                                                                     "\
+                                                ).arg((requestId))
+
+#define QUERY_SEL_PARTS_REQUESTS_STATIC         QString(                                                                                               \
+                                                "SELECT                                                                                             \n"\
+                                                "  0 AS 'select',                                                                                   \n"\
+                                                "  t1.`id`,                                                                                         \n"\
+                                                "  t1.`request_time`,                                                                               \n"\
+                                                "  t1.`from_user`,                                                                                  \n"\
+                                                "  IF(t3.`type`, IF(LENGTH(TRIM(t3.`ur_name`)), t3.`ur_name`, t3.`name`), CONCAT_WS(' ', t3.`surname`, t3.`name`, t3.`patronymic`)) AS 'client',\n"\
+                                                "  t1.`item_name`,                                                                                  \n"\
+                                                "  t1.`count`,                                                                                      \n"\
+                                                "  IF(t6.`type`, IF(LENGTH(TRIM(t6.`ur_name`)), t6.`ur_name`, t6.`name`), CONCAT_WS(' ', t6.`surname`, t6.`name`, t6.`patronymic`)) AS 'dealer',\n"\
+                                                "  t1.`repair`,                                                                                     \n"\
+                                                "  t1.`state`,                                                                                      \n"\
+                                                "  t1.`tracking`,                                                                                   \n"\
+                                                "  t1.`pririty`,                                                                                    \n"\
+                                                "  t1.`state`,                                                                                      \n"\
+                                                "  t1.`end_date`,                                                                                   \n"\
+                                                "  t1.`plan_end_date`,                                                                              \n"\
+                                                "  t1.`summ`,                                                                                       \n"\
+                                                "  t1.`item_id`,                                                                                    \n"\
+                                                "  t1.`notes`,                                                                                      \n"\
+                                                "  t1.`url`,                                                                                        \n"\
+                                                "  t3.`short_name` AS 'client_short_name'                                                           \n"\
+                                                "FROM                                                                                               \n"\
+                                                "  `parts_request` AS t1                                                                            \n"\
+                                                "  LEFT JOIN `parts_request_employees` AS t2                                                        \n"\
+                                                "    ON t1.`id` = t2.`request`                                                                      \n"\
+                                                "  LEFT JOIN `clients` AS t3                                                                        \n"\
+                                                "    ON t1.`client` = t3.`id`                                                                       \n"\
+                                                "  LEFT JOIN `parts_request_suppliers` AS t4                                                        \n"\
+                                                "    ON t4.`request_id` = t1.`id`                                                                   \n"\
+                                                "  LEFT JOIN `clients` AS t5                                                                        \n"\
+                                                "    ON t4.`supplier_id` = t5.`id`                                                                  \n"\
+                                                "  LEFT JOIN `clients` AS t6                                                                        \n"\
+                                                "    ON t1.`dealer` = t6.`id`                                                                         "\
+                                                )
+
+#define QUERY_SEL_PRT_RQST_SUPPLIERS(rqstId) QString("SELECT `id`, `request_id`, `supplier_id`, `supplier_url`, `item_url`, `moq`, `price`, `select`, `notes` FROM `parts_request_suppliers` WHERE `request_id` = %1;").arg((rqstId))
+
+#define QUERY_UPD_PRT_RQST_SUPPLIERS_SEL(id, rqst)   QString("UPDATE `parts_request_suppliers` SET `select` = IF(`id` = %1, 1, 0) WHERE `request_id` = %2;").arg((id)).arg((rqst))
 
 #define QUERY_UPD_CLIENT_PURCHASES(id, num)      QString("UPDATE `clients` SET `purchases`=`purchases`+(%2) WHERE `id` = %1;").arg((id)).arg((num))
 #define QUERY_UPD_CLIENT_REPAIRS(id)      QString("UPDATE `clients` SET `repairs`=`repairs`+1 WHERE `id` = %1;").arg((id))

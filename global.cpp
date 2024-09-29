@@ -5,6 +5,7 @@
 #include "models/sstoreitemmodel.h"
 #include "models/sofficemodel.h"
 #include "models/stableclientsmodel.h"
+#include "modules/purchasemanager/srequestsmodel.h"
 
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
@@ -22,6 +23,7 @@ QMap<int, QString> *allUsersMap = new QMap<int, QString>;
 SSqlQueryModel *usersModel = new SSqlQueryModel;
 SSqlQueryModel *usersSalaryTaxesModel = new SSqlQueryModel;
 SSqlQueryModel *managersModel = new SSqlQueryModel;
+SSqlQueryModel *partRequestManagersModel;
 SSqlQueryModel *engineersModel = new SSqlQueryModel;
 SSqlQueryModel *itemBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *repairBoxesModel = new SSqlQueryModel;
@@ -75,6 +77,8 @@ QVector<QWidget*> tabList;
 SStandardItemModel *cartridgeRepeatReason = new SStandardItemModel();
 SStandardItemModel *cartridgeMaterialsListModel;
 SStandardItemModel *currencyListModel = new SStandardItemModel();
+SStandardItemModel *partRequestStatesListModel;
+SStandardItemModel *partRequestPrioritiesListModel;
 
 //QWidget *modalWidget = nullptr;
 
@@ -229,6 +233,10 @@ void initGlobalModels()
     }
     currencyListModel->setObjectName("currency");
     currencyListModel->setHorizontalHeaderLabels({"name", "id"});
+
+    partRequestStatesListModel = SPartRequest::statesList();
+    partRequestPrioritiesListModel = SPartRequest::prioritiesList();
+    partRequestManagersModel = SPartRequest::managersList();
 
 #ifdef QT_DEBUG
     initClients4Test();

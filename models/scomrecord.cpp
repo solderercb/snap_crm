@@ -44,6 +44,8 @@ bool SComRecord::commit()
 {
     SDatabaseRecord::commit();
     i_nErr &= commitLogs();
+    if(i_nErr)
+        SDatabaseRecord::setDirty(false);
     return i_nErr;
 }
 
@@ -90,6 +92,14 @@ void SComRecord::initQueryFields(const QList<QStandardItem *> &record)
 
         setQueryField(i, record.at(i)->data(Qt::DisplayRole), record.at(i)->data(DataRoles::OldValue));
     }
+}
+
+/* Сброс флага наличия несохранённых изменений должен быть сброшен только после выполнения запросов
+ * записи в таблицу logs, поэтому в этом переопределённом методе ничего не нужно делать.
+ * TODO: позже нужно переделать; см. комментарий к методу SComRecord::dbErrFlagHandler
+*/
+void SComRecord::setDirty(const bool state)
+{
 }
 
 /* Метод получения данных для отчетов LimeReport

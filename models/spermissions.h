@@ -118,6 +118,7 @@ public:
     PROPSTRUCT_FIELD(int, editPaymentSystemInCommittedCashRegisters, dummy)
     PROPSTRUCT_FIELD(int, viewEmployeesSalary, dummy)
     PROPSTRUCT_FIELD(int, workWithTechReports, dummy)
+    PROPSTRUCT_FIELD(int, viewAllPartsRequests, dummy)
 public:
     explicit SPermissions();
     QStringList list();
@@ -402,6 +403,7 @@ inline void SPermissions::translateNames()
     tr("editPaymentSystemInCommittedCashRegisters");
     tr("viewEmployeesSalary");
     tr("workWithTechReports");
+    tr("viewAllPartsRequests");
 }
 
 #endif // SPERMISSIONS_H

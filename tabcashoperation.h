@@ -60,7 +60,7 @@ private:
     int m_linkType = LinkType::NoLink;
     bool m_clientWidgetVisible = true;
     int m_clientWidgetMode = ClientMode::Client;
-    int m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied;
+    int m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard;
     QString m_generatedReason;
     bool m_reasonRO = 1;
     bool m_amountRO = 0;

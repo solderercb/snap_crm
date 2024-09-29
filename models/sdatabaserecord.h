@@ -26,6 +26,8 @@ public:
     QString created();
     void setCreated(const QDateTime &timestamp);
     static bool checkSystemTime();
+    bool isDirty();
+    virtual void setDirty(bool state);
 protected:
     int i_id = 0;
     bool i_nErr = 1;
@@ -43,6 +45,7 @@ protected:
 private:
     int m_newId = 0;
     bool m_isIdColumnNameSet = 0;
+    bool m_isDirty = 0;
     bool checkObligatoryFields();
     bool checkTableName();
 signals:

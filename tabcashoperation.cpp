@@ -306,7 +306,7 @@ bool tabCashOperation::commit(bool repeatAfter)
 
             m_comboBoxTypeRO = 1;
             m_amountRO = 1;
-            m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied;
+            m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard;
             m_checkBoxPrintVisible = 0;
             m_reasonRO = 1;
         }
@@ -770,7 +770,7 @@ void tabCashOperation::operationTypeChanged(int index)
     else
     {
         m_comboBoxTypeRO = 1;
-        m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied;
+        m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard;
         m_amountRO = true;
         m_checkBoxPrintVisible = 0;
         if(m_amount >= 0)
@@ -790,19 +790,19 @@ void tabCashOperation::operationTypeChanged(int index)
         case SCashRegisterModel::ExpBalance:
         case SCashRegisterModel::RecptBalance: m_showBalance = 1; m_skipAutoLogRecord = 1; break;                                /* нет полей связанного объекта; поле с балансом */
         case SCashRegisterModel::ExpInvoice:   m_linkType = LinkType::Document; m_clientWidgetButtons = SClientSelectForm::AccessMode::SelectClear; break; /* выбор ПН; поля клиента RO; сумма редактируемая для "оплаты часятями" */
-        case SCashRegisterModel::RecptGoods:   m_linkType = LinkType::Document; m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied; m_amountRO = true; break;  /* выбор РН; поля клиента RO */
+        case SCashRegisterModel::RecptGoods:   m_linkType = LinkType::Document; m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard; m_amountRO = true; break;  /* выбор РН; поля клиента RO */
         case SCashRegisterModel::ExpZ:         m_clientWidgetMode = ClientMode::NotVisible; m_skipAutoLogRecord = 1; break;                /* нет полей связанного объекта; нет полей клиента */
-        case SCashRegisterModel::RecptPrepayRepair: m_skipAutoLogRecord = 1; m_linkType = LinkType::Repair; m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied; break;     /* поля клиента RO; при предоплате за ремонт запись в журнал производится в классе SRepair */
-        case SCashRegisterModel::RecptRepair:  m_amountRO = true; m_linkType = LinkType::Repair; m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied; break;    /* аналогично предоплате, но сумма не редактируемая */
-        case SCashRegisterModel::RecptInvoice: m_linkType = LinkType::Invoice; m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied; m_amountRO = true; m_skipAutoLogRecord = 1; break;   /* выбор счета; поля клиента RO */
+        case SCashRegisterModel::RecptPrepayRepair: m_skipAutoLogRecord = 1; m_linkType = LinkType::Repair; m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard; break;     /* поля клиента RO; при предоплате за ремонт запись в журнал производится в классе SRepair */
+        case SCashRegisterModel::RecptRepair:  m_amountRO = true; m_linkType = LinkType::Repair; m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard; break;    /* аналогично предоплате, но сумма не редактируемая */
+        case SCashRegisterModel::RecptInvoice: m_linkType = LinkType::Invoice; m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard; m_amountRO = true; m_skipAutoLogRecord = 1; break;   /* выбор счета; поля клиента RO */
         case SCashRegisterModel::RecptSimple:
         case SCashRegisterModel::ExpSimple:    m_skipAutoLogRecord = 1; break;
         case SCashRegisterModel::ExpSubsist:
-        case SCashRegisterModel::ExpSalary:    m_clientWidgetMode = ClientMode::Employee; m_widgetClientLabel = tr("Сотрудник"); m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied; break;  /* только просмотр; в поле клиента пишем данные сотрудника */
+        case SCashRegisterModel::ExpSalary:    m_clientWidgetMode = ClientMode::Employee; m_widgetClientLabel = tr("Сотрудник"); m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard; break;  /* только просмотр; в поле клиента пишем данные сотрудника */
         case SCashRegisterModel::AddSubCash:   m_clientWidgetMode = ClientMode::NotVisible; break;                /* только просмотр; нет полей клиента */
         case SCashRegisterModel::ExpRepair:    m_linkType = LinkType::Repair; break;       /* только просмотр */
         case SCashRegisterModel::ExpGoods:     m_linkType = LinkType::Document; break;     /* только просмотр */
-        case SCashRegisterModel::ExpDealer:    m_clientWidgetButtons = SClientSelectForm::AccessMode::Denied; break;          /* только просмотр */
+        case SCashRegisterModel::ExpDealer:    m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard; break;          /* только просмотр */
         case SCashRegisterModel::ExpRevert:    /*m_paymentAccountRO = 1; не помню почему не допускается выбор платёжной системы */m_skipAutoLogRecord = 1; break;
 //        case SCashRegisterModel::MoveCash:     m_clientWidgetMode = ClientMode::NotVisible; break;              /* TODO: */
     }

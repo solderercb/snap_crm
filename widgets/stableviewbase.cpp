@@ -466,7 +466,6 @@ void STableViewBase::horizontalHeaderSectionClicked(const int logicalIndex)
 void STableViewBase::cutToClipboard()
 {
     copyToClipboard();
-    qDebug() << "[" << this << "] () | data copied; removing not implemented";
 }
 
 /* Преобразование QModelIndexList в двумерный массив QModelIndex
@@ -608,14 +607,13 @@ void STableViewBase::toggleOrder(int logicalIndex)
 {
     if(m_sortColumn == -1 || m_sortColumn != logicalIndex)
     {
-        m_sortColumn = logicalIndex;
-        m_sortOrder = Qt::AscendingOrder;
+        setSorting(logicalIndex, Qt::AscendingOrder);
     }
     else if(m_sortOrder == Qt::AscendingOrder)
-        m_sortOrder = Qt::DescendingOrder;
+        setSorting(m_sortColumn, Qt::DescendingOrder);
     else    // m_sortColumn >=0 && m_sortOrder == Qt::DescendingOrder
     {
-        m_sortColumn = -1;
+        setSorting(-1, Qt::AscendingOrder);
     }
 
     applySorting();
@@ -1008,6 +1006,16 @@ void STableViewBase::saveScrollPos()
     i_vspTopVisibleRowUniqueId = index.siblingAtColumn(m_uniqueIdColumn).data();
 }
 
+/* Очистка сохранённых значений положения прокрутки
+ * По умолчанию используется с моделями данных типа STableBaseModel
+ * В случае использования модели другого типа необходимо переопределить этот метод
+*/
+void STableViewBase::clearVScrollPos()
+{
+    i_vspOldRowCount = 0;
+    i_vspValue = -1;
+}
+
 /* Вычисление смещения положения вертикальной полосы прокрутки.
  * Предназначена для случаев, если изменилось кол-во строк в модели данных таблицы после обновления
 */
@@ -1290,7 +1298,7 @@ void STableViewBase::autorefreshTable()
 {
     if(m_delayedRefreshPending)
     {
-        refresh(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+        refreshPending();
         m_delayedRefreshPending = 0;
     }
     else
@@ -1335,10 +1343,10 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
     verticalScrollBar()->setValue(0);
     clearModel();
 
+
     if(m_queryConditionsChanged)
     {
-        i_vspOldRowCount = 0;
-        i_vspValue = -1;
+        clearVScrollPos();
         m_queryConditionsChanged = 0;
     }
 
@@ -1350,6 +1358,15 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
         horizontalHeader()->blockSignals(false);
     }
     restoreSelection();
+}
+
+/* Обновление таблицы с обнулением положения прокрутки и снятия выделения
+ * Метод используется в механизме обновления с задержкой
+ * Может быть переопределён в наследующем классе для выполнения дополнительных действий
+*/
+void STableViewBase::refreshPending()
+{
+    refresh(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
 }
 
 void STableViewBase::applyGuiSettings()

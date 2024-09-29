@@ -27,6 +27,8 @@
     <file>light/1F512_32.png</file>
     <file>light/1F3E0_32.png</file>
     <file>light/down-arrow.png</file>
+    <file>light/pencil_16.png</file>
+    <file>light/pencil2_16.png</file>
     <file>light/toggle_sw_on.png</file>
     <file>light/toggle_sw_off.png</file>
     <file>light/mode_sw_left.png</file>
@@ -37,5 +39,9 @@
     <file>light/checkbox-flat-excl.png</file>
     <file>light/checkbox-flat-checked.png</file>
     <file>light/checkbox-flat-unchecked.png</file>
+    <file>light/antenna_1b_32.png</file>
+    <file>light/antenna_2b_32.png</file>
+    <file>light/antenna_3b_32.png</file>
+    <file>light/antenna_4b_32.png</file>
   </qresource>
 </RCC>

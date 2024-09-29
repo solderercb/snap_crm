@@ -101,6 +101,8 @@ public slots:
     void createTabSparePartReserve(int);
     void switchToLastUsedTab();
     void createTabTechReports();
+    void createTabPurchaseManager();
+    QWidget *createTabPartRequest(const int id);
     void reactivateCallerTab(QWidget *);
 private slots:
     void reactivateTabRepairNew(int);

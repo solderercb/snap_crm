@@ -231,6 +231,7 @@ bool SDatabaseRecord::commit()
     if(!i_nErr)
         throw Global::ThrowType::QueryError;
 
+    setDirty(false);
     return i_nErr;
 }
 
@@ -243,6 +244,20 @@ void SDatabaseRecord::dbErrFlagHandler(bool flushValues)
 
     if(i_nErr && flushValues)
         i_valuesMap.clear();
+}
+
+bool SDatabaseRecord::isDirty()
+{
+    return m_isDirty;
+}
+
+/* Флаг наличия несохранённых данных (true) должен устанавливаться вручную
+ * После успешного выполнения запроса флаг сбрасывается автоматически
+ * TODO: позже нужно переделать; см. комментарий к методу SComRecord::dbErrFlagHandler
+*/
+void SDatabaseRecord::setDirty(bool state)
+{
+    m_isDirty = state;
 }
 
 

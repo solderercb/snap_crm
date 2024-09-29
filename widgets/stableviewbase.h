@@ -70,7 +70,9 @@ public:
     void clearSelection();
     void setLayoutVariant(const SLocalSettings::SettingsVariant &layoutVariant);
     void enableAutorefresh(const int msec);
-    void delayedRefresh(const int msec);
+    virtual void delayedRefresh(const int msec);
+    virtual void refreshPending();
+    virtual void refresh(bool preserveScrollPos = ScrollPosReset, bool preserveSelection = SelectionReset);
     void restartAutorefreshTimer();
     Qt::SortOrder sortOrder();
     int sortSection();
@@ -108,7 +110,7 @@ protected:
     void initAutosizedColumns();
     void adoptAutosizedColumns();
     virtual void setColumnWidth(int column, int width);
-    void setDefaultLayoutParams();
+    virtual void setDefaultLayoutParams();
     void setDefaultColumnParams(const int column, const QString &label, const int width);
     void readLayout();
     void initHorizontalHeaderMenu();
@@ -116,6 +118,7 @@ protected:
     void resetRowVisibility();
     void vScrollCorrection();
     void saveScrollPos();
+    virtual void clearVScrollPos();
     virtual void restoreVScrollPos();
     virtual void restoreHScrollPos();
     void saveSelection();
@@ -130,7 +133,7 @@ protected:
     virtual void fetchMore(const QModelIndex &parent);
     virtual void layoutChanged(int,int,int);
     void undoToggleSortIndicator();
-    void setSorting(const int logicalIndex, const Qt::SortOrder order);
+    virtual void setSorting(const int logicalIndex, const Qt::SortOrder order);
     virtual void applySorting();
     void keyPressEvent(QKeyEvent *event) override;
     virtual void selectionToArray(const QModelIndexList &selection, QMap<int, QMap<int, QModelIndex>> &array);
@@ -160,7 +163,6 @@ private:
 public slots:
     void reset() override;
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс
-    virtual void refresh(bool preserveScrollPos = ScrollPosReset, bool preserveSelection = SelectionReset);
     virtual void applyGuiSettings();
     void hideColumn(const int col);
     void toggleOrder(int logicalIndex);

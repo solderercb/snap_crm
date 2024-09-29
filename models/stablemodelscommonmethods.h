@@ -26,6 +26,7 @@ public:
     QVariant unformattedData(const QModelIndex &item, int role = Qt::DisplayRole) const;
     QVariant unformattedData(const int row, const int column, int role = Qt::DisplayRole) const;
     void setColumnWidth(const int column, const int width);
+    void setRecordValue(QSqlRecord &record, const int field, const QVariant &value);
 private:
     QModelIndex index_(const int row, const int column) const;
     int rowCount_();

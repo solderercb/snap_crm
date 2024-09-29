@@ -136,6 +136,12 @@ void STableModelsCommonMethods::setColumnWidth(const int column, const int width
     i_columnWidths[column] = width;
 }
 
+void STableModelsCommonMethods::setRecordValue(QSqlRecord &record, const int field, const QVariant &value)
+{
+    record.setValue(field, value);
+    record.setGenerated(field, true);
+}
+
 int STableModelsCommonMethods::columnIndex(const QString &name)
 {
     int enumIndex = this->metaObject()->indexOfEnumerator("Columns");

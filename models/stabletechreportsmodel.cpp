@@ -26,6 +26,9 @@ QVariant STableTechReportsModel::data(const QModelIndex &index, int role) const
     return STableBaseModel::data(index, role);
 }
 
+/*
+    TODO: аналогичный код используется в SPartsRequestsModel и STableRepairsModel; нужно сделать общий
+*/
 QVariant STableTechReportsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)

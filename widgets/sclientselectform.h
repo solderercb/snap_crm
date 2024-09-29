@@ -14,7 +14,7 @@ class SClientSelectForm : public SClientInputFormBase
 {
     Q_OBJECT
 public:
-    enum AccessMode {Full = 0, SelectClear = 1, Denied = 2};
+    enum AccessMode {Full = 0, SelectClear = 1, ViewCard = 2, Denied = 3};
     explicit SClientSelectForm(QWidget *parent = nullptr);
     ~SClientSelectForm();
     SClientModel *clientModel();

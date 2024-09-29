@@ -44,6 +44,9 @@ public:
     void startPopupShowIntervalTimer();
     void setPopupShowIntervalObserved();
     void setListRowHeight(const int height);
+    void setRowHidden(const int row, const bool state = true);
+    void hideRow(const int row);
+    void setFont(const QFont &font);
     void applyGuiSettings();
 protected:
     QAbstractItemView *listViewWidget = nullptr;

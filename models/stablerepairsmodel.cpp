@@ -108,6 +108,9 @@ void STableRepairsModel::reportCallbackData(const LimeReport::CallbackInfo &info
     }
 }
 
+/*
+    TODO: аналогичный код используется в STableTechReportsModel и SPartsRequestsModel; нужно сделать общий
+*/
 QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)

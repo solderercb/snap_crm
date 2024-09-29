@@ -255,13 +255,18 @@ void SClientSelectForm::setDefaultStylesheets()
 
 void SClientSelectForm::setHandlingButtons(int mode)
 {
+    if(!permissions->viewClients)
+        mode = AccessMode::Denied;
     bool ro = (mode != AccessMode::Full);
     if(mode == AccessMode::Denied)
     {
-        if(m_clientId && permissions->viewClients)
+        ui->lineEditLastName->clearButtons();
+        ui->widgetClientMatch->hide();
+    }
+    else if(mode == AccessMode::ViewCard)
+    {
+        if(m_clientId)
             ui->lineEditLastName->setButtons("Open");
-        else
-            ui->lineEditLastName->clearButtons();
         ui->widgetClientMatch->hide();
     }
     else if(mode == AccessMode::SelectClear)
@@ -271,7 +276,7 @@ void SClientSelectForm::setHandlingButtons(int mode)
         else
             ui->lineEditLastName->setButtons("Search");
     }
-    else
+    else // Full
     {
         if(m_clientId)
             ui->lineEditLastName->setButtons("Clear");

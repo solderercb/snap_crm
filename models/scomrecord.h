@@ -25,6 +25,7 @@ public:
     void appendLogText(const QString&, const QString &disambiguation);
     void removeLogText(const QString &disambiguation);
     virtual void initDemo(){};
+    virtual void setDirty(const bool state) override;
 protected:
     virtual bool commit() override;
     virtual void dbErrFlagHandler(bool flushCache = true) override;

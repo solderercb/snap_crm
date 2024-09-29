@@ -345,6 +345,28 @@ void SComboBox::setListRowHeight(const int height)
     applyListViewRowHeight();
 }
 
+// Скрытие элемента модели данных в выпадающем списке; найдено: https://stackoverflow.com/a/52164503
+void SComboBox::setRowHidden(const int row, const bool state)
+{
+    if(!model())
+        Q_ASSERT_X(0, "SComboBox::setRowHidden(int, int)", "Data model not set");
+
+    QListView *view = static_cast<QListView*>(this->view());
+    view->setRowHidden(row, state);
+}
+
+void SComboBox::hideRow(const int row)
+{
+    setRowHidden(row);
+}
+
+void SComboBox::setFont(const QFont &font)
+{
+    QComboBox::setFont(font);
+    szHint = QComboBox::sizeHint();
+    minSzHint = QComboBox::minimumSizeHint();
+}
+
 void SComboBox::applyGuiSettings()
 {
 
@@ -409,6 +431,11 @@ void SComboBox::setEditable(bool editable)
     if(editable)
     {
         initLineEdit();
+        connect(lineEditWidget, &SLineEdit::editingFinished, this, &SComboBox::longTextHandler);
+    }
+    else
+    {
+        disconnect(lineEditWidget, &SLineEdit::editingFinished, this, &SComboBox::longTextHandler);
     }
 
     if(lineEditWidget)

@@ -74,7 +74,13 @@ SOURCES += \
     models/sdatabaseauxiliary.cpp \
     models/seditablebasemodel.cpp \
     models/sofficemodel.cpp \
+    modules/purchasemanager/srequest.cpp \
+    modules/purchasemanager/sgroupingmodel.cpp \
+    modules/purchasemanager/ssupplier.cpp \
+    models/srelationalbasemodel.cpp \
     models/stableclientsmodel.cpp \
+    modules/purchasemanager/srequestsmodel.cpp \
+    modules/purchasemanager/ssuppliersmodel.cpp \
     models/ssqlfetchingmodel.cpp \
     models/stablemodelscommonmethods.cpp \
     models/stablerepairsmodel.cpp \
@@ -122,6 +128,8 @@ SOURCES += \
     models/sphonesmodel.cpp \
     reports/sprintposreport.cpp \
     sapplication.cpp \
+    modules/purchasemanager/tabrequest.cpp \
+    modules/purchasemanager/tabmanager.cpp \
     tabreceptcartridge.cpp \
     tabrepaircartridges.cpp \
     tabsalary.cpp \
@@ -149,6 +157,7 @@ SOURCES += \
     widgets/scartridgeform.cpp \
     widgets/scartridgematerialstableitemdelegates.cpp \
     widgets/scartridgecard.cpp \
+    widgets/scheckcombobox.cpp \
     widgets/sclientinputform.cpp \
     widgets/sclientinputformbase.cpp \
     widgets/sclientselectform.cpp \
@@ -160,7 +169,10 @@ SOURCES += \
     widgets/settingstabwidgets/ssettingspageuser.cpp \
     widgets/settingstabwidgets/stableviewpermissions.cpp \
     widgets/smodalwidget.cpp \
+    widgets/snotification.cpp \
     widgets/spageclientsummary.cpp \
+    modules/purchasemanager/srequestswidget.cpp \
+    modules/purchasemanager/ssupplierswidget.cpp \
     widgets/srepairstablefiltermenu.cpp \
     squerylog.cpp \
     tabcashmoveexch.cpp \
@@ -184,6 +196,8 @@ SOURCES += \
     widgets/stableviewboqworkshop.cpp \
     widgets/stableviewclients.cpp \
     widgets/stableviewclientsitemdelegates.cpp \
+    modules/purchasemanager/ssupplierstable.cpp \
+    modules/purchasemanager/srequeststable.cpp \
     widgets/stableviewrepairsitemdelegates.cpp \
     widgets/stableviewrepairs.cpp \
     widgets/sdialogissuerepair.cpp \
@@ -252,7 +266,13 @@ HEADERS  += \
     models/sdatabaseauxiliary.h \
     models/seditablebasemodel.h \
     models/sofficemodel.h \
+    modules/purchasemanager/srequest.h \
+    modules/purchasemanager/sgroupingmodel.h \
+    modules/purchasemanager/ssupplier.h \
+    models/srelationalbasemodel.h \
     models/stableclientsmodel.h \
+    modules/purchasemanager/srequestsmodel.h \
+    modules/purchasemanager/ssuppliersmodel.h \
     models/spermissions.h \
     models/ssqlfetchingmodel.h \
     models/stablemodelscommonmethods.h \
@@ -303,6 +323,8 @@ HEADERS  += \
     models/sphonesmodel.h \
     reports/sprintposreport.h \
     sapplication.h \
+    modules/purchasemanager/tabrequest.h \
+    modules/purchasemanager/tabmanager.h \
     tabreceptcartridge.h \
     tabrepaircartridges.h \
     tabsalary.h \
@@ -330,6 +352,7 @@ HEADERS  += \
     widgets/scartridgeform.h \
     widgets/scartridgematerialstableitemdelegates.h \
     widgets/scartridgecard.h \
+    widgets/scheckcombobox.h \
     widgets/sclientinputform.h \
     widgets/sclientinputformbase.h \
     widgets/sclientselectform.h \
@@ -341,7 +364,10 @@ HEADERS  += \
     widgets/settingstabwidgets/ssettingspageuser.h \
     widgets/settingstabwidgets/stableviewpermissions.h \
     widgets/smodalwidget.h \
+    widgets/snotification.h \
     widgets/spageclientsummary.h \
+    modules/purchasemanager/srequestswidget.h \
+    modules/purchasemanager/ssupplierswidget.h \
     widgets/srepairstablefiltermenu.h \
     squerylog.h \
     stable.h \
@@ -365,6 +391,8 @@ HEADERS  += \
     widgets/stableviewboqworkshop.h \
     widgets/stableviewclients.h \
     widgets/stableviewclientsitemdelegates.h \
+    modules/purchasemanager/ssupplierstable.h \
+    modules/purchasemanager/srequeststable.h \
     widgets/stableviewrepairsitemdelegates.h \
     widgets/stableviewgridlayout.h \
     widgets/stableviewbase.h \
@@ -397,6 +425,8 @@ FORMS += \
     mainwindow.ui \
     models/ssloptionsdialog.ui \
     models/tabsalesettingsmenu.ui \
+    modules/purchasemanager/tabrequest.ui \
+    modules/purchasemanager/tabmanager.ui \
     tabreceptcartridge.ui \
     tabrepaircartridges.ui \
     tabsalary.ui \
@@ -418,6 +448,8 @@ FORMS += \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.ui \
     widgets/settingstabwidgets/ssettingspageuser.ui \
     widgets/spageclientsummary.ui \
+    modules/purchasemanager/srequestswidget.ui \
+    modules/purchasemanager/ssupplierswidget.ui \
     widgets/srepairstablefiltermenu.ui \
     tabcashmoveexch.ui \
     tabcashoperation.ui \
