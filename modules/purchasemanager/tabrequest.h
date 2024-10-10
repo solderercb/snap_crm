@@ -46,6 +46,7 @@ private:
     void initWidgets();
     void updateWidgets();
     bool checkInput();
+    bool isManagersChanged();
     void setModelData();
     bool commit(bool repeatAfter);
     void guiFontChanged() override;

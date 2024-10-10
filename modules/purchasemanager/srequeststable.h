@@ -28,6 +28,7 @@ private:
 class STableViewPartsRequests : public STableViewBase
 {
     Q_OBJECT
+    friend class SPartsRequests;
 signals:
     void checkChanges(int &result, int mask, QMessageBox::StandardButtons buttons = QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
 public:

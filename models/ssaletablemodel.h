@@ -115,7 +115,7 @@ public:
     void setEditStrategy(const int);
     bool isWarranty();
     void setIsWarranty(const bool);
-    bool isUnsaved();
+    bool isDirty();
     void initDemo();
     QString reportUID();
     QString reportId();
@@ -156,7 +156,7 @@ private:
     double m_amountItems = 0, m_amountWorks = 0, m_amountTotal = 0;
     int m_currentIndex = -1;
     bool m_isWarranty = 0;
-    bool m_unsaved = 0;
+    bool m_isDirty = 0;
     qsizetype m_reportRowNum = 0;
     SCartridgeCardModel *m_cartridgeCardModel = nullptr;
     QList<QStandardItem *> row(int) const;

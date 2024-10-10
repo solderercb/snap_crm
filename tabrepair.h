@@ -52,6 +52,7 @@ public:
     ~tabRepair();
     QString tabTitle() override;
     bool tabCloseRequest() override;
+    static void refreshIfTabExists(const int repairId);
 private:
     Ui::tabRepair *ui;
     static QMap<int, tabRepair*> p_instance;
@@ -107,6 +108,7 @@ private:
 
 private slots:
     void reloadRepairData();
+    void reloadRequestsList();
     void updateWidgets();
     void saveState();
     void saveState(int);

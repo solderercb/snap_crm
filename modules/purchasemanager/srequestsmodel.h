@@ -24,8 +24,10 @@ public:
     bool removeRow(const int row, const QModelIndex &parent = QModelIndex());
     void clear() override;
     void setQuery(const QString &query, const QSqlDatabase &db = QSqlDatabase());
+    void setReadOnly(bool state);
 private:
     QList<QModelIndex> m_itemsToInvoice;
+    bool m_modelRO = 0;
     void translateNames();
     QVariant clientName(const QModelIndex &index) const;
     QVariant dateTime(const QModelIndex &index) const;

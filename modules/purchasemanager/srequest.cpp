@@ -458,6 +458,7 @@ void SPartRequest::updateNotifications(QList<int> managers)
 {
     QList<int> list = managers;
     list.removeOne(userDbData->id); // уведомление самому себе не нужно
+    list.removeOne(employee()); // уведомление инициатору не нужно
     updateAdditionalModel(m_notifications, list, NotificationsModelFields::Employee);
 }
 

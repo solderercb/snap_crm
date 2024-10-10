@@ -87,6 +87,10 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     ui->comboBoxNotifyStatus->setModel(notifyStatusesModel);
     ui->comboBoxNotifyStatus->blockSignals(false);
 
+    ui->textEditDiagResult->setMinimumHeight(3);
+    ui->widgetPartsRequests->setReadOnly(true);
+    ui->widgetPartsRequests->setTableLayout(SLocalSettings::RepairPartsRequestsGrid);
+
     ui->widgetBOQ->linkWithRepairModel(repairModel);
     ui->widgetBOQ->setReadOnly(true);
 
@@ -163,7 +167,7 @@ QString tabRepair::tabTitle()
 
 bool tabRepair::tabCloseRequest()
 {
-    if((!m_autosaveDiag && (m_diagChanged || m_spinBoxAmountChanged)) || (ui->widgetBOQ->isCommitted()))
+    if((!m_autosaveDiag && (m_diagChanged || m_spinBoxAmountChanged)) || ui->widgetBOQ->isDirty())
     {
         auto result = QMessageBox::question(this, tr("Данные не сохранены"), tr("Результат диагностики, согласованная сумма или список работ и деталей не сохранены!\nСохранить перед закрытием?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
         if (result == QMessageBox::Cancel)
@@ -181,6 +185,24 @@ bool tabRepair::tabCloseRequest()
     return 1;
 }
 
+void tabRepair::refreshIfTabExists(const int repairId)
+{
+    QList<tabRepair*> repairTabs;
+
+    repairTabs = MainWindow::getInstance()->findChildren<tabRepair*>();
+    if(repairTabs.count())
+    {
+        foreach (auto tab, repairTabs)
+        {
+            if(tab->repair_id != repairId)
+                continue;
+
+            tab->reloadRepairData();
+            return;
+        }
+    }
+}
+
 void tabRepair::reloadRepairData()
 {
     repairModel->load(repair_id);
@@ -189,14 +211,32 @@ void tabRepair::reloadRepairData()
         m_clientId = repairModel->clientId();
         clientModel->load(m_clientId);
     }
+
     additionalFieldsModel->load(repair_id);
-    ui->widgetBOQ->load(repair_id);
+
+    reloadRequestsList();
+
     ui->widgetComments->load(repair_id);
 
-    statusesProxyModel->setFilterRegularExpression("");
-    updateStatesModel(repairModel->state());
-    setWidgetsParams(repairModel->state());
-    updateWidgets();
+    // Перезагрузка таблицы работ и деталей (а также обновление статуса) только если она сохранена
+    if(!ui->widgetBOQ->isDirty())
+    {
+        ui->widgetBOQ->load(repair_id);
+        statusesProxyModel->setFilterRegularExpression("");
+        updateStatesModel(repairModel->state());
+        setWidgetsParams(repairModel->state());
+        updateWidgets();
+    }
+}
+
+void tabRepair::reloadRequestsList()
+{
+    FilterList filter;
+    filter.op = FilterList::And;
+    filter.fields.append(STableViewBase::initFilterField("t1.`repair`", FilterField::Equals, repair_id));
+    filter.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::NotMark|FilterField::InSet, SPartRequest::State::Cancelled));
+    ui->widgetPartsRequests->setFilter(filter);
+    ui->widgetPartsRequests->refresh();
 }
 
 void tabRepair::updateWidgets()
@@ -310,6 +350,7 @@ void tabRepair::updateWidgets()
     ui->toolButtonSaveState->setEnabled(!modelRO);
 
     ui->widgetBOQ->updateWidgets();
+    ui->widgetPartsRequests->setVisible(ui->widgetPartsRequests->requestCount() > 0);
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled);
 }
 

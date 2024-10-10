@@ -16,11 +16,11 @@ public:
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
     void setFixedHeight(int);
+    void setMinimumHeight(const int rows);
 protected:
 private:
     int m_minimumHeightHint = 21;
     void focusOutEvent(QFocusEvent *event) override;
-    void setMinimumHeight(const int rows);
     void resizeEvent(QResizeEvent *e) override;
 
 signals:

@@ -1,6 +1,7 @@
 #include "modules/purchasemanager/tabrequest.h"
 #include "ui_tabrequest.h"
 #include "modules/purchasemanager/tabmanager.h"
+#include "tabrepair.h"
 
 QMap<int, tabPartRequest*> tabPartRequest::p_instance;
 
@@ -68,19 +69,7 @@ bool tabPartRequest::tabCloseRequest()
         if(m_partRequest->id())
         {
             if(m_partRequest->dealer() != m_dealerModel->id())  throw 5;
-            foreach (auto mgr, m_partRequest->managers())
-            {
-                // Право использовать менеджер закупок может быть отозвано и некоторые заявки всегда будут считаться изменёнными
-                if(partRequestManagersModel->rowByDatabaseID(mgr) == -1)
-                    continue;
-
-                if(!ui->comboBoxManagers->checked().contains(mgr))
-                    throw 6;
-            }
-            foreach (auto mgr, ui->comboBoxManagers->checked())
-            {
-                if(!m_partRequest->managers().contains(mgr)) throw 7;
-            }
+            if(isManagersChanged()) throw 6;
             if(m_partRequest->planEndDate() != ui->dateEditPlanEndDate->date()) throw 8;
             if(m_partRequest->state() != partRequestStatesListModel->databaseIDByRow(ui->comboBoxState->currentIndex()))    throw 9;
             if(m_partRequest->priority() != partRequestPrioritiesListModel->databaseIDByRow(ui->comboBoxPriority->currentIndex()))  throw 10;
@@ -142,6 +131,7 @@ void tabPartRequest::load(const int id)
     updateTabPtr(m_initialRequestId, id);
     m_requestId = id;
     m_partRequest->load(id);
+    ui->comboBoxCreator->setCurrentIndex(usersModel->rowByDatabaseID(m_partRequest->employee()));
     ui->widgetDealerInput->fillCreds(m_partRequest->dealer());
     ui->widgetDealerInput->setHandlingButtons(m_dealerRO);
     ui->widgetSuppliers->select(id);
@@ -272,6 +262,29 @@ bool tabPartRequest::checkInput()
     return 1;
 }
 
+/* Проверка изменений отмеченных менеджеров
+ * Возвращает 1 если есть изменения
+*/
+bool tabPartRequest::isManagersChanged()
+{
+    foreach (auto mgr, m_partRequest->managers())
+    {
+        // Право использовать менеджер закупок может быть отозвано и некоторые заявки всегда будут считаться изменёнными
+        if(partRequestManagersModel->rowByDatabaseID(mgr) == -1)
+            continue;
+
+        if(!ui->comboBoxManagers->checked().contains(mgr))
+            return 1;
+    }
+    foreach (auto mgr, ui->comboBoxManagers->checked())
+    {
+        if(!m_partRequest->managers().contains(mgr))
+            return 1;
+    }
+
+    return 0;
+}
+
 void tabPartRequest::setModelData()
 {
     QDate plannedEnd = ui->dateEditPlanEndDate->date();
@@ -331,7 +344,8 @@ bool tabPartRequest::commit(bool repeatAfter)
             ui->widgetSuppliers->setRequestId(m_requestId);
         }
 
-        m_partRequest->setManagers(ui->comboBoxManagers->checked());
+        if(isManagersChanged() || m_newRequest)
+            m_partRequest->setManagers(ui->comboBoxManagers->checked());
         m_partRequest->commitManagers();
         ui->widgetSuppliers->saveLinks();
         ui->widgetSuppliers->select(m_requestId);
@@ -373,6 +387,17 @@ bool tabPartRequest::commit(bool repeatAfter)
 
     if (nErr)   // если все запросы выполнены без ошибок
     {
+        QString message;
+        if(m_newRequest)
+            message = tr("Успешно сохранёна");
+        else
+            message = tr("Изменения успешно сохранёны");
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Заявка на закупку"), message, QColor(214,239,220), QColor(229,245,234));
+
+        int rep = m_partRequest->repair();
+        if(rep)
+            tabRepair::refreshIfTabExists(rep);
+
         // TODO: аналогичный код используется в классе tabCashOperation; нужно унифицировать
         if(!repeatAfter)
         {
@@ -387,6 +412,7 @@ bool tabPartRequest::commit(bool repeatAfter)
             m_requestId = m_initialRequestId;
             m_partRequest->deleteLater();
             m_partRequest = new SPartRequest(this);
+            m_partRequest->setRepair(rep);
             ui->widgetSuppliers->clearModel();
             ui->widgetSuppliers->addSupplierRecord(m_dealerModel->id());
         }

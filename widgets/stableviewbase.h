@@ -111,6 +111,7 @@ protected:
     void adoptAutosizedColumns();
     virtual void setColumnWidth(int column, int width);
     virtual void setDefaultLayoutParams();
+    void setColumnLayoutHidden(const int column, const bool state);
     void setDefaultColumnParams(const int column, const QString &label, const int width);
     void readLayout();
     void initHorizontalHeaderMenu();

@@ -28,6 +28,9 @@ public:
     void delayedRefresh(const int msec);
     void setButtonsVisible(bool visible = true);
     bool isDirty();
+    int requestCount();
+    void setReadOnly(const bool state);
+    void setTableLayout(const SLocalSettings::SettingsVariant &layoutVariant);
 private:
     Ui::SPartsRequests *ui;
     SPartsRequestsModel *m_model;

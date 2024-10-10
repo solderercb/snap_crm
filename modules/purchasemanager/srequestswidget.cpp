@@ -15,6 +15,7 @@ SPartsRequests::SPartsRequests(QWidget *parent) :
     ui->tableView->setModel(m_model);
     ui->tableView->setQuery(QUERY_SEL_PARTS_REQUESTS_STATIC, QSqlDatabase::database("connMain"));
     ui->tableView->setGrouping(QStringList{"t1.`id`"});    // default GROUP part of query
+    ui->tableView->setMinimumHeight(110);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SPartsRequests::tableRowSelected);
     connect(ui->pushButtonSaveChanges, &QPushButton::clicked, this, &SPartsRequests::commit);
     connect(ui->tableView, &STableViewPartsRequests::doubleClicked, this, &SPartsRequests::tableRowDoubleClicked);
@@ -37,6 +38,7 @@ void SPartsRequests::updateWidgets()
     ui->pushButtonCreateCopy->setVisible(m_buttonsVisible);
     ui->pushButtonSaveChanges->setVisible(m_buttonsVisible);
     ui->pushButtonCreateInvoice->setVisible(m_buttonsVisible);
+    ui->pushButtonCancel->setVisible(m_buttonsVisible);
 }
 
 bool SPartsRequests::eventFilter(QObject *object, QEvent *event)
@@ -91,6 +93,24 @@ void SPartsRequests::setButtonsVisible(bool visible)
 bool SPartsRequests::isDirty()
 {
     return m_model->isDirty();
+}
+
+int SPartsRequests::requestCount()
+{
+    return m_model->rowCount();
+}
+
+void SPartsRequests::setReadOnly(const bool state)
+{
+    m_model->setReadOnly(state);
+    m_buttonsVisible = !state;
+    updateWidgets();
+}
+
+void SPartsRequests::setTableLayout(const SLocalSettings::SettingsVariant &layoutVariant)
+{
+    ui->tableView->setLayoutVariant(layoutVariant);
+    ui->tableView->readLayout();
 }
 
 void SPartsRequests::commit()

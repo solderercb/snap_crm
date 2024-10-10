@@ -22,6 +22,14 @@ void STableViewPartsRequests::setDefaultLayoutParams()
 {
     STableViewBase::setDefaultLayoutParams();
     i_gridLayout->$GridControl.Columns[Column::ItemName].Width_marked = true;  // автоширина по умолчанию
+    if(m_layoutVariant == SLocalSettings::RepairPartsRequestsGrid)
+    {
+        setColumnLayoutHidden(Column::Check, true);
+        setColumnLayoutHidden(Column::Customer, true);
+//        setColumnLayoutHidden(Column::Dealer, true);
+        setColumnLayoutHidden(Column::Repair, true);
+        setColumnLayoutHidden(Column::Track, true);
+    }
 }
 
 bool STableViewPartsRequests::eventFilter(QObject *object, QEvent *event)

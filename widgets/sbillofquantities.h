@@ -22,7 +22,7 @@ public:
     void setRepairId(const int id);
     void linkWithRepairModel(SRepairModel *model);
     void setReadOnly(bool state = true);
-    bool isCommitted();
+    bool isDirty();
     void commit();
     void load(const int repair);
     bool isEmpty();
@@ -51,6 +51,7 @@ private slots:
     void buttonWorksAdminEdit(bool state);
     void buttonAddItemClicked();
     void repairModelUpdated();
+    void createTabNewPartRequest();
 };
 
 #endif // SBILLOFQUANTITIES_H

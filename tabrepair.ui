@@ -728,7 +728,7 @@ QListView::item  {
           <height>574</height>
          </rect>
         </property>
-        <layout class="QGridLayout" name="rightScrollAreaGridLayout" rowstretch="0,1,2,0,1">
+        <layout class="QGridLayout" name="rightScrollAreaGridLayout" rowstretch="0,2,4,1,0,1">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -741,6 +741,104 @@ QListView::item  {
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBoxDiagResult">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Результат диагностики</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="horizontalSpacing">
+             <number>0</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <layout class="QGridLayout" name="gridLayoutDiagResult" rowstretch="1,0" columnstretch="0,0,1" columnminimumwidth="120,0,0">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="pushButtonSaveDiagAmount">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>Сохранить результат диагностики и стоимость</string>
+                </property>
+                <property name="text">
+                 <string>Сохранить</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="3">
+               <widget class="STextEdit" name="textEditDiagResult">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="tabChangesFocus">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="SDoubleSpinBox" name="doubleSpinBoxAmount">
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="maximum">
+                 <double>9999999.990000000223517</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::MinimumExpanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item row="0" column="0">
           <widget class="QGroupBox" name="groupBoxDeviceSummary">
            <property name="sizePolicy">
@@ -868,115 +966,21 @@ QListView::item  {
            </layout>
           </widget>
          </item>
-         <item row="3" column="0">
-          <spacer name="verticalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::MinimumExpanding</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="4" column="0">
-          <widget class="SComments" name="widgetComments" native="true"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBoxDiagResult">
+         <item row="2" column="0">
+          <widget class="SBillOfQuantities" name="widgetBOQ" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>Результат диагностики</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_10">
-            <property name="leftMargin">
-             <number>5</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>5</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <property name="horizontalSpacing">
-             <number>0</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>5</number>
-            </property>
-            <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayoutDiagResult" rowstretch="1,0" columnstretch="0,0,1" columnminimumwidth="120,0,0">
-              <property name="spacing">
-               <number>3</number>
-              </property>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="pushButtonSaveDiagAmount">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string>Сохранить результат диагностики и стоимость</string>
-                </property>
-                <property name="text">
-                 <string>Сохранить</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="3">
-               <widget class="STextEdit" name="textEditDiagResult">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="tabChangesFocus">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="SDoubleSpinBox" name="doubleSpinBoxAmount">
-                <property name="buttonSymbols">
-                 <enum>QAbstractSpinBox::NoButtons</enum>
-                </property>
-                <property name="maximum">
-                 <double>9999999.990000000223517</double>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="SBillOfQuantities" name="widgetBOQ" native="true">
+         <item row="5" column="0">
+          <widget class="SComments" name="widgetComments" native="true"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="SPartsRequests" name="widgetPartsRequests" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -1200,6 +1204,17 @@ QListView::item  {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SPartsRequests</class>
+   <extends>QWidget</extends>
+   <header>modules/purchasemanager/srequestswidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header location="global">widgets/sdoublespinbox.h</header>
@@ -1214,9 +1229,10 @@ QListView::item  {
    </slots>
   </customwidget>
   <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
+   <class>SComments</class>
+   <extends>QWidget</extends>
+   <header>widgets/scomments.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>STextEdit</class>
@@ -1225,12 +1241,6 @@ QListView::item  {
    <slots>
     <signal>editFinished()</signal>
    </slots>
-  </customwidget>
-  <customwidget>
-   <class>SComments</class>
-   <extends>QWidget</extends>
-   <header location="global">widgets/scomments.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>SBillOfQuantities</class>

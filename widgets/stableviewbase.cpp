@@ -270,6 +270,22 @@ void STableViewBase::setDefaultLayoutParams()
     }
 }
 
+/* Скрытие/отображение столбца в макете
+*/
+void STableViewBase::setColumnLayoutHidden(const int column, const bool state)
+{
+    if(state)
+    {
+        i_gridLayout->$GridControl.Columns[column].ActualWidth = 0;
+        i_gridLayout->$GridControl.Columns[column].Visible = false;
+    }
+    else
+    {
+        i_gridLayout->$GridControl.Columns[column].ActualWidth = i_defaultColumnsWidths.value(column, 0);
+        i_gridLayout->$GridControl.Columns[column].Visible = true;
+    }
+}
+
 void STableViewBase::setDefaultColumnParams(const int column, const QString &label, const int width)
 {
     i_gridLayout->$GridControl.Columns[column].Width = width;

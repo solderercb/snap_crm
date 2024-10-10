@@ -791,7 +791,7 @@ bool SSaleTableModel::repair_autoSaveTables()
     }
     else if(m_editStrategy == OnManualSubmit)
     {
-        m_unsaved = 1;
+        m_isDirty = 1;
         emit tableDataChanged();
     }
 
@@ -1103,9 +1103,9 @@ void SSaleTableModel::setIsWarranty(const bool isWarranty)
     m_isWarranty = isWarranty;
 }
 
-bool SSaleTableModel::isUnsaved()
+bool SSaleTableModel::isDirty()
 {
-    return m_unsaved;
+    return m_isDirty;
 }
 
 QList<QStandardItem *> SSaleTableModel::row(int row) const
@@ -1195,7 +1195,7 @@ void SSaleTableModel::clearChangedFlagForAllField()
             QStandardItemModel::setData(index(i, SStoreItemModel::SaleOpColumns::ColId), 0, DataRoles::Changed);   // снятие флага о наличии изменений в строке
         }
     }
-    m_unsaved = 0;
+    m_isDirty = 0;
 }
 
 /*  Возвращает кол-во строк в таблице, не помеченных на удаление

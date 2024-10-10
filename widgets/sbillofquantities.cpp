@@ -1,5 +1,7 @@
 #include "sbillofquantities.h"
 #include "ui_sbillofquantities.h"
+#include "mainwindow.h"
+#include "modules/purchasemanager/tabrequest.h"
 
 SBillOfQuantities::SBillOfQuantities(QWidget *parent) :
     QWidget(parent),
@@ -19,6 +21,7 @@ SBillOfQuantities::SBillOfQuantities(QWidget *parent) :
         connect(ui->lineEditQuickAddPart, &SLineEdit::returnPressed, this, &SBillOfQuantities::onReturnQuickAddPart);
     }
 
+    connect(ui->pushButtonRequestSparePart, &QPushButton::clicked, this, &SBillOfQuantities::createTabNewPartRequest);
     connect(ui->switchEditStrategy, &QPushButton::toggled, this, &SBillOfQuantities::switchEditStrategy);
     connect(ui->toolButtonSaveSaleTable, &QToolButton::clicked, this, &SBillOfQuantities::saveSaleTableClicked);
     connect(ui->pushButtonAdmEditWorks, &QPushButton::clicked, this, &SBillOfQuantities::buttonWorksAdminEdit);
@@ -32,6 +35,7 @@ SBillOfQuantities::SBillOfQuantities(QWidget *parent) :
 
     ui->tableViewBOQ->setModel(m_model);
     ui->tableViewBOQ->setItemDelegate(itemDelagates);
+    ui->tableViewBOQ->setMinimumHeight(150);
     connect(itemDelagates, &STableViewBOQItemDelegates::addItem, this, &SBillOfQuantities::buttonAddItemClicked);
     connect(ui->tableViewBOQ, &STableViewBOQWorkshop::pressed, m_model, &SSaleTableModel::indexSelected);
 
@@ -76,14 +80,14 @@ void SBillOfQuantities::setReadOnly(bool state)
     m_modelRO = state;
 }
 
-bool SBillOfQuantities::isCommitted()
+bool SBillOfQuantities::isDirty()
 {
-    return !ui->switchEditStrategy->isChecked() && m_model->isUnsaved();
+    return m_model->isDirty();
 }
 
 void SBillOfQuantities::commit()
 {
-    if(!m_model->isUnsaved())
+    if(!m_model->isDirty())
         return;
 
     m_model->repair_saveTablesStandalone();
@@ -91,7 +95,8 @@ void SBillOfQuantities::commit()
 
 void SBillOfQuantities::load(const int repair)
 {
-    m_model->repair_loadTable(repair);
+    if(!m_model->isDirty())
+        m_model->repair_loadTable(repair);
 }
 
 bool SBillOfQuantities::isEmpty()
@@ -107,15 +112,16 @@ void SBillOfQuantities::clearTable()
 
 void SBillOfQuantities::updateWidgets()
 {
+    bool repExists = m_repairModel && m_repairModel->id();
     ui->pushButtonAddWork->setEnabled((!m_modelRO || m_modelAdmEdit) && permissions->addCustomWork);
 //    ui->pushButtonAddWorkFromPriceList->setEnabled(!m_modelRO || m_modelAdmEdit);
-//    ui->pushButtonRequestSparePart->setEnabled(!m_modelRO || m_modelAdmEdit);
-    ui->toolButtonSaveSaleTable->setVisible(m_repairModel && m_repairModel->id());
-    ui->toolButtonSaveSaleTable->setEnabled((!m_modelRO || m_modelAdmEdit) && m_model->isUnsaved());
-    ui->switchEditStrategy->setVisible(m_repairModel && m_repairModel->id());
+    ui->pushButtonRequestSparePart->setEnabled((!m_modelRO || m_modelAdmEdit) && repExists);
+    ui->toolButtonSaveSaleTable->setVisible(repExists);
+    ui->toolButtonSaveSaleTable->setEnabled((!m_modelRO || m_modelAdmEdit) && m_model->isDirty());
+    ui->switchEditStrategy->setVisible(repExists);
     ui->switchEditStrategy->setEnabled(!m_modelRO || m_modelAdmEdit);
     ui->switchEditStrategy->setChecked(m_model->editStrategy() == SSaleTableModel::OnFieldChange || m_model->editStrategy() == SSaleTableModel::OnRowChange);
-    ui->pushButtonAdmEditWorks->setVisible(permissions->advEditWorkList && m_repairModel && m_repairModel->id() && m_modelRO);
+    ui->pushButtonAdmEditWorks->setVisible(permissions->advEditWorkList && repExists && m_modelRO);
     ui->pushButtonAdmEditWorks->setChecked(false);
     m_model->setState((m_modelRO && !m_modelAdmEdit)?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
 }
@@ -178,7 +184,7 @@ void SBillOfQuantities::switchEditStrategy(bool state)
 {
     if(state)
     {
-        if(m_model->isUnsaved())
+        if(m_model->isDirty())
             m_model->repair_saveTablesStandalone();
         m_model->setEditStrategy(SSaleTableModel::OnFieldChange);
     }
@@ -186,7 +192,7 @@ void SBillOfQuantities::switchEditStrategy(bool state)
     {
         m_model->setEditStrategy(SSaleTableModel::OnManualSubmit);
     }
-    ui->toolButtonSaveSaleTable->setEnabled(m_model->isUnsaved());
+    ui->toolButtonSaveSaleTable->setEnabled(m_model->isDirty());
 
     updateWidgets();
 }
@@ -210,14 +216,14 @@ void SBillOfQuantities::buttonWorksAdminEdit(bool state)
         m_modelAdmEdit = 1;
         m_model->setState(SSaleTableModel::State::WorkshopAdm);
         ui->switchEditStrategy->setEnabled(true);
-        ui->toolButtonSaveSaleTable->setEnabled(m_model->isUnsaved());
+        ui->toolButtonSaveSaleTable->setEnabled(m_model->isDirty());
         ui->pushButtonAddWork->setEnabled(true);
     }
     else
     {
         m_modelAdmEdit = 0;
         m_model->setState(m_modelAdmEdit?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
-        if(m_model->isUnsaved())
+        if(m_model->isDirty())
             saveSaleTableClicked();
         ui->switchEditStrategy->setEnabled(!m_modelAdmEdit);
         ui->toolButtonSaveSaleTable->setEnabled(!m_modelAdmEdit);
@@ -240,6 +246,12 @@ void SBillOfQuantities::repairModelUpdated()
         m_model->setClient(m_clientId);
     }
     m_model->setIsWarranty(m_repairModel->isWarranty());
+}
+
+void SBillOfQuantities::createTabNewPartRequest()
+{
+    tabPartRequest *tabRequest = static_cast<tabPartRequest*>(MainWindow::getInstance()->createTabPartRequest(0));
+    tabRequest->setRepair(m_repairModel->id());
 }
 
 #ifdef QT_DEBUG

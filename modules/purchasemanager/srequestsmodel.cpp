@@ -93,6 +93,8 @@ Qt::ItemFlags SPartsRequestsModel::flags(const QModelIndex &item) const
 
 Qt::ItemFlags SPartsRequestsModel::flagsMask(const QModelIndex &item) const
 {
+    if(m_modelRO)
+        return Qt::ItemIsEditable;
     // Завершенные и отменённые нельзя редактировать
     switch(unformattedData(item.siblingAtColumn(State)).toInt())
     {
@@ -124,6 +126,11 @@ void SPartsRequestsModel::setQuery(const QString &query, const QSqlDatabase &db)
     QSqlQueryModel::setQuery(query, db);
 
     select();
+}
+
+void SPartsRequestsModel::setReadOnly(bool state)
+{
+    m_modelRO = state;
 }
 
 bool SPartsRequestsModel::select()
