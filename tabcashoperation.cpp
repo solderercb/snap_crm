@@ -295,6 +295,8 @@ bool tabCashOperation::commit(bool repeatAfter)
         if(repeatAfter)
         {
             m_orderId = m_initialOrderId;
+            m_cashRegisterModel->setSystemId(paymentSystemId());
+            m_cashRegisterModel->setClient(m_clientModel->id());
 //            resetWidgetsSettings();
         }
         else

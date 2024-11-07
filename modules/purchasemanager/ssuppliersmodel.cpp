@@ -40,6 +40,23 @@ QVariant SPartSuppliersModel::data(const QModelIndex &index, int role) const
             state = unformattedData(index).toBool();
         return state?Qt::Checked:Qt::Unchecked;
     }
+    if(role == Qt::BackgroundRole)
+    {
+        if (m_highlightRows)
+        {
+            if(index.column() == 0)
+            {
+                if( index.siblingAtColumn(Columns::Supplier).data().toString().compare(m_highlightName) == 0 ||
+                        SPartsRequestsGroupingModel::urlFormat(index.siblingAtColumn(Columns::SupplierUrl).data().toString()).compare(m_highlightName) == 0 )
+                    m_highlightedRow = index.row();
+            }
+
+            if(m_highlightedRow >= 0 && index.row() == m_highlightedRow)
+            {
+                return QColor(190,255,190);
+            }
+        }
+    }
 
     return SRelationalBaseModel::data(index, role);
 }
@@ -96,6 +113,8 @@ void SPartSuppliersModel::updateFilter(const int id)
         setFilter(QString("`request_id` = %1").arg(id));
     else
         setFilter("0");
+
+    m_highlightedRow = -1;
 }
 
 bool SPartSuppliersModel::select()
@@ -226,6 +245,18 @@ void SPartSuppliersModel::addSupplierRecord(int id)
     }
 
     appendRow();
+}
+
+void SPartSuppliersModel::setRowHighlightingClause(const int id, const QString &name)
+{
+    m_highlightRows = !(id <= 0 && name.isEmpty());
+    if(!m_highlightRows)
+    {
+        m_highlightedRow = -1;
+    }
+
+    m_highlightId = id;
+    m_highlightName = name;
 }
 
 QVariant SPartSuppliersModel::supplierName(const QModelIndex &index) const

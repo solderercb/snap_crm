@@ -39,6 +39,8 @@ private:
     QString m_excludeStates;
     QString constructSubgroupListQuery(const int &group, const QString &field = QString());
     void constructQueryClause(FilterList &filter, const int &group = -1);
+public slots:
+    void quickFilterBySupplierUrl(const QString &url);
 private slots:
     void refresh();
     void refreshManual();
@@ -82,6 +84,7 @@ private:
     SPartsRequestsGroupingModel *m_model = nullptr;
     void setDefaultLayoutParams() override;
     bool mouseEventOnCell(QEvent *event);
+    QString prepareOrderClause(const int column, Qt::SortOrder order) override;
     void translateNames();
 };
 

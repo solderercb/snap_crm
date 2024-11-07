@@ -955,6 +955,7 @@
 #define QUERY_SEL_PARTS_REQUESTS_NO_GROUPING    QString(                                                                              \
                                                 "SELECT                                                                            \n"\
                                                 "  NULL AS 'group',                                                                \n"\
+                                                "  NULL AS 'sel',                                                                  \n"\
                                                 "  '' AS 'count',                                                                  \n"\
                                                 "  NULL AS 'id',                                                                   \n"\
                                                 "  0 AS 'C'                                                                          "\
@@ -1029,9 +1030,9 @@
                                                 "  IF(t4.`id` IS NULL,                                                                              \n"\
                                                 "     IFNULL(t6.`ur_name`, CONCAT_WS(' ', t6.`surname`, t6.`name`, t6.`patronymic`)),               \n"\
                                                 "     IF(t4.`supplier_id` IS NULL,                                                                  \n"\
-                                                "        t4.`supplier_url`,                                                                         \n"\
+                                                "        TRIM(TRAILING '/' FROM t4.`supplier_url`),                                                 \n"\
                                                 "        IFNULL(t5.`ur_name`, CONCAT_WS(' ', t5.`surname`, t5.`name`, t5.`patronymic`)))) AS 'group',   \n"\
-                                                "  SUM(IFNULL(t4.`select`, 0)) AS 'sel',                                                            \n"\
+                                                "  SUM(IF(t4.`select` > 0, 1, 0)) AS 'sel',                                                         \n"\
                                                 "  IF(t1.`dealer` IS NOT NULL OR t4.`supplier_id` IS NOT NULL OR t4.`supplier_url` IS NOT NULL, COUNT(DISTINCT t1.`id`), NULL) AS 'count',  \n"\
                                                 "  IF(t4.`supplier_id` IS NOT NULL OR t4.`supplier_url` IS NOT NULL, t4.`supplier_id`, t1.`dealer`) AS 'id',    \n"\
                                                 "  IF(t1.`dealer` IS NOT NULL OR t4.`supplier_id` IS NOT NULL OR t4.`supplier_url` IS NOT NULL, 1, 0) AS 'C'  \n"\

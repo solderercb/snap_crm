@@ -19,7 +19,7 @@ public:
     QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const override;
     int id(const QModelIndex &item);
     QString name(const QModelIndex &item);
-    QString urlFormat(const QString &url) const;
+    static QString urlFormat(const QString &url);
 public slots:
     void changeGroup(int id);
 private:

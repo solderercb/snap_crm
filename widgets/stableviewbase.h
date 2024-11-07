@@ -139,6 +139,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     virtual void selectionToArray(const QModelIndexList &selection, QMap<int, QMap<int, QModelIndex>> &array);
     void copyToClipboard(QMap<int, QMap<int, QModelIndex>> &items) const;
+    virtual bool isDecimal(const int column);
 private:
     QFile m_layoutSettingsFileName;
     QSqlDatabase m_db;
@@ -161,6 +162,7 @@ private:
     void createAutorefreshTimer();
     void deleteAutorefreshTimer();
     void prepareQuery();
+    virtual QString prepareOrderClause(const int column, Qt::SortOrder order);
 public slots:
     void reset() override;
 //    void applyLayoutForCategory(const int category);    // это для таблицы товаров, позже будет перенесено в наследующий класс

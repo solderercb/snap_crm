@@ -30,7 +30,7 @@ QWidget *SCartridgeMaterialsTableItemDelegates::createEditor(QWidget *parent, co
         case materialsTable::Column::SalarySumm:
             w = createDoubleSpinBox(parent, index); break;
         case materialsTable::Column::Articul:
-            w = createSpinBox(parent, index); static_cast<QSpinBox*>(w)->setButtonSymbols(QSpinBox::NoButtons); break;
+            w = createSpinBox(parent, index); static_cast<QSpinBox*>(w)->setButtonSymbols(QSpinBox::NoButtons); static_cast<QSpinBox*>(w)->setMaximum((int)((((long)1) << 31) - 1)); break;
         default:
             w = QStyledItemDelegate::createEditor(parent, option, index);
     }
@@ -78,14 +78,6 @@ void SCartridgeMaterialsTableItemDelegates::setTableModel(QAbstractItemModel *mo
     m_tableModel = static_cast<SCartridgeMaterialsModel*>(model);
 }
 
-QSpinBox * SCartridgeMaterialsTableItemDelegates::createSpinBox(QWidget *parent, const QModelIndex &index) const
-{
-    QSpinBox *sb = STableViewBaseItemDelegates::createSpinBox(parent, index);
-    sb->setMinimum(1);
-    sb->setMaximum(999999);
-    return sb;
-}
-
 void  SCartridgeMaterialsTableItemDelegates::setModelDataFromSpinBox(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     QSpinBox *sb = qobject_cast<QSpinBox *>(editor);
@@ -94,26 +86,6 @@ void  SCartridgeMaterialsTableItemDelegates::setModelDataFromSpinBox(QWidget *ed
         model->setData(index, sb->value(), Qt::EditRole);
     else
         model->setData(index, QVariant(), Qt::EditRole);
-}
-
-// Create the spinbox and populate it
-QDoubleSpinBox * SCartridgeMaterialsTableItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
-{
-    QDoubleSpinBox *sb = STableViewBaseItemDelegates::createDoubleSpinBox(parent, index);
-    if(comSettings->classicKassa)
-    {
-        sb->setDecimals(2);
-        sb->setMinimum(0.00);
-        sb->setMaximum(999999.99);
-    }
-    else
-    {
-        sb->setDecimals(0);
-        sb->setMinimum(0);
-        sb->setMaximum(999999);
-    }
-
-    return sb;
 }
 
 void  SCartridgeMaterialsTableItemDelegates::setModelDataFromDoubleSpinBox(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const

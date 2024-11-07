@@ -203,20 +203,11 @@ QSpinBox *STableViewBOQItemDelegates::createSpinBox(QWidget *parent, const QMode
 QDoubleSpinBox *STableViewBOQItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
 {
     QDoubleSpinBox *sb = STableViewBaseItemDelegates::createDoubleSpinBox(parent, index);
-    if(comSettings->classicKassa)
-    {
-        sb->setDecimals(2);
-        sb->setMinimum(0.01);   // TODO: в гарантийном ремонте минимальная цена должна быть равна нулю
-        sb->setMaximum(999999.99);
-    }
-    else
-    {
-        sb->setDecimals(0);
-        sb->setMinimum(1);
-        sb->setMaximum(999999);
-    }
+
+    // в гарантийном ремонте минимальная цена может быть равна нулю
     if(m_tableModel->isWarranty() || !m_tableModel->index(index.row(), 0).data(SSaleTableModel::DataRoles::RecordType).toBool())
         sb->setMinimum(0);
+
     return sb;
 }
 

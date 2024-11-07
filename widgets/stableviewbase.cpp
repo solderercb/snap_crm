@@ -534,6 +534,16 @@ void STableViewBase::copyToClipboard(QMap<int, QMap<int, QModelIndex> > &items) 
 
 }
 
+/* Признак того, что в столбце column отображаются числа с десятичной дробью.
+ * Метод используется для автозамены символа разделителя целой и дробной части
+ * на системный (напр. точки на запятую) при вставке значения из буфера обмена.
+ * Должен быть переопределён в наследующих таблицах.
+ */
+bool STableViewBase::isDecimal(const int column)
+{
+    return false;
+}
+
 void STableViewBase::copyToClipboard()
 {
     if(!selectionModel()->hasSelection())
@@ -548,15 +558,32 @@ void STableViewBase::copyToClipboard()
 
 void STableViewBase::pasteFromClipboard()
 {
-    if(!(currentIndex().flags()&Qt::ItemIsEditable))
-        return;
-
     const QMimeData *mimeData = qApp->clipboard()->mimeData();
 
     if (!mimeData || !mimeData->hasText())
         return;
 
-    model()->setData(currentIndex(), mimeData->text());
+    // split by \n and add row if needed
+
+    QModelIndex focusedIndex = currentIndex();
+    int visualColumn = horizontalHeader()->visualIndex(focusedIndex.column());
+    QStringList values = mimeData->text().split('\t');
+    for(int i = 0; i < values.count() && visualColumn < horizontalHeader()->count(); i++, visualColumn++)
+    {
+        int logicalColumn = horizontalHeader()->logicalIndex(visualColumn);
+        QModelIndex index = focusedIndex.siblingAtColumn(logicalColumn);
+
+        if(!(index.flags()&Qt::ItemIsEditable))
+            continue;
+
+        QVariant value = values.at(i);
+        if(isDecimal(logicalColumn))
+        {
+            if(values[i].contains(QRegExp("\\d+[,|.]\\d+")))
+                value = values[i].replace(QRegExp("[,|.]"), ".").toDouble();
+        }
+        model()->setData(index, value);
+    }
 }
 
 Qt::SortOrder STableViewBase::sortOrder()
@@ -813,19 +840,25 @@ void STableViewBase::prepareQuery()
     if(m_grouping)
         m_query.append(m_grouping->count()>0?"\nGROUP BY " + m_grouping->join(", "):"");
 
-    if (m_sortColumn >= 0)
-    {
-        QString orderClause;
-        int field = m_sortColumn + 1; // нумерация полей в запросе с 1
-        orderClause = QString("\nORDER BY %1 %2").arg(field).arg((m_sortOrder == Qt::AscendingOrder)?"ASC":"DESC");
-        m_query.append(orderClause);
-    }
+    m_query.append(prepareOrderClause(m_sortColumn, m_sortOrder));
 
 #ifdef QT_DEBUG
 //    m_query.append(" LIMIT 1000");
 #endif
 
 //    qDebug().nospace().noquote() << "[" << this << "] prepareQuery() | \r\n" << m_query;
+}
+
+QString STableViewBase::prepareOrderClause(const int column, Qt::SortOrder order)
+{
+    if (column < 0)
+        return QString();
+
+    QString clause;
+    int field = column + 1; // нумерация полей в запросе с 1
+    clause = QString("\nORDER BY %1 %2").arg(field).arg((order == Qt::AscendingOrder)?"ASC":"DESC");
+
+    return clause;
 }
 
 void STableViewBase::setFilter(const FilterList &filter)
@@ -896,10 +929,6 @@ QString STableViewBase::formatFilterGroup(const FilterList &filter)
 QString STableViewBase::formatFilterField(const FilterField &field)
 {
     if (field.column.isEmpty())
-        return QString();
-    if ((field.operation & ~FilterField::NotMark) != FilterField::NoOp
-         && (field.operation & ~FilterField::NotMark) != FilterField::Null
-         && field.value.toString().isEmpty())
         return QString();
 
     QSqlDriver* driver = QSqlDatabase::database().driver();

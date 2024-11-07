@@ -21,21 +21,20 @@ void STableViewPartRequestSuppliers::mouseMoveEvent(QMouseEvent *event)
     QModelIndex index = indexAt(pos);
     QRect cellRect = visualRect(index);
 
-    if (index.isValid())
+    // при наведении указателя на ссылку изменяем его вид
+    if (index.isValid() &&
+        (index.column() == Column::SupplierUrl ||
+          index.column() == Column::ItemUrl) &&
+         PSItemDelegate::isUrl(index) &&
+         PSItemDelegate::pointInRect(pos, PSItemDelegate::urlRect(cellRect, PSItemDelegate::urlSize(index))) )
     {
-        // при наведении указателя на ссылку изменяем его вид
-        if ( (index.column() == Column::SupplierUrl ||
-              index.column() == Column::ItemUrl) &&
-             PSItemDelegate::isUrl(index) &&
-             PSItemDelegate::pointInRect(pos, PSItemDelegate::urlRect(cellRect, PSItemDelegate::urlSize(index))) )
-        {
-            setCursor(Qt::PointingHandCursor);
-        }
-        else
-        {
-            setCursor(Qt::ArrowCursor);
-        }
+        setCursor(Qt::PointingHandCursor);
     }
+    else
+    {
+        setCursor(Qt::ArrowCursor);
+    }
+
     STableViewBase::mouseMoveEvent(event);
 }
 
@@ -84,6 +83,11 @@ void STableViewPartRequestSuppliers::translateNames()
     tr("Notes");
 }
 
+bool STableViewPartRequestSuppliers::isDecimal(const int column)
+{
+    return column == Column::Price;
+}
+
 PSItemDelegate::PSItemDelegate(QObject *parent) :
     STableViewBaseItemDelegates(parent)
 {
@@ -105,6 +109,9 @@ void PSItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
             painter->setPen(option.palette.highlightedText().color());
             penColor = penColor.lighter(175);
         }
+        if ( !(option.state & QStyle::State_Selected) )
+            if(index.data(Qt::BackgroundRole).canConvert(QMetaType::QColor))
+                painter->fillRect(option.rect, index.data(Qt::BackgroundRole).value<QColor>());
         painter->drawText(option.rect, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
         painter->setPen(penColor);
         drawItemsCount(index, option, painter);
@@ -151,7 +158,11 @@ void PSItemDelegate::drawUrl(const QModelIndex &index, const QStyleOptionViewIte
         painter->setPen(option.palette.highlightedText().color());
     }
     else
+    {
+        if(index.data(Qt::BackgroundRole).canConvert(QMetaType::QColor))
+            painter->fillRect(option.rect, index.data(Qt::BackgroundRole).value<QColor>());
         painter->setPen(option.palette.link().color());
+    }
     painter->setFont(font);
     painter->drawText(textRect(option.rect), Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
 }
@@ -165,7 +176,7 @@ void PSItemDelegate::drawItemsCount(const QModelIndex &index, const QStyleOption
     QModelIndexList match;
     int selected, total;
 
-    supplier = m_subgroupsModel->urlFormat(index.siblingAtColumn(SPartSuppliersModel::Columns::SupplierUrl).data().toString());
+    supplier = SPartsRequestsGroupingModel::urlFormat(index.siblingAtColumn(SPartSuppliersModel::Columns::SupplierUrl).data().toString());
     if(supplier.isEmpty())
         supplier = index.siblingAtColumn(SPartSuppliersModel::Columns::Supplier).data().toString();
 
@@ -262,19 +273,11 @@ bool PSItemDelegate::quickEdit(const QStyleOptionViewItem &option, const QModelI
     return false;
 }
 
-QSpinBox *PSItemDelegate::createSpinBox(QWidget *parent, const QModelIndex &index) const
-{
-    QSpinBox *sb = STableViewBaseItemDelegates::createSpinBox(parent, index);
-    sb->setMinimum(1);
-    sb->setMaximum(999);
-    return sb;
-}
-
 QDoubleSpinBox *PSItemDelegate::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
 {
     Q_UNUSED(index)
     SDoubleSpinBox *sb = new SDoubleSpinBox(parent);
-    // В таблице ссылок цена может быть с десятичной дролью независимо от настроек
+    // В таблице ссылок цена может быть с десятичной дробью независимо от настроек
     sb->setDecimals(2);
     sb->setMinimum(0.01);
     sb->setMaximum(999999.99);
@@ -289,28 +292,34 @@ bool PSItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const
     if(event->type() == QEvent::MouseButtonRelease && e->button() == Qt::LeftButton)
     {
         if( (index.column() == STableViewPartRequestSuppliers::Column::ItemUrl ||
-            index.column() == STableViewPartRequestSuppliers::Column::SupplierUrl) &&
-            isUrl(index) )
+            index.column() == STableViewPartRequestSuppliers::Column::SupplierUrl) )
         {
-            // TODO: аналогичный код используется в STableViewBOQItemDelegates::editorEvent(...)
-#if QT_VERSION >= 0x060000
-            QPoint click = e->position().toPoint();
-#else
-            QPoint click = e->localPos().toPoint();
-#endif
-            int clickX = click.x() - option.rect.x();  // коррекция координат курсора для случая когда левый верхний угол яч. уходит за края виджета
+            // клик с нажатой клавишей Alt для быстрого поиска
+            if(QGuiApplication::queryKeyboardModifiers() & Qt::AltModifier)
+                return true;
 
-            if(PSItemDelegate::pointInRect(e->localPos().toPoint(), PSItemDelegate::urlRect(option.rect, PSItemDelegate::urlSize(index))))
-                            {
-                QDesktopServices::openUrl(index.data().toUrl());
-                return false;
-            }
-            else if(clickX < option.rect.width() && clickX > option.rect.width() - PIXMAP_W)
+            if( isUrl(index) )
             {
-                return quickEdit(option, index);
+                // TODO: аналогичный код используется в STableViewBOQItemDelegates::editorEvent(...)
+#if QT_VERSION >= 0x060000
+                QPoint click = e->position().toPoint();
+#else
+                QPoint click = e->localPos().toPoint();
+#endif
+                int clickX = click.x() - option.rect.x();  // коррекция координат курсора для случая когда левый верхний угол яч. уходит за края виджета
+
+                if(PSItemDelegate::pointInRect(e->localPos().toPoint(), PSItemDelegate::urlRect(option.rect, PSItemDelegate::urlSize(index))))
+                {
+                    QDesktopServices::openUrl(index.data().toUrl());
+                    return false;
+                }
+                else if(clickX < option.rect.width() && clickX > option.rect.width() - PIXMAP_W)
+                {
+                    return quickEdit(option, index);
+                }
+                else
+                    return false;
             }
-            else
-                return false;
         }
         else if(index.column() == STableViewPartRequestSuppliers::Column::Select)
         {

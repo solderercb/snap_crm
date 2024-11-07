@@ -32,11 +32,12 @@ tabTechReports::tabTechReports(MainWindow *parent) :
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabTechReports::buttonRefreshClicked);
     connect(ui->pushButtonPrint, &QPushButton::clicked, this, &tabTechReports::buttonPrintClicked);
     connect(ui->lineEditSearch, &QLineEdit::textChanged, this, &tabTechReports::lineEditSearchTextChanged);
-    refreshTable();
 
     ui->widgetPeriodSelector->setMovingInterval(SPeriodSelector::Year);
     ui->widgetPeriodSelector->setDefaultPeriod();
     connect(ui->widgetPeriodSelector, &SPeriodSelector::refreshButtonClicked, this, &tabTechReports::buttonRefreshClicked);
+
+    refreshTable();
 }
 
 tabTechReports::~tabTechReports()
@@ -88,15 +89,25 @@ void tabTechReports::constructQueryClause()
 
     list.fields.append(STableViewBase::initFilterField("`company`", FilterField::Equals, companiesModel->databaseIDByRow(ui->comboBoxCompany->currentIndex())));
 
-    FilterList searchText;
-    searchText.op = FilterList::Or;
+    if(!ui->lineEditSearch->text().isEmpty())
+    {
+        FilterList search;
+        search.op = FilterList::Or;
+        FilterField::Op matchFlag;
+        if(userDbData->useRegExpSearch)
+            matchFlag = FilterField::RegExp;
+        else
+            matchFlag = FilterField::Contains;
 
-    searchText.fields.append(STableViewBase::initFilterField("t1.`num`", FilterField::Contains, ui->lineEditSearch->text()));
-    searchText.fields.append(STableViewBase::initFilterField("t1.`device`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    searchText.fields.append(STableViewBase::initFilterField("t1.`inventory_number`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    searchText.fields.append(STableViewBase::initFilterField("t1.`serial_number`", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`short_name`, t2.`ur_name`)", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
-    searchText.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`surname`, t2.`name`, t2.`patronymic`)", FilterField::Contains, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+        search.fields.append(STableViewBase::initFilterField("t1.`num`", matchFlag, ui->lineEditSearch->text()));
+        search.fields.append(STableViewBase::initFilterField("t1.`device`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+        search.fields.append(STableViewBase::initFilterField("t1.`inventory_number`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+        search.fields.append(STableViewBase::initFilterField("t1.`serial_number`", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+        search.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`short_name`, t2.`ur_name`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+        search.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t2.`surname`, t2.`name`, t2.`patronymic`)", matchFlag, ui->lineEditSearch->text(), Qt::CaseInsensitive));
+
+        list.childs.append(search);
+    }
 
     FilterList period;
     period.op = FilterList::And;
@@ -104,7 +115,6 @@ void tabTechReports::constructQueryClause()
     period.fields.append(STableViewBase::initFilterField("t1.`created`", FilterField::MoreEq, ui->widgetPeriodSelector->periodBegin()));
     period.fields.append(STableViewBase::initFilterField("t1.`created`", FilterField::Less, ui->widgetPeriodSelector->periodEnd()));
 
-    list.childs.append(searchText);
     list.childs.append(period);
 
     query_group.clear();

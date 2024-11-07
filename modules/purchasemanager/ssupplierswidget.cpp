@@ -1,9 +1,10 @@
 #include "ssupplierswidget.h"
 #include "ui_ssupplierswidget.h"
 #include "widgets/shortlivednotification.h"
+#include "modules/purchasemanager/tabmanager.h"
 
 SPartSuppliers::SPartSuppliers(QWidget *parent) :
-    QWidget(parent),
+    SWidget(parent),
     ui(new Ui::SPartSuppliers)
 {
     ui->setupUi(this);
@@ -62,6 +63,7 @@ void SPartSuppliers::select(const int &id)
     m_requestId = id;
     if(!m_model->select(id))
         qDebug().nospace() << "[" << this << "] select() | error: " << m_model->lastError().driverText();
+    ui->tableViewLinks->verticalScrollBar()->setValue(0);
 }
 
 /* Очистка модели
@@ -156,6 +158,11 @@ void SPartSuppliers::setGroupingMode(const int mode)
     static_cast<PSItemDelegate*>(ui->tableViewLinks->itemDelegate())->setGroupingMode(mode);
 }
 
+void SPartSuppliers::setRowHighlightingClause(const int id, const QString &name)
+{
+    m_model->setRowHighlightingClause(id, name);
+}
+
 void SPartSuppliers::setPredefSupplierId(const int id)
 {
     m_model->setPredefSupplierId(id);
@@ -167,6 +174,29 @@ void SPartSuppliers::refresh(bool preserveScrollPos, bool preserveSelection)
 {
     ui->tableViewLinks->setQuery(m_model->query().lastQuery(), m_model->database());
     ui->tableViewLinks->refresh(preserveScrollPos, preserveSelection);
+}
+
+/* Настройка связи сигнал-слот для быстрой фильтрации по URL поставщика
+ * Связь должна работать только на вкладке Менеджера.
+*/
+void SPartSuppliers::connectSuppliersTableWithManager()
+{
+    tabPurchaseManager *tab = static_cast<tabPurchaseManager*>(findParentTab());
+
+    connect(ui->tableViewLinks, &QTableView::clicked, this, [=](const QModelIndex &index){
+        if(index.column() == STableViewPartRequestSuppliers::Column::SupplierUrl && QGuiApplication::queryKeyboardModifiers() & Qt::AltModifier)
+        {
+            QString searchStr = ui->tableViewLinks->model()->data(index).toString();
+            if(userDbData->useRegExpSearch)
+            { // TODO: код скопирован из класса tabRepairs::tableItemClick; нужно унифицировать
+                searchStr = searchStr.replace("(", "\\(").replace(")", "\\)");
+                searchStr = searchStr.replace("[", "\\[").replace("]", "\\]");
+                searchStr = searchStr.replace("^", "\\^").replace("$", "\\$");
+                searchStr = searchStr.replace("?", "\\?").replace("\\", "\\\\");
+            }
+            tab->quickFilterBySupplierUrl(searchStr.replace("\\\\","\\"));
+        }
+    });
 }
 
 void SPartSuppliers::saveLinks()

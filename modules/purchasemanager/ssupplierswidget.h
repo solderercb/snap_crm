@@ -1,7 +1,7 @@
 #ifndef SPARTSUPPLIERS_H
 #define SPARTSUPPLIERS_H
 
-#include <QWidget>
+#include "widgets/swidget.h"
 #include <QClipboard>
 #include "widgets/stableviewbase.h"
 #include "modules/purchasemanager/sgroupingmodel.h"
@@ -12,7 +12,7 @@ namespace Ui {
 class SPartSuppliers;
 }
 
-class SPartSuppliers : public QWidget
+class SPartSuppliers : public SWidget
 {
     Q_OBJECT
 signals:
@@ -32,8 +32,10 @@ public:
     void setRequestId(int requestId);
     void setSubgroupsModel(SPartsRequestsGroupingModel *subgroupsModel);
     void setGroupingMode(const int mode);
+    void setRowHighlightingClause(const int id, const QString &name);
     void setPredefSupplierId(const int id);
     void refresh(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
+    void connectSuppliersTableWithManager();
 private:
     Ui::SPartSuppliers *ui;
     SPartSuppliersModel *m_model;

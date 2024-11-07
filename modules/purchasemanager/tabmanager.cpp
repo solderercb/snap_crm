@@ -92,6 +92,7 @@ tabPurchaseManager::tabPurchaseManager(MainWindow *parent) :
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabPurchaseManager::refreshManual);
     connect(ui->widgetPartSuppliers, &SPartSuppliers::beginRowInsert, this, [=]{commitChanges(checkChanges(DirtyFlags::SuppliersModel));});
     connect(ui->widgetPartSuppliers, &SPartSuppliers::submitOk, this, &tabPurchaseManager::linksSaveOk);
+    ui->widgetPartSuppliers->connectSuppliersTableWithManager();
 
     groupChanged(SPartsRequestsGroupingModel::Group::No);
 
@@ -227,6 +228,11 @@ void tabPurchaseManager::constructQueryClause(FilterList &filter, const int &gro
     }
 }
 
+void tabPurchaseManager::quickFilterBySupplierUrl(const QString &url)
+{
+    ui->lineEditSearch->setText(url);
+}
+
 QString tabPurchaseManager::constructSubgroupListQuery(const int &group, const QString &field)
 {
     QString query;
@@ -288,7 +294,7 @@ void tabPurchaseManager::constructMainTableQueryFilter()
         case SPartsRequestsGroupingModel::Group::Tracking: filter.fields.append(STableViewBase::initFilterField("t1.`tracking`", FilterField::Equals, value, Qt::CaseInsensitive)); break;
         case SPartsRequestsGroupingModel::Group::Supplier: {
             if(id == -1)
-                filter.fields.append(STableViewBase::initFilterField("t4.`supplier_url`", FilterField::Equals, value, Qt::CaseInsensitive));
+                filter.fields.append(STableViewBase::initFilterField("TRIM(TRAILING '/' FROM t4.`supplier_url`)", FilterField::Equals, value, Qt::CaseInsensitive));
             else
             {
                 FilterList supplId;
@@ -401,6 +407,15 @@ void tabPurchaseManager::subgroupIndexChanged(const QModelIndex &item)
     ui->widgetPartSuppliers->clearModel();
     constructMainTableQueryFilter();
     ui->widgetPartsRequests->refresh(STableViewBase::ScrollPosReset, STableViewBase::SelectionReset);
+
+    if( ui->comboBoxGrouping->currentIndex() == SPartsRequestsGroupingModel::Group::Supplier
+        && item.siblingAtColumn(SPartsRequestsGroupingModel::Columns::C).data().toInt() == 1 )
+    {
+        ui->widgetPartSuppliers->setRowHighlightingClause(item.siblingAtColumn(SPartsRequestsGroupingModel::Columns::Id).data().toInt(),
+                                                          item.siblingAtColumn(SPartsRequestsGroupingModel::Columns::Group).data().toString());
+    }
+    else
+        ui->widgetPartSuppliers->setRowHighlightingClause(-1, QString());
 }
 
 bool tabPurchaseManager::comboBoxIndexChanged(QComboBox *widget, int &oldIndex, int newIndex)
@@ -593,6 +608,21 @@ bool STableViewSubgroups::mouseEventOnCell(QEvent *event)
     }
 
     return false;
+}
+
+QString STableViewSubgroups::prepareOrderClause(const int column, Qt::SortOrder order)
+{
+    if (column < 0)
+        return QString();
+
+    // Чтобы элемент "Все" был всегда первым применяется сортировка по служебному полю `C`,
+    // которое для этого элемента всегда 0, а для других элементов всегда 1; нумерация полей с 1
+    QString clause = QString("\nORDER BY %1 ASC, %2 %3") \
+                 .arg(5) \
+                 .arg(column + 1) \
+                 .arg((order == Qt::AscendingOrder)?"ASC":"DESC");
+
+    return clause;
 }
 
 void STableViewSubgroups::refreshPending()

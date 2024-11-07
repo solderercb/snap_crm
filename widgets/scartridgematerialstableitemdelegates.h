@@ -19,9 +19,7 @@ public:
 private:
     SCartridgeMaterialsModel *m_tableModel;
     mutable bool m_must_open_box;
-    QSpinBox* createSpinBox(QWidget*, const QModelIndex &) const;
     void setModelDataFromSpinBox(QWidget*, QAbstractItemModel*, const QModelIndex&) const;
-    QDoubleSpinBox* createDoubleSpinBox(QWidget*, const QModelIndex&) const;
     void setModelDataFromDoubleSpinBox(QWidget*, QAbstractItemModel*, const QModelIndex&) const;
 };
 

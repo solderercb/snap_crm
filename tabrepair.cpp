@@ -349,6 +349,7 @@ void tabRepair::updateWidgets()
     ui->comboBoxState->setEnabled(m_comboBoxStateEnabled && !modelRO);
     ui->toolButtonSaveState->setEnabled(!modelRO);
 
+    ui->widgetBOQ->setReadOnly(m_BOQModelRO);
     ui->widgetBOQ->updateWidgets();
     ui->widgetPartsRequests->setVisible(ui->widgetPartsRequests->requestCount() > 0);
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled);
@@ -479,8 +480,6 @@ bool tabRepair::setWidgetsParams(const int stateId)
             case Global::RepStateActions::EditDiagSumm: m_diagRO = 0; m_summRO = 0; break;
         }
     }
-
-    ui->widgetBOQ->setReadOnly(m_BOQModelRO);
 
     return 1;
 }

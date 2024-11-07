@@ -37,7 +37,6 @@ private:
     static QRect urlRect(const QRect &cell, const QSize &urlSize);
     static bool pointInRect(const QPoint &point, const QRect &rect);
     bool quickEdit(const QStyleOptionViewItem &option, const QModelIndex &index);
-    QSpinBox* createSpinBox(QWidget*, const QModelIndex &) const;
     QDoubleSpinBox* createDoubleSpinBox(QWidget*, const QModelIndex&) const;
     void setSubgroupsModel(SPartsRequestsGroupingModel *subgroupsModel);
     void setGroupingMode(const int mode);
@@ -61,6 +60,7 @@ public:
 private:
     void setDefaultLayoutParams() override;
     void translateNames();
+    bool isDecimal(const int column) override;
 };
 
 #endif // STABLEVIEWPARTREQUESTSUPPLIERS_H

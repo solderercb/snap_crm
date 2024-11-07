@@ -1,5 +1,6 @@
 #include "stableviewbaseitemdelegates.h"
 #include <QProxyStyle>
+#include "widgets/sdoublespinbox.h"
 
 STableViewBaseItemDelegates::STableViewBaseItemDelegates(QObject *parent) :
     QStyledItemDelegate(parent)
@@ -176,6 +177,7 @@ QSpinBox *STableViewBaseItemDelegates::createSpinBox(QWidget *parent, const QMod
 {
     Q_UNUSED(index);
     QSpinBox *sb = new QSpinBox(parent);
+    sb->setRange(1, 999999);
     return sb;
 }
 
@@ -197,7 +199,20 @@ void STableViewBaseItemDelegates::setModelDataFromSpinBox(QWidget *editor, QAbst
 QDoubleSpinBox *STableViewBaseItemDelegates::createDoubleSpinBox(QWidget *parent, const QModelIndex &index) const
 {
     Q_UNUSED(index);
-    QDoubleSpinBox *sb = new QDoubleSpinBox(parent);
+    QDoubleSpinBox *sb = new SDoubleSpinBox(parent);
+    if(comSettings->classicKassa)
+    {
+        sb->setDecimals(2);
+        sb->setMinimum(0.00);
+        sb->setMaximum(999999.99);
+    }
+    else
+    {
+        sb->setDecimals(0);
+        sb->setMinimum(0);
+        sb->setMaximum(999999);
+    }
+
     return sb;
 }
 

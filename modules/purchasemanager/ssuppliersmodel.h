@@ -2,6 +2,7 @@
 #define SPARTSUPPLIERSMODEL_H
 
 #include "modules/purchasemanager/srequest.h"
+#include "modules/purchasemanager/sgroupingmodel.h"
 #include "models/srelationalbasemodel.h"
 #include <QObject>
 #include <QSqlField>
@@ -34,6 +35,7 @@ public:
     int predefSupplierId();
     void setPredefSupplierId(const int id);
     void addSupplierRecord(int id);
+    void setRowHighlightingClause(const int id, const QString &name);
 private:
     int m_requestId = 0;
     int m_requestState = SPartRequest::Created;
@@ -42,6 +44,10 @@ private:
     int m_postSubmitAction = PostSubmitAction::DefaultSelect;
     int m_newCheckedId = 0;
     int m_predefSupplierId = 0;
+    bool m_highlightRows = 0;
+    int m_highlightId = -1;
+    QString m_highlightName = QString();
+    mutable int m_highlightedRow = -1;
     QVariant supplierName(const QModelIndex &index) const;
     QString url(const QModelIndex &index) const;
     bool setCheckStateExclusive(const QModelIndex &checkedIndex);

@@ -18,11 +18,14 @@ SStandardItemModel *SPartsRequestsGroupingModel::groupsList()
 }
 
 /* В списке группировки по поставщику нет смысла отображать протокол
- * Также этот метод вызывается из PSItemDelegate::drawItemsCount
+ * Также этот метод используется для отрисовки кол-ва ссылок и подсветки выбранного
+ * поставщика в режиме группировки
 */
-QString SPartsRequestsGroupingModel::urlFormat(const QString &url) const
+QString SPartsRequestsGroupingModel::urlFormat(const QString &url)
 {
     QString ret(url);
+    if(ret.right(1) == '/')
+        ret.chop(1);
     return ret.replace("https://", "");
 }
 
@@ -41,7 +44,7 @@ QVariant SPartsRequestsGroupingModel::data(const QModelIndex &item, int role) co
 int SPartsRequestsGroupingModel::id(const QModelIndex &item)
 {
     QVariant data = item.siblingAtColumn(Columns::Id).data();
-    if(data.isNull())
+    if(data.isNull() || data.toString().isEmpty())
         return -1;
     return data.toInt();
 }

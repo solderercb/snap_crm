@@ -78,6 +78,7 @@ void SBillOfQuantities::linkWithRepairModel(SRepairModel *model)
 void SBillOfQuantities::setReadOnly(bool state)
 {
     m_modelRO = state;
+    m_model->setState(m_modelRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
 }
 
 bool SBillOfQuantities::isDirty()
@@ -122,8 +123,7 @@ void SBillOfQuantities::updateWidgets()
     ui->switchEditStrategy->setEnabled(!m_modelRO || m_modelAdmEdit);
     ui->switchEditStrategy->setChecked(m_model->editStrategy() == SSaleTableModel::OnFieldChange || m_model->editStrategy() == SSaleTableModel::OnRowChange);
     ui->pushButtonAdmEditWorks->setVisible(permissions->advEditWorkList && repExists && m_modelRO);
-    ui->pushButtonAdmEditWorks->setChecked(false);
-    m_model->setState((m_modelRO && !m_modelAdmEdit)?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
+    ui->pushButtonAdmEditWorks->setChecked(m_modelAdmEdit);
 }
 
 void SBillOfQuantities::addCustomWork()
@@ -138,7 +138,12 @@ void SBillOfQuantities::addCustomWork()
 
 void SBillOfQuantities::onReturnQuickAddPart()
 {
-    if(quickAddPart(ui->lineEditQuickAddPart->text().toInt()))
+    QString text = ui->lineEditQuickAddPart->text();
+
+    if(text.isEmpty())
+        return;
+
+    if(quickAddPart(text.toInt()))
         ui->lineEditQuickAddPart->setText("");
 }
 
@@ -215,20 +220,15 @@ void SBillOfQuantities::buttonWorksAdminEdit(bool state)
     {
         m_modelAdmEdit = 1;
         m_model->setState(SSaleTableModel::State::WorkshopAdm);
-        ui->switchEditStrategy->setEnabled(true);
-        ui->toolButtonSaveSaleTable->setEnabled(m_model->isDirty());
-        ui->pushButtonAddWork->setEnabled(true);
     }
     else
     {
         m_modelAdmEdit = 0;
-        m_model->setState(m_modelAdmEdit?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
+        setReadOnly();
         if(m_model->isDirty())
             saveSaleTableClicked();
-        ui->switchEditStrategy->setEnabled(!m_modelAdmEdit);
-        ui->toolButtonSaveSaleTable->setEnabled(!m_modelAdmEdit);
-        ui->pushButtonAddWork->setEnabled(!m_modelAdmEdit && permissions->addCustomWork);
     }
+    updateWidgets();
 }
 
 void SBillOfQuantities::buttonAddItemClicked()
