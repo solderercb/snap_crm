@@ -3651,7 +3651,7 @@ p, li { white-space: pre-wrap; }
         <translation>Поставщик</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequestsmodel.cpp" line="172"/>
+        <location filename="../modules/purchasemanager/srequestsmodel.cpp" line="179"/>
         <source>no permissions</source>
         <translation></translation>
     </message>
@@ -4938,7 +4938,7 @@ p, li { white-space: pre-wrap; }
     <name>STableRepairsModel</name>
     <message>
         <location filename="../models/stablerepairsmodel.cpp" line="41"/>
-        <location filename="../models/stablerepairsmodel.cpp" line="117"/>
+        <location filename="../models/stablerepairsmodel.cpp" line="124"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4959,7 +4959,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableTechReportsModel</name>
     <message>
-        <location filename="../models/stabletechreportsmodel.cpp" line="35"/>
+        <location filename="../models/stabletechreportsmodel.cpp" line="42"/>
         <source>no permissions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5099,46 +5099,79 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>STableViewClientMatch</name>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="198"/>
+        <source>FullName</source>
+        <translation>ФИО</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="199"/>
+        <source>Balance</source>
+        <translation>Баланс</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="200"/>
+        <source>Repairs</source>
+        <translation>Ремонтов</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="201"/>
+        <source>Purchases</source>
+        <translation>Покупок</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="202"/>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sclientmatch.cpp" line="203"/>
+        <source>PrimaryPhone</source>
+        <translation>Основной телефон</translation>
+    </message>
+</context>
+<context>
     <name>STableViewClients</name>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
+        <location filename="../widgets/stableviewclients.cpp" line="35"/>
         <source>ID</source>
-        <translation type="unfinished">№ записи</translation>
+        <translation>ID</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
-        <source>ФИО</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewclients.cpp" line="36"/>
+        <source>FullName</source>
+        <translation>ФИО</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
-        <source>Баланс</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewclients.cpp" line="37"/>
+        <source>Balance</source>
+        <translation>Баланс</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
-        <source>Ремонтов</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewclients.cpp" line="38"/>
+        <source>Repairs</source>
+        <translation>Ремонтов</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
-        <source>Покупок</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewclients.cpp" line="39"/>
+        <source>Purchases</source>
+        <translation>Покупок</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
-        <source>Тип</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewclients.cpp" line="40"/>
+        <source>Type</source>
+        <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
-        <source>Телефон</source>
-        <translation type="unfinished"></translation>
+        <location filename="../widgets/stableviewclients.cpp" line="41"/>
+        <source>PrimaryPhone</source>
+        <translation>Основной телефон</translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewclients.cpp" line="7"/>
-        <source>email</source>
-        <translation type="unfinished">email</translation>
+        <location filename="../widgets/stableviewclients.cpp" line="42"/>
+        <source>EMail</source>
+        <translation>e-mail</translation>
     </message>
 </context>
 <context>
@@ -5182,67 +5215,67 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableViewPartsRequests</name>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="122"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="130"/>
         <source>Check</source>
         <translation>*</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="123"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="131"/>
         <source>Id</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="124"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="132"/>
         <source>Date</source>
         <translation>Создана</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="125"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="133"/>
         <source>Employee</source>
         <translation>Сотрудник</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="126"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="134"/>
         <source>Customer</source>
         <translation>Клиент</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="127"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="135"/>
         <source>ItemName</source>
         <translation>Наименование</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="128"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="136"/>
         <source>Count</source>
         <translation>Кол-во/вес</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="129"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="137"/>
         <source>Dealer</source>
         <translation>Поставщик</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="130"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="138"/>
         <source>Repair</source>
         <translation>Ремонт</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="131"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="139"/>
         <source>State</source>
         <translation>Статус</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="132"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="140"/>
         <source>Track</source>
         <translation>ТТН</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="133"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="141"/>
         <source>Priority</source>
         <translation>Приоритет</translation>
     </message>
     <message>
-        <location filename="../modules/purchasemanager/srequeststable.cpp" line="134"/>
+        <location filename="../modules/purchasemanager/srequeststable.cpp" line="142"/>
         <source>Progress</source>
         <translation></translation>
     </message>
@@ -6472,39 +6505,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../chooseofficewindow.cpp" line="20"/>
         <source>&lt;выберите офис&gt;</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>matchingClientsTable</name>
-    <message>
-        <location filename="../widgets/sclientmatch.cpp" line="189"/>
-        <source>FullName</source>
-        <translation>ФИО</translation>
-    </message>
-    <message>
-        <location filename="../widgets/sclientmatch.cpp" line="190"/>
-        <source>Balance</source>
-        <translation>Баланс</translation>
-    </message>
-    <message>
-        <location filename="../widgets/sclientmatch.cpp" line="191"/>
-        <source>Repairs</source>
-        <translation>Ремонтов</translation>
-    </message>
-    <message>
-        <location filename="../widgets/sclientmatch.cpp" line="192"/>
-        <source>Purchases</source>
-        <translation>Покупок</translation>
-    </message>
-    <message>
-        <location filename="../widgets/sclientmatch.cpp" line="193"/>
-        <source>Type</source>
-        <translation>Тип</translation>
-    </message>
-    <message>
-        <location filename="../widgets/sclientmatch.cpp" line="194"/>
-        <source>PrimaryPhone</source>
-        <translation>Основной телефон</translation>
     </message>
 </context>
 <context>
@@ -7805,14 +7805,14 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../tabrepair.cpp" line="130"/>
         <location filename="../tabrepair.cpp" line="527"/>
-        <location filename="../tabrepair.cpp" line="752"/>
-        <location filename="../tabrepair.cpp" line="789"/>
+        <location filename="../tabrepair.cpp" line="753"/>
+        <location filename="../tabrepair.cpp" line="790"/>
         <source>Информация</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="752"/>
-        <location filename="../tabrepair.cpp" line="789"/>
+        <location filename="../tabrepair.cpp" line="753"/>
+        <location filename="../tabrepair.cpp" line="790"/>
         <source>Проверьте права доступа или обратитесь к администратору</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7832,13 +7832,13 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="804"/>
+        <location filename="../tabrepair.cpp" line="805"/>
         <location filename="../tabrepair.h" line="102"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="804"/>
+        <location filename="../tabrepair.cpp" line="805"/>
         <source>Статус информирования клиента обновлён</source>
         <translation type="unfinished"></translation>
     </message>

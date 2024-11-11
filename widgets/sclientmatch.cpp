@@ -1,5 +1,6 @@
 #include "sclientmatch.h"
 #include "ui_sclientmatch.h"
+#include "com_sql_queries.h"
 
 SClientMatch::SClientMatch(QWidget *parent) :
     QWidget(parent),
@@ -12,7 +13,7 @@ SClientMatch::SClientMatch(QWidget *parent) :
     ui->groupBoxClientMatch->installEventFilter(groupBoxEventFilter);
     ui->tableView->horizontalHeader()->setHidden(false);
     connect(groupBoxEventFilter,SIGNAL(toggleElementsVisibility()),this,SLOT(toggleElementsVisibility()));
-    clientsMatchTable = new SSqlFetchingModel(this);
+    clientsMatchTable = new STableClientMatchModel(this);
     ui->tableView->setModel(clientsMatchTable);
     ui->tableView->setQuery(QUERY_SEL_CLIENT_MATCH_STATIC, QSqlDatabase::database("connMain"));
 }
@@ -82,7 +83,7 @@ void SClientMatch::findClient()
         nameClause.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`surname`, t1.`name`, t1.`patronymic`)", matchFlag, lastName, Qt::CaseInsensitive));
 
     if (companyName.length() >= 3 )
-        nameClause.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`name`, t1.`ur_name`, t1.`short_name`)", matchFlag, companyName, Qt::CaseInsensitive));
+        nameClause.fields.append(STableViewBase::initFilterField("CONCAT_WS(' ', t1.`ur_name`, t1.`short_name`)", matchFlag, companyName, Qt::CaseInsensitive));
 
     if (enteredByUserDigits.length() >= 3 )
     {
@@ -155,36 +156,44 @@ void SClientMatch::toggleElementsVisibility()
 }
 
 // ===============================================================================================================
-matchingClientsTable::matchingClientsTable(QWidget *parent) :
+STableViewClientMatch::STableViewClientMatch(QWidget *parent) :
     STableViewBase(SLocalSettings::ClientsMatchGrid, parent)
 {
     readLayout();
     i_gridLayout->$GridControl.Columns[Column::FullName].Width_marked = true;  // по умолчанию автоширина столбца с ФИО
 }
 
-matchingClientsTable::~matchingClientsTable()
+STableViewClientMatch::~STableViewClientMatch()
 {
 }
 
-void matchingClientsTable::setModel(QAbstractItemModel *model)
+void STableViewClientMatch::setModel(QAbstractItemModel *model)
 {
-    m_model = static_cast<SSqlFetchingModel*>(model);
+    m_model = static_cast<STableClientMatchModel*>(model);
     STableViewBase::setModel(model);
-//    matchingClientsTableItemDelegates *itemDelagates = new matchingClientsTableItemDelegates(m_model, this);
+//    STableViewClientMatchItemDelegates *itemDelagates = new STableViewClientMatchItemDelegates(m_model, this);
 //    setItemDelegate(itemDelagates);
 }
 
-void matchingClientsTable::clearModel()
+void STableViewClientMatch::clearModel()
 {
     m_model->clear();
 }
 
-void matchingClientsTable::setModelQuery(const QString &query, const QSqlDatabase &database)
+void STableViewClientMatch::setModelQuery(const QString &query, const QSqlDatabase &database)
 {
     m_model->setQuery(query, database);
 }
 
-void matchingClientsTable::translateNames()
+void STableViewClientMatch::setColumnWidth(int column, int width)
+{
+    if(m_model)
+        m_model->setColumnWidth(column, (int)(width/m_fontMetrics->averageCharWidth()));
+
+    STableViewBase::setColumnWidth(column, width);
+}
+
+void STableViewClientMatch::translateNames()
 {
     tr("FullName");
     tr("Balance");
@@ -192,4 +201,40 @@ void matchingClientsTable::translateNames()
     tr("Purchases");
     tr("Type");
     tr("PrimaryPhone");
+}
+
+/******************************************************************************************************************************************
+*/
+STableClientMatchModel::STableClientMatchModel(QObject *parent) :
+    SSqlFetchingModel(parent),
+    STableModelsCommonMethods(parent)
+{
+    m_sqlFetchingModel = this;
+}
+
+QVariant STableClientMatchModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+
+    if(role == Qt::DisplayRole)
+    {
+        switch(index.column())
+        {
+            case Columns::FullName:           return dataShort(index);
+            default: ;
+        }
+    }
+
+    return SSqlFetchingModel::data(index, role);
+}
+
+QModelIndex STableClientMatchModel::indexForShortData(const QModelIndex &index) const
+{
+    switch(index.column())
+    {
+        case Columns::FullName: return index.siblingAtColumn(Columns::ShortName);
+    }
+
+    return QModelIndex();
 }

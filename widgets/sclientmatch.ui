@@ -45,7 +45,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="matchingClientsTable" name="tableView">
+       <widget class="STableViewClientMatch" name="tableView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -112,7 +112,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>matchingClientsTable</class>
+   <class>STableViewClientMatch</class>
    <extends>QTableView</extends>
    <header>widgets/sclientmatch.h</header>
   </customwidget>

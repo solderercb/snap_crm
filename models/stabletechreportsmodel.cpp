@@ -26,28 +26,22 @@ QVariant STableTechReportsModel::data(const QModelIndex &index, int role) const
     return STableBaseModel::data(index, role);
 }
 
-/*
-    TODO: аналогичный код используется в SPartsRequestsModel и STableRepairsModel; нужно сделать общий
-*/
+QModelIndex STableTechReportsModel::indexForShortData(const QModelIndex &index) const
+{
+    switch(index.column())
+    {
+        case Columns::Client: return index.siblingAtColumn(Columns::ClientShortName);
+    }
+
+    return QModelIndex();
+}
+
 QVariant STableTechReportsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)
         return tr("no permissions");
 
-    QString value;
-    int width = i_columnWidths[idx.column()];
-
-    // полное имя (название организации)
-    value = STableBaseModel::data(idx).toString();
-    if(value.length() < width)
-        return value;
-
-    // короткое имя
-    value = STableBaseModel::data(idx.siblingAtColumn(Columns::ClientShortName)).toString();
-    if(!value.isEmpty())
-        return value;
-
-    return STableBaseModel::data(idx);
+    return dataShort(idx);
 }
 
 QVariant STableTechReportsModel::deviceDate(const QModelIndex &idx) const

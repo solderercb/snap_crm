@@ -108,28 +108,22 @@ void STableRepairsModel::reportCallbackData(const LimeReport::CallbackInfo &info
     }
 }
 
-/*
-    TODO: аналогичный код используется в STableTechReportsModel и SPartsRequestsModel; нужно сделать общий
-*/
+QModelIndex STableRepairsModel::indexForShortData(const QModelIndex &index) const
+{
+    switch(index.column())
+    {
+        case Columns::Client: return index.siblingAtColumn(Columns::ClientShortName);
+    }
+
+    return QModelIndex();
+}
+
 QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)
         return tr("no permissions");
 
-    QString value;
-    int width = i_columnWidths[idx.column()];
-
-    // полное имя (название организации)
-    value = SSqlFetchingModel::data(idx).toString();
-    if(value.length() < width)
-        return value;
-
-    // короткое имя
-    value = SSqlFetchingModel::data(index(idx.row(), Columns::ClientShortName)).toString();
-    if(!value.isEmpty())
-        return value;
-
-    return SSqlFetchingModel::data(idx);
+    return dataShort(idx);
 }
 
 QVariant STableRepairsModel::dateTime(const QModelIndex &idx) const

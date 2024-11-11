@@ -16,6 +16,7 @@ public:
 private:
     QVariant clientName(const QModelIndex &index) const;
     QVariant deviceDate(const QModelIndex &index) const;
+    QModelIndex indexForShortData(const QModelIndex &index) const override;
 };
 
 #endif // STABLETECHREPORTSMODEL_H

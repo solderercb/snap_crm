@@ -163,28 +163,22 @@ void SPartsRequestsModel::translateNames()
     tr("Dealer");
 }
 
-/*
-    TODO: аналогичный код используется в STableTechReportsModel и STableRepairsModel; нужно сделать общий
-*/
+QModelIndex SPartsRequestsModel::indexForShortData(const QModelIndex &index) const
+{
+    switch(index.column())
+    {
+        case Columns::Client: return index.siblingAtColumn(Columns::ClientShortName);
+    }
+
+    return QModelIndex();
+}
+
 QVariant SPartsRequestsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)
         return tr("no permissions");
 
-    QString value;
-    int width = i_columnWidths[idx.column()];
-
-    // полное имя (название организации)
-    value = SEditableBaseModel::data(idx).toString();
-    if(value.length() < width)
-        return value;
-
-    // короткое имя
-    value = SEditableBaseModel::data(idx.siblingAtColumn(Columns::ClientShortName)).toString();
-    if(!value.isEmpty() && value.length() < width)
-        return value;
-
-    return SEditableBaseModel::data(idx);
+    return dataShort(idx);
 }
 
 QVariant SPartsRequestsModel::dateTime(const QModelIndex &idx) const

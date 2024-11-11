@@ -34,7 +34,7 @@ private:
     bool toggleCheckBox(const QModelIndex &index);
     int checkBoxState(const QModelIndex &index) const;
     bool updateRowInTable(int row, const QSqlRecord &values) override;
-
+    QModelIndex indexForShortData(const QModelIndex &index) const override;
 public slots:
     bool commit();
     bool select() override;

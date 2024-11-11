@@ -47,6 +47,7 @@ public:
     void refresh(bool preserveScrollPos = ScrollPosReset, bool preserveSelection = SelectionReset) override;
 private:
     SPartsRequestsModel *m_model = nullptr;
+    void setColumnWidth(int column, int width) override;
     bool mouseEventOnCell(QEvent *event);
     void translateNames();
 private slots:

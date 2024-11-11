@@ -25,6 +25,7 @@ public:
     QVariant data(const int row, const int column, int role = Qt::DisplayRole) const;
     QVariant unformattedData(const QModelIndex &item, int role = Qt::DisplayRole) const;
     QVariant unformattedData(const int row, const int column, int role = Qt::DisplayRole) const;
+    QVariant dataShort(const QModelIndex &index) const;
     void setColumnWidth(const int column, const int width);
     void setRecordValue(QSqlRecord &record, const int field, const QVariant &value);
 private:
@@ -37,6 +38,7 @@ protected:
     int columnIndex(const QString &name);
     QString columnName(const int &index);
     const QMetaObject *metaObject();
+    virtual QModelIndex indexForShortData(const QModelIndex &index) const;
 };
 
 #endif // STABLEMODELSCOMMONMETHODS_H

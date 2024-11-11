@@ -28,6 +28,7 @@ public:
 public slots:
     void reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
 private:
+    QModelIndex indexForShortData(const QModelIndex &index) const override;
     QVariant clientName(const QModelIndex &index) const;
     QVariant dateTime(const QModelIndex &index) const;
 };

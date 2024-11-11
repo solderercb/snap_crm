@@ -117,6 +117,14 @@ void STableViewPartsRequests::refresh(bool preserveScrollPos, bool preserveSelec
         restoreVScrollPos();
 }
 
+void STableViewPartsRequests::setColumnWidth(int column, int width)
+{
+    if(m_model)
+        m_model->setColumnWidth(column, (int)(width/m_fontMetrics->averageCharWidth()));
+
+    STableViewBase::setColumnWidth(column, width);
+}
+
 void STableViewPartsRequests::translateNames()
 {
     tr("Check");

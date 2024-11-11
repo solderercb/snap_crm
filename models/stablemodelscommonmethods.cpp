@@ -116,6 +116,40 @@ const QMetaObject *STableModelsCommonMethods::metaObject()
     return 0;
 }
 
+/* Индекс для короткой формы данных.
+ * По умолчанию возвращает инвалидный индекс.
+ * Должен быть переопределён в наследующих классах.
+*/
+QModelIndex STableModelsCommonMethods::indexForShortData(const QModelIndex &index) const
+{
+    return QModelIndex();
+}
+
+/* Возвращает DisplayRole данные в короткой форме, если полная форма не умещается в ширину столбца
+*/
+QVariant STableModelsCommonMethods::dataShort(const QModelIndex &index) const
+{
+    QVariant regularData;
+    int width = i_columnWidths[index.column()];
+
+    // обычное (полное) значение
+    regularData = unformattedData(index);
+    if(regularData.toString().length() < width)
+        return regularData;
+
+    // короткое значение
+    QModelIndex shortIndex = indexForShortData(index);
+    if(shortIndex.isValid())
+    {
+        QVariant shortData;
+        shortData = unformattedData(shortIndex);
+        if(!shortData.toString().isEmpty())
+            return shortData;
+    }
+
+    return regularData;
+}
+
 QVariant STableModelsCommonMethods::data(const QModelIndex &index, int role) const
 {
     return this->data(index.row(), index.column(), role);
