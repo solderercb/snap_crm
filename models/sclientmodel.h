@@ -34,6 +34,7 @@ public:
 private:
     QString m_reason;
     int m_client;
+    void updateLogAssociatedRecId() override;
 };
 
 class SClientModel : public SComRecord
@@ -213,23 +214,21 @@ public:
     QString priceColumnStr();
     int repairs();
     void setRepairs(const int val);
-    bool updateRepairs(const int val);
+    void updateRepairs(const int val);
     int purchases();
     void setPurchases(int);
-    bool updatePurchases(int);
+    void updatePurchases(int);
     QString token();
     void setToken(const QString&);
     void showNotification(const QString &, const QMessageBox::Icon);
     QString genWebPass();
     void appendLogText(const QString&);
     bool commit();
-    bool integrityStatus();
     void initDemo() override;
     int employeeId();
     void setEmployeeId(const int id);
     bool printBOQDefaultState();
 private:
-    bool nIntegrityErr = 1;
     bool m_standAlone = 0;
     int m_editStrategy = OnManualSubmit;
     SPhonesModel *m_phones;
@@ -284,6 +283,7 @@ private:
     bool m_notificationShown = 0;
     void initBinaryOptions(QSqlQueryModel*);
     void translateNames();
+    void updateLogAssociatedRecId() override;
 };
 
 #endif // SCLIENTMODEL_H

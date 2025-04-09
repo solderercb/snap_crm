@@ -558,23 +558,30 @@
 
 // ACHTUNG! ACHTUNG! если в выражениях ниже не закомментирован вызов функции qDebug(), а выражение используется в теле условного оператора БЕЗ ЗАКЛЮЧЕНИЯ в {}, то работа программы будет неправильной
 #define QUERY_EXEC(obj,flag)                /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Executing query...";*/ if ((flag)) (flag) = (obj)->exec
+#define QUERY_EXEC_TH(obj,flag,query) if ((flag)) if(!(obj)->exec((query))) Global::throwError((obj)->lastError());
+
 
 // верификация записанных в БД данных; производится примитивно, путём сравнения записанных данных с данными, которые были переданы в запросе;
 // если данные совпадают, то сервер должен вернуть 55AAh (21930d), иначе 00h
 // далее, если контрольное число совпадает, flag устанавливаем в 1, иначе — 0.
-#define QUERY_EXEC_VRFY(obj,flag)           if ((flag)){\
-                                                (obj)->first();\
+#define QUERY_EXEC_VRFY(obj,id)             (obj)->first();\
+                                            if ((obj)->value(0).toInt() != 21930){\
+                                                Global::throwError(Global::ThrowType::IntegrityError,\
+                                                                    QObject::tr("Ошибка целостности данных баланса (id = %1)").arg((id)));\
                                                 /*qDebug() << "Integrity magic number: " << (obj)->value(0).toInt();*/\
-                                                (flag) = ((obj)->value(0).toInt() == 21930)?1:0;}
+                                            }
 
-#define QUERY_NEW_ID(col,tbl,obj,flag,id)   if ((flag)){\
-                                                (flag) = (obj)->exec("SELECT (MAX(`" + (col) + "`)) + 1 AS 'id', COUNT(1) FROM `" + (tbl) + "`;");\
-                                                (obj)->first();\
-                                                (id) = (obj)->value(0).toInt();}
+#define QUERY_NEW_ID(column, table)         QString("SELECT (MAX(`%1`)) + 1 AS 'id', COUNT(1) AS 'count' FROM `%2`;")\
+                                                .arg((column), (table))
 
 // QSqlQuery::lastInsertId() почему-то не работает, поэтому так:
 #define QUERY_LAST_INS_ID(obj,flag,id)      /*qDebug() << "(!!!) nDBErr=" << (flag) << ". Executing SELECT LAST_INSERT_ID() query...";*/ if ((flag)){\
                                                 (obj)->exec("SELECT LAST_INSERT_ID();");\
+                                                (obj)->first();\
+                                                (id) = (obj)->value(0).toInt();}
+#define QUERY_LAST_INS_ID_TH(obj,flag,id)   if ((flag)){\
+                                                if(!(obj)->exec("SELECT LAST_INSERT_ID();"))\
+                                                    Global::throwError((obj)->lastError());\
                                                 (obj)->first();\
                                                 (id) = (obj)->value(0).toInt();}
 
@@ -584,27 +591,27 @@
 #define QUERY_ROLLBACK_MSG(obj,text)        qDebug() << QString("Возникла ошибка: %1").arg((text));\
                                             QMessageBox msgBox;\
                                             msgBox.setText(QString("Возникла ошибка\r\n%1").arg((text)));\
-                                            obj->exec(QUERY_ROLLBACK);\
+                                            (obj)->exec(QUERY_ROLLBACK);\
                                             msgBox.exec();
 #define QUERY_COMMIT_ROLLBACK(obj,flag)     if (flag == 0)   /* в случае ошибки выполнения запроса нужно всё откатить */\
                                             {\
-                                                obj->exec(QUERY_ROLLBACK);\
+                                                (obj)->exec(QUERY_ROLLBACK);\
                                             }\
                                             else\
                                             {\
-                                                obj->exec(QUERY_COMMIT);\
+                                                (obj)->exec(QUERY_COMMIT);\
                                             }
 #define QUERY_COMMIT_ROLLBACK_MSG(obj,flag) if (flag == 0)   /* в случае ошибки выполнения запроса нужно всё откатить */\
                                             {\
-                                                qDebug() << QString("Ошибка выполнения запроса: %1").arg(obj->lastError().text());\
+                                                qDebug() << QString("Ошибка выполнения запроса: %1").arg((obj)->lastError().text());\
                                                 QMessageBox msgBox;\
-                                                msgBox.setText(QString("Ошибка выполнения запроса\r\n%1").arg(obj->lastError().text()));\
-                                                obj->exec(QUERY_ROLLBACK);\
+                                                msgBox.setText(QString("Ошибка выполнения запроса\r\n%1").arg((obj)->lastError().text()));\
+                                                (obj)->exec(QUERY_ROLLBACK);\
                                                 msgBox.exec();\
                                             }\
                                             else\
                                             {\
-                                                obj->exec(QUERY_COMMIT);\
+                                                (obj)->exec(QUERY_COMMIT);\
                                             }
 
 

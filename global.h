@@ -11,6 +11,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QSettings>
+#include "global_ns.h"
 #include "applog.h"
 #include "models/scomsettings.h"
 #include "models/susersettings.h"
@@ -48,11 +49,22 @@ namespace Global
                   tech_report,
                   not_impl = 256};
     Q_ENUM_NS(Reports)
-    enum ThrowType {Debug = 0, QueryError = 1, TimeError = 2, ConnLost = 252, IntegrityError = 253, ConditionsError = 254, UserCanceled = 255};
     enum UserRoles {Admininstrator = 1, Engineer = 2, Manager = 3, Director = 4, SeniorEngineer = 5, SeniorManager = 6}; // роли по умолчанию
     Q_ENUM_NS(UserRoles)
+    enum ThrowType {Debug = 0, QueryError = 1, TimeError = 2, ResultError = 3, ConditionsError = 250, AccessDenied = 251, ConnLost = 252, IntegrityError = 253, InputError = 254, UserCanceled = 255};
+    Q_ENUM_NS(ThrowType)
+    int throwCodeByQueryError(const QSqlError &err);
+    void errorMsg(const QString &errorText);
+    void errorMsg(const int type, const QString &errorText = QString());
+    void errorMsg(const QSqlError &err, const QString &errorText = QString());
+    QString throwMsg(const int &throwCode);
+    void errorPopupMsg(const QString &msg);
+    void errorPopupMsg(const int &throwCode);
+    void errorPopupMsg(const QSqlError &err);
 }
 
+extern QString errQuerySelDeviceMakers;
+extern QString errQuerySelCartridgeCatId;
 extern QLocale sysLocale;
 extern QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 extern SUserSettings *userDbData;

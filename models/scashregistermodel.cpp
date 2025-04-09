@@ -111,8 +111,7 @@ bool SCashRegisterModel::commit()
         if(m_amount == 0)
             return 1;
 
-        QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-        bool nIntegrityErr = 1;
+        QSqlQuery query(QSqlDatabase::database("connThird"));
         QString q;
 
         i_valuesMap.insert("user", userDbData->id);
@@ -131,17 +130,12 @@ bool SCashRegisterModel::commit()
         q = "SELECT IF(\n  " + fields_verify.join(" AND\n  ") + "\n, 21930, 0)\n"\
                                                                 "FROM `cash_orders`\n"\
                                                                 "WHERE `id` = " + QString::number(i_id) + ";";
-        QUERY_EXEC(query,i_nErr)(q);
-        QUERY_EXEC_VRFY(query,nIntegrityErr);
-
-        delete query;
-
-        if(!nIntegrityErr)
-            throw Global::ThrowType::IntegrityError;
+        QUERY_EXEC_TH(&query,i_nErr,q);
+        QUERY_EXEC_VRFY(&query,m_client);
     }
 
     if(!i_nErr)
-        throw Global::ThrowType::QueryError;
+        Global::throwError(Global::ThrowType::QueryError);
 
     if(!m_skipLogRecording)
         i_logRecord->commit();

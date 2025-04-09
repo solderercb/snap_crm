@@ -131,21 +131,13 @@ bool SFieldsModel::commit()
     SFieldValueModel *item;
     foreach(item, m_fieldsList)
     {
-        if(!item->commit())
-        {
-            m_nErr = 0;
-            throw Global::ThrowType::QueryError;
-        }
+        item->commit();
     }
 
     while( !m_removeList.isEmpty() )
     {
         item = m_removeList.last();
-        if(!item->delDBRecord())
-        {
-            m_nErr = 0;
-            throw Global::ThrowType::QueryError;
-        }
+        item->delDBRecord();
 
         m_removeList.removeLast();
         item->deleteLater();

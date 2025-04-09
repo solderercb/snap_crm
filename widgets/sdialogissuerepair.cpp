@@ -285,44 +285,28 @@ void SDialogIssueRepair::buttonIssueClicked()
     if(checkInput())
         return;
 
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     QUERY_LOG_START(parent()->metaObject()->className());
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         issueRepairs();
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
 
         // в случае возникновения ошибки запроса нужно обновить данные моделей
-        QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
-        SRepairModel *repairModel;
-        while(i != m_repairsModels.constEnd())
-        {
-            repairModel = (*i);
-            repairModel->reload();
-            i++;
-        }
         m_clientModel->load(m_repairsModels.at(0)->clientId());
-
         emit issueFailed();
     }
     QUERY_LOG_STOP;
@@ -379,7 +363,7 @@ void SDialogIssueRepair::issueRepairs()
             case Global::RepStateIds::Ready | AmountZero | InCredit: newState = Global::RepStateIds::Returned; break; // при выдаче в долг ранее оплаченных они переключаются в "Выдано клиенту"
             case Global::RepStateIds::GetIn | InCredit | QuickRepair:
             case Global::RepStateIds::Ready | InCredit: newState = Global::RepStateIds::ReturnedInCredit; break;
-            default: throw Global::ThrowType::ConditionsError;
+            default: Global::throwError(Global::ThrowType::InputError);
         }
 
         workshopIssuedModel = new SWorkshopIssuedModel();

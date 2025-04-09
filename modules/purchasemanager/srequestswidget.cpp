@@ -17,7 +17,7 @@ SPartsRequests::SPartsRequests(QWidget *parent) :
     ui->tableView->setGrouping(QStringList{"t1.`id`"});    // default GROUP part of query
     ui->tableView->setMinimumHeight(110);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SPartsRequests::tableRowSelected);
-    connect(ui->pushButtonSaveChanges, &QPushButton::clicked, this, &SPartsRequests::commit);
+    connect(ui->pushButtonSaveChanges, &QPushButton::clicked, this, &SPartsRequests::manualSubmit);
     connect(ui->tableView, &STableViewPartsRequests::doubleClicked, this, &SPartsRequests::tableRowDoubleClicked);
     connect(ui->tableView, &STableViewPartsRequests::checkChanges, this, &SPartsRequests::checkChanges);
     connect(ui->pushButtonCreateCopy, &QPushButton::clicked, this, &SPartsRequests::createRequestCopy);
@@ -44,6 +44,7 @@ void SPartsRequests::updateWidgets()
 bool SPartsRequests::eventFilter(QObject *object, QEvent *event)
 {
     Q_UNUSED(object)
+    Q_UNUSED(event)
 
     return false;
 }
@@ -51,6 +52,44 @@ bool SPartsRequests::eventFilter(QObject *object, QEvent *event)
 STableViewBase *SPartsRequests::tableView()
 {
     return ui->tableView;
+}
+
+void SPartsRequests::manualSubmit()
+{
+    bool nErr = 1;
+    QSqlQuery query(QSqlDatabase::database("connThird"));
+
+    QUERY_LOG_START(metaObject()->className());
+
+    try
+    {
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
+
+        commit();
+
+#ifdef QT_DEBUG
+//        Global::throwDebug();
+#endif
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
+    }
+    catch (const Global::ThrowType &type)
+    {
+        nErr = 0;
+        if (type == Global::ThrowType::ConnLost)
+        {
+            ;
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+    }
+
+    QUERY_LOG_STOP;
+
+    if(nErr)
+    {
+        refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
+    }
 }
 
 /* Вызов метода проверки несохранённых данных в таблицах заявок и ссылок на вкладке Мереджер закупок
@@ -115,9 +154,7 @@ void SPartsRequests::setTableLayout(const SLocalSettings::SettingsVariant &layou
 
 void SPartsRequests::commit()
 {
-    m_model->commit();
-
-    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
+    m_model->submitAll();
 }
 
 void SPartsRequests::tableRowSelected(const QModelIndex &current, const QModelIndex &prev)

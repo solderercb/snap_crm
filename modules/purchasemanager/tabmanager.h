@@ -45,7 +45,6 @@ private slots:
     void refresh();
     void refreshManual();
     void refreshQuiet();
-    void linksSaveOk();
     void lineEditSearchTextChanged(QString);
     void groupChanged(int index);
     void subgroupsUpdated();

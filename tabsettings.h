@@ -36,7 +36,6 @@ private:
     bool m_buttonRefreshVisible = 0;
     bool m_lineEditSearchVisible = 0;
     bool m_editStrategy = 0;
-    SQueryLog *m_queryLog;
 public slots:
     void buttonSaveClicked();
 private slots:

@@ -140,7 +140,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //    }
     appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Normal application exit");
     appLog->appendRecord("\r\n\r\n\r\n");
-    userActivityLog->appendRecord("Logout");
+    userActivityLog->appendRecordStandalone("Logout");
 }
 
 void MainWindow::createMenu()

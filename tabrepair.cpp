@@ -115,19 +115,19 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    if(!checkViewPermission())
+    try
     {
+        checkViewPermission();
         logUserActivity();
-        reloadRepairData();
+        loadData();
         setLock();
         m_repairLockUpdateTimer = new QTimer(this);
         connect(m_repairLockUpdateTimer, &QTimer::timeout, [=]{setLock();});
         m_repairLockUpdateTimer->setSingleShot(false);
         m_repairLockUpdateTimer->start(repairModel->lockTimeout()*1000);
     }
-    else
+    catch(Global::ThrowType)
     {
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Не достаточно прав для открытия карточки чужого ремонта"), QColor(255,255,255), QColor(245,245,245));
         this->deleteLater();
         return;
     }
@@ -135,7 +135,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 #ifdef QT_DEBUG
     if( m_getOutButtonVisible && (repairModel->state() == Global::RepStateIds::Ready || repairModel->state() == Global::RepStateIds::ReadyNoRepair) )
         createDialogIssue();
-    connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(reloadRepairData()));
+    connect(ui->pushButtonManualUpdateRepairData, SIGNAL(clicked()), this, SLOT(reloadData()));
 #else
     ui->pushButtonManualUpdateRepairData->setHidden(true);
 #endif
@@ -197,13 +197,13 @@ void tabRepair::refreshIfTabExists(const int repairId)
             if(tab->repair_id != repairId)
                 continue;
 
-            tab->reloadRepairData();
+            tab->reloadData();
             return;
         }
     }
 }
 
-void tabRepair::reloadRepairData()
+void tabRepair::loadData()
 {
     repairModel->load(repair_id);
     if(repairModel->clientId() != m_clientId)  // перезагрузка данных клиента только при первом вызове метода или если был изменён клиент
@@ -227,6 +227,21 @@ void tabRepair::reloadRepairData()
         setWidgetsParams(repairModel->state());
         updateWidgets();
     }
+
+}
+
+void tabRepair::reloadData()
+{
+    try
+    {
+        loadData();
+    }
+    catch(Global::ThrowType)
+    {
+        // TODO: выключение всех виджетов, чтобы спровоцировать пользователя закрыть вкладку
+        //       или создание виджета, перекрывающего элементы вкладки и отображающего информацию о сбое
+    }
+
 }
 
 void tabRepair::reloadRequestsList()
@@ -394,8 +409,10 @@ void tabRepair::setLock(bool state)
         i_tabIcon = nullptr;
     }
 
-    if(!modelRO)
-        repairModel->lock(state);
+    if(modelRO)
+        return;
+
+    repairModel->lock(state);
 }
 
 void tabRepair::createAdditionalFieldsWidgets()
@@ -538,8 +555,8 @@ void tabRepair::createDialogIssue()
     list.append(repairModel);
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
     connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printRepairWorksReports(list, false);});
-    connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepair::reloadRepairData);
-    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepair::reloadRepairData);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepair::reloadData);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepair::reloadData);
 }
 
 void tabRepair::openPrevRepair()
@@ -579,13 +596,13 @@ void tabRepair::initEngineer()
 }
 
 /*  Проверка разрешения на открытие чужих карт ремонта
- *  Возвращает 1 если пользователь не обладает таким правом
+ *  Если пользователю не обладает такими правами, будет сгенерировано исключение
 */
-bool tabRepair::checkViewPermission()
+void tabRepair::checkViewPermission()
 {
     if(permissions->viewAnyRepair)
     {
-        return 0;
+        return;
     }
 
     bool ret = 1;
@@ -593,13 +610,13 @@ bool tabRepair::checkViewPermission()
     int repManager = 0;
     int repEngineer = 0;
     QStringList userRoles = userDbData->roles.split(',');
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery query(QSqlDatabase::database("connMain"));
 
-    query->exec(QUERY_SEL_REPAIR_MNGR_ENGR(repair_id));
-    if(query->first())
+    query.exec(QUERY_SEL_REPAIR_MNGR_ENGR(repair_id));
+    if(query.first())
     {
-        repManager = query->value(0).toInt();
-        repEngineer = query->value(1).toInt();
+        repManager = query.value(0).toInt();
+        repEngineer = query.value(1).toInt();
 
         foreach(auto r, userRoles)
         {
@@ -618,8 +635,8 @@ bool tabRepair::checkViewPermission()
         }
     }
 
-    delete query;
-    return ret;
+    if(ret)
+        Global::throwError(Global::ThrowType::AccessDenied);
 }
 
 void tabRepair::openInvoice(int)
@@ -693,35 +710,28 @@ void tabRepair::setPricesToZero()
 bool tabRepair::commit(const QString &notificationCaption, const QString &notificationText)
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     QUERY_LOG_START(metaObject()->className());
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         repairModel->updateLastSave();
         nErr = repairModel->commit();
-        shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if(type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
     QUERY_LOG_STOP;
 
-    delete query;
+    if(nErr)
+        shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
 
     return nErr;
 }
@@ -849,10 +859,12 @@ void tabRepair::saveDiagAmount()
     if(m_spinBoxAmountChanged)
     {
         repairModel->setRepairCost(ui->doubleSpinBoxAmount->value());
+        m_spinBoxAmountChanged = 0;
     }
     if(m_diagChanged)
     {
         repairModel->setDiagnosticResult(ui->textEditDiagResult->toPlainText());
+        m_diagChanged = 0;
     }
 
     if(m_groupUpdate)

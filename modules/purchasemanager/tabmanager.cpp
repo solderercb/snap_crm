@@ -91,7 +91,6 @@ tabPurchaseManager::tabPurchaseManager(MainWindow *parent) :
     connect(ui->pushButtonCreateNew, &QPushButton::clicked, this, []{MainWindow::getInstance()->createTabPartRequest(0);});
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabPurchaseManager::refreshManual);
     connect(ui->widgetPartSuppliers, &SPartSuppliers::beginRowInsert, this, [=]{commitChanges(checkChanges(DirtyFlags::SuppliersModel));});
-    connect(ui->widgetPartSuppliers, &SPartSuppliers::submitOk, this, &tabPurchaseManager::linksSaveOk);
     ui->widgetPartSuppliers->connectSuppliersTableWithManager();
 
     groupChanged(SPartsRequestsGroupingModel::Group::No);
@@ -356,30 +355,30 @@ bool tabPurchaseManager::commitChanges(int flags)
         return 1;
 
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     QUERY_LOG_START(metaObject()->className());
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         if(flags & DirtyFlags::SuppliersModel)
-            ui->widgetPartSuppliers->saveLinks();
+            ui->widgetPartSuppliers->commit();
         if(flags & DirtyFlags::RequestsModel)
             ui->widgetPartsRequests->commit();
-        QUERY_COMMIT_ROLLBACK(query, nErr);
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
     }
     catch(Global::ThrowType type)
     {
         nErr = 0;
-        if (type == Global::ThrowType::QueryError)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
+
     QUERY_LOG_STOP;
 
-    delete query;
+    if(nErr)
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
 
     return nErr;
 }
@@ -487,12 +486,6 @@ void tabPurchaseManager::refreshQuiet()
     ui->widgetPartsRequests->tableView()->refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
     ui->widgetPartSuppliers->refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
     ui->widgetPartsRequests->tableView()->blockSignals(false);
-}
-
-void tabPurchaseManager::linksSaveOk()
-{
-    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
-    refreshQuiet();
 }
 
 bool tabPurchaseManager::tabCloseRequest()

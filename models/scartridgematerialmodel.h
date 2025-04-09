@@ -30,17 +30,21 @@ public:
     QString workName();
     double salarySumm() const;
     void setSalarySumm(double salarySumm);
+    void setInitializerCardId(const int id);
+
 private:
     int m_type;
     int m_count;
     int m_articul;
     QString m_name;
     int m_cardId;
+    int m_initializerCardId = 0;    // см. комментарий к сеттеру
     double m_price;
     double m_worksPrice;
     double m_salarySumm;
     QString m_workName;
     void initWorkName(const Type type);
+    void loadError(const int type);
 };
 
 #endif // SCARTRIDGEMATERIALMODEL_H

@@ -76,24 +76,24 @@ bool tabCashMoveExch::commit(bool repeatAfter)
     if(!checkInput())
         return 0;
 
-    SOfficeModel *officeSrc = new SOfficeModel();
-    SOfficeModel *officeDst = new SOfficeModel();
+    SOfficeModel officeSrc;
+    SOfficeModel officeDst;
 
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     bool nErr = 1;
 
     QUERY_LOG_START(metaObject()->className());
 
-    officeSrc->load(officesModel->databaseIDByRow(ui->comboBoxSrcOffice->currentIndex()));
-    officeDst->load(officesModel->databaseIDByRow(ui->comboBoxDstOffice->currentIndex()));
+    officeSrc.load(officesModel->databaseIDByRow(ui->comboBoxSrcOffice->currentIndex()));
+    officeDst.load(officesModel->databaseIDByRow(ui->comboBoxDstOffice->currentIndex()));
     cashRegisterSrc->setOperationType(SCashRegisterModel::MoveCash);
     cashRegisterDst->setOperationType(SCashRegisterModel::MoveCash);
     cashRegisterSrc->setAmount(-ui->doubleSpinBoxSrcAmount->value());
     cashRegisterDst->setAmount(ui->doubleSpinBoxDstAmount->value());
-    cashRegisterSrc->setCompany(officeSrc->defaultCompany());
-    cashRegisterDst->setCompany(officeDst->defaultCompany());
-    cashRegisterSrc->setOffice(officeSrc->id());
-    cashRegisterDst->setOffice(officeDst->id());
+    cashRegisterSrc->setCompany(officeSrc.defaultCompany());
+    cashRegisterDst->setCompany(officeDst.defaultCompany());
+    cashRegisterSrc->setOffice(officeSrc.id());
+    cashRegisterDst->setOffice(officeDst.id());
     cashRegisterSrc->setCreatedDate(ui->dateEdit->date());
     cashRegisterDst->setCreatedDate(ui->dateEdit->date());
     cashRegisterSrc->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSrcPaymentAccount->currentIndex(), "system_id"));
@@ -103,7 +103,7 @@ bool tabCashMoveExch::commit(bool repeatAfter)
 
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         cashRegisterSrc->setReason(QString());  // поле обязательное, поэтому сначала записывается пустая строка
         cashRegisterDst->setReason(QString());
         cashRegisterSrc->commit();
@@ -116,37 +116,25 @@ bool tabCashMoveExch::commit(bool repeatAfter)
         cashRegisterDst->commit();
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
 
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
         initCashRegisterModel();
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
+
+//        if(type == Global::ThrowType::Debug)
+//            nErr = 1; // это чтобы проверить работу дальше
     }
 
-#ifdef QT_DEBUG
-//    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
-#endif
-
     QUERY_LOG_STOP;
-
-    delete query;
-    delete officeSrc;
-    delete officeDst;
 
     if(nErr)
     {

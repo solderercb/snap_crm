@@ -2,7 +2,6 @@
 #include <exception>
 #include <QDebug>
 #include "global.h"
-#include "widgets/shortlivednotification.h"
 
 SApplication::SApplication(int& argc, char** argv) :
     QApplication(argc, argv)
@@ -19,20 +18,20 @@ bool SApplication::notify(QObject *receiver, QEvent *event)
     // запись в журнал и прочие действия для разных типов исключений:
     catch (const std::exception& ex)
     {
-        qDebug().nospace() << "SApplication::notify() | std::exception: " << ex.what();
+        qDebug().nospace() << "SApplication::notify() | Unhandled std::exception: " << ex.what();
     }
     catch (const int &ex)
     {
-        qDebug().nospace() << "SApplication::notify() | int exception: " << ex;
+        qDebug().nospace() << "SApplication::notify() | Unhandled int exception: " << ex;
     }
     catch (const Global::ThrowType &ex)
     {
-        qDebug().nospace() << "SApplication::notify() | Global exception: " << (Global::ThrowType)ex;
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), tr("Локальное время и время сервера отличаются на более чем 30 секунд"), QColor("#FFC7AD"), QColor("#FFA477"));
+        Global::errorPopupMsg(ex);
+        qDebug().nospace() << "SApplication::notify() | Unhandled ThrowType exception: " << ex;
     }
     catch (...)
     {
-        qDebug().nospace() << "SApplication::notify() | unknown exception";
+        qDebug().nospace() << "SApplication::notify() | Unhandled unknown exception";
     }
     return done;
 

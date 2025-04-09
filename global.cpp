@@ -6,7 +6,10 @@
 #include "models/sofficemodel.h"
 #include "models/stableclientsmodel.h"
 #include "modules/purchasemanager/srequestsmodel.h"
+#include "widgets/shortlivednotification.h"
 
+QString errQuerySelDeviceMakers(QObject::tr("Сбой выполнения QUERY_SEL_DEVICE_MAKERS"));
+QString errQuerySelCartridgeCatId(QObject::tr("Сбой выполнения QUERY_SEL_CARTRIDGE_CAT_ID; возможно в настройках каталога устроств не задана категория \"заправка\""));
 QLocale sysLocale = QLocale::system();
 QVector<QSqlDatabase *> connections;    // массив указателей на соединения (для установки всем соединениям одинаковых параметров)
 SUserSettings *userDbData = new SUserSettings;
@@ -300,3 +303,127 @@ void initSystemObjects()
     clientBinaryProperties->setObjectName("clientBinaryProperties");
     clientBinaryProperties->setHorizontalHeaderLabels({"name", "bitfield", "dbField, shortName"});
 }
+
+QString Global::throwMsg(const int &throwCode)
+{
+    QString msg;
+
+    switch (throwCode)
+    {
+        case Global::ThrowType::Debug: msg = QObject::tr("=== DEBUG ==="); break;
+        case Global::ThrowType::QueryError: msg = QObject::tr("Синтаксическая ошибка в запросе"); break;
+        case Global::ThrowType::TimeError: msg = QObject::tr("Локальное время и время сервера отличаются на более чем 30 секунд"); break;
+        case Global::ThrowType::ResultError: msg = QObject::tr("Ошибка загрузки: запрос не вернул данных"); break;
+        case Global::ThrowType::ConnLost: msg = QObject::tr("Нет связи с сервером"); break;
+        case Global::ThrowType::IntegrityError: msg = QObject::tr("Ошибка верификации данных"); break;
+        case Global::ThrowType::ConditionsError: msg = QObject::tr("Некорректные данные"); break;
+        case Global::ThrowType::InputError: msg = QObject::tr("Не заполнены обязательные поля"); break;
+        case Global::ThrowType::UserCanceled: msg = QObject::tr("Отменено пользователем"); break;
+        case Global::ThrowType::AccessDenied: msg = QObject::tr("Проверьте права доступа или обратитесь к администратору"); break;  // QColor(212,237,242), QColor(229,244,247)
+        default: msg = QObject::tr("Неизвестная ошибка"); break;
+    }
+
+    return msg;
+}
+
+/* Возвращает код исключения по ошибке запроса
+*/
+int Global::throwCodeByQueryError(const QSqlError &err)
+{
+    ThrowType tr;
+
+    switch (err.type())
+    {
+        case QSqlError::ConnectionError: tr = ThrowType::ConnLost; break;
+        case QSqlError::StatementError: tr = ThrowType::QueryError; break;
+        default: tr = ThrowType::ConditionsError; break;
+    }
+
+    return tr;
+}
+
+/* Всплывающее сообщение об ошибке
+*/
+void Global::errorPopupMsg(const QString &msg)
+{
+    shortlivedNotification *newPopup = new shortlivedNotification(nullptr, QObject::tr("Ошибка"), msg, QColor("#FFC7AD"), QColor("#FFA477"));
+}
+
+void Global::errorPopupMsg(const int &throwCode)
+{
+    errorPopupMsg(throwMsg(throwCode));
+}
+
+void Global::errorPopupMsg(const QSqlError &err)
+{
+    errorPopupMsg(throwCodeByQueryError(err));
+}
+
+/* Вывод высплывающего сообщения и запись в журнал
+*/
+void Global::errorMsg(const QString &text)
+{
+    errorPopupMsg(text);
+    appLog->appendRecord(text);
+}
+
+/* По коду исключения ThrowType:
+ *  выводится всплывающее сообщение,
+ *  производится запись в журнал
+ * errorText добавляется к общему описанию ошибки, чтобы запись в журнале имела контекст.
+*/
+void Global::errorMsg(const int type, const QString &errorText)
+{
+    QString text = throwMsg(type);
+    errorPopupMsg(text);
+    if(!errorText.isEmpty())
+        text.prepend(errorText + ". ");
+    appLog->appendRecord(text);
+}
+
+/* По коду ошибки запроса:
+ *  выводится всплывающее сообщение,
+ *  производится запись в журнал
+ * customErrorText добавляется к описанию ошибки MySQL, чтобы запись в журнале имела контекст.
+*/
+void Global::errorMsg(const QSqlError &err, const QString &customErrorText)
+{
+    QString text = err.text();
+    ThrowType type = (ThrowType)throwCodeByQueryError(err);
+    errorPopupMsg(type);
+    if(!customErrorText.isEmpty())
+        text.prepend(customErrorText + " | ");
+    appLog->appendRecord(text);
+}
+
+/* По коду исключения ThrowType;
+ *  выводится всплывающее сообщение,
+ *  производится запись в журнал
+ *  генерируется глобальное исключение
+*/
+void Global::throwError(const int type, const QString &errorText)
+{
+    errorMsg(type, errorText);
+    throw (ThrowType)type;
+}
+
+/* По коду ошибки запроса:
+ *  выводится всплывающее сообщение,
+ *  производится запись в журнал
+ *  генерируется глобальное исключение
+*/
+void Global::throwError(const QSqlError &err, const QString &customErrorText)
+{
+    errorMsg(err, customErrorText);
+    throw (ThrowType)throwCodeByQueryError(err);
+}
+
+/* Вывод всплывающего сообщения, используемый в режиме отладки
+*/
+#ifdef QT_DEBUG
+void Global::throwDebug()
+{
+    errorPopupMsg(ThrowType::Debug);
+    throw ThrowType::Debug;
+}
+#endif

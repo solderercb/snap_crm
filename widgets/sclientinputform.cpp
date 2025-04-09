@@ -214,8 +214,7 @@ void SClientInputForm::createClient()
     clientModel->setType(ui->checkBoxClientType->isChecked());
     if(ui->checkBoxClientType->isChecked())
         clientModel->setUrName(ui->lineEditClientFirstName->text());
-    if(!clientModel->commit())
-        throw Global::ThrowType::QueryError;
+    clientModel->commit();
 
     m_client = clientModel->id();
 }
@@ -223,18 +222,17 @@ void SClientInputForm::createClient()
 void SClientInputForm::commit()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     if (clientModel->isNew() || clientModel->phones()->isUpdated())
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         if(clientModel->isNew())
             createClient();
         if(clientModel->phones()->isUpdated())
             clientModel->phones()->commit();
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
         fillClientCreds(m_client);
     }
-    delete query;
 }
 
 void SClientInputForm::primaryPhoneEdited(QString number)

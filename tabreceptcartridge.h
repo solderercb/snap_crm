@@ -36,14 +36,14 @@ private:
     QTimer *m_findBySerialDelay;
     bool m_closePending = 0;
     SClientModel *m_client = nullptr;
-    SCartridgeCard *m_cartridgeCardForm;
     bool m_printReport = 0;
     void setDefaultStyleSheets();
     void initWidgets();
     void clearWidgets();
     bool checkInput();
     bool checkInputBeforeAdd();
-    void appendToReceptList(SCartridgeForm *form);
+    void initReceiptCartridgeForm(SCartridgeForm *&form, const QSqlRecord &record = QSqlRecord());
+    void appendToList(SCartridgeForm *form);
     void print();
     const QList<SCartridgeForm*> existentForms();
 #ifdef QT_DEBUG
@@ -57,7 +57,7 @@ private slots:
     bool createRepairs();
     void createRepairsAndClose();
     void comboBoxModelButtonClickHandler(int);
-    void appendToReceptList();
+    void appendToList();
     void updateTotalPreagreedAmount();
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();

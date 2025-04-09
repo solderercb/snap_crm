@@ -426,11 +426,19 @@ QList<SRepairModel*> tabRepairs::repairsListFromSelection()
 
     for(int i = 0; i < idsList->count(); i++)
     {
-        repair = new SRepairModel(idsList->at(i));
-        BOQModel = new SSaleTableModel(repair);
-        BOQModel->repair_loadTable(idsList->at(i));
-        repair->setBOQModel(BOQModel);
-        list.append(repair);
+        try
+        {
+            repair = new SRepairModel();
+            repair->load(idsList->at(i));
+            BOQModel = new SSaleTableModel(repair);
+            BOQModel->repair_loadTable(idsList->at(i));
+            repair->setBOQModel(BOQModel);
+            list.append(repair);
+        }
+        catch (Global::ThrowType)
+        {
+            delete repair;
+        }
     }
 
     delete idsList;

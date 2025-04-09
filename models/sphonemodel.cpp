@@ -225,3 +225,6 @@ void SPhoneModel::setPrimaryUi()
     setType(SPhoneModel::Primary);
 }
 
+void SPhoneModel::updateLogAssociatedRecId()
+{
+}

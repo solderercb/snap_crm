@@ -14,8 +14,10 @@ public:
     QString filePath();
     void setFile(const QString&);
     bool appendRecord(const QString&);
+    static SAppLog* getInstance();
 private:
     QFile file;
+    static SAppLog* p_instance;
 };
 
 #endif // SAPPLOG_H

@@ -1,6 +1,8 @@
 #include "scomsettings.h"
 #include "global.h"
 
+static QString errMsg(QObject::tr("Не удалось сохранить основные настройки"));
+
 SComSettings::SComSettings() :
     SPropertyCollection()
 {
@@ -173,7 +175,7 @@ void SComSettings::prepareUpdateList(Table table)
 void SComSettings::save()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     QString q;
 
     for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
@@ -190,42 +192,38 @@ void SComSettings::save()
     if(!i_valuesMap.isEmpty())
     {
         q = QString("UPDATE\n  `config`\nSET\n  %2\nWHERE `id` = 1;").arg(fields.join(",\n  "));
-        QUERY_EXEC(query, nErr)(q);
+        QUERY_EXEC_TH(&query, nErr,q);
     }
+
     if(!nErr)
-        throw Global::ThrowType::QueryError;
+        Global::throwError(query.lastError(), errMsg);
 
     saveToTableSettings();
 
     i_fieldModified.clear();
     i_jsonFieldModified.clear();
-    delete query;
 }
 
 void SComSettings::saveToTableSettings()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     i_valuesMap.clear();
     prepareUpdateList(Table::Settings);
 
-    query->prepare(QString("UPDATE `settings` SET `value` = :value WHERE `name` = :name"));
+    query.prepare(QString("UPDATE `settings` SET `value` = :value WHERE `name` = :name"));
     QMap<QString, QVariant>::const_iterator i = i_valuesMap.constBegin();
     while(i != i_valuesMap.constEnd())
     {
-        query->bindValue(":name", i.key());
-        query->bindValue(":value", i.value());
-        nErr = query->exec();
+        query.bindValue(":name", i.key());
+        query.bindValue(":value", i.value());
+        nErr = query.exec();
         if(!nErr)
-        {
-            errorToLog(metaObject()->className(), query->lastError().text());
-            throw Global::ThrowType::QueryError;
-        }
+            Global::throwError(query.lastError(), errMsg);
+
         i++;
     }
-
-    delete query;
 }
 
 // json объекты нужно обработать отдельно.

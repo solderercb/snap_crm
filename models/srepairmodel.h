@@ -77,12 +77,10 @@ class SRepairModel : public SComRecord
     Q_PROPERTY(bool termsControl READ termsControl)
 public:
     explicit SRepairModel(QObject *parent = nullptr);
-    explicit SRepairModel(const int, QObject *parent = nullptr);
     ~SRepairModel();
     int id();
     void setId(const int);
     void load(const int);
-    void reload();
     bool isHidden();
     void setHidden(const bool);
     QString title();
@@ -324,6 +322,8 @@ private:
     QString realPartsCostStr();
     QString warranty();
     bool commitCartridge();
+    void updateLogAssociatedRecId() override;
+    void loadError(const int type);
 };
 
 #endif // SREPAIRMODEL_H

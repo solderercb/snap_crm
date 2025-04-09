@@ -30,7 +30,7 @@ public:
     static SSqlQueryModel *managersList();
     int id();
     void setId(const int id);
-    void load(const int &id);
+    void load(const int &id, QSqlDatabase db = QSqlDatabase());
     QDateTime createdUtc() override;
     void setCreated(const QDateTime &timestamp);
     int employee();
@@ -41,14 +41,18 @@ public:
     void setClient(const int &id);
     int state();
     void setState(const int &newState);
+    static QString logMsgStateChange(const int &newState);
     QDate endDate();
     void setEndDate(const QDate &date);
     QDate planEndDate();
     void setPlanEndDate(const QDate &date);
+    static QString logMsgPlanEndDateChange(const QDate &date);
     double amount();
     void setAmount(const double &amount);
+    static QString logMsgAmountChange(const double &amount);
     QString tracking();
     void setTracking(const QString &tracking);
+    static QString logMsgTrackingChange(const QString &newTrack, const QString &oldTrack = QString());
     int itemId();
     void setItemId(const int &id);
     QString name();
@@ -59,8 +63,10 @@ public:
     void setUrl(const QString &url);
     int priority();
     void setPriority(const int &priority);
+    static QString logMsgPriorityChange(const int &priority);
     int count();
     void setCount(const int &count);
+    static QString logMsgCountChange(const int &count);
     int dealer();
     void setDealer(const int &id);
     void updateAdditionalModel(SEditableBaseModel *model, QList<int> newList, const int columnUser);
@@ -70,6 +76,7 @@ public:
     void updateNotifications(QList<int> managers);
     void setDirty(const bool state) override;
     bool commit() override;
+    bool isManagersModelDirty();
     bool commitManagers();
 protected:
     int m_employee = userDbData->id;
@@ -91,6 +98,7 @@ protected:
     SEditableBaseModel *m_notifications = nullptr;
     void translateNames();
 private:
+    void updateLogAssociatedRecId() override;
     void dbErrFlagHandler(bool flushCache = true) override;
 private slots:
     void managersPrimeInsert(int row, QSqlRecord &record);

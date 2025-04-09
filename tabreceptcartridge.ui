@@ -127,7 +127,7 @@
                <x>0</x>
                <y>0</y>
                <width>773</width>
-               <height>301</height>
+               <height>291</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
@@ -180,10 +180,24 @@
        <property name="sizeConstraint">
         <enum>QLayout::SetMinimumSize</enum>
        </property>
-       <item row="2" column="0">
-        <widget class="QLabel" name="labelPaymentAccount">
+       <item row="3" column="0" colspan="2">
+        <widget class="QLabel" name="labelIsHighPriority">
          <property name="text">
-          <string>Оплата</string>
+          <string>Срочный</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QLabel" name="labelStickersCount">
+         <property name="text">
+          <string>Стикеров</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2">
+        <widget class="QLabel" name="labelTotalCartridgeQty">
+         <property name="text">
+          <string>Итого</string>
          </property>
         </widget>
        </item>
@@ -199,32 +213,6 @@
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="5" column="2">
-        <widget class="QSpinBox" name="spinBoxStickersCount">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::ClickFocus</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="2">
-        <widget class="QCheckBox" name="checkBoxPrintReceipt">
-         <property name="focusPolicy">
-          <enum>Qt::ClickFocus</enum>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
        </item>
        <item row="2" column="1" colspan="2">
         <widget class="QComboBox" name="comboBoxPresetPaymentAccount">
@@ -248,28 +236,21 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
-        <widget class="SDoubleSpinBox" name="doubleSpinBoxTotalPreagreedAmount">
+       <item row="1" column="0" colspan="3">
+        <widget class="QComboBox" name="comboBoxOffice">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="focusPolicy">
           <enum>Qt::ClickFocus</enum>
          </property>
-         <property name="readOnly">
-          <bool>true</bool>
+         <property name="editable">
+          <bool>false</bool>
          </property>
-         <property name="buttonSymbols">
-          <enum>QAbstractSpinBox::NoButtons</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QCheckBox" name="checkBoxIsHighPriority">
-         <property name="focusPolicy">
-          <enum>Qt::ClickFocus</enum>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="text">
+         <property name="currentText">
           <string/>
          </property>
         </widget>
@@ -305,6 +286,26 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="labelPaymentAccount">
+         <property name="text">
+          <string>Оплата</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="SDoubleSpinBox" name="doubleSpinBoxTotalPreagreedAmount">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::NoButtons</enum>
+         </property>
+        </widget>
+       </item>
        <item row="7" column="0" colspan="2">
         <widget class="QLabel" name="labelPrintReceipt">
          <property name="text">
@@ -312,24 +313,29 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="2">
-        <widget class="QLabel" name="labelTotalCartridgeQty">
+       <item row="3" column="2">
+        <widget class="QCheckBox" name="checkBoxIsHighPriority">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
          <property name="text">
-          <string>Итого</string>
+          <string/>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QLabel" name="labelStickersCount">
-         <property name="text">
-          <string>Стикеров</string>
+       <item row="7" column="2">
+        <widget class="QCheckBox" name="checkBoxPrintReceipt">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QLabel" name="labelIsHighPriority">
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
          <property name="text">
-          <string>Срочный</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -352,10 +358,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="3">
-        <widget class="QComboBox" name="comboBoxOffice">
+       <item row="5" column="2">
+        <widget class="QSpinBox" name="spinBoxStickersCount">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -363,13 +369,18 @@
          <property name="focusPolicy">
           <enum>Qt::ClickFocus</enum>
          </property>
-         <property name="editable">
-          <bool>false</bool>
-         </property>
-         <property name="currentText">
-          <string/>
-         </property>
         </widget>
+       </item>
+       <item row="9" column="0">
+        <layout class="QHBoxLayout" name="groupBoxDebugPanel">
+         <item>
+          <widget class="QPushButton" name="pushButtonAddRandom">
+           <property name="text">
+            <string>addRandom</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -542,14 +553,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header location="global">widgets/sdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">widgets/scombobox.h</header>
   </customwidget>
   <customwidget>
    <class>SClientInputForm</class>

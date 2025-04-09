@@ -1,3 +1,4 @@
+#include "sapplication.h"
 #include "modules/purchasemanager/tabrequest.h"
 #include "ui_tabrequest.h"
 #include "modules/purchasemanager/tabmanager.h"
@@ -267,6 +268,9 @@ bool tabPartRequest::checkInput()
 */
 bool tabPartRequest::isManagersChanged()
 {
+    if(m_partRequest->isManagersModelDirty())
+        return true;
+
     foreach (auto mgr, m_partRequest->managers())
     {
         // Право использовать менеджер закупок может быть отозвано и некоторые заявки всегда будут считаться изменёнными
@@ -325,7 +329,8 @@ bool tabPartRequest::commit(bool repeatAfter)
         return false;
 
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlDatabase db = QSqlDatabase::database("connThird");
+    QSqlQuery query(db);
 
     setModelData();
 
@@ -335,26 +340,27 @@ bool tabPartRequest::commit(bool repeatAfter)
 
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
         m_partRequest->commit();
         if(m_newRequest)
         {
             m_requestId = m_partRequest->id();
             ui->widgetSuppliers->setRequestId(m_requestId);
+            m_partRequest->updateAdditionalModelsFilters(m_requestId);
         }
 
         if(isManagersChanged() || m_newRequest)
+        {
             m_partRequest->setManagers(ui->comboBoxManagers->checked());
-        m_partRequest->commitManagers();
-        ui->widgetSuppliers->saveLinks();
-        ui->widgetSuppliers->select(m_requestId);
-
+            m_partRequest->commitManagers();
+        }
+        ui->widgetSuppliers->commit();
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query, nErr);
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
     }
     catch (Global::ThrowType type)
     {
@@ -362,28 +368,20 @@ bool tabPartRequest::commit(bool repeatAfter)
         if(m_newRequest)
         {
             m_requestId = 0;
-            m_partRequest->setId(m_requestId);
+            m_partRequest->setId(0);
             m_partRequest->setState(SPartRequest::NewUncommitted);
         }
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            m_partRequest->setDirty(true);
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
 #ifdef QT_DEBUG
 //    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
 #endif
 
-    QUERY_LOG_STOP;
+    int rep = m_partRequest->repair();
 
     if (nErr)   // если все запросы выполнены без ошибок
     {
@@ -394,18 +392,19 @@ bool tabPartRequest::commit(bool repeatAfter)
             message = tr("Изменения успешно сохранёны");
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Заявка на закупку"), message, QColor(214,239,220), QColor(229,245,234));
 
-        int rep = m_partRequest->repair();
-        if(rep)
-            tabRepair::refreshIfTabExists(rep);
-
         // TODO: аналогичный код используется в классе tabCashOperation; нужно унифицировать
         if(!repeatAfter)
         {
-            updateTabPtr(m_initialRequestId, m_requestId);
-            emit updateTabTitle(this);
+            if(m_newRequest)
+            {
+                updateTabPtr(m_initialRequestId, m_requestId);
+                emit updateTabTitle(this);
+            }
 
             ui->widgetClientInput->setHandlingButtons(SClientSelectForm::ViewCard);
+            m_partRequest->load(m_requestId, db);
             ui->widgetSuppliers->setRequestState(m_partRequest->state());
+            ui->widgetSuppliers->select(m_requestId);
         }
         else
         {
@@ -416,13 +415,18 @@ bool tabPartRequest::commit(bool repeatAfter)
             ui->widgetSuppliers->clearModel();
             ui->widgetSuppliers->addSupplierRecord(m_dealerModel->id());
         }
-        tabPurchaseManager::refreshIfTabExists();
     }
 
-    delete query;
+    QUERY_LOG_STOP;   // остановка записи сейчас, чтобы в журнал sql не попали запросы не касающиеся этой сессии
 
-    updateWidgets();
+    if (nErr)
+    {
+        updateWidgets();
+        if(rep)
+            tabRepair::refreshIfTabExists(rep);
 
+        tabPurchaseManager::refreshIfTabExists();
+    }
     return nErr;
 }
 

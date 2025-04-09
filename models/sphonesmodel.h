@@ -38,11 +38,9 @@ public:
     QString iterativePhone();
     void initDemo();
 private:
-    QSqlQuery *query;
     QList<SPhoneModel*> m_phonesList;
     QList<SPhoneModel*> m_removeList;
     SPhoneModel* sqlRecordHandler(const QSqlRecord &phone = QSqlRecord());
-    SLogRecordModel *logRecord = nullptr;
     SPhoneModel *m_newPrimaryPhone = nullptr;
     int m_client = 0;
     bool m_updated = false;

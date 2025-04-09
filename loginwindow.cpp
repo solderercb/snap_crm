@@ -175,7 +175,7 @@ bool LoginWindow::checkProcessPriv()
 
         grants = grants.left(end).replace(", ", ",");
         QStringList grantsLst = grants.split(',');
-        ret = grantsLst.contains("PROCESS") | grantsLst.contains("ALL PRIVILEGES");
+        ret = grantsLst.contains("PROCESS") || grantsLst.contains("ALL PRIVILEGES");
     }
 
     delete query;

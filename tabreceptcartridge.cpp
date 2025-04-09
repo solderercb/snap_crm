@@ -28,13 +28,22 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
     query = QUERY_SEL_CARTRIDGE_CAT_ID;
     q.exec(query);
     if(!q.first())
+    {
+        Global::errorMsg(Global::ThrowType::ResultError, errQuerySelCartridgeCatId);
         return;
+    }
+
     m_deviceClassId = q.value(0).toInt();
     query = QUERY_SEL_DEVICE_MAKERS(q.value(1).toString());
     m_vendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    if(m_vendorsModel->lastError().isValid())
+        Global::errorMsg(m_vendorsModel->lastError(), errQuerySelDeviceMakers);
+    else if(m_vendorsModel->rowCount() == 0)
+        Global::errorMsg(Global::ThrowType::ResultError, errQuerySelDeviceMakers + "; " + tr("список id: \'%1\'").arg(q.value(1).toString()));
     ui->comboBoxVendor->setCurrentIndex(-1);
 
 #ifdef QT_DEBUG
+    connect(ui->pushButtonAddRandom, &QPushButton::clicked, this, [=]{test_scheduler_counter = 1; randomFill();});
     test_scheduler->start(200);
 //    SRepairModel *repair;
 //    repair = new SRepairModel();
@@ -44,7 +53,7 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
 //    appendToReceptList(repair);
 //    repair->initCartridgeModel(2);
 #else
-//    ui->groupBoxDebugPanel->hide();
+    ui->pushButtonAddRandom->hide();
 #endif
 }
 
@@ -139,7 +148,7 @@ void tabReceptCartridge::initWidgets()
 
 //    connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
     connect(ui->comboBoxVendor, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVendor(int)));
-    connect(ui->pushButtonAdd, &QPushButton::clicked, this, qOverload<>(&tabReceptCartridge::appendToReceptList));
+    connect(ui->pushButtonAdd, &QPushButton::clicked, this, qOverload<>(&tabReceptCartridge::appendToList));
     connect(ui->buttonRecept, &QPushButton::clicked, this, &tabReceptCartridge::createRepairs);
     connect(ui->buttonReceptAndClose, &QPushButton::clicked, this, &tabReceptCartridge::createRepairsAndClose);
     connect(ui->lineEditSerial, &QLineEdit::textEdited, this, &tabReceptCartridge::serialTextEdited);
@@ -238,38 +247,31 @@ bool tabReceptCartridge::checkInputBeforeAdd()
     return false;
 }
 
-void tabReceptCartridge::appendToReceptList(SCartridgeForm *form)
+void tabReceptCartridge::appendToList(SCartridgeForm *form)
 {
     ui->verticalLayoutCartridges->addWidget(form);
-    connect(form, &SCartridgeForm::updateTotalPreagreedAmount, this, &tabReceptCartridge::updateTotalPreagreedAmount);
-    form->initWidgets();
+    updateTotalPreagreedAmount();
 }
 
-void tabReceptCartridge::appendToReceptList()
+void tabReceptCartridge::appendToList()
 {
     if(checkInputBeforeAdd())
         return;
 
+    SCartridgeForm *form = nullptr;
+
     for(int i = 0; i < ui->spinBoxQty->value(); i++)
     {
-        SCartridgeForm *form = new SCartridgeForm();
-        form->setDeviceClassId(m_deviceClassId);
-        form->setDeviceVendorId(m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex()));
-        form->setCardId(m_cartridgesModel->databaseIDByRow(ui->comboBoxModel->currentIndex()));
-        form->setTitle(tr("картридж") + " " + ui->comboBoxVendor->currentText() + " " + ui->comboBoxModel->currentText());
-        if(!ui->lineEditSerial->text().isEmpty() && ui->spinBoxQty->value() == 1)
-            form->setSerialNumber(ui->lineEditSerial->text());
-        else
+        try
         {
-            // если не указан(ы) серийки, спросить пользователя о генерации; при положительном ответе распечатать новые этикетки
-            // TODO: параметр глобальных настроек с паттерном серийного номера
+            initReceiptCartridgeForm(form);
+            appendToList(form);
         }
-
-#ifdef QT_DEBUG
-        form->randomFill();
-#endif
-        appendToReceptList(form);
-
+        catch (Global::ThrowType)
+        {
+            delete form;
+            return;
+        }
     }
 
     ui->comboBoxModel->setCurrentIndex(-1);
@@ -288,13 +290,59 @@ void tabReceptCartridge::updateTotalPreagreedAmount()
     ui->doubleSpinBoxTotalPreagreedAmount->setValue(amount);
 }
 
+/* Виджет формы картриджа для списка приёма в ремонт
+*/
+void tabReceptCartridge::initReceiptCartridgeForm(SCartridgeForm* &form, const QSqlRecord &record)
+{
+    form = new SCartridgeForm(this);
+
+    if(record.isEmpty())
+    {
+        form->setDeviceClassId(m_deviceClassId);
+        form->setDeviceVendorId(m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex()));
+        form->setTitle(tr("картридж") + " " + ui->comboBoxVendor->currentText() + " " + ui->comboBoxModel->currentText());
+        form->setCardId(m_cartridgesModel->databaseIDByRow(ui->comboBoxModel->currentIndex()));
+        if(!ui->lineEditSerial->text().isEmpty() && ui->spinBoxQty->value() == 1)
+            form->setSerialNumber(ui->lineEditSerial->text());
+        else
+        {
+            // если не указан(ы) серийки, спросить пользователя о генерации; при положительном ответе распечатать новые этикетки
+            // TODO: параметр глобальных настроек с паттерном серийного номера
+        }
+    }
+    else
+    {
+        form->setDeviceClassId(record.value("type").toInt());
+        form->setDeviceVendorId(record.value("maker").toInt());
+        form->setTitle(record.value("Title").toString());
+        form->setCardId(record.value("card_id").toInt());
+        form->setSerialNumber(record.value("serial_number").toString());
+        form->setIsRepeat(1);
+    }
+
+    connect(form, &SCartridgeForm::updateTotalPreagreedAmount, this, &tabReceptCartridge::updateTotalPreagreedAmount);
+    form->init();
+
+#ifdef QT_DEBUG
+    form->randomFill();
+#endif
+}
+
+/* Карточка картриджа (форма редактирования свойств)
+*/
 void tabReceptCartridge::createCartridgeCardForm(const int id)
 {
     int vendorIndex = ui->comboBoxVendor->currentIndex();
 
-    m_cartridgeCardForm = new SCartridgeCard(id, vendorIndex, Qt::SplashScreen, this);
-    connect(m_cartridgeCardForm, &SCartridgeCard::onDelete, this, &tabReceptCartridge::closeCartridgeCardForm);
-    connect(m_cartridgeCardForm, &SCartridgeCard::newCardCreated, this, &tabReceptCartridge::updateDevicesModel);
+    try
+    {
+        SCartridgeCard *cardForm = new SCartridgeCard(id, vendorIndex, Qt::SplashScreen, this);
+        connect(cardForm, &SCartridgeCard::onDelete, this, &tabReceptCartridge::closeCartridgeCardForm);
+        connect(cardForm, &SCartridgeCard::newCardCreated, this, &tabReceptCartridge::updateDevicesModel);
+    }
+    catch (Global::ThrowType)
+    {
+    }
 }
 
 void tabReceptCartridge::closeCartridgeCardForm()
@@ -361,26 +409,32 @@ const QList<SCartridgeForm *> tabReceptCartridge::existentForms()
 void tabReceptCartridge::randomFill()
 {
     int i;
+
     if (test_scheduler_counter == 0)
     {
         ui->widgetClient->randomFill();
     }
     else if(test_scheduler_counter == 1)
     {
-        ui->comboBoxVendor->setCurrentIndex(1);
+        i = m_vendorsModel->rowCount();
+        ui->comboBoxVendor->setCurrentIndex(QRandomGenerator::global()->bounded(i));
     }
     else if(test_scheduler_counter == 2)
     {
-        ui->comboBoxModel->setCurrentIndex(0);
+        i = m_cartridgesModel->rowCount();
+        if(i < 1)
+            test_scheduler_counter = 0; // Если у выбранного производителя нет картриджей, нужно повторить сначала
+        else
+            ui->comboBoxModel->setCurrentIndex(QRandomGenerator::global()->bounded(i));
     }
     else if(test_scheduler_counter == 3)
     {
-        ui->lineEditSerial->setText(QString::number(QRandomGenerator::global()->bounded(2147483647)));
+        ui->lineEditSerial->setText("T" + QString::number(QRandomGenerator::global()->bounded(9999)));
     }
     else if(test_scheduler_counter == 4)
     {
-//        ui->spinBoxQty->setValue(QRandomGenerator::global()->bounded(5));
-        ui->spinBoxQty->setValue(2);
+        ui->spinBoxQty->setValue(QRandomGenerator::global()->bounded(5));
+//        ui->spinBoxQty->setValue(2);
     }
     else if (test_scheduler_counter == 5)   // инженер
     {
@@ -399,7 +453,7 @@ void tabReceptCartridge::randomFill()
     {
         ui->pushButtonAdd->click();
     }
-    if (test_scheduler_counter < 6)
+    if (test_scheduler_counter < 7)
     {
         test_scheduler_counter++;
         test_scheduler->start(400);    //  (пере-)запускаем таймер
@@ -457,19 +511,20 @@ void tabReceptCartridge::findAndAddBySerial()
         return;
     }
 
-    ui->widgetClient->fillClientCreds(q.value("client").toInt());
+    SCartridgeForm *form = nullptr;
+    try
+    {
+        ui->widgetClient->fillClientCreds(q.value("client").toInt());
 
-    SCartridgeForm *form = new SCartridgeForm();
-    form->setDeviceClassId(q.value("type").toInt());
-    form->setDeviceVendorId(q.value("maker").toInt());
-    form->setCardId(q.value("card_id").toInt());
-    form->setTitle(q.value("Title").toString());
-    form->setSerialNumber(q.value("serial_number").toString());
-    form->setIsRepeat(1);
-
-    appendToReceptList(form);
-    ui->lineEditSerial->setText("");
-    ui->lineEditSerial->setFocus();
+        initReceiptCartridgeForm(form, q.record());
+        appendToList(form);
+        ui->lineEditSerial->setText("");
+        ui->lineEditSerial->setFocus();
+    }
+    catch (Global::ThrowType)
+    {
+        delete form;
+    }
 }
 
 #ifdef QT_DEBUG
@@ -488,7 +543,7 @@ bool tabReceptCartridge::createRepairs()
         return 0;
 
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     setDefaultStyleSheets();
     m_printReport = ui->checkBoxPrintReceipt->isChecked(); // кэширование состояния
@@ -500,7 +555,7 @@ bool tabReceptCartridge::createRepairs()
         ui->widgetClient->commit();
         m_client = ui->widgetClient->model();
 
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         for(auto form : existentForms())
         {
             form->setClientId(m_client->id());
@@ -515,25 +570,20 @@ bool tabReceptCartridge::createRepairs()
         }
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query, nErr);
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+
+//        if(type == Global::ThrowType::Debug)
 //            nErr = 1; // это чтобы проверить работу дальше
-        }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     QUERY_LOG_STOP;

@@ -5,6 +5,7 @@
 #include "propstruct.h"
 #include "com_sql_queries.h"
 #include "sdatabaseauxiliary.h"
+#include "global_ns.h"
 
 class SPermissions : public QStandardItemModel, public SDatabaseAuxiliary
 {
@@ -201,39 +202,42 @@ inline void SPermissions::save(const QString &name, const QString &description)
     if(!m_currentRole)
         return;
 
-    bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    query->exec(QString("DELETE FROM `permissions_roles` WHERE `role_id` = %1").arg(m_currentRole));
-    query->prepare(QString("INSERT INTO `permissions_roles` (`role_id`, `permission_id`) VALUES (:role, :perm)"));
-    query->bindValue(":role", m_currentRole);
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
+    QString q;
+    QSqlQuery query(QSqlDatabase::database("connThird"));
+
+    try
     {
-        if(metaObject()->property(i).read(this).toInt() == 0)
-            continue;
-
-        query->bindValue(":perm", permissionIdToRow(i));
-        nErr = query->exec();
-
-        if(!nErr)
-        {
-            errorToLog(metaObject()->className(), query->lastError().text());
+        q = QString("DELETE FROM `permissions_roles` WHERE `role_id` = %1").arg(m_currentRole);
+        if(!query.exec(q))
             throw 1;
+
+        q = QString("INSERT INTO `permissions_roles` (`role_id`, `permission_id`) VALUES (:role, :perm)");
+        if(!query.prepare(q))
+            throw 2;
+        query.bindValue(":role", m_currentRole);
+        for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
+        {
+            if(metaObject()->property(i).read(this).toInt() == 0)
+                continue;
+
+            query.bindValue(":perm", permissionIdToRow(i));
+            if(!query.exec())
+                throw 3;
+        }
+
+        if(!name.isEmpty() || !description.isEmpty())
+        {
+            q = QString("UPDATE `roles` SET `name` = '%1', `description` = '%2' WHERE `id` = %3").arg(name, description).arg(m_currentRole);
+            if(!query.exec(q))
+                throw 4;
         }
     }
-
-    if(!name.isEmpty() || !description.isEmpty())
-        nErr = query->exec(QString("UPDATE `roles` SET `name` = '%1', `description` = '%2' WHERE `id` = %3").arg(name, description).arg(m_currentRole));
-
-    if(!nErr)
+    catch(int)
     {
-        errorToLog(metaObject()->className(), query->lastError().text());
-        throw 1;
+        Global::throwError(query.lastError(), tr("Не удалось сохранить настройки роли"));
     }
 
-    // TODO Запись в журнал?
-
     m_modelEdited = 0;
-    delete query;
 }
 
 inline QVariant SPermissions::data(const QModelIndex &index, int role) const

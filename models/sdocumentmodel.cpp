@@ -309,7 +309,6 @@ bool SDocumentModel::commit()
         insert();
     }
 
-    i_logRecord->setDocumentId(i_id);
     commitLogs();
 
     if(!i_nErr)
@@ -332,4 +331,9 @@ QString SDocumentModel::title()
         case Buyout: ret = tr("Выкуп техники"); break;
     };
     return ret;
+}
+
+void SDocumentModel::updateLogAssociatedRecId()
+{
+    i_logRecord->setDocumentId(i_id);
 }

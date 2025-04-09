@@ -15,7 +15,7 @@ public:
     ~SCartridgeCardModel();
     int id();
     void load(const int id);
-    void loadError();
+    void loadError(const int type);
     void initMaterials();
     void removeMaterials();
     bool commit();

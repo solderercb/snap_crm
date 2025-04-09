@@ -17,20 +17,6 @@ SCartridgeForm::SCartridgeForm(QWidget *parent) :
     installEventFilter(this);
 }
 
-SCartridgeForm::SCartridgeForm(const int repairId, QWidget *parent) :
-    SCartridgeForm(parent)
-{
-    m_repairId = repairId;
-    try
-    {
-        initWidgets();
-    }
-    catch (...)
-    {
-        m_repairId = 0;
-    }
-}
-
 SCartridgeForm::~SCartridgeForm()
 {
     delete ui;
@@ -69,45 +55,9 @@ void SCartridgeForm::initModels()
         m_BOQModel->setCartridgeCardModel(m_cartridgeCard);
         m_repair->setBOQModel(m_BOQModel);
     }
-
-    updateModels();
 }
 
-void SCartridgeForm::updateModels()
-{
-    if(m_repairId)
-    {
-        m_repair->load(m_repairId);
-        if(!m_repair->id())
-            throw 1;
-
-        m_serialNumber = m_repair->serialNumber();
-        m_cardId = m_repair->cartridge()->cardId();
-        m_clientId = m_repair->clientId();
-        m_BOQModel->repair_loadTable(m_repair->id());
-        updateStatesModel(m_repair->state());
-    }
-
-    updateCardModel();
-}
-
-void SCartridgeForm::updateCardModel()
-{
-    m_cartridgeCard->load(m_cardId);
-    if(m_repairId)
-    {
-        updateWorksCheckBoxes();
-        updateWorksMenu();
-    }
-}
-
-void SCartridgeForm::randomFill()
-{
-    if(ui->lineEditSerial->text().isEmpty())
-        ui->lineEditSerial->setText(QString::number(QRandomGenerator::global()->bounded(9999)));
-}
-
-void SCartridgeForm::initWidgets()
+void SCartridgeForm::configureWidgets()
 {
     QIcon activeCheckBoxIcon;
     activeCheckBoxIcon.addFile(QString::fromUtf8(":/icons/light/checkbox-unchecked.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -117,7 +67,6 @@ void SCartridgeForm::initWidgets()
     unactiveCheckBoxIcon.addFile(QString::fromUtf8(":/icons/light/checkbox-flat-unchecked.png"), QSize(), QIcon::Normal, QIcon::Off);
     unactiveCheckBoxIcon.addFile(QString::fromUtf8(":/icons/light/checkbox-flat-checked.png"), QSize(), QIcon::Normal, QIcon::On);
 
-    initModels();
     ui->comboBoxWasEarly->setModel(cartridgeRepeatReason);
     ui->comboBoxWasEarly->setCurrentIndex(-1);
     ui->comboBoxWasEarly->disableWheelEvent(true);
@@ -181,12 +130,75 @@ void SCartridgeForm::initWidgets()
         connect(ui->pushButtonPreagreedDrumReplace, &QPushButton::toggled, this, &SCartridgeForm::setDrumReplace);
         connect(ui->pushButtonPreagreedBladeReplace, &QPushButton::toggled, this, &SCartridgeForm::setBladeReplace);
         ui->pushButtonPreagreedRefill->setChecked(true);
-        setRefill(true);    // почему-то при вызове метода setChecked() слот setRefill() не вызывается
     }
+}
+
+void SCartridgeForm::load()
+{
+    if(m_repairId)
+    {
+        m_repair->load(m_repairId);
+
+        m_serialNumber = m_repair->serialNumber();
+        setCardId(m_repair->cartridge()->cardId());
+        m_clientId = m_repair->clientId();
+        m_BOQModel->repair_loadTable(m_repairId);
+        updateStatesModel(m_repair->state());
+    }
+
+    loadCardData();
+}
+
+void SCartridgeForm::loadCardData()
+{
+    m_cartridgeCard->load(m_cardId);
+    if(m_repairId)
+    {
+        updateWorksCheckBoxes();
+        updateWorksMenu();
+    }
+}
+
+void SCartridgeForm::reloadData()
+{
+    try
+    {
+        m_repair->load(m_repairId);
+        m_BOQModel->repair_loadTable(m_repairId);
+    }
+    catch (Global::ThrowType)
+    {
+        // TODO: деактивация формы, наглядно дающая понять, что произошла ошибка
+    }
+}
+
+void SCartridgeForm::randomFill()
+{
+    if(ui->lineEditSerial->text().isEmpty())
+        ui->lineEditSerial->setText("T" + QString::number(QRandomGenerator::global()->bounded(9999)));
+
+    int i = QRandomGenerator::global()->bounded(16384);
+
+    ui->pushButtonPreagreedRefill->setChecked((i>>0)&0x01);
+    ui->pushButtonPreagreedChipReplace->setChecked((i>>1)&0x01);
+    ui->pushButtonPreagreedDrumReplace->setChecked((i>>2)&0x01);
+    ui->pushButtonPreagreedBladeReplace->setChecked((i>>3)&0x01);
+}
+
+void SCartridgeForm::setRepair(int id)
+{
+    m_repairId = id;
+}
+
+void SCartridgeForm::init()
+{
+    initModels();
+    load();
+    configureWidgets();
     m_initDone = 1;
 }
 
-/* Натсройка виджетов предварительно согласованных работ
+/* Настройка виджетов предварительно согласованных работ
  * isFlat: 0 - форма приёма картриджей; 1 - форма работы (заправки) с картриджем
 */
 void SCartridgeForm::initCheckBoxWidgets(const QIcon &icon, QPushButton *button, bool isFlat, bool installEventFilter)
@@ -596,7 +608,7 @@ bool SCartridgeForm::checkData(const int stateId)
         if(m_BOQModel->amountTotal() == 0)
         {
             ui->doubleSpinBoxTotalAmount->setStyleSheet(commonSpinBoxStyleSheetRed);
-            throw Global::ThrowType::ConditionsError;
+            Global::throwError(Global::ThrowType::ConditionsError);
         }
     }
     return 1;
@@ -666,18 +678,16 @@ void SCartridgeForm::setWidgetsParams(const int stateId)
     updateStateWidget(stateId);
 }
 
-bool SCartridgeForm::checkStateAcl(const int stateId)
+void SCartridgeForm::checkStateAcl(const int stateId)
 {
     if(m_repair->state() == Global::RepStateIds::GetIn && !m_repair->engineer() && !permissions->beginUnengagedRepair)
-        return 0;
+        Global::throwError(Global::ThrowType::AccessDenied);
 
     const QString allowedForRoles = comSettings->repairStatuses[stateId].Roles.join('|');
-
     if(userDbData->roles.contains(QRegularExpression(QString("\\b(%1)\\b").arg(allowedForRoles))))
-    {
-        return 1;
-    }
-    return 0;
+        return;
+
+    Global::throwError(Global::ThrowType::AccessDenied);
 }
 
 void SCartridgeForm::setPricesToZero()
@@ -751,40 +761,33 @@ void SCartridgeForm::updateLists()
 
 bool SCartridgeForm::commit(const QString &notificationCaption, const QString &notificationText)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     i_queryLog = new SQueryLog();
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     bool nErr = 1;
     QUERY_LOG_START(metaObject()->className());
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         m_repair->updateLastSave();
         nErr = m_repair->commit();
-        shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
     QUERY_LOG_STOP;
 
-    delete query;
+    if(nErr)
+        shortlivedNotification *newPopup = new shortlivedNotification(this, notificationCaption, notificationText, QColor(214,239,220), QColor(229,245,234));
 
     return nErr;
 }
@@ -1043,17 +1046,12 @@ void SCartridgeForm::saveState(int stateId)
 
     try
     {
-        if(!checkStateAcl(stateId))
-        {
-            shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Проверьте права доступа или обратитесь к администратору"), QColor(212,237,242), QColor(229,244,247));
-            throw Global::ThrowType::ConditionsError;
-        }
+        checkStateAcl(stateId);
         checkData(stateId);
         doStateActions(stateId);
         m_repair->setState(stateId);
 
-        if(!commit())
-            throw Global::ThrowType::QueryError;
+        commit();
     }
     catch (Global::ThrowType type)
     {
@@ -1072,6 +1070,9 @@ void SCartridgeForm::saveState(int stateId)
 void SCartridgeForm::removeWidget()
 {
     updateComment();
+    preagreedAmounts.clear();
+    m_amount = 0;
+    emit updateTotalPreagreedAmount();
     this->deleteLater();
 }
 

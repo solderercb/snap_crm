@@ -37,7 +37,7 @@ bool SPhonesModel::load(int client)
     clear();
 
     m_client = client;
-    query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
 
     query->exec(QUERY_SEL_CLIENT_PHONES(client));
     while(query->next())
@@ -86,27 +86,24 @@ bool SPhonesModel::commit()
     SPhoneModel *item;
     foreach(item, m_phonesList)
     {
-        if(!item->commit())
-            throw Global::ThrowType::QueryError;
+        item->commit();
     }
 
     if(m_newPrimaryPhone != nullptr)
     {
-        logRecord = new SLogRecordModel();  // запись в журнал о смене основного номера телефона
-        logRecord->setClient(m_client);
-        logRecord->setType(SLogRecordModel::Client);
-        logRecord->setText(tr("Номер %1 задан основным").arg(m_newPrimaryPhone->phone()));
+        // запись в журнал о смене основного номера телефона
+        SLogRecordModel logRecord;
+        logRecord.setClient(m_client);
+        logRecord.setType(SLogRecordModel::Client);
+        logRecord.setText(tr("Номер %1 задан основным").arg(m_newPrimaryPhone->phone()));
         m_newPrimaryPhone = nullptr;
-        if(!logRecord->commit())
-            throw Global::ThrowType::QueryError;
-        logRecord->deleteLater();
+        logRecord.commit();
     }
 
     while( !m_removeList.isEmpty() )
     {
         item = m_removeList.last();
-        if(!item->delDBRecord())
-            throw Global::ThrowType::QueryError;
+        item->delDBRecord();
 
         m_removeList.removeLast();
         item->deleteLater();

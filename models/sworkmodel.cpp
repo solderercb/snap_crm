@@ -291,3 +291,7 @@ void SWorkModel::setSalarySumm(double salarySumm)
     i_valuesMap.insert("salary_summ", salarySumm);
 }
 
+void SWorkModel::updateLogAssociatedRecId()
+{
+    // установка id ремонта происходит в конструкторе; метод переопределён для подавления предупреждения
+}

@@ -31,6 +31,7 @@ public:
     int requestCount();
     void setReadOnly(const bool state);
     void setTableLayout(const SLocalSettings::SettingsVariant &layoutVariant);
+    void commit();
 private:
     Ui::SPartsRequests *ui;
     SPartsRequestsModel *m_model;
@@ -38,8 +39,8 @@ private:
     void updateWidgets();
     bool eventFilter(QObject *object, QEvent *event) override;
     STableViewBase* tableView();
-public slots:
-    void commit();
+protected slots:
+    virtual void manualSubmit();
 private slots:
     void tableRowSelected(const QModelIndex &current, const QModelIndex &prev);
     void tableRowDoubleClicked(const QModelIndex &index);

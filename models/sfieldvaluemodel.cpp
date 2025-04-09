@@ -319,13 +319,11 @@ bool SFieldValueModel::commit()
 
     if(i_id)
     {
-        if(!update())
-            return 0;
+        update();
     }
     else
     {
-        if(!insert())
-            return 0;
+        insert();
     }
     commitLogs();
     return i_nErr;

@@ -433,7 +433,7 @@ void SComboBox::setEditable(bool editable)
         initLineEdit();
         connect(lineEditWidget, &SLineEdit::editingFinished, this, &SComboBox::longTextHandler);
     }
-    else
+    else if(lineEditWidget)
     {
         disconnect(lineEditWidget, &SLineEdit::editingFinished, this, &SComboBox::longTextHandler);
     }

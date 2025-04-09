@@ -442,9 +442,14 @@ void tabRepairNew::changeDeviceClass(int index)
     QString query;
     classId = deviceClassesModel->databaseIDByRow(index);
 
-
     query = QUERY_SEL_DEVICE_MAKERS(deviceClassesModel->index(index, 2).data().toString());
     deviceVendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
+
+    if(deviceVendorsModel->lastError().isValid())
+        Global::errorMsg(deviceVendorsModel->lastError(), errQuerySelDeviceMakers);
+    else if(deviceVendorsModel->rowCount() == 0)
+        Global::errorMsg(Global::ThrowType::ResultError, errQuerySelDeviceMakers + "; " + tr("список id: \'%1\'").arg(deviceClassesModel->index(index, 2).data().toString()));
+
     ui->comboBoxDeviceVendor->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка неисправностей
@@ -758,7 +763,7 @@ bool tabRepairNew::createRepair()
 
     bool nErr = 1;
     int repair;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     m_stickersCount = ui->spinBoxStickersCount->value();
     repairModel = new SRepairModel(this);
     ui->widgetQuickRepairBOQ->linkWithRepairModel(repairModel);
@@ -772,7 +777,7 @@ bool tabRepairNew::createRepair()
         ui->widgetClient->commit();
         clientModel = ui->widgetClient->model();
 
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
         setModelData();
         repairModel->commit();
@@ -817,30 +822,22 @@ bool tabRepairNew::createRepair()
         }
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query, nErr);
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
         additionalFields->resetIds();
-        if(type == Global::ThrowType::Debug)
+
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+
+//        if(type == Global::ThrowType::Debug)
 //            nErr = 1; // это чтобы проверить работу дальше
-        }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
-    }
-    catch(...)
-    {
-        nErr = 0;
     }
 
     QUERY_LOG_STOP;
@@ -855,7 +852,6 @@ bool tabRepairNew::createRepair()
 
     ui->widgetQuickRepairBOQ->linkWithRepairModel(nullptr);
 
-    delete query;
     return nErr;
 }
 
@@ -1073,6 +1069,7 @@ void tabRepairNew::randomFill()
                     ui->lineEditPrevRepair->setText(query->value(0).toString());
                 else
                     ui->checkBoxWasEarlier->setChecked(0);  // это если вдруг не выбран номер
+                delete query;
             }
             else
             {

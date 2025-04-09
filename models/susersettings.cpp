@@ -1,6 +1,9 @@
+#include "sapplication.h"
 #include "susersettings.h"
 #include "global.h"
 #include "tabprintdialog.h"
+
+static QString errMsg(QObject::tr("Не удалось сохранить персональные настройки пользователя"));
 
 SUserSettings::SUserSettings()
 {
@@ -145,21 +148,20 @@ void SUserSettings::loadPrinterSettings()
 bool SUserSettings::commit()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
     QString q;
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     fieldsUpdFormatter();
-    if(!i_valuesMap.isEmpty())
-    {
-        q = QString("UPDATE\n  `users`\nSET\n  %2\nWHERE `id` = %1;").arg(id).arg(fields.join(",\n  "));
-        QUERY_EXEC(query, nErr)(q);
-    }
-    delete query;
+    if(i_valuesMap.isEmpty())
+        return 1;
 
-    if(nErr)
-        i_valuesMap.clear();
+    q = QString("UPDATE\n  `users`\nSET\n  %2\nWHERE `id` = %1;").arg(id).arg(fields.join(",\n  "));
+    if(!query.exec(q))
+        Global::throwError(query.lastError(), errMsg);
 
-    return nErr;
+    i_valuesMap.clear();
+
+    return 1;
 }
 
 // распределение изменённых значений по группам по названию таблиц
@@ -230,8 +232,8 @@ void SUserSettings::save()
         emit rowHeightChanged();
     }
 
-    if(!commit())
-        throw Global::ThrowType::QueryError;
+    commit();
+
     saveToUsersParams();
 
     i_fieldModified.clear();
@@ -240,28 +242,25 @@ void SUserSettings::save()
 void SUserSettings::saveToUsersParams()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     i_valuesMap.clear();
     prepareUpdateList(Table::UsersParams);
 
-    query->prepare(QString("INSERT INTO `users_params` (`user_id`, `param_id`, `value`) VALUES (:user_id, :param_id, :value) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);"));
-    query->bindValue(":user_id", id);
+    query.prepare(QString("INSERT INTO `users_params` (`user_id`, `param_id`, `value`) VALUES (:user_id, :param_id, :value) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);"));
+    query.bindValue(":user_id", id);
     QMap<QString, QVariant>::const_iterator i = i_valuesMap.constBegin();
     while(i != i_valuesMap.constEnd())
     {
-        query->bindValue(":param_id", m_params.value(i.key()));
-        query->bindValue(":value", i.value());
-        nErr = query->exec();
-        if(!nErr)
-        {
-            errorToLog(metaObject()->className(), query->lastError().text());
-            throw Global::ThrowType::QueryError;
-        }
+        query.bindValue(":param_id", m_params.value(i.key()));
+        query.bindValue(":value", i.value());
+        if(!query.exec())
+            Global::throwError(query.lastError(), errMsg);
+
         i++;
     }
 
-    delete query;
+    i_valuesMap.clear();
 }
 
 void SUserSettings::savePrinterSettings()
@@ -274,33 +273,28 @@ void SUserSettings::savePrinterSettings()
 void SUserSettings::updateLoginTimestamp()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
-    query->exec(QUERY_BEGIN);
-    i_valuesMap.insert("last_login", QDateTime::currentDateTime());
-    nErr = commit();
-    QUERY_COMMIT_ROLLBACK(query, nErr);
-
-    delete query;
+    try
+    {
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
+        i_valuesMap.insert("last_login", QDateTime::currentDateTime());
+        nErr = commit();
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
+    }
+    catch(Global::ThrowType type)
+    {
+        if (type != Global::ThrowType::ConnLost)
+        {
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+    }
 }
 
-void SUserSettings::updateActivityTimestamp(const bool standalone)
+void SUserSettings::updateActivityTimestamp()
 {
-    bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-
-    if(standalone)
-    {
-        query->exec(QUERY_BEGIN);
-    }
     i_valuesMap.insert("last_activity", QDateTime::currentDateTime());
-    nErr = commit();
-    if(standalone)
-    {
-        QUERY_COMMIT_ROLLBACK(query, nErr);
-    }
-
-    delete query;
+    commit();
 }
 
 void SUserSettings::setComboBoxModel(const QString propertyName, SSqlQueryModel *model)

@@ -613,7 +613,6 @@ bool tabSale::unSale()  // распроведение
 {
     // TODO: нужно изучить вопрос возврата товара при условии использования РРО, возможно, для этого нужно создавать отдельный документ на возврат
     bool nErr = 1, balance = 0;
-    QSqlQuery *query;
     int paymentAccount = 0;
     double amount;
 
@@ -626,13 +625,13 @@ bool tabSale::unSale()  // распроведение
         return true; // return 0 — OK, return 1 - ошибка
     }
 
-    query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     QUERY_LOG_START(metaObject()->className());
 
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
         tableModel->unsaleItems(ui->textEditRevertReason->toPlainText());
         clientModel->updatePurchases(-tableModel->itemsAffected());
@@ -671,29 +670,20 @@ bool tabSale::unSale()  // распроведение
         }
 
 #ifdef QT_DEBUG
-//    throw Global::ThrowType::Debug; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     QUERY_LOG_STOP;
-
-    delete query;
 
     if(nErr)
         return false;
@@ -724,7 +714,7 @@ bool tabSale::sale()
     bool nErr = 1, balance = 0, isAnonBuyer = 0;
     int paymentAccount = 0, initial_doc_id = doc_id;
     double amount;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     amount = tableModel->amountTotal();
 
@@ -750,20 +740,20 @@ bool tabSale::sale()
         {
             if (clientModel->isNew())
             {
-                QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+                QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
                 nErr = createClient();
-                QUERY_COMMIT_ROLLBACK(query,nErr);
+                QUERY_COMMIT_ROLLBACK(&query,nErr);
                 fillClientCreds(client);
             }
         }
 
         tableModel->setClient(client);
 
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
         if(balance)
             if(!clientModel->balanceEnough(-amount))
-                throw Global::ThrowType::UserCanceled;
+                Global::throwError(Global::ThrowType::UserCanceled);
 
         if(m_opType == Sale || m_opType == Reserve)
         {
@@ -818,10 +808,10 @@ bool tabSale::sale()
         docModel->commit();
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
 
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
@@ -831,17 +821,11 @@ bool tabSale::sale()
             doc_id = initial_doc_id;
             docModel->setId(0);
         }
-        if(type == Global::ThrowType::Debug)
+
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
 #ifdef QT_DEBUG
@@ -849,8 +833,6 @@ bool tabSale::sale()
 #endif
 
     QUERY_LOG_STOP;
-
-    delete query;
 
     if(nErr)
     {
@@ -939,23 +921,31 @@ void tabSale::phoneTypeChanged(int index)
 void tabSale::setTrackNum()     // слот вызываемый по нажатию Return
 {
     bool nErr = 1;
-    QSqlQuery *query;
 
     if( QString::compare(ui->lineEditTrack->text(), docModel->trackingNumber()) == 0 )
         return;
 
-    query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
-    QUERY_EXEC(query,nErr)(QUERY_BEGIN);
-    docModel->setTrackingNumber(ui->lineEditTrack->text());
-    nErr = docModel->commit();
-    QUERY_COMMIT_ROLLBACK(query,nErr);
-    shortlivedNotification *newPopup;
+    try
+    {
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
+        docModel->setTrackingNumber(ui->lineEditTrack->text());
+        nErr = docModel->commit();
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
+    }
+    catch (Global::ThrowType type)
+    {
+        nErr = 0;
+
+        if (type != Global::ThrowType::ConnLost)
+        {
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+    }
+
     if(nErr)
-        newPopup = new shortlivedNotification(this, "Успешно", "ТТН задана", QColor(214,239,220), QColor(229,245,234));
-    else
-        newPopup = new shortlivedNotification(this, "Неудача", "Ошибка установки ТТН", QColor(255,199,173), QColor(255,164,119));
-    delete query;
+        shortlivedNotification *newPopup = new shortlivedNotification(this, "Успешно", "ТТН задана", QColor(214,239,220), QColor(229,245,234));
 }
 
 void tabSale::setTrackNum(int)
@@ -969,17 +959,16 @@ void tabSale::reserveCancelButtonClicked()
         return;
 
     bool nErr = 1;
-    QSqlQuery *query;
 
-    query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
     QUERY_LOG_START(metaObject()->className());
 
-    QUERY_EXEC(query,nErr)(QUERY_BEGIN);
     try
     {
-        nErr = tableModel->freeItems();
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
+        nErr = tableModel->freeItems();
 
         // если в следствие (нескольких) частичных распроведений были возвращены все товары, то нужно изменить статус документа
         if(tableModel->amountTotal() == 0)
@@ -994,30 +983,22 @@ void tabSale::reserveCancelButtonClicked()
         docModel->commit();
 
 #ifdef QT_DEBUG
-//    throw Global::ThrowType::Debug; // это временное для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if(type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     QUERY_LOG_STOP;
 
     updateWidgets();
-    delete query;
 }
 
 void tabSale::printButtonClicked()

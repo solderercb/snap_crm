@@ -133,14 +133,16 @@ void SComments::clearInputField()
 void SComments::commit()
 {
     bool nErr = 1;
+
+    QUERY_LOG_START(m_parentTab->metaObject()->className());
+
     try
     {
-        QUERY_LOG_START(m_parentTab->metaObject()->className());
-        QUERY_EXEC(m_query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(m_query,nErr,QUERY_BEGIN);
         if(!ui->plainTextEdit->property("recordId").isValid())
         {
             commentsModel->add(ui->plainTextEdit->toPlainText());
-            userActivityLog->appendRecord(QString("Comment %1").arg(m_parentTab->tabTitle()), 0);
+            userActivityLog->appendRecord(QString("Comment %1").arg(m_parentTab->tabTitle()));
         }
         else
         {
@@ -152,24 +154,17 @@ void SComments::commit()
         ui->plainTextEdit->clear();
 
         QUERY_COMMIT_ROLLBACK(m_query,nErr);
-        QUERY_LOG_STOP;
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(m_query, err);
-        }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(m_query, nErr);
-        }
-        else
             QUERY_COMMIT_ROLLBACK(m_query, nErr);
-        return;
+        }
     }
+
+    QUERY_LOG_STOP;
 }
 
 void SComments::editLastComment()
@@ -193,10 +188,10 @@ void SComments::remove()
                                  tr("Вы уверены, что хотите удалить эту запись?"),
                                  QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
+            QUERY_LOG_START(m_parentTab->metaObject()->className());
             try
             {
-                QUERY_LOG_START(m_parentTab->metaObject()->className());
-                QUERY_EXEC(m_query,nErr)(QUERY_BEGIN);
+                QUERY_EXEC_TH(m_query,nErr,QUERY_BEGIN);
                 if(ui->plainTextEdit->property("recordId").isValid())
                 {
                     ui->plainTextEdit->setProperty("recordId", QVariant());
@@ -205,24 +200,17 @@ void SComments::remove()
                 }
                 commentsModel->remove(row);
                 QUERY_COMMIT_ROLLBACK(m_query,nErr);
-                QUERY_LOG_STOP;
             }
             catch (Global::ThrowType type)
             {
                 nErr = 0;
-                if(type == Global::ThrowType::Debug)
+                if (type != Global::ThrowType::ConnLost)
                 {
-                    QString err = "DEBUG ROLLBACK";
-                    QUERY_ROLLBACK_MSG(m_query, err);
-                }
-                else if (type == Global::ThrowType::QueryError)
-                {
-                    QUERY_COMMIT_ROLLBACK_MSG(m_query, nErr);
-                }
-                else
                     QUERY_COMMIT_ROLLBACK(m_query, nErr);
-                return;
+                }
             }
+
+            QUERY_LOG_STOP;
         }
     }
 }

@@ -8,12 +8,6 @@ SCartridgeRepairModel::SCartridgeRepairModel(QObject *parent) : SComRecord(paren
     i_idColumnName = "id";
 }
 
-SCartridgeRepairModel::SCartridgeRepairModel(const int id, QObject *parent) :
-    SCartridgeRepairModel(parent)
-{
-    load(id);
-}
-
 SCartridgeRepairModel::~SCartridgeRepairModel()
 {
 }
@@ -27,51 +21,42 @@ void SCartridgeRepairModel::load(const int id)
 {
     i_id = id;
 
-    if(!id)
+    if(!i_id)
     {
-        loadError();
+        loadError(Global::ThrowType::ConditionsError);
         return;
     }
 
-    QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
-    record->exec(QUERY_SEL_CARTRIDGE_REPAIR_DATA(i_id));
-    if(!record->first())
+    QSqlQuery record(QSqlDatabase::database("connMain"));
+    record.exec(QUERY_SEL_CARTRIDGE_REPAIR_DATA(i_id));
+    if(!record.first())
     {
-        loadError();
+        loadError(Global::ThrowType::ResultError);
         return;
     }
 
-    m_refill = record->value("refill").toBool();
-    m_chip = record->value("chip").toBool();
-    m_drum = record->value("opc_drum").toBool();
-    m_Blade = record->value("c_blade").toBool();
-    m_cardId = record->value("card_id").toInt();
-
-    delete record;
+    m_refill = record.value("refill").toBool();
+    m_chip = record.value("chip").toBool();
+    m_drum = record.value("opc_drum").toBool();
+    m_Blade = record.value("c_blade").toBool();
+    m_cardId = record.value("card_id").toInt();
 }
 
-// TODO: аналогичный метод есть в классе SCartridgeCardModel; нужно их обобщить
-void SCartridgeRepairModel::loadError()
+void SCartridgeRepairModel::loadError(const int type)
 {
-    SRepairModel* repair = dynamic_cast<SRepairModel*>(parent());
-    if(repair)
-    {
-        appLog->appendRecord(tr("Не удалось инициализировать модель SCartridgeRepairModel ремонта №%1").arg(repair->id()));
-        shortlivedNotification *newPopup = new shortlivedNotification(this, "Ошибка", "Не удалось загрузить информацию о картридже. Обратитесь к администратору", QColor("#FFC7AD"), QColor("#FFA477"));
-    }
+    QString msg = tr("Не удалось загрузить SCartridgeRepairModel; id записи в таблице `c_workshop`: %1, id ремонта: %2").arg(i_id).arg(m_repairId);
+    Global::throwError(type, msg);
 }
 
 bool SCartridgeRepairModel::commit()
 {
     if(i_id)
     {
-        if(!update())
-            throw Global::ThrowType::QueryError;
+        update();
     }
     else
     {
-        if(!insert())
-            throw Global::ThrowType::QueryError;
+        insert();
     }
 
     return 1;
@@ -125,5 +110,15 @@ int SCartridgeRepairModel::cardId()
 void SCartridgeRepairModel::setCardId(const int cardId)
 {
     i_valuesMap.insert("card_id", cardId);
+}
+
+int SCartridgeRepairModel::repairId() const
+{
+    return m_repairId;
+}
+
+void SCartridgeRepairModel::setRepairId(int id)
+{
+    m_repairId = id;
 }
 

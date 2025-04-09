@@ -32,9 +32,10 @@ public:
     void setValueAfter(const QString &);   // `logs`.`values_after`
     void setOffice(const int id);
     void setUser(const int id);
-    void clear();
-    void findNewId() override {};    // после создания новой записи id не используется
+    void clear() override;
 private:
+    void queryNewId(int&) override {};    // после создания новой записи id не используется
+    void queryLastInsertId() override {}; // id записи в журнале не нужен
 };
 
 #endif // SLOGRECORDMODEL_H

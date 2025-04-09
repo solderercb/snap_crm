@@ -24,12 +24,12 @@ signals:
     void createCartridgeCardForm(int id);
 public:
     explicit SCartridgeForm(QWidget *parent = nullptr);
-    explicit SCartridgeForm(const int repairId, QWidget *parent = nullptr);
     ~SCartridgeForm();
     bool eventFilter(QObject *, QEvent *);
     SRepairModel *model();
     void initModels();
-    void initWidgets();
+    void configureWidgets();
+    void init();
     void initCheckBoxWidgets(const QIcon &icon, QPushButton *button, bool isFlat = 0, bool installEventFilter = 0);
     bool createRepair();
     bool updateRepair();
@@ -63,9 +63,11 @@ public:
     double preargeedAmount();
     int checkInput();
     int isReady();
-    void updateModels();
-    void updateCardModel();
+    void load();
+    void loadCardData();
+    void reloadData();
     void randomFill();
+    void setRepair(int id);
 private:
     Ui::SCartridgeForm *ui;
     SQueryLog *i_queryLog;
@@ -109,7 +111,7 @@ private:
     void updatePreagreedAmount(SCartridgeMaterialModel *material, const bool state);
     void setDefaultStyleSheets();
     void setWidgetsParams(const int);
-    bool checkStateAcl(const int);
+    void checkStateAcl(const int);
     void setPricesToZero();
     void setInformedStatus(int);
     void initEngineer();

@@ -109,53 +109,40 @@ void tabSettings::initPage(const int page)
 void tabSettings::buttonSaveClicked()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
-    m_queryLog = new SQueryLog();
+    QSqlQuery query(QSqlDatabase::database("connThird"));
+
+    QUERY_LOG_START(metaObject()->className());
 
     try
     {
-        m_queryLog->start(metaObject()->className());
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
         emit saveSettings();
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+
+//        if(type == Global::ThrowType::Debug)
 //            nErr = 1; // это чтобы проверить работу дальше
-        }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-        {
-            QUERY_COMMIT_ROLLBACK(query, nErr);
-            shortlivedNotification *newPopup = new shortlivedNotification(this,
-                                                                          tr("Информация"),
-                                                                          tr("Не удалось сохранить настройки (ошибка %1)").arg(type),
-                                                                          QColor(255,164,119),
-                                                                          QColor(255,199,173));
-        }
     }
 
-    m_queryLog->stop();
+    QUERY_LOG_STOP;
     if(nErr)
+    {
         shortlivedNotification *newPopup = new shortlivedNotification(this, tabTitle(), tr("Настройки успешно сохранены"), QColor(214,239,220), QColor(229,245,234));
-
-    emit updateDaughterPagesModels();
-
-    delete query;
-    delete m_queryLog;
+        emit updateDaughterPagesModels();
+    }
 }
 
 tabSettings* tabSettings::getInstance(MainWindow *parent)

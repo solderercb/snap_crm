@@ -704,7 +704,7 @@ bool SSaleTableModel::repair_saveTablesStandalone()
 {
     bool nErr = 1;
 
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
 
 #ifdef QT_DEBUG
     SQueryLog *queryLog = new SQueryLog();
@@ -713,27 +713,24 @@ bool SSaleTableModel::repair_saveTablesStandalone()
 
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
         repair_saveTables();
 
 #ifdef QT_DEBUG
-//            throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
 
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch(Global::ThrowType type)
     {
         nErr = 0;
 
-        if(type == Global::ThrowType::Debug)
+        if(type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 #ifdef QT_DEBUG
     queryLog->stop();
@@ -744,7 +741,6 @@ bool SSaleTableModel::repair_saveTablesStandalone()
     {
         shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Список работ и деталей сохранён"), QColor(214,239,220), QColor(229,245,234));
     }
-    delete query;
 
     return nErr;
 }

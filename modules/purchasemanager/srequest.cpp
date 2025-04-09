@@ -9,6 +9,7 @@ SPartRequest::SPartRequest(QObject *parent)
     i_idColumnName = "id";
 
     i_createdUtc = QDateTime::currentDateTimeUtc();
+    i_logRecord->setType(SLogRecordModel::RecordTypes::PartRequest);
 
     m_managers = new SEditableBaseModel(this, QSqlDatabase::database("connThird"));
     m_managers->setEditStrategy(QSqlTableModel::OnManualSubmit);
@@ -53,6 +54,9 @@ SStandardItemModel *SPartRequest::prioritiesList()
 
 }
 
+/* Статический метод инициализации модели менеджеров заявок на закупку.
+ * Должен вызываться только при запуске приложения.
+*/
 SSqlQueryModel *SPartRequest::managersList()
 {
     SSqlQueryModel *model = new SSqlQueryModel;
@@ -72,11 +76,16 @@ void SPartRequest::setId(const int id)
     i_id = id;
 }
 
-void SPartRequest::load(const int &id)
+void SPartRequest::load(const int &id, QSqlDatabase db)
 {
-    QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlDatabase database = db;
+    if(!database.isValid())
+        database = QSqlDatabase::database("connMain");
+
+    QSqlQuery *record = new QSqlQuery(database);
 
     beginResetModel();
+    i_valuesMap.clear();
 
     record->exec(QUERY_SEL_PART_REQUEST(id));
 
@@ -195,12 +204,17 @@ void SPartRequest::setState(const int &newState)
             setCreated(QDateTime::currentDateTime());
     }
     else    //  (Any -» Created)
-        appendLogText(tr("Статус изменён на %1").arg(partRequestStatesListModel->getDisplayRole(newState)));
+        appendLogText(logMsgStateChange(newState));
 
     if(newState == Finished)
         setEndDate(QDate::currentDate());
 
     i_valuesMap.insert("state", newState);
+}
+
+QString SPartRequest::logMsgStateChange(const int &newState)
+{
+    return tr("Статус изменён на %1").arg(partRequestStatesListModel->getDisplayRole(newState));
 }
 
 QDate SPartRequest::endDate()
@@ -233,11 +247,16 @@ void SPartRequest::setPlanEndDate(const QDate &date)
         if(!planEndDate().isValid())
             logText = tr("Указана плановая дата завершения: %1").arg(date.toString("dd.MM.yyyy"));
         else
-            logText = tr("Плановая дата завершения изменёна на %1").arg(date.toString("dd.MM.yyyy"));
+            logText = logMsgPlanEndDateChange(date);
     }
 
     i_valuesMap.insert("plan_end_date", date);
     appendLogText(logText);
+}
+
+QString SPartRequest::logMsgPlanEndDateChange(const QDate &date)
+{
+    return tr("Плановая дата завершения изменёна на %1").arg(date.toString("dd.MM.yyyy"));
 }
 
 double SPartRequest::amount()
@@ -254,10 +273,15 @@ void SPartRequest::setAmount(const double &amount)
     if(this->amount() == 0)
         logText = tr("Указана сумма: %1").arg(sysLocale.toCurrencyString(amount));
     else
-        logText = tr("Сумма изменёна на %1").arg(sysLocale.toCurrencyString(amount));
+        logText = logMsgAmountChange(amount);
 
     i_valuesMap.insert("summ", amount);
     appendLogText(logText);
+}
+
+QString SPartRequest::logMsgAmountChange(const double &amount)
+{
+    return tr("Сумма изменёна на %1").arg(sysLocale.toCurrencyString(amount));
 }
 
 QString SPartRequest::tracking()
@@ -271,15 +295,21 @@ void SPartRequest::setTracking(const QString &tracking)
         return;
 
     QString logText;
-    if(this->tracking().isEmpty())
-        logText = tr("Указан трэк-номер: %1").arg(tracking);
-    else if(tracking.isEmpty())
-        logText = tr("Трэк-номер удалён");
-    else if(m_state != NewUncommitted)
-        logText = tr("Трэк-номер изменён на %1").arg(tracking);
+    logText = logMsgTrackingChange(tracking, this->tracking());
 
     i_valuesMap.insert("tracking", tracking);
     appendLogText(logText);
+}
+
+QString SPartRequest::logMsgTrackingChange(const QString &newTrack, const QString &oldTrack)
+{
+    if(oldTrack.isEmpty())
+        return tr("Указан трэк-номер: %1").arg(newTrack);
+
+    if(newTrack.isEmpty())
+        return tr("Трэк-номер удалён");
+
+    return tr("Трэк-номер изменён на %1").arg(newTrack);
 }
 
 int SPartRequest::itemId()
@@ -346,10 +376,15 @@ void SPartRequest::setPriority(const int &priority)
         if(this->priority() == priority)
             return;
 
-        appendLogText(tr("Приоритет изменён на %1").arg(partRequestPrioritiesListModel->getDisplayRole(priority)));
+        appendLogText(logMsgPriorityChange(priority));
     }
 
     i_valuesMap.insert("pririty", priority);
+}
+
+QString SPartRequest::logMsgPriorityChange(const int &priority)
+{
+    return tr("Приоритет изменён на %1").arg(partRequestPrioritiesListModel->getDisplayRole(priority));
 }
 
 int SPartRequest::count()
@@ -364,10 +399,15 @@ void SPartRequest::setCount(const int &count)
         if(this->count() == count)
             return;
 
-        appendLogText(tr("Количество изменёно на %1").arg(count));
+        appendLogText(logMsgCountChange(count));
     }
 
     i_valuesMap.insert("count", count);
+}
+
+QString SPartRequest::logMsgCountChange(const int &count)
+{
+    return tr("Количество изменёно на %1").arg(count);
 }
 
 int SPartRequest::dealer()
@@ -418,8 +458,15 @@ void SPartRequest::updateAdditionalModel(SEditableBaseModel *model, QList<int> n
 
 void SPartRequest::updateAdditionalModelsFilters(const int id)
 {
-    m_managers->setFilter(QString("`request` = %1").arg(i_id));
-    m_notifications->setFilter(QString("`part_request_id` = %1").arg(i_id));
+    QString filter;
+
+    filter = QString("`request` = %1").arg(i_id);
+    if(filter.compare(m_managers->filter()))
+        m_managers->setFilter(filter);
+
+    filter = QString("`part_request_id` = %1").arg(i_id);
+    if(filter.compare(m_notifications->filter()))
+        m_notifications->setFilter(filter);
 }
 
 QList<int> SPartRequest::managers()
@@ -443,7 +490,6 @@ QList<int> SPartRequest::managers()
 void SPartRequest::setManagers(QList<int> managers)
 {
     Q_ASSERT_X(i_id, "SPartRequest::setManagers()", "request id not set; porbably this method invoked before method commit()");
-    updateAdditionalModelsFilters(i_id); // при установке фильтров происходит вызов SELECT и обновление моделей данными из БД
     updateAdditionalModel(m_managers, managers, ManagersModelFields::Employee);
     if(comSettings->notifyItemPurchaseRequest)
         updateNotifications(managers);
@@ -474,6 +520,8 @@ bool SPartRequest::commit()
     }
     else
     {
+        i_logTexts->clear();
+
         QStringList logs;
         logs.append(tr("Заявка на закупку %1ед. \"%2\" создана").arg(count()).arg(name()));
         logs.append(tr("Приоритет: %1").arg(partRequestPrioritiesListModel->getDisplayRole(priority())));
@@ -487,12 +535,29 @@ bool SPartRequest::commit()
     return SComRecord::commit();
 }
 
+bool SPartRequest::isManagersModelDirty()
+{
+    return m_managers->isDirty();
+}
+
 bool SPartRequest::commitManagers()
 {
-    i_nErr &= m_managers->submitAll();
-    i_nErr &= m_notifications->submitAll();
+    SDatabaseRecord::checkSystemTime();
+
+    if(!m_managers->submitAll())
+        Global::throwError(m_managers->lastError(), tr("Не удалось сохранить ответственных сотрудников в заявке на закупку"));
+    if(!m_notifications->submitAll())
+        Global::throwError(m_notifications->lastError(), tr("Не удалось отправить уведомления ответственным сотрудникам при сохранении заявки на закупку"));
 
     return i_nErr;
+}
+
+/* Переопределённый метод
+ * Установка ID запроса на закупку в поле `logs`.`part_request`
+*/
+void SPartRequest::updateLogAssociatedRecId()
+{
+    i_logRecord->setPartRequestId(i_id);
 }
 
 /* Переопределённый метод

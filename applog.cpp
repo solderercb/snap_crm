@@ -1,6 +1,8 @@
 #include "applog.h"
 #include "models/slocalsettings.h"
 
+SAppLog* SAppLog::p_instance = nullptr;
+
 SAppLog::SAppLog()
 {
     file.setFileName(SLocalSettings::appSettingsPath()+"/snap.log");
@@ -18,6 +20,9 @@ void SAppLog::setFile(const QString &filename)
 
 bool SAppLog::appendRecord(const QString &text)
 {
+    if(text.isEmpty())
+        return 1;
+
     QByteArray fileBuf = 0;
 
     if (file.open(QIODevice::ReadWrite))
@@ -34,4 +39,11 @@ bool SAppLog::appendRecord(const QString &text)
         qDebug() << "Can't open appLog file";
         return 0;
     }
+}
+
+SAppLog *SAppLog::getInstance()
+{
+    if( !p_instance )
+      p_instance = new SAppLog();
+    return p_instance;
 }

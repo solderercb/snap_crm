@@ -177,35 +177,24 @@ void SPageSalarySummary::addOldBalanceValue()
 
 void SPageSalarySummary::markRepairsPayed()
 {
-    try
+    QDateTime periodEnd = parentTab->m_periodEnd;
+    periodEnd = periodEnd.addSecs(-1);
+
+    for(int i = 0; i < parentTab->m_repairs->rowCount(); i++)
     {
-        QDateTime periodEnd = parentTab->m_periodEnd;
-        periodEnd = periodEnd.addSecs(-1);
+        if(parentTab->m_repairs->index(i, 10).data().toInt())   // пропуск ранее оплаченных, если они отображаются
+            continue;
 
-        for(int i = 0; i < parentTab->m_repairs->rowCount(); i++)
-        {
-            if(parentTab->m_repairs->index(i, 10).data().toInt())   // пропуск ранее оплаченных, если они отображаются
-                continue;
-
-            salaryRepairsModel = new SSalaryRepairsModel();
-//            if(parentTab->m_repairs->index(i, 13).data().toInt())
-//                salaryRepairsModel->setCartridge();
-//            else
-                salaryRepairsModel->setRepair(parentTab->m_repairs->id(i));
-            salaryRepairsModel->setUser(parentTab->m_userModel->id());
-            salaryRepairsModel->setSumm(parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryWorks).toDouble() + parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryParts).toDouble());
-            salaryRepairsModel->setAccountingDate(periodEnd);
-            salaryRepairsModel->commit();
-
-            delete salaryRepairsModel;
-        }
+        SSalaryRepairsModel salaryRepairsModel;
+//        if(parentTab->m_repairs->index(i, 13).data().toInt())
+//            salaryRepairsModel.setCartridge();
+//        else
+            salaryRepairsModel.setRepair(parentTab->m_repairs->id(i));
+        salaryRepairsModel.setUser(parentTab->m_userModel->id());
+        salaryRepairsModel.setSumm(parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryWorks).toDouble() + parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryParts).toDouble());
+        salaryRepairsModel.setAccountingDate(periodEnd);
+        salaryRepairsModel.commit();
     }
-    catch(Global::ThrowType)
-    {
-        delete salaryRepairsModel;
-        throw Global::ThrowType::QueryError;
-    }
-
 }
 
 void SPageSalarySummary::paySubsistence()
@@ -265,7 +254,7 @@ void SPageSalarySummary::paySalary()
 void SPageSalarySummary::pay()
 {
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     m_queryLog = new SQueryLog();
 
     try
@@ -275,24 +264,24 @@ void SPageSalarySummary::pay()
         if(m_commitUserClientModelsPending)
         {
             // TODO: исправить чехарду с несколькими BEGIN/COMMIT
-            QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+            QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
             m_userClient->commit();
             parentTab->m_userModel->setClientUserId(m_userClient->id());
             parentTab->m_userModel->commit();
-            QUERY_COMMIT_ROLLBACK(query,nErr);
+            QUERY_COMMIT_ROLLBACK(&query,nErr);
             shortlivedNotification *newPopup = new shortlivedNotification(this, parentTab->tabTitle(), tr("Карточка сотрудника-клиента успешно создана или связана"), QColor(214,239,220), QColor(229,245,234));
             m_userClient->setBalanceEnabled();  // TODO: изменить методы в классе SClientModel, связанные с включением, выключением и пополнением баланса; произвести соотв. изменения в этом классе.
             if(m_employeeBalanceToConvert)
             {
-                QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+                QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
                 m_userClient->updateBalance(m_employeeBalanceToConvert, tr("Преобразование данных о сумме на балансе сотрудника из формата программы АСЦ"));
-                QUERY_COMMIT_ROLLBACK(query,nErr);
+                QUERY_COMMIT_ROLLBACK(&query,nErr);
             }
 
             m_commitUserClientModelsPending = 0;
         }
 
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         salaryModel->commit();
         cashRegister->commit();
         if(salaryModel->type() == SSalaryModel::Salary)
@@ -316,34 +305,27 @@ void SPageSalarySummary::pay()
 
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
 
-        shortlivedNotification *newPopup = new shortlivedNotification(this, parentTab->tabTitle(), tr("Ошибка выполнения запроса"), QColor(255,164,119), QColor(255,199,173));
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+
+//        if(type == Global::ThrowType::Debug)
 //            nErr = 1; // это чтобы проверить работу дальше
-        }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     m_queryLog->stop();
     if(nErr)
         shortlivedNotification *newPopup = new shortlivedNotification(this, parentTab->tabTitle(), tr("Проведено"), QColor(214,239,220), QColor(229,245,234));
 
-    delete query;
     delete m_queryLog;
     delete salaryModel;
     delete cashRegister;

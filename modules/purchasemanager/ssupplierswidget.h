@@ -18,7 +18,6 @@ class SPartSuppliers : public SWidget
 signals:
     void confirmChanges(int &result);
     void modelReset();
-    void submitOk();
     void beginRowInsert();
 public:
     explicit SPartSuppliers(QWidget *parent = nullptr);
@@ -36,6 +35,7 @@ public:
     void setPredefSupplierId(const int id);
     void refresh(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
     void connectSuppliersTableWithManager();
+    void commit();
 private:
     Ui::SPartSuppliers *ui;
     SPartSuppliersModel *m_model;
@@ -50,8 +50,9 @@ private:
     void initTableMenu();
     void addRow();
     void copyLink();
+protected slots:
+    virtual void manualSubmit();
 public slots:
-    void saveLinks();
     void orderChanged(const int section, Qt::SortOrder order);
     void removeSelected();
     void setRequestState(const int state);

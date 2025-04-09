@@ -239,21 +239,20 @@ void tabCashOperation::updateModelData()
 
 bool tabCashOperation::commit(bool repeatAfter)
 {
-    QSqlQuery *query;
-    bool nErr = 1;
-    int initial_order_id = m_orderId;
-
     if(!checkInput())
         return 0;
 
-    query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    bool nErr = 1;
+    int initial_order_id = m_orderId;
+
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     QUERY_LOG_START(metaObject()->className());
 
     updateModelData();
 
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         m_cashRegisterModel->commit();
         m_orderId = m_cashRegisterModel->id();
         commitLink();
@@ -262,33 +261,24 @@ bool tabCashOperation::commit(bool repeatAfter)
 //        Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
 #endif
 
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
         m_cashRegisterModel->setId(0);
         m_orderId = initial_order_id;
-        if(type == Global::ThrowType::Debug)
+
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
+
+//        if(type == Global::ThrowType::Debug)
+//            nErr = 1; // это чтобы проверить работу дальше
     }
 
-#ifdef QT_DEBUG
-//    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
-#endif
-
     QUERY_LOG_STOP;
-
-    delete query;
 
     if(nErr)
     {
@@ -354,7 +344,7 @@ bool tabCashOperation::commitSimple()
 bool tabCashOperation::commitBalance(const double amount)
 {
     if(amount < 0 && !m_clientModel->balanceEnough(amount))
-        throw Global::ThrowType::UserCanceled;
+        Global::throwError(Global::ThrowType::UserCanceled);
 
     QString note;
     bool nErr = 1;
@@ -660,23 +650,29 @@ void tabCashOperation::fillDeviceCreds(int repairId)
 
 void tabCashOperation::initRepairVariables(int repairId)
 {
-    m_repairModel = new SRepairModel();
-    m_repairModel->load(repairId);
-    m_linkId = QString::number(m_repairModel->id());
-    m_linkTitle = m_repairModel->title();
-    if(m_cashRegisterModel->id() <= 0)
+    try
     {
-        m_amount = m_repairModel->realRepairCost() - m_repairModel->paymentsAmount();
-        m_maxAmount = m_amount;
-        if(m_orderType == SCashRegisterModel::RecptPrepayRepair)
-            m_minAmount = qMin(0.1 * m_repairModel->realRepairCost(), m_maxAmount);    // TODO: настройка минимального процента предоплаты в общих настройках системы (Настройки-»Финансы)
+        m_repairModel = new SRepairModel();
+        m_repairModel->load(repairId);
+        m_linkId = QString::number(m_repairModel->id());
+        m_linkTitle = m_repairModel->title();
+        if(m_cashRegisterModel->id() <= 0)
+        {
+            m_amount = m_repairModel->realRepairCost() - m_repairModel->paymentsAmount();
+            m_maxAmount = m_amount;
+            if(m_orderType == SCashRegisterModel::RecptPrepayRepair)
+                m_minAmount = qMin(0.1 * m_repairModel->realRepairCost(), m_maxAmount);    // TODO: настройка минимального процента предоплаты в общих настройках системы (Настройки-»Финансы)
+            else
+                m_minAmount = m_maxAmount;
+        }
         else
-            m_minAmount = m_maxAmount;
-    }
-    else
-        m_amount = m_cashRegisterModel->amountAbs();
+            m_amount = m_cashRegisterModel->amountAbs();
 
-    fillClientCreds(m_repairModel->clientId());    // загрузка данных клиента последним шагом
+        fillClientCreds(m_repairModel->clientId());    // загрузка данных клиента последним шагом
+    }
+    catch (Global::ThrowType)
+    {
+    }
 }
 
 void tabCashOperation::initDocumentVariables(int documentId)

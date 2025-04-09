@@ -135,32 +135,18 @@ void SPartsRequestsModel::setReadOnly(bool state)
 
 bool SPartsRequestsModel::select()
 {
+    if(m_postSubmitAction == PostSubmitAction::NoSelect)
+    {
+        m_postSubmitAction = PostSubmitAction::DefaultSelect;
+        return true;
+    }
+
     return SEditableBaseModel::select();
-    return 1;
 }
 
 bool SPartsRequestsModel::selectRow(int row)
 {
     return SEditableBaseModel::select();
-}
-
-void SPartsRequestsModel::translateNames()
-{
-    tr("Employee");
-    tr("Repair");
-    tr("Client");
-    tr("State");
-    tr("EndDate");
-    tr("PlanEndDate");
-    tr("Summ");
-    tr("Tracking");
-    tr("ItemId");
-    tr("Name");
-    tr("Notes");
-    tr("Url");
-    tr("Priority");
-    tr("Count");
-    tr("Dealer");
 }
 
 QModelIndex SPartsRequestsModel::indexForShortData(const QModelIndex &index) const
@@ -207,16 +193,71 @@ bool SPartsRequestsModel::updateRowInTable(int row, const QSqlRecord &values)
         return 0;
     }
 
-    return 1;
-}
+    SLogRecordModel logRecord;
+    logRecord.setType(SLogRecordModel::RecordTypes::PartRequest);
+    logRecord.setPartRequestId(whereField.value().toInt());
 
-bool SPartsRequestsModel::commit()
-{
-
-    if(!submitAll())
+    QString logText;
+    QMap<QString, QString> logTexts;
+    for(int i = 0; i < values.count(); i++)
     {
-        throw Global::ThrowType::QueryError;
+        if(!values.isGenerated(i))
+            continue;
+
+        if(values.fieldName(i).compare("state") == 0)
+            logTexts.insert(QString::number(logTexts.size()), SPartRequest::logMsgStateChange(values.value(i).toInt()));
+        if(values.fieldName(i).compare("plan_end_date") == 0)
+            logTexts.insert(QString::number(logTexts.size()), SPartRequest::logMsgPlanEndDateChange(values.value(i).toDate()));
+        if(values.fieldName(i).compare("summ") == 0)
+            logTexts.insert(QString::number(logTexts.size()), SPartRequest::logMsgAmountChange(values.value(i).toDouble()));
+        if(values.fieldName(i).compare("tracking") == 0)
+        {
+            QModelIndex indx = QSqlQueryModel::index(row,Columns::Tracking);
+            logTexts.insert(QString::number(logTexts.size()), SPartRequest::logMsgTrackingChange(values.value(i).toString(), QSqlQueryModel::data(indx).toString()));
+        }
+        if(values.fieldName(i).compare("pririty") == 0)
+            logTexts.insert(QString::number(logTexts.size()), SPartRequest::logMsgPriorityChange(values.value(i).toInt()));
+        if(values.fieldName(i).compare("count") == 0)
+            logTexts.insert(QString::number(logTexts.size()), SPartRequest::logMsgCountChange(values.value(i).toInt()));
+    }
+    foreach(logText, logTexts)
+    {
+        logRecord.setText(logText);
+        logRecord.commit();
     }
 
     return 1;
+}
+
+bool SPartsRequestsModel::submitAll()
+{
+    m_postSubmitAction = PostSubmitAction::NoSelect;    // нужно пропустить вызов метода select() из родительского класса и вызвать его самостоятельно по окончании (для сохранения положения и выделенной строки)
+
+    SDatabaseRecord::checkSystemTime();
+
+    if(!SEditableBaseModel::submitAll())
+    {
+        Global::throwError(lastError(), tr("Не удалось сохранить список заявок на закупку | %1").arg(lastError().text()));
+    }
+
+    return 1;
+}
+
+void SPartsRequestsModel::translateNames()
+{
+    tr("Employee");
+    tr("Repair");
+    tr("Client");
+    tr("State");
+    tr("EndDate");
+    tr("PlanEndDate");
+    tr("Summ");
+    tr("Tracking");
+    tr("ItemId");
+    tr("Name");
+    tr("Notes");
+    tr("Url");
+    tr("Priority");
+    tr("Count");
+    tr("Dealer");
 }

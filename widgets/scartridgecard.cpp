@@ -1,3 +1,4 @@
+#include "sapplication.h"
 #include "scartridgecard.h"
 #include "ui_scartridgecard.h"
 
@@ -7,8 +8,9 @@ SCartridgeCard::SCartridgeCard(Qt::WindowFlags flags, QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowModality(Qt::WindowModal);
-    initWidgets();
 
+    initModels();
+    configureWidgets();
     show();
 }
 
@@ -39,10 +41,10 @@ void SCartridgeCard::load(const int id)
     m_id = id;
 
     m_cardModel->load(m_id);
-    setCardId(m_id);
+    setMaterialsTableFilter(m_id);
 }
 
-void SCartridgeCard::setCardId(const int id)
+void SCartridgeCard::setMaterialsTableFilter(const int id)
 {
     m_materialsModel->setCardId(id);
 
@@ -55,29 +57,37 @@ void SCartridgeCard::setCardId(const int id)
 
 void SCartridgeCard::initModels()
 {
+    bool nErr = 1;
     QString query;
     QSqlQuery q(QSqlDatabase::database("connMain"));
 
     query = QUERY_SEL_CARTRIDGE_CAT_ID;
-    q.exec(query);
+    QUERY_EXEC_TH(&q,nErr,query);
+
     if(!q.first())
-        return;
+        Global::throwError(Global::ThrowType::ResultError, errQuerySelCartridgeCatId);
+
+    m_vendorsModel = new SSqlQueryModel(this);
     m_deviceClassId = q.value(0).toInt();
     query = QUERY_SEL_DEVICE_MAKERS(q.value(1).toString());
-    m_vendorsModel = new SSqlQueryModel(this);
     m_vendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
+
+    if(m_vendorsModel->lastError().isValid())
+        Global::errorMsg(m_vendorsModel->lastError(), errQuerySelDeviceMakers);
+    else if(m_vendorsModel->rowCount() == 0)
+        Global::errorMsg(Global::ThrowType::ResultError, errQuerySelDeviceMakers + "; " + tr("список id: \'%1\'").arg(q.value(1).toString()));
 
     m_cardModel = new SCartridgeCardModel(this);
     m_materialsModel = new SCartridgeMaterialsModel(this);
-    connect(m_materialsModel, &SCartridgeMaterialsModel::noFurtherMaterialAddition, ui->pushButtonAddMaterial, &QPushButton::setDisabled);
     m_cartridgeColors = colorsList();
     m_cartridgeColors->setParent(this);
+
+    connect(m_materialsModel, &SCartridgeMaterialsModel::noFurtherMaterialAddition, ui->pushButtonAddMaterial, &QPushButton::setDisabled);
 }
 
-void SCartridgeCard::initWidgets()
+void SCartridgeCard::configureWidgets()
 {
     m_modelRW = permissions->editCartridgeCards;
-    initModels();
     ui->comboBoxVendor->setModel(m_vendorsModel);
     ui->comboBoxVendor->setCurrentIndex(-1);
     ui->tableViewMaterials->setModel(m_materialsModel);
@@ -235,7 +245,7 @@ bool SCartridgeCard::commit()
     if(!checkInput())
         return 0;
 
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     bool nErr = 1;
     bool isNew = (m_cardModel->id() == 0);
     setModelData();
@@ -243,47 +253,46 @@ bool SCartridgeCard::commit()
     QUERY_LOG_START(metaObject()->className());
     try
     {
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         m_cardModel->commit();
         if(isNew)
             m_materialsModel->setCardId(m_cardModel->id());
         m_materialsModel->commit();
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Данные сохранены"), QColor(214,239,220), QColor(229,245,234));
 
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
+
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
         }
-        else if (type == Global::ThrowType::QueryError)
+    }
+
+    QUERY_LOG_STOP;
+
+    if(nErr)
+    {
+        if(!m_id)
         {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
+            m_id = m_cardModel->id();
+            setMaterialsTableFilter(m_id);
+            emit newCardCreated(m_id);
         }
         else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
-    }
-    if(!m_id)
-    {
-        m_id = m_cardModel->id();
-        setCardId(m_id);
-        emit newCardCreated(m_id);
-    }
-    else
-    {
-        emit cardModified(m_id);
-    }
-    QUERY_LOG_STOP;
-    delete query;
+        {
+            emit cardModified(m_id);
+        }
 
-    updateWidgets();
+        updateWidgets();
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Данные сохранены"), QColor(214,239,220), QColor(229,245,234));
+    }
+
     return nErr;
 }
 

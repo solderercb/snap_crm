@@ -57,9 +57,9 @@ public:
     explicit SCartridgeCard(const int id, const int vendorIndex, Qt::WindowFlags flags, QWidget *parent = nullptr);
     ~SCartridgeCard();
     void load(const int id);
-    void setCardId(const int id);
+    void setMaterialsTableFilter(const int id);
     void initModels();
-    void initWidgets();
+    void configureWidgets();
     void updateWidgets();
     static SStandardItemModel *colorsList();
     bool checkInput();

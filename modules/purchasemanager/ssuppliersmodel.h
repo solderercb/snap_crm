@@ -31,7 +31,7 @@ public:
     bool deleteRowFromTable(int row) override;
     bool isDirty() const;
     bool submit() override;
-    bool submitAll();
+    void submitAll();
     int predefSupplierId();
     void setPredefSupplierId(const int id);
     void addSupplierRecord(int id);
@@ -40,7 +40,6 @@ private:
     int m_requestId = 0;
     int m_requestState = SPartRequest::Created;
     bool m_itemsEditableFlagOverride = 0;
-    bool m_submitSuccess = 1;
     int m_postSubmitAction = PostSubmitAction::DefaultSelect;
     int m_newCheckedId = 0;
     int m_predefSupplierId = 0;
@@ -52,6 +51,7 @@ private:
     QString url(const QModelIndex &index) const;
     bool setCheckStateExclusive(const QModelIndex &checkedIndex);
     void slotPrimeInsert(int row, QSqlRecord &record);
+    bool postSubmitDispatcher(const bool &queryResult);
 };
 
 #endif // SPARTSUPPLIERSMODEL_H

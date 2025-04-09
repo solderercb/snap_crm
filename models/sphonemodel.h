@@ -50,6 +50,7 @@ private:
     bool m_receiveSMS = 0;
     QString cleanPhone(const QString &);
     void setType(const int type);
+    void updateLogAssociatedRecId() override;
 
 public slots:
     void setPrimaryUi();

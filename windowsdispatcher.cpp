@@ -12,7 +12,7 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     setObjectName("windowsDispatcherObj");
 
     debugInitSettings();
-    appLog = new SAppLog();
+    appLog = SAppLog::getInstance();
     appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Application start");
     LoginWindow *windowLogin = new LoginWindow(this);
 
@@ -53,7 +53,7 @@ void windowsDispatcher::connectOK()
     QApplication::setFont(f);
 
     userDbData->updateLoginTimestamp();
-    userActivityLog->appendRecord(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
+    userActivityLog->appendRecordStandalone(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
 
     userDbData->currentOffice = userDbData->office;
 

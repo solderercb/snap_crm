@@ -81,7 +81,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
 private:
-    enum ReportState {New = 0, Initialized = 1, RenderingInProcess = 2, RenderingFinished = 3};
+    enum ReportState {New = 0, Initialized = 1, RenderingInProcess = 2, RenderingFinished = 3, DataInitError = 4};
     Ui::tabPrintDialog *ui;
     QPrinter *m_printer = nullptr;
     QStringList m_printersList;

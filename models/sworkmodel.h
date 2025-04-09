@@ -47,7 +47,6 @@ public:
     bool commit();
     double salarySumm() const;
     void setSalarySumm(double salarySumm);
-
 private:
     int m_user;
     int m_repair;
@@ -62,6 +61,7 @@ private:
     int m_payRepair;
     int m_payRepair_quick;
     double m_salarySumm;
+    void updateLogAssociatedRecId() override;
 };
 
 #endif // SWORKMODEL_H

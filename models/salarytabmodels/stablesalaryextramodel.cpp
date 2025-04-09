@@ -57,14 +57,20 @@ void STableSalaryExtraModel::addNewRow()
 
 void STableSalaryExtraModel::saveTable()
 {
+    if(rowCount() == 0)
+        return;
+
     bool nErr = 1;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database("connThird"));
     m_queryLog = new SQueryLog();
 
+    m_queryLog->start(metaObject()->className());
+    // TODO: все второстепенные операции (например, запуск журналирования, открытие сессии) нужно перенести в класс виджета tabSalary или SPageSalaryExtra для дальнейшей унификации кода
     try
     {
-        m_queryLog->start(metaObject()->className());
-        QUERY_EXEC(query,nErr)(QUERY_BEGIN);
+        SDatabaseRecord::checkSystemTime();
+
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
 
         for(int i = 0; i < rowCount(); i++)
         {
@@ -87,26 +93,20 @@ void STableSalaryExtraModel::saveTable()
                 throw Global::ThrowType::QueryError;
         }
 #ifdef QT_DEBUG
-//        throw Global::ThrowType::Debug; // это для отладки (чтобы сессия всегда завершалась ROLLBACK'OM)
+//        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(query,nErr);
+        QUERY_COMMIT_ROLLBACK(&query,nErr);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        // TODO всплывающее сообщение
-        if(type == Global::ThrowType::Debug)
+        if (type != Global::ThrowType::ConnLost)
         {
-            QString err = "DEBUG ROLLBACK";
-            QUERY_ROLLBACK_MSG(query, err);
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+
+//        if(type == Global::ThrowType::Debug)
 //            nErr = 1; // это чтобы проверить работу дальше
-        }
-        else if (type == Global::ThrowType::QueryError)
-        {
-            QUERY_COMMIT_ROLLBACK_MSG(query, nErr);
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(query, nErr);
     }
 
     m_queryLog->stop();
@@ -116,7 +116,6 @@ void STableSalaryExtraModel::saveTable()
         emit repopulate();
     }
 
-    delete query;
     delete m_queryLog;
 }
 

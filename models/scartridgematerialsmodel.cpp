@@ -86,11 +86,12 @@ void SCartridgeMaterialsModel::setCardId(const int id)
 
 bool SCartridgeMaterialsModel::commit()
 {
+    SDatabaseRecord::checkSystemTime();
+
     if(!submitAll())
     {
-        throw Global::ThrowType::QueryError;
+        Global::throwError(lastError(), tr("Не удалось сохранить список материалов в карточке картриджа | %1").arg(lastError().text()));
     }
-
     return 1;
 }
 

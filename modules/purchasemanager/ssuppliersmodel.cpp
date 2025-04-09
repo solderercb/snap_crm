@@ -137,10 +137,13 @@ bool SPartSuppliersModel::select()
 
 bool SPartSuppliersModel::select(const int requestId)
 {
+    bool ret = 1;
     m_requestId = requestId;
     m_newCheckedId = 0;
     updateFilter(m_requestId);
-    return select();
+    if(!query().isActive()) // select() вызывается в QSqlTableModel::setFilter() если isActive() возвращает true, второй вызов не нужен
+        ret = select();
+    return ret;
 }
 
 int SPartSuppliersModel::requestId() const
@@ -154,6 +157,7 @@ int SPartSuppliersModel::requestId() const
 */
 void SPartSuppliersModel::setRequestId(int id)
 {
+    m_requestId = id;
     m_itemsEditableFlagOverride = true;
     for(int i = 0; i < rowCount(); i++)
     {
@@ -168,25 +172,27 @@ void SPartSuppliersModel::setRequestState(int state)
     m_requestState = state;
 }
 
+/* определение действия по окончании выполнения запроса
+*/
+bool SPartSuppliersModel::postSubmitDispatcher(const bool &queryResult)
+{
+    m_postSubmitAction = queryResult?PostSubmitAction::SelectById:PostSubmitAction::NoSelect;
+    return queryResult;
+}
+
 bool SPartSuppliersModel::updateRowInTable(int row, const QSqlRecord &values)
 {
-    m_submitSuccess = SRelationalBaseModel::updateRowInTable(row, values);
-    m_postSubmitAction = m_submitSuccess?PostSubmitAction::SelectById:PostSubmitAction::NoSelect;
-    return m_submitSuccess;
+    return postSubmitDispatcher(SRelationalBaseModel::updateRowInTable(row, values));
 }
 
 bool SPartSuppliersModel::insertRowIntoTable(const QSqlRecord &values)
 {
-    m_submitSuccess = QSqlRelationalTableModel::insertRowIntoTable(values);
-    m_postSubmitAction = m_submitSuccess?PostSubmitAction::SelectById:PostSubmitAction::NoSelect;
-    return m_submitSuccess;
+    return postSubmitDispatcher(QSqlRelationalTableModel::insertRowIntoTable(values));
 }
 
 bool SPartSuppliersModel::deleteRowFromTable(int row)
 {
-    m_submitSuccess = SRelationalBaseModel::deleteRowFromTable(row);
-    m_postSubmitAction = m_submitSuccess?PostSubmitAction::SelectById:PostSubmitAction::NoSelect;
-    return m_submitSuccess;
+    return postSubmitDispatcher(SRelationalBaseModel::deleteRowFromTable(row));
 }
 
 bool SPartSuppliersModel::isDirty() const
@@ -199,25 +205,31 @@ bool SPartSuppliersModel::submit()
     return SRelationalBaseModel::submit();
 }
 
-bool SPartSuppliersModel::submitAll()
+void SPartSuppliersModel::submitAll()
 {
-    m_submitSuccess = 1;
     if(m_requestId)
         m_postSubmitAction = PostSubmitAction::NoSelect;
+
+    SDatabaseRecord::checkSystemTime();
+
     if(m_newCheckedId)
     {
-        this->database().exec(QUERY_UPD_PRT_RQST_SUPPLIERS_SEL(m_newCheckedId, m_requestId));
+        QString q;
+        q = QUERY_UPD_PRT_RQST_SUPPLIERS_SEL(m_newCheckedId, m_requestId);
+        QSqlQuery query(this->database());
+        QUERY_EXEC_TH(&query,1,q);
     }
-    m_submitSuccess = SRelationalBaseModel::submitAll();
+
+    if(!SRelationalBaseModel::submitAll())
+        Global::throwError(lastError(), tr("Не удалось сохранить список ссылок к заявке на закупку | %1").arg(lastError().text()));
+
     if(m_newCheckedId)
     {
-        QModelIndexList ifahg = match(index(0, 0), Qt::DisplayRole, m_newCheckedId);
-        emit dataChanged(ifahg.first(), ifahg.first().siblingAtColumn(Supplier));
+        QModelIndexList il = match(index(0, 0), Qt::DisplayRole, m_newCheckedId);
+        emit dataChanged(il.first(), il.first().siblingAtColumn(Supplier));
     }
 
     m_newCheckedId = 0;
-
-    return m_submitSuccess;
 }
 
 int SPartSuppliersModel::predefSupplierId()

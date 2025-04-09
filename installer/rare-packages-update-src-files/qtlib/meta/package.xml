@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <Package>
-	<DisplayName>библиотеки Qt</DisplayName>
-	<Description>необходимые для работы библиотеки Qt</Description>
-  <Version>5.15.10</Version>
-  <ReleaseDate>2023-07-01</ReleaseDate>
+	<DisplayName>Qt MySQL libraries</DisplayName>
+	<Description>необходимы для подключения к серверу БД</Description>
+  <Version>5.15.10.1</Version>
+  <ReleaseDate>2025-04-09</ReleaseDate>
+  <Essential>true</Essential>
   <Default>true</Default>
   <Script>dummy</Script>
 </Package>

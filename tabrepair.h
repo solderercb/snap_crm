@@ -101,13 +101,14 @@ private:
     void setPricesToZero();
     bool commit(const QString &notificationCaption = tr("Успешно"), const QString &notificationText = tr("Данные сохранены"));
     void initEngineer();
-    bool checkViewPermission();
+    void checkViewPermission();
+    void loadData();
 #ifdef QT_DEBUG
     void randomFill() override {};
 #endif
 
 private slots:
-    void reloadRepairData();
+    void reloadData();
     void reloadRequestsList();
     void updateWidgets();
     void saveState();

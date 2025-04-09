@@ -86,6 +86,7 @@ private:
     QString m_trackingNumber;
     int m_d_store = 0;
     bool m_d_pay = 0;
+    void updateLogAssociatedRecId() override;
 };
 
 #endif // SDOCUMENTMODEL_H

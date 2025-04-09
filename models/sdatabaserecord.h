@@ -28,6 +28,7 @@ public:
     static bool checkSystemTime();
     bool isDirty();
     virtual void setDirty(bool state);
+    QSqlError lastError();
 protected:
     int i_id = 0;
     bool i_nErr = 1;
@@ -35,7 +36,8 @@ protected:
     QStringList i_obligatoryFields = {};   // поля не имеющие значения по умолчанию
     QDateTime i_createdUtc;
     QSqlQuery *i_query;
-    virtual void findNewId();
+    virtual void queryNewId(int &newId);
+    virtual void queryLastInsertId();
     bool insert(bool flush = true);
     bool update();
     bool del();
@@ -43,7 +45,6 @@ protected:
     virtual bool commit();
     virtual void dbErrFlagHandler(bool);
 private:
-    int m_newId = 0;
     bool m_isIdColumnNameSet = 0;
     bool m_isDirty = 0;
     bool checkObligatoryFields();

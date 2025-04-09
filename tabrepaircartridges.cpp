@@ -62,9 +62,16 @@ tabRepairCartridges *tabRepairCartridges::getInstance(QList<int> *list, MainWind
     return p_instance;
 }
 
+void tabRepairCartridges::initRepairCartridgeForm(SCartridgeForm *&form, const int repairId)
+{
+    form = new SCartridgeForm(this);
+    form->setRepair(repairId);
+    form->init();
+}
+
 void tabRepairCartridges::loadForms(QList<int> *list)
 {
-    SCartridgeForm *form;
+    SCartridgeForm *form = nullptr;
     QList<int> currentList;
 
     for(auto form : existentForms())
@@ -76,15 +83,18 @@ void tabRepairCartridges::loadForms(QList<int> *list)
     {
         if(currentList.contains(list->at(i)))
             continue;
-        form = new SCartridgeForm(list->at(i));
 
-        if(!form->repairId())   // если не удалось загрузить данные модели ремонта (например, ремонт с таким номером не существует)
+        try
+        {
+            initRepairCartridgeForm(form, list->at(i));
+            appendToList(form);
+        }
+        catch (Global::ThrowType)
         {
             delete form;
-            continue;
         }
-        appendToReceptList(form);
     }
+
     delete list;    // этот объект больше не нужен
     if(ui->verticalLayoutCartridges->count() == 0)
         this->deleteLater();
@@ -100,8 +110,11 @@ QString tabRepairCartridges::tabTitle()
     return tr("Заправка картриджей");
 }
 
-void tabRepairCartridges::appendToReceptList(SCartridgeForm *form)
+void tabRepairCartridges::appendToList(SCartridgeForm *form)
 {
+    if(!form)
+        return;
+
     ui->verticalLayoutCartridges->addWidget(form);
     connect(form, &SCartridgeForm::createTabClient, this, &tabRepairCartridges::createTabClient);
     connect(form, &SCartridgeForm::createTabRepair, this, &tabRepairCartridges::createTabRepair);
@@ -143,30 +156,28 @@ const QList<SCartridgeForm *> tabRepairCartridges::existentForms()
     return ui->scrollAreaWidgetContents->findChildren<SCartridgeForm *>();
 }
 
-/* Перезагрузка данных модели из БД
+/* Перезагрузка данных моделей форм из БД
 */
-void tabRepairCartridges::reloadRepairData()
+void tabRepairCartridges::reloadFormsData()
 {
-    SRepairModel *repairModel;
-    SSaleTableModel *BOQModel;
-    int repairId;
-
     for(auto form : existentForms())
     {
-        repairModel = form->model();
-        repairId = repairModel->id();
-        BOQModel = repairModel->BOQModel();
-        repairModel->load(repairId);
-        BOQModel->repair_loadTable(repairId);
+        form->reloadData();
     }
 
 }
 
 void tabRepairCartridges::createCartridgeCardForm(const int id)
 {
-    m_cartridgeCardForm = new SCartridgeCard(id, 0, Qt::SplashScreen, this);
-    connect(m_cartridgeCardForm, &SCartridgeCard::cardModified, this, &tabRepairCartridges::reloadCardModel);
-    connect(m_cartridgeCardForm, &SCartridgeCard::onDelete, this, &tabRepairCartridges::closeCartridgeCardForm);
+    try
+    {
+        SCartridgeCard *cardForm = new SCartridgeCard(id, 0, Qt::SplashScreen, this);
+        connect(cardForm, &SCartridgeCard::cardModified, this, &tabRepairCartridges::reloadCardModel);
+        connect(cardForm, &SCartridgeCard::onDelete, this, &tabRepairCartridges::closeCartridgeCardForm);
+    }
+    catch (Global::ThrowType)
+    {
+    }
 }
 
 void tabRepairCartridges::closeCartridgeCardForm()
@@ -177,7 +188,13 @@ void tabRepairCartridges::reloadCardModel(int)
 {
     for(auto form : existentForms())
     {
-        form->updateCardModel();
+        try
+        {
+            form->loadCardData();
+        }
+        catch(Global::ThrowType)
+        {
+        }
     }
 }
 
@@ -224,7 +241,7 @@ void tabRepairCartridges::createDialogIssue()
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
     connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printCartridgeWorksReports(list, false);});
     connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepairCartridges::closeTab);
-    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::reloadRepairData);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::reloadFormsData);
 }
 
 #ifdef QT_DEBUG

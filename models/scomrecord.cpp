@@ -65,15 +65,15 @@ void SComRecord::dbErrFlagHandler(bool flushCache)
 
 bool SComRecord::commitLogs()
 {
+    if(i_logTexts->isEmpty())
+        return 1;
+
     QString logText;
+    updateLogAssociatedRecId();
     foreach(logText, *i_logTexts)
     {
         i_logRecord->setText(logText);
         i_nErr &= i_logRecord->commit();
-        if(!i_nErr)
-        {
-            throw Global::ThrowType::QueryError;
-        }
     }
 
     i_logTexts->clear();
@@ -92,6 +92,18 @@ void SComRecord::initQueryFields(const QList<QStandardItem *> &record)
 
         setQueryField(i, record.at(i)->data(Qt::DisplayRole), record.at(i)->data(DataRoles::OldValue));
     }
+}
+
+/* Метод должен быть переопределён в наследующем классе для установки ID записи
+ * в соответствующее поле i_logText (ремонт, клиент. и т. п.)
+ */
+void SComRecord::updateLogAssociatedRecId()
+{
+    QMessageLogger(__FILE__, __LINE__, nullptr).warning("ASSERT failure in %s: \"%s\", file %s, line %d",
+                                                        metaObject()->className(),
+                                                        "Probably associated ID for i_logText not set",
+                                                        __FILE__,
+                                                        __LINE__);
 }
 
 /* Сброс флага наличия несохранённых изменений должен быть сброшен только после выполнения запросов

@@ -18,6 +18,7 @@ int SDatabaseRecord::lastInsertId()
 
 /*  Проверка валидности системного времени.
  *  Сравнивает время клиента с сервером
+ *  Метод должен вызываться из объекта модели данных (не из объекта виджета)
 */
 bool SDatabaseRecord::checkSystemTime()
 {
@@ -26,16 +27,16 @@ bool SDatabaseRecord::checkSystemTime()
     int secDiff;
     QString error;
 
-    serverTime.exec("SELECT UTC_TIMESTAMP();");
+    QUERY_EXEC_TH(&serverTime,1,"SELECT UTC_TIMESTAMP();");
+
     serverTime.first();
     date = serverTime.record().value(0).toDateTime();
     date.setTimeZone(QTimeZone::utc());
     secDiff = date.secsTo(QDateTime::currentDateTimeUtc());
     if( secDiff > 30 || secDiff < -30 )
     {
-        error = QString("[Warning] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss"));
-        appLog->appendRecord(error);
-        throw Global::ThrowType::TimeError;
+        error = QString("[Error] client machine time %1 (UTC), server time %2 (UTC)").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss")).arg(date.toString("yyyy-MM-dd hh:mm:ss"));
+        Global::throwError(Global::ThrowType::TimeError, error);
     }
     return 1;
 }
@@ -105,7 +106,7 @@ void SDatabaseRecord::setCreated(const QDateTime &timestamp)
 
 /* Получение id для новой записи в таблице
 */
-void SDatabaseRecord::findNewId()
+void SDatabaseRecord::queryNewId(int &newId)
 {
     if(!m_isIdColumnNameSet)
     {
@@ -115,18 +116,28 @@ void SDatabaseRecord::findNewId()
             m_isIdColumnNameSet = 1;
     }
 
-    m_newId = 0;
+    if(!i_nErr)
+        return;
 
-    QUERY_NEW_ID(i_idColumnName, i_tableName, i_query, i_nErr, m_newId);
+    QUERY_EXEC_TH(i_query, 1, QUERY_NEW_ID(i_idColumnName, i_tableName));
 
-    if(!m_newId && i_nErr)
+    i_query->first();
+    QVariant val = i_query->value("id");
+
+    if(val.isNull())
     {
-        if(i_query->value(1).toInt() == 0)
-            m_newId = 1;
+        if(i_query->value("count").toInt() == 0) // Если таблица не содержит записей
+            newId = 1;
+
+        return;
     }
 
-    if(m_newId)
-        i_valuesMap.insert(i_idColumnName, m_newId);
+    newId = val.toInt();
+}
+
+void SDatabaseRecord::queryLastInsertId()
+{
+    QUERY_LAST_INS_ID_TH(i_query,i_nErr,i_id);
 }
 
 /*  Формирует и отправляет запрос INSERT
@@ -141,13 +152,16 @@ bool SDatabaseRecord::  insert(bool flushValues)
 #ifdef QT_DEBUG
     checkTableName();
 #endif
-    if(!checkSystemTime())
-        return 0;
+    checkSystemTime();
 
     if(!checkObligatoryFields())
         return 0;
 
-    findNewId();
+    int newId = 0;
+    queryNewId(newId);
+
+    if(newId)
+        i_valuesMap.insert(i_idColumnName, newId);
 
     fieldsInsFormatter();
     q = QString("INSERT INTO `%1` (\n  %2\n) VALUES (\n  %3\n);")\
@@ -155,12 +169,12 @@ bool SDatabaseRecord::  insert(bool flushValues)
                                          .arg(fields.join(','))\
                                          .arg(field_values.join(','));
 //    qDebug().noquote() << q;
-    QUERY_EXEC(i_query,i_nErr)(q);
+    QUERY_EXEC_TH(i_query,i_nErr,q);
 
-    if(m_newId && i_nErr)
-        i_id = m_newId;
+    if(newId)
+        i_id = newId;
     else
-        QUERY_LAST_INS_ID(i_query,i_nErr,i_id);
+        queryLastInsertId();
 
     dbErrFlagHandler(flushValues);
 
@@ -181,8 +195,7 @@ bool SDatabaseRecord::update()
 #ifdef QT_DEBUG
     checkTableName();
 #endif
-    if(!checkSystemTime())
-        return 0;
+    checkSystemTime();
 
     fieldsUpdFormatter();
     q = QString("UPDATE\n  `%1`\nSET\n  %2\nWHERE `id` = %3;")\
@@ -190,7 +203,7 @@ bool SDatabaseRecord::update()
                                          .arg(fields.join(",\n  "))\
                                          .arg(i_id);
 
-    QUERY_EXEC(i_query,i_nErr)(q);
+    QUERY_EXEC_TH(i_query,i_nErr,q);
     dbErrFlagHandler(true);
 
     if(i_nErr)
@@ -211,7 +224,7 @@ bool SDatabaseRecord::del()
                                          .arg(i_tableName)\
                                          .arg(i_id);
     //    qDebug().noquote() << q;
-    QUERY_EXEC(i_query,i_nErr)(q);
+    QUERY_EXEC_TH(i_query,i_nErr,q);
     dbErrFlagHandler(false);
 
     return i_nErr;
@@ -229,7 +242,7 @@ bool SDatabaseRecord::commit()
     }
 
     if(!i_nErr)
-        throw Global::ThrowType::QueryError;
+        Global::throwError(i_query->lastError());
 
     setDirty(false);
     return i_nErr;
@@ -237,11 +250,6 @@ bool SDatabaseRecord::commit()
 
 void SDatabaseRecord::dbErrFlagHandler(bool flushValues)
 {
-    if(!i_nErr)
-    {
-        errorToLog(metaObject()->className(), i_query->lastError().text());
-    }
-
     if(i_nErr && flushValues)
         i_valuesMap.clear();
 }
@@ -258,6 +266,11 @@ bool SDatabaseRecord::isDirty()
 void SDatabaseRecord::setDirty(bool state)
 {
     m_isDirty = state;
+}
+
+QSqlError SDatabaseRecord::lastError()
+{
+    return i_query->lastError();
 }
 
 

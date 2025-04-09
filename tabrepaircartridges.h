@@ -33,9 +33,9 @@ private:
     static tabRepairCartridges* p_instance;
     bool m_issueButtonVisible = 1;
     bool m_readyButtonVisible = 1;
-    SCartridgeCard *m_cartridgeCardForm;
     SDialogIssueRepair *m_dialogIssue;
-    void appendToReceptList(SCartridgeForm *form);
+    void initRepairCartridgeForm(SCartridgeForm *&form, const int repairId);
+    void appendToList(SCartridgeForm *form);
     void updateWidgets();
     const QList<SCartridgeForm*> existentForms();
 #ifdef QT_DEBUG
@@ -43,7 +43,7 @@ private:
 #endif
 public slots:
 private slots:
-    void reloadRepairData();
+    void reloadFormsData();
     void createDialogIssue();
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();

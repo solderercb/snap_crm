@@ -18,7 +18,26 @@ tabCommon::tabCommon(MainWindow *p) :
 
 tabCommon::~tabCommon()
 {
-    userDbData->updateActivityTimestamp();
+    bool nErr = 1;
+    QSqlQuery query(QSqlDatabase::database("connThird"));
+
+    try
+    {
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
+        userDbData->updateActivityTimestamp();
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
+    }
+    catch(Global::ThrowType type)
+    {
+        if (type != Global::ThrowType::ConnLost)
+        {
+            bool nErr = 1;
+            QSqlQuery query(QSqlDatabase::database("connThird"));
+
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+        }
+    }
+
     while(tabList.removeOne(this));
     // если вкладка создана с другой вкладки (выбор клиента/ремонта/др.), то сработает механизм переключения на вызвавшую вкладку,
     // иначе переключение на последнюю использованную вкладку
@@ -68,5 +87,5 @@ void tabCommon::setCursorPositionsToZero()
 
 void tabCommon::logUserActivity()
 {
-    userActivityLog->appendRecord("Navigation " + tabTitle());
+    userActivityLog->appendRecordStandalone("Navigation " + tabTitle());
 }

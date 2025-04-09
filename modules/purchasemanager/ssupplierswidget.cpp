@@ -1,6 +1,6 @@
+#include "sapplication.h"
 #include "ssupplierswidget.h"
 #include "ui_ssupplierswidget.h"
-#include "widgets/shortlivednotification.h"
 #include "modules/purchasemanager/tabmanager.h"
 
 SPartSuppliers::SPartSuppliers(QWidget *parent) :
@@ -44,7 +44,7 @@ void SPartSuppliers::initWidgets()
     connect(ui->tableViewLinks->horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &SPartSuppliers::orderChanged);
     connect(ui->tableViewLinks, &QTableView::customContextMenuRequested, this, &SPartSuppliers::menuRequest);
     connect(ui->pushButtonAdd, &QPushButton::clicked, this, &SPartSuppliers::addRow);
-    connect(ui->pushButtonSave, &QPushButton::clicked, this, &SPartSuppliers::saveLinks);
+    connect(ui->pushButtonSave, &QPushButton::clicked, this, &SPartSuppliers::manualSubmit);
     connect(ui->pushButtonDelete, &QPushButton::clicked, this, &SPartSuppliers::removeSelected);
 }
 
@@ -61,9 +61,14 @@ void SPartSuppliers::select(const int &id)
     }
 
     m_requestId = id;
-    if(!m_model->select(id))
-        qDebug().nospace() << "[" << this << "] select() | error: " << m_model->lastError().driverText();
+
+    bool r = m_model->select(id);
     ui->tableViewLinks->verticalScrollBar()->setValue(0);
+
+    // при ошибке генерируем только сообщение, а не исключение как в других случаях;
+    // так сделано потому, что при отсутствии связи с сервером и нажатии на другую заявку выделенная строка не изменяется
+    if(!r)
+        Global::errorPopupMsg(m_model->lastError());
 }
 
 /* Очистка модели
@@ -199,15 +204,9 @@ void SPartSuppliers::connectSuppliersTableWithManager()
     });
 }
 
-void SPartSuppliers::saveLinks()
+void SPartSuppliers::commit()
 {
-    if(!m_model->submitAll())
-    {
-        qDebug() << "[" << this << "] saveLinks() | : " << m_model->lastError();
-        throw Global::ThrowType::QueryError;
-    }
-
-    emit submitOk();
+    m_model->submitAll();
 }
 
 void SPartSuppliers::orderChanged(const int section, Qt::SortOrder order)
@@ -278,6 +277,41 @@ void SPartSuppliers::copyLink()
     QModelIndex index = ui->tableViewLinks->selectionModel()->currentIndex();
     QString data = index.data().toString();
     qApp->clipboard()->setText(data);
+}
+
+void SPartSuppliers::manualSubmit()
+{
+    bool nErr = 1;
+    QSqlQuery query(QSqlDatabase::database("connThird"));
+
+    QUERY_LOG_START(metaObject()->className());
+
+    try
+    {
+        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
+
+        commit();
+
+#ifdef QT_DEBUG
+//        Global::throwDebug();
+#endif
+        QUERY_COMMIT_ROLLBACK(&query, nErr);
+    }
+    catch (const Global::ThrowType &type)
+    {
+        nErr = 0;
+        if (type == Global::ThrowType::ConnLost)
+        {
+            ;
+        }
+        else
+            QUERY_COMMIT_ROLLBACK(&query, nErr);
+    }
+
+    if(nErr)
+        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
+
+    QUERY_LOG_STOP;
 }
 
 void SPartSuppliers::setRequestState(const int state)

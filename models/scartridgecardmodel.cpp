@@ -24,43 +24,37 @@ void SCartridgeCardModel::load(const int id)
 
     if(!id)
     {
-        loadError();
+        loadError(Global::ThrowType::ConditionsError);
         return;
     }
 
-    QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
-    record->exec(QString("SELECT `name`, `maker`, `full_weight`, `toner_weight`, `resource`, `created`, `user`, `notes`, `photo`, `color`, `archive` FROM `cartridge_cards` WHERE `id` = %1;").arg(id));
-    if(!record->first())
+    QSqlQuery record(QSqlDatabase::database("connMain"));
+    record.exec(QString("SELECT `name`, `maker`, `full_weight`, `toner_weight`, `resource`, `created`, `user`, `notes`, `photo`, `color`, `archive` FROM `cartridge_cards` WHERE `id` = %1;").arg(id));
+    if(!record.isActive() || !record.first())
     {
-        loadError();
+        loadError(Global::ThrowType::ResultError);
         return;
     }
 
-    m_name = record->value("name").toString();
-    m_vendor = record->value("maker").toInt();
-    m_fullWeight = record->value("full_weight").toDouble();
-    m_tonerWeight = record->value("toner_weight").toDouble();
-    m_resource = record->value("resource").toInt();
-    i_createdUtc = record->value("created").toDateTime();
-    m_user = record->value("user").toInt();
-    m_notes = record->value("notes").toString();
-    m_photo = record->value("photo").toInt();
-    m_color = record->value("color").toInt();
-    m_archive = record->value("archive").toBool();
+    m_name = record.value("name").toString();
+    m_vendor = record.value("maker").toInt();
+    m_fullWeight = record.value("full_weight").toDouble();
+    m_tonerWeight = record.value("toner_weight").toDouble();
+    m_resource = record.value("resource").toInt();
+    i_createdUtc = record.value("created").toDateTime();
+    m_user = record.value("user").toInt();
+    m_notes = record.value("notes").toString();
+    m_photo = record.value("photo").toInt();
+    m_color = record.value("color").toInt();
+    m_archive = record.value("archive").toBool();
     initMaterials();
-
-    delete record;
 }
 
 // TODO: аналогичный метод есть в классе SCartridgeRepairModel; нужно их обобщить
-void SCartridgeCardModel::loadError()
+void SCartridgeCardModel::loadError(const int type)
 {
-    SRepairModel* repair = dynamic_cast<SRepairModel*>(parent());
-    if(repair)
-    {
-        appLog->appendRecord(tr("Не удалось инициализировать модель SCartridgeCardModel ремонта №%1").arg(repair->id()));
-        shortlivedNotification *newPopup = new shortlivedNotification(this, "Ошибка", "Не удалось загрузить информацию о модели картриджа. Обратитесь к администратору", QColor("#FFC7AD"), QColor("#FFA477"));
-    }
+    QString msg = tr("Не удалось загрузить SCartridgeCardModel; id картриджа: %1").arg(i_id);
+    Global::throwError(type, msg);
 }
 
 void SCartridgeCardModel::initMaterials()
@@ -73,6 +67,7 @@ void SCartridgeCardModel::initMaterials()
     while(query.next())
     {
         material = new SCartridgeMaterialModel();
+        material->setInitializerCardId(i_id);
         material->load(query.value(0).toInt());
         m_materials.insert(material->type(), material);
     }

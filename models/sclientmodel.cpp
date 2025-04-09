@@ -720,8 +720,6 @@ bool SClientModel::balanceEnabled()
 */
 bool SClientModel::setBalanceEnabled(bool state)
 {
-    QSqlQuery *query;
-
     if( state != (bool)(m_options&BalanceEnabled) )
     {
 
@@ -753,11 +751,10 @@ bool SClientModel::setBalanceEnabled(bool state)
         }
         i_valuesMap.insert("balance_enable", state);
 
-        query = new QSqlQuery(QSqlDatabase::database("connThird"));
-        QUERY_EXEC(query,i_nErr)(QUERY_BEGIN);
+        QSqlQuery query(QSqlDatabase::database("connThird"));
+        QUERY_EXEC_TH(&query,i_nErr,QUERY_BEGIN);
         commit();
-        QUERY_COMMIT_ROLLBACK(query,i_nErr);
-        delete query;
+        QUERY_COMMIT_ROLLBACK(&query,i_nErr);
     }
     return i_nErr;
 }
@@ -801,7 +798,7 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
         return 1;
 
     if(isNew())   // TODO: проверка включен ли баланс у клиента
-        throw Global::ThrowType::ConditionsError;
+        Global::throwError(Global::ThrowType::InputError);
 
     balanceLog->setText(text);
     balanceLog->setClient(i_id);
@@ -809,21 +806,10 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
     i_nErr = balanceLog->commit(amount);
     double newAmount = m_balance + amount;
 
-    QUERY_EXEC(i_query,i_nErr)(QUERY_UPDATE_BALANCE(i_id, newAmount));
-    QUERY_EXEC(i_query,i_nErr)(QUERY_VRFY_BALANCE(i_id));
+    QUERY_EXEC_TH(i_query,i_nErr,QUERY_UPDATE_BALANCE(i_id, newAmount));
 
-    if(!i_nErr)
-    {
-        throw Global::ThrowType::QueryError;
-    }
-
-    QUERY_EXEC_VRFY(i_query,nIntegrityErr);
-
-    if(!nIntegrityErr)
-    {
-        showNotification(tr("Ошибка целостности данных баланса (id = %1)").arg(i_id), QMessageBox::Critical);
-        throw Global::ThrowType::IntegrityError;
-    }
+    QUERY_EXEC_TH(i_query,i_nErr,QUERY_VRFY_BALANCE(i_id));
+    QUERY_EXEC_VRFY(i_query,i_id);
 
     m_balance = i_query->value("balance").toDouble();
     return i_nErr;
@@ -892,22 +878,18 @@ void SClientModel::setRepairs(const int val)
     i_valuesMap.insert("repairs", val);
 }
 
-bool SClientModel::updateRepairs(const int val)
+void SClientModel::updateRepairs(const int val)
 {
     if(i_id == 0)
-        return 1;
+        return;
 
-    QUERY_EXEC(i_query, i_nErr)(QString("SELECT `repairs` FROM `clients` WHERE `id` = %1;").arg(i_id));
+    QUERY_EXEC_TH(i_query, i_nErr, QString("SELECT `repairs` FROM `clients` WHERE `id` = %1;").arg(i_id));
     i_query->first();
     m_repairs = i_query->value(0).toInt();
     setRepairs(m_repairs + val);
     commit();
 
-    if(!i_nErr)
-        throw Global::ThrowType::QueryError;
-
     m_repairs += val;
-    return i_nErr;
 }
 
 int SClientModel::purchases()
@@ -915,19 +897,14 @@ int SClientModel::purchases()
     return m_purchases;
 }
 
-bool SClientModel::updatePurchases(int items)
+void SClientModel::updatePurchases(int items)
 {
     if(i_id == 0)
-        return 1;
+        return;
 
     // в АСЦ с кол-вом покупок то ли глюк, то ли странная задумка: в таблице клиентов отображается кол-во РН, а в самой карте клиента кол-во записей в таблице store_sales
     // TODO: разобраться с этим
-    QUERY_EXEC(i_query,i_nErr)(QUERY_UPD_CLIENT_PURCHASES(i_id, items));
-
-    if(!i_nErr)
-        throw Global::ThrowType::QueryError;
-
-    return i_nErr;
+    QUERY_EXEC_TH(i_query,i_nErr,QUERY_UPD_CLIENT_PURCHASES(i_id, items));
 }
 
 QString SClientModel::token()
@@ -989,31 +966,26 @@ bool SClientModel::commit()
 {
     if(i_id)
     {
-        if(!update())
-            throw Global::ThrowType::QueryError;
+        update();
     }
     else
     {
         i_valuesMap.insert("created", QDateTime::currentDateTime());
         i_valuesMap.insert("web_password", genWebPass());
-        if(!insert())
-            throw Global::ThrowType::QueryError;
+        insert();
     }
 
-    i_logRecord->setClient(i_id);
-    if(!commitLogs())
-        throw Global::ThrowType::QueryError;
+    commitLogs();
 
     m_phones->setClient(i_id);
-    if(!m_phones->commit())
-        throw Global::ThrowType::QueryError;    // исключение генерируется в SPhonesModel::commit(), поэтому это выражение не выполнится никогда
+    m_phones->commit();
 
     return i_nErr;
 }
 
-bool SClientModel::integrityStatus()
+void SClientModel::updateLogAssociatedRecId()
 {
-    return nIntegrityErr;
+    i_logRecord->setClient(i_id);
 }
 
 SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):
@@ -1108,6 +1080,12 @@ bool SBalanceLogRecordModel::commit(const double amount, const QString &text)
     setText(text);
     commit(amount);
     return i_nErr;
+}
+
+void SBalanceLogRecordModel::updateLogAssociatedRecId()
+{
+    // запись в журнал об изменении баланса связана только с id клиента; его установка происходит при создании объекта
+    // метод переопределён для подавления предупреждения
 }
 
 void SClientModel::translateNames()

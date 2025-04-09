@@ -75,7 +75,7 @@ tabPrintDialog *tabPrintDialog::create(Global::Reports type)
 
 bool tabPrintDialog::tabCloseRequest()
 {
-    if(m_reportState != ReportState::RenderingFinished)
+    if(m_reportState < ReportState::RenderingFinished)
         return 0;
     return 1;
 }
@@ -176,7 +176,18 @@ void tabPrintDialog::initReport()
 
     setTemplateName(m_reportName);
     setProgressText("Initializing datasources");
-    initDataSources();
+
+    try
+    {
+        initDataSources();
+    }
+    catch (Global::ThrowType)
+    {
+        m_reportState = ReportState::DataInitError;
+        setProgressText("Error initializing datasources");
+        return;
+    }
+
     setProgressText("Loading file");
     loadTemplateFromFile();
 

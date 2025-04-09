@@ -44,7 +44,6 @@ private:
     SFieldValueModel* itemHandler(const QSqlRecord &phone = QSqlRecord());
     SLogRecordModel *logRecord = nullptr;
     bool m_type = 0;
-    bool m_nErr = 1;
     qsizetype m_reportFieldIndex = -1;
     void deleteWidgets();
     void deleteFields();

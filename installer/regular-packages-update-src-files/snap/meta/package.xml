@@ -2,8 +2,9 @@
 <Package>
 	<DisplayName>SNAP CRM</DisplayName>
 	<Description>исполняемый и вспомогательные файлы</Description>
-  <Version>0.0.0.240</Version>
-  <ReleaseDate>2023-09-13</ReleaseDate>
+  <Version>0.0.0.305</Version>
+  <ReleaseDate>2025-04-09</ReleaseDate>
+  <ForcedUpdate>true</ForcedUpdate>
   <Default>true</Default>
   <Script>installscript.qs</Script>
 </Package>

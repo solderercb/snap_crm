@@ -32,6 +32,7 @@ protected:
     bool commitLogs();
     void initQueryFields(const QList<QStandardItem *> &record);
     virtual void setQueryField(const int, const QVariant, const QVariant){};
+    virtual void updateLogAssociatedRecId();
     QMap<QString, QString> *i_logTexts;
     SLogRecordModel *i_logRecord;
 public slots:

@@ -153,7 +153,7 @@ public:
     void saveToUsersParams();
     void savePrinterSettings();
     void updateLoginTimestamp();
-    void updateActivityTimestamp(const bool standalone = true);
+    void updateActivityTimestamp();
 private:
     QMap<QString, int> m_params;
     QStringList m_printersList;

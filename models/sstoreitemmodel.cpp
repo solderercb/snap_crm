@@ -871,32 +871,24 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
     if(royaltyForItem == 0)
         return 1;
 
-    SClientModel *dealer = new SClientModel();
-    dealer->setId(m_dealer);
-    dealer->createBalanceObj();
+    SClientModel dealer;
+    dealer.setId(m_dealer);
+    dealer.createBalanceObj();
 
-    try
+    if(m_opOnItemType == Unsale || m_opOnItemType == UnsaleRepair)
     {
-        if(m_opOnItemType == Unsale || m_opOnItemType == UnsaleRepair)
-        {
-            double dealerRoyalty = m_savedSaleQty*royaltyForItem;
-            if(m_opOnItemType == Unsale)
-                logText = tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id);
-            else
-                logText = tr("Списание %1 за %2ед. товара %3, находившегося на реализации, по причение отмены выдачи ремонта").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id);
-            i_nErr = dealer->updateBalance(-dealerRoyalty, logText, source, m_saleObjId);
-        }
+        double dealerRoyalty = m_savedSaleQty*royaltyForItem;
+        if(m_opOnItemType == Unsale)
+            logText = tr("Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id);
         else
-        {
-            double dealerRoyalty = m_saleQty*royaltyForItem;
-            i_nErr = dealer->updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_saleQty).arg(i_id), source, m_saleObjId);
-        }
+            logText = tr("Списание %1 за %2ед. товара %3, находившегося на реализации, по причение отмены выдачи ремонта").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_savedSaleQty).arg(i_id);
+        i_nErr = dealer.updateBalance(-dealerRoyalty, logText, source, m_saleObjId);
     }
-    catch (int)
+    else
     {
-        i_nErr = 0;
+        double dealerRoyalty = m_saleQty*royaltyForItem;
+        i_nErr = dealer.updateBalance(dealerRoyalty, tr("Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации").arg(sysLocale.toCurrencyString(dealerRoyalty)).arg(m_saleQty).arg(i_id), source, m_saleObjId);
     }
-    delete dealer;
 
     return i_nErr;
 }

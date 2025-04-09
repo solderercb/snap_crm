@@ -25,7 +25,7 @@ TEMPLATE = app
 
 RC_FILE = resources.rc
 
-system($${PWD}/appver-update.bat >nul 2>&1)
+#system($${PWD}/appver-update.bat >nul 2>&1)
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -49,7 +49,6 @@ SOURCES += \
     amountToWords/amountToWords.cpp \
     bottoolbarwidget.cpp \
     chooseofficewindow.cpp \
-    clients4test.cpp \
     global.cpp \
     loginwindow.cpp \
     mainwindow.cpp \
@@ -239,9 +238,9 @@ HEADERS  += \
     appver.h \
     bottoolbarwidget.h \
     chooseofficewindow.h \
-    clients4test.h \
     com_sql_queries.h \
     global.h \
+    global_ns.h \
     loginwindow.h \
     mainwindow.h \
     models/propstruct.h \
@@ -469,6 +468,13 @@ FORMS += \
     widgets/sphone.ui \
     widgets/sphones.ui \
     widgets/stoolboxswitchpanel.ui \
+
+CONFIG(debug, debug|release) {
+SOURCES += \
+    clients4test.cpp
+HEADERS  += \
+    clients4test.h
+}
 
 RESOURCES += styles/styles.qrc
 RESOURCES += help/help.qrc
