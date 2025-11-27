@@ -1,6 +1,12 @@
 #include "stabpage.h"
+#ifdef QT_DEBUG
+#include <QTimer>
+#include <QRandomGenerator>
+#endif
 
-STabPage::STabPage(QWidget *parent) : SWidget(parent)
+STabPage::STabPage(QWidget *parent) :
+    SWidget(parent),
+    m_parentTab(parent)
 {
 #ifdef QT_DEBUG
     test_scheduler = new QTimer();

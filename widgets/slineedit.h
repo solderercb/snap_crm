@@ -3,13 +3,10 @@
 
 #include <QLineEdit>
 #include <QStringList>
-#include <QToolButton>
-#include <QStyle>
-#include <QVector>
-#include <QSignalMapper>
-#include <QMetaEnum>
-#include <QDebug>
-#include <QResizeEvent>
+
+class QFontMetrics;
+class QToolButton;
+class QSignalMapper;
 
 class SLineEdit : public QLineEdit
 {

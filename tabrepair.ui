@@ -1206,23 +1206,23 @@ QListView::item  {
   <customwidget>
    <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
+   <header location="global">SComboBox</header>
   </customwidget>
   <customwidget>
    <class>SPartsRequests</class>
    <extends>QWidget</extends>
-   <header>modules/purchasemanager/srequestswidget.h</header>
+   <header location="global">SPartsRequests</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
+   <header location="global">SDoubleSpinBox</header>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
@@ -1231,13 +1231,13 @@ QListView::item  {
   <customwidget>
    <class>SComments</class>
    <extends>QWidget</extends>
-   <header>widgets/scomments.h</header>
+   <header location="global">SComments</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>STextEdit</class>
    <extends>QTextEdit</extends>
-   <header>widgets/stextedit.h</header>
+   <header location="global">STextEdit</header>
    <slots>
     <signal>editFinished()</signal>
    </slots>
@@ -1245,13 +1245,13 @@ QListView::item  {
   <customwidget>
    <class>SBillOfQuantities</class>
    <extends>QWidget</extends>
-   <header>widgets/sbillofquantities.h</header>
+   <header location="global">SBillOfQuantities</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header location="global">widgets/splaintextedit.h</header>
+   <header location="global">SPlainTextEdit</header>
   </customwidget>
  </customwidgets>
  <tabstops>

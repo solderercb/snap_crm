@@ -1,7 +1,8 @@
 #include "srepairstablefiltermenu.h"
 #include "ui_srepairstablefiltermenu.h"
-#include "models/ssqlquerymodel.h"
-#include "models/sstandarditemmodel.h"
+#include <QTimeZone>
+#include <SSqlQueryModel>
+#include <SStandardItemModel>
 
 Widget::Widget(QWidget *parent) :
     QFrame(parent),

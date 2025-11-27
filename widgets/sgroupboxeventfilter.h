@@ -2,14 +2,8 @@
 #define SGROUPBOXEVENTFILTER_H
 
 #include <QObject>
-#include <QGroupBox>
-#include <QEvent>
-#include <QLabel>
-#include <QLineEdit>
-#include <QTextEdit>
-#include <QTableView>
-#include <QPushButton>
-#include <QMouseEvent>
+
+class QEvent;
 
 class SGroupBoxEventFilter : public QObject
 {

@@ -1,8 +1,7 @@
 #ifndef STABLESALARYSALESMODEL_H
 #define STABLESALARYSALESMODEL_H
 
-#include "../stablebasemodel.h"
-#include <QObject>
+#include <STableModelBase>
 
 class STableSalarySalesModel : public STableBaseModel
 {

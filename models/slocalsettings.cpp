@@ -1,6 +1,16 @@
-#include "appver.h"
-#include "global.h"
 #include "slocalsettings.h"
+#include <QApplication>
+#include <QDir>
+#include <QStandardPaths>
+#include <QResource>
+#include <QCryptographicHash>
+#include <QCollator>
+#include <appVer>
+#include <SAppLog>
+#include <ProjectGlobals>
+#include <SUserSettings>
+#include <SLocalSettingsStructs>
+#include <QSerializer>
 
 const QLatin1String SLocalSettings::base32StringEncodeMap = QLatin1String("abcdefghijklmnopqrstuvwxyz012345");
 
@@ -52,13 +62,13 @@ void SLocalSettings::genSettingsFileName(QFile &file, const QString subVariant)
                              + "-"
                              + subVariant
                              + "-"
-                             + userDbData->username
+                             + userDbData->username()
                              + ".xml");
             break;
         default:
             file.setFileName(QString(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant))
                              + "-"
-                             + userDbData->username
+                             + userDbData->username()
                              + ".xml");
     }
 }

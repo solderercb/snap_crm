@@ -1,8 +1,9 @@
 #ifndef SCLIENTINPUTFORM_H
 #define SCLIENTINPUTFORM_H
 
-#include "widgets/sclientinputformbase.h"
-#include "models/sclientmodel.h"
+#include <SClientInputFormBase>
+
+class SClientModel;
 
 namespace Ui {
 class SClientInputForm;

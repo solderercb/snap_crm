@@ -1,5 +1,7 @@
-#include "mainwindow.h"
+#include <MainWindow>
 #include "stableviewboqworkshop.h"
+#include <STableViewGridLayout>
+#include <SSaleTableModel>
 
 STableViewBOQWorkshop::STableViewBOQWorkshop(QWidget *parent) :
     STableViewBase(SLocalSettings::RepairWorksGrid, parent)
@@ -30,10 +32,10 @@ void STableViewBOQWorkshop::mouseDoubleClickEvent(QMouseEvent *event)
         {
             clearSelection();
             selectionModel()->select(currentIndex(), QItemSelectionModel::Select);
-            MainWindow::getInstance()->createTabSparePart(m_model->index(row, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
+            MainWindow::getInstance()->createTabSparePart(m_model->index(row, SSaleTableModel::Columns::ItemId).data().toInt());
         }
         else
-            MainWindow::getInstance()->createTabSparePartReserve(m_model->index(row, SStoreItemModel::SaleOpColumns::ColId).data().toInt());
+            MainWindow::getInstance()->createTabSparePartReserve(m_model->index(row, SSaleTableModel::Columns::Id).data().toInt());
     }
 }
 
@@ -52,7 +54,7 @@ void STableViewBOQWorkshop::dataChanged(const QModelIndex &topLeft, const QModel
         {
             switch(col)
             {
-                case SStoreItemModel::SaleOpColumns::ColName: resizeRowToContents(row); break;
+                case SSaleTableModel::Columns::Name: resizeRowToContents(row); break;
                 default: /*resizeColumnToContents(col)*/;
             }
         }

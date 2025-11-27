@@ -1,4 +1,7 @@
 #include "sdateedit.h"
+#include <QWidget>
+#include <QTimer>
+#include <QDebug>
 
 SDateEdit::SDateEdit(QWidget *parent) :
     QDateEdit(parent)

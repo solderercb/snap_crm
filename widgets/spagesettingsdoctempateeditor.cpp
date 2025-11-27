@@ -1,13 +1,20 @@
 #include "spagesettingsdoctempateeditor.h"
 #include "ui_spagesettingsdoctempateeditor.h"
-#include "global.h"
-#include "com_sql_queries.h"
+#include <QFileInfo>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SAppLog>
+#include <FlashPopup>
+#include <SSqlQueryModel>
 
 SPageSettingsDocTempateEditor::SPageSettingsDocTempateEditor(QWidget *parent) :
     STabPage(parent),
     ui(new Ui::SPageSettingsDocTempateEditor)
 {
     ui->setupUi(this);
+    if(!m_parentTab)
+        m_parentTab = findParentTab();
+
     ui->pushButtonImport->hide();
     ui->pushButtonExport->hide();
     ui->lineEdit->setButtons("Apply");
@@ -30,7 +37,7 @@ SPageSettingsDocTempateEditor::SPageSettingsDocTempateEditor(QWidget *parent) :
     reportDesigner = m_report->getDesignerWindow();
 
 //    connect(m_report, SIGNAL(saveFinished()), this, SLOT(reportSaved()));
-    connect(m_report, SIGNAL(onSave(bool&)), this, SLOT(reportOnSave(bool&)));
+    connect(m_report, &LimeReport::ReportEngine::onSave, this, [=]{manualSubmit();});
 
     ui->scrollArea->setWidget(reportDesigner);
 #ifdef QT_DEBUG
@@ -47,6 +54,8 @@ SPageSettingsDocTempateEditor::~SPageSettingsDocTempateEditor()
 
 bool SPageSettingsDocTempateEditor::pageCloseRequest()
 {
+    // Редактор не знает о результатах сохранения и после сбоя операции запрос подтверждения выведен не будет.
+    // Однако, ситуация из категории очень редких и делать её обработчик смысла мало.
     return reportDesigner->checkNeedToSave();
 }
 
@@ -64,56 +73,76 @@ void SPageSettingsDocTempateEditor::selectTemplate(int index)
     loadTemplateFromFile();
 }
 
-bool SPageSettingsDocTempateEditor::saveTemplateToDB()
+QString SPageSettingsDocTempateEditor::queryLogFile()
 {
-    QByteArray buffer = m_report->saveToByteArray();
-    QByteArray vrfyBuffer;
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
-    QFile tmpFile;
-    QString hashsum = hash(&buffer);
+    return m_parentTab->metaObject()->className();
+}
 
-    query.exec(QUERY_SEL_DOC_TEMPL_CHECKSUM(m_reportName));
-    query.first();
-    if(query.isValid())
-        // вызов метода происходит по сигналу onSave и т. к. сигнал генерируется дважды нет смысла второй раз писать данные
-        if(hashsum.toUpper() == query.value(0).toString())
+int SPageSettingsDocTempateEditor::checkInput()
+{
+    m_templateBuffer = std::make_unique<QByteArray>(m_report->saveToByteArray());
+    auto tmp = std::make_unique<QString>(hash(m_templateBuffer.get()));
+
+    // сигнал onSave генерируется дважды, вторая итерация будет пропущена
+    if(m_templateHash.get() && m_templateHash->compare(*tmp) == 0)
+    {
+        m_templateHash.reset(); // нужно игнорировать только повторно сгенерированный сигнал, но после сбоя должна производиться попытка сохранения
+        return 1;
+    }
+
+    m_templateHash = std::move(tmp);
+
+    // Сравнение хэшей и пропуск операции если они совпадают
+    // Примечание: при первом открытии редактора шаблонов нажатие кнопки Сохранить приведёт к
+    // перезаписи данных в БД (выведется сообщение) даже если не вносились изменения. Это происходит
+    // потому, что механизм (де-)сериализации данных не сохраняет порядок аттрибутов в тэгах XML
+    // при открытии/сохранении шаблона. Т. е. дизайн шаблона не изменяется, но хэш будет отличаться.
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    query->exec(QUERY_SEL_DOC_TEMPL_CHECKSUM(m_reportName));
+    query->first();
+    if(query->isValid())
+    {
+        if(m_templateHash->compare(query->value(0).toString(), Qt::CaseInsensitive) == 0)
             return 1;
-
-    // временный файл для контроля записанных данных
-    tmpFile.setFileName(m_templatesDir + m_reportName + ".lrxml." + QDateTime::currentDateTime().toString("yyMMdd-hhmmss"));
-    if(!writeFile(tmpFile, &buffer))
-        return 0;
-
-    query.exec("BEGIN;");
-    query.exec(QUERY_UPD_DOC_TEMPL_DATA(m_reportName, QString(buffer.toHex()), hashsum));
-    if(query.lastError().isValid())
-    {
-        qDebug().nospace() << "[" << this << "] saveTemplateToDB() | " << query.lastError().text();
-        appLog->appendRecord(query.lastError().text());
-        return 0;
     }
-    query.exec(QUERY_SEL_DOC_TEMPL_DATA(m_reportName));
-    query.first();
-    if(!query.isValid())
-        return 0;
 
-    vrfyBuffer = query.value(0).toByteArray();
-    if(hashsum != hash(&vrfyBuffer))
+    // Временный файл для контроля записанных данных. Запись должна производиться именно сейчас.
+    m_temporaryFile = std::make_unique<QFile>();
+    m_temporaryFile->setFileName(m_templatesDir + m_reportName + ".lrxml." + QDateTime::currentDateTime().toString("yyMMdd-hhmmss"));
+    writeFile(*m_temporaryFile, m_templateBuffer.get());
+
+    return 0;
+}
+
+void SPageSettingsDocTempateEditor::commit(const int)
+{
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+
+    QUERY_EXEC_TH(query, 1, QUERY_UPD_DOC_TEMPL_DATA(m_reportName, QString(m_templateBuffer->toHex()), *m_templateHash));
+    QUERY_EXEC_TH(query, 1, QUERY_SEL_DOC_TEMPL_DATA(m_reportName));
+
+    query->first();
+    auto vrfyBuffer  = std::make_unique<QByteArray>(query->value(0).toByteArray());
+    if(m_templateHash.get() != hash(vrfyBuffer.get()))
     {
-        QString err = "Error occured while saving report template to DB: probably data corruption, hashes mismatch. Queries was rollbacked.";
-        qDebug().nospace() << "[" << this << "] saveTemplateToDB() | " << err;
-        appLog->appendRecord(err);
-        query.exec("ROLLBACK;");
-        return 0;
+        Global::throwError(Global::ThrowType::IntegrityError, tr("Error occurred while saving report template to DB: hashes mismatch detected"));
     }
-    query.exec("COMMIT;");
+}
 
-    tmpFile.remove();
+void SPageSettingsDocTempateEditor::throwHandler(int)
+{
+    appLog->appendRecord(tr("   Changes saved to temporary file %1").arg(QFileInfo(m_temporaryFile->fileName()).fileName()));
+}
 
-    if(!writeFile(CurrentFile, &buffer))
-        return 0;
+void SPageSettingsDocTempateEditor::endCommit()
+{
+    new shortlivedNotification(this, tr("Успешно"), tr("Шаблон сохранен в БД"), QColor(214,239,220), QColor(229,245,234));
 
-    return 1;
+    if(CurrentFile.exists())
+        CurrentFile.remove();
+    if(!m_temporaryFile->rename(CurrentFile.fileName()))
+        Global::errorMsg(Global::ThrowType::DiskWriteError, tr("Шаблон отчёта"));
+
 }
 
 void SPageSettingsDocTempateEditor::removeReportDataSources()
@@ -166,24 +195,6 @@ void SPageSettingsDocTempateEditor::translate()
     tr("cartridges");
 }
 
-void SPageSettingsDocTempateEditor::reportSaved()
-{   // Этот сигнал посылается когда файл отчета уже сохранён (перезаписан) (контролировал путём сравнения контрольной суммы с оригинальным)
-//    qDebug().nospace() << "[" << this << "] reportSaved()";
-}
-
-void SPageSettingsDocTempateEditor::reportOnSave(bool&)
-{   // Этот сигнал посылается при нажатии кнопки "Сохранить", но до того как файл будет перезаписан (контролировал путём сравнения контрольной суммы с оригинальным)
-    // оставлю для истории
-//    qDebug().nospace() << "[" << this << "] reportOnSave() | saved = " << saved;
-
-    // здесь хитро получилось...  поскольку дизайнер загружает шаблон из QByteArray, то при сохранении сигнал OnSave генерируется дважды.
-    // А т. к. после первого раза я сохранил на диске копию, то диалог сохранения файла не отображается.
-    // ВНИМАНИЕ! Также, после сохранения файла на диск с пом. Save as... (т. е. экспорта) и до закрытия вкладки настроек, любое внесенное изменение сохранится и в БД и в экспортированный файл.
-    // В таком поведении есть и плюсы и минусы. Например, если стоит цель создать резервную копию перед выполнением пробных изменений, нужно переименовать файл на диске для защиты от перезаписи.
-    // TODO: реализовать в LimeReport Disigner функцию Save as copy...
-    saveTemplateToDB();
-}
-
 /* Дэмо-данные
 */
 void SPageSettingsDocTempateEditor::initWorksDataSources()
@@ -218,4 +229,3 @@ void SPageSettingsDocTempateEditor::test_scheduler2_handler()
 
 }
 #endif
-

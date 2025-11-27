@@ -1,32 +1,25 @@
 #ifndef SDEVMDLMODEL_H
 #define SDEVMDLMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
+#include <SSingleRowJModel>
 
-class SDevMdlModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(name, name, QString, 0)                                     \
+    TABLE_FIELD(position, position, int, 0)                                 \
+    TABLE_FIELD(maker, maker, int, 0)                                       \
+    TABLE_FIELD(device, device, int, 0)
+
+class SDevMdlModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
     explicit SDevMdlModel(QObject *parent = nullptr);
     ~SDevMdlModel();
-    bool commit();
-    int id();
-    void setId(const int);
-    QString name();
-    void setName(const QString);
-    int position();
-    void setPosition(const int);
-    int maker();
-    void setMaker(const int);
-    int device();
-    void setDevice(const int);
-private:
-    int m_id;
-    QString m_name;
-    int m_position;
-    int m_maker;
-    int m_device;
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
 };
 
 #endif // SDEVMDLMODEL_H

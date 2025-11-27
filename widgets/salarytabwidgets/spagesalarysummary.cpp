@@ -1,5 +1,25 @@
 #include "spagesalarysummary.h"
 #include "ui_spagesalarysummary.h"
+#include <QWidget>
+#include <QTimeZone>
+#include <tabSalary>
+#include <SUserSettings>
+#include <SUserModel>
+#include <SPermissions>
+#include <SSalaryBasePage>
+#include <SQueryLog>
+#include <SCashRegisterModel>
+#include <SClientModel>
+#include <FlashPopup>
+#include <SSqlQueryModel>
+#include <SSortFilterProxyModel>
+#include <SSalaryRepairModel>
+#include <SSalaryRepairsModel>
+#include <SSalaryReceptedIssuedModel>
+#include <SSalarySalesModel>
+#include <SSalaryExtraModel>
+#include <SSalaryItemsModel>
+#include <SSalaryPaymentsModel>
 
 SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
     SPageSalaryBase(parent),
@@ -9,7 +29,7 @@ SPageSalarySummary::SPageSalarySummary(QWidget *parent) :
     SPageSalarySummary::guiFontChanged();
 
     ui->textEditDisclaimer->setVisible(ui->toolButtonDisclaimer->isChecked());
-    connect(parentTab, &tabSalary::showSubsistanceGroup, this, &SPageSalarySummary::setGroupBoxSubsistanceVisible);
+    connect(parentTab, &tabSalary::showSubsistanceGroup, this, &SPageSalarySummary::setGroupBoxSubsistenceVisible);
     connect(parentTab, &tabSalary::setFillMonthChargeOnUpdate, this, &SPageSalarySummary::setFillMonthChargeOnUpdate);
     connect(parentTab, &tabSalary::fwdFillClientCreds, this, &SPageSalarySummary::fillClientCreds);
     ui->toolButtonApplySummaryMonthCharge->resize(ui->doubleSpinBoxSummaryMonthCharge->height(), ui->doubleSpinBoxSummaryMonthCharge->height());
@@ -63,11 +83,7 @@ int SPageSalarySummary::createUserClientCardMsgBox()
         {
             if(!permissions->editGlobalSettings)  // Изменять служебные настройки
             {
-                shortlivedNotification *newPopup = new shortlivedNotification(this,
-                                                                              tr("Информация"),
-                                                                              tr("У вас недостаточно прав. Обратитесь к администратору."),
-                                                                              QColor(255,164,119),
-                                                                              QColor(255,199,173));
+                Global::errorPopupMsg(Global::ThrowType::AccessDenied);
                 return CancelOperation;
             }
             return CreateAutomaticaly;
@@ -78,11 +94,12 @@ int SPageSalarySummary::createUserClientCardMsgBox()
         }
         else    // btnN
         {
-            shortlivedNotification *newPopup = new shortlivedNotification(this,
+            auto *p = new shortlivedNotification(this,
                                                                           tr("Информация"),
                                                                           tr("Сумма выплаты не соответствует значению в поле \"Итого к оплате\""),
                                                                           QColor(255,164,119),
                                                                           QColor(255,199,173));
+            Q_UNUSED(p);
             return DontCreate;
         }
     }
@@ -95,11 +112,11 @@ void SPageSalarySummary::createUserClientCard()
     m_userClient = new SClientModel(0, this);
     SUserModel *user = parentTab->m_userModel;
 
-    m_userClient->setFirstName(user->name());
-    m_userClient->setLastName(user->surname());
-    m_userClient->setPatronymicName(user->patronymic());
+    m_userClient->set_firstName(user->name());
+    m_userClient->set_lastName(user->surname());
+    m_userClient->set_patronymicName(user->patronymic());
     m_userClient->appendLogText(tr("Быстрое создание клиента при выплате заработной платы"));
-    m_userClient->setEmployeeId(user->id());
+    m_userClient->set_employeeId(user->id());
     m_userClient->setAdTypeIndex(-1);
     parentTab->m_userModel->setClientModel(m_userClient);
     addOldBalanceValue();
@@ -114,7 +131,7 @@ void SPageSalarySummary::setFillMonthChargeOnUpdate(const bool state)
 void SPageSalarySummary::setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date)
 {
     int employee = parentTab->m_userModel->id();
-    int user = userDbData->id;
+    int user = userDbData->id();
     QDateTime periodBegin = parentTab->m_periodBegin;
     QDateTime periodEnd = parentTab->m_periodEnd;
     QDateTime created = QDateTime::currentDateTime();
@@ -126,27 +143,27 @@ void SPageSalarySummary::setDbRecordModelsData(const int type, const int system,
     periodEnd.toUTC();
     periodEnd = periodEnd.addSecs(-1);
 
-    salaryModel->setType(type);
-    salaryModel->setSumm(amount);
-    salaryModel->setNotes(reason);
-    salaryModel->setPaymentDate(created);
-    salaryModel->setPeriodFrom(periodBegin);
-    salaryModel->setPeriodTo(periodEnd);
-    salaryModel->setEmployee(employee);
-    salaryModel->setUser(user);
-    salaryModel->setBalance(0);
+    salaryModel->set_type(type);
+    salaryModel->set_amount(amount);
+    salaryModel->set_notes(reason);
+    salaryModel->set_paymentDate(created);
+    salaryModel->set_periodFrom(periodBegin);
+    salaryModel->set_periodTo(periodEnd);
+    salaryModel->set_employee(employee);
+    salaryModel->set_user(user);
+    salaryModel->set_balance(0);
 
     if(type == SSalaryModel::Salary)
-        cashRegister->setOperationType(SCashRegisterModel::ExpSalary);
+        cashRegister->set_operationType(SCashRegisterModel::ExpSalary);
     else
-        cashRegister->setOperationType(SCashRegisterModel::ExpSubsist);
-    cashRegister->setCompany(userDbData->company);
-    cashRegister->setSystemId(system);
-    cashRegister->setAmount(-amount);
-    cashRegister->setReason(reason);
-    cashRegister->setCreated(created);
-    cashRegister->setEmployee(employee);
-    cashRegister->setUser(user);
+        cashRegister->set_operationType(SCashRegisterModel::ExpSubsist);
+    cashRegister->set_company(userDbData->company());
+    cashRegister->set_systemId(system);
+    cashRegister->set_amount(-amount);
+    cashRegister->set_reason(reason);
+    cashRegister->set_created(created);
+    cashRegister->set_employee(employee);
+    cashRegister->set_user(user);
     //    cashRegister->setSkipLogRecording(true);
 }
 
@@ -185,153 +202,193 @@ void SPageSalarySummary::markRepairsPayed()
         if(parentTab->m_repairs->index(i, 10).data().toInt())   // пропуск ранее оплаченных, если они отображаются
             continue;
 
-        SSalaryRepairsModel salaryRepairsModel;
+        SSalaryRepairModel salaryRepairModel;
 //        if(parentTab->m_repairs->index(i, 13).data().toInt())
-//            salaryRepairsModel.setCartridge();
+//            salaryRepairModel.setCartridge();
 //        else
-            salaryRepairsModel.setRepair(parentTab->m_repairs->id(i));
-        salaryRepairsModel.setUser(parentTab->m_userModel->id());
-        salaryRepairsModel.setSumm(parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryWorks).toDouble() + parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryParts).toDouble());
-        salaryRepairsModel.setAccountingDate(periodEnd);
-        salaryRepairsModel.commit();
+            salaryRepairModel.set_repair(parentTab->m_repairs->id(i));
+        salaryRepairModel.set_user(parentTab->m_userModel->id());
+        salaryRepairModel.set_amount(parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryWorks).toDouble() + parentTab->m_repairs->unformattedData(i, STableSalaryRepairsModel::Columns::EmployeeSalaryParts).toDouble());
+        salaryRepairModel.set_accountingDate(periodEnd);
+        salaryRepairModel.commit();
     }
 }
 
 void SPageSalarySummary::paySubsistence()
 {
-    if(!ui->checkBoxSubsistenceOK->isChecked())
-        return;
+    m_paymentType = SSalaryModel::Subsistence;
+    manualSubmit();
+}
 
-    double currentAmount = ui->doubleSpinBoxSubsistenceSumm->value();
-
-    salaryModel = new SSalaryModel();
-    cashRegister = new SCashRegisterModel();
-
-    setDbRecordModelsData(SSalaryModel::Subsistence,
+void SPageSalarySummary::configureSubsistenceModels()
+{
+    setDbRecordModelsData(m_paymentType,
                           paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSubsistencePaymentSystem->currentIndex(), "system_id"),
-                          currentAmount,
+                          ui->doubleSpinBoxSubsistenceSumm->value(),
                           ui->textEditSubsistenceReason->toPlainText(),
                           ui->dateEditSubsistenceDate->date());
-
-    pay();
-    parentTab->updateModels();
 }
 
 void SPageSalarySummary::paySalary()
 {
-    if(!ui->checkBoxSalaryOK->isChecked())
-        return;
+    m_paymentType = SSalaryModel::Salary;
+    manualSubmit();
+}
 
-    double currentAmount = ui->doubleSpinBoxSalarySumm->value();
-    if(currentAmount != m_earningSinceLastPay)
+int SPageSalarySummary::checkInput()
+{
+    bool checked = 1;
+    switch(m_paymentType)
+    {
+        case SSalaryModel::Salary: checked = ui->checkBoxSalaryOK->isChecked(); break;
+        case SSalaryModel::Subsistence: checked = ui->checkBoxSubsistenceOK->isChecked(); break;
+    }
+
+    if(!checked)
+    {
+        // Аналогичная ошибка выводится в SDialogIssueRepair; нужно объединить это с помощью Global::errorPopupMsg(const int &throwCode)
+        new shortlivedNotification(this, tr("Ошибка"), tr("Подтвердите правильность ввода данных"), QColor("#FFC7AD"), QColor("#FFA477"));
+        return 1;
+    }
+
+    if(m_paymentType == SSalaryModel::Salary && ui->doubleSpinBoxSalarySumm->value() != m_earningSinceLastPay)
     {
         int tmp = createUserClientCardMsgBox();
         switch(tmp)
         {
             case ClientExists: m_userClient = parentTab->m_userModel->clientModel(); break;
             case CreateAutomaticaly: createUserClientCard(); break;
-            case SelectExist: parentTab->createTabSelectExistingClient(); return;   // после создания вкладки выбора сотрудника-клиента прерываем операцию выдачи ЗП; она будет продолжена в методе fillClientCreds()
+            case SelectExist: parentTab->createTabSelectExistingClient(); return 1;   // после создания вкладки выбора сотрудника-клиента прерываем операцию выдачи ЗП; она будет продолжена в методе fillClientCreds()
             case DontCreate:
-            case CancelOperation: return;
+            case CancelOperation: return 1;
             default: ;
         }
     }
 
-    QString reason = tr("Выплата заработной платы за период с %1 по %2").arg(parentTab->m_periodBegin.date().toString("dd.MM.yyyy"), parentTab->m_periodEnd.addDays(-1).toString("dd.MM.yyyy"));
-    salaryModel = new SSalaryModel();
-    cashRegister = new SCashRegisterModel();
+    return 0;
+}
 
-    setDbRecordModelsData(SSalaryModel::Salary,
+void SPageSalarySummary::configureSalaryModels()
+{
+    double amount = ui->doubleSpinBoxSalarySumm->value();
+
+    if(amount != m_earningSinceLastPay && m_userClient && !m_userClient->isBalanceEnabled())
+        m_enableBalancePending = 1;
+
+    QString reason = tr("Выплата заработной платы за период с %1 по %2").arg(parentTab->m_periodBegin.date().toString("dd.MM.yyyy"), parentTab->m_periodEnd.addDays(-1).toString("dd.MM.yyyy"));
+    setDbRecordModelsData(m_paymentType,
                           paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSalaryPaymentSystem->currentIndex(), "system_id"),
-                          currentAmount,
+                          amount,
                           reason,
                           ui->dateEditSalaryDate->date());
-
-    pay();
-    parentTab->updateModels();
 }
 
-void SPageSalarySummary::pay()
+void SPageSalarySummary::beginCommit()
 {
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-    m_queryLog = new SQueryLog();
-
-    try
+    salaryModel = std::unique_ptr<SSalaryModel>(new SSalaryModel());
+    cashRegister = std::unique_ptr<SCashRegisterModel>(new SCashRegisterModel());
+    switch(m_paymentType)
     {
-        m_queryLog->start(parentTab->metaObject()->className());
-
-        if(m_commitUserClientModelsPending)
-        {
-            // TODO: исправить чехарду с несколькими BEGIN/COMMIT
-            QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-            m_userClient->commit();
-            parentTab->m_userModel->setClientUserId(m_userClient->id());
-            parentTab->m_userModel->commit();
-            QUERY_COMMIT_ROLLBACK(&query,nErr);
-            shortlivedNotification *newPopup = new shortlivedNotification(this, parentTab->tabTitle(), tr("Карточка сотрудника-клиента успешно создана или связана"), QColor(214,239,220), QColor(229,245,234));
-            m_userClient->setBalanceEnabled();  // TODO: изменить методы в классе SClientModel, связанные с включением, выключением и пополнением баланса; произвести соотв. изменения в этом классе.
-            if(m_employeeBalanceToConvert)
-            {
-                QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-                m_userClient->updateBalance(m_employeeBalanceToConvert, tr("Преобразование данных о сумме на балансе сотрудника из формата программы АСЦ"));
-                QUERY_COMMIT_ROLLBACK(&query,nErr);
-            }
-
-            m_commitUserClientModelsPending = 0;
-        }
-
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        salaryModel->commit();
-        cashRegister->commit();
-        if(salaryModel->type() == SSalaryModel::Salary)
-        {
-            markRepairsPayed();
-
-            double amount = cashRegister->amountAbs();
-            if(amount != m_earningSinceLastPay && m_userClient)
-            {
-                m_userClient->setBalanceEnabled();  // TODO: изменить методы в классе SClientModel, связанные с включением, выключением и пополнением баланса; произвести соотв. изменения в этом классе.
-                QString reason;
-                if(amount > m_earningSinceLastPay)
-                    reason = tr("Списание средств с баланса сотрудника-клиента при выплате заработной платы");
-                else
-                    reason = tr("Зачисление разницы заработка и выплаченной суммы на баланс сотрудника-клиента");
-                m_userClient->updateBalance(m_earningSinceLastPay - amount, reason);
-                salaryModel->setBalanceRecord(m_userClient->balanceObj()->id());
-                salaryModel->commit();
-            }
-        }
-
-
-#ifdef QT_DEBUG
-//        Global::throwDebug();
-#endif
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
+        case SSalaryModel::Salary: configureSalaryModels(); break;
+        case SSalaryModel::Subsistence: configureSubsistenceModels(); break;
     }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
-
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-
-//        if(type == Global::ThrowType::Debug)
-//            nErr = 1; // это чтобы проверить работу дальше
-    }
-
-    m_queryLog->stop();
-    if(nErr)
-        shortlivedNotification *newPopup = new shortlivedNotification(this, parentTab->tabTitle(), tr("Проведено"), QColor(214,239,220), QColor(229,245,234));
-
-    delete m_queryLog;
-    delete salaryModel;
-    delete cashRegister;
 }
 
-void SPageSalarySummary::setGroupBoxSubsistanceVisible(bool visible)
+int SPageSalarySummary::commitStages()
+{
+    return 3; // 3 этапа: создание крточки клиента-сотрудника, автоматическое включение баланса клиента и запись информации о выплате
+}
+
+bool SPageSalarySummary::skip(const int stage)
+{
+    if(stage == 0)
+        return !m_commitUserClientModelsPending;
+    if(stage == 1)
+        return !m_enableBalancePending;
+
+    return 0;
+}
+
+void SPageSalarySummary::commit(const int stage)
+{
+    switch(stage)
+    {
+        case 0: commitClientUser(); break;
+        case 1: enableBalance(); break;
+        case 2: commitPayment(); break;
+    }
+}
+
+void SPageSalarySummary::endCommit(const int stage)
+{
+    switch(stage)
+    {
+        case 0: new shortlivedNotification(this, parentTab->tabTitle(), tr("Карточка сотрудника-клиента успешно создана или связана"), QColor(214,239,220), QColor(229,245,234)); break;
+        case 1:
+        case 2: break;
+    }
+}
+
+void SPageSalarySummary::commitClientUser()
+{
+    m_userClient->commit();
+    parentTab->m_userModel->set_clientUserId(m_userClient->id());
+    parentTab->m_userModel->commit();
+
+    m_commitUserClientModelsPending = 0;
+
+}
+
+void SPageSalarySummary::enableBalance()
+{
+    m_userClient->setBalanceEnabled();
+    m_enableBalancePending = 0;
+
+    if(m_employeeBalanceToConvert)
+    {
+        m_userClient->updateBalance(m_employeeBalanceToConvert, tr("Преобразование данных о сумме на балансе сотрудника из формата программы АСЦ"));
+        m_employeeBalanceToConvert = 0;
+    }
+}
+
+void SPageSalarySummary::commitPayment()
+{
+    salaryModel->commit();
+    cashRegister->commit();
+    if(salaryModel->type() == SSalaryModel::Salary)
+    {
+        markRepairsPayed();
+
+        double amount = cashRegister->amountAbs();
+        if(amount != m_earningSinceLastPay && m_userClient)
+        {
+            QString reason;
+            if(amount > m_earningSinceLastPay)
+                reason = tr("Списание средств с баланса сотрудника-клиента при выплате заработной платы");
+            else
+                reason = tr("Зачисление разницы заработка и выплаченной суммы на баланс сотрудника-клиента");
+            m_userClient->updateBalance(m_earningSinceLastPay - amount, reason);
+            salaryModel->set_balanceRecord(m_userClient->balanceObj()->id());
+            salaryModel->commit();
+        }
+    }
+#ifdef QT_DEBUG
+//    Global::throwDebug();
+#endif
+}
+
+void SPageSalarySummary::endCommit()
+{
+    new shortlivedNotification(this, parentTab->tabTitle(), tr("Проведено"), QColor(214,239,220), QColor(229,245,234));
+    parentTab->updateModels();
+    ui->checkBoxSalaryOK->setChecked(false);
+    ui->checkBoxSubsistenceOK->setChecked(false);
+
+    std::unique_ptr<SSalaryModel> salaryModel = nullptr;
+    std::unique_ptr<SCashRegisterModel> cashRegister = nullptr;
+}
+
+void SPageSalarySummary::setGroupBoxSubsistenceVisible(bool visible)
 {
     ui->groupBoxSubsistence->setVisible(visible);
 }
@@ -398,21 +455,21 @@ void SPageSalarySummary::updateWidgets()
 
 void SPageSalarySummary::fillClientCreds(int id)
 {
-    qDebug().nospace() << "[" << this << "] fillClientCreds() | id = " << id;
-    parentTab->m_userModel->setClientUserId(id);
+    parentTab->m_userModel->set_clientUserId(id);
     m_userClient = new SClientModel(id, this);
-    m_userClient->setEmployeeId(parentTab->m_userModel->id());
+    m_userClient->set_employeeId(parentTab->m_userModel->id());
     parentTab->m_userModel->setClientModel(m_userClient);
     addOldBalanceValue();
     m_commitUserClientModelsPending = 1;
-    paySalary();
+
+    manualSubmit();
 }
 
 void SPageSalarySummary::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
     font.setKerning(true);
 
     ui->doubleSpinBoxEarning->setFont(font);
@@ -432,4 +489,9 @@ void SPageSalarySummary::setMonthCharge()
         return;
     parentTab->updateModels();
     updateWidgets();
+}
+
+QString SPageSalarySummary::queryLogFile()
+{
+    return parentTab->metaObject()->className();
 }

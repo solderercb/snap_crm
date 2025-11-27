@@ -1,24 +1,23 @@
 #ifndef SWORKSHOPISSUEDMODEL_H
 #define SWORKSHOPISSUEDMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
+#include <SSingleRowJModel>
 
-class SWorkshopIssuedModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(repair_id, repair, int, 0)                               \
+    TABLE_FIELD(employee_id, employee, int, 0)                           \
+    TABLE_FIELD(created_at, created, QDateTime, 0)
+
+class SWorkshopIssuedModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
     explicit SWorkshopIssuedModel(QObject *parent = nullptr);
-    int id();
-    int repair();
-    void setRepair(const int);
-    int employee();
-    void setEmployee(const int);
-    void load(const int id);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
     bool commit();
-private:
-    int m_repair;
-    int m_employeeId;
 };
 
 #endif // SWORKSHOPISSUEDMODEL_H

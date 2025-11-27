@@ -1,10 +1,11 @@
 #ifndef STABLEVIEWREPAIRS_H
 #define STABLEVIEWREPAIRS_H
 
-#include "stableviewbase.h"
-#include <QWidget>
-#include "models/stablerepairsmodel.h"
-#include "stableviewrepairsitemdelegates.h"
+#include <STableViewBase>
+
+class QWidget;
+class STableRepairsModel;
+class SRepairsDelegates;
 
 class STableViewRepairs : public STableViewBase
 {

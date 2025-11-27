@@ -25,7 +25,7 @@ TEMPLATE = app
 
 RC_FILE = resources.rc
 
-#system($${PWD}/appver-update.bat >nul 2>&1)
+system($${PWD}/appver-update.bat >nul 2>&1)
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -43,6 +43,8 @@ DEFINES += QS_HAS_XML
 
 PRECOMPILED_HEADER = stable.h
 
+INCLUDEPATH += $${PWD}/include
+
 SOURCES += \
     applog.cpp \
     main.cpp\
@@ -52,10 +54,9 @@ SOURCES += \
     global.cpp \
     loginwindow.cpp \
     mainwindow.cpp \
-    models/propstruct.cpp \
     models/salarytabmodels/sadditionalpaymentmodel.cpp \
     models/salarytabmodels/ssalarymodel.cpp \
-    models/salarytabmodels/ssalaryrepairsmodel.cpp \
+    models/salarytabmodels/ssalaryrepairmodel.cpp \
     models/salarytabmodels/stablesalaryextramodel.cpp \
     models/salarytabmodels/stablesalaryitemsmodel.cpp \
     models/salarytabmodels/stablesalarypaymentsmodel.cpp \
@@ -70,9 +71,14 @@ SOURCES += \
     models/scartridgematerialsmodel.cpp \
     models/scartridgerepairmodel.cpp \
     models/scomsettings.cpp \
-    models/sdatabaseauxiliary.cpp \
     models/seditablebasemodel.cpp \
+    models/sfieldmodel.cpp \
     models/sofficemodel.cpp \
+    models/ssettingsbase.cpp \
+    models/ssinglerowjmodel.cpp \
+    models/ssinglerowmodel.cpp \
+    models/ssinglerowmodelbase.cpp \
+    models/sworkpricemodel.cpp \
     modules/purchasemanager/srequest.cpp \
     modules/purchasemanager/sgroupingmodel.cpp \
     modules/purchasemanager/ssupplier.cpp \
@@ -116,11 +122,8 @@ SOURCES += \
     models/susersettings.cpp \
     models/sworkmodel.cpp \
     models/sworkshopissuedmodel.cpp \
-    models/tabsalesettingsmenu.cpp \
     models/scashregistermodel.cpp \
     models/sclientmodel.cpp \
-    models/scomrecord.cpp \
-    models/sdatabaserecord.cpp \
     models/sdocumentmodel.cpp \
     models/slogrecordmodel.cpp \
     models/sphonemodel.cpp \
@@ -135,6 +138,7 @@ SOURCES += \
     tabsettings.cpp \
     tabtechreports.cpp \
     widgets/qtooltipper.cpp \
+    widgets/ssaletabsettingsmenu.cpp \
     widgets/salarytabwidgets/spagesalaryextra.cpp \
     widgets/salarytabwidgets/spagesalaryitems.cpp \
     widgets/salarytabwidgets/spagesalarypayments.cpp \
@@ -167,6 +171,7 @@ SOURCES += \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.cpp \
     widgets/settingstabwidgets/ssettingspageuser.cpp \
     widgets/settingstabwidgets/stableviewpermissions.cpp \
+    widgets/sframe.cpp \
     widgets/smodalwidget.cpp \
     widgets/snotification.cpp \
     widgets/spageclientsummary.cpp \
@@ -218,6 +223,7 @@ SOURCES += \
     widgets/stextedit.cpp \
     widgets/stoolboxswitchpanel.cpp \
     widgets/swidget.cpp \
+    widgets/swidgetcommonmethods.cpp \
     windowsdispatcher.cpp
 
 HEADERS  += \
@@ -243,10 +249,9 @@ HEADERS  += \
     global_ns.h \
     loginwindow.h \
     mainwindow.h \
-    models/propstruct.h \
     models/salarytabmodels/sadditionalpaymentmodel.h \
     models/salarytabmodels/ssalarymodel.h \
-    models/salarytabmodels/ssalaryrepairsmodel.h \
+    models/salarytabmodels/ssalaryrepairmodel.h \
     models/salarytabmodels/stablesalaryextramodel.h \
     models/salarytabmodels/stablesalaryitemsmodel.h \
     models/salarytabmodels/stablesalarypaymentsmodel.h \
@@ -262,9 +267,14 @@ HEADERS  += \
     models/scartridgerepairmodel.h \
     models/scomsettings.h \
     models/scomsettingstypes.h \
-    models/sdatabaseauxiliary.h \
     models/seditablebasemodel.h \
+    models/sfieldmodel.h \
     models/sofficemodel.h \
+    models/ssettingsbase.h \
+    models/ssinglerowjmodel.h \
+    models/ssinglerowmodel.h \
+    models/ssinglerowmodelbase.h \
+    models/sworkpricemodel.h \
     modules/purchasemanager/srequest.h \
     modules/purchasemanager/sgroupingmodel.h \
     modules/purchasemanager/ssupplier.h \
@@ -311,11 +321,8 @@ HEADERS  += \
     models/susersettingstypes.h \
     models/sworkmodel.h \
     models/sworkshopissuedmodel.h \
-    models/tabsalesettingsmenu.h \
     models/scashregistermodel.h \
     models/sclientmodel.h \
-    models/scomrecord.h \
-    models/sdatabaserecord.h \
     models/sdocumentmodel.h \
     models/slogrecordmodel.h \
     models/sphonemodel.h \
@@ -330,6 +337,7 @@ HEADERS  += \
     tabsettings.h \
     tabtechreports.h \
     widgets/qtooltipper.h \
+    widgets/ssaletabsettingsmenu.h \
     widgets/salarytabwidgets/spagesalaryextra.h \
     widgets/salarytabwidgets/spagesalaryitems.h \
     widgets/salarytabwidgets/spagesalarypayments.h \
@@ -362,6 +370,7 @@ HEADERS  += \
     widgets/settingstabwidgets/ssettingspagerolesandpermissions.h \
     widgets/settingstabwidgets/ssettingspageuser.h \
     widgets/settingstabwidgets/stableviewpermissions.h \
+    widgets/sframe.h \
     widgets/smodalwidget.h \
     widgets/snotification.h \
     widgets/spageclientsummary.h \
@@ -415,6 +424,7 @@ HEADERS  += \
     widgets/stextedit.h \
     widgets/stoolboxswitchpanel.h \
     widgets/swidget.h \
+    widgets/swidgetcommonmethods.h \
     windowsdispatcher.h
 
 FORMS += \
@@ -423,7 +433,6 @@ FORMS += \
     loginwindow.ui \
     mainwindow.ui \
     models/ssloptionsdialog.ui \
-    models/tabsalesettingsmenu.ui \
     modules/purchasemanager/tabrequest.ui \
     modules/purchasemanager/tabmanager.ui \
     tabreceptcartridge.ui \
@@ -431,6 +440,7 @@ FORMS += \
     tabsalary.ui \
     tabsettings.ui \
     tabtechreports.ui \
+    widgets/ssaletabsettingsmenu.ui \
     widgets/salarytabwidgets/spagesalaryextra.ui \
     widgets/salarytabwidgets/spagesalaryitems.ui \
     widgets/salarytabwidgets/spagesalarypayments.ui \

@@ -1,4 +1,7 @@
 #include "stableviewboqstore.h"
+#include <STableViewGridLayout>
+#include <SBOQDelegates>
+#include <SSaleTableModel>
 
 STableViewBOQStore::STableViewBOQStore(QWidget *parent) :
     STableViewBase(SLocalSettings::SaleItemsGrid, parent)
@@ -29,7 +32,7 @@ void STableViewBOQStore::mouseDoubleClickEvent(QMouseEvent *event)
     {
         clearSelection();
         selectionModel()->select(currentIndex(), QItemSelectionModel::Select);
-        emit createTabSparePart(m_model->index(row, SStoreItemModel::SaleOpColumns::ColItemId).data().toInt());
+        emit createTabSparePart(m_model->index(row, SSaleTableModel::Columns::ItemId).data().toInt());
     }
 }
 

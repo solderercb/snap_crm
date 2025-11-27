@@ -1,8 +1,12 @@
 #include "sclientselectform.h"
 #include "ui_sclientselectform.h"
-#include "global.h"
-#include "mainwindow.h"
-#include "tabclients.h"
+#include <ProjectGlobals>
+#include <MainWindow>
+#include <tabClients>
+#include <SPermissions>
+#include <SClientModel>
+#include <SLineEdit>
+#include <SDoubleSpinBox>
 
 SClientSelectForm::SClientSelectForm(QWidget *parent) :
     SClientInputFormBase(parent),
@@ -159,9 +163,9 @@ void SClientSelectForm::update()
     }
 
     m_widgetId->setValue(m_clientId);
-    setLineEditNameTextAtomic(m_clientModel->fullShortName());
+    setLineEditNameTextAtomic(m_clientModel->fullShortName().toString());
 
-    if(m_clientModel->balanceEnabled())
+    if(m_clientModel->isBalanceEnabled())
         ui->doubleSpinBoxBalance->setValue(m_clientModel->balance());
     else
         ui->doubleSpinBoxBalance->clear();
@@ -198,14 +202,14 @@ void SClientSelectForm::fillCreds(int clientId)
 /* Проверка включен ли баланс и вывод диалогового окна для возможности его включить (при наличии соотв. прав).
  * Возвращает 1 в случае ошибки.
 */
-int SClientSelectForm::checkBalanceEnabled()
+bool SClientSelectForm::checkBalanceEnabled()
 {
     if(!m_clientModel)
         return 0;
 
     setDefaultStylesheets();
 
-    if(!m_clientModel->balanceEnabled())
+    if(!m_clientModel->isBalanceEnabled())
     {
         bool tmp = permissions->editClients;    // Редактировать существующих клиентов
         if(tmp)
@@ -217,11 +221,7 @@ int SClientSelectForm::checkBalanceEnabled()
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
             msgBox.setDefaultButton(QMessageBox::Yes);
 
-            if(msgBox.exec() == QMessageBox::Yes)
-            {
-                tmp = m_clientModel->setBalanceEnabled();
-            }
-            else
+            if(msgBox.exec() == QMessageBox::No)
                 tmp = 0;
         }
         if(!tmp)

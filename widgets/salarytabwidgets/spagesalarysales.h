@@ -1,9 +1,10 @@
 #ifndef SPAGESALARYSALES_H
 #define SPAGESALARYSALES_H
 
-#include <QWidget>
-#include "spagesalarybase.h"
-#include "../stableviewbase.h"
+#include <QObject>
+#include <SSalaryBasePage>
+
+class QWidget;
 
 namespace Ui {
 class SPageSalarySales;

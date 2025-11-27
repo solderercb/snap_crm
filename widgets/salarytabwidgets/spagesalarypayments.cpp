@@ -1,5 +1,11 @@
 #include "spagesalarypayments.h"
 #include "ui_spagesalarypayments.h"
+#include <QWidget>
+#include <ProjectQueries>
+#include <tabSalary>
+#include <SSalaryPaymentsModel>
+#include <SSalaryPaymentsView>
+#include <STableBaseModel>
 
 SPageSalaryPayments::SPageSalaryPayments(QWidget *parent) :
     SPageSalaryBase(parent),

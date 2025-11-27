@@ -1,5 +1,8 @@
 #include "stoolboxswitchpanel.h"
 #include "ui_stoolboxswitchpanel.h"
+#include <QMap>
+#include <QCommandLinkButton>
+#include <QDebug>
 
 SToolboxSwitchPanel::SToolboxSwitchPanel(QWidget *parent) :
     QWidget(parent),

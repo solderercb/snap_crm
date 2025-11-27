@@ -1,6 +1,10 @@
-#include "global.h"
+#include <ProjectGlobals>
 #include "ssloptionsdialog.h"
 #include "ui_ssloptionsdialog.h"
+#include <SLocalSettingsStructs>
+#include <QWidget>
+#include <QSignalMapper>
+#include <QFileDialog>
 
 SSLOptionsDialog::SSLOptionsDialog(QWidget *p, Qt::WindowFlags f) :
     QFrame(p, f),

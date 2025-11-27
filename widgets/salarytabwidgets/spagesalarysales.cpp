@@ -1,7 +1,17 @@
 #include "spagesalarysales.h"
 #include "ui_spagesalarysales.h"
-#include "stableviewsalarysaleparts.h"
-#include "stableviewsalarysales.h"
+#include <QWidget>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <Mainwindow>
+#include <tabSalary>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SUserModel>
+#include <SSalarySalesView>
+#include <SSalarySalesModel>
+#include <SSalarySalePartsView>
+#include <SSalarySalePartsModel>
 
 SPageSalarySales::SPageSalarySales(QWidget *parent) :
     SPageSalaryBase(parent),
@@ -49,7 +59,7 @@ void SPageSalarySales::updateWidgets()
     m_userModel = parentTab->m_userModel;
 
     ui->labelPercentPartsValue->setText(QString::number(m_userModel->paySale()));
-    ui->labelSalesSummValue->setText(sysLocale.toString(parentTab->m_sales->total(STableSalarySalesModel::Columns::SalaryPart), 'f', comSettings->classicKassa?2:0));
+    ui->labelSalesSummValue->setText(sysLocale.toString(parentTab->m_sales->total(STableSalarySalesModel::Columns::SalaryPart), 'f', comSettings->classicKassa()?2:0));
 }
 
 void SPageSalarySales::tableSalesRowSelected(const QModelIndex &current, const QModelIndex &prev)
@@ -77,7 +87,7 @@ void SPageSalarySales::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
     font.setBold(true);
 
     ui->labelPercentPartsValue->setFont(font);

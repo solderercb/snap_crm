@@ -19,8 +19,8 @@ QString amountToWords(double n, const QString &currencyCode)
 
 void SAmountToWords::init()
 {
-    currencyCodeCached = comSettings->currencyId;
-    amountToWords_p = amountToWords(comSettings->currencyId);
+    currencyCodeCached = comSettings->currencyId();
+    amountToWords_p = amountToWords(comSettings->currencyId());
 }
 
 QString (*SAmountToWords::amountToWords(const QString &currencyCode))(double)

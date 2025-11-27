@@ -1,7 +1,7 @@
-#include "sapplication.h"
+#include <SApplication>
 #include <QTranslator>
-#include "windowsdispatcher.h"
-//#include "mainwindow.h"
+#include <windowsDispatcher>
+//#include <MainWindow>
 
 /*
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)

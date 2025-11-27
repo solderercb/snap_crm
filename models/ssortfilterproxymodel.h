@@ -2,7 +2,7 @@
 #define SSORTFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include "sabstractitemmodel.h"
+#include <SAbstractItemModel>
 #include <QObject>
 
 class SSortFilterProxyModel : public QSortFilterProxyModel, public SAbstractItemModel

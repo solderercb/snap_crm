@@ -1,7 +1,11 @@
-#include "global.h"
-#include "appver.h"
 #include "chooseofficewindow.h"
 #include "ui_chooseofficewindow.h"
+#include <QComboBox>
+#include <ProjectGlobals>
+#include <SUserSettings>
+#include <appVer>
+#include <SSqlQueryModel>
+#include <windowsDispatcher>
 
 chooseOfficeWindow::chooseOfficeWindow(windowsDispatcher *parent) :
     QDialog(nullptr),
@@ -35,7 +39,7 @@ void chooseOfficeWindow::accept()
     int comboBoxOfficeIndex = ui->officesComboBox->currentIndex();
     if (comboBoxOfficeIndex >= 0)
     {
-        userDbData->currentOffice = officesModel->databaseIDByRow(comboBoxOfficeIndex);
+        userDbData->set_currentOffice(officesModel->databaseIDByRow(comboBoxOfficeIndex));
         emit officeChoosed();
         this->deleteLater();
     }

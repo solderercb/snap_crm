@@ -2,9 +2,9 @@
 #define SDEVICEMATCH_H
 
 #include <QWidget>
-#include "global.h"
-#include "com_sql_queries.h"
-#include "sgroupboxeventfilter.h"
+
+class SGroupBoxEventFilter;
+class QSqlQueryModel;
 
 namespace Ui {
 class SDeviceMatch;

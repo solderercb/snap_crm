@@ -1,6 +1,8 @@
-#include "global.h"
 #include "stablesalaryextramodel.h"
-#include "../../com_sql_queries.h"
+#include <ProjectGlobals>
+#include <SSalaryAdditionalPaymentModel>
+#include <SUserSettings>
+#include <QSqlField>
 
 STableSalaryExtraModel::STableSalaryExtraModel(QObject *parent) : SEditableBaseModel(parent, QSqlDatabase::database("connThird"))
 {
@@ -57,66 +59,25 @@ void STableSalaryExtraModel::addNewRow()
 
 void STableSalaryExtraModel::saveTable()
 {
-    if(rowCount() == 0)
-        return;
-
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-    m_queryLog = new SQueryLog();
-
-    m_queryLog->start(metaObject()->className());
-    // TODO: все второстепенные операции (например, запуск журналирования, открытие сессии) нужно перенести в класс виджета tabSalary или SPageSalaryExtra для дальнейшей унификации кода
-    try
+    for(int i = 0; i < rowCount(); i++)
     {
-        SDatabaseRecord::checkSystemTime();
+        if(index(i, Columns::Id).data().toInt())
+            continue;
 
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
+        auto additionalPayment = std::make_unique<SAdditionalPaymentModel>();
 
-        for(int i = 0; i < rowCount(); i++)
-        {
-            if(index(i, Columns::Id).data().toInt())
-                continue;
+        additionalPayment->set_name(SEditableBaseModel::data(index(i, Columns::Name)).toString());
+        additionalPayment->set_summ(SEditableBaseModel::data(index(i, Columns::Price)).toDouble());
+        additionalPayment->set_paymentDate(SEditableBaseModel::data(index(i, Columns::PaymentDate)).toDateTime());
+        additionalPayment->set_user(userDbData->id());
+        additionalPayment->set_employee(m_employee);
+        additionalPayment->commit();
 
-            additionalPayment = new SAdditionalPaymentModel();
-
-            additionalPayment->setName(SEditableBaseModel::data(index(i, Columns::Name)).toString());
-            additionalPayment->setSumm(SEditableBaseModel::data(index(i, Columns::Price)).toDouble());
-            additionalPayment->setPaymentDate(SEditableBaseModel::data(index(i, Columns::PaymentDate)).toDateTime());
-            additionalPayment->setUser(userDbData->id);
-            additionalPayment->setEmployee(m_employee);
-            nErr = additionalPayment->commit();
-            delete additionalPayment;
-
-            // TODO Запись в журнал?
-
-            if(!nErr)
-                throw Global::ThrowType::QueryError;
-        }
+        // TODO Запись в журнал?
+    }
 #ifdef QT_DEBUG
 //        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-    }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-
-//        if(type == Global::ThrowType::Debug)
-//            nErr = 1; // это чтобы проверить работу дальше
-    }
-
-    m_queryLog->stop();
-    if(nErr)
-    {
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Начисления и списания"), tr("Список успешно сохранён"), QColor(214,239,220), QColor(229,245,234));
-        emit repopulate();
-    }
-
-    delete m_queryLog;
 }
 
 void STableSalaryExtraModel::slotPrimeInsert(int row, QSqlRecord &record)
@@ -143,7 +104,7 @@ void STableSalaryExtraModel::slotPrimeInsert(int row, QSqlRecord &record)
     delete field;
 
     field = new QSqlField("user", QVariant::Int);
-    field->setValue(userDbData->id);
+    field->setValue(userDbData->id());
     rec->append(*field);
     delete field;
 

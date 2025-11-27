@@ -1,17 +1,13 @@
 #ifndef SCOMBOBOX_H
 #define SCOMBOBOX_H
 
-#include <QCoreApplication>
 #include <QComboBox>
-#include <QLineEdit>
-#include <QListView>
 #include <QEvent>
-#include <QMouseEvent>
-#include <QFocusEvent>
-#include <QResizeEvent>
-#include <QTimer>
-#include <QDebug>
-#include "slineedit.h"
+
+class QFontMetrics;
+class SLineEdit;
+class QWidget;
+class QAbstractItemView;
 
 class SComboBox : public QComboBox
 {

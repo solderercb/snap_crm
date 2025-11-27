@@ -655,12 +655,12 @@
   <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
+   <header location="global">SDoubleSpinBox</header>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
@@ -669,13 +669,13 @@
   <customwidget>
    <class>SClientSelectForm</class>
    <extends>QWidget</extends>
-   <header>widgets/sclientselectform.h</header>
+   <header location="global">SClientSelectForm</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SDateEdit</class>
    <extends>QDateEdit</extends>
-   <header>widgets/sdateedit.h</header>
+   <header location="global">SDateEdit</header>
   </customwidget>
  </customwidgets>
  <tabstops>

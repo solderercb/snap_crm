@@ -1,0 +1,40 @@
+QT += core
+QT += testlib
+QT += widgets
+QT += sql
+QT -= gui
+
+CONFIG += c++17
+CONFIG += qt console warn_on depend_includepath testcase
+CONFIG -= app_bundle
+
+TEMPLATE = app
+
+DEFINES += _PWD=$${PWD}/..
+
+INCLUDEPATH += $${PWD}/include
+
+SOURCES +=  \
+    global.cpp \
+    ../tdebugstuff.cpp \
+    ../slocalsettings.cpp \
+    ../../squerylog.cpp \
+    ../../models/ssinglerowjmodel.cpp \
+    ../../models/ssinglerowmodelbase.cpp \
+    ../../models/ssinglerowmodel.cpp \
+    ../../models/slogrecordmodel.cpp \
+    ../../models/sinvoicemodel.cpp \
+    tclasstest.cpp
+
+HEADERS += \
+    com_sql_queries.h \
+    global.h \
+    ../tdebugstuff.h \
+    ../slocalsettings.h \
+    ../../squerylog.h \
+    ../../models/ssinglerowjmodel.h \
+    ../../models/ssinglerowmodelbase.h \
+    ../../models/ssinglerowmodel.h \
+    ../../models/slogrecordmodel.h \
+    ../../models/sinvoicemodel.h \
+    sclientmodel.h

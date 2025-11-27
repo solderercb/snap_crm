@@ -1,16 +1,11 @@
 #ifndef SLOCALSETTINGS_H
 #define SLOCALSETTINGS_H
 
-#include <QApplication>
 #include <QObject>
-#include <QDir>
 #include <QFile>
-#include <QStandardPaths>
-#include <QResource>
 #include <QIODevice>
-#include <QCryptographicHash>
-#include <QCollator>
-#include <3rdparty/QSerializer/QSerializer>
+
+class QSerializer;
 
 class SLocalSettings : public QObject
 {

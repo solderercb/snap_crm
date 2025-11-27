@@ -55,12 +55,12 @@
   <customwidget>
    <class>STableViewSalaryExtra</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalaryextra.h</header>
+   <header location="global">SSalaryExtraView</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalaryExtraSummary</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/spagesalaryextra.h</header>
+   <header location="global">SSalaryExtraPage</header>
   </customwidget>
  </customwidgets>
  <resources/>

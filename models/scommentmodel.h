@@ -1,47 +1,32 @@
 #ifndef SCOMMENTMODEL_H
 #define SCOMMENTMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
-#include <QDateTime>
-#include <QString>
+#include <SSingleRowJModel>
 
-class SCommentModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+// Порядок полей изменён, он важен!
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(created, created, QDateTime, 0)                             \
+    TABLE_FIELD(user, user, int, 0)                                         \
+    TABLE_FIELD(text, text, QString, 0)                                     \
+    TABLE_FIELD(remont, repair, int, 0)                                     \
+    TABLE_FIELD(client, client, int, 0)                                     \
+    TABLE_FIELD(task_id, task, int, 0)                                      \
+    TABLE_FIELD(part_request, partRequest, int, 0)
+
+class SCommentModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
-    enum Columns {ColId = 0, ColCreated, ColUser, ColText, ColRepair, ColClient, ColTask, ColPartRequest};
     enum Mode {NotSet = 0, Repair = 1, Client, Task, PartRequest};
     explicit SCommentModel(QObject *parent = nullptr);
-    explicit SCommentModel(QList<QStandardItem*> &record, QObject *parent = nullptr);
     ~SCommentModel();
-    int id();
-    void setId(const int);
-    QString text();
-    void setText(const QString);
-    int user();
-    void setUser(const int);
-    int remont();
-    void setRepair(const int);
-    int client();
-    void setClient(const int);
-    int taskId();
-    void setTask(const int);
-    int partRequest();
-    void setPartRequest(const int);
-    bool commit();
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    bool commit() override;
     void setObjId(const int mode, const int id);
-    void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue) override;
     bool remove();
-    void queryNewId(int&) override{};    // после создания новой записи id не используется
-private:
-    int m_id;
-    QString m_text;
-    int m_user;
-    int m_remont;
-    int m_client;
-    int m_taskId;
-    int m_partRequest;
 };
 
 #endif // SCOMMENTMODEL_H

@@ -1,4 +1,6 @@
 #include "ssettingspagebase.h"
+#include <Mainwindow>
+#include <tabSettings>
 
 SSettingsPageBase::SSettingsPageBase(QWidget *parent) :
     STabPage(parent)

@@ -1,6 +1,8 @@
 #include "ssettingspageuser.h"
 #include "ui_ssettingspageuser.h"
-#include "global.h"
+#include <QPushButton>
+#include <ProjectGlobals>
+#include <SUserSettings>
 
 SSettingsPageUser::SSettingsPageUser(QWidget *parent) :
     SSettingsPageBase(parent),
@@ -27,7 +29,7 @@ void SSettingsPageUser::saveSettings()
 void SSettingsPageUser::updateWidgets()
 {
     QFormLayout *layout;
-    for(int i = 0; i < userDbData->count(); i++)
+    for(int i = 0; i < userDbData->size(); i++)
     {
         switch (userDbData->propertyGroup(i))
         {
@@ -41,14 +43,14 @@ void SSettingsPageUser::updateWidgets()
             case 18: layout = ui->formLayoutFinances; break;
             default: continue;  // параметры с другими кодами групп отображаются на других страницах
         }
-        layout->setWidget(i, QFormLayout::LabelRole, userDbData->widget(i, SPropertyCollection::Label));
-        layout->setWidget(i, QFormLayout::FieldRole, userDbData->widget(i, SPropertyCollection::Editor));
+        layout->setWidget(i, QFormLayout::LabelRole, userDbData->label(i));
+        layout->setWidget(i, QFormLayout::FieldRole, userDbData->widget(i));
     }
 }
 
 //void SSettingsPageUser::updateWidgetsOf...Group()
 //{
-//    if(userDbData->voipId <= 0 || userDbData->voipId == 3)
+//    if(userDbData->voipId() <= 0 || userDbData->voipId() == 3)
 //    {
 //        ui->groupBoxVoip->setVisible(false);
 //    }
@@ -81,7 +83,7 @@ void SSettingsPageUser::updateWidgets()
 //        while(i!=propIds.constEnd())
 //        {
 //            int colSpan = 1;
-//            switch((userDbData->voipId)*10 + i.key())  // 0 - off, 10 - Zadarma, 20 - Asterisk, 30 - off, 40 - Rostelecom, 50 - Mango telecom, 60 - Megafon
+//            switch((userDbData->voipId())*10 + i.key())  // 0 - off, 10 - Zadarma, 20 - Asterisk, 30 - off, 40 - Rostelecom, 50 - Mango telecom, 60 - Megafon
 //            {
 //                case 15: colSpan = 3; break;
 //                case 17: colSpan = 3; break;
@@ -138,7 +140,7 @@ void SSettingsPageUser::updateWidgets()
 //            voipTestButton = new QPushButton(ui->groupBoxVoip);
 //            connect(voipTestButton, &QPushButton::clicked, this, &SSettingsPageUser::voipTest);
 //        }
-//        voipTestButton->setText((userDbData->voipId == 2)?tr("Тест"):tr("Баланс"));
+//        voipTestButton->setText((userDbData->voipId() == 2)?tr("Тест"):tr("Баланс"));
 //        grLayout->addWidget(voipTestButton, grLayoutRow, grLayoutColumn++, 1, 5);
 //    }
 //}

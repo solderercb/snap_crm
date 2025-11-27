@@ -1,48 +1,39 @@
 #ifndef SSALARYMODEL_H
 #define SSALARYMODEL_H
 
-#include "../sdatabaserecord.h"
-#include <QObject>
+#include <SSingleRowModel>
 
-class SSalaryModel : public SDatabaseRecord
+#include "../ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(user_id, employee, int, 0)                                  \
+    TABLE_FIELD(summ, amount, double, 0)                                    \
+    TABLE_FIELD(balance, balance, double, 0)                                \
+    TABLE_FIELD(balance_record, balanceRecord, int, 0)                      \
+    TABLE_FIELD(payment_date, paymentDate, QDateTime, 0)                    \
+    TABLE_FIELD(notes, notes, QString, 0)                                   \
+    TABLE_FIELD(period_from, periodFrom, QDateTime, 0)                      \
+    TABLE_FIELD(period_to, periodTo, QDateTime, 0)                          \
+    TABLE_FIELD(from_user, user, int, 0)                                    \
+    TABLE_FIELD(type, type, bool, 0)                                        \
+
+class SSalaryModel : public SSingleRowModel
 {
     Q_OBJECT
 public:
     enum Type{Salary = 0, Subsistence = 1};
     explicit SSalaryModel(QObject *parent = nullptr);
+#include "../ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
     void load(const int id);
-    void load(const QSqlRecord &record);
-    int id();
-    int employee();
-    void setEmployee(const int);
-    double summ();
-    void setSumm(const double);
-    double balance();
-    void setBalance(const double);
-    QString paymentDate();
-    void setPaymentDate(const QDateTime);
-    QString notes();
-    void setNotes(const QString&);
-    QDate periodFrom();
-    void setPeriodFrom(const QDateTime);
-    QDate periodTo();
-    void setPeriodTo(const QDateTime);
-    int user();
-    void setUser(const int);
-    bool type();
-    void setType(const bool);
-    bool commit();
-    void setBalanceRecord(const int id);
+protected:
+    int indexOfCreated() override;
 private:
-    int m_employee;
-    double m_summ;
-    double m_balance;
-    QDateTime m_paymentDate;
-    QString m_notes;
-    QDate m_periodFrom;
-    QDate m_periodTo;
-    int m_user;
-    bool m_type;
 };
+
+inline int SSalaryModel::indexOfCreated()
+{
+    return C_paymentDate;
+}
 
 #endif // SSALARYMODEL_H

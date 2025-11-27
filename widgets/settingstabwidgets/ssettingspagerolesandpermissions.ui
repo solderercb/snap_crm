@@ -128,7 +128,7 @@
   <customwidget>
    <class>STableViewPermissions</class>
    <extends>QTableView</extends>
-   <header>widgets/settingstabwidgets/stableviewpermissions.h</header>
+   <header location="global">SPermissionsView</header>
   </customwidget>
  </customwidgets>
  <resources/>

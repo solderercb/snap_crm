@@ -260,12 +260,12 @@
   <customwidget>
    <class>STableViewTechReports</class>
    <extends>QTableView</extends>
-   <header>widgets/stableviewtechreports.h</header>
+   <header location="global">STechReportsView</header>
   </customwidget>
   <customwidget>
    <class>SPeriodSelector</class>
    <extends>QWidget</extends>
-   <header>widgets/speriodselector.h</header>
+   <header location="global">SPeriodSelector</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

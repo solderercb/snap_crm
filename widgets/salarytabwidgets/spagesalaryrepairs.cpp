@@ -1,6 +1,19 @@
 #include "spagesalaryrepairs.h"
 #include "ui_spagesalaryrepairs.h"
-#include "widgets/salarytabwidgets/stableviewsalaryrepairs.h"
+#include <QWidget>
+#include <QScrollBar>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SComSettings>
+#include <Mainwindow>
+#include <tabSalary>
+#include <SUserSettings>
+#include <SUserModel>
+#include <SSalaryRepairsView>
+#include <SSalaryRepairsModel>
+#include <SSalaryRepairWorksModel>
+#include <SSalaryRepairPartsModel>
+#include <SSalaryReceptedIssuedModel>
 
 SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
     SPageSalaryBase(parent),
@@ -8,7 +21,7 @@ SPageSalaryRepairs::SPageSalaryRepairs(QWidget *parent) :
 {
     ui->setupUi(this);
     SPageSalaryRepairs::guiFontChanged();
-    ui->checkBoxIncludeNotIssued->setChecked(comSettings->salaryIncludeNotIssuedByDefault);
+    ui->checkBoxIncludeNotIssued->setChecked(comSettings->salaryIncludeNotIssuedByDefault());
 
     ui->tableViewRepairsSummary->setGridLayout(ui->tableViewRepairs->gridLayout());
     connect(ui->tableViewRepairs, &STableViewSalaryRepairs::signalColumnResized, this, &SPageSalaryRepairs::tableColumnResized);
@@ -96,17 +109,17 @@ void SPageSalaryRepairs::updateWidgets()
     m_userModel = parentTab->m_userModel;
     ui->labelPercentWorksValue->setText(QString::number(m_userModel->payRepair()));
     ui->labelPercentWorksQuickValue->setText(QString::number(m_userModel->payRepairQuick()));
-    ui->labelPercentPartsValue->setText(QString::number(m_userModel->pay4SaleInRepair()?m_userModel->paySale():0));
+    ui->labelPercentPartsValue->setText(QString::number(m_userModel->payForSaleInRepair()?m_userModel->paySale():0));
     ui->labelPercentRefillValue->setText(QString::number(m_userModel->payCartridgeRefill()));
 
     updateSummary();
     if(ui->checkBoxIncludeNotIssued->isChecked())
         notIssuedValue = parentTab->m_repairs->notIssuedTotal(STableSalaryRepairsModel::EmployeeSalaryWorks) + parentTab->m_repairs->notIssuedTotal(STableSalaryRepairsModel::EmployeeSalaryParts);
 
-    ui->labelSalaryValue->setText(sysLocale.toString(parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryWorks, STableSalaryReceptedIssued::IncludePayed) + parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryParts, STableSalaryReceptedIssued::IncludePayed), 'f', comSettings->classicKassa?2:0));
-    ui->labelSalaryCartridgesValue->setText(sysLocale.toString(parentTab->m_repairs->totalForCartridges(), 'f', comSettings->classicKassa?2:0));
-    ui->labelSalaryToPayValue->setText(sysLocale.toString(parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryWorks) + parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryParts), 'f', comSettings->classicKassa?2:0));
-    ui->labelNotIssuedValue->setText(sysLocale.toString(notIssuedValue, 'f', comSettings->classicKassa?2:0));
+    ui->labelSalaryValue->setText(sysLocale.toString(parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryWorks, STableSalaryReceptedIssued::IncludePayed) + parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryParts, STableSalaryReceptedIssued::IncludePayed), 'f', comSettings->classicKassa()?2:0));
+    ui->labelSalaryCartridgesValue->setText(sysLocale.toString(parentTab->m_repairs->totalForCartridges(), 'f', comSettings->classicKassa()?2:0));
+    ui->labelSalaryToPayValue->setText(sysLocale.toString(parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryWorks) + parentTab->m_repairs->total(STableSalaryRepairsModel::EmployeeSalaryParts), 'f', comSettings->classicKassa()?2:0));
+    ui->labelNotIssuedValue->setText(sysLocale.toString(notIssuedValue, 'f', comSettings->classicKassa()?2:0));
 }
 
 void SPageSalaryRepairs::repairsModelReset()
@@ -144,7 +157,7 @@ void SPageSalaryRepairs::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
     font.setBold(true);
 
     ui->labelNotIssuedValue->setFont(font);

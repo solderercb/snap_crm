@@ -1,5 +1,7 @@
 #include "ssqlfetchingmodel.h"
-#include "qsqldriver.h"
+#include <QSqlDriver>
+#include <QSqlQuery>
+#include <QDebug>
 
 SSqlFetchingModel::SSqlFetchingModel(QObject *parent) : QSqlQueryModel(parent)
 {

@@ -1,8 +1,12 @@
 #include "ssuppliersmodel.h"
-#include "modules/purchasemanager/srequest.h"
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SPartRequest>
+#include <SPartsRequestsGroupingModel>
 
-SPartSuppliersModel::SPartSuppliersModel(QObject *parent, QSqlDatabase db)
-    : SRelationalBaseModel{parent, db}
+SPartSuppliersModel::SPartSuppliersModel(QObject *parent, QSqlDatabase db) :
+    SRelationalBaseModel{parent, db},
+    m_requestState(SPartRequest::Created)
 {
     setTable("parts_request_suppliers");
     setRelation(SPartSuppliersModel::Columns::Supplier, QSqlRelation("clients", "id", "ur_name"));
@@ -210,7 +214,7 @@ void SPartSuppliersModel::submitAll()
     if(m_requestId)
         m_postSubmitAction = PostSubmitAction::NoSelect;
 
-    SDatabaseRecord::checkSystemTime();
+    SSingleRowModel::checkSystemTime();
 
     if(m_newCheckedId)
     {

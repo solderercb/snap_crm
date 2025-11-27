@@ -1,10 +1,17 @@
 #include "tabsettings.h"
 #include "ui_tabsettings.h"
-#include "global.h"
-#include "widgets/spagesettingsdoctempateeditor.h"
-#include "widgets/settingstabwidgets/ssettingspagerolesandpermissions.h"
-#include "widgets/settingstabwidgets/ssettingspageuser.h"
-#include "widgets/settingstabwidgets/ssettingspageglobal.h"
+#include <QWidget>
+#include <QSqlQueryModel>
+#include <QSqlField>
+#include <QScrollBar>
+#include <ProjectGlobals>
+#include <SSettingsDocTempateEditorPage>
+#include <SSettingsRolesAndPermissionsPage>
+#include <SSettingsUserPage>
+#include <SSettingsGlobalPage>
+#include <SPermissions>
+#include <FlashPopup>
+#include <SQueryLog>
 
 tabSettings* tabSettings::p_instance = nullptr;
 
@@ -18,6 +25,7 @@ tabSettings::tabSettings(MainWindow *parent) :
     connect(ui->pages, &SPagedInterface::updateBotToolbar, this, &tabSettings::updateBotToolbar);
     connect(ui->pages, &SPagedInterface::initPage, this, &tabSettings::initPage);
     connect(this, &tabSettings::pageInitFinished, ui->pages, &SPagedInterface::addPage);
+    connect(ui->buttonSave, &QPushButton::clicked, this, [=]{manualSubmit();});
 
 //    ui->buttonSave->setEnabled(0);
     ui->buttonRefresh->setEnabled(0);
@@ -106,43 +114,16 @@ void tabSettings::initPage(const int page)
     emit pageInitFinished(widget, page);
 }
 
-void tabSettings::buttonSaveClicked()
+void tabSettings::commit(const int)
 {
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
+    emit saveSettings();
+}
 
-    QUERY_LOG_START(metaObject()->className());
-
-    try
-    {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-
-        emit saveSettings();
-
-#ifdef QT_DEBUG
-//        Global::throwDebug();
-#endif
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-    }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
-
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-
-//        if(type == Global::ThrowType::Debug)
-//            nErr = 1; // это чтобы проверить работу дальше
-    }
-
-    QUERY_LOG_STOP;
-    if(nErr)
-    {
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tabTitle(), tr("Настройки успешно сохранены"), QColor(214,239,220), QColor(229,245,234));
-        emit updateDaughterPagesModels();
-    }
+void tabSettings::endCommit()
+{
+    auto *p = new shortlivedNotification(this, tabTitle(), tr("Настройки успешно сохранены"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
+    emit updateDaughterPagesModels();
 }
 
 tabSettings* tabSettings::getInstance(MainWindow *parent)

@@ -1,9 +1,16 @@
 #include "scommentsmodel.h"
+#include <SUserSettings>
+#include <QTimeZone>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SCommentModel>
 
 SCommentsModel::SCommentsModel(QObject *parent) :
     SStandardItemModel(parent),
-    m_queryData(new QSqlQueryModel)
+    m_queryData(new QSqlQueryModel),
+    m_mode(SCommentModel::NotSet)
 {
+    m_standardItemModel = this;
     connect(m_queryData, SIGNAL(modelReset()), this, SLOT(sqlDataChanged()));
 }
 
@@ -16,69 +23,51 @@ void SCommentsModel::load(const int id)
     setObjId(id);
     switch(m_mode)
     {
-        case SCommentModel::Mode::Repair: setQuery(QUERY_SEL_COMMENTS("remont",id)); break;
-        case SCommentModel::Mode::Client: setQuery(QUERY_SEL_COMMENTS("client",id)); break;
-        case SCommentModel::Mode::Task: setQuery(QUERY_SEL_COMMENTS("task_id",id)); break;
-        case SCommentModel::Mode::PartRequest: setQuery(QUERY_SEL_COMMENTS("part_request",id)); break;
+        case SCommentModel::Mode::Repair: setQuery(QUERY_SEL_COMMENTS("remont",id), loadConnection()); break;
+        case SCommentModel::Mode::Client: setQuery(QUERY_SEL_COMMENTS("client",id), loadConnection()); break;
+        case SCommentModel::Mode::Task: setQuery(QUERY_SEL_COMMENTS("task_id",id), loadConnection()); break;
+        case SCommentModel::Mode::PartRequest: setQuery(QUERY_SEL_COMMENTS("part_request",id), loadConnection()); break;
     }
 }
 
 bool SCommentsModel::add(const QString &text)
 {
-    bool nErr = 1;
-    int newId = 0;
-    QList<QStandardItem*> row;
-    QStandardItem *item;
-    item = new QStandardItem(); // id
-    item->setData(1, SCommentModel::DataRoles::Changed);
-    row << item;
-    item = new QStandardItem();
-    item->setData(QDateTime::currentDateTimeUtc(), Qt::EditRole);
-    item->setData(1, SCommentModel::DataRoles::Changed);
-    row << item;
-    item = new QStandardItem(QString::number(userDbData->id));
-    item->setData(1, SCommentModel::DataRoles::Changed);
-    row << item;
-    item = new QStandardItem(text);
-    item->setData(1, SCommentModel::DataRoles::Changed);
-    row << item;
-
-    SCommentModel *comment = new SCommentModel(row);
+    auto comment = std::make_shared<SCommentModel>();
+    comment->setDatabase(commitConnection());
+    comment->set_text(text);
     comment->setObjId(m_mode, m_objId);
-    nErr = comment->commit();
-    newId = comment->id();
-    delete comment;
+    if(!comment->commit())
+        return 0;
 
-    if(!nErr)
-        throw Global::ThrowType::QueryError;
-
-    this->insertRow(0, row);
-    QStandardItemModel::setData(this->index(0, SCommentModel::ColId), newId);
-    clearChangedFlagForAllField();
+    insertRows(0, 1);
+    setCacheItem(0, comment);
+//    dataChanged(index(0,0), index(0, SCommentModel::C_text), QVector<int>({Qt::DisplayRole, Qt::EditRole}));
 
     return 1;
+}
+
+/* Инициализация SSingleRowModel ранее загруженными данными из указанной строки
+ * Возвращает 0 если в процессе возникла ошибка
+*/
+void SCommentsModel::initSingleRowModel(const int row, std::shared_ptr<SSingleRowJModel> model)
+{
+    model->setPrimaryKey(this->data(index(row, SCommentModel::C_id)));
+    model->initFieldWithPrevLoaded(SCommentModel::C_created, SStandardItemModel::data(index(row, SCommentModel::C_created)));
+    model->initFieldWithPrevLoaded(SCommentModel::C_user, SStandardItemModel::data(index(row, SCommentModel::C_user)));
+    model->initFieldWithPrevLoaded(SCommentModel::C_text, SStandardItemModel::data(index(row, SCommentModel::C_text)));
 }
 
 bool SCommentsModel::remove(const int row)
 {
     bool nErr = 1;
-    QList<QStandardItem*> rowItems = this->row(row);
-    QStandardItem* item;
 
-    SCommentModel *comment = new SCommentModel(rowItems);
+    auto comment = std::make_shared<SCommentModel>();
+    comment->setDatabase(commitConnection());
+    comment->setPrimaryKey(this->data(index(row, SCommentModel::C_id)));  // для удаления достаточно инициализировать только primarykey
     nErr = comment->remove();
-    delete comment;
 
-    if(!nErr)
-        throw Global::ThrowType::QueryError;
-
-    for(int i = rowItems.count() - 1; i >= 0; i--)
-    {
-        item = rowItems.at(i);
-        rowItems.removeAt(i);
-        delete item;
-    }
-    removeRow(row);
+    if(nErr)
+        SStandardItemModel::removeRows(row, 1);
 
     return nErr;
 }
@@ -88,20 +77,18 @@ QVariant SCommentsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole)
     {
         switch (index.column()) {
-            case SCommentModel::Columns::ColUser: return allUsersMap->value(QStandardItemModel::data(index, role).toInt());
-            case SCommentModel::Columns::ColCreated: return createdStr(index);
+            case SCommentModel::Columns::C_user: return userFromId(index);
+            case SCommentModel::Columns::C_created: return createdStr(index);
         }
     }
 
-    return QStandardItemModel::data(index, role);
+    return SStandardItemModel::data(index, role & 0xFF);
 }
 
 bool SCommentsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     bool nErr = 1;
-    nErr &= QStandardItemModel::setData(index, value, role);
-    nErr &= QStandardItemModel::setData(index, 1, SComRecord::Changed); // пометка поля изменённым
-    nErr &= QStandardItemModel::setData(this->index(index.row(), SCommentModel::ColId), 1, SComRecord::Changed); // пометка строки изменённой
+    nErr &= SStandardItemModel::setData(index, value, role);
 
     return nErr;
 }
@@ -128,81 +115,61 @@ bool SCommentsModel::isColumnHidden(const int column)
 
 int SCommentsModel::recordId(const int row)
 {
-    return QStandardItemModel::data(this->index(row, SCommentModel::ColId)).toInt();
+    return SStandardItemModel::data(this->index(row, SCommentModel::C_id)).toInt();
 }
 
 int SCommentsModel::userId(const int row)
 {
-    return QStandardItemModel::data(this->index(row, SCommentModel::ColUser)).toInt();
+    return SStandardItemModel::data(this->index(row, SCommentModel::C_user)).toInt();
 }
 
 QDateTime SCommentsModel::created(const int row) const
 {
-    QDateTime date = QStandardItemModel::data(this->index(row, SCommentModel::ColCreated)).toDateTime();
-    date.setTimeZone(QTimeZone::utc());
-    return date;
+    return timestampUtc(index(row, SCommentModel::C_created));
 }
 
 QString SCommentsModel::text(const int row)
 {
-    return QStandardItemModel::data(this->index(row, SCommentModel::ColText)).toString();
+    return SStandardItemModel::data(this->index(row, SCommentModel::C_text)).toString();
 }
 
 bool SCommentsModel::setText(const int rowNum, const QString &text)
 {
     bool nErr = 1;
-    setData(this->index(rowNum, SCommentModel::ColText), text);
-    QList<QStandardItem*> rowItems = row(rowNum);
-    SCommentModel *comment = new SCommentModel(rowItems);
-    comment->setObjId(m_mode, m_objId);
+    setData(this->index(rowNum, SCommentModel::C_text), text);
+    auto comment = cacheItem(rowNum);
+    comment->setDatabase(commitConnection());
     nErr = comment->commit();
-    delete comment;
+    return nErr;
+}
 
-    if(!nErr)
-        throw Global::ThrowType::QueryError;
+void SCommentsModel::clear()
+{
+    SStandardItemModel::clear();
+}
 
-    clearChangedFlagForAllField();
-    return 1;
+std::shared_ptr<SSingleRowJModel> SCommentsModel::singleRowModel(const int row)
+{
+    auto model = cacheItem(row);
+    if(model)
+    {
+        return model;
+    }
+
+    model = std::make_shared<SCommentModel>();
+    initSingleRowModel(row, model);
+    setCacheItem(row, model);
+    return model;
 }
 
 QString SCommentsModel::createdStr(const QModelIndex &index) const
 {
-    return created(index.row()).toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-}
-
-void SCommentsModel::clearChangedFlagForAllField()
-{
-    for(int i = 0; i < rowCount(); i++)
-    {
-        if(index(i, 0).data(SComRecord::Changed).toBool())
-        {
-            for(int j = 1; j < columnCount(); j++) // в нулевом столбце — id записи в таблице, он не изменяется средствами программы
-            {
-                if(index(i, j).data(SComRecord::Changed).toBool())
-                {
-                    QStandardItemModel::setData(index(i, j), 0, SComRecord::Changed);   // снятие флага о наличии изменений в поле
-                    QStandardItemModel::setData(index(i, j), QVariant(), SComRecord::OldValue);   // очистка старого значения
-                }
-            }
-            QStandardItemModel::setData(index(i, SCommentModel::ColId), 0, SComRecord::Changed);   // снятие флага о наличии изменений в строке
-        }
-    }
+    return timestampLocal(index).toString("dd.MM.yyyy hh:mm:ss");
 }
 
 void SCommentsModel::setQuery(const QString &query, const QSqlDatabase &db)
 {
     m_queryData->setQuery(query, db);
-}
-
-QList<QStandardItem *> SCommentsModel::row(int row) const
-{
-    QList<QStandardItem*> rowItems;
-    for(int column = 0; column < columnCount(); column++)
-    {
-        rowItems << QStandardItemModel::item(row, column);
-    }
-
-    return rowItems;
 }
 
 /* В этом слоте происходит копирование данных из QSqlQueryModel в QStandardItemModel

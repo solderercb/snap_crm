@@ -1,11 +1,7 @@
 #ifndef SPARTSUPPLIERSMODEL_H
 #define SPARTSUPPLIERSMODEL_H
 
-#include "modules/purchasemanager/srequest.h"
-#include "modules/purchasemanager/sgroupingmodel.h"
-#include "models/srelationalbasemodel.h"
-#include <QObject>
-#include <QSqlField>
+#include <SRelationalBaseModel>
 
 class SPartSuppliersModel : public SRelationalBaseModel
 {
@@ -38,7 +34,7 @@ public:
     void setRowHighlightingClause(const int id, const QString &name);
 private:
     int m_requestId = 0;
-    int m_requestState = SPartRequest::Created;
+    int m_requestState;
     bool m_itemsEditableFlagOverride = 0;
     int m_postSubmitAction = PostSubmitAction::DefaultSelect;
     int m_newCheckedId = 0;

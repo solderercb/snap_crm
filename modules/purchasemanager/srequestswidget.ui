@@ -129,7 +129,7 @@
   <customwidget>
    <class>STableViewPartsRequests</class>
    <extends>QTableView</extends>
-   <header>modules/purchasemanager/srequeststable.h</header>
+   <header location="global">SPartsRequestsView</header>
   </customwidget>
  </customwidgets>
  <resources/>

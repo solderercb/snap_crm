@@ -1,10 +1,23 @@
-#include "global.h"
-#include "appver.h"
 #include "windowsdispatcher.h"
-#include "loginwindow.h"
-#include "mainwindow.h" // подключать файл нужно именно здесь, по другому компилятор ругается
-#include "chooseofficewindow.h"
-#include "models/sofficemodel.h"
+#include <QtWidgets/QApplication>
+#include <QStandardPaths>
+#include <QDir>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <appVer>
+#include <SAppLog>
+#include <LoginWindow>
+#include <MainWindow> // подключать файл нужно именно здесь, по другому компилятор ругается
+#include <chooseOfficeWindow>
+#include <SOfficeModel>
+#include <SLocalSettings>
+#include <SUserSettings>
+#include <SLocalSettingsStructs>
+#include <SPermissions>
+#include <SUserActivityModel>
+#include <SSqlQueryModel>
 
 windowsDispatcher::windowsDispatcher(QObject *parent) :
     QObject(parent)
@@ -49,13 +62,13 @@ void windowsDispatcher::connectOK()
 
     QFont f;
     f.setFamily(userLocalData->FontFamily.value);
-    f.setPixelSize(userDbData->fontSize);
+    f.setPixelSize(userDbData->fontSize());
     QApplication::setFont(f);
 
     userDbData->updateLoginTimestamp();
     userActivityLog->appendRecordStandalone(tr("Login"));   // Заменено на "Login", потому что АСЦ не позволяет запускать два экз. программы, а определение происходит по фразе "Выполнен вход в систему"
 
-    userDbData->currentOffice = userDbData->office;
+    userDbData->set_currentOffice(userDbData->office());
 
     if ((permissions->changeOffice && (officesModel->rowCount() > 1)) || SOfficeModel::current()->id() == 0)
     {   // АСЦ успешно логинится с архивным офисом в настройках сотрудника, это неправильно.
@@ -75,7 +88,7 @@ void windowsDispatcher::createChooseOfficeWindow()
     if(debugLoginOptions)
         if(debugLoginOptions->contains("office"))
         {
-            userDbData->currentOffice = debugLoginOptions->value("office").toInt();
+            userDbData->set_currentOffice(debugLoginOptions->value("office").toInt());
             if(SOfficeModel::current()->id())
             {
                 createMainWindow();
@@ -90,7 +103,7 @@ void windowsDispatcher::createChooseOfficeWindow()
 
 void windowsDispatcher::createMainWindow()
 {
-    userDbData->company = SOfficeModel::current()->defaultCompany();
+    userDbData->set_company(SOfficeModel::current()->defaultCompany());
     MainWindow *windowMain = MainWindow::getInstance(this); // указатель должен объявляться именно здесь, по другому компилятор ругается
     windowMain->show();
     windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты

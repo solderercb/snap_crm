@@ -1,17 +1,23 @@
 #include "sbillofquantities.h"
 #include "ui_sbillofquantities.h"
-#include "mainwindow.h"
-#include "modules/purchasemanager/tabrequest.h"
+#include <MainWindow>
+#include <tabPartRequest>
+#include <SPermissions>
+#include <SUserSettings>
+#include <SRepairModel>
+#include <SSaleTableModel>
+#include <SBOQWorkshopView>
+#include <SBOQDelegates>
+#include <FlashPopup>
 
 SBillOfQuantities::SBillOfQuantities(QWidget *parent) :
-    QWidget(parent),
+    SWidget(parent),
     ui(new Ui::SBillOfQuantities)
 {
     ui->setupUi(this);
 
-    m_model = new SSaleTableModel(this);
+    m_model = new WorkshopSaleModel(this);
     STableViewBOQItemDelegates *itemDelagates = new STableViewBOQItemDelegates(m_model, ui->tableViewBOQ);
-    m_model->setMode(SSaleTableModel::WorkshopSale);
     m_model->setPriceColumn(SStoreItemModel::PriceOptionService); // по умолчанию цена для сервиса
 
     if(permissions->addGoodsFromWarehouse)  // Устанавливать детали со склада
@@ -23,14 +29,14 @@ SBillOfQuantities::SBillOfQuantities(QWidget *parent) :
 
     connect(ui->pushButtonRequestSparePart, &QPushButton::clicked, this, &SBillOfQuantities::createTabNewPartRequest);
     connect(ui->switchEditStrategy, &QPushButton::toggled, this, &SBillOfQuantities::switchEditStrategy);
-    connect(ui->toolButtonSaveSaleTable, &QToolButton::clicked, this, &SBillOfQuantities::saveSaleTableClicked);
+    connect(ui->toolButtonSaveSaleTable, &QToolButton::clicked, this, &SBillOfQuantities::manualSubmit);
     connect(ui->pushButtonAdmEditWorks, &QPushButton::clicked, this, &SBillOfQuantities::buttonWorksAdminEdit);
     connect(m_model, &SSaleTableModel::amountChanged, this, &SBillOfQuantities::updateAmounts);
     connect(m_model, &SSaleTableModel::tableSaved, this, &SBillOfQuantities::saveAmounts);
     connect(m_model, &SSaleTableModel::tableDataChanged, this, &SBillOfQuantities::setSaveSaleTableEnabled);
     connect(ui->pushButtonAddWork, &QPushButton::clicked, this, &SBillOfQuantities::addCustomWork);
 
-    if(!userDbData->autosavePartList)    // установка состояния должна выполняться после соединения сигналов и слотов
+    if(!userDbData->autosavePartList())    // установка состояния должна выполняться после соединения сигналов и слотов
         m_model->setEditStrategy(SSaleTableModel::OnManualSubmit);
 
     ui->tableViewBOQ->setModel(m_model);
@@ -40,8 +46,8 @@ SBillOfQuantities::SBillOfQuantities(QWidget *parent) :
     connect(ui->tableViewBOQ, &STableViewBOQWorkshop::pressed, m_model, &SSaleTableModel::indexSelected);
 
 #ifdef QT_DEBUG
-    connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, m_model, &SSaleTableModel::dbgAddRandomItem);
-    connect(ui->dbgBtnAddRandomPartBasket, &QPushButton::clicked, m_model, &SSaleTableModel::dbgAddRandomItemBasket);
+    connect(ui->dbgBtnAddRandomPart, &QPushButton::clicked, m_model, &WorkshopSaleModel::dbgAddRandomItem);
+    connect(ui->dbgBtnAddRandomPartBasket, &QPushButton::clicked, m_model, &WorkshopSaleModel::dbgAddRandomItemBasket);
 #else
     ui->dbgBtnAddRandomPart->setHidden(true);
     ui->dbgBtnAddRandomPartBasket->setHidden(true);
@@ -78,7 +84,7 @@ void SBillOfQuantities::linkWithRepairModel(SRepairModel *model)
 void SBillOfQuantities::setReadOnly(bool state)
 {
     m_modelRO = state;
-    m_model->setState(m_modelRO?SSaleTableModel::WorkshopRO:SSaleTableModel::WorkshopRW);
+    m_model->setState(m_modelRO?WorkshopSaleModel::State::RO:WorkshopSaleModel::State::RW);
 }
 
 bool SBillOfQuantities::isDirty()
@@ -86,18 +92,27 @@ bool SBillOfQuantities::isDirty()
     return m_model->isDirty();
 }
 
-void SBillOfQuantities::commit()
+int SBillOfQuantities::checkInput()
 {
-    if(!m_model->isDirty())
-        return;
+    return !m_model->isDirty();
+}
 
-    m_model->repair_saveTablesStandalone();
+void SBillOfQuantities::commit(const int)
+{
+    m_model->commit();
+}
+
+void SBillOfQuantities::endCommit()
+{
+    ui->toolButtonSaveSaleTable->setEnabled(false);
+    auto *p = new shortlivedNotification(this, tr("Успешно"), tr("Список работ и деталей сохранён"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
 }
 
 void SBillOfQuantities::load(const int repair)
 {
     if(!m_model->isDirty())
-        m_model->repair_loadTable(repair);
+        m_model->loadTable(repair);
 }
 
 bool SBillOfQuantities::isEmpty()
@@ -132,7 +147,7 @@ void SBillOfQuantities::addCustomWork()
     m_model->addCustomWork();
 
     ui->tableViewBOQ->scrollToBottom();
-    ui->tableViewBOQ->setCurrentIndex(m_model->index(row, SStoreItemModel::SaleOpColumns::ColName));
+    ui->tableViewBOQ->setCurrentIndex(m_model->index(row, SSaleTableModel::Columns::Name));
     ui->tableViewBOQ->setFocus();
 }
 
@@ -156,15 +171,15 @@ bool SBillOfQuantities::quickAddPart(const int uid)
         return 0;
 
     // TODO: диалог ввода кол-ва
-    return m_model->addItemByUID(uid);
+    return m_model->addItemByID(uid);
 }
 
-void SBillOfQuantities::updateAmounts(const double, const double, const double)
+void SBillOfQuantities::updateAmounts(const double amountTotal, const double, const double)
 {
     ui->lineEditTotalAmount->setText(m_model->amountTotalLocale());
     ui->lineEditWorksAmount->setText(m_model->amountWorksLocale());
     ui->lineEditSparePartsAmount->setText(m_model->amountItemsLocale());
-    emit amountUpdated(m_model->amountTotal());
+    emit amountUpdated(amountTotal);
 }
 
 void SBillOfQuantities::saveAmounts()
@@ -172,8 +187,9 @@ void SBillOfQuantities::saveAmounts()
     if(!m_repairModel)
         return;
 
-    m_repairModel->setRealRepairCost(m_model->amountTotal());
-    m_repairModel->setPartsCost(m_model->amountItems());
+    m_repairModel->set_realRepairCost(m_model->amountTotal());
+    m_repairModel->set_partsCost(m_model->amountItems());
+    m_repairModel->updateLastSave();
 
     if(!m_repairModel->id())    // в быстром ремонте запись сумм происходит в общем запросе
         return;
@@ -189,8 +205,7 @@ void SBillOfQuantities::switchEditStrategy(bool state)
 {
     if(state)
     {
-        if(m_model->isDirty())
-            m_model->repair_saveTablesStandalone();
+        manualSubmit();
         m_model->setEditStrategy(SSaleTableModel::OnFieldChange);
     }
     else
@@ -200,12 +215,6 @@ void SBillOfQuantities::switchEditStrategy(bool state)
     ui->toolButtonSaveSaleTable->setEnabled(m_model->isDirty());
 
     updateWidgets();
-}
-
-void SBillOfQuantities::saveSaleTableClicked()
-{
-    if(m_model->repair_saveTablesStandalone())
-        ui->toolButtonSaveSaleTable->setEnabled(false);
 }
 
 void SBillOfQuantities::setSaveSaleTableEnabled()
@@ -219,14 +228,13 @@ void SBillOfQuantities::buttonWorksAdminEdit(bool state)
     if(state)
     {
         m_modelAdmEdit = 1;
-        m_model->setState(SSaleTableModel::State::WorkshopAdm);
+        m_model->setState(WorkshopSaleModel::State::Adm);
     }
     else
     {
         m_modelAdmEdit = 0;
         setReadOnly();
-        if(m_model->isDirty())
-            saveSaleTableClicked();
+        manualSubmit();
     }
     updateWidgets();
 }
@@ -258,7 +266,7 @@ void SBillOfQuantities::createTabNewPartRequest()
 void SBillOfQuantities::dbgAddWork()
 {
     addCustomWork();
-    m_model->setData(ui->tableViewBOQ->currentIndex().siblingAtColumn(SStoreItemModel::ColName), "repair");
-    m_model->setData(ui->tableViewBOQ->currentIndex().siblingAtColumn(SStoreItemModel::ColPrice), 123);
+    m_model->setData(ui->tableViewBOQ->currentIndex().siblingAtColumn(SSaleTableModel::Columns::Name), "repair");
+    m_model->setData(ui->tableViewBOQ->currentIndex().siblingAtColumn(SSaleTableModel::Columns::Price), 123);
 }
 #endif

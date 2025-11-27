@@ -1,5 +1,8 @@
 #include "stablesalaryitemsmodel.h"
-#include "../srepairsaleitemmodel.h"
+#include <ProjectGlobals>
+#include <SRepairSaleItemModel>
+#include <SStoreItemModel>
+#include <SStandardItemModel>
 
 STableSalaryItemsModel::STableSalaryItemsModel(QObject *parent) : STableBaseModel(parent)
 {

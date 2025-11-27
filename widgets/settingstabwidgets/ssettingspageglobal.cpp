@@ -1,6 +1,8 @@
 #include "ssettingspageglobal.h"
 #include "ui_ssettingspageglobal.h"
-#include "global.h"
+#include <ProjectGlobals>
+#include <SComSettings>
+#include <QPushButton>
 
 SSettingsPageGlobal::SSettingsPageGlobal(QWidget *parent) :
     SSettingsPageBase(parent),
@@ -27,7 +29,7 @@ void SSettingsPageGlobal::saveSettings()
 void SSettingsPageGlobal::updateWidgets()
 {
     QFormLayout *layout;
-    for(int i = 0; i < comSettings->count(); i++)
+    for(int i = 0; i < comSettings->size(); i++)
     {
         switch (comSettings->propertyGroup(i))
         {
@@ -48,8 +50,8 @@ void SSettingsPageGlobal::updateWidgets()
             case 14: layout = ui->formLayoutAdditional; break;
             default: continue;  // параметры с другими кодами групп отображаются на других страницах
         }
-        layout->setWidget(i, QFormLayout::LabelRole, comSettings->widget(i, SComSettings::Label));
-        layout->setWidget(i, QFormLayout::FieldRole, comSettings->widget(i, SComSettings::Editor));
+        layout->setWidget(i, QFormLayout::LabelRole, comSettings->label(i));
+        layout->setWidget(i, QFormLayout::FieldRole, comSettings->widget(i));
     }
 
     updateWidgetsOfNotificationGroup();
@@ -59,7 +61,7 @@ void SSettingsPageGlobal::updateWidgets()
 
 void SSettingsPageGlobal::updateWidgetsOfVoipGroup()
 {
-    if(comSettings->voipId <= 0 || comSettings->voipId == 3)
+    if(comSettings->voipId() <= 0 || comSettings->voipId() == 3)
     {
         ui->groupBoxVoip->setVisible(false);
     }
@@ -70,21 +72,21 @@ void SSettingsPageGlobal::updateWidgetsOfVoipGroup()
         QGridLayout *grLayout = ui->gridLayoutVoip;
         int grLayoutRow = 0, grLayoutColumn = 0;
         QMap<int, int> propIds;
-        propIds.insert(0, comSettings->propertyId("voipAsteriskHost"));
-        propIds.insert(1, comSettings->propertyId("voipAsteriskPort"));
-        propIds.insert(2, comSettings->propertyId("voipAsteriskLogin"));
-        propIds.insert(3, comSettings->propertyId("voipAsteriskPassword"));
-        propIds.insert(4, comSettings->propertyId("voipAsteriskWebPort"));
-        propIds.insert(5, comSettings->propertyId("voipKey"));
-        propIds.insert(6, comSettings->propertyId("voipPrefix"));
-        propIds.insert(7, comSettings->propertyId("voipSecret"));
-        propIds.insert(8, comSettings->propertyId("voipEndpoint"));
+        propIds.insert(0, SComSettings::C_voipAsteriskHost);
+        propIds.insert(1, SComSettings::C_voipAsteriskPort);
+        propIds.insert(2, SComSettings::C_voipAsteriskLogin);
+        propIds.insert(3, SComSettings::C_voipAsteriskPassword);
+        propIds.insert(4, SComSettings::C_voipAsteriskWebPort);
+        propIds.insert(5, SComSettings::C_voipKey);
+        propIds.insert(6, SComSettings::C_voipPrefix);
+        propIds.insert(7, SComSettings::C_voipSecret);
+        propIds.insert(8, SComSettings::C_voipEndpoint);
 
         QMap<int, int>::const_iterator i = propIds.constBegin();
         while(i != propIds.constEnd())
         {
-            grLayout->removeWidget(comSettings->widget(i.value(), SComSettings::Label));
-            grLayout->removeWidget(comSettings->widget(i.value(), SComSettings::Editor));
+            grLayout->removeWidget(comSettings->label(i.value()));
+            grLayout->removeWidget(comSettings->widget(i.value()));
             i++;
         }
 
@@ -92,7 +94,7 @@ void SSettingsPageGlobal::updateWidgetsOfVoipGroup()
         while(i!=propIds.constEnd())
         {
             int colSpan = 1;
-            switch((comSettings->voipId)*10 + i.key())  // 0 - off, 10 - Zadarma, 20 - Asterisk, 30 - off, 40 - Rostelecom, 50 - Mango telecom, 60 - Megafon
+            switch((comSettings->voipId())*10 + i.key())  // 0 - off, 10 - Zadarma, 20 - Asterisk, 30 - off, 40 - Rostelecom, 50 - Mango telecom, 60 - Megafon
             {
                 case 15: colSpan = 3; break;
                 case 17: colSpan = 3; break;
@@ -113,10 +115,10 @@ void SSettingsPageGlobal::updateWidgetsOfVoipGroup()
 
             if(grLayoutColumn == 0 || grLayoutColumn == 2)
             {
-                QWidget *lw = comSettings->widget(i.value(), SComSettings::Label);
+                QWidget *lw = comSettings->label(i.value());
                 grLayout->addWidget(lw, grLayoutRow, grLayoutColumn++, 1, colSpan);   // label
             }
-            QWidget *ew = comSettings->widget(i.value(), SComSettings::Editor);
+            QWidget *ew = comSettings->widget(i.value());
             grLayout->addWidget(ew, grLayoutRow, grLayoutColumn++, 1, colSpan);
 
             if(i.key() == 3 || i.key() == 5 || i.key() == 7)
@@ -149,7 +151,7 @@ void SSettingsPageGlobal::updateWidgetsOfVoipGroup()
             voipTestButton = new QPushButton(ui->groupBoxVoip);
             connect(voipTestButton, &QPushButton::clicked, this, &SSettingsPageGlobal::voipTest);
         }
-        voipTestButton->setText((comSettings->voipId == 2)?tr("Тест"):tr("Баланс"));
+        voipTestButton->setText((comSettings->voipId() == 2)?tr("Тест"):tr("Баланс"));
         grLayout->addWidget(voipTestButton, grLayoutRow, grLayoutColumn++, 1, 5);
     }
 }
@@ -157,7 +159,7 @@ void SSettingsPageGlobal::updateWidgetsOfVoipGroup()
 // TODO: Это копия кода метода updateWidgetsOfVoipGroup(). Необходимо подумать над созданием универсального метода
 void SSettingsPageGlobal::updateWidgetsOfOnlineStoreGroup()
 {
-    if(comSettings->onlineStoreId <= 0)
+    if(comSettings->onlineStoreId() <= 0)
     {
         ui->groupBoxOnlineStore->setVisible(false);
     }
@@ -169,14 +171,14 @@ void SSettingsPageGlobal::updateWidgetsOfOnlineStoreGroup()
         int grLayoutRow = 0, grLayoutColumn = 0;
 
         QMap<int, int> propIds;
-        propIds.insert(0, comSettings->propertyId("onlineStoreUrl"));
-        propIds.insert(1, comSettings->propertyId("onlineStoreKey"));
+        propIds.insert(0, SComSettings::C_onlineStoreUrl);
+        propIds.insert(1, SComSettings::C_onlineStoreKey);
 
         QMap<int, int>::const_iterator i = propIds.constBegin();
         while(i != propIds.constEnd())
         {
-            grLayout->removeWidget(comSettings->widget(i.value(), SComSettings::Label));
-            grLayout->removeWidget(comSettings->widget(i.value(), SComSettings::Editor));
+            grLayout->removeWidget(comSettings->label(i.value()));
+            grLayout->removeWidget(comSettings->widget(i.value()));
             i++;
         }
 
@@ -184,7 +186,7 @@ void SSettingsPageGlobal::updateWidgetsOfOnlineStoreGroup()
         while(i!=propIds.constEnd())
         {
             int colSpan = 1;
-            switch((comSettings->onlineStoreId)*10 + i.key())  // 0 - off, 10 - OpenCart
+            switch((comSettings->onlineStoreId())*10 + i.key())  // 0 - off, 10 - OpenCart
             {
                 case 10: colSpan = 4; break;
                 case 11: colSpan = 3; break;
@@ -193,10 +195,10 @@ void SSettingsPageGlobal::updateWidgetsOfOnlineStoreGroup()
 
             if(grLayoutColumn == 0)
             {
-                QWidget *lw = comSettings->widget(i.value(), SComSettings::Label);
+                QWidget *lw = comSettings->label(i.value());
                 grLayout->addWidget(lw, grLayoutRow, grLayoutColumn++, 1, colSpan);   // label
             }
-            QWidget *ew = comSettings->widget(i.value(), SComSettings::Editor);
+            QWidget *ew = comSettings->widget(i.value());
             grLayout->addWidget(ew, grLayoutRow, grLayoutColumn++, 1, colSpan);
 
             if(i.key() == 1)
@@ -227,7 +229,7 @@ void SSettingsPageGlobal::updateWidgetsOfNotificationGroup()
 {
     QGridLayout *grLayout = ui->formLayoutNotifications;
     int grLayoutRow = 0, grLayoutColumn = 0;
-    for(int i = 0; i < comSettings->count(); i++)
+    for(int i = 0; i < comSettings->size(); i++)
     {
         if(comSettings->propertyGroup(i) != 9)
             continue;
@@ -235,11 +237,11 @@ void SSettingsPageGlobal::updateWidgetsOfNotificationGroup()
         // Отображение настроек данной группы аналогично АСЦ: label checkBox ComboBox
         if(grLayoutColumn == 0)
         {
-            QWidget *lw = comSettings->widget(i, SComSettings::Label);
+            QWidget *lw = comSettings->label(i);
             grLayout->addWidget(lw, grLayoutRow, grLayoutColumn++, 1, 1);   // label
         }
 
-        QWidget *ew = comSettings->widget(i, SComSettings::Editor);
+        QWidget *ew = comSettings->widget(i);
         QComboBox *cb = dynamic_cast<QComboBox *>(ew);   // TODO: здесь должен быть не простой comboBox, а виджет выбора цвета
         if(cb)
             grLayoutColumn = 2;
@@ -256,7 +258,7 @@ void SSettingsPageGlobal::updateWidgetsOfNotificationGroup()
 void SSettingsPageGlobal::toggleLineEditEchoMode()
 {
     QWidget *sender = dynamic_cast<QWidget*>(QObject::sender());
-    QLineEdit *le = dynamic_cast<QLineEdit*>(comSettings->widget(m_extraWidgets.key(sender), SComSettings::Editor));
+    QLineEdit *le = dynamic_cast<QLineEdit*>(comSettings->widget(m_extraWidgets.key(sender)));
     if(le->echoMode() == QLineEdit::Password)
         le->setEchoMode(QLineEdit::Normal);
     else

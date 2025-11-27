@@ -1,4 +1,9 @@
 #include "sphonesmodel.h"
+#include <QMetaProperty>
+#include <SSqlQueryModel>
+#include <ProjectGlobals>
+#include <SPhoneModel>
+#include <SLogRecordModel>
 
 SPhonesModel::SPhonesModel(int client, QObject *parent) :
     QObject(parent)
@@ -18,10 +23,9 @@ SPhoneModel *SPhonesModel::primary()
     if(m_phonesList.isEmpty())  // если в БД нет телефонных номеров клиента
     {
         SPhoneModel *dummyPhone = new SPhoneModel(this);
-        dummyPhone->setPrimary();  // Первый всегда основной
-        dummyPhone->setClient(m_client);
+        dummyPhone->set_primary();  // Первый всегда основной
+        dummyPhone->set_client(m_client);
         add(dummyPhone);
-        markUpdated();
     }
 
     return m_phonesList.first();
@@ -37,26 +41,32 @@ bool SPhonesModel::load(int client)
     clear();
 
     m_client = client;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    auto q = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto dummy = std::make_unique<SPhoneModel>();
 
-    query->exec(QUERY_SEL_CLIENT_PHONES(client));
-    while(query->next())
+    QString query = dummy->fieldsForSelectQuery();
+    query.prepend("SELECT\n");
+    query.append(QString("\n"\
+                         "FROM `tel`\n"\
+                         "WHERE `customer` = %1\n"\
+                         "ORDER BY `type` DESC, `id` DESC;")
+                 .arg(client));
+
+    q->exec(query);
+    while(q->next())
     {
-        sqlRecordHandler(query->record());
+        sqlRecordHandler(q->record());
     }
-
-    delete query;
-    markUpdated(false);
 
     return 0;
 }
 
 void SPhonesModel::add(SPhoneModel *phone)
 {
-    connect(phone,SIGNAL(markedPrimary(SPhoneModel*)),this,SLOT(switchPrimaryPhone(SPhoneModel*)));
+    connect(phone, &SPhoneModel::markedPrimary, this, &SPhonesModel::switchPrimaryPhone);
 
     m_phonesList.append(phone);
-    phone->setClient(m_client);
+    phone->set_client(m_client);
 }
 
 void SPhonesModel::remove(SPhoneModel *phone)
@@ -77,7 +87,7 @@ void SPhonesModel::setClient(const int id)
     SPhoneModel *item;
     foreach(item, m_phonesList)
     {
-        item->setClient(id);
+        item->set_client(id);
     }
 }
 
@@ -93,9 +103,9 @@ bool SPhonesModel::commit()
     {
         // запись в журнал о смене основного номера телефона
         SLogRecordModel logRecord;
-        logRecord.setClient(m_client);
-        logRecord.setType(SLogRecordModel::Client);
-        logRecord.setText(tr("Номер %1 задан основным").arg(m_newPrimaryPhone->phone()));
+        logRecord.set_client(m_client);
+        logRecord.set_type(SLogRecordModel::Client);
+        logRecord.set_text(tr("Номер %1 задан основным").arg(m_newPrimaryPhone->phone()));
         m_newPrimaryPhone = nullptr;
         logRecord.commit();
     }
@@ -108,8 +118,6 @@ bool SPhonesModel::commit()
         m_removeList.removeLast();
         item->deleteLater();
     }
-
-    markUpdated(false);
 
     return 1;
 }
@@ -129,7 +137,14 @@ void SPhonesModel::clear()
 
 bool SPhonesModel::isUpdated()
 {
-    return m_updated;
+    SPhoneModel *item;
+    foreach(item, m_phonesList)
+    {
+        if(item->isDirty())
+            return 1;
+    }
+
+    return 0;
 }
 
 void SPhonesModel::reset()
@@ -137,11 +152,6 @@ void SPhonesModel::reset()
     clear();
     primary();
     emit modelUpdated();
-}
-
-void SPhonesModel::markUpdated(bool state)
-{
-    m_updated = state;
 }
 
 QString SPhonesModel::primaryStr()
@@ -202,11 +212,11 @@ QString SPhonesModel::iterativePhone()
 void SPhonesModel::initDemo()
 {
     SPhoneModel *primary = new SPhoneModel();
-    primary->setMask(clientPhoneTypesModel->index(0, 1).data().toInt());
-    primary->setPhone("123-45-67");
+    primary->set_maskIndex(clientPhoneTypesModel->index(0, 1).data().toInt());
+    primary->set_phone("123-45-67");
     SPhoneModel *secondary = new SPhoneModel();
-    secondary->setMask(clientPhoneTypesModel->index(0, 1).data().toInt());
-    secondary->setPhone("765-43-21");
+    secondary->set_maskIndex(clientPhoneTypesModel->index(0, 1).data().toInt());
+    secondary->set_phone("765-43-21");
     add(primary);
     add(secondary);
 }
@@ -227,13 +237,13 @@ void SPhonesModel::switchPrimaryPhone(SPhoneModel *newPrimaryPhone)
         if(item == newPrimaryPhone)
             continue;
 
-        item->setPrimary(false);
+        item->set_primary(false);
     }
 
 }
 
 /* Метод получения данных для отчетов LimeReport
- * Смотри описание метода с таким же названием в классе SComRecord
+ * Смотри описание метода с таким же названием в классе SSingleRowJModel
  */
 void SPhonesModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
 {

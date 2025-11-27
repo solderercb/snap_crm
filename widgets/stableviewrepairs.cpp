@@ -1,5 +1,11 @@
 #include "stableviewrepairs.h"
-#include "models/stablerepairsmodel.h"
+#include <ProjectGlobals>
+#include <SRepairsModel>
+#include <SComSettings>
+#include <STableViewGridLayout>
+#include <QWidget>
+#include <SRepairsModel>
+#include <SRepairsDelegates>
 
 STableViewRepairs::STableViewRepairs(QWidget *parent) :
     STableViewBase(SLocalSettings::RepairsGrid, parent)
@@ -43,7 +49,7 @@ bool STableViewRepairs::selectedCanBeIssued()
             break;
         }
 
-        if(m_mode == ModeCartridges && comSettings->useSimplifiedCartridgeRepair)
+        if(m_mode == ModeCartridges && comSettings->useSimplifiedCartridgeRepair())
         {
             if(!(s == Global::RepStateIds::Ready || s == Global::RepStateIds::ReadyNoRepair || (a > 0 && s == Global::RepStateIds::InWork)))
             {

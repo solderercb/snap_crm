@@ -1,67 +1,59 @@
 #ifndef SWORKMODEL_H
 #define SWORKMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
-#include "models/sstoreitemmodel.h"
+#include <SSingleRowJModel>
 
-class SWorkModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(user, user, int, 0)                                         \
+    TABLE_FIELD(repair, repair, int, 0)                                     \
+    TABLE_FIELD(document_id, documentId, int, 0)                            \
+    TABLE_FIELD(name, name, QString, 0)                                     \
+    TABLE_FIELD(price, price, double, 0)                                    \
+    TABLE_FIELD(count, count, int, 0)                                       \
+    TABLE_FIELD(warranty, warranty, int, 0)                                 \
+    TABLE_FIELD(price_id, priceId, int, 0)                                  \
+    TABLE_FIELD(is_pay, isPay, bool, 0)                                     \
+    TABLE_FIELD(added, created, QDateTime, 0)                               \
+    TABLE_FIELD(type, type, int, 0)                                         \
+    TABLE_FIELD(pay_repair, payRepair, int, 0)                              \
+    TABLE_FIELD(pay_repair_quick, payRepairQuick, int, 0)                   \
+    TABLE_FIELD(salary_summ, salarySumm, double, 0)
+
+class SWorkModel : public SSingleRowJModel
 {
     Q_OBJECT
+    friend class SWorkModelExt;
+    friend class TClassTest;
 public:
     enum Type{Regular = 0, CartridgeRefill, CartridgeChipReplace, CartridgeDrumReplace, CartridgeBladeReplace, CartridgeReplaceOfWorn,
               CartridgeRefillPlus, CartridgeMagRollerReplace,  CartridgeProphilaxy, CartridgePrimRollerReplace,
               CartridgeMarkerReplace, CartridgeScraperReplace, CartridgeBushingsReplace};
     Q_ENUM(Type)
     explicit SWorkModel(QObject *parent = nullptr);
-    explicit SWorkModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
-    int id();
-    void load(const int);
-    int user();
-    void setUser(const int id, const QVariant oldValue = QVariant());
-    int repair();
-    void setRepair(const int);
-    int documentId();
-    void setDocumentId(const int);
-    QString name();
-    void setName(const QString name, const QVariant oldValue = QVariant());
-    double price();
-    void setPrice(const double price, const QVariant oldValue = QVariant());
-    int count();
-    void setCount(const int count, const QVariant oldValue = QVariant());
-    int warranty();
-    void setWarranty(const int warranty, const QVariant oldValue = QVariant());
-    int priceId();
-    void setPriceId(const int);
-    bool isPay();
-    void setIsPay(const bool);
-    void setCreated(const QDateTime);
-    int type();
-    void setType(const int);
-    int payRepair();
-    void setPayRepair(const int);
-    int payRepairQuick();
-    void setPayRepairQuick(const int);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    bool setData(const int index, const QVariant &data) override;
     bool remove();
-    void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue = QVariant()) override;
-    bool commit();
-    double salarySumm() const;
-    void setSalarySumm(double salarySumm);
+    bool commit() override;
 private:
-    int m_user;
-    int m_repair;
-    int m_documentId;
-    QString m_name;
-    double m_price;
-    int m_count;
-    int m_warranty;
-    int m_priceId;
-    bool m_isPay;
-    int m_type;
-    int m_payRepair;
-    int m_payRepair_quick;
-    double m_salarySumm;
     void updateLogAssociatedRecId() override;
+    void initFieldWithPrevLoaded(const int index, const QVariant &value) override;
+    void addAdminModeMarkToLogText(QString &text);
+    void userBeforeChange(const int userId);
+    void constructInitialLogMsg(const int column);
+    void nameChanged();
+    void repairChanged(const QVariant &data);
+    void countChanged();
+    void priceChanged();
+    void priceIdChanged();
+    void warrantyChanged();
+    void userChanged();
+private slots:
+    void setDataRework(const int index, QVariant &data);
+    void logDataChange(const int index, const QVariant &data) override;
 };
 
 #endif // SWORKMODEL_H

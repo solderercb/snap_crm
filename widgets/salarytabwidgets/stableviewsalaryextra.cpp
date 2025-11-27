@@ -1,5 +1,6 @@
 #include "stableviewsalaryextra.h"
-#include "models/salarytabmodels/stablesalaryextramodel.h"
+#include <STableViewGridLayout>
+#include <SSalaryExtraModel>
 
 STableViewSalaryExtra::STableViewSalaryExtra(QWidget *parent) :
     STableViewBase(SLocalSettings::SalaryExtraChargesGrid, parent)

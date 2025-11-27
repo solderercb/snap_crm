@@ -1,15 +1,10 @@
 #ifndef SPhone_H
 #define SPhone_H
 
-#include <QWidget>
-#include <QComboBox>
 #include <QCheckBox>
-#include "../models/ssqlquerymodel.h"
-#include "../models/sphonemodel.h"
-#include "global.h"
-#ifdef QT_DEBUG
-#include <QRandomGenerator>
-#endif
+#include <QWidget>
+
+class SPhoneModel;
 
 namespace Ui {
 class SPhone;

@@ -1,31 +1,16 @@
 #ifndef TABREPAIR_H
 #define TABREPAIR_H
 
-#include <QWidget>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QToolButton>
-#include <QStyle>
-#include <QTableWidget>
-#include <QLabel>
-#include <QSqlQueryModel>
-#include <QSqlTableModel>
-#include <QSqlField>
-#include <QScrollBar>
-#include <QTimeZone>
-#include <QDateTime>
-#include <QLocale>
-#include <QClipboard>
-#include "tabcommon.h"
-#include "widgets/sdialogissuerepair.h"
-#include "widgets/sgroupboxeventfilter.h"
-#include "widgets/stableviewbase.h"
-#include "models/srepairmodel.h"
-#include "models/srepairstatuslog.h"
-#include "models/sfieldsmodel.h"
-#include "models/ssortfilterproxymodel.h"
-#include "models/ssaletablemodel.h"
-#include "widgets/stableviewboqitemdelegates.h"
+#include <tabCommon>
+
+class QWidget;
+class MainWindow;
+class SRepairModel;
+class SClientModel;
+class SFieldsModel;
+class SSortFilterProxyModel;
+class SSaleTableModel;
+class SDialogIssueRepair;
 
 namespace Ui {
 class tabRepair;
@@ -54,6 +39,7 @@ public:
     bool tabCloseRequest() override;
     static void refreshIfTabExists(const int repairId);
 private:
+    enum OpType {SaveState, SaveInformedState, SaveDiagAmount, SaveBOQ, SavePlace, SaveBeforeClose};
     Ui::tabRepair *ui;
     static QMap<int, tabRepair*> p_instance;
     int repair_id;
@@ -62,9 +48,6 @@ private:
     SFieldsModel *additionalFieldsModel;
     SSortFilterProxyModel *statusesProxyModel = nullptr;
     SSaleTableModel *m_BOQModel;    // bill of quantities
-    bool m_statusUpdateInProgress = 0;
-    double works_sum, parts_sum, total_sum;
-    QString box_name;
     bool modelRO = 0;   // признак блокировки карты ремонта
     SDialogIssueRepair *m_dialogIssue;
     bool m_BOQModelRO = 1;
@@ -75,44 +58,53 @@ private:
     bool m_comboBoxNotifyStatusEnabled = 1;
     bool m_outDateVisible = 0;
     bool m_buttonDebtReceivedVisible = 0;
-    SGroupBoxEventFilter *groupBoxEventFilter;
     int m_clientId = 0;
     QList<QWidget*> additionalFieldsWidgets;
     bool m_autosaveDiag = 0;
     QTimer *m_autosaveDiagTimer;
     bool m_diagChanged = 0;
     bool m_spinBoxAmountChanged = 0;
-    bool m_groupUpdate = 0;
     bool m_buttonSaveStateEnabled = 0;
     QTimer *m_repairLockUpdateTimer = nullptr;
-    int getFieldIdByName(const QString &, QSqlQueryModel *);
-    QString getDisplayRoleById(int, QAbstractItemModel*, int column = 0);
-    void eventResize(QResizeEvent *);
+    OpType m_opType;
     void fillExtraInfo();
     void setLock(bool state = 1);
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);
-    bool setWidgetsParams(const int);
-    bool checkStateAcl(const int);
-    bool checkData(const int);
-    void updateStatesModel(const int statusId);
+    void setWidgetsParams(const int);
+    void updateStatesModel();
+    void updateComboBoxInformedStatus();
+    void updateComboBoxPlace();
     void doStateActions(const int);
     void setPricesToZero();
-    bool commit(const QString &notificationCaption = tr("Успешно"), const QString &notificationText = tr("Данные сохранены"));
     void initEngineer();
     void checkViewPermission();
     void loadData();
+    void reloadRequestsList();
+    void saveState(int);
+    bool checkStateAcl(const int);
+    bool checkBeforeStateChange();
+    bool checkBeforeInformedStatusChange();
+    bool checkBeforePlaceChange();
+    int checkInput() override;
+    void setModelDiagAmount();
+    void doStateActionsBeforeClose();
+    void beginCommit() override;
+    bool skip(const int) override;
+    int commitStages() override;
+    void commit(const int) override;
+    void throwHandler(int) override;
+    void endCommit() override;
+    void diagAmountSaved();
 #ifdef QT_DEBUG
     void randomFill() override {};
 #endif
-
 private slots:
     void reloadData();
-    void reloadRequestsList();
     void updateWidgets();
     void saveState();
-    void saveState(int);
+    void endStateChange();
     void comboBoxStateIndexChanged(int);
     void createDialogIssue();
     void openPrevRepair();
@@ -131,7 +123,6 @@ private slots:
     void spinBoxAmountEditingFinished();
     void saveDiagAmount();
     void autosaveDiagAmount();
-    void diagAmountSaved();
     void savePlace(int index);
     void comboBoxPlaceButtonClickHandler(int id);
     void guiFontChanged() override;

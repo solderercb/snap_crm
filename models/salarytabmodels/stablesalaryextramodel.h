@@ -1,19 +1,11 @@
 #ifndef STABLESALARYEXTRAMODEL_H
 #define STABLESALARYEXTRAMODEL_H
 
-#include "../seditablebasemodel.h"
-#include "sadditionalpaymentmodel.h"
-#include "../../squerylog.h"
-#include "widgets/shortlivednotification.h"
-
-#include <QObject>
-#include <QSqlField>
+#include <SEditableBaseModel>
 
 class STableSalaryExtraModel : public SEditableBaseModel
 {
     Q_OBJECT
-signals:
-    void repopulate();
 public:
     enum Columns {Id = 0, Name = 1, Price = 2, PaymentDate = 3, User = 4};
     explicit STableSalaryExtraModel(QObject *parent = nullptr);
@@ -22,8 +14,6 @@ public:
     void setEmployeeId(const int id);
 private:
     int m_employee = 0;
-    SAdditionalPaymentModel *additionalPayment;
-    SQueryLog *m_queryLog;
 public slots:
     void addNewRow();
     void saveTable();

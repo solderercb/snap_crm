@@ -313,12 +313,12 @@
   <customwidget>
    <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
+   <header location="global">SComboBox</header>
   </customwidget>
   <customwidget>
    <class>STableViewClients</class>
    <extends>QTableView</extends>
-   <header location="global">widgets/stableviewclients.h</header>
+   <header location="global">SClientsView</header>
   </customwidget>
  </customwidgets>
  <tabstops>

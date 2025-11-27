@@ -1,13 +1,10 @@
 #ifndef QUERYLOG_H
 #define QUERYLOG_H
 
-#include <QApplication>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QByteArray>
+#include <QSqlDatabase>
 #include <QFile>
-#include <QVariant>
-#include <QDebug>
+
+class QSqlQuery;
 
 class SQueryLog
 {

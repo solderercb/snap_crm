@@ -1,6 +1,13 @@
 #include "tabtechreports.h"
 #include "ui_tabtechreports.h"
-#include "tabprintdialog.h"
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SUserSettings>
+#include <tabPrintDialog>
+#include <SSqlQueryModel>
+#include <STableViewBase>
+#include <STechReportModel>
+#include <STechReportsModel>
 
 tabTechReports* tabTechReports::p_instance = nullptr;
 
@@ -37,7 +44,7 @@ tabTechReports::tabTechReports(MainWindow *parent) :
     ui->widgetPeriodSelector->setDefaultPeriod();
     connect(ui->widgetPeriodSelector, &SPeriodSelector::refreshButtonClicked, this, &tabTechReports::buttonRefreshClicked);
 
-    refreshTable();
+    tabCommon::refreshTable();
 }
 
 tabTechReports::~tabTechReports()
@@ -94,7 +101,7 @@ void tabTechReports::constructQueryClause()
         FilterList search;
         search.op = FilterList::Or;
         FilterField::Op matchFlag;
-        if(userDbData->useRegExpSearch)
+        if(userDbData->useRegExpSearch())
             matchFlag = FilterField::RegExp;
         else
             matchFlag = FilterField::Contains;

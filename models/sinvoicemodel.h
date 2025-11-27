@@ -1,61 +1,41 @@
 #ifndef SINVOICEMODEL_H
 #define SINVOICEMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
+#include <SSingleRowJModel>
 
-class SInvoiceModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(num, num, QString, 0)                                       \
+    TABLE_FIELD(created, created, QDateTime, 0)                             \
+    TABLE_FIELD(user, user, int, 0)                                         \
+    TABLE_FIELD(seller, seller, int, 0)                                     \
+    TABLE_FIELD(customer, covenantor, int, 0)                               \
+    TABLE_FIELD(paid, paid, QDateTime, 0)                                   \
+    TABLE_FIELD(tax, tax, double, 0)                                        \
+    TABLE_FIELD(summ, summ, double, 0)                                      \
+    TABLE_FIELD(notes, notes, QString, 0)                                   \
+    TABLE_FIELD(total, total, double, 0)                                    \
+    TABLE_FIELD(state, state, int, 0)                                       \
+    TABLE_FIELD(office, office, int, 0)                                     \
+    TABLE_FIELD(type, type, int, 0)
+
+class SInvoiceModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
     enum State {Declared = 1, Payed = 2, Archived = 3};
     explicit SInvoiceModel(QObject *parent = nullptr);
     ~SInvoiceModel();
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
     void load(int);
-    int id();
-    void setId(int);
-    QString num();
-    void setNum(const QString);
-    int user();
-    void setUser(const int);
-    int seller();
-    void setSeller(const int);
-    int covenantorId();
     QString covenantorName();
-    void setCovenantor(const int);
     int clientId();
-    QDateTime paid();
-    void setPaid(const QDateTime);
-    double tax();
-    void setTax(const double);
-    double summ();
-    void setSumm(const double);
-    QString notes();
-    void setNotes(const QString);
-    double total();
-    void setTotal(const double);
-    int state();
-    void setState(const int);
-    int office();
-    void setOffice(const int);
-    int type();
-    void setType(const int);
-    bool commit();
+    bool commit() override;
 private:
-    QString m_num;
-    int m_user;
-    int m_seller;
-    int m_covenantorId;
-    QString m_covenantorName;
-    int m_clientId;
-    QDateTime m_paid;
-    double m_tax;
-    double m_summ;
-    QString m_notes;
-    double m_total;
-    int m_state;
-    int m_office;
-    int m_type;
+    QString constructSelectQuery() override;
 };
 
 #endif // SINVOICEMODEL_H

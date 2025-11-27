@@ -1,4 +1,5 @@
 #include "stableviewsalaryrepairworks.h"
+#include <STableViewGridLayout>
 
 STableViewSalaryRepairWorks::STableViewSalaryRepairWorks(QWidget *parent) :
     STableViewBase(SLocalSettings::SalaryRepairPartsGrid, parent)

@@ -2,9 +2,8 @@
 #define SPAGESALARYEXTRA_H
 
 #include <QWidget>
-#include "spagesalarybase.h"
-#include "../stableviewbase.h"
-#include "../stableviewsummarybase.h"
+#include <STableViewSummaryBase>
+#include <SSalaryBasePage>
 
 namespace Ui {
 class SPageSalaryExtra;
@@ -30,6 +29,10 @@ public:
 private:
     Ui::SPageSalaryExtra *ui;
     void enableVScrollbarPadding(const bool state = 1);
+    int checkInput() override;
+    QString queryLogFile() override;
+    void commit(const int) override;
+    void endCommit() override;
 public slots:
     void updateModels();
     void updateWidgets();

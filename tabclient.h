@@ -1,12 +1,10 @@
 #ifndef TABCLIENT_H
 #define TABCLIENT_H
 
-#include <QWidget>
-#include <QSqlQueryModel>
-#include <QSqlField>
-#include <QScrollBar>
-#include "tabcommon.h"
-#include "widgets/spageclientsummary.h"
+#include <tabCommon>
+
+class QWidget;
+class MainWindow;
 
 namespace Ui {
 class tabClient;
@@ -35,7 +33,7 @@ private:
     bool m_buttonSaveVisible = 1;
     bool m_buttonRefreshVisible = 0;
     bool m_lineEditFilterVisible = 0;
-    bool m_editStrategy = SClientModel::EditStrategy::OnManualSubmit;
+    bool m_editStrategy;
 private slots:
     void buttonSaveClicked();
     void buttonPrintClicked();

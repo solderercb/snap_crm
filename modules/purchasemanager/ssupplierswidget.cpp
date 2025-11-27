@@ -1,7 +1,17 @@
-#include "sapplication.h"
 #include "ssupplierswidget.h"
 #include "ui_ssupplierswidget.h"
-#include "modules/purchasemanager/tabmanager.h"
+#include <QScrollBar>
+#include <QClipboard>
+#include <QMenu>
+#include <QAction>
+#include <QMessageBox>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <tabPurchaseManager>
+#include <SUserSettings>
+#include <SPartsRequestsGroupingModel>
+#include <SPartSuppliersModel>
+#include <FlashPopup>
 
 SPartSuppliers::SPartSuppliers(QWidget *parent) :
     SWidget(parent),
@@ -192,7 +202,7 @@ void SPartSuppliers::connectSuppliersTableWithManager()
         if(index.column() == STableViewPartRequestSuppliers::Column::SupplierUrl && QGuiApplication::queryKeyboardModifiers() & Qt::AltModifier)
         {
             QString searchStr = ui->tableViewLinks->model()->data(index).toString();
-            if(userDbData->useRegExpSearch)
+            if(userDbData->useRegExpSearch())
             { // TODO: код скопирован из класса tabRepairs::tableItemClick; нужно унифицировать
                 searchStr = searchStr.replace("(", "\\(").replace(")", "\\)");
                 searchStr = searchStr.replace("[", "\\[").replace("]", "\\]");
@@ -204,9 +214,20 @@ void SPartSuppliers::connectSuppliersTableWithManager()
     });
 }
 
-void SPartSuppliers::commit()
+void SPartSuppliers::commit(const int stage)
 {
+    Q_UNUSED(stage)
     m_model->submitAll();
+
+#ifdef QT_DEBUG
+//        Global::throwDebug();
+#endif
+}
+
+void SPartSuppliers::endCommit()
+{
+    auto *p = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
 }
 
 void SPartSuppliers::orderChanged(const int section, Qt::SortOrder order)
@@ -265,7 +286,8 @@ void SPartSuppliers::initTableMenu()
 */
 void SPartSuppliers::addRow()
 {
-    emit beginRowInsert();
+    if(isDirty())
+        emit beginRowInsert();
     m_model->appendRow();
 }
 
@@ -277,41 +299,6 @@ void SPartSuppliers::copyLink()
     QModelIndex index = ui->tableViewLinks->selectionModel()->currentIndex();
     QString data = index.data().toString();
     qApp->clipboard()->setText(data);
-}
-
-void SPartSuppliers::manualSubmit()
-{
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-
-    QUERY_LOG_START(metaObject()->className());
-
-    try
-    {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-
-        commit();
-
-#ifdef QT_DEBUG
-//        Global::throwDebug();
-#endif
-        QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-    catch (const Global::ThrowType &type)
-    {
-        nErr = 0;
-        if (type == Global::ThrowType::ConnLost)
-        {
-            ;
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-
-    if(nErr)
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
-
-    QUERY_LOG_STOP;
 }
 
 void SPartSuppliers::setRequestState(const int state)
@@ -350,4 +337,3 @@ void SPartSuppliers::menuRequest(QPoint pos)
 {
     tableMenu->popup(ui->tableViewLinks->viewport()->mapToGlobal(pos));
 }
-

@@ -132,12 +132,12 @@
   <customwidget>
    <class>STableViewSalarySales</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalarysales.h</header>
+   <header location="global">SSalarySalesView</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalarySaleParts</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalarysaleparts.h</header>
+   <header location="global">SSalarySalePartsView</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,12 +1,13 @@
 #ifndef SPAGESETTINGSDOCTEMPATEEDITOR_H
 #define SPAGESETTINGSDOCTEMPATEEDITOR_H
 
-#include "widgets/stabpage.h"
-#include "widgets/sreportscommonfunctions.h"
-#include <QAbstractItemModel>
-#include <QStandardItemModel>
-#include <QStringListModel>
-#include <QIODevice>
+#include <STabPage>
+#include <SReportsCommonFunctions>
+
+class QWidget;
+class SSqlQueryModel;
+class QByteArray;
+class QFile;
 
 namespace Ui {
 class SPageSettingsDocTempateEditor;
@@ -23,13 +24,19 @@ public:
 private:
     Ui::SPageSettingsDocTempateEditor *ui;
     SSqlQueryModel* docTemplatesList;
-//    SStandardItemModel* docTemplatesList;
     LimeReport::ReportDesignWindowInterface *reportDesigner;
-    bool saveTemplateToDB();
+    std::unique_ptr<QByteArray> m_templateBuffer = nullptr;
+    std::unique_ptr<QString> m_templateHash = nullptr;
+    std::unique_ptr<QFile> m_temporaryFile = nullptr;
     void removeReportDataSources();
     void translate();
     void initWorksDataSources() override;
     void initTechReportDataSources() override;
+    QString queryLogFile() override;
+    int checkInput() override;
+    void commit(const int) override;
+    void throwHandler(int) override;
+    void endCommit() override;
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
@@ -40,13 +47,6 @@ protected slots:
 #endif
 public slots:
     void selectTemplate(int index);
-private slots:
-    void reportSaved();
-    void reportOnSave(bool&);
-//    void repairsListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
-//    void repairsListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
-//    void repairWorksListCallbackData(const LimeReport::CallbackInfo &info, QVariant &data);
-//    void repairWorksListCallbackDataChangePos(const LimeReport::CallbackInfo::ChangePosType &type, bool &result);
 };
 
 #endif // SPAGESETTINGSDOCTEMPATEEDITOR_H

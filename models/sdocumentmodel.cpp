@@ -1,326 +1,111 @@
 #include "sdocumentmodel.h"
+#include <ProjectGlobals>
+#include <SUserSettings>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
+#include <SLogRecordModel>
 
-SDocumentModel::SDocumentModel(QObject *parent) : SComRecord(parent)
+SDocumentModel::SDocumentModel(QObject *parent) : SSingleRowJModel(parent)
 {
+    mapFields();
+
     i_obligatoryFields << "company" << "user" << "total" << "created" << "office" << "img1" << "img2" << "img3";
     i_tableName = "docs";
-    i_idColumnName = "id";
-    i_logRecord->setType(SLogRecordModel::Doc);
+    setPrimaryKeyIndex(0);
+    i_logRecord->set_type(SLogRecordModel::Doc);
+    connect(this, &SSingleRowModel::beginDataChange, this, &SDocumentModel::setDataRework);
 }
 
 SDocumentModel::SDocumentModel(int id, QObject *parent) : SDocumentModel(parent)
 {
-    setId(id);
-    load();
+    load(id);
 }
 
 SDocumentModel::~SDocumentModel()
 {
 }
 
-int SDocumentModel::id()
-{
-    return i_id;
-}
-
-void SDocumentModel::setId(int id)
-{
-    i_id = id;
-}
-
-void SDocumentModel::load()
-{
-    QSqlQueryModel *docModel = new QSqlQueryModel();
-    docModel->setQuery(QUERY_SEL_DOC(i_id), QSqlDatabase::database("connMain"));
-
-    if(docModel->rowCount())
-    {
-        i_valuesMap.clear();
-        m_type = docModel->record(0).value("type").toInt();
-        m_state = docModel->record(0).value("state").toInt();
-        m_realization = docModel->record(0).value("is_realization").toBool();
-        m_paymentSystem = docModel->record(0).value("payment_system").toInt();
-        m_company = docModel->record(0).value("company").toInt();
-        m_store = docModel->record(0).value("store").toInt();
-        m_user = docModel->record(0).value("user").toInt();
-        m_amount = docModel->record(0).value("total").toInt();
-        m_notes = docModel->record(0).value("notes").toString();
-        i_createdUtc = docModel->record(0).value("created").toDateTime();
-        m_updated = docModel->record(0).value("updated_at").toDateTime();
-        m_office = docModel->record(0).value("office").toInt();
-        m_client = docModel->record(0).value("dealer").toInt();
-        m_currencyRate = docModel->record(0).value("currency_rate").toDouble();
-//        m_img1 = docModel->record(0).value("img1").toInt();
-//        m_img2 = docModel->record(0).value("img2").toInt();
-//        m_img3 = docModel->record(0).value("img3").toInt();
-        m_reason = docModel->record(0).value("reason").toString();
-        m_cashOrder = docModel->record(0).value("order_id").toInt();
-        m_priceOption = docModel->record(0).value("price_option").toInt();
-        m_returnPercent = docModel->record(0).value("return_percent").toInt();
-        m_reserveDays = docModel->record(0).value("reserve_days").toInt();
-        m_master = docModel->record(0).value("master_id").toInt();
-        m_repair = docModel->record(0).value("repair_id").toInt();
-        m_worksIncluded = docModel->record(0).value("works_included").toBool();
-        m_bill = docModel->record(0).value("invoice").toInt();
-        m_trackingNumber = docModel->record(0).value("track").toString();
-        m_d_store = docModel->record(0).value("d_store").toInt();
-        m_d_pay = docModel->record(0).value("d_pay").toInt();
-    }
-
-    delete docModel;
-}
-
 void SDocumentModel::load(int id)
 {
-    setId(id);
-    load();
-}
-
-int SDocumentModel::type()
-{
-    return m_type;
-}
-
-void SDocumentModel::setType(int type)
-{
-    m_type = type;
-    i_valuesMap.insert("type", type);
-}
-
-int SDocumentModel::state()
-{
-    return m_state;
-}
-
-void SDocumentModel::setState(int state)
-{
-    m_state = state;
-    i_valuesMap.insert("state", state);
-}
-
-int SDocumentModel::office() const
-{
-    return m_office;
-}
-
-void SDocumentModel::setOffice(int id)
-{
-    m_office = id;
-    i_valuesMap.insert("office", id);
+    setPrimaryKey(id);
+    SSingleRowJModel::load();
 }
 
 void SDocumentModel::setOfficeIndex(int index)
 {
-    setOffice(officesModel->databaseIDByRow(index, "id"));
-}
-
-
-int SDocumentModel::client()
-{
-    return m_client;
-}
-void SDocumentModel::setClient(int id)
-{
-    if(id == 0)
-    {
-        unsetClient();
-        return;
-    }
-
-    m_client = id;
-    i_valuesMap.insert("dealer", id);
+    set_office(officesModel->databaseIDByRow(index, "id"));
 }
 
 void SDocumentModel::unsetClient()
 {
-    i_valuesMap.insert("dealer", QVariant());
-    i_logRecord->unsetClient();
-}
-
-int SDocumentModel::paymentSystem()
-{
-    return m_paymentSystem;
+    setData(C_client, QVariant());
 }
 
 int SDocumentModel::paymentSystemIndex()
 {
-    return paymentSystemsModel->rowByDatabaseID(m_paymentSystem, "system_id");
-}
-
-void SDocumentModel::setPaymentSystem(int id)
-{
-    m_paymentSystem = id;
-    i_valuesMap.insert("payment_system", id);
-}
-
-double SDocumentModel::amount()
-{
-    return m_amount;
+    return paymentSystemsModel->rowByDatabaseID(paymentSystem(), "system_id");
 }
 
 QString SDocumentModel::amountLocal()
 {
-    return sysLocale.toString(m_amount, 'f', 2);
-}
-
-void SDocumentModel::setAmount(double amount)
-{
-    m_amount = amount;
-    i_valuesMap.insert("total", amount);
-}
-
-double SDocumentModel::currencyRate()
-{
-    return m_currencyRate;
+    return sysLocale.toString(amount(), 'f', 2);
 }
 
 QString SDocumentModel::currencyRateLocal()
 {
-    return sysLocale.toString(m_currencyRate, 'f', 4);
-}
-
-void SDocumentModel::setCurrencyRate(double rate)
-{
-    m_currencyRate = rate;
-    i_valuesMap.insert("currency_rate", rate);
-}
-
-int SDocumentModel::company()
-{
-    return m_company;
+    return sysLocale.toString(currencyRate(), 'f', 4);
 }
 
 int SDocumentModel::companyIndex()
 {
-    return companiesModel->rowByDatabaseID(m_company, "id");
-}
-
-void SDocumentModel::setCompany(int company)
-{
-    m_company = company;
-    i_valuesMap.insert("company", company);
+    return companiesModel->rowByDatabaseID(company(), "id");
 }
 
 void SDocumentModel::setCompanyIndex(int index)
 {
-    setCompany(companiesModel->databaseIDByRow(index, "id"));
-}
-
-int SDocumentModel::priceOption()
-{
-    return m_priceOption;
+    set_company(companiesModel->databaseIDByRow(index, "id"));
 }
 
 int SDocumentModel::priceOptionIndex()
 {
-    return priceColModel->rowByDatabaseID(m_priceOption, "id");
+    return priceColModel->rowByDatabaseID(priceOption(), "id");
 }
 
-void SDocumentModel::setPriceOption(int option)
+void SDocumentModel::trackingNumberChanged(const QString &track)
 {
-    m_priceOption = option;
-    i_valuesMap.insert("price_option", option);
-}
+    auto old = commitedData(C_trackingNumber).value_or(QVariant()).toString();
+    if(!old.isEmpty())
+    {
+        if(track.isEmpty())
+            appendLogText(tr("Номер ТТН для РН №%1 удалён").arg(id()));
+        else
+            appendLogText(tr("Номер ТТН для РН №%1 изменён с %2 на %3").arg(id()).arg(old, track));
 
-QString SDocumentModel::notes()
-{
-    return m_notes;
-}
-
-void SDocumentModel::setNotes(QString text)
-{
-    m_notes = text;
-    i_valuesMap.insert("notes", text);
-}
-
-QString SDocumentModel::reason()
-{
-    return m_reason;
-}
-
-void SDocumentModel::setReason(QString text)
-{
-    m_reason = text;
-    i_valuesMap.insert("reason", text);
-}
-
-int SDocumentModel::orderId()
-{
-    return m_cashOrder;
-}
-
-void SDocumentModel::setOrderId(const int id)
-{
-    i_valuesMap.insert("order_id", id);
-}
-
-int SDocumentModel::reserveDays()
-{
-    return m_reserveDays;
-}
-
-void SDocumentModel::setReserveDays(int days)
-{
-    m_reserveDays = days;
-    i_valuesMap.insert("reserve_days", days);
-}
-
-QString SDocumentModel::trackingNumber()
-{
-    return m_trackingNumber;
-}
-
-void SDocumentModel::setTrackingNumber(const QString &track)
-{
-    m_trackingNumber = track;
-    i_valuesMap.insert("track", track);
-    if(track.isEmpty())
-        appendLogText(tr("Номер ТТН для РН №%1 удалён").arg(i_id));
+    }
     else
-        appendLogText(tr("РН №%1 присвоен номер ТТН: %2").arg(i_id).arg(track));
-}
-
-bool SDocumentModel::isValid()
-{
-    if (i_id)
-        return 1;
-
-    return 0;
+        appendLogText(tr("РН №%1 присвоен номер ТТН: %2").arg(id()).arg(track));
 }
 
 bool SDocumentModel::commit()
 {
-    if(i_id)
+    if(!isPrimaryKeyValid())
     {
-        update();
-    }
-    else
-    {
-        i_valuesMap.insert("img1", QVariant()); // NULL
-        i_valuesMap.insert("img2", QVariant());
-        i_valuesMap.insert("img3", QVariant());
-        if(!i_valuesMap.contains("company"))
-            i_valuesMap.insert("company", userDbData->company);
-        if(!i_valuesMap.contains("office"))
-            i_valuesMap.insert("office", userDbData->currentOffice);
-        i_valuesMap.insert("user", userDbData->id);
-        i_valuesMap.insert("created", QDateTime::currentDateTime());
-
-        insert();
+        initMandatoryField(C_img1, QVariant());
+        initMandatoryField(C_img2, QVariant());
+        initMandatoryField(C_img3, QVariant());
+        initMandatoryField(C_company, userDbData->company());
+        initMandatoryField(C_office, userDbData->currentOffice());
+        initMandatoryField(C_user, userDbData->id());
+        initMandatoryField(C_created, QDateTime::currentDateTime());
     }
 
-    commitLogs();
-
-    if(!i_nErr)
-        throw Global::ThrowType::QueryError;
-
-    return i_nErr;
+    return SSingleRowJModel::commit();
 }
 
 QString SDocumentModel::title()
 {
     QString ret;
-    switch (m_type)
+    switch (type())
     {
         case InInvoice: ret = tr("Приходная накладная"); break;
         case OutInvoice: ret = tr("Расходная накладная"); break;
@@ -335,5 +120,23 @@ QString SDocumentModel::title()
 
 void SDocumentModel::updateLogAssociatedRecId()
 {
-    i_logRecord->setDocumentId(i_id);
+    i_logRecord->set_document(id());
+}
+
+void SDocumentModel::setDataRework(const int index, QVariant &data)
+{
+    switch(index)
+    {
+        case C_client: if(!data.toInt()) {data = QVariant(); i_logRecord->unsetClient();} break;
+        default: ;
+    }
+}
+
+void SDocumentModel::logDataChange(const int index, const QVariant &data)
+{
+    switch (index)
+    {
+        case C_trackingNumber: trackingNumberChanged(data.toString()); break;
+        default: break;
+    }
 }

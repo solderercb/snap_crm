@@ -1,15 +1,9 @@
 #ifndef STABLEREPAIRSMODEL_H
 #define STABLEREPAIRSMODEL_H
 
-#include <QAbstractTableModel>
-#include <QSqlQuery>
-#include <QSqlQueryModel>
-#include <QColor>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include "models/ssqlfetchingmodel.h"
-#include "models/stablemodelscommonmethods.h"
-#include "global.h"
+#include <SSqlFetchingModel>
+#include <STableModelCommonMethods>
+#include <LimeReport>
 
 class STableRepairsModel : public SSqlFetchingModel, public STableModelsCommonMethods
 {

@@ -1,7 +1,7 @@
 #ifndef STABLEVIEWSALARYRECEPTEDISSUED_H
 #define STABLEVIEWSALARYRECEPTEDISSUED_H
 
-#include "../stableviewbase.h"
+#include <STableViewBase>
 #include <QObject>
 
 class STableViewSalaryRecepted : public STableViewBase

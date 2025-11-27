@@ -1,7 +1,7 @@
 #ifndef STABLESALARYREPAIRSMODEL_H
 #define STABLESALARYREPAIRSMODEL_H
 
-#include "../stablebasemodel.h"
+#include <STableModelBase>
 
 class STableSalaryRepairsModel : public STableBaseModel
 {

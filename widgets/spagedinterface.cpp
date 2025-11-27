@@ -1,6 +1,11 @@
 #include "spagedinterface.h"
-#include "widgets/stabpage.h"
-#include "tabsettings.h"
+#include <ProjectGlobals>
+#include <STabPage>
+#include <tabSettings>
+#include <SPermissions>
+#include <QGridLayout>
+#include <QStackedWidget>
+#include <SToolboxSwitchPanel>
 
 SPagedInterface::SPagedInterface(QWidget *parent) : QWidget(parent)
 {

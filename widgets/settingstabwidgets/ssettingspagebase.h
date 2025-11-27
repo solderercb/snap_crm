@@ -1,9 +1,10 @@
 #ifndef SSETTINGSPAGEBASE_H
 #define SSETTINGSPAGEBASE_H
 
-#include <widgets/stabpage.h>
+#include <STabPage>
 #include <QObject>
-#include "tabsettings.h"
+
+class tabSettings;
 
 class SSettingsPageBase : public STabPage
 {

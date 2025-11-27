@@ -1,5 +1,9 @@
 #include "scartridgematerialstableitemdelegates.h"
-#include "scartridgecard.h"
+#include <ProjectGlobals>
+#include <SCartridgeCard>
+#include <SStandardItemModel>
+#include <SCartridgeMaterialsModel>
+#include <QSpinBox>
 
 SCartridgeMaterialsTableItemDelegates::SCartridgeMaterialsTableItemDelegates(QObject *parent) : STableViewBaseItemDelegates(parent)
 {

@@ -1,14 +1,14 @@
 #ifndef STABLEVIEWPARTREQUESTSUPPLIERS_H
 #define STABLEVIEWPARTREQUESTSUPPLIERS_H
 
-#include "widgets/stableviewbase.h"
-#include <QWidget>
-#include "widgets/stableviewbaseitemdelegates.h"
-#include <QPainter>
-#include <QPaintEngine>
-#include <QDesktopServices>
-#include "modules/purchasemanager/ssuppliersmodel.h"
-#include "modules/purchasemanager/sgroupingmodel.h"
+#include <STableViewBaseDelegates>
+#include <STableViewBase>
+#include <QObject>
+
+class QWidget;
+class QPainter;
+class SPartSuppliersModel;
+class SPartsRequestsGroupingModel;
 
 class PSItemDelegate : public STableViewBaseItemDelegates
 {

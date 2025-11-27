@@ -2,8 +2,8 @@
 #define SDEVMDLSMODEL_H
 
 #include <QObject>
-#include <QSqlQueryModel>
-#include "sdevmdlmodel.h"
+
+class QSqlQueryModel;
 
 class SDevMdlsModel : public QObject
 {

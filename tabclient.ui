@@ -244,7 +244,7 @@
   <customwidget>
    <class>SPagedInterface</class>
    <extends>QWidget</extends>
-   <header location="global">widgets/spagedinterface.h</header>
+   <header location="global">SPagedInterface</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,10 +1,18 @@
 #include "sclientmatch.h"
 #include "ui_sclientmatch.h"
-#include "com_sql_queries.h"
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SUserSettings>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
+#include <SClientModel>
+#include <SGroupBoxEventFilter>
+#include <STableViewGridLayout>
 
 SClientMatch::SClientMatch(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::SClientMatch)
+    ui(new Ui::SClientMatch),
+    m_category(SClientModel::Categories::All)
 {
     ui->setupUi(this);
     this->hide();
@@ -73,7 +81,7 @@ void SClientMatch::findClient()
          whereClause.fields.append(STableViewBase::initFilterField(clientsTypesList->item(m_category, 2)->text(), FilterField::NoOp, 1));  // категория клиентов
 
     FilterField::Op matchFlag;
-    if(userDbData->useRegExpSearch)
+    if(userDbData->useRegExpSearch())
         matchFlag = FilterField::RegExp;
     else
         matchFlag = FilterField::Contains;

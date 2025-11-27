@@ -150,12 +150,12 @@
   <customwidget>
    <class>commentsTable</class>
    <extends>QTableView</extends>
-   <header>tabrepair.h</header>
+   <header location="global">SComments</header>
   </customwidget>
   <customwidget>
    <class>SPlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header location="global">widgets/splaintextedit.h</header>
+   <header location="global">SPlainTextEdit</header>
   </customwidget>
  </customwidgets>
  <resources/>

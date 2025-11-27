@@ -1,5 +1,5 @@
 #include "stableviewtechreports.h"
-#include "models/stabletechreportsmodel.h"
+#include <STechReportsModel>
 
 STableViewTechReports::STableViewTechReports(QWidget *parent) :
     STableViewBase(SLocalSettings::TechReportsGrid, parent)

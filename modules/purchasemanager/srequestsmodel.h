@@ -1,11 +1,8 @@
 #ifndef SPARTSREQUESTSMODEL_H
 #define SPARTSREQUESTSMODEL_H
 
-#include "models/seditablebasemodel.h"
-#include "models/sstandarditemmodel.h"
-#include "modules/purchasemanager/srequest.h"
-#include <QSqlIndex>
-#include <QObject>
+#include <SEditableBaseModel>
+#include <SPartRequest>
 
 class SPartsRequestsModel : public SEditableBaseModel
 {

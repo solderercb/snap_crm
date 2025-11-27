@@ -2,10 +2,10 @@
 #define SPHONES_H
 
 #include <QWidget>
-#include <QList>
-#include "../models/sphonesmodel.h"
-#include "../models/ssqlquerymodel.h"
-#include "sphone.h"
+
+class SPhone;
+class SPhoneModel;
+class SPhonesModel;
 
 namespace Ui {
 class SPhones;
@@ -44,7 +44,6 @@ private:
 private slots:
     void delPhone(SPhone*);
     void updateFormsButtons();
-    void markPhonesModelUpdated();
     void slotModelUpdated();
 public slots:
     void addPhone();

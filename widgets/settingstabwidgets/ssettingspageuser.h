@@ -1,10 +1,10 @@
 #ifndef SSETTINGSPAGEUSER_H
 #define SSETTINGSPAGEUSER_H
 
-#include <QWidget>
-#include <QPushButton>
-#include "models/susersettings.h"
-#include "widgets/settingstabwidgets/ssettingspagebase.h"
+#include <QObject>
+#include <SSettingsPageBase>
+
+class QWidget;
 
 namespace Ui {
 class SSettingsPageUser;

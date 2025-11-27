@@ -1,19 +1,20 @@
 #ifndef TABPRINTDIALOG_H
 #define TABPRINTDIALOG_H
 
-#include <QWidget>
-#include <QPrinter>
-#include <QPrinterInfo>
-#include <QPageSetupDialog>
-#include "tabcommon.h"
-#include "mainwindow.h"
+#include <tabCommon>
+#include <SReportsCommonFunctions>
 #include <Windows.h>
-#include <QMessageBox>
-#include <QMetaEnum>
-#include "models/slogrecordmodel.h"
-#include "models/stechreportmodel.h"
-#include "widgets/sreportscommonfunctions.h"
-#include "reports/sprintposreport.h"
+
+class QWidget;
+class MainWindow;
+class QPrinter;
+class QLabel;
+class QTimer;
+class SLogRecordModel;
+class QEvent;
+class SRepairModel;
+class STechReportModel;
+
 //#define PRINT_DEBUG_PAGE_INFO
 
 namespace Ui {
@@ -27,10 +28,11 @@ signals:
     void renderFinished();
 public:
     enum BelongReportsList {NotInList, InList};
-    explicit tabPrintDialog(MainWindow *parent, Global::Reports type = Global::Reports::not_impl);
+    explicit tabPrintDialog(MainWindow *parent);
+    explicit tabPrintDialog(MainWindow *parent, int type);
     explicit tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> rv = {{"type","dummy"}});
     ~tabPrintDialog();
-    static tabPrintDialog* create(Global::Reports type);
+    static tabPrintDialog* create(int type);
     virtual bool tabCloseRequest() override;
     QString tabTitle() override;
     void startRender();

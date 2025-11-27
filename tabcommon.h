@@ -1,13 +1,13 @@
 #ifndef TABCOMMON_H
 #define TABCOMMON_H
 
-#include <qglobal.h>
-#include "widgets/swidget.h"
+#include <SWidget>
 #include <QString>
-#include "mainwindow.h"
+
+class QWidget;
+class MainWindow;
 #ifdef QT_DEBUG
-#include <QTimer>
-#include <QRandomGenerator>
+class QTimer;
 #endif
 
 class tabCommon : public SWidget
@@ -38,7 +38,14 @@ protected:
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;
     uint test_scheduler_counter = 0;
 #endif
+private:
+    enum OpType {ActionsOnClose = 1, };
+    int m_opType = 0;
+    void commit(const int) override;
 protected slots:
+    void refreshTable();
+    void refreshTable(bool preserveScrollPos);
+    virtual void refreshTable(bool preserveScrollPos, bool preserveSelection);
 #ifdef QT_DEBUG
     virtual void test_scheduler_handler(){};
     virtual void test_scheduler2_handler(){};

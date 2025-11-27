@@ -1,318 +1,137 @@
 #ifndef SUSERMODEL_H
 #define SUSERMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
-#include "models/sclientmodel.h"
+#include <SSingleRowJModel>
 
-class SUserModel : public SComRecord
+class SClientModel;
+
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 1)                                             \
+    TABLE_FIELD(sip_user_id, sipId, int, 1)                                 \
+    TABLE_FIELD(client_user_id, clientUserId, int, 0)                       \
+    TABLE_FIELD(username, username, QString, 1)                             \
+    TABLE_FIELD(name, name, QString, 1)                                     \
+    TABLE_FIELD(surname, surname, QString, 1)                               \
+    TABLE_FIELD(patronymic, patronymic, QString, 1)                         \
+    TABLE_FIELD(phone, phone, QString, 1)                                   \
+    TABLE_FIELD(phone2, phone2, QString, 1)                                 \
+    TABLE_FIELD(phone_mask, phoneMask, int, 0)                              \
+    TABLE_FIELD(phone2_mask, phone2Mask, int, 0)                            \
+    TABLE_FIELD(address, address, QString, 1)                               \
+    TABLE_FIELD(passport_num, passportNum, QString, 0)                      \
+    TABLE_FIELD(passport_date, passportIssuedDate, QDate, 0)                \
+    TABLE_FIELD(passport_organ, passportIssuedBy, QString, 0)               \
+    TABLE_FIELD(state, state, int, 0)                                       \
+    TABLE_FIELD(created, created, QDateTime, 1)                             \
+    TABLE_FIELD(office, office, int, 0)                                     \
+    TABLE_FIELD(birthday, birthday, QDateTime, 0)                           \
+    TABLE_FIELD(def_office, defOffice, int, 0)                              \
+    TABLE_FIELD(def_store, defStore, int, 0)                                \
+    TABLE_FIELD(def_item_state, defItemState, int, 0)                       \
+    TABLE_FIELD(def_employee, defEmployee, int, 0)                          \
+    TABLE_FIELD(def_status, defStatus, int, 0)                              \
+    TABLE_FIELD(def_ws_filter, defWsFilter, int, 0)                         \
+    TABLE_FIELD(last_login, lastLogin, QDateTime, 0)                        \
+    TABLE_FIELD(last_activity, lastActivity, QDateTime, 0)                  \
+    TABLE_FIELD(email, email, QString, 1)                                   \
+    TABLE_FIELD(sex, sex, int, 0)                                           \
+    TABLE_FIELD(photo, photo, QByteArray, 1)                                \
+    TABLE_FIELD(salary_rate, salaryRate, int, 0)                            \
+    TABLE_FIELD(pay_day, payDay, int, 0)                                    \
+    TABLE_FIELD(pay_day_off, payDayOff, int, 0)                             \
+    TABLE_FIELD(pay_repair, payRepair, int, 0)                              \
+    TABLE_FIELD(pay_repair_quick, payRepairQuick, int, 0)                   \
+    TABLE_FIELD(pay_sale, paySale, int, 0)                                  \
+    TABLE_FIELD(pay_repair_q_sale, payRepairQuickSale, int, 0)              \
+    TABLE_FIELD(pay_cartridge_refill, payCartridgeRefill, int, 0)           \
+    TABLE_FIELD(pay_device_in, payDeviceIn, int, 0)                         \
+    TABLE_FIELD(pay_device_out, payDeviceOut, int, 0)                       \
+    TABLE_FIELD(pay_4_sale_in_repair, payForSaleInRepair, int, 0)           \
+    TABLE_FIELD(row_color, rowColor, QString, 0)                            \
+    TABLE_FIELD(ge_highlight_color, geHighlightColor, QString, 0)           \
+    TABLE_FIELD(color_label_ws, colorLabelWs, QString, 0)                   \
+    TABLE_FIELD(workspace_mode, workspaceMode, int, 0)                      \
+    TABLE_FIELD(preview_before_print, previewBeforePrint, int, 0)           \
+    TABLE_FIELD(new_rep_doc_copies, newRepDocCopies, int, 0)                \
+    TABLE_FIELD(auto_refresh_workspace, autoRefreshWorkspace, int, 0)       \
+    TABLE_FIELD(refresh_time, refreshTime, int, 0)                          \
+    TABLE_FIELD(xls_c1, xlsC1, int, 0)                                      \
+    TABLE_FIELD(xls_c2, xlsC2, int, 0)                                      \
+    TABLE_FIELD(xls_c3, xlsC3, int, 0)                                      \
+    TABLE_FIELD(xls_c4, xlsC4, int, 0)                                      \
+    TABLE_FIELD(xls_c5, xlsC5, int, 0)                                      \
+    TABLE_FIELD(xls_c6, xlsC6, int, 0)                                      \
+    TABLE_FIELD(xls_c7, xlsC7, int, 0)                                      \
+    TABLE_FIELD(xls_c8, xlsC8, int, 0)                                      \
+    TABLE_FIELD(xls_c9, xlsC9, int, 0)                                      \
+    TABLE_FIELD(xls_c10, xlsC10, int, 0)                                    \
+    TABLE_FIELD(xls_c11, xlsC11, int, 0)                                    \
+    TABLE_FIELD(xls_c12, xlsC12, int, 0)                                    \
+    TABLE_FIELD(xls_c13, xlsC13, int, 0)                                    \
+    TABLE_FIELD(xls_c14, xlsC14, int, 0)                                    \
+    TABLE_FIELD(xls_c15, xlsC15, int, 0)                                    \
+    TABLE_FIELD(display_out, displayOut, int, 0)                            \
+    TABLE_FIELD(display_complete, displayComplete, int, 0)                  \
+    TABLE_FIELD(is_bot, isBot, int, 0)                                      \
+    TABLE_FIELD(new_on_top, newOnTop, int, 0)                               \
+    TABLE_FIELD(issued_color, issuedColor, QString, 0)                      \
+    TABLE_FIELD(fields_cfg, fieldsCfg, QString, 0)                          \
+    TABLE_FIELD(save_state_on_close, saveStateOnClose, int, 0)              \
+    TABLE_FIELD(group_store_items, groupStoreItems, int, 0)                 \
+    TABLE_FIELD(track_activity, trackActivity, int, 0)                      \
+    TABLE_FIELD(card_on_call, cardOnCall, int, 0)                           \
+    TABLE_FIELD(inn, inn, QString, 1)                                       \
+    TABLE_FIELD(inform_comment, informComment, int, 0)                      \
+    TABLE_FIELD(inform_status, informStatus, int, 0)                        \
+    TABLE_FIELD(kkt, KKT, int, 0)                                           \
+    TABLE_FIELD(pinpad, pinpad, int, 0)                                     \
+    TABLE_FIELD(advance_disable, subsistenceDisable, int, 0)                \
+    TABLE_FIELD(salary_disable, salaryDisable, int, 0)                      \
+    TABLE_FIELD(notes, notes, QString, 1)                                   \
+    TABLE_FIELD(signature, signature, QString, 0)                           \
+    TABLE_FIELD(kkm_pass, kkmPwd, int, 0)                                   \
+    TABLE_FIELD(prefer_regular, preferRegular, int, 0)                      \
+    TABLE_FIELD(fontsize, fontSize, int, 0)                                 \
+    TABLE_FIELD(rowheight, rowHeight, int, 0)                               \
+    TABLE_FIELD(animation, animation, QString, 0)
+
+// Список дополнительных полей для отчетов
+// Описание смотри в sdatabaserecord_new.h
+#undef ADDITIONAL_REPORT_FIELDS
+#define ADDITIONAL_REPORT_FIELDS                                            \
+    ADDITIONAL_REPORT_FIELD(photo, photo)                                   \
+    ADDITIONAL_REPORT_FIELD(fullLongName, fullLongName)                     \
+    ADDITIONAL_REPORT_FIELD(fullShortName, fullShortName)
+
+class SUserModel : public SSingleRowJModel
 {
     Q_OBJECT
-    Q_PROPERTY(int id READ id)
-    Q_PROPERTY(int sipId READ sipId)
-    Q_PROPERTY(QString username READ username)
-    Q_PROPERTY(QString name READ name)
-    Q_PROPERTY(QString surname READ surname)
-    Q_PROPERTY(QString patronymic READ patronymic)
-    Q_PROPERTY(QString fullLongName READ fullLongName)
-    Q_PROPERTY(QString fullShortName READ fullShortName)
-    Q_PROPERTY(QString phone READ phone)
-    Q_PROPERTY(QString phone2 READ phone2)
-    Q_PROPERTY(QString address READ address)
-    Q_PROPERTY(QDateTime created READ created)
-    Q_PROPERTY(QString email READ email)
-    Q_PROPERTY(QByteArray photo READ photo)
-    Q_PROPERTY(QString inn READ inn)
-    Q_PROPERTY(QString notes READ notes)
+    friend class TClassTest;
 signals:
     void sigModelReset();
 public:
     explicit SUserModel(QObject *parent = nullptr);
     ~SUserModel();
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    void load() override;
     void load(const int id);
-    int id();
-    int sipId();
-    void setSipId(const int);//sip_user_id
-    QString username();
-    void setUsername(const QString);//username
-    QString name();
-    void setName(const QString);//name
-    QString surname();
-    void setSurname(const QString);//surname
-    QString patronymic();
-    void setPatronymic(const QString);//patronymic
-    QString fullLongName();   // Фамилия Имя Отчество
-    QString fullShortName();  // Фамилия И. О.
-    QString phone();
-    void setPhone(const QString);//phone
-    QString phone2();
-    void setPhone2(const QString);//phone2
-    int phoneMask();
-    void setPhoneMask(const int);//phone_mask
-    int phone2Mask();
-    void setPhone2Mask(const int);//phone2_mask
-    QString address();
-    void setAddress(const QString);//address
-    QString passportNum();
-    void setPassportNum(const QString);//passport_num
-    QDate passportDate();
-    void setPassportDate(const QDate);//passport_date
-    QString passportOrgan();
-    void setPassportOrgan(const QString);//passport_organ
-    int state();
-    void setState(const int);//state
-    QDateTime created();
-    void setCreated(const QDateTime);//created
-    int office();
-    void setOffice(const int);//office
-    int currentOffice();
-    void setCurrentOffice(const int id);
-    int company();
-    void setCompany(const int id);
-//    int currentCompany();
-//    void setCurrentCompany(const int id);
-    QDateTime birthday();
-    void setBirthday(const QDateTime);//birthday
-    int defOffice();
-    void setDefOffice(const int);//def_office
-    int defStore();
-    void setDefStore(const int);//def_store
-    int defItemState();
-    void setDefItemState(const int);//def_item_state
-    int defEmployee();
-    void setDefEmployee(const int);//def_employee
-    int defStatus();
-    void setDefStatus(const int);//def_status
-    int defWsFilter();
-    void setDefWsFilter(const int);//def_ws_filter
-    QDateTime lastLogin();
-    void setLastLogin(const QDateTime);//last_login
-    QDateTime lastActivity();
-    void setLastActivity(const QDateTime);//last_activity
-    QString email();
-    void setEmail(const QString);//email
-    int sex();
-    void setSex(const int);//sex
-    QByteArray photo();
-    void setPhoto(const QByteArray);//photo
-    int salaryRate();
-    void setSalaryRate(const int);//salary_rate
-    int payDay();
-    void setPayDay(const int);//pay_day
-    int payDayOff();
-    void setPayDayOff(const int);//pay_day_off
-    int payRepair();
-    void setPayRepair(const int);//pay_repair
-    int payRepairQuick();
-    void setPayRepairQuick(const int);//pay_repair_quick
-    int paySale();
-    void setPaySale(const int);//pay_sale
-    int payRepairQSale();
-    void setPayRepairQSale(const int);//pay_repair_q_sale
-    int payCartridgeRefill();
-    void setPayCartridgeRefill(const int);//pay_cartridge_refill
-    int payDeviceIn();
-    void setPayDeviceIn(const int);//pay_device_in
-    int payDeviceOut();
-    void setPayDeviceOut(const int);//pay_device_out
-    bool pay4SaleInRepair();
-    void setPay4SaleInRepair(const bool);//pay_4_sale_in_repair
-    QString rowColor();
-    void setRowColor(const QString);//row_color
-    QString geHighlightColor();
-    void setGeHighlightColor(const QString);//ge_highlight_color
-    QString colorLabelWs();
-    void setColorLabelWs(const QString);//color_label_ws
-    int workspaceMode();
-    void setWorkspaceMode(const int);//workspace_mode
-    bool previewBeforePrint();
-    void setPreviewBeforePrint(const bool);//preview_before_print
-    int newRepDocCopies();
-    void setNewRepDocCopies(const int);//new_rep_doc_copies
-    bool autoRefreshWorkspace();
-    void setAutoRefreshWorkspace(const bool);//auto_refresh_workspace
-    int refreshTime();
-    void setRefreshTime(const int);//refresh_time
-    int xlsC1();
-    void setXlsC1(const int);//xls_c1
-    int xlsC2();
-    void setXlsC2(const int);//xls_c2
-    int xlsC3();
-    void setXlsC3(const int);//xls_c3
-    int xlsC4();
-    void setXlsC4(const int);//xls_c4
-    int xlsC5();
-    void setXlsC5(const int);//xls_c5
-    int xlsC6();
-    void setXlsC6(const int);//xls_c6
-    int xlsC7();
-    void setXlsC7(const int);//xls_c7
-    int xlsC8();
-    void setXlsC8(const int);//xls_c8
-    int xlsC9();
-    void setXlsC9(const int);//xls_c9
-    int xlsC10();
-    void setXlsC10(const int);//xls_c10
-    int xlsC11();
-    void setXlsC11(const int);//xls_c11
-    int xlsC12();
-    void setXlsC12(const int);//xls_c12
-    int xlsC13();
-    void setXlsC13(const int);//xls_c13
-    int xlsC14();
-    void setXlsC14(const int);//xls_c14
-    int xlsC15();
-    void setXlsC15(const int);//xls_c15
-    bool displayOut();
-    void setDisplayOut(const bool);//display_out
-    bool displayComplete();
-    void setDisplayComplete(const bool);//display_complete
-    bool isBot();
-    void setIsBot(const bool);//is_bot
-    bool newOnTop();
-    void setNewOnTop(const bool);//new_on_top
-    QString issuedColor();
-    void setIssuedColor(const QString);//issued_color
-    QString fieldsCfg();
-    void setFieldsCfg(const QString);//fields_cfg
-    bool saveStateOnClose();
-    void setSaveStateOnClose(const bool);//save_state_on_close
-    bool groupStoreItems();
-    void setGroupStoreItems(const bool);//group_store_items
-    bool trackActivity();
-    void setTrackActivity(const bool);//track_activity
-    bool cardOnCall();
-    void setCardOnCall(const bool);//card_on_call
-    QString inn();
-    void setInn(const QString);//inn
-    bool informComment();
-    void setInformComment(const bool);//inform_comment
-    bool informStatus();
-    void setInformStatus(const bool);//inform_status
-    int kkt();
-    void setKkt(const int);//kkt
-    int pinpad();
-    void setPinpad(const int);//pinpad
-    bool advanceDisable();
-    void setAdvanceDisable(const bool);//advance_disable
-    bool salaryDisable();
-    void setSalaryDisable(const bool);//salary_disable
-    QString notes();
-    void setNotes(const QString);//notes
-    QString signature();
-    void setSignature(const QString);//signature
-    int kkmPwd();
-    void setKkmPwd(const int);//kkm_pass
-    bool preferRegular();
-    void setPreferRegular(const bool);//prefer_regular
-    int fontSize();
-    void setFontSize(const int);//fontsize
-    int rowHeight();
-    void setRowHeight(const int);//rowheight
-    QString animation();
-    void setAnimation(const QString);//animation
-    void loadSalaryRate();
-    void setSalaryRate(double rate);
     void setSalaryRateStartDate(const QDate date);
     double balance();
-    int clientUserId();
-    void setClientUserId(const int id);
-    int m_clientUserId = 0;
     SClientModel* clientModel();
     void setClientModel(SClientModel *model);
-    bool commit();
+    bool commit() override;
 private:
-    int m_sipId;
-    QString m_username;
-    QString m_firstName;
-    QString m_lastName;
-    QString m_patronymicName;
-    QString m_phone;
-    QString m_phone2;
-    int m_phoneMask;
-    int m_phone2Mask;
-    QString m_address;
-    QString m_passportNum;
-    QDate m_passportDate;
-    QString m_passportOrgan;
-    int m_state;
-    QDateTime m_created;
-    int m_office;
-    int m_currentOffice;
-    int m_company = 1;
-//    int m_currentCompany;
-    QDateTime m_birthday;
-    int m_defOffice;
-    int m_defStore;
-    int m_defItemState;
-    int m_defEmployee;
-    int m_defStatus;
-    int m_defWsFilter;
-    QDateTime m_lastLogin;
-    QDateTime m_lastActivity;
-    QString m_email;
-    int m_sex;
-    QByteArray m_photo;
-    int m_salaryRate;
-    int m_payDay;
-    int m_payDayOff;
-    int m_payRepair;
-    int m_payRepairQuick;
-    int m_paySale;
-    int m_payRepairQSale;
-    int m_payCartridgeRefill;
-    int m_payDeviceIn;
-    int m_payDeviceOut;
-    bool m_pay4SaleInRepair;
-    QString m_rowColor;
-    QString m_geHighlightColor;
-    QString m_colorLabelWs;
-    int m_workspaceMode;
-    bool m_previewBeforePrint;
-    int m_newRepDocCopies;
-    bool m_autoRefreshWorkspace;
-    int m_refreshTime;
-    int m_xlsC1;
-    int m_xlsC2;
-    int m_xlsC3;
-    int m_xlsC4;
-    int m_xlsC5;
-    int m_xlsC6;
-    int m_xlsC7;
-    int m_xlsC8;
-    int m_xlsC9;
-    int m_xlsC10;
-    int m_xlsC11;
-    int m_xlsC12;
-    int m_xlsC13;
-    int m_xlsC14;
-    int m_xlsC15;
-    bool m_displayOut;
-    bool m_displayComplete;
-    bool m_isBot;
-    bool m_newOnTop;
-    QString m_issuedColor;
-    QString m_fieldsCfg;
-    bool m_saveStateOnClose;
-    bool m_groupStoreItems;
-    bool m_trackActivity;
-    bool m_cardOnCall;
-    QString m_inn;
-    bool m_informComment;
-    bool m_informStatus;
-    int m_kkt;
-    int m_pinpad;
-    bool m_advanceDisable;
-    bool m_salaryDisable;
-    QString m_notes;
-    QString m_signature;
-    int m_kkmPwd;
-    bool m_preferRegular;
-    int m_fontSize;
-    int m_rowHeight;
-    QString m_animation;
     QDate m_salaryRateStartDate;
     SClientModel* m_clientModel = nullptr;
+    QString constructSelectQuery() override;
+    void loadSalaryRate();
+    void updateLogAssociatedRecId() override;
+    void overrideSalaryRate(const int rate);
+public Q_SLOTS:
+    QString fullLongName();   // Фамилия Имя Отчество
+    QString fullShortName();  // Фамилия И. О.
 };
 
 #endif // SUSERMODEL_H

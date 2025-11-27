@@ -1,5 +1,15 @@
 #include "sphone.h"
 #include "ui_sphone.h"
+#include <QComboBox>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SPermissions>
+#include <SSqlQueryModel>
+#include <SPhoneModel>
+#include <ProjectGlobals>
+#ifdef QT_DEBUG
+#include <QRandomGenerator>
+#endif
 
 SPhone::SPhone(QWidget *parent) :
     QWidget(parent),
@@ -49,20 +59,20 @@ SPhoneModel *SPhone::model()
 
 void SPhone::setModel(SPhoneModel *model)
 {
-    connect(model,SIGNAL(modelUpdated()),this,SLOT(modelUpdated()));
+    connect(model, &SPhoneModel::modelUpdated, this, &SPhone::modelUpdated);
 
-    if(!model->isEmpty())
+    if(!model->isNew())
         setReadOnly();
 
     m_phoneModel = model;
     m_messengers = model->messengers();
-    ui->comboBoxPhoneMask->setCurrentIndex((permissions->viewClients || !m_isReadOnly)?model->maskIndex():-1);
-    ui->lineEditPhone->setText((permissions->viewClients || !m_isReadOnly)?model->phone():tr("no permissions"));
+    ui->comboBoxPhoneMask->setCurrentIndex(model->maskIndex());
+    ui->lineEditPhone->setText(model->phone());
     ui->checkBoxViber->setChecked(m_messengers&SPhoneModel::Viber);
     ui->checkBoxTelegram->setChecked(m_messengers&SPhoneModel::Telegram);
     ui->checkBoxWhatsapp->setChecked(m_messengers&SPhoneModel::Whatsapp);
     ui->checkBoxSMS->setChecked(model->receiveSMS());
-    ui->lineEditNotes->setText((permissions->viewClients || !m_isReadOnly)?model->note():tr("no permissions"));
+    ui->lineEditNotes->setText(model->note());
 
     m_isPrimary = model->type();
     if(m_isPrimary)
@@ -132,7 +142,7 @@ bool SPhone::isValid()
     if(!permissions->viewClients && m_isReadOnly)  // если не разрешён просмотр клиентов, но модель содержит номер
         return m_isValid;
 
-    if (!ui->lineEditPhone->hasAcceptableInput() && comSettings->isClientPhoneRequired && !m_isReadOnly)
+    if (!ui->lineEditPhone->hasAcceptableInput() && comSettings->isClientPhoneRequired() && !m_isReadOnly)
     {
         ui->lineEditPhone->setStyleSheet(commonLineEditStyleSheetRed);
         m_isValid = 0;
@@ -147,7 +157,7 @@ void SPhone::setButtonVisible(Buttons button, bool state)
     {
         case Buttons::Add   :ui->pushButtonAddPhone->setVisible(state); break;
         case Buttons::Del   :ui->pushButtonDelPhone->setVisible(state); break;
-        case Buttons::Edit  : if(!m_phoneModel->isEmpty()) ui->pushButtonEditPhone->setVisible(state); break;
+        case Buttons::Edit  : if(!m_phoneModel->isNew()) ui->pushButtonEditPhone->setVisible(state); break;
     }
 }
 
@@ -189,7 +199,7 @@ void SPhone::phoneMaskChanged(int index)
         ui->lineEditPhone->setReadOnly(true);
 
     if(!m_isReadOnly)
-        m_phoneModel->setMask(index);
+        m_phoneModel->set_maskIndex(index);
 }
 
 void SPhone::checkBoxTypeToggled(bool checked)
@@ -243,39 +253,39 @@ void SPhone::numberEdited(QString)
 void SPhone::numberEditFinished()
 {
     if(!m_isReadOnly)
-        m_phoneModel->setPhone(ui->lineEditPhone->text());
+        m_phoneModel->set_phone(ui->lineEditPhone->text());
 }
 
 void SPhone::notesEditFinished()
 {
-    m_phoneModel->setNote(ui->lineEditNotes->text());
+    m_phoneModel->set_note(ui->lineEditNotes->text());
 }
 
 void SPhone::checkBoxViberClicked(bool state)
 {
-    m_phoneModel->setMessengers(SPhoneModel::Viber, state);
+    m_phoneModel->set_viber(state);
 }
 
 void SPhone::checkBoxTelegramClicked(bool state)
 {
-    m_phoneModel->setMessengers(SPhoneModel::Telegram, state);
+    m_phoneModel->set_telegram(state);
 }
 
 void SPhone::checkBoxWhatsappClicked(bool state)
 {
-    m_phoneModel->setMessengers(SPhoneModel::Whatsapp, state);
+    m_phoneModel->set_whatsapp(state);
 }
 
 void SPhone::checkBoxSMSClicked(bool state)
 {
-    m_phoneModel->setReceiveSMS(state);
+    m_phoneModel->set_receiveSMS(state);
 }
 
 void SPhone::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
 
     ui->lineEditPhone->setFont(font);
     ui->comboBoxPhoneMask->setFont(font);

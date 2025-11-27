@@ -356,18 +356,18 @@ QListView::item  {
   <customwidget>
    <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
+   <header location="global">SComboBox</header>
   </customwidget>
   <customwidget>
    <class>SPhones</class>
    <extends>QWidget</extends>
-   <header>widgets/sphones.h</header>
+   <header location="global">SPhones</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SClientMatch</class>
    <extends>QWidget</extends>
-   <header>widgets/sclientmatch.h</header>
+   <header location="global">SClientMatch</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

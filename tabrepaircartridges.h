@@ -1,13 +1,12 @@
 #ifndef TABREPAIRCARTRIDGES_H
 #define TABREPAIRCARTRIDGES_H
-#include "mainwindow.h"
-#include "tabcommon.h"
-#include "models/srepairmodel.h"
-#include "widgets/scartridgeform.h"
-#include "widgets/sdialogissuerepair.h"
-#include "widgets/scartridgecard.h"
 
-#include <QWidget>
+#include <tabCommon>
+
+class QWidget;
+class MainWindow;
+class SCartridgeForm;
+class SDialogIssueRepair;
 
 namespace Ui {
 class tabRepairCartridges;
@@ -34,6 +33,7 @@ private:
     bool m_issueButtonVisible = 1;
     bool m_readyButtonVisible = 1;
     SDialogIssueRepair *m_dialogIssue;
+    QList<SCartridgeForm*> m_existentForms;
     void initRepairCartridgeForm(SCartridgeForm *&form, const int repairId);
     void appendToList(SCartridgeForm *form);
     void updateWidgets();
@@ -43,12 +43,18 @@ private:
 #endif
 public slots:
 private slots:
-    void reloadFormsData();
+    void updateForms();
     void createDialogIssue();
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();
     void reloadCardModel(int id);
-    void setReadyToIssue();
+    void beginCommit() override;
+    int commitStages() override;
+    bool skip(const int) override;
+    void commit(const int stage = 0) override;
+    void endCommit(const int stage) override;
+    void throwHandler(int) override;
+    void endCommit() override;
     void closeTab();
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;

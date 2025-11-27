@@ -1,5 +1,10 @@
 #include "speriodselector.h"
 #include "ui_speriodselector.h"
+#include <QTimeZone>
+#include <QMenu>
+#include <QAction>
+#include <QMetaEnum>
+#include <QDebug>
 
 SPeriodSelector::SPeriodSelector(QWidget *parent) :
     QWidget(parent),

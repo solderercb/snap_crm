@@ -1,32 +1,25 @@
 #ifndef SADDITIONALPAYMENTMODEL_H
 #define SADDITIONALPAYMENTMODEL_H
 
-#include "../scomrecord.h"
-#include <QObject>
+#include <SSingleRowJModel>
 
-class SAdditionalPaymentModel : public SComRecord
+#include "../ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(name, name, QString, 0)                                     \
+    TABLE_FIELD(payment_date, paymentDate, QDateTime, 0)                    \
+    TABLE_FIELD(user, user, int, 0)                                         \
+    TABLE_FIELD(to_user, employee, int, 0)                                  \
+    TABLE_FIELD(price, summ, double, 0)
+
+class SAdditionalPaymentModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
     explicit SAdditionalPaymentModel(QObject *parent = nullptr);
-    int id();
-    QString name();
-    void setName(const QString);
-    QDateTime paymentDate();
-    void setPaymentDate(const QDateTime);
-    int user();
-    void setUser(const int);
-    int employee();
-    void setEmployee(const int);
-    double summ();
-    void setSumm(const double);
+#include "../ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
     bool commit();
-private:
-    QString m_name;
-    QDateTime m_paymentDate;
-    int m_user;
-    int m_employee;
-    double m_summ;
 };
 
 #endif // SADDITIONALPAYMENTMODEL_H

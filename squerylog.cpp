@@ -1,5 +1,11 @@
 #include "squerylog.h"
-#include "models/slocalsettings.h"
+#include <SLocalSettings>
+#include <QApplication>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QByteArray>
+#include <QVariant>
+#include <QDebug>
 
 SQueryLog::SQueryLog(QSqlQuery *q) :
     query(q)

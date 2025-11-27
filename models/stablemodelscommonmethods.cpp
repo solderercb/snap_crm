@@ -1,5 +1,12 @@
-#include "global.h"
 #include "stablemodelscommonmethods.h"
+#include <ProjectGlobals>
+#include <QTimeZone>
+#include <QSqlRecord>
+#include <SComSettings>
+#include <SSqlQueryModel>
+#include <SSqlFetchingModel>
+#include <SStandardItemModel>
+#include <QDebug>
 
 STableModelsCommonMethods::STableModelsCommonMethods(QObject *parent)
 {
@@ -49,12 +56,12 @@ QString STableModelsCommonMethods::dataLocalizedFromDouble(const double value, c
 
 QString STableModelsCommonMethods::dataLocalizedFromDouble(const double value) const
 {
-    return dataLocalizedFromDouble(value, comSettings->classicKassa?2:0);
+    return dataLocalizedFromDouble(value, comSettings->classicKassa()?2:0);
 }
 
 QString STableModelsCommonMethods::dataLocalizedFromDouble(const QModelIndex &item) const
 {
-    return dataLocalizedFromDouble(unformattedData(item, Qt::DisplayRole).toDouble(), comSettings->classicKassa?2:0);
+    return dataLocalizedFromDouble(unformattedData(item, Qt::DisplayRole).toDouble(), comSettings->classicKassa()?2:0);
 }
 
 QString STableModelsCommonMethods::companyFromId(const QModelIndex &item) const
@@ -72,6 +79,7 @@ QString STableModelsCommonMethods::warrantyFromId(const QModelIndex &item) const
     return warrantyTermsModel->getDisplayRole(unformattedData(item, Qt::DisplayRole).toInt(), 1);
 }
 
+// TODO: переделать с использованием фабрики
 QModelIndex STableModelsCommonMethods::index_(const int row, const int column) const
 {
     if(m_sqlQueryModel)
@@ -79,6 +87,9 @@ QModelIndex STableModelsCommonMethods::index_(const int row, const int column) c
 
     if(m_sqlFetchingModel)
         return m_sqlFetchingModel->index(row, column);
+
+    if(m_standardItemModel)
+        return m_standardItemModel->index(row, column);
 
     return QModelIndex();
 }
@@ -91,6 +102,9 @@ QVariant STableModelsCommonMethods::data(const int row, const int column, int ro
     if(m_sqlFetchingModel)
         return m_sqlFetchingModel->data(this->index_(row, column), role);
 
+    if(m_standardItemModel)
+        return m_standardItemModel->data(this->index_(row, column), role);
+
     return QVariant();
 }
 
@@ -101,6 +115,9 @@ int STableModelsCommonMethods::rowCount_()
 
     if(m_sqlFetchingModel)
         return m_sqlFetchingModel->rowCount();
+
+    if(m_standardItemModel)
+        return m_standardItemModel->rowCount();
 
     return 0;
 }
@@ -113,6 +130,9 @@ const QMetaObject *STableModelsCommonMethods::metaObject()
     if(m_sqlFetchingModel)
         return m_sqlFetchingModel->metaObject();
 
+    if(m_standardItemModel)
+        return m_standardItemModel->metaObject();
+
     return 0;
 }
 
@@ -120,7 +140,7 @@ const QMetaObject *STableModelsCommonMethods::metaObject()
  * По умолчанию возвращает инвалидный индекс.
  * Должен быть переопределён в наследующих классах.
 */
-QModelIndex STableModelsCommonMethods::indexForShortData(const QModelIndex &index) const
+QModelIndex STableModelsCommonMethods::indexForShortData(const QModelIndex&) const
 {
     return QModelIndex();
 }

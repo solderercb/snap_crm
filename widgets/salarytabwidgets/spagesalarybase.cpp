@@ -1,7 +1,11 @@
 #include "spagesalarybase.h"
+#include <ProjectGlobals>
+#include <SUserSettings>
+#include <Mainwindow>
+#include <tabSalary>
 
 SPageSalaryBase::SPageSalaryBase(QWidget *parent) :
-    QWidget(parent)
+    SWidget(parent)
 {
     parentTab = MainWindow::getInstance()->findChild<tabSalary*>();
     mainWindow = MainWindow::getInstance();

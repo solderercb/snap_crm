@@ -1,16 +1,16 @@
 #ifndef STABLEVIEWBOQITEMDELEGATES_H
 #define STABLEVIEWBOQITEMDELEGATES_H
-#include <QApplication>
-#include <QStyledItemDelegate>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QLineEdit>
-#include <QMouseEvent>
-#include <QAbstractItemView>
-#include "stableviewbaseitemdelegates.h"
-#include "../models/ssaletablemodel.h"
+
+#include <STableViewBaseItemDelegates>
+
+class SSaleTableModel;
+class QWidget;
+class QStyleOptionViewItem;
+class QModelIndex;
+class QAbstractItemModel;
+class QSpinBox;
+class QDoubleSpinBox;
+class QPainter;
 
 #define PIXMAP_W 16
 #define PIXMAP_H 16
@@ -40,7 +40,6 @@ private:
     QDoubleSpinBox* createDoubleSpinBox(QWidget*, const QModelIndex&) const;
     QRect pixmapRect(const QRect &delegateRect, const PixmapType p) const;
     void drawPixmap(const QRect &delegateRect, PixmapType p, QPainter *painter) const;
-    int rowConditionsForPixmap(const QModelIndex&) const;
     void buttonHandler(const int buttonNum, const int row);
 };
 

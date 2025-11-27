@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QSqlQueryModel>
-#include "sabstractitemmodel.h"
+#include <SAbstractItemModel>
 
 class SSqlQueryModel : public QSqlQueryModel, public SAbstractItemModel
 {

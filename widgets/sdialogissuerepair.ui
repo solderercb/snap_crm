@@ -505,7 +505,7 @@
   <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
+   <header location="global">SDoubleSpinBox</header>
   </customwidget>
  </customwidgets>
  <resources/>

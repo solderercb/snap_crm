@@ -1,14 +1,11 @@
 #ifndef TABCASHMOVEEXCH_H
 #define TABCASHMOVEEXCH_H
 
-#include <QWidget>
-#include <QSortFilterProxyModel>
-#include <QMap>
-#include "tabcommon.h"
-#include "models/slogrecordmodel.h"
-#include "models/scashregistermodel.h"
-#include "models/ssortfilterproxymodel.h"
-#include "widgets/shortlivednotification.h"
+#include <tabCommon>
+
+class SCashRegisterModel;
+class SSortFilterProxyModel;
+class MainWindow;
 
 namespace Ui {
 class tabCashMoveExch;
@@ -21,6 +18,7 @@ signals:
     void generatePrintout(QMap<QString, QVariant>);
 public:
     enum Type {Move = 0, Exchange = 1};
+    enum EndCommitOp {SwitchToViewMode, PrepareRepeat};
     explicit tabCashMoveExch(MainWindow *parent = nullptr);
     static tabCashMoveExch* getInstance(MainWindow *parent);
     ~tabCashMoveExch();
@@ -48,17 +46,23 @@ private:
     double prevCurrencyRate = 0;
     bool currencyFlipped = 0;
     QString chargeType; // используется для подписи поля Комиссия/Курс и для создания части примечания
+    int m_endCommitOp = 0;
     Ui::tabCashMoveExch *ui;
     void setWidgetsParams();
     void updateWidgets();
-    bool checkInput();
     void initCashRegisterModel();
     void setDefaultStylesheets();
-    bool commit(bool repeatAfter = 0);
+    void commit(const int stage) override;
     void print();
     void updateOrderIdLineEdit();
     void constructReasonPart();
     void calculateDstAmount();
+    void prepareForRepeatedOp();
+    void switchTabToViewMode();
+    int checkInput() override;
+    void throwHandler(int) override;
+    void beginCommit() override;
+    void endCommit() override;
 
 #ifdef QT_DEBUG
     enum RandomFillerStep {OpType = 1, SrcAccount, DstAccount, Amount, End};

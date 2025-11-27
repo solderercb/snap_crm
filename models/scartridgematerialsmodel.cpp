@@ -1,6 +1,11 @@
 #include "scartridgematerialsmodel.h"
 #include <QSqlTableModel>
-#include "widgets/scartridgecard.h"
+#include <QSqlField>
+#include <SCartridgeCard>
+#include <SPermissions>
+#include <SSingleRowModel>
+#include <SStandardItemModel>
+#include <SCartridgeMaterialModel>
 
 SCartridgeMaterialsModel::SCartridgeMaterialsModel(QObject *parent) :
     SEditableBaseModel(parent, QSqlDatabase::database("connThird"))
@@ -86,7 +91,7 @@ void SCartridgeMaterialsModel::setCardId(const int id)
 
 bool SCartridgeMaterialsModel::commit()
 {
-    SDatabaseRecord::checkSystemTime();
+    SSingleRowModel::checkSystemTime();
 
     if(!submitAll())
     {

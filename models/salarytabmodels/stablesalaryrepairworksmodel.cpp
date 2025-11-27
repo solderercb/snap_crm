@@ -1,4 +1,4 @@
-#include "global.h"
+#include <ProjectGlobals>
 #include "stablesalaryrepairworksmodel.h"
 
 STableSalaryRepairWorksModel::STableSalaryRepairWorksModel(QObject *parent) : STableBaseModel(parent)

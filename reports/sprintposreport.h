@@ -3,10 +3,13 @@
 
 #include <QObject>
 #include <QLocale>
-#include "global.h"
-#include "models/sclientmodel.h"
-#include "models/srepairmodel.h"
-#include "escposprinter.h"
+
+class SClientModel;
+class SRepairModel;
+
+namespace EscPosQt {
+    class EscPosPrinter;
+}
 
 class SPrintPOSReport : public QObject
 {

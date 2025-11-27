@@ -1,7 +1,8 @@
-#include "global.h"
+#include <ProjectGlobals>
 #include "stablebasemodel.h"
 #include <QtSql>
 #include <QString>
+#include <QDebug>
 
 const QRegularExpression STableBaseModel::queryPrepareRegexpPattern = QRegularExpression("( +\n)|((;?) +$)|(;$)");
 

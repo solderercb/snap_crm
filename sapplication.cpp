@@ -1,7 +1,7 @@
 #include "sapplication.h"
 #include <exception>
 #include <QDebug>
-#include "global.h"
+#include <ProjectGlobals>
 
 SApplication::SApplication(int& argc, char** argv) :
     QApplication(argc, argv)

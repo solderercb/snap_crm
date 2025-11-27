@@ -1,10 +1,11 @@
 #ifndef SCLIENTSELECTFORM_H
 #define SCLIENTSELECTFORM_H
 
-#include "sclientinputformbase.h"
-#include "models/sclientmodel.h"
-#include "widgets/slineedit.h"
-#include "widgets/sdoublespinbox.h"
+#include <SClientInputFormBase>
+
+class SClientModel;
+class SLineEdit;
+class QSpinBox;
 
 namespace Ui {
 class SClientSelectForm;
@@ -29,7 +30,7 @@ public:
     void setFont(QFont font);
     void update();
     void clearCreds(bool keepCoincidenceShown = true);
-    int checkBalanceEnabled();
+    bool checkBalanceEnabled();
     void setDefaultStylesheets();
     int checkInput();
     void setHandlingButtons(int mode);

@@ -2,11 +2,9 @@
 #define SPERIODSELECTOR_H
 
 #include <QWidget>
-#include <QTimeZone>
-#include <QMenu>
-#include <QAction>
-#include <QMetaEnum>
-#include <QDebug>
+
+class QMenu;
+class QSignalMapper;
 
 namespace Ui {
 class SPeriodSelector;

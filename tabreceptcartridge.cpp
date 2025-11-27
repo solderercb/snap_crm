@@ -1,8 +1,24 @@
-#include "global.h"
 #include "tabreceptcartridge.h"
 #include "ui_tabreceptcartridge.h"
-#include "tabrepairs.h"
-#include "models/sofficemodel.h"
+#include <QWidget>
+#include <QComboBox>
+#include <ProjectGlobals>
+#include <MainWindow>
+#include <tabRepairs>
+#include <SOfficeModel>
+#include <SPermissions>
+#include <SUserSettings>
+#include <SComSettings>
+#include <SLocalSettingsStructs>
+#include <SPhonesModel>
+#include <SLineEdit>
+#include <SClientModel>
+#include <SPrintPOSReport>
+#include <SSqlQueryModel>
+#include <SRepairModel>
+#include <SCartridgeForm>
+#include <SCartridgeCard>
+#include <FlashPopup>
 
 tabReceptCartridge* tabReceptCartridge::p_instance = nullptr;
 
@@ -118,7 +134,7 @@ void tabReceptCartridge::initWidgets()
     // установка моделей данных
     // TODO: группу из comboBox для выбора компании и офиса перенести в отдельный класс;
     ui->comboBoxCompany->setModel(companiesModel);
-//    if(comSettings->isAutoSetCompanyOnRepairRecept)   // в АСЦ эта настройка, похоже, не учитывается
+//    if(comSettings->isAutoSetCompanyOnRepairRecept())   // в АСЦ эта настройка, похоже, не учитывается
         ui->comboBoxCompany->setCurrentIndex(SOfficeModel::current()->defaultCompanyIndex());
 //    else
 //        ui->comboBoxCompany->setCurrentIndex(-1);
@@ -128,7 +144,7 @@ void tabReceptCartridge::initWidgets()
         ui->comboBoxCompany->setVisible(false);
     }
     ui->comboBoxOffice->setModel(officesModel);
-    ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->currentOffice));
+    ui->comboBoxOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->currentOffice()));
     if(officesModel->rowCount() == 1)
     {
         ui->comboBoxOffice->setVisible(false);
@@ -137,14 +153,14 @@ void tabReceptCartridge::initWidgets()
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
     ui->comboBoxPresetPaymentAccount->setModel(paymentSystemsModel);
     ui->comboBoxPresetPaymentAccount->setCurrentIndex(paymentSystemsModel->rowByDatabaseID(0, "system_id"));
-    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
+    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty());
     ui->widgetClient->setClientsTabDefaultCategory(SClientModel::Categories::Regulars);
     ui->comboBoxVendor->setButtons("Clear");
     ui->comboBoxVendor->setModel(m_vendorsModel);
     ui->comboBoxVendor->setCurrentIndex(-1);
     ui->comboBoxModel->setModel(m_cartridgesModel);
     m_client = ui->widgetClient->model();
-    ui->checkBoxPrintReceipt->setChecked(comSettings->printCartridgeReceptDoc);
+    ui->checkBoxPrintReceipt->setChecked(comSettings->printCartridgeReceptDoc());
 
 //    connect(ui->widgetDeviceMatch,SIGNAL(deviceSelected(int)),this,SLOT(fillDeviceCreds(int)));
     connect(ui->comboBoxVendor, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVendor(int)));
@@ -154,14 +170,14 @@ void tabReceptCartridge::initWidgets()
     connect(ui->lineEditSerial, &QLineEdit::textEdited, this, &tabReceptCartridge::serialTextEdited);
     connect(ui->lineEditSerial, &QLineEdit::returnPressed, this, &tabReceptCartridge::findAndAddBySerial);
     connect(ui->comboBoxModel, &SComboBox::buttonClicked, this, &tabReceptCartridge::comboBoxModelButtonClickHandler);
-    connect(m_client, &SClientModel::modelUpdated, [=](){ui->checkBoxPrintReceipt->setChecked(comSettings->printCartridgeReceptDoc && !(m_client->options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular)));});
+    connect(m_client, &SClientModel::modelUpdated, [=](){ui->checkBoxPrintReceipt->setChecked(comSettings->printCartridgeReceptDoc() && !(m_client->isBalanceEnabled() | m_client->isCompany() | m_client->isRegular()));});
 }
 
 void tabReceptCartridge::clearWidgets()
 {
     ui->checkBoxIsHighPriority->setCheckState(Qt::Unchecked);
     ui->comboBoxPresetEngineer->setCurrentIndex(-1);
-    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty);
+    ui->spinBoxStickersCount->setValue(comSettings->defaultRepairStickersQty());
     ui->lineEditSerial->setText("");
     ui->spinBoxQty->setValue(1);
     ui->comboBoxVendor->setCurrentIndex(-1);
@@ -172,7 +188,7 @@ void tabReceptCartridge::clearWidgets()
     }
 }
 
-bool tabReceptCartridge::checkInput()
+int tabReceptCartridge::checkInput()
 {
     int error = 0;
 
@@ -188,7 +204,7 @@ bool tabReceptCartridge::checkInput()
         ui->comboBoxOffice->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 2;
     }
-    if ( comSettings->isEngineerRequiredOnDeviceRecept && ui->comboBoxPresetEngineer->currentIndex() < 0 )
+    if ( comSettings->isEngineerRequiredOnDeviceRecept() && ui->comboBoxPresetEngineer->currentIndex() < 0 )
     {
         ui->comboBoxPresetEngineer->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 3;
@@ -211,7 +227,13 @@ bool tabReceptCartridge::checkInput()
 
     for(auto form : existentForms())
     {
-        error = qMax(error, form->checkInput());
+        error = qMax(error, form->checkBeforeRepairCreate());
+    }
+
+    if (error)
+    {
+        Global::errorPopupMsg(Global::ThrowType::InputError);
+        m_closePending = 0;
     }
 
     return error;
@@ -232,7 +254,7 @@ bool tabReceptCartridge::checkInputBeforeAdd()
         ui->comboBoxModel->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 2;
     }
-    if(ui->lineEditSerial->text() == "" && comSettings->isCartridgeSerialNumberRequired && ui->spinBoxQty->value() == 1)
+    if(ui->lineEditSerial->text() == "" && comSettings->isCartridgeSerialNumberRequired() && ui->spinBoxQty->value() == 1)
     {
         ui->lineEditSerial->setStyleSheet(commonLineEditStyleSheetRed);
         error = 3;
@@ -360,7 +382,7 @@ void tabReceptCartridge::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
 
     ui->comboBoxPresetEngineer->setFont(font);
     ui->comboBoxCompany->setFont(font);
@@ -390,7 +412,7 @@ void tabReceptCartridge::print()
 
     // печать стикеров
 //    QMap<QString, QVariant> report_vars;
-//    if(comSettings->printCartridgeStickers)
+//    if(comSettings->printCartridgeStickers())
 //    {
 //        report_vars.insert("type", Global::Reports::rep_label);
 //        report_vars.insert("repair_id", repair);
@@ -503,11 +525,12 @@ void tabReceptCartridge::findAndAddBySerial()
 
     if(!m_client->isNew() && m_client->id() != q.value("client").toInt())
     {
-        shortlivedNotification *newPopup = new shortlivedNotification(this,
+        auto *p = new shortlivedNotification(this,
                                                                       tr("Информация"),
                                                                       tr("Нельзя принять картриджи разных клиентов вместе."),
                                                                       QColor(255,164,119),
                                                                       QColor(255,199,173));
+        Q_UNUSED(p);
         return;
     }
 
@@ -537,65 +560,100 @@ void tabReceptCartridge::dbgRandomFillClicked()
 }
 #endif
 
-bool tabReceptCartridge::createRepairs()
+int tabReceptCartridge::commitStages()
 {
-    if(checkInput())
-        return 0;
+    return 2;   // 2 этапа: запись данных клиента, запись данных о ремонтах
+}
 
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-
+void tabReceptCartridge::beginCommit()
+{
     setDefaultStyleSheets();
     m_printReport = ui->checkBoxPrintReceipt->isChecked(); // кэширование состояния
+}
 
-    QUERY_LOG_START(metaObject()->className());
-
-    try
+bool tabReceptCartridge::skip(const int stage)
+{
+    switch(stage)
     {
-        ui->widgetClient->commit();
-        m_client = ui->widgetClient->model();
+        case 0: return (!m_client->isNew() && !m_client->phones()->isUpdated());
+        default: ;
+    }
 
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        for(auto form : existentForms())
-        {
-            form->setClientId(m_client->id());
-            form->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-            form->setOfficeIndex(ui->comboBoxOffice->currentIndex());
-            form->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
-            if(ui->checkBoxIsHighPriority->isChecked())
-                form->setIsHighPriority(1);
-            form->setPaymentSystemIndex(ui->comboBoxPresetPaymentAccount->currentIndex());
+    return 0;
+}
 
-            form->createRepair();
-        }
+void tabReceptCartridge::commitClient()
+{
+    ui->widgetClient->commit();
+}
+
+void tabReceptCartridge::commitRepairs()
+{
+    for(auto form : existentForms())
+    {
+        form->setClientId(m_client->id());
+        form->setCompanyIndex(ui->comboBoxCompany->currentIndex());
+        form->setOfficeIndex(ui->comboBoxOffice->currentIndex());
+        form->setEngineerIndex(ui->comboBoxPresetEngineer->currentIndex());
+        if(ui->checkBoxIsHighPriority->isChecked())
+            form->setIsHighPriority(1);
+        form->setPaymentSystemIndex(ui->comboBoxPresetPaymentAccount->currentIndex());
+
+        form->createRepair();
+    }
 
 #ifdef QT_DEBUG
 //        Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-    catch (Global::ThrowType type)
+}
+
+void tabReceptCartridge::commit(const int stage)
+{
+    switch(stage)
     {
-        nErr = 0;
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-
-//        if(type == Global::ThrowType::Debug)
-//            nErr = 1; // это чтобы проверить работу дальше
+        case 0: commitClient(); break;
+        case 1: commitRepairs(); break;
     }
+}
 
-    QUERY_LOG_STOP;
+void tabReceptCartridge::throwHandler(int)
+{
+    ui->widgetClient->model()->setFieldsFailed();   // будет иметь эффект только в случае сбоя на этапе создания нового клиента
 
-    if (nErr)   // если все запросы выполнены без ошибок
+    // изменять статус полей в моделях ремонтов не нужно, т. к. они временные и больше нигде не используются
+    if(m_endCommitOp == CloseTab)
+        m_closePending = 0;
+}
+
+void tabReceptCartridge::endCommit(const int stage)
+{
+    if(stage == 0)
     {
-        print();
-        clearWidgets();
-        tabRepairs::refreshIfTabExists();
+        // изменять статус полей в модели данных клиента не нужно, т. к. в методе fillClientCreds происходит перезагрузка данных
+        ui->widgetClient->fillClientCreds(m_client->id());
     }
+    // изменять статус полей в моделях ремонтов не нужно, т. к. они временные и больше нигде не используются
+}
 
-    return nErr;
+void tabReceptCartridge::endCommit()
+{
+    print();
+    tabRepairs::refreshIfTabExists();
+    if(m_endCommitOp == PrepareRepeat)
+        prepareForRepeatedOp();
+    else
+        this->deleteLater();
+}
+
+void tabReceptCartridge::prepareForRepeatedOp()
+{
+    clearWidgets();
+}
+
+void tabReceptCartridge::createRepairs()
+{
+    m_endCommitOp = PrepareRepeat;
+    manualSubmit();
 }
 
 void tabReceptCartridge::createRepairsAndClose()
@@ -603,12 +661,9 @@ void tabReceptCartridge::createRepairsAndClose()
     if(!m_closePending)    // программа падает при двойном клике по кнопке.
     {
         m_closePending = 1;
-        if (createRepairs())
-            this->deleteLater();
-        else
-            m_closePending = 0;
+        m_endCommitOp = CloseTab;
+        manualSubmit();
     }
-
 }
 
 void tabReceptCartridge::comboBoxModelButtonClickHandler(int id)

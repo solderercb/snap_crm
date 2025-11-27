@@ -1,5 +1,6 @@
 #include "applog.h"
-#include "models/slocalsettings.h"
+#include <SLocalSettings>
+#include <QDebug>
 
 SAppLog* SAppLog::p_instance = nullptr;
 

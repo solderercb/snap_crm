@@ -2,7 +2,6 @@
 #define SABSTRACTITEMMODEL_H
 
 #include <QAbstractItemModel>
-#include <QObject>
 #include <QString>
 
 class SAbstractItemModel
@@ -19,7 +18,7 @@ public:
     int rowByDatabaseID(int id, QString field = "id");
     int databaseIDByRow(int row, int column);
     int databaseIDByRow(int row, QString field = "id");
-    template<typename T> int valueColumnToRow(T value, int column);
+    template<typename T> int valueColumnToRow(const T &value, int column);
     template<typename T> T rowColumnToValue(int row, int column);
     void setDisplayRoleColumn(const QString&);
     int findIndex(const QString&);
@@ -29,11 +28,12 @@ protected:
     QAbstractItemModel *abstractItemModel;
 };
 
-/*  Возвращает номер строки, соответствующий value из столбца column
+/*  Возвращает номер строки, в которой значение в столбце column равно value
+ *  id может быть как числом, так и строкой (например, код валюты)
  *  Если значение не найдено, возвращает -1
 */
 template<typename T>
-int SAbstractItemModel::valueColumnToRow(T value, int column)
+int SAbstractItemModel::valueColumnToRow(const T &value, int column)
 {
     if(abstractItemModel->rowCount() == 0)
         return -1;

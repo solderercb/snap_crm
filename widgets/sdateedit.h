@@ -2,8 +2,9 @@
 #define SDATEEDIT_H
 
 #include <QDateEdit>
-#include <QWidget>
-#include <QDebug>
+
+class QWidget;
+class QTimer;
 
 #define DATE_EDIT_REFRESH_TIMER 30000
 

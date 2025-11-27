@@ -1,11 +1,11 @@
 #ifndef SPAGESALARYREPAIRS_H
 #define SPAGESALARYREPAIRS_H
 
-#include <QWidget>
-#include "spagesalarybase.h"
-#include "../stableviewbase.h"
-#include "../stableviewsummarybase.h"
-#include "widgets/stableviewbaseitemdelegates.h"
+#include <QObject>
+#include <SSalaryBasePage>
+#include <STableViewSummaryBase>
+
+class QWidget;
 
 namespace Ui {
 class SPageSalaryRepairs;

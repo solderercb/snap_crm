@@ -1,9 +1,12 @@
 #ifndef TABPARTSREQUESTSMANAGER_H
 #define TABPARTSREQUESTSMANAGER_H
 
-#include "tabcommon.h"
-#include "modules/purchasemanager/sgroupingmodel.h"
-#include "widgets/speriodselector.h"
+#include <tabCommon>
+#include <QObject>
+#include <STableViewBase>
+
+class SStandardItemModel;
+class SPartsRequestsGroupingModel;
 
 namespace Ui {
 class tabPurchaseManager;
@@ -39,6 +42,10 @@ private:
     QString m_excludeStates;
     QString constructSubgroupListQuery(const int &group, const QString &field = QString());
     void constructQueryClause(FilterList &filter, const int &group = -1);
+    int commitStages() override;
+    bool skip(const int) override;
+    void commit(const int stage) override;
+    void endCommit() override;
 public slots:
     void quickFilterBySupplierUrl(const QString &url);
 private slots:
@@ -54,8 +61,9 @@ private slots:
     void undoComboBoxIndexChange(QComboBox *widget, int &oldIndex);
     void filterChanged(int);
     int checkChanges(int mask);
-    void confirmChanges(int &result, int mask = SuppliersModel, QMessageBox::StandardButtons buttons = QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
-    bool commitChanges(int flags = SuppliersModel);
+    void confirmChanges(int &result);
+    void confirmChanges(int &result, int mask);
+    void confirmChanges(int &result, int mask, int buttons);
 };
 
 class STableViewSubgroups : public STableViewBase

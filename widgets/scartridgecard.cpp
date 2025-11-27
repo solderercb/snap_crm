@@ -1,6 +1,15 @@
-#include "sapplication.h"
 #include "scartridgecard.h"
 #include "ui_scartridgecard.h"
+#include <QMessageBox>
+#include <SPermissions>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
+#include <SCartridgeCardModel>
+#include <SCartridgeMaterialModel>
+#include <SCartridgeMaterialsModel>
+#include <SCartridgeMaterialsDelegates>
+#include <STableViewGridLayout>
+#include <FlashPopup>
 
 SCartridgeCard::SCartridgeCard(Qt::WindowFlags flags, QWidget *parent) :
     SModalWidget(parent, flags),
@@ -107,7 +116,7 @@ void SCartridgeCard::configureWidgets()
     connect(ui->pushButtonAddMaterial, &QPushButton::clicked, m_materialsModel, &SCartridgeMaterialsModel::appendRow);
     connect(ui->pushButtonRemoveMaterial, &QPushButton::clicked, this, &SCartridgeCard::removeMaterial);
     connect(ui->spinBoxTonerWeight, qOverload<int>(&QSpinBox::valueChanged), m_materialsModel, &SCartridgeMaterialsModel::setDefaultTonerWeight);
-    connect(ui->pushButtonCreateSave, &QPushButton::clicked, this, &SCartridgeCard::commit);
+    connect(ui->pushButtonCreateSave, &QPushButton::clicked, this, &SCartridgeCard::manualSubmit);
     connect(ui->pushButtonCancel, &QPushButton::clicked, this, &SCartridgeCard::closeForm);
     connect(ui->tableViewMaterials->horizontalHeader(), &QHeaderView::sectionClicked, this, &SCartridgeCard::sortMaterials);
 }
@@ -160,7 +169,7 @@ SStandardItemModel *SCartridgeCard::colorsList()
     return list;
 }
 
-bool SCartridgeCard::checkInput()
+int SCartridgeCard::checkInput()
 {
     try
     {
@@ -192,28 +201,24 @@ bool SCartridgeCard::checkInput()
             case 6: errMsg = tr("Не указана модель картриджа"); break;
             default: errMsg = "";
         }
-        shortlivedNotification *newPopup = new shortlivedNotification(this,
-                                                                      tr("Ошибка"),
-                                                                      errMsg,
-                                                                      QColor(255,164,119),
-                                                                      QColor(255,199,173));
-        return 0;
+        Global::errorPopupMsg(errMsg);
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 
 void SCartridgeCard::setModelData()
 {
-    m_cardModel->setArchive(ui->checkBoxArchive->isChecked());
-    m_cardModel->setColor(m_cartridgeColors->databaseIDByRow(ui->comboBoxColor->currentIndex()));
-    m_cardModel->setFullWeight(ui->spinBoxFullWeight->value());
-    m_cardModel->setTonerWeight(ui->spinBoxTonerWeight->value());
-    m_cardModel->setVendor(m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex()));
-    m_cardModel->setName(ui->lineEditName->text());
-    m_cardModel->setNotes(ui->plainTextEditNotes->toPlainText());
-//    m_cardModel->setPhoto()   // TODO:
-    m_cardModel->setResource(ui->spinBoxResource->value());
+    m_cardModel->set_archive(ui->checkBoxArchive->isChecked());
+    m_cardModel->set_color(m_cartridgeColors->databaseIDByRow(ui->comboBoxColor->currentIndex()));
+    m_cardModel->set_fullWeight(ui->spinBoxFullWeight->value());
+    m_cardModel->set_tonerWeight(ui->spinBoxTonerWeight->value());
+    m_cardModel->set_vendor(m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex()));
+    m_cardModel->set_name(ui->lineEditName->text());
+    m_cardModel->set_notes(ui->plainTextEditNotes->toPlainText());
+//    m_cardModel->set_photo()   // TODO:
+    m_cardModel->set_resource(ui->spinBoxResource->value());
 }
 
 void SCartridgeCard::materialSelected(const QModelIndex &index)
@@ -240,60 +245,43 @@ void SCartridgeCard::setTonerWeight(const int weight)
     ui->spinBoxTonerWeight->blockSignals(false);
 }
 
-bool SCartridgeCard::commit()
+void SCartridgeCard::throwHandler(int)
 {
-    if(!checkInput())
-        return 0;
+    m_cardModel->setFieldsFailed();
+}
 
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-    bool nErr = 1;
-    bool isNew = (m_cardModel->id() == 0);
+void SCartridgeCard::beginCommit()
+{
     setModelData();
+}
 
-    QUERY_LOG_START(metaObject()->className());
-    try
+void SCartridgeCard::endCommit()
+{
+    m_cardModel->SSingleRowModelBase::load();
+    setMaterialsTableFilter(m_cardModel->id());
+    if(!m_id)
     {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        m_cardModel->commit();
-        if(isNew)
-            m_materialsModel->setCardId(m_cardModel->id());
-        m_materialsModel->commit();
-
-#ifdef QT_DEBUG
-//        Global::throwDebug();
-#endif
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-
+        m_id = m_cardModel->id();
+        emit newCardCreated(m_id);
     }
-    catch (Global::ThrowType type)
+    else
     {
-        nErr = 0;
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
+        emit cardModified(m_id);
     }
 
-    QUERY_LOG_STOP;
+    updateWidgets();
 
-    if(nErr)
-    {
-        if(!m_id)
-        {
-            m_id = m_cardModel->id();
-            setMaterialsTableFilter(m_id);
-            emit newCardCreated(m_id);
-        }
-        else
-        {
-            emit cardModified(m_id);
-        }
+    auto *p = new shortlivedNotification(this, tr("Успешно"), tr("Данные сохранены"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
+}
 
-        updateWidgets();
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Успешно"), tr("Данные сохранены"), QColor(214,239,220), QColor(229,245,234));
-    }
-
-    return nErr;
+void SCartridgeCard::commit(const int)
+{
+    bool isNew = (m_cardModel->id() == 0);
+    m_cardModel->commit();
+    if(isNew)
+        m_materialsModel->setCardId(m_cardModel->id());
+    m_materialsModel->commit();
 }
 
 void SCartridgeCard::closeForm()
@@ -318,7 +306,7 @@ void SCartridgeCard::sortMaterials(const int column)
         switch (resBtn)
         {
             case QMessageBox::Yes:
-                if(!commit())
+                if(!manualSubmit())
                 {
                     ui->tableViewMaterials->undoToggleSortIndicator();
                     return;
@@ -399,6 +387,8 @@ void materialsTable::clearModel()
 
 void materialsTable::setModelQuery(const QString &query, const QSqlDatabase &database)
 {
+    Q_UNUSED(database)
+
     m_model->setSelectStatement(query);
     m_model->select();
 }

@@ -1,4 +1,5 @@
 #include "stableviewsalarysaleparts.h"
+#include <STableViewGridLayout>
 
 STableViewSalarySaleParts::STableViewSalarySaleParts(QWidget *parent) :
     STableViewBase(SLocalSettings::SalarySalePartsGrid, parent)

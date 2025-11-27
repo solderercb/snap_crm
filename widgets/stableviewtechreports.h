@@ -1,9 +1,10 @@
 #ifndef STABLEVIEWTECHREPORTS_H
 #define STABLEVIEWTECHREPORTS_H
 
-#include "stableviewbase.h"
+#include <STableViewBase>
 #include <QWidget>
-#include "models/stabletechreportsmodel.h"
+
+class STableTechReportsModel;
 
 class STableViewTechReports : public STableViewBase
 {

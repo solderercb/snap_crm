@@ -1,19 +1,19 @@
 #ifndef TABSALARY_H
 #define TABSALARY_H
 
-#include <QWidget>
-#include "tabcommon.h"
-#include "models/susermodel.h"
-#include "models/ssortfilterproxymodel.h"
-#include "models/salarytabmodels/stablesalaryrepairsmodel.h"
-#include "models/salarytabmodels/stablesalaryreceptedissued.h"
-#include "models/salarytabmodels/stablesalaryrepairworksmodel.h"
-#include "models/salarytabmodels/stablesalaryrepairpartsmodel.h"
-#include "models/salarytabmodels/stablesalarypaymentsmodel.h"
-#include "models/salarytabmodels/stablesalarysalesmodel.h"
-#include "models/salarytabmodels/stablesalaryitemsmodel.h"
-#include "models/salarytabmodels/stablesalarysalepartsmodel.h"
-#include "models/salarytabmodels/stablesalaryextramodel.h"
+#include <tabCommon>
+
+class SUserModel;
+class SSortFilterProxyModel;
+class STableSalaryRepairsModel;
+class STableSalaryRepairWorksModel;
+class STableSalaryRepairPartsModel;
+class STableSalarySalesModel;
+class STableSalarySalePartsModel;
+class STableSalaryExtraModel;
+class STableSalaryItemsModel;
+class STableSalaryPaymentsModel;
+class STableSalaryReceptedIssued;
 
 namespace Ui {
 class tabSalary;
@@ -73,7 +73,7 @@ private:
     void modelsUpdated();
     void updateWidgets();
     void setModelUpdatedFlag(const int pos);
-    bool checkInput();
+    int checkInput() override;
     void createTabSelectExistingClient();
 public slots:
     void loadButtonPressed();

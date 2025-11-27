@@ -1,136 +1,226 @@
 #include "sfieldsmodel.h"
+#include <QHash>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <ProjectQueries>
+#include <QMetaProperty>
+#include <SFieldModel>
+#include <FieldFactory>
+#include <SLogRecordModel>
 
-SFieldsModel::SFieldsModel(Type type, QObject *parent) :
-    QObject(parent),
-    m_type(type)
+SFieldsModel::SFieldsModel(std::unique_ptr<FieldFactory> factory, QObject *parent) :
+    QObject(parent)
 {
-    query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    setFieldFactory(std::move(factory));
 }
 
 SFieldsModel::~SFieldsModel()
 {
-    delete query;
     clear();
 }
 
 void SFieldsModel::clear()
 {
-    SFieldValueModel *f;
-
-    while(!m_fieldsList.isEmpty())
+    m_ownerId = 0;
+    while(!m_valueModels.isEmpty())
     {
-        f = m_fieldsList.last();
-        m_fieldsList.removeLast();
-        delete f;
+        m_valueModels.removeLast();
     }
 }
 
-QList<SFieldValueModel*> SFieldsModel::list()
+/* Возвращает массив указателей на SFieldModel, соответствующих заданной категории
+*/
+QList<std::shared_ptr<SFieldModel> > SFieldsModel::entitiesList()
 {
-    return m_fieldsList;
+    QList<std::shared_ptr<SFieldModel>> list;
+
+    if(!m_initDone)
+        return list;
+
+    foreach (auto f, m_valueModels)
+    {
+        list.append(f->m_entityModel);
+    }
+
+    return list;
+
 }
 
-/*  Инициализация массива виджетов для нового товара или ремонта
- *  isRepair == 1 — инициализация виджетов для класса <id> устройств,
- *  иначе для <id> категории товаров
+/* Возвращает массив указателей на SFieldValueModel, существующих в БД
+ * (т. е. загруженных ранее или записанных при жизни этой модели).
+ *
+*/
+QList<std::shared_ptr<SFieldValueModel>> SFieldsModel::valuesList()
+{
+    QList<std::shared_ptr<SFieldValueModel>> list;
+
+    foreach (auto f, m_valueModels)
+    {
+        if(f->isPrimaryKeyValid())
+            list.append(f);
+    }
+
+    return list;
+}
+
+void SFieldsModel::setSqlQuery(std::shared_ptr<QSqlQuery> query)
+{
+    m_query = query;
+}
+
+/*  Инициализация массива виджетов
  */
+bool SFieldsModel::init()
+{
+    Q_ASSERT_X(m_category, "Category not set", "call setCategory() before init()");
+
+    if(m_initDone)
+        return 1;
+
+    QMap<int, std::shared_ptr<SFieldValueModel>> loadedValues;
+    foreach(auto f, m_valueModels)
+    {
+        if(f->isModelLoaded())
+            loadedValues.insert(f->fieldId(), f);
+    }
+
+    std::shared_ptr<SFieldModel> entityModel;
+    std::shared_ptr<SFieldValueModel> valueModel;
+
+    initSqlQuery();
+    m_query->exec(QUERY_SEL_ADDITIONAL_FIELDS_TYPES(m_fieldFactory->type(), m_category));
+
+    while(m_query->next())
+    {
+        entityModel = std::make_shared<SFieldModel>(m_query->value(0).toInt(), m_database);
+        entityModel->createWidget();
+
+        if(loadedValues.contains(entityModel->id()))
+        {
+            valueModel = loadedValues[entityModel->id()];
+            entityModel->setWidgetValue(valueModel->value());
+            valueModel->enableEdit(entityModel);
+            continue;
+        }
+        if(loadedValues.isEmpty())
+            entityModel->setWidgetDefaultValue(); // дефолтные значения только для абсолютно новой модели
+
+        valueModel = std::make_shared<SFieldValueModel>(entityModel);
+        m_fieldFactory->initFieldHandler(valueModel);
+        add(valueModel);
+    }
+
+    updateValueModelOwner();
+
+    m_initDone = 1;
+
+    return 1;
+}
+
 bool SFieldsModel::init(const int id)
 {
     if(id == 0)
         return 0;
 
-    if( !m_fieldsList.isEmpty() )
-    {
-        clear();
-    }
+    if(m_category != id)
+        m_initDone = 0;
 
-    SFieldValueModel *field;
-
-    query->exec(QUERY_SEL_ADDITIONAL_FIELDS_TYPES((m_type?1:0), id));
-    while(query->next())
-    {
-        field = new SFieldValueModel();
-        field->createWidget(query->record());
-        add(field);
-    }
-    return 1;
+    m_category = id;
+    return init();
 }
 
 bool SFieldsModel::load(int id)
 {
     clear();
-    if(m_type == Type::Repair)
-        query->exec(QUERY_SEL_REPAIR_ADD_FIELDS(id));
-    else
-        query->exec(QUERY_SEL_ITEM_ADD_FIELDS(id));
 
-    while(query->next())
+    m_ownerId = id;
+    initSqlQuery();
+    m_query->exec(m_fieldFactory->query(id));
+
+    while(m_query->next())
     {
-        itemHandler(query->record());
+        initValueModel(m_query->record());
     }
+
 
     return 1;
 }
 
 void SFieldsModel::initDemo()
 {
-    if( !m_fieldsList.isEmpty() )
+    if( !m_valueModels.isEmpty() )
     {
         clear();
     }
 
-    SFieldValueModel *field;
+    std::shared_ptr<SFieldValueModel> field;
 
-    query->exec("SELECT 1 AS 'id', '<extra field 1>' AS 'name', '<value 1>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 1 AS `printable` \n"\
+    initSqlQuery();
+    m_query->exec("SELECT 1 AS 'id', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '<value 1>' AS 'value', '<extra field 1>' AS 'name', 1 AS 'printable'\n"\
                 "UNION ALL\n"\
-                "SELECT 2 AS 'id', '<extra field 2>' AS 'name', '<value 2>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 1 AS `printable` \n"\
+                "SELECT 2 AS 'id', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '<value 2>' AS 'value', '<extra field 2>' AS 'name', 1 AS 'printable'\n"\
                 "UNION ALL\n"\
-                "SELECT 3 AS 'id', '<extra field 3>' AS 'name', '<value 3>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 0 AS `printable` \n"\
+                "SELECT 3 AS 'id', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '<value 3>' AS 'value', '<extra field 3>' AS 'name', 0 AS 'printable'\n"\
                 "UNION ALL\n"\
-                "SELECT 4 AS 'id', '<extra field 4>' AS 'name', '<value 4>' AS 'value', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '' AS 'comment', 1 AS `printable`;");
-    while(query->next())
+                "SELECT 4 AS 'id', 0 AS 'field_id', 0 AS 'repair_id', 0 AS 'item_id', '<value 4>' AS 'value', '<extra field 4>' AS 'name', 1 AS 'printable';");
+    while(m_query->next())
     {
-        field = new SFieldValueModel();
-        field->load(query->record());
+        field = std::make_shared<SFieldValueModel>();
+        field->load(m_query->record());
         add(field);
     }
 }
 
-void SFieldsModel::add(SFieldValueModel *item)
+void SFieldsModel::add(std::shared_ptr<SFieldValueModel> item)
 {
-    m_fieldsList.append(item);
+    m_valueModels.append(item);
 }
 
-void SFieldsModel::remove(SFieldValueModel *item)
+void SFieldsModel::setFieldFactory(std::unique_ptr<FieldFactory> factory)
 {
-    m_removeList.append(item);
-    int index = m_fieldsList.indexOf(item);
-    m_fieldsList.removeAt(index);
-
+    m_fieldFactory = std::move(factory);
+    initFieldsHandlers();
 }
 
-bool SFieldsModel::isEmpty()
+void SFieldsModel::initFieldsHandlers()
 {
-    return m_fieldsList.isEmpty();
-}
-
-void SFieldsModel::setObjectId(const int id)
-{
-    SFieldValueModel *f;
-    foreach(f, m_fieldsList)
+    foreach(auto f, m_valueModels)
     {
-        if(m_type == Type::Repair)
-            f->setRepairId(id);
-        else
-            f->setItemId(id);
+        if(f->m_field.get())
+            continue;
+
+        m_fieldFactory->initFieldHandler(f);
+    }
+
+}
+
+void SFieldsModel::setOwnerId(const int id)
+{
+    m_ownerId = id;
+    updateValueModelOwner();
+}
+
+void SFieldsModel::updateValueModelOwner()
+{
+    foreach(auto f, m_valueModels)
+    {
+        f->setOwnerId(m_ownerId);
     }
 }
 
 bool SFieldsModel::commit()
 {
-    SFieldValueModel *item;
-    foreach(item, m_fieldsList)
+    std::shared_ptr<SFieldValueModel> item;
+    foreach(item, m_valueModels)
     {
+        if(!item->acquireWidgetValue())
+        {
+            if(item->isPrimaryKeyValid())
+            {
+                m_removeList.append(item);
+            }
+            continue;
+        }
         item->commit();
     }
 
@@ -138,9 +228,7 @@ bool SFieldsModel::commit()
     {
         item = m_removeList.last();
         item->delDBRecord();
-
         m_removeList.removeLast();
-        item->deleteLater();
     }
 
     return 1;
@@ -149,39 +237,39 @@ bool SFieldsModel::commit()
 bool SFieldsModel::validate()
 {
     bool ret = 1;
-    SFieldValueModel *item;
-    foreach(item, m_fieldsList)
+
+    foreach(auto item, m_valueModels)
     {
-        ret &= item->validate();
+        ret &= item->m_entityModel->validate();
     }
     return ret;
 }
 
-void SFieldsModel::resetIds()
+void SFieldsModel::setAllFailed()
 {
-    SFieldValueModel *item;
-    foreach(item, m_fieldsList)
+    foreach(auto item, m_valueModels)
     {
         if(!item->value().isEmpty())
-            item->setId(0);
+        {
+            item->setFieldsFailed();
+            item->i_logRecord->setFieldsFailed();
+        }
     }
 }
 
-void SFieldsModel::enableEdit()
+void SFieldsModel::enableEdit(const int cat)
 {
-    SFieldValueModel *item;
-    foreach(item, m_fieldsList)
-    {
-        connect(item, SIGNAL(emptied(SFieldValueModel*)), this, SLOT(remove(SFieldValueModel*)));
-    }
+    init(cat);
 }
 
 int SFieldsModel::printableFieldsCount()
 {
     int count = 0;
-    for( SFieldValueModel *i : qAsConst(m_fieldsList) )
-        if(i->isPrintable())
+    foreach(auto item, m_valueModels)
+    {
+        if(item->isPrintable())
             count++;
+    }
 
     return count;
 }
@@ -191,7 +279,7 @@ QString SFieldsModel::reportFieldName()
     if(m_reportFieldIndex == -1)
         return QString();
 
-    return m_fieldsList.at(m_reportFieldIndex)->name();
+    return m_valueModels.at(m_reportFieldIndex)->name();
 }
 
 QString SFieldsModel::reportFieldValue()
@@ -199,19 +287,38 @@ QString SFieldsModel::reportFieldValue()
     if(m_reportFieldIndex == -1)
         return QString();
 
-    return m_fieldsList.at(m_reportFieldIndex)->value();
+    return m_valueModels.at(m_reportFieldIndex)->value();
 }
 
-SFieldValueModel *SFieldsModel::itemHandler(const QSqlRecord &record)
+void SFieldsModel::initValueModel()
 {
-    SFieldValueModel *item = new SFieldValueModel(this);
-    item->load(record);
-    add(item);
-    return item;
+    initValueModel(QSqlRecord());
+}
+
+void SFieldsModel::initValueModel(const QSqlRecord &rec)
+{
+    std::shared_ptr<SFieldValueModel> model = std::make_shared<SFieldValueModel>(this);
+    m_fieldFactory->initFieldHandler(model);
+    model->load(rec);
+    add(model);
+}
+
+void SFieldsModel::initSqlQuery()
+{
+    initSqlQuery(QSqlDatabase::database("connMain"));
+}
+
+void SFieldsModel::initSqlQuery(QSqlDatabase database)
+{
+    if(!m_query.get())
+    {
+        m_database = database;
+        m_query = std::make_shared<QSqlQuery>(database);
+    }
 }
 
 /* Метод получения данных для отчетов LimeReport
- * Смотри описание метода с таким же названием в классе SComRecord
+ * Смотри описание метода с таким же названием в классе SSingleRowJModel
  */
 void SFieldsModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)
 {
@@ -246,11 +353,11 @@ void SFieldsModel::reportCallbackDataChangePos(const LimeReport::CallbackInfo::C
         m_reportFieldIndex = 0;
     else
     {
-        if(m_reportFieldIndex+1 >= m_fieldsList.count())
+        if(m_reportFieldIndex+1 >= m_valueModels.count())
             return;
-        while(!m_fieldsList.at(++m_reportFieldIndex)->isPrintable())
+        while(!m_valueModels.at(++m_reportFieldIndex)->isPrintable())
         {
-            if(m_reportFieldIndex+1 >= m_fieldsList.count())
+            if(m_reportFieldIndex+1 >= m_valueModels.count())
                 return;
         }
     }
@@ -260,10 +367,10 @@ void SFieldsModel::reportCallbackDataChangePos(const LimeReport::CallbackInfo::C
 #ifdef QT_DEBUG
 void SFieldsModel::randomFill()
 {
-    for(int j=0; j< m_fieldsList.size(); j++)   // автозаполнение обязательных доп. полей
+    for(int j=0; j< m_valueModels.size(); j++)   // автозаполнение обязательных доп. полей
     {
-        if ( m_fieldsList[j]->property("fieldRequired").toBool() )
-            m_fieldsList[j]->randomFill();
+        if ( m_valueModels[j]->property("fieldRequired").toBool() )
+            m_valueModels[j]->randomFill();
     }
 }
 #endif

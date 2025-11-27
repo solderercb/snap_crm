@@ -1,12 +1,20 @@
 #include "tabclient.h"
 #include "ui_tabclient.h"
+#include <SPermissions>
+#include <SClientModel>
+#include <QWidget>
+#include <QSqlQueryModel>
+#include <QSqlField>
+#include <QScrollBar>
+#include <SClientSummaryPage>
 
 QMap<int, tabClient*> tabClient::p_instance;
 
 tabClient::tabClient(int id, MainWindow *parent) :
     tabCommon(parent),
     ui(new Ui::tabClient),
-    m_clientId(id)
+    m_clientId(id),
+    m_editStrategy(SClientModel::EditStrategy::OnManualSubmit)
 {
     logUserActivity();
 

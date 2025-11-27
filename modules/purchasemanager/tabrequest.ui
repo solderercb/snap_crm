@@ -602,23 +602,23 @@
   <customwidget>
    <class>SPartSuppliers</class>
    <extends>QWidget</extends>
-   <header>modules/purchasemanager/ssupplierswidget.h</header>
+   <header location="global">SPartSuppliers</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
+   <header location="global">SComboBox</header>
   </customwidget>
   <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
+   <header location="global">SDoubleSpinBox</header>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
@@ -627,29 +627,29 @@
   <customwidget>
    <class>SComments</class>
    <extends>QWidget</extends>
-   <header>widgets/scomments.h</header>
+   <header location="global">SComments</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SCheckComboBox</class>
    <extends>QComboBox</extends>
-   <header>widgets/scheckcombobox.h</header>
+   <header location="global">SCheckComboBox</header>
   </customwidget>
   <customwidget>
    <class>STextEdit</class>
    <extends>QTextEdit</extends>
-   <header>widgets/stextedit.h</header>
+   <header location="global">STextEdit</header>
   </customwidget>
   <customwidget>
    <class>SClientSelectForm</class>
    <extends>QWidget</extends>
-   <header>widgets/sclientselectform.h</header>
+   <header location="global">SClientSelectForm</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SDateEdit</class>
    <extends>QDateEdit</extends>
-   <header>widgets/sdateedit.h</header>
+   <header location="global">SDateEdit</header>
   </customwidget>
  </customwidgets>
  <resources/>

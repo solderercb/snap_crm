@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QSqlQuery>
-#include "sphonemodel.h"
-#include "slogrecordmodel.h"
+#include <QSqlRecord>
+#include <LImeReport>
+
+class SPhoneModel;
 
 class SPhonesModel : public QObject
 {
@@ -30,7 +32,6 @@ public:
     bool commit();
     bool isUpdated();
     void reset();
-    void markUpdated(bool state = true);
     QString primaryStr();
     QString phone2();
     QString phone3();

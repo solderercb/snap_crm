@@ -1,4 +1,9 @@
 #include "scheckcombobox.h"
+#include <QStandardItemModel>
+#include <QAbstractItemModel>
+#include <QEvent>
+#include <QIdentityProxyModel>
+#include <QDebug>
 
 SCheckComboBox::SCheckComboBox(QWidget *parent) :
     SComboBox(parent)
@@ -44,6 +49,18 @@ QList<int> SCheckComboBox::checked()
     return ret;
 }
 
+/* Аналогично checked(), но результат в виде строки, где id через запятую
+*/
+QString SCheckComboBox::checkedString()
+{
+    QStringList stringList;
+    foreach (auto v, checked())
+    {
+        stringList.append(QString::number(v));
+    }
+    return stringList.join(',');
+}
+
 /* Возвращает список id НЕ отмеченных галочной строк
 */
 QList<int> SCheckComboBox::unchecked()
@@ -69,6 +86,8 @@ QList<int> SCheckComboBox::unchecked()
 */
 void SCheckComboBox::resetChecked()
 {
+    Q_ASSERT_X(m_proxyModel, this->objectName().toLocal8Bit(), "data model not set");
+
     m_proxyModel->setAll(Qt::Unchecked);
 }
 
@@ -80,10 +99,23 @@ void SCheckComboBox::setChecked(const QList<int> &list)
     toggleChecked(list);
 }
 
+void SCheckComboBox::setChecked(const QString &csv_list)
+{
+    QStringList stringList = csv_list.split(',');
+    QList<int> intList;
+    foreach (auto v, stringList)
+    {
+        intList.append(v.toInt());
+    }
+    setChecked(intList);
+}
+
 /* Переключение состояния checkBox, соответствующего id, в противоположное состояние
 */
 void SCheckComboBox::toggleChecked(const int id)
 {
+    Q_ASSERT_X(m_proxyModel, this->objectName().toLocal8Bit(), "data model not set");
+
     QModelIndexList l = m_proxyModel->match(m_proxyModel->index(0, SCheckComboBoxDataModel::Columns::Id), Qt::DisplayRole, id);
     QModelIndexList::ConstIterator it = l.constBegin();
     while(it != l.constEnd())

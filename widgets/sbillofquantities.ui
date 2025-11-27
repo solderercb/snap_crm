@@ -358,7 +358,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
@@ -367,7 +367,7 @@ QPushButton:checked{ background-color: rgba(255, 255, 255, 0); border: none;}
   <customwidget>
    <class>STableViewBOQWorkshop</class>
    <extends>QTableView</extends>
-   <header>widgets/stableviewboqworkshop.h</header>
+   <header location="global">SBOQWorkshopView</header>
   </customwidget>
  </customwidgets>
  <resources>

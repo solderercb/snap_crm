@@ -1,4 +1,12 @@
 #include "sgroupboxeventfilter.h"
+#include <QGroupBox>
+#include <QEvent>
+#include <QLabel>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QTableView>
+#include <QPushButton>
+#include <QMouseEvent>
 
 SGroupBoxEventFilter::SGroupBoxEventFilter(QObject *parent) : QObject(parent)
 {

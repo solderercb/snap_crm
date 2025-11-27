@@ -1,5 +1,10 @@
 #include "srequestsmodel.h"
-#include "modules/purchasemanager/srequeststable.h"
+#include <QSqlDriver>
+#include <QSqlField>
+#include <SPartsRequestsView>
+#include <SPermissions>
+#include <SStandardItemModel>
+#include <SLogRecordModel>
 
 SPartsRequestsModel::SPartsRequestsModel(QObject *parent, QSqlDatabase db)
     : SEditableBaseModel{parent, db}
@@ -144,7 +149,7 @@ bool SPartsRequestsModel::select()
     return SEditableBaseModel::select();
 }
 
-bool SPartsRequestsModel::selectRow(int row)
+bool SPartsRequestsModel::selectRow(int)
 {
     return SEditableBaseModel::select();
 }
@@ -162,7 +167,7 @@ QModelIndex SPartsRequestsModel::indexForShortData(const QModelIndex &index) con
 QVariant SPartsRequestsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)
-        return tr("no permissions");
+        return tr("no permissions"); // TODO: заменить "no permissions" на "Имя Ф." (как при переводе денег на карту)
 
     return dataShort(idx);
 }
@@ -194,8 +199,8 @@ bool SPartsRequestsModel::updateRowInTable(int row, const QSqlRecord &values)
     }
 
     SLogRecordModel logRecord;
-    logRecord.setType(SLogRecordModel::RecordTypes::PartRequest);
-    logRecord.setPartRequestId(whereField.value().toInt());
+    logRecord.set_type(SLogRecordModel::RecordTypes::PartRequest);
+    logRecord.set_partRequest(whereField.value().toInt());
 
     QString logText;
     QMap<QString, QString> logTexts;
@@ -222,7 +227,7 @@ bool SPartsRequestsModel::updateRowInTable(int row, const QSqlRecord &values)
     }
     foreach(logText, logTexts)
     {
-        logRecord.setText(logText);
+        logRecord.set_text(logText);
         logRecord.commit();
     }
 
@@ -233,7 +238,7 @@ bool SPartsRequestsModel::submitAll()
 {
     m_postSubmitAction = PostSubmitAction::NoSelect;    // нужно пропустить вызов метода select() из родительского класса и вызвать его самостоятельно по окончании (для сохранения положения и выделенной строки)
 
-    SDatabaseRecord::checkSystemTime();
+    SSingleRowModel::checkSystemTime();
 
     if(!SEditableBaseModel::submitAll())
     {

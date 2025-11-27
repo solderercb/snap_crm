@@ -1,8 +1,10 @@
 #include "srequestswidget.h"
 #include "ui_srequestswidget.h"
-#include "mainwindow.h"
-#include "modules/purchasemanager/tabrequest.h"
-#include "modules/purchasemanager/tabmanager.h"
+#include <ProjectQueries>
+#include <MainWindow>
+#include <tabPartRequest>
+#include <tabPurchaseManager>
+#include <FlashPopup>
 
 SPartsRequests::SPartsRequests(QWidget *parent) :
     SWidget(parent),
@@ -54,42 +56,11 @@ STableViewBase *SPartsRequests::tableView()
     return ui->tableView;
 }
 
-void SPartsRequests::manualSubmit()
+void SPartsRequests::endCommit()
 {
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-
-    QUERY_LOG_START(metaObject()->className());
-
-    try
-    {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-
-        commit();
-
-#ifdef QT_DEBUG
-//        Global::throwDebug();
-#endif
-        QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-    catch (const Global::ThrowType &type)
-    {
-        nErr = 0;
-        if (type == Global::ThrowType::ConnLost)
-        {
-            ;
-        }
-        else
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-
-    QUERY_LOG_STOP;
-
-    if(nErr)
-    {
-        refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
-    }
+    refresh(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionPreserve);
+    auto *p = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
 }
 
 /* Вызов метода проверки несохранённых данных в таблицах заявок и ссылок на вкладке Мереджер закупок
@@ -152,9 +123,14 @@ void SPartsRequests::setTableLayout(const SLocalSettings::SettingsVariant &layou
     ui->tableView->readLayout();
 }
 
-void SPartsRequests::commit()
+void SPartsRequests::commit(const int stage)
 {
+    Q_UNUSED(stage)
     m_model->submitAll();
+
+#ifdef QT_DEBUG
+//    Global::throwDebug();
+#endif
 }
 
 void SPartsRequests::tableRowSelected(const QModelIndex &current, const QModelIndex &prev)
@@ -199,7 +175,8 @@ void SPartsRequests::createRequestCopy()
 
     if(selection->selectedRows().count() > 1)
     {
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Выделено более одной строки"), QColor(212,237,242), QColor(229,244,247));
+        auto *p = new shortlivedNotification(this, tr("Информация"), tr("Выделено более одной строки"), QColor(212,237,242), QColor(229,244,247));
+        Q_UNUSED(p);
         return;
     }
 

@@ -1,19 +1,19 @@
 #ifndef STABLEVIEWBASEITEMDELEGATES_H
 #define STABLEVIEWBASEITEMDELEGATES_H
-#include <QApplication>
 #include <QStyledItemDelegate>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QLineEdit>
-#include <QMouseEvent>
-#include <QAbstractItemView>
-#include <QStyleOption>
-#include <QPainter>
 #include <QProgressBar>
-#include "../models/stablebasemodel.h"
-#include "../global.h"
+
+class STableBaseModel;
+class QWidget;
+class QModelIndex;
+class QAbstractItemModel;
+class QStyleOptionViewItem;
+class QPainter;
+class QEvent;
+class QFont;
+class QStyleOptionProgressBar;
+class QSpinBox;
+class QDoubleSpinBox;
 
 #define PIXMAP_W 16
 #define PIXMAP_H 16

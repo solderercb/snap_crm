@@ -451,43 +451,43 @@
   <customwidget>
    <class>SPageSalarySummary</class>
    <extends>QWidget</extends>
-   <header>widgets/salarytabwidgets/spagesalarysummary.h</header>
+   <header location="global">SSalarySummaryPage</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPageSalaryRepairs</class>
    <extends>QWidget</extends>
-   <header>widgets/salarytabwidgets/spagesalaryrepairs.h</header>
+   <header location="global">SSalaryRepairsPage</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPageSalaryReceptedIssued</class>
    <extends>QWidget</extends>
-   <header>widgets/salarytabwidgets/spagesalaryreceptedissued.h</header>
+   <header location="global">SSalaryReceptedIssuedPage</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPageSalaryPayments</class>
    <extends>QWidget</extends>
-   <header>widgets/salarytabwidgets/spagesalarypayments.h</header>
+   <header location="global">SSalaryPaymentsPage</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPageSalarySales</class>
    <extends>QWidget</extends>
-   <header>widgets/salarytabwidgets/spagesalarysales.h</header>
+   <header location="global">SSalarySalesPage</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPageSalaryItems</class>
    <extends>QWidget</extends>
-   <header>widgets/salarytabwidgets/spagesalaryitems.h</header>
+   <header location="global">SSalaryItemsPage</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPageSalaryExtra</class>
    <extends>QWidget</extends>
-   <header>widgets/salarytabwidgets/spagesalaryextra.h</header>
+   <header location="global">SSalaryExtraPage</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

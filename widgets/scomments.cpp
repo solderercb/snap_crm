@@ -1,5 +1,22 @@
 #include "scomments.h"
 #include "ui_scomments.h"
+#include <QScrollArea>
+#include <QMenu>
+#include <QAction>
+#include <QClipboard>
+#include <QScrollBar>
+#include <QMessageBox>
+#include <ProjectGlobals>
+#include <SUserSettings>
+#include <SPermissions>
+#include <SUserActivityModel>
+#include <tabCommon>
+#include <SPlainTextEdit>
+#include <SCommentModel>
+#include <SCommentsModel>
+#ifdef QT_DEBUG
+#include <QTest>
+#endif
 
 SComments::SComments(QWidget *parent) :
     SWidget(parent),
@@ -48,15 +65,15 @@ void SComments::initTableMenu()
     tableMenu = new QMenu(this);
     QAction * copy = new QAction(tr("Копировать"), tableMenu);
     copy->setProperty("type", MenuActions::Copy);
-    connect(copy, SIGNAL(triggered()), this, SLOT(copyToClipboard()));
+    connect(copy, &QAction::triggered, this, &SComments::copyToClipboard);
     tableMenu->addAction(copy);
     QAction * edit = new QAction(tr("Редактировать"), tableMenu);
     edit->setProperty("type", MenuActions::Edit);
-    connect(edit, SIGNAL(triggered()), this, SLOT(edit()));
+    connect(edit, &QAction::triggered, this, &SComments::edit);
     tableMenu->addAction(edit);
     QAction * remove = new QAction(tr("Удалить"), tableMenu);
     remove->setProperty("type", MenuActions::Remove);
-    connect(remove, SIGNAL(triggered()), this, SLOT(remove()));
+    connect(remove, &QAction::triggered, this, [=](){m_opType = Delete; manualSubmit();});
     tableMenu->addAction(remove);
 }
 
@@ -83,7 +100,7 @@ bool SComments::isEditable(const int row)
 
     // Удаление и редактирование доступно только в течение некоторого времени после создания (подсмотрено в Telegram).
     // Удалять и редактировать можно только свои комментарии или при наличии особого разрешения
-    if((timeDiff < 3600 && authorId == userDbData->id) || permissions->editAnyComment )
+    if((timeDiff < 3600 && authorId == userDbData->id()) || permissions->editAnyComment )
         return 1;
 
     return 0;
@@ -130,41 +147,74 @@ void SComments::clearInputField()
     ui->plainTextEdit->clear();
 }
 
-void SComments::commit()
+int SComments::checkInput()
 {
-    bool nErr = 1;
+    checkParentTab();
 
-    QUERY_LOG_START(m_parentTab->metaObject()->className());
-
-    try
+    if(m_opType == Commit)
     {
-        QUERY_EXEC_TH(m_query,nErr,QUERY_BEGIN);
-        if(!ui->plainTextEdit->property("recordId").isValid())
-        {
-            commentsModel->add(ui->plainTextEdit->toPlainText());
-            userActivityLog->appendRecord(QString("Comment %1").arg(m_parentTab->tabTitle()));
-        }
+        return ui->plainTextEdit->isEmpty();
+    }
+    else if(m_opType == Delete)
+    {
+        int row = ui->tableViewComments->selectionModel()->currentIndex().row();
+        if(row < 0)
+            return 1;
+
+        if (QMessageBox::warning(this,
+                                 tr("Удаление записи"),
+                                 tr("Вы уверены, что хотите удалить эту запись?"),
+                                 QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+            return 1;
+    }
+
+    return 0;
+}
+
+QString SComments::queryLogFile()
+{
+    return m_parentTab->metaObject()->className();
+}
+
+void SComments::commit(const int)
+{
+    if(m_opType == Commit)
+    {
+        if(ui->plainTextEdit->property("recordId").isValid())
+            updateComment();
         else
-        {
-            commentsModel->setText(ui->plainTextEdit->property("recordRow").toInt(), ui->plainTextEdit->toPlainText());
-            ui->plainTextEdit->setProperty("recordId", QVariant());
-            ui->plainTextEdit->setProperty("recordRow", QVariant());
-        }
-
-        ui->plainTextEdit->clear();
-
-        QUERY_COMMIT_ROLLBACK(m_query,nErr);
+            addComment();
     }
-    catch (Global::ThrowType type)
+    else if(m_opType == Delete)
+        deleteComment();
+}
+
+void SComments::addComment()
+{
+    commentsModel->add(ui->plainTextEdit->toPlainText());
+    userActivityLog->appendRecord(QString("Comment %1").arg(m_parentTab->tabTitle()));
+}
+
+void SComments::updateComment()
+{
+    commentsModel->setText(ui->plainTextEdit->property("recordRow").toInt(), ui->plainTextEdit->toPlainText());
+    clearInputField();
+
+}
+
+void SComments::deleteComment()
+{
+    int row = ui->tableViewComments->selectionModel()->currentIndex().row();
+    if(!ui->plainTextEdit->property("recordId").isValid())
     {
-        nErr = 0;
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(m_query, nErr);
-        }
+        clearInputField();
     }
+    commentsModel->remove(row);
+}
 
-    QUERY_LOG_STOP;
+void SComments::endCommit()
+{
+    ui->plainTextEdit->clear();
 }
 
 void SComments::editLastComment()
@@ -178,41 +228,8 @@ void SComments::editLastComment()
 
 void SComments::remove()
 {
-    bool nErr = 1;
-
-    checkParentTab();
-    int row = ui->tableViewComments->selectionModel()->currentIndex().row();
-    if(row >= 0){
-        if (QMessageBox::warning(this,
-                                 tr("Удаление записи"),
-                                 tr("Вы уверены, что хотите удалить эту запись?"),
-                                 QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-        {
-            QUERY_LOG_START(m_parentTab->metaObject()->className());
-            try
-            {
-                QUERY_EXEC_TH(m_query,nErr,QUERY_BEGIN);
-                if(ui->plainTextEdit->property("recordId").isValid())
-                {
-                    ui->plainTextEdit->setProperty("recordId", QVariant());
-                    ui->plainTextEdit->setProperty("recordRow", QVariant());
-                    ui->plainTextEdit->clear();
-                }
-                commentsModel->remove(row);
-                QUERY_COMMIT_ROLLBACK(m_query,nErr);
-            }
-            catch (Global::ThrowType type)
-            {
-                nErr = 0;
-                if (type != Global::ThrowType::ConnLost)
-                {
-                    QUERY_COMMIT_ROLLBACK(m_query, nErr);
-                }
-            }
-
-            QUERY_LOG_STOP;
-        }
-    }
+    m_opType = Delete;
+    manualSubmit();
 }
 
 void SComments::edit()
@@ -237,7 +254,7 @@ void SComments::copyToClipboard(const bool)
 
     for(int i = 0; i < indexesList.count(); i++)
     {
-        if(indexesList.at(i).column() == SCommentModel::ColText)
+        if(indexesList.at(i).column() == SCommentModel::C_text)
             text.append(indexesList.at(i).data().toString());
     }
 
@@ -260,7 +277,7 @@ void SComments::lineEditKeyPressEvent(int key)
     checkParentTab();
     switch(key)
     {
-        case SPlainTextEdit::PressedKey::Enter: commit(); break;
+        case SPlainTextEdit::PressedKey::Enter: m_opType = Commit; manualSubmit(); break;
         case SPlainTextEdit::PressedKey::ShiftEnter: appendLineTermination(); break;
         case SPlainTextEdit::PressedKey::Escape: clearInputField(); break;
         case SPlainTextEdit::PressedKey::Up: editLastComment(); break;
@@ -308,9 +325,9 @@ void commentsTable::resizeEvent(QResizeEvent *event)
         }
     }
     if (verticalScrollBar()->isVisible())
-        setColumnWidth(SCommentModel::Columns::ColText, colTextWidth - verticalScrollBar()->width());
+        setColumnWidth(SCommentModel::Columns::C_text, colTextWidth - verticalScrollBar()->width());
     else
-        setColumnWidth(SCommentModel::Columns::ColText, colTextWidth);
+        setColumnWidth(SCommentModel::Columns::C_text, colTextWidth);
     setVerticalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
     resizeRowsToContents();
 }
@@ -328,4 +345,3 @@ QModelIndexList commentsTable::selectedIndexes() const
 {
     return QTableView::selectedIndexes();
 }
-

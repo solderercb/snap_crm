@@ -1,10 +1,6 @@
 #ifndef WINDOWSDISPATCHER_H
 #define WINDOWSDISPATCHER_H
 #include <QObject>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QSqlQueryModel>
-#include "com_sql_queries.h"
 
 class windowsDispatcher : public QObject
 {

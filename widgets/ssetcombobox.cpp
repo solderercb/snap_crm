@@ -1,4 +1,17 @@
 #include "ssetcombobox.h"
+#include <SLineEdit>
+#include <QCompleter>
+#include <QFocusEvent>
+#include <QMouseEvent>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QToolButton>
+#include <QRegularExpression>
+#include <SSortFilterProxyModel>
+#ifdef QT_DEBUG
+#include <QRandomGenerator>
+#include <QDebug>
+#endif
 
 daughterLineEdit::daughterLineEdit(QWidget *parent)
     : QLineEdit(parent)

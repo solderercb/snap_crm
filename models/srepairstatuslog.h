@@ -1,38 +1,32 @@
 #ifndef SREPAIRSTATUSLOG_H
 #define SREPAIRSTATUSLOG_H
 
-#include "scomrecord.h"
-#include <QObject>
+#include <SSingleRowJModel>
 
-class SRepairStatusLog : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(created_at, created, QDateTime, 0)                          \
+    TABLE_FIELD(repair_id, repair, int, 0)                                  \
+    TABLE_FIELD(status_id, status, int, 0)                                  \
+    TABLE_FIELD(user_id, user, int, 0)                                      \
+    TABLE_FIELD(manager_id, manager, int, 0)                                \
+    TABLE_FIELD(master_id, engineer, int, 0)
+
+class SRepairStatusLog : public SSingleRowJModel
 {
     Q_OBJECT
 public:
-    explicit SRepairStatusLog(const int repair, QObject *parent = nullptr);
-    int id();
-    void setCreated(const QDateTime);
-    int repair();
-    void setRepair(const int);
-    int status();
-    void setStatus(const int);
-    int user();
-    void setUser(const int);
-    int manager();
-    void setManager(const int);
-    void setManagerIndex(const int);
-    int engineer();
-    void setEngineer(const int);
-    void setEngineerIndex(const int);
-    bool commit();
-private:
-    int m_repair;
-    int m_status;
-    int m_user;
-    int m_manager;
-    int m_master;
-    bool m_changed = 0;
-    void setManager(const QVariant);
-    void setEngineer(const QVariant);
+    explicit SRepairStatusLog(QObject *parent = nullptr);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    void set_managerIndex(const int);
+    void set_engineerIndex(const int);
+    bool commit() override;
+    bool isDirty() override;
+    void setAllState(ModifiedField::State state) override;
+private slots:
+    void setDataRework(const int index, QVariant &data);
 };
 
 #endif // SREPAIRSTATUSLOG_H

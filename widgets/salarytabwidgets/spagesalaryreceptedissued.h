@@ -1,8 +1,10 @@
 #ifndef SPAGESALARYRECEPTEDISSUED_H
 #define SPAGESALARYRECEPTEDISSUED_H
 
-#include <QWidget>
-#include "spagesalarybase.h"
+#include <QObject>
+#include <SSalaryBasePage>
+
+class QWidget;
 
 namespace Ui {
 class SPageSalaryReceptedIssued;

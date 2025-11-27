@@ -1,6 +1,19 @@
 #include "stableviewbaseitemdelegates.h"
 #include <QProxyStyle>
-#include "widgets/sdoublespinbox.h"
+#include <SDoubleSpinBox>
+#include <SComSettings>
+#include <QApplication>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QLineEdit>
+#include <QMouseEvent>
+#include <QAbstractItemView>
+#include <QStyleOption>
+#include <QPainter>
+#include <STableModelBase>
+#include <ProjectGlobals>
 
 STableViewBaseItemDelegates::STableViewBaseItemDelegates(QObject *parent) :
     QStyledItemDelegate(parent)
@@ -200,7 +213,7 @@ QDoubleSpinBox *STableViewBaseItemDelegates::createDoubleSpinBox(QWidget *parent
 {
     Q_UNUSED(index);
     QDoubleSpinBox *sb = new SDoubleSpinBox(parent);
-    if(comSettings->classicKassa)
+    if(comSettings->classicKassa())
     {
         sb->setDecimals(2);
         sb->setMinimum(0.00);

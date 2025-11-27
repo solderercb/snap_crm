@@ -1,12 +1,31 @@
 #include "global.h"
-#include "com_sql_queries.h"
-#include "models/sclientmodel.h"
-#include "models/scartridgematerialsmodel.h"
-#include "models/sstoreitemmodel.h"
-#include "models/sofficemodel.h"
-#include "models/stableclientsmodel.h"
-#include "modules/purchasemanager/srequestsmodel.h"
-#include "widgets/shortlivednotification.h"
+#include <ProjectQueries>
+#include <SClientModel>
+#include <SCartridgeMaterialsModel>
+#include <SStoreItemModel>
+#include <SWorkPriceModel>
+#include <SPartsRequestsModel>
+#include <FlashPopup>
+#include <SPermissions>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SLocalSettingsStructs>
+#include <SLocalSettings>
+#include <SUserActivityModel>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
+#include <SPaymentTypesModel>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QLocale>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QSettings>
+#include <SAppLog>
 
 QString errQuerySelDeviceMakers(QObject::tr("Сбой выполнения QUERY_SEL_DEVICE_MAKERS"));
 QString errQuerySelCartridgeCatId(QObject::tr("Сбой выполнения QUERY_SEL_CARTRIDGE_CAT_ID; возможно в настройках каталога устроств не задана категория \"заправка\""));
@@ -69,6 +88,7 @@ QString commonSpinBoxStyleSheet = "QSpinBox, QDoubleSpinBox {  border: 1px solid
 QString commonSpinBoxStyleSheetRed = "QSpinBox, QDoubleSpinBox {  border: 1px solid red;  padding: 1px 18px 1px 3px; background: #FFD1D1;}";
 SStandardItemModel *rejectReasonModel = new SStandardItemModel;
 SStandardItemModel *priceColModel = new SStandardItemModel;
+SStandardItemModel *workPriceColModel = new SStandardItemModel;
 SStandardItemModel *itemUnitsModel = new SStandardItemModel;
 SAppLog *appLog;
 SUserActivityModel *userActivityLog;
@@ -88,26 +108,26 @@ SStandardItemModel *partRequestPrioritiesListModel;
 void initGlobalModels()
 {
     comSettings->load();
-    for (int i=0; i < comSettings->ascPhoneMask1.size(); i++)     // В ASC CRM (а точнее в DevExpress) маски ввода в lineEdit работают не так, как в Qt
-        if (comSettings->ascPhoneMask1.at(i) == '0')              // В Qt: 0 - это необязательная цифра, а 9 — обязательная цифра. Чтобы работала проверка
+    for (int i=0; i < comSettings->ascPhoneMask1().size(); i++)     // В ASC CRM (а точнее в DevExpress) маски ввода в lineEdit работают не так, как в Qt
+        if (comSettings->ascPhoneMask1().at(i) == '0')              // В Qt: 0 - это необязательная цифра, а 9 — обязательная цифра. Чтобы работала проверка
         {                                                                           // введённого номера телефона (если в настройках установлен флаг обязательности), нужно изменить маску.
             qDebug() << "МАСКА ТЕЛЕФОНА 1!!!";                                      // (это заглушка для отладки)
             break;                                                                  // TODO: добавить хитрую подсказку для полей ввода номера, если обнаруживается такое несовпадение
         }
-    for (int i=0; i < comSettings->ascPhoneMask2.size(); i++)
-        if (comSettings->ascPhoneMask2.at(i) == '0')
+    for (int i=0; i < comSettings->ascPhoneMask2().size(); i++)
+        if (comSettings->ascPhoneMask2().at(i) == '0')
         {
             qDebug() << "МАСКА ТЕЛЕФОНА 2!!!";
             break;
         }
-    comSettings->ascPhoneMask1 =  comSettings->ascPhoneMask1.replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
-    comSettings->ascPhoneMask2 =  comSettings->ascPhoneMask2.replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
+    comSettings->ascPhoneMask1() =  comSettings->ascPhoneMask1().replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
+    comSettings->ascPhoneMask2() =  comSettings->ascPhoneMask2().replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
 
     clientPhoneTypesModel->setQuery(QUERY_SEL_PHONE_TYPES, QSqlDatabase::database("connMain"));
     clientPhoneTypesModel->setObjectName("clientPhoneTypesModel");
 //    clientPhoneTypesModel->setHorizontalHeaderLabels({"name", "id", "mask"});
 
-    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->currentOffice), QSqlDatabase::database("connMain"));
+    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->currentOffice()), QSqlDatabase::database("connMain"));
     warehousesModel->setObjectName("warehousesModel");
     allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
     allUsersModel->setDisplayRoleColumn("username");
@@ -127,7 +147,7 @@ void initGlobalModels()
     engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
     engineersModel->setDisplayRoleColumn("username");
     engineersModel->setObjectName("engineersModel");
-    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->currentOffice), QSqlDatabase::database("connMain"));
+    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->currentOffice()), QSqlDatabase::database("connMain"));
     itemBoxesModel->setObjectName("itemBoxesModel");
     repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
     repairBoxesModel->setObjectName("repairBoxesModel");
@@ -184,6 +204,7 @@ void initGlobalModels()
     rejectReasonModel->setHorizontalHeaderLabels({"name","id"});
 
     priceColModel = SStoreItemModel::priceOptionsList();
+    workPriceColModel = SWorkPriceModel::priceOptionsList();
 
     QVector<QString> itemUnitsList = {QObject::tr("шт"), QObject::tr("г"), QObject::tr("м"), QObject::tr("см"), QObject::tr("л")};
     QVector<QString> itemUnitsIdsList = {"1", "2", "3", "4", "5"};
@@ -253,7 +274,7 @@ void initUserDbData()
 
 void initPermissions()
 {
-    permissions->load(userDbData->roles);
+    permissions->load(userDbData->roles());
 }
 
 void initCompanies()    // Список компаний.
@@ -264,7 +285,7 @@ void initCompanies()    // Список компаний.
 
 void initOffices()      // Список офисов
 {
-    officesModel->setQuery(QUERY_SEL_OFFICES(userDbData->company), QSqlDatabase::database("connMain"));
+    officesModel->setQuery(QUERY_SEL_OFFICES(userDbData->company()), QSqlDatabase::database("connMain"));
     officesModel->setObjectName("officesModel");
 }
 
@@ -314,6 +335,7 @@ QString Global::throwMsg(const int &throwCode)
         case Global::ThrowType::QueryError: msg = QObject::tr("Синтаксическая ошибка в запросе"); break;
         case Global::ThrowType::TimeError: msg = QObject::tr("Локальное время и время сервера отличаются на более чем 30 секунд"); break;
         case Global::ThrowType::ResultError: msg = QObject::tr("Ошибка загрузки: запрос не вернул данных"); break;
+        case Global::ThrowType::DiskWriteError: msg = QObject::tr("Не удалось записать файл на диск"); break;
         case Global::ThrowType::ConnLost: msg = QObject::tr("Нет связи с сервером"); break;
         case Global::ThrowType::IntegrityError: msg = QObject::tr("Ошибка верификации данных"); break;
         case Global::ThrowType::ConditionsError: msg = QObject::tr("Некорректные данные"); break;
@@ -346,7 +368,8 @@ int Global::throwCodeByQueryError(const QSqlError &err)
 */
 void Global::errorPopupMsg(const QString &msg)
 {
-    shortlivedNotification *newPopup = new shortlivedNotification(nullptr, QObject::tr("Ошибка"), msg, QColor("#FFC7AD"), QColor("#FFA477"));
+    auto *p = new shortlivedNotification(nullptr, QObject::tr("Ошибка"), msg, QColor("#FFC7AD"), QColor("#FFA477"));
+    Q_UNUSED(p);
 }
 
 void Global::errorPopupMsg(const int &throwCode)

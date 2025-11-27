@@ -1,9 +1,10 @@
 #ifndef STABLEVIEWCLIENTSITEMDELEGATES_H
 #define STABLEVIEWCLIENTSITEMDELEGATES_H
 
-#include "stableviewbaseitemdelegates.h"
+#include <STableViewBaseDelegates>
 #include <QObject>
-#include <QPainter>
+
+class QPainter;
 
 class STableViewClientsItemDelegates : public STableViewBaseItemDelegates
 {

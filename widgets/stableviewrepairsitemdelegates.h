@@ -1,10 +1,11 @@
 #ifndef STABLEVIEWREPAIRSITEMDELEGATES_H
 #define STABLEVIEWREPAIRSITEMDELEGATES_H
 
-#include "stableviewbaseitemdelegates.h"
+#include <STableViewBaseDelegates>
 #include <QObject>
-#include <QPainter>
-#include "models/stablerepairsmodel.h"
+
+class QPainter;
+class STableRepairsModel;
 
 class STableViewRepairsItemDelegates : public STableViewBaseItemDelegates
 {

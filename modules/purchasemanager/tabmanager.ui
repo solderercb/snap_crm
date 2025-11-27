@@ -424,30 +424,30 @@
   <customwidget>
    <class>SPartSuppliers</class>
    <extends>QWidget</extends>
-   <header>modules/purchasemanager/ssupplierswidget.h</header>
+   <header location="global">SPartSuppliers</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
+   <header location="global">SComboBox</header>
   </customwidget>
   <customwidget>
    <class>SPeriodSelector</class>
    <extends>QWidget</extends>
-   <header>widgets/speriodselector.h</header>
+   <header location="global">SPeriodSelector</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SPartsRequests</class>
    <extends>QWidget</extends>
-   <header>modules/purchasemanager/srequestswidget.h</header>
+   <header location="global">SPartsRequests</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>STableViewSubgroups</class>
    <extends>QTableView</extends>
-   <header>modules/purchasemanager/tabmanager.h</header>
+   <header location="global">tabPurchaseManager</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,11 +1,10 @@
 #ifndef STEXTEDIT_H
 #define STEXTEDIT_H
 
-#include <QWidget>
 #include <QTextEdit>
-#include <QDebug>
-#include <QScrollBar>
-#include "widgets/scomtextedit.h"
+#include <SComTextEdit>
+
+class QWidget;
 
 class STextEdit : public QTextEdit, public SComTextEdit
 {

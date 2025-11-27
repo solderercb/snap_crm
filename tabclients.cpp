@@ -1,10 +1,25 @@
-#include "global.h"
-#include "appver.h"
 #include "tabclients.h"
 #include "ui_tabclients.h"
-#include "mainwindow.h"
-#include "com_sql_queries.h"
-#include "models/sclientmodel.h"
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QToolButton>
+#include <QStyle>
+#include <QTableWidget>
+#include <QLabel>
+#include <QSqlQueryModel>
+#include <QSortFilterProxyModel>
+#include <QTimer>
+#include <QWidget>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <appVer>
+#include <MainWindow>
+#include <SClientModel>
+#include <SUserSettings>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
+#include <STableClientsModel>
+#include <STableViewBase>
 
 tabClients* tabClients::p_instance[] = {nullptr,nullptr};
 
@@ -14,8 +29,6 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 {
     m_type = type;    // инициализация до вызова любых методов
 
-    logUserActivity();
-
     ui->setupUi(this);
     this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -24,11 +37,13 @@ tabClients::tabClients(bool type, MainWindow *parent) :
     else
         i_tabTitle = tr("Клиенты");
 
+    logUserActivity();
+
     clientsTable = new STableClientsModel(this);
     ui->tableView->setModel(clientsTable);
     ui->tableView->setQuery(QUERY_SEL_CLIENTS_STATIC, QSqlDatabase::database("connMain"));
     ui->tableView->setUniqueIdColumn(0);
-    ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
+    ui->tableView->enableAutorefresh(userDbData->refreshTime()*1000);
     if (type == 1)
     {
         ui->buttonPrint->hide();
@@ -46,7 +61,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
     connect(ui->buttonRefreshTable, &QPushButton::clicked, this, &tabClients::buttonRefreshClicked);
 
-    refreshTable();
+    tabCommon::refreshTable();
 }
 
 tabClients::~tabClients()
@@ -110,7 +125,7 @@ void tabClients::constructQueryClause()
       FilterList searchText;
       searchText.op = FilterList::Or;
       FilterField::Op matchFlag;
-      if(userDbData->useRegExpSearch)
+      if(userDbData->useRegExpSearch())
             matchFlag = FilterField::RegExp;
       else
             matchFlag = FilterField::Contains;

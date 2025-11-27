@@ -1,15 +1,31 @@
 #include "srequest.h"
-#include "widgets/snotification.h"
+#include <QSqlTableModel>
+#include <QMetaEnum>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SNotification>
+#include <SComSettings>
+#include <SPermissions>
+#include <SSqlQueryModel>
+#include <SUserSettings>
+#include <SEditableBaseModel>
+#include <SStandardItemModel>
+#include <SLogRecordModel>
 
-SPartRequest::SPartRequest(QObject *parent)
-    : SComRecord{parent}
+SPartRequest::SPartRequest(QObject *parent) :
+    SSingleRowJModel{parent}
 {
+    mapFields();
+
     i_obligatoryFields << "request_time" << "from_user" << "state" << "item_name" << "notes" << "url" << "pririty";
     i_tableName = "parts_request";
-    i_idColumnName = "id";
+    setPrimaryKeyIndex(0);
 
-    i_createdUtc = QDateTime::currentDateTimeUtc();
-    i_logRecord->setType(SLogRecordModel::RecordTypes::PartRequest);
+    m_record->setValue(C_state, State::NewUncommitted);
+
+    i_logRecord->set_type(SLogRecordModel::RecordTypes::PartRequest);
+
+//    int m_state = State::NewUncommitted;
 
     m_managers = new SEditableBaseModel(this, QSqlDatabase::database("connThird"));
     m_managers->setEditStrategy(QSqlTableModel::OnManualSubmit);
@@ -21,6 +37,7 @@ SPartRequest::SPartRequest(QObject *parent)
 
     connect(m_managers, &SEditableBaseModel::primeInsert, this, &SPartRequest::managersPrimeInsert);
     connect(m_notifications, &SEditableBaseModel::primeInsert, this, &SPartRequest::notificationsPrimeInsert);
+    connect(this, &SSingleRowModel::beginDataChange, this, &SPartRequest::setDataRework);
 }
 
 SPartRequest::~SPartRequest()
@@ -60,156 +77,58 @@ SStandardItemModel *SPartRequest::prioritiesList()
 SSqlQueryModel *SPartRequest::managersList()
 {
     SSqlQueryModel *model = new SSqlQueryModel;
-    model->setQuery(QUERY_SEL_PRT_RQST_MANAGERS(permissions->permissionId("enableSparepartRequestManager")), QSqlDatabase::database("connMain"));
+    model->setQuery(QUERY_SEL_PRT_RQST_MANAGERS(SPermissions::C_enableSparepartRequestManager), QSqlDatabase::database("connMain"));
     model->setObjectName("partRequestManagersModel");
 
     return model;
 }
 
-int SPartRequest::id()
+QString SPartRequest::constructSelectQuery()
 {
-    return i_id;
+    return QUERY_SEL_PART_REQUEST(id());
 }
 
-void SPartRequest::setId(const int id)
+void SPartRequest::load()
 {
-    i_id = id;
+    beginUpdateModel();
+
+    SSingleRowModelBase::load();
+    updateAdditionalModelsFilters(this->id());
+    m_managers->select();
+    m_notifications->select();
+
+    endUpdateModel();
 }
 
-void SPartRequest::load(const int &id, QSqlDatabase db)
+void SPartRequest::load(const int &id, QSqlDatabase &db)
 {
-    QSqlDatabase database = db;
-    if(!database.isValid())
-        database = QSqlDatabase::database("connMain");
+    if(db.isValid())
+        setDatabase(db);
 
-    QSqlQuery *record = new QSqlQuery(database);
+    setPrimaryKey(id);
 
-    beginResetModel();
-    i_valuesMap.clear();
-
-    record->exec(QUERY_SEL_PART_REQUEST(id));
-
-    if(record->first())
-    {
-        i_id = record->value("id").toInt();
-        i_createdUtc = record->value("request_time").toDateTime();
-        m_employee = record->value("from_user").toInt();
-        m_repair = record->value("repair").toInt();
-        m_client = record->value("client").toInt();
-        m_state = record->value("state").toInt();
-        m_endDate = record->value("end_date").toDate();
-        m_planEndDate = record->value("plan_end_date").toDate();
-        m_amount = record->value("summ").toDouble();
-        m_tracking = record->value("tracking").toString();
-        m_itemId = record->value("item_id").toInt();
-        m_name = record->value("item_name").toString();
-        m_notes = record->value("notes").toString();
-        m_url = record->value("url").toString();
-        m_priority = record->value("pririty").toInt();
-        m_count = record->value("count").toInt();
-        m_dealer = record->value("dealer").toInt();
-
-        updateAdditionalModelsFilters(i_id);
-        m_managers->select();
-        m_notifications->select();
-    }
-
-    delete record;
-    endResetModel();
+    load();
 }
 
-QDateTime SPartRequest::createdUtc()
+void SPartRequest::load(const int &id)
 {
-    return cachedValue("request_time", i_createdUtc).toDateTime();
+    QSqlDatabase db = QSqlDatabase();
+    load(id, db);
 }
 
-/*  Установка даты создания
- *  TODO: подумать о необходимости возможности установки будущей даты для не срочных заявок
- *  timestamp - локальное время (не UTC)
- */
-void SPartRequest::setCreated(const QDateTime &timestamp)
+void SPartRequest::stateChanged(const int newState)
 {
-    if(m_state != NewUncommitted)
-    {
-        if(createdUtc() == timestamp.toUTC())
-            return;
-    }
-
-    i_createdUtc = timestamp.toUTC();
-    i_valuesMap.insert("request_time", timestamp);
-}
-
-int SPartRequest::employee()
-{
-    return cachedValue("from_user", m_employee).toInt();
-}
-
-void SPartRequest::setEmployee(const int &id)
-{
-    if(m_state != NewUncommitted)
-        return;
-
-    i_valuesMap.insert("from_user", id);
-}
-
-int SPartRequest::repair()
-{
-    return cachedValue("repair", m_repair).toInt();
-}
-
-void SPartRequest::setRepair(const int &id)
-{
-    if(this->repair() == id)
-        return;
-
-    i_valuesMap.insert("repair", id);
-}
-
-int SPartRequest::client()
-{
-    return cachedValue("client", m_client).toInt();
-}
-
-void SPartRequest::setClient(const int &id)
-{
-    if(this->client() == id)
-        return;
-
-    i_valuesMap.insert("client", id?id:QVariant());
-}
-
-int SPartRequest::state()
-{
-    return cachedValue("state", m_state).toInt();
-}
-
-void SPartRequest::setState(const int &newState)
-{
-    int currentState = this->state();
-    if(currentState == newState)
-        return;
-
-    // сброс статуса в случае отката изменений при создании заявки (Created -» NewUncommitted)
-    if(newState == NewUncommitted && currentState == Created)
-    {
-        i_valuesMap.remove("state");
-        setCreated(QDateTime());
-        return;
-    }
-
-    if(currentState == NewUncommitted)
+    if(!isPrimaryKeyValid())
     {
         //  (NewUncommitted -» Created)
-        if(newState == Created && !createdUtc().isValid())
-            setCreated(QDateTime::currentDateTime());
+        if(newState == Created)
+            initMandatoryField(C_created, QDateTime::currentDateTime());
     }
     else    //  (Any -» Created)
         appendLogText(logMsgStateChange(newState));
 
     if(newState == Finished)
-        setEndDate(QDate::currentDate());
-
-    i_valuesMap.insert("state", newState);
+        set_endDate(QDate::currentDate());
 }
 
 QString SPartRequest::logMsgStateChange(const int &newState)
@@ -217,40 +136,19 @@ QString SPartRequest::logMsgStateChange(const int &newState)
     return tr("Статус изменён на %1").arg(partRequestStatesListModel->getDisplayRole(newState));
 }
 
-QDate SPartRequest::endDate()
+void SPartRequest::planEndDateChanged(const QDate &date)
 {
-    return cachedValue("end_date", m_endDate).toDate();
-}
-
-void SPartRequest::setEndDate(const QDate &date)
-{
-    if(endDate() == date)
+    if(!isPrimaryKeyValid())
         return;
 
-    i_valuesMap.insert("end_date", date);
-}
-
-QDate SPartRequest::planEndDate()
-{
-    return cachedValue("plan_end_date", m_planEndDate).toDate();
-}
-
-void SPartRequest::setPlanEndDate(const QDate &date)
-{
-    if(planEndDate() == date)
-        return;
-
-    // эти записи в журнал не производятся создании заявки, а только при изменении
+    // эти записи в журнал не производятся при создании заявки, а только при изменении
+    auto old = commitedData(C_planEndDate).value_or(QVariant(QVariant::DateTime));
     QString logText;
-    if(m_state != NewUncommitted)
-    {
-        if(!planEndDate().isValid())
-            logText = tr("Указана плановая дата завершения: %1").arg(date.toString("dd.MM.yyyy"));
-        else
-            logText = logMsgPlanEndDateChange(date);
-    }
+    if(!old.toDateTime().isValid())
+        logText = tr("Указана плановая дата завершения: %1").arg(date.toString("dd.MM.yyyy"));
+    else
+        logText = logMsgPlanEndDateChange(date);
 
-    i_valuesMap.insert("plan_end_date", date);
     appendLogText(logText);
 }
 
@@ -259,23 +157,18 @@ QString SPartRequest::logMsgPlanEndDateChange(const QDate &date)
     return tr("Плановая дата завершения изменёна на %1").arg(date.toString("dd.MM.yyyy"));
 }
 
-double SPartRequest::amount()
+void SPartRequest::amountChanged(const double &amount)
 {
-    return cachedValue("summ", m_amount).toDouble();
-}
-
-void SPartRequest::setAmount(const double &amount)
-{
-    if(this->amount() == amount)
+    if(!isPrimaryKeyValid())
         return;
 
+    auto old = commitedData(C_amount).value_or(QVariant(QVariant::Double));
     QString logText;
-    if(this->amount() == 0)
+    if(old.isNull())
         logText = tr("Указана сумма: %1").arg(sysLocale.toCurrencyString(amount));
     else
         logText = logMsgAmountChange(amount);
 
-    i_valuesMap.insert("summ", amount);
     appendLogText(logText);
 }
 
@@ -283,21 +176,12 @@ QString SPartRequest::logMsgAmountChange(const double &amount)
 {
     return tr("Сумма изменёна на %1").arg(sysLocale.toCurrencyString(amount));
 }
-
-QString SPartRequest::tracking()
+void SPartRequest::trackingChanged(const QString &tracking)
 {
-    return cachedValue("tracking", m_tracking).toString();
-}
-
-void SPartRequest::setTracking(const QString &tracking)
-{
-    if(this->tracking() == tracking)
-        return;
-
+    auto old = commitedData(C_tracking).value_or(QVariant(QVariant::String));
     QString logText;
-    logText = logMsgTrackingChange(tracking, this->tracking());
+    logText = logMsgTrackingChange(tracking, old.toString());
 
-    i_valuesMap.insert("tracking", tracking);
     appendLogText(logText);
 }
 
@@ -312,74 +196,12 @@ QString SPartRequest::logMsgTrackingChange(const QString &newTrack, const QStrin
     return tr("Трэк-номер изменён на %1").arg(newTrack);
 }
 
-int SPartRequest::itemId()
+void SPartRequest::priorityChanged(const int &priority)
 {
-    return cachedValue("item_id", m_itemId).toInt();
-}
-
-void SPartRequest::setItemId(const int &id)
-{
-    if(itemId() == id)
+    if(!isPrimaryKeyValid())
         return;
 
-    i_valuesMap.insert("item_id", id);
-}
-
-QString SPartRequest::name()
-{
-    return cachedValue("item_name", m_name).toString();
-}
-
-void SPartRequest::setName(const QString &name)
-{
-    if(m_state != NewUncommitted && this->name() == name)
-        return;
-
-    i_valuesMap.insert("item_name", name);
-}
-
-QString SPartRequest::notes()
-{
-    return cachedValue("notes", m_notes).toString();
-}
-
-void SPartRequest::setNotes(const QString &notes)
-{
-    if(this->notes() == notes && m_state != NewUncommitted)
-        return;
-
-    i_valuesMap.insert("notes", notes);
-}
-
-QString SPartRequest::url()
-{
-    return cachedValue("url", m_url).toString();
-}
-
-void SPartRequest::setUrl(const QString &url)
-{
-    if(m_state != NewUncommitted && this->url() == url)
-        return;
-
-    i_valuesMap.insert("url", url);
-}
-
-int SPartRequest::priority()
-{
-    return cachedValue("pririty", m_priority).toInt();
-}
-
-void SPartRequest::setPriority(const int &priority)
-{
-    if(m_state != NewUncommitted)
-    {
-        if(this->priority() == priority)
-            return;
-
-        appendLogText(logMsgPriorityChange(priority));
-    }
-
-    i_valuesMap.insert("pririty", priority);
+    appendLogText(logMsgPriorityChange(priority));
 }
 
 QString SPartRequest::logMsgPriorityChange(const int &priority)
@@ -387,40 +209,17 @@ QString SPartRequest::logMsgPriorityChange(const int &priority)
     return tr("Приоритет изменён на %1").arg(partRequestPrioritiesListModel->getDisplayRole(priority));
 }
 
-int SPartRequest::count()
+void SPartRequest::countChanged(const int &count)
 {
-    return cachedValue("count", m_count).toInt();
-}
+    if(!isPrimaryKeyValid())
+        return;
 
-void SPartRequest::setCount(const int &count)
-{
-    if(m_state != NewUncommitted)
-    {
-        if(this->count() == count)
-            return;
-
-        appendLogText(logMsgCountChange(count));
-    }
-
-    i_valuesMap.insert("count", count);
+    appendLogText(logMsgCountChange(count));
 }
 
 QString SPartRequest::logMsgCountChange(const int &count)
 {
     return tr("Количество изменёно на %1").arg(count);
-}
-
-int SPartRequest::dealer()
-{
-    return cachedValue("dealer", m_dealer).toInt();
-}
-
-void SPartRequest::setDealer(const int &id)
-{
-    if(dealer() == id)
-        return;
-
-    i_valuesMap.insert("dealer", id?id:QVariant());
 }
 
 /* Общий метод для синхронизации данных моделей таблиц notifications и parts_request_employees
@@ -460,11 +259,11 @@ void SPartRequest::updateAdditionalModelsFilters(const int id)
 {
     QString filter;
 
-    filter = QString("`request` = %1").arg(i_id);
+    filter = QString("`request` = %1").arg(id);
     if(filter.compare(m_managers->filter()))
         m_managers->setFilter(filter);
 
-    filter = QString("`part_request_id` = %1").arg(i_id);
+    filter = QString("`part_request_id` = %1").arg(id);
     if(filter.compare(m_notifications->filter()))
         m_notifications->setFilter(filter);
 }
@@ -473,7 +272,7 @@ QList<int> SPartRequest::managers()
 {
     QList<int> list;
 
-    if(m_managers->rowCount() == 0)
+    if(!isPrimaryKeyValid())
     {
         for(int i = 0; i < partRequestManagersModel->rowCount(); i++)
             list.append(partRequestManagersModel->databaseIDByRow(i));
@@ -489,9 +288,9 @@ QList<int> SPartRequest::managers()
 
 void SPartRequest::setManagers(QList<int> managers)
 {
-    Q_ASSERT_X(i_id, "SPartRequest::setManagers()", "request id not set; porbably this method invoked before method commit()");
+    Q_ASSERT_X(id(), "SPartRequest::setManagers()", "request id not set; porbably this method invoked before method commit()");
     updateAdditionalModel(m_managers, managers, ManagersModelFields::Employee);
-    if(comSettings->notifyItemPurchaseRequest)
+    if(comSettings->notifyItemPurchaseRequest())
         updateNotifications(managers);
 }
 
@@ -503,36 +302,41 @@ void SPartRequest::setManagers(QList<int> managers)
 void SPartRequest::updateNotifications(QList<int> managers)
 {
     QList<int> list = managers;
-    list.removeOne(userDbData->id); // уведомление самому себе не нужно
+    list.removeOne(userDbData->id()); // уведомление самому себе не нужно
     list.removeOne(employee()); // уведомление инициатору не нужно
     updateAdditionalModel(m_notifications, list, NotificationsModelFields::Employee);
 }
 
-void SPartRequest::setDirty(const bool state)
+void SPartRequest::logDataChange(const int index, const QVariant &data)
 {
-    SDatabaseRecord::setDirty(state);
+    switch (index)
+    {
+        case C_state: stateChanged(data.toInt()); break;
+        case C_planEndDate: planEndDateChanged(data.toDate()); break;
+        case C_amount: amountChanged(data.toDouble()); break;
+        case C_tracking: trackingChanged(data.toString()); break;
+        case C_priority: priorityChanged(data.toInt()); break;
+        case C_count: countChanged(data.toInt()); break;
+        default: break;
+    }
 }
 
 bool SPartRequest::commit()
 {
-    if(i_id)
+    if(!isPrimaryKeyValid())
     {
-    }
-    else
-    {
-        i_logTexts->clear();
-
         QStringList logs;
         logs.append(tr("Заявка на закупку %1ед. \"%2\" создана").arg(count()).arg(name()));
         logs.append(tr("Приоритет: %1").arg(partRequestPrioritiesListModel->getDisplayRole(priority())));
         if(planEndDate().isValid())
             logs.append(tr("Deadline: %1").arg(planEndDate().toString(sysLocale.dateFormat(QLocale::ShortFormat))));
-        appendLogText(logs.join(". "));
+        appendLogText(logs.join(". "), ".");
 
-        setUrl("");
+        initMandatoryField(C_notes, "");
+        initMandatoryField(C_url, "");
     }
 
-    return SComRecord::commit();
+    return SSingleRowJModel::commit();
 }
 
 bool SPartRequest::isManagersModelDirty()
@@ -542,14 +346,14 @@ bool SPartRequest::isManagersModelDirty()
 
 bool SPartRequest::commitManagers()
 {
-    SDatabaseRecord::checkSystemTime();
+    SSingleRowModel::checkSystemTime();
 
     if(!m_managers->submitAll())
         Global::throwError(m_managers->lastError(), tr("Не удалось сохранить ответственных сотрудников в заявке на закупку"));
     if(!m_notifications->submitAll())
         Global::throwError(m_notifications->lastError(), tr("Не удалось отправить уведомления ответственным сотрудникам при сохранении заявки на закупку"));
 
-    return i_nErr;
+    return 1;
 }
 
 /* Переопределённый метод
@@ -557,27 +361,14 @@ bool SPartRequest::commitManagers()
 */
 void SPartRequest::updateLogAssociatedRecId()
 {
-    i_logRecord->setPartRequestId(i_id);
-}
-
-/* Переопределённый метод
- * TODO: Это временное решение; метод будет удалён после переработки всех наследующих
- * классов SComRecord (см. более детальное описание там); в данном случае очистка кэша не
- * нужна, т. к. в этом классе геттеры возвращают актуальное значение: если изменялось, то из
- * кэша, в противном случае из приватной переменной, проинициализированной в методе load();
-*/
-void SPartRequest::dbErrFlagHandler(bool flushCache)
-{
-    Q_UNUSED(flushCache);
-
-    SComRecord::dbErrFlagHandler(false);
+    i_logRecord->set_partRequest(id());
 }
 
 void SPartRequest::managersPrimeInsert(int row, QSqlRecord &record)
 {
     Q_UNUSED(row)
 
-    m_managers->setRecordValue(record, ManagersModelFields::RequestId, i_id);
+    m_managers->setRecordValue(record, ManagersModelFields::RequestId, id());
 }
 
 void SPartRequest::notificationsPrimeInsert(int row, QSqlRecord &record)
@@ -589,10 +380,10 @@ void SPartRequest::notificationsPrimeInsert(int row, QSqlRecord &record)
     int repair = this->repair();
 
     m_notifications->setRecordValue(record, NotificationsModelFields::Created, QDateTime::currentDateTimeUtc());
-    m_notifications->setRecordValue(record, NotificationsModelFields::Employee, m_employee);
+    m_notifications->setRecordValue(record, NotificationsModelFields::Employee, employee());
     m_notifications->setRecordValue(record, NotificationsModelFields::Type, type);
-    if(i_id)
-        m_notifications->setRecordValue(record, NotificationsModelFields::BuyRequest, i_id);
+    if(id())
+        m_notifications->setRecordValue(record, NotificationsModelFields::BuyRequest, id());
     if(client)
         m_notifications->setRecordValue(record, NotificationsModelFields::Client, client);
     if(repair)
@@ -600,6 +391,20 @@ void SPartRequest::notificationsPrimeInsert(int row, QSqlRecord &record)
     m_notifications->setRecordValue(record, NotificationsModelFields::Subject, SNotification::typeToSubject(type));
     m_notifications->setRecordValue(record, NotificationsModelFields::Text, name());
     m_notifications->setRecordValue(record, NotificationsModelFields::State, 0);
+}
+
+void SPartRequest::setDataRework(const int index, QVariant &data)
+{
+    switch(index)
+    {
+        case C_repair:
+        case C_dealer:
+        case C_client: if(!data.toInt()) data = QVariant(QVariant::Int); break;
+        case C_amount: if(data.toDouble() == 0) data = QVariant(QVariant::Double); break;
+        case C_notes:
+        case C_tracking: if(data.toString().isEmpty()) data = QVariant(QVariant::String); break;
+        default: ;
+    }
 }
 
 void SPartRequest::translateNames()
@@ -620,3 +425,4 @@ void SPartRequest::translateNames()
     tr("High");
     tr("Low");
 }
+

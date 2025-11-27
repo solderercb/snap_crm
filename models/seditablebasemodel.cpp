@@ -1,4 +1,6 @@
 #include "seditablebasemodel.h"
+#include <ProjectGlobals>
+#include <QDebug>
 
 SEditableBaseModel::SEditableBaseModel(QObject *parent, QSqlDatabase db):
     QSqlTableModel(parent, db),

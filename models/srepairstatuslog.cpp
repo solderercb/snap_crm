@@ -1,119 +1,77 @@
 #include "srepairstatuslog.h"
+#include <SUserSettings>
+#include <ProjectGlobals>
+#include <SSqlQueryModel>
 
-SRepairStatusLog::SRepairStatusLog(const int repair, QObject *parent):
-    SComRecord(parent),
-    m_repair(repair)
+SRepairStatusLog::SRepairStatusLog(QObject *parent):
+    SSingleRowJModel(parent)
 {
+    mapFields();
+
     i_obligatoryFields << "created_at" << "repair_id" << "status_id" << "user_id";
     i_tableName = "repair_status_logs";
-    i_idColumnName = "id";
+
+    i_primaryKeyIndex = 0;
+    connect(this, &SSingleRowModel::beginDataChange, this, &SRepairStatusLog::setDataRework);
 }
 
-int SRepairStatusLog::id()
-{
-    return i_id;
-}
-
-void SRepairStatusLog::setCreated(const QDateTime created_at)
-{
-    i_valuesMap.insert("created_at", created_at);
-}
-
-int SRepairStatusLog::repair()
-{
-    return m_repair;
-}
-
-void SRepairStatusLog::setRepair(const int repair_id)
-{
-    m_repair = repair_id;
-}
-
-int SRepairStatusLog::status()
-{
-    return m_status;
-}
-
-void SRepairStatusLog::setStatus(const int status_id)
-{
-    m_changed = 1;
-    i_id = 0;
-    i_valuesMap.insert("status_id", status_id);
-}
-
-int SRepairStatusLog::user()
-{
-    return m_user;
-}
-
-void SRepairStatusLog::setUser(const int user_id)
-{
-    i_valuesMap.insert("user_id", user_id);
-}
-
-int SRepairStatusLog::manager()
-{
-    return m_manager;
-}
-
-void SRepairStatusLog::setManager(const QVariant value)
-{
-    i_valuesMap.insert("manager_id", value);
-}
-
-void SRepairStatusLog::setManager(const int id)
-{
-    if(!id)
-        setManager(QVariant());
-    else
-        setManager(QVariant(id));
-}
-
-void SRepairStatusLog::setManagerIndex(const int index)
+void SRepairStatusLog::set_managerIndex(const int index)
 {
     if(index == -1)
-        setManager(QVariant());
+        set_manager(0);
     else
-    setManager(managersModel->databaseIDByRow(index));
+        set_manager(managersModel->databaseIDByRow(index));
 }
 
-int SRepairStatusLog::engineer()
-{
-    return m_master;
-}
-
-void SRepairStatusLog::setEngineer(const QVariant value)
-{
-    i_valuesMap.insert("master_id", value);
-}
-
-void SRepairStatusLog::setEngineer(const int id)
-{
-    if(!id)
-        setEngineer(QVariant());
-    else
-        setEngineer(QVariant(id));
-}
-
-void SRepairStatusLog::setEngineerIndex(const int index)
+void SRepairStatusLog::set_engineerIndex(const int index)
 {
     if(index == -1)
-        setEngineer(QVariant());
+        set_engineer(0);
     else
-        setEngineer(engineersModel->databaseIDByRow(index));
+        set_engineer(engineersModel->databaseIDByRow(index));
 }
 
 bool SRepairStatusLog::commit()
 {
-    if(!m_changed)
+    if(!isDirty())
         return 1;
 
-    i_valuesMap.insert("repair_id", m_repair);
-    setUser(userDbData->id);
-    setCreated(QDateTime::currentDateTime());
-    if(insert())
-        m_changed = 0;
+    initMandatoryField(C_user, userDbData->id());
+    initMandatoryField(C_created, QDateTime::currentDateTime());
+    if(!insert())
+        return 0;
+    setFieldsExecuted();
 
-    return i_nErr;
+    return 1;
 }
 
+void SRepairStatusLog::setDataRework(const int index, QVariant &data)
+{
+    switch(index)
+    {
+        case C_manager: if(!data.toInt()) data = QVariant(); break;
+        case C_engineer: if(!data.toInt()) data = QVariant(); break;
+        default: ;
+    }
+}
+
+/* Переопределённый метод
+ * Требуется пометка только поля status.
+ * В тестах это позволит проверить последнюю запись на предмет правильно отработавших алгоритмов коммита
+*/
+void SRepairStatusLog::setAllState(ModifiedField::State state)
+{
+    CacheMap::iterator i = cache.find(C_status);
+    if(i != cache.end())
+    {
+        setState(*i, state);
+    }
+}
+
+/* Переопределённый метод
+ * Проверяется только поле status.
+*/
+bool SRepairStatusLog::isDirty()
+{
+    return isFieldDirty(C_status);
+}

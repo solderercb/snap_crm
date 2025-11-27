@@ -1,7 +1,16 @@
-#include "global.h"
 #include "tabcashmoveexch.h"
 #include "ui_tabcashmoveexch.h"
-#include "models/sofficemodel.h"
+#include <ProjectGlobals>
+#include <SAppLog>
+#include <SOfficeModel>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SPermissions>
+#include <SLogRecordModel>
+#include <SCashRegisterModel>
+#include <SSortFilterProxyModel>
+#include <SSqlQueryModel>
+#include <FlashPopup>
 
 tabCashMoveExch* tabCashMoveExch::p_instance;
 
@@ -13,24 +22,24 @@ tabCashMoveExch::tabCashMoveExch(MainWindow *parent) :
 
     ui->setupUi(this);
     tabCashMoveExch::guiFontChanged();
-    ui->checkBoxPrintCheck->setChecked(comSettings->printCheck);
+    ui->checkBoxPrintCheck->setChecked(comSettings->printCheck());
 
     paymentSystemsProxyModel = new SSortFilterProxyModel();
     paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
     paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(-2)|(-1)).*$"));
     paymentSystemsProxyModel->setFilterKeyColumn(1);
     ui->comboBoxSrcPaymentAccount->setModel(paymentSystemsProxyModel);
-    ui->comboBoxSrcPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
+    ui->comboBoxSrcPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem(), "system_id"));
     ui->comboBoxDstPaymentAccount->setModel(paymentSystemsProxyModel);
-    ui->comboBoxDstPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
+    ui->comboBoxDstPaymentAccount->setCurrentIndex(paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem(), "system_id"));
 
     bool officeVisible = officesModel->rowCount() > 1;
     ui->labelOffice->setVisible(officeVisible);
     ui->comboBoxSrcOffice->setModel(officesModel);
-    ui->comboBoxSrcOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
+    ui->comboBoxSrcOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office()));
     ui->comboBoxSrcOffice->setVisible(officeVisible);
     ui->comboBoxDstOffice->setModel(officesModel);
-    ui->comboBoxDstOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office));
+    ui->comboBoxDstOffice->setCurrentIndex(officesModel->rowByDatabaseID(userDbData->office()));
     ui->comboBoxDstOffice->setVisible(officeVisible);
 
     cashRegisterSrc = new SCashRegisterModel();
@@ -71,86 +80,74 @@ void tabCashMoveExch::setDefaultStylesheets()
 
 }
 
-bool tabCashMoveExch::commit(bool repeatAfter)
+void tabCashMoveExch::beginCommit()
 {
-    if(!checkInput())
-        return 0;
-
     SOfficeModel officeSrc;
     SOfficeModel officeDst;
 
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-    bool nErr = 1;
-
-    QUERY_LOG_START(metaObject()->className());
-
     officeSrc.load(officesModel->databaseIDByRow(ui->comboBoxSrcOffice->currentIndex()));
     officeDst.load(officesModel->databaseIDByRow(ui->comboBoxDstOffice->currentIndex()));
-    cashRegisterSrc->setOperationType(SCashRegisterModel::MoveCash);
-    cashRegisterDst->setOperationType(SCashRegisterModel::MoveCash);
-    cashRegisterSrc->setAmount(-ui->doubleSpinBoxSrcAmount->value());
-    cashRegisterDst->setAmount(ui->doubleSpinBoxDstAmount->value());
-    cashRegisterSrc->setCompany(officeSrc.defaultCompany());
-    cashRegisterDst->setCompany(officeDst.defaultCompany());
-    cashRegisterSrc->setOffice(officeSrc.id());
-    cashRegisterDst->setOffice(officeDst.id());
-    cashRegisterSrc->setCreatedDate(ui->dateEdit->date());
-    cashRegisterDst->setCreatedDate(ui->dateEdit->date());
-    cashRegisterSrc->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSrcPaymentAccount->currentIndex(), "system_id"));
-    cashRegisterDst->setSystemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxDstPaymentAccount->currentIndex(), "system_id"));
-    cashRegisterSrc->setSkipLogRecording(m_skipAutoLogRecord);
-    cashRegisterDst->setSkipLogRecording(m_skipAutoLogRecord);
+    cashRegisterSrc->set_operationType(SCashRegisterModel::MoveCash);
+    cashRegisterDst->set_operationType(SCashRegisterModel::MoveCash);
+    cashRegisterSrc->set_amount(-ui->doubleSpinBoxSrcAmount->value());
+    cashRegisterDst->set_amount(ui->doubleSpinBoxDstAmount->value());
+    cashRegisterSrc->set_company(officeSrc.defaultCompany());
+    cashRegisterDst->set_company(officeDst.defaultCompany());
+    cashRegisterSrc->set_office(officeSrc.id());
+    cashRegisterDst->set_office(officeDst.id());
+    cashRegisterSrc->set_createdDate(ui->dateEdit->date());
+    cashRegisterDst->set_createdDate(ui->dateEdit->date());
+    cashRegisterSrc->set_systemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxSrcPaymentAccount->currentIndex(), "system_id"));
+    cashRegisterDst->set_systemId(paymentSystemsProxyModel->databaseIDByRow(ui->comboBoxDstPaymentAccount->currentIndex(), "system_id"));
+    cashRegisterSrc->set_skipLogRecording(m_skipAutoLogRecord);
+    cashRegisterDst->set_skipLogRecording(m_skipAutoLogRecord);
+}
 
-    try
-    {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        cashRegisterSrc->setReason(QString());  // поле обязательное, поэтому сначала записывается пустая строка
-        cashRegisterDst->setReason(QString());
-        cashRegisterSrc->commit();
-        cashRegisterDst->commit();
-        m_srcOrderId = cashRegisterSrc->id();
-        m_dstOrderId = cashRegisterDst->id();
-        cashRegisterSrc->setReason(QString("%1; %2").arg(cashRegisterSrc->constructReason(m_dstOrderId)).arg(ui->lineEditReason->text()));    //
-        cashRegisterDst->setReason(QString("%1; %2").arg(cashRegisterDst->constructReason(m_srcOrderId)).arg(ui->lineEditReason->text()));
-        cashRegisterSrc->commit();
-        cashRegisterDst->commit();
+void tabCashMoveExch::commit(const int)
+{
+    cashRegisterSrc->set_reason(QString());  // поле обязательное, поэтому сначала записывается пустая строка
+    cashRegisterDst->set_reason(QString());
+    cashRegisterSrc->commit();
+    cashRegisterDst->commit();
+    m_srcOrderId = cashRegisterSrc->id();
+    m_dstOrderId = cashRegisterDst->id();
+    cashRegisterSrc->set_reason(QString("%1; %2").arg(cashRegisterSrc->constructReason(m_dstOrderId)).arg(ui->lineEditReason->text()));    //
+    cashRegisterDst->set_reason(QString("%1; %2").arg(cashRegisterDst->constructReason(m_srcOrderId)).arg(ui->lineEditReason->text()));
+    cashRegisterSrc->commit();
+    cashRegisterDst->commit();
 
 #ifdef QT_DEBUG
 //        Global::throwDebug();
 #endif
+}
 
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-    }
-    catch (Global::ThrowType type)
+void tabCashMoveExch::throwHandler(int)
+{
+    initCashRegisterModel();
+}
+
+void tabCashMoveExch::switchTabToViewMode()
+{
+    cashRegisterSrc->SSingleRowModelBase::load();
+    cashRegisterDst->SSingleRowModelBase::load();
+
+    emit updateTabTitle(this);
+    m_widgetsRO = 1;
+    m_reasonRO = 1;
+    m_showCheckBoxPrint = 0;
+    updateWidgets();
+}
+
+void tabCashMoveExch::endCommit()
+{
+    switch(m_endCommitOp)
     {
-        nErr = 0;
-        initCashRegisterModel();
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-
-//        if(type == Global::ThrowType::Debug)
-//            nErr = 1; // это чтобы проверить работу дальше
+        case PrepareRepeat: prepareForRepeatedOp(); break;
+        case SwitchToViewMode: switchTabToViewMode(); break;
     }
 
-    QUERY_LOG_STOP;
-
-    if(nErr)
-    {
-        if(!repeatAfter)
-        {
-            emit updateTabTitle(this);
-            m_widgetsRO = 1;
-            m_reasonRO = 1;
-            m_showCheckBoxPrint = 0;
-            updateWidgets();
-        }
-
-        if(ui->checkBoxPrintCheck->isChecked())
-            print();
-    }
-    return nErr;
+    if(ui->checkBoxPrintCheck->isChecked())
+        print();
 }
 
 void tabCashMoveExch::print()
@@ -196,7 +193,7 @@ void tabCashMoveExch::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
 
     ui->doubleSpinBoxSrcAmount->setFont(font);
     ui->doubleSpinBoxDstAmount->setFont(font);
@@ -217,7 +214,7 @@ void tabCashMoveExch::updateWidgets()
     if(m_srcOrderId && m_dstOrderId)
     {
         m_widgetsRO = 1;
-        ui->lineEditDate->setText(cashRegisterSrc->created());
+        ui->lineEditDate->setText(cashRegisterSrc->createdStr());
         ui->buttonSave->hide();
         ui->buttonSaveMore->hide();
         updateOrderIdLineEdit();
@@ -249,7 +246,7 @@ void tabCashMoveExch::updateWidgets()
     ui->toolButtonFlipCurrency->setVisible(m_showFlipCurrencyButton && !m_widgetsRO);
 }
 
-bool tabCashMoveExch::checkInput()
+int tabCashMoveExch::checkInput()
 {
     int error = 0;
 
@@ -293,17 +290,17 @@ bool tabCashMoveExch::checkInput()
     if (error)
     {
         appLog->appendRecord(QString("Error while creating cash register records: probably some obligatory fields empty (error %1)").arg(error));
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 void tabCashMoveExch::initCashRegisterModel()
 {
     m_srcOrderId = 0;
     m_dstOrderId = 0;
-    cashRegisterSrc->setId(0);
-    cashRegisterDst->setId(0);
+    cashRegisterSrc->clearCache();
+    cashRegisterDst->clearCache();
 }
 
 void tabCashMoveExch::operationTypeChanged(bool)
@@ -360,15 +357,20 @@ void tabCashMoveExch::dateChanged(QDate)
 
 void tabCashMoveExch::buttonSaveClicked()
 {
-    commit();
+    m_endCommitOp = SwitchToViewMode;
+    manualSubmit();
 }
 
 void tabCashMoveExch::buttonSaveMoreClicked()
 {
-    if(!commit(1))
-        return;
+    m_endCommitOp = PrepareRepeat;
+    manualSubmit();
+}
 
-    shortlivedNotification *newPopup = new shortlivedNotification(this, tabTitle(), tr("Проведёно"), QColor(214,239,220), QColor(229,245,234));
+void tabCashMoveExch::prepareForRepeatedOp()
+{
+    auto *p = new shortlivedNotification(this, tabTitle(), tr("Проведёно"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
 
     initCashRegisterModel();
     m_widgetsRO = 0;
@@ -413,7 +415,7 @@ void tabCashMoveExch::calculateDstAmount()
         dstValue = ui->doubleSpinBoxSrcAmount->value() - ui->doubleSpinBoxCharge->value();
     }
     ui->doubleSpinBoxDstAmount->setValue(dstValue);
-    cashRegisterDst->setAmount(dstValue);
+    cashRegisterDst->set_amount(dstValue);
     ui->doubleSpinBoxDstAmount->blockSignals(0);
 }
 
@@ -535,4 +537,3 @@ void tabCashMoveExch::test_scheduler2_handler()
 {
 }
 #endif
-

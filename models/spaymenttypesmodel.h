@@ -1,10 +1,7 @@
 #ifndef SPAYMENTTYPESMODEL_H
 #define SPAYMENTTYPESMODEL_H
 
-#include "com_sql_queries.h"
-#include "sstandarditemmodel.h"
-#include <QObject>
-#include <QSqlQueryModel>
+#include <SStandardItemModel>
 
 class SPaymentTypesModel : public SStandardItemModel
 {

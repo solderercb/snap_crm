@@ -3,10 +3,8 @@
 
 #include <QWidget>
 #include <QIcon>
-#include <QMap>
-#include <QCommandLinkButton>
-#include <QDebug>
-#include <QString>
+
+class QCommandLinkButton;
 
 namespace Ui {
 class SToolboxSwitchPanel;

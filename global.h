@@ -1,31 +1,37 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QLocale>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-#include <QSettings>
+// подсмотрено: https://stackoverflow.com/a/5459929
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)   // препроцессор заключит конструкцию x в кавычки
+#define DBG_FUNC_NAME QString::fromStdString(std::string(__func__) + "()")
+#define DBG_VAR_OUT(var)   STR(| var:) << (var)
+
 #include "global_ns.h"
-#include "applog.h"
-#include "models/scomsettings.h"
-#include "models/susersettings.h"
-#include "models/slocalsettings.h"
-#include "models/slocalsettingsstructs.h"
-#include "models/suseractivitymodel.h"
-#include "models/sstandarditemmodel.h"
-#include "models/ssqlquerymodel.h"
-#include "models/spaymenttypesmodel.h"
-#include "models/spermissions.h"
-#include "models/ssortfilterproxymodel.h"
 #ifdef QT_DEBUG
-#include "clients4test.h"
+#include <SClient4Test>
 #endif
+
+class QSqlDatabase;
+class QSqlError;
+class QSqlQuery;
+class QSqlRecord;
+class QLocale;
+class QJsonDocument;
+class QJsonObject;
+class QJsonArray;
+class QJsonValue;
+class QSettings;
+class SAppLog;
+class SPermissions;
+class SComSettings;
+class SUserSettings;
+class t_userSettings;
+class SLocalSettings;
+class SUserActivityModel;
+class SStandardItemModel;
+class SSqlQueryModel;
+class SPaymentTypesModel;
 
 namespace Global
 {
@@ -51,7 +57,7 @@ namespace Global
     Q_ENUM_NS(Reports)
     enum UserRoles {Admininstrator = 1, Engineer = 2, Manager = 3, Director = 4, SeniorEngineer = 5, SeniorManager = 6}; // роли по умолчанию
     Q_ENUM_NS(UserRoles)
-    enum ThrowType {Debug = 0, QueryError = 1, TimeError = 2, ResultError = 3, ConditionsError = 250, AccessDenied = 251, ConnLost = 252, IntegrityError = 253, InputError = 254, UserCanceled = 255};
+    enum ThrowType {Debug = 0, QueryError = 1, TimeError = 2, ResultError = 3, DiskWriteError = 4, ConditionsError = 250, AccessDenied = 251, ConnLost = 252, IntegrityError = 253, InputError = 254, UserCanceled = 255};
     Q_ENUM_NS(ThrowType)
     int throwCodeByQueryError(const QSqlError &err);
     void errorMsg(const QString &errorText);
@@ -105,6 +111,7 @@ extern QString commonSpinBoxStyleSheet;
 extern QString commonSpinBoxStyleSheetRed;
 extern SStandardItemModel *rejectReasonModel;
 extern SStandardItemModel *priceColModel;
+extern SStandardItemModel *workPriceColModel;
 extern SStandardItemModel *itemUnitsModel;
 extern SAppLog *appLog;
 extern SUserActivityModel *userActivityLog;

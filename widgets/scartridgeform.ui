@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SCartridgeForm</class>
- <widget class="QFrame" name="SCartridgeForm">
+ <widget class="SFrame" name="SCartridgeForm">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -1157,17 +1157,23 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">widgets/scombobox.h</header>
+   <header location="global">SComboBox</header>
   </customwidget>
   <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
+   <header location="global">SDoubleSpinBox</header>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>SFrame</class>
+   <extends>QFrame</extends>
+   <header location="global">SFrame</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

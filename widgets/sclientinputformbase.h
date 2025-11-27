@@ -1,8 +1,9 @@
 #ifndef SCLIENTINPUTFORMBASE_H
 #define SCLIENTINPUTFORMBASE_H
 
-#include "widgets/swidget.h"
-#include "models/sclientmodel.h"
+#include <SWidget>
+
+class SClientModel;
 
 class SClientInputFormBase : public SWidget
 {
@@ -14,7 +15,7 @@ public:
     virtual void setMatchWidgetFilter(int category) = 0;
 protected:
     QString i_clientsTabTitle;
-    int i_clientsTabDefaultCategory = SClientModel::Categories::All;
+    int i_clientsTabDefaultCategory;
 public slots:
     virtual void fillCreds(int id);
 #ifdef QT_DEBUG

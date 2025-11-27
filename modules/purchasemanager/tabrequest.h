@@ -1,11 +1,11 @@
 #ifndef TABPARTREQUEST_H
 #define TABPARTREQUEST_H
 
-#include <QWidget>
-#include <QLineEdit>
-#include "tabcommon.h"
-#include "modules/purchasemanager/srequest.h"
-#include "models/sclientmodel.h"
+#include <tabCommon>
+#include <QObject>
+
+class SPartRequest;
+class SClientModel;
 
 namespace Ui {
 class tabPartRequest;
@@ -15,6 +15,7 @@ class tabPartRequest : public tabCommon
 {
     Q_OBJECT
 public:
+    enum EndCommitOp {SwitchToViewMode, PrepareRepeat, UpdateWidgets};
     static tabPartRequest* getInstance(int id, MainWindow *parent = nullptr);
     explicit tabPartRequest(int id = 0, MainWindow *parent = nullptr);
     ~tabPartRequest();
@@ -41,14 +42,20 @@ private:
     bool m_endDateVisible = 0;
     bool m_commentsVisible = 0;
     bool m_newRequest = 1;
+    int m_endCommitOp = 0;
     void load(const int id);
     void setDefaultStyleSheets();
     void initWidgets();
     void updateWidgets();
-    bool checkInput();
+    int checkInput() override;
+    void throwHandler(int) override;
+    void beginCommit() override;
+    void commit(const int stage = 0) override;
+    void endCommit() override;
+    void prepareForRepeatedOp();
+    void switchTabToViewMode();
     bool isManagersChanged();
     void setModelData();
-    bool commit(bool repeatAfter);
     void guiFontChanged() override;
     void stateHandler(const int state);
     void updateTabPtr(const int oldId, const int newId);

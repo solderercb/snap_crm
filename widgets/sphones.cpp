@@ -1,5 +1,12 @@
 #include "sphones.h"
 #include "ui_sphones.h"
+#include <SPermissions>
+#include <QWidget>
+#include <QList>
+#include <SPhone>
+#include <SPhoneModel>
+#include <SPhonesModel>
+#include <SSqlQueryModel>
 
 SPhones::SPhones(QWidget *parent) :
     QWidget(parent),
@@ -29,7 +36,7 @@ void SPhones::setModel(SPhonesModel *model)
 {
     m_phonesModel = model;
     slotModelUpdated();
-    connect(m_phonesModel,SIGNAL(modelUpdated()),this,SLOT(slotModelUpdated()));
+    connect(m_phonesModel, &SPhonesModel::modelUpdated, this, &SPhones::slotModelUpdated);
 }
 
 void SPhones::addForm(SPhoneModel *model)
@@ -38,12 +45,11 @@ void SPhones::addForm(SPhoneModel *model)
     if(m_notEditable)
         phoneForm->setEditable(SPhone::NotEditable);
     phoneForm->setModel(model);
-    connect(phoneForm,SIGNAL(buttonAddClicked()),this,SLOT(addPhone()));
-    connect(phoneForm,SIGNAL(delPhone(SPhone*)),this,SLOT(delPhone(SPhone*)));
-    connect(phoneForm,SIGNAL(sigEditPhone()),this,SLOT(updateFormsButtons()));
-    connect(phoneForm,SIGNAL(sigEditPhone()),this,SLOT(markPhonesModelUpdated()));
-    connect(phoneForm,SIGNAL(markedPrimary()),model,SLOT(setPrimaryUi()));
-    connect(phoneForm,SIGNAL(phoneEdited(QString)),this,SIGNAL(primaryPhoneEdited(QString)));
+    connect(phoneForm, &SPhone::buttonAddClicked, this, &SPhones::addPhone);
+    connect(phoneForm, &SPhone::delPhone, this, &SPhones::delPhone);
+    connect(phoneForm, &SPhone::sigEditPhone, this, &SPhones::updateFormsButtons);
+    connect(phoneForm, &SPhone::markedPrimary, model, &SPhoneModel::setPrimaryUi);
+    connect(phoneForm, &SPhone::phoneEdited, this, &SPhones::primaryPhoneEdited);
 
     m_isPrimary = model->type();
     if(m_isPrimary)
@@ -70,11 +76,6 @@ void SPhones::updateFormsButtons()
         i++;
     }
     (*i)->setButtonVisible(SPhone::Add, true);
-}
-
-void SPhones::markPhonesModelUpdated()
-{
-    m_phonesModel->markUpdated();
 }
 
 void SPhones::slotModelUpdated()

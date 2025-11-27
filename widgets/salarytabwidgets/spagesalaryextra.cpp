@@ -1,5 +1,12 @@
 #include "spagesalaryextra.h"
 #include "ui_spagesalaryextra.h"
+#include <QScrollBar>
+#include <ProjectQueries>
+#include <tabSalary>
+#include <STableViewBase>
+#include <FlashPopup>
+#include <SSalaryExtraModel>
+#include <SSalaryExtraView>
 
 SPageSalaryExtra::SPageSalaryExtra(QWidget *parent) :
     SPageSalaryBase(parent),
@@ -9,7 +16,6 @@ SPageSalaryExtra::SPageSalaryExtra(QWidget *parent) :
 
     ui->tableViewExtraChargesSummary->setGridLayout(ui->tableViewExtraCharges->gridLayout());
     connect(ui->tableViewExtraCharges, &STableViewSalaryExtra::signalColumnResized, this, &SPageSalaryExtra::tableColumnResized);
-    connect(parentTab->m_extraCharges, &STableSalaryExtraModel::repopulate, this, &SPageSalaryExtra::updateModels);
 
     ui->tableViewExtraCharges->setModel(parentTab->m_extraCharges);
 }
@@ -60,3 +66,27 @@ void STableViewSalaryExtraSummary::setGridLayout(XtraSerializer *layout)
     setData(0, STableViewSalaryExtra::Column::ID, "<value>");
     setData(0, STableViewSalaryExtra::Column::Amount, "<value>");
 }
+
+
+int SPageSalaryExtra::checkInput()
+{
+    return (parentTab->m_extraCharges->rowCount() == 0);
+}
+
+QString SPageSalaryExtra::queryLogFile()
+{
+    return parentTab->metaObject()->className();
+}
+
+void SPageSalaryExtra::commit(const int)
+{
+    parentTab->m_extraCharges->saveTable();
+}
+
+void SPageSalaryExtra::endCommit()
+{
+    auto *p = new shortlivedNotification(this, tr("Начисления и списания"), tr("Список успешно сохранён"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
+    updateModels();
+}
+

@@ -1,10 +1,11 @@
 #ifndef SSETTINGSPAGEGLOBAL_H
 #define SSETTINGSPAGEGLOBAL_H
 
-#include <QWidget>
-#include <QPushButton>
-#include "models/scomsettings.h"
-#include "widgets/settingstabwidgets/ssettingspagebase.h"
+#include <QObject>
+#include <SSettingsPageBase>
+
+class QWidget;
+class QPushButton;
 
 namespace Ui {
 class SSettingsPageGlobal;

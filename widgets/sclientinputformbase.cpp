@@ -1,11 +1,13 @@
 #include "sclientinputformbase.h"
 #ifdef QT_DEBUG
-#include "models/sdatabaseauxiliary.h"
+#include <SSingleRowModelBase>
 #endif
+#include <SClientModel>
 
 
 SClientInputFormBase::SClientInputFormBase(QWidget *parent) :
-    SWidget(parent)
+    SWidget(parent),
+    i_clientsTabDefaultCategory(SClientModel::Categories::All)
 {
     i_clientsTabTitle = tr("Выбрать клиента");
 }
@@ -47,7 +49,7 @@ int SClientInputFormBase::randomClientIdFromDB(const QString &filterField, QVari
 
     if(!filterField.isEmpty())
     {
-        f = " AND t1.`" + filterField + "` = " + SDatabaseAuxiliary::fieldValueHandler(filterValue);
+        f = " AND t1.`" + filterField + "` = " + SSingleRowModelBase::fieldValueHandler(filterValue);
     }
 
     for(int j = 0; j < 5; j++)

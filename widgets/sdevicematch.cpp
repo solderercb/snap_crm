@@ -1,5 +1,8 @@
 #include "sdevicematch.h"
 #include "ui_sdevicematch.h"
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SGroupBoxEventFilter>
 
 SDeviceMatch::SDeviceMatch(QWidget *parent) :
     QWidget(parent),

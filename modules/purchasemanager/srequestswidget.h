@@ -1,11 +1,10 @@
 #ifndef SPARTSREQUESTS_H
 #define SPARTSREQUESTS_H
 
-#include "widgets/swidget.h"
-#include <QTableView>
-#include "widgets/stableviewbase.h"
-#include "modules/purchasemanager/srequestsmodel.h"
-#include "widgets/shortlivednotification.h"
+#include <QMessageBox>
+#include <SWidget>
+#include <STableViewBase>
+#include <SPartsRequestsModel>
 
 namespace Ui {
 class SPartsRequests;
@@ -31,7 +30,7 @@ public:
     int requestCount();
     void setReadOnly(const bool state);
     void setTableLayout(const SLocalSettings::SettingsVariant &layoutVariant);
-    void commit();
+    void commit(const int stage = 0) override;
 private:
     Ui::SPartsRequests *ui;
     SPartsRequestsModel *m_model;
@@ -39,8 +38,7 @@ private:
     void updateWidgets();
     bool eventFilter(QObject *object, QEvent *event) override;
     STableViewBase* tableView();
-protected slots:
-    virtual void manualSubmit();
+    void endCommit() override;
 private slots:
     void tableRowSelected(const QModelIndex &current, const QModelIndex &prev);
     void tableRowDoubleClicked(const QModelIndex &index);

@@ -1,4 +1,6 @@
 #include "splaintextedit.h"
+#include <QWidget>
+#include <QDebug>
 
 SPlainTextEdit::SPlainTextEdit(QWidget *parent) :
     QPlainTextEdit(parent),

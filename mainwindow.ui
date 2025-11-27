@@ -358,7 +358,7 @@
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>

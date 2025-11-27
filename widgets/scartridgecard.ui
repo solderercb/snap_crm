@@ -243,7 +243,7 @@
   <customwidget>
    <class>materialsTable</class>
    <extends>QTableView</extends>
-   <header>widgets/scartridgecard.h</header>
+   <header location="global">SCartridgeCard</header>
   </customwidget>
  </customwidgets>
  <tabstops>

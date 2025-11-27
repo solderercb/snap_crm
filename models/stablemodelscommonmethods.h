@@ -3,10 +3,14 @@
 #ifndef STABLEMODELSCOMMONMETHODS_H
 #define STABLEMODELSCOMMONMETHODS_H
 
-#include <QObject>
-#include <QSqlQueryModel>
-#include <QDebug>
-#include "models/ssqlfetchingmodel.h"
+#include <QVariant>
+#include <QDateTime>
+
+class QObject;
+class QSqlQueryModel;
+class QSqlRecord;
+class SSqlFetchingModel;
+class SStandardItemModel;
 
 class STableModelsCommonMethods
 {
@@ -35,10 +39,11 @@ protected:
     QMap<int, int> i_columnWidths;  // ширина столбца в символах
     QSqlQueryModel *m_sqlQueryModel = nullptr;
     SSqlFetchingModel *m_sqlFetchingModel = nullptr;
+    SStandardItemModel *m_standardItemModel = nullptr;
     int columnIndex(const QString &name);
     QString columnName(const int &index);
     const QMetaObject *metaObject();
-    virtual QModelIndex indexForShortData(const QModelIndex &index) const;
+    virtual QModelIndex indexForShortData(const QModelIndex &) const;
 };
 
 #endif // STABLEMODELSCOMMONMETHODS_H

@@ -1,41 +1,42 @@
-#ifndef SLOGRECORDMODEL_H
-#define SLOGRECORDMODEL_H
+#ifndef SLOGRECORDMODEL_NEW_H
+#define SLOGRECORDMODEL_NEW_H
 
-#include <QObject>
-#include <QMap>
-#include <QSqlQuery>
-#include "global.h"
-#include "com_sql_queries.h"
-#include "models/sdatabaserecord.h"
+#include <SSingleRowModel>
 
-class SLogRecordModel : public SDatabaseRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                \
+    TABLE_FIELD(id, id, int, 0) \
+    TABLE_FIELD(group, group, int, 0) \
+    TABLE_FIELD(type, type, int, 0) \
+    TABLE_FIELD(arh, arh, bool, 0) \
+    TABLE_FIELD(user, user, int, 0) \
+    TABLE_FIELD(created, created, QDateTime, 0) \
+    TABLE_FIELD(values, values, QString, 0) \
+    TABLE_FIELD(values_after, valuesAfter, QString, 0) \
+    TABLE_FIELD(office, office, int, 0) \
+    TABLE_FIELD(client, client, int, 0) \
+    TABLE_FIELD(repair, repair, int, 0) \
+    TABLE_FIELD(item, item, int, 0) \
+    TABLE_FIELD(document, document, int, 0) \
+    TABLE_FIELD(cash_order, cashOrder, int, 0) \
+    TABLE_FIELD(part_request, partRequest, int, 0) \
+    TABLE_FIELD(notes, text, QString, 0)
+
+class SLogRecordModel : public SSingleRowModel
 {
     Q_OBJECT
 public:
     // типы записей для не входящие ни в какие группы (`logs`.`group` = NULL); Doc = 5 в АСЦ не использовался
     enum RecordTypes{ACP = 1, Client = 2, Repair = 3, User = 4, Doc = 5, Part = 6, PartRequest = 8};
     explicit SLogRecordModel(QObject *parent = nullptr);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
     bool commit() override;
     bool commit(const QString &);
-    void setText(const QString &);
-    void setClient(int);
     void unsetClient(); // удаление модели клиента (анонимный)
-    void setGroup(int);
-    void setType(int);
-    void setCurrencyId(int);
-    void setRepairId(int);
-    void setDocumentId(int);
-    void setItemId(int);
-    void setCashOrderId(int);
-    void setPartRequestId(int);
-    void setValueBefore(const QString &);
-    void setValueAfter(const QString &);   // `logs`.`values_after`
-    void setOffice(const int id);
-    void setUser(const int id);
-    void clear() override;
+    void setAllState(ModifiedField::State state) override;
 private:
-    void queryNewId(int&) override {};    // после создания новой записи id не используется
-    void queryLastInsertId() override {}; // id записи в журнале не нужен
+    void queryNewId() override {};
 };
 
-#endif // SLOGRECORDMODEL_H
+#endif // SLOGRECORDMODEL_NEW_H

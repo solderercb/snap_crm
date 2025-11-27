@@ -2,7 +2,8 @@
 #define CHOOSEOFFICEWINDOW_H
 
 #include <QDialog>
-#include "windowsdispatcher.h"
+
+class windowsDispatcher;
 
 namespace Ui {
 class chooseOfficeWindow;

@@ -1,6 +1,16 @@
-#include "modules/purchasemanager/tabmanager.h"
+#include "tabmanager.h"
 #include "ui_tabmanager.h"
-#include "tabprintdialog.h"
+#include <QMessageBox>
+#include <Mainwindow>
+#include <tabPrintDialog>
+#include <SPermissions>
+#include <SUserSettings>
+#include <SPartsRequestsGroupingModel>
+#include <SPeriodSelector>
+#include <STableViewGridLayout>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
+#include <FlashPopup>
 
 tabPurchaseManager* tabPurchaseManager::p_instance = nullptr;
 
@@ -37,7 +47,7 @@ tabPurchaseManager::tabPurchaseManager(MainWindow *parent) :
     ui->comboBoxManager->setModel(usersModel);
     ui->comboBoxManager->setButtons("Clear");
     ui->comboBoxManager->setPlaceholderText(tr("Все"));
-    ui->comboBoxManager->setCurrentIndex(usersModel->rowByDatabaseID(userDbData->id));
+    ui->comboBoxManager->setCurrentIndex(usersModel->rowByDatabaseID(userDbData->id()));
     ui->labelManager->setVisible(permissions->viewAllPartsRequests);
     ui->comboBoxManager->setVisible(permissions->viewAllPartsRequests);
 
@@ -90,7 +100,7 @@ tabPurchaseManager::tabPurchaseManager(MainWindow *parent) :
     connect(ui->widgetPeriodSelector, &SPeriodSelector::refreshButtonClicked, this, &tabPurchaseManager::refreshManual);
     connect(ui->pushButtonCreateNew, &QPushButton::clicked, this, []{MainWindow::getInstance()->createTabPartRequest(0);});
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabPurchaseManager::refreshManual);
-    connect(ui->widgetPartSuppliers, &SPartSuppliers::beginRowInsert, this, [=]{commitChanges(checkChanges(DirtyFlags::SuppliersModel));});
+    connect(ui->widgetPartSuppliers, &SPartSuppliers::beginRowInsert, this, [=]{manualSubmit();});
     ui->widgetPartSuppliers->connectSuppliersTableWithManager();
 
     groupChanged(SPartsRequestsGroupingModel::Group::No);
@@ -120,7 +130,7 @@ void tabPurchaseManager::groupChanged(int index)
     if(!comboBoxIndexChanged(ui->comboBoxGrouping, m_grouping, index))
         return;
 
-    MAINCONN_QUERY_LOG_START(metaObject()->className());
+    MAINCONN_QUERY_LOG_START((metaObject()->className() + QString("_sel")));
 
     QString query;
 
@@ -181,7 +191,7 @@ void tabPurchaseManager::constructQueryClause(FilterList &filter, const int &gro
         FilterList search;
         search.op = FilterList::Or;
         FilterField::Op matchFlag;
-        if(userDbData->useRegExpSearch)
+        if(userDbData->useRegExpSearch())
             matchFlag = FilterField::RegExp;
         else
             matchFlag = FilterField::Contains;
@@ -323,12 +333,22 @@ int tabPurchaseManager::checkChanges(int mask)
     return ((ui->widgetPartsRequests->isDirty() << 1) | (ui->widgetPartSuppliers->isDirty() << 0)) & mask;
 }
 
+void tabPurchaseManager::confirmChanges(int &result)
+{
+    confirmChanges(result, SuppliersModel);
+}
+
+void tabPurchaseManager::confirmChanges(int &result, int mask)
+{
+    confirmChanges(result, mask, QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
+}
+
 /* Вызов метода проверки несохранённых данных в таблицах заявок и ссылок
  * result бдует содержать ответ пользователя
  * с помощью mask можно задать вариаты проверки (битовые флаги)
  * с помощью buttons можно переопределить кнопки диалогового окна; по умолчанию: Да, Нет и Отмена
  */
-void tabPurchaseManager::confirmChanges(int &result, int mask, QMessageBox::StandardButtons buttons)
+void tabPurchaseManager::confirmChanges(int &result, int mask, int buttons)
 {
     int flags = 0;
     flags = checkChanges(mask);
@@ -343,44 +363,41 @@ void tabPurchaseManager::confirmChanges(int &result, int mask, QMessageBox::Stan
 
     if(result == QMessageBox::Yes)
     {
-        if(!commitChanges(flags))
+        if(!manualSubmit())
             result = QMessageBox::Cancel;
     }
     // Обработка нажатий No и Cancel происходит в вызывающем методе
 }
 
-bool tabPurchaseManager::commitChanges(int flags)
+int tabPurchaseManager::commitStages()
 {
-    if(!flags)
-        return 1;
+    return 2;   // 2 этапа: таблица заявок и таблица ссылок
+}
 
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-    QUERY_LOG_START(metaObject()->className());
-    try
+bool tabPurchaseManager::skip(const int stage)
+{
+    switch(stage)
     {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        if(flags & DirtyFlags::SuppliersModel)
-            ui->widgetPartSuppliers->commit();
-        if(flags & DirtyFlags::RequestsModel)
-            ui->widgetPartsRequests->commit();
-        QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-    catch(Global::ThrowType type)
-    {
-        nErr = 0;
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
+        case 0: return (!ui->widgetPartSuppliers->isDirty());
+        case 1: return (!ui->widgetPartsRequests->isDirty());
     }
 
-    QUERY_LOG_STOP;
+    return 0;
+}
 
-    if(nErr)
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
+void tabPurchaseManager::commit(const int stage)
+{
+    switch(stage)
+    {
+        case 0: ui->widgetPartSuppliers->commit(); break;
+        case 1: ui->widgetPartsRequests->commit(); break;
+    }
+}
 
-    return nErr;
+void tabPurchaseManager::endCommit()
+{
+    auto *p = new shortlivedNotification(this, tr("Менеджер закупок"), tr("Изменения успешно сохранёны"), QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
 }
 
 void tabPurchaseManager::subgroupsUpdated()

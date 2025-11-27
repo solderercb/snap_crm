@@ -1,12 +1,7 @@
 #ifndef TABSETTINGS_H
 #define TABSETTINGS_H
 
-#include <QWidget>
-#include <QSqlQueryModel>
-#include <QSqlField>
-#include <QScrollBar>
-#include "tabcommon.h"
-#include "squerylog.h"
+#include <tabCommon>
 
 namespace Ui {
 class tabSettings;
@@ -36,8 +31,8 @@ private:
     bool m_buttonRefreshVisible = 0;
     bool m_lineEditSearchVisible = 0;
     bool m_editStrategy = 0;
-public slots:
-    void buttonSaveClicked();
+    void commit(const int) override;
+    void endCommit() override;
 private slots:
     void updateBotToolbar(const int page);
     void initPage(const int page);

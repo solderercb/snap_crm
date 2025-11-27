@@ -1,6 +1,14 @@
 #include "sclientinputform.h"
 #include "ui_sclientinputform.h"
-#include "tabclients.h"
+#include <Mainwindow>
+#include <tabClients>
+#include <SPermissions>
+#include <SUserSettings>
+#include <SComSettings>
+#include <SClientModel>
+#include <SSqlQueryModel>
+#include <SPhone>
+#include <SPhonesModel>
 
 SClientInputForm::SClientInputForm(QWidget *parent) :
     SClientInputFormBase(parent),
@@ -125,7 +133,7 @@ void SClientInputForm::fillClientCreds(int id)
     m_client = id;
 
     clientModel->load(m_client);
-    ui->checkBoxClientType->setChecked(clientModel->type());
+    ui->checkBoxClientType->setChecked(clientModel->isCompany());
     changeClientType();
     ui->checkBoxClientType->setEnabled(false);
     ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
@@ -136,18 +144,18 @@ void SClientInputForm::fillClientCreds(int id)
     ui->lineEditClientEmail->setReadOnly(true);
 
     ui->pushButtonCreateTabClient->setEnabled(true);
-    ui->lineEditClientFirstName->setText(permissions->viewClients?clientModel->firstName():tr("no permissions"));
-    ui->lineEditClientLastName->setText(permissions->viewClients?clientModel->lastName():tr("no permissions"));
-    ui->lineEditClientPatronymic->setText(permissions->viewClients?clientModel->patronymicName():tr("no permissions"));
+    ui->lineEditClientFirstName->setText(clientModel->firstName());
+    ui->lineEditClientLastName->setText(clientModel->lastName());
+    ui->lineEditClientPatronymic->setText(clientModel->patronymicName());
 //    if(permissions->viewClients)
         ui->phones->setModel(clientModel->phones());
 //    else
 //        ui->phones->setEnabled(false);
-    ui->lineEditClientAddress->setText(permissions->viewClients?clientModel->address():tr("no permissions"));
-    ui->lineEditClientEmail->setText(permissions->viewClients?clientModel->email():tr("no permissions"));
+    ui->lineEditClientAddress->setText(clientModel->address());
+    ui->lineEditClientEmail->setText(clientModel->email());
     ui->pushButtonCreateTabClient->setVisible(permissions->viewClients);
     ui->listWidgetClientOptions->addItems(clientModel->optionsList(SClientModel::OptionsOutputForm::Short));
-    if(clientModel->balanceEnabled())
+    if(clientModel->isBalanceEnabled())
         ui->listWidgetClientOptions->addItems(QStringList("бал. "+sysLocale.toString(clientModel->balance(), 'f', 2)));
 
 }
@@ -172,22 +180,22 @@ int SClientInputForm::checkInput()
         ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
         error = 6;
     }
-    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->isClientPatronymicRequired && !m_client)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
+    if (ui->lineEditClientPatronymic->text() == "" && ui->checkBoxClientType->checkState() == 0 && comSettings->isClientPatronymicRequired() && !m_client)   // если не указано отчество и оно обязятельно (только для физ. лиц и только для новых клиентов)
     {
         ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
         error = 7;
     }
-    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->isVisitSourceRequired && !m_client)        // если не указан источник обращения, а он обязателен и клиент новый
+    if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->isVisitSourceRequired() && !m_client)        // если не указан источник обращения, а он обязателен и клиент новый
     {
         ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 8;
     }
-    if (ui->lineEditClientAddress->text() == "" && comSettings->isClientAddressRequired && !m_client)   // если не указан адрес, а он обязателен и клиент новый
+    if (ui->lineEditClientAddress->text() == "" && comSettings->isClientAddressRequired() && !m_client)   // если не указан адрес, а он обязателен и клиент новый
     {
         ui->lineEditClientAddress->setStyleSheet(commonLineEditStyleSheetRed);
         error = 9;
     }
-    if (ui->lineEditClientEmail->text() == "" && comSettings->isClientEmailRequired && !m_client)   // если не указан email, а он обязателен и клиент новый
+    if (ui->lineEditClientEmail->text() == "" && comSettings->isClientEmailRequired() && !m_client)   // если не указан email, а он обязателен и клиент новый
     {
         ui->lineEditClientEmail->setStyleSheet(commonLineEditStyleSheetRed);
         error = 10;
@@ -205,15 +213,15 @@ SClientModel *SClientInputForm::model()
 
 void SClientInputForm::createClient()
 {
-    clientModel->setFirstName(ui->lineEditClientFirstName->text());
-    clientModel->setLastName(ui->lineEditClientLastName->text());
-    clientModel->setPatronymicName(ui->lineEditClientPatronymic->text());
+    clientModel->set_firstName(ui->lineEditClientFirstName->text());
+    clientModel->set_lastName(ui->lineEditClientLastName->text());
+    clientModel->set_patronymicName(ui->lineEditClientPatronymic->text());
     clientModel->appendLogText(tr("Быстрое создание клиента из формы приёма в ремонт"));
     clientModel->setAdTypeIndex(ui->comboBoxClientAdType->currentIndex());
-    clientModel->setAddress(ui->lineEditClientAddress->text());
-    clientModel->setType(ui->checkBoxClientType->isChecked());
+    clientModel->set_address(ui->lineEditClientAddress->text());
+    clientModel->set_isCompany(ui->checkBoxClientType->isChecked());
     if(ui->checkBoxClientType->isChecked())
-        clientModel->setUrName(ui->lineEditClientFirstName->text());
+        clientModel->set_urName(ui->lineEditClientFirstName->text());
     clientModel->commit();
 
     m_client = clientModel->id();
@@ -221,17 +229,12 @@ void SClientInputForm::createClient()
 
 void SClientInputForm::commit()
 {
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
     if (clientModel->isNew() || clientModel->phones()->isUpdated())
     {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
         if(clientModel->isNew())
             createClient();
         if(clientModel->phones()->isUpdated())
             clientModel->phones()->commit();
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-        fillClientCreds(m_client);
     }
 }
 
@@ -244,7 +247,7 @@ void SClientInputForm::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
 
     ui->lineEditClientAddress->setFont(font);
     ui->lineEditClientEmail->setFont(font);

@@ -1,9 +1,7 @@
 #ifndef STABLETECHREPORTSMODEL_H
 #define STABLETECHREPORTSMODEL_H
 
-#include <QObject>
-#include "models/stablebasemodel.h"
-#include "global.h"
+#include <STableModelBase>
 
 class STableTechReportsModel : public STableBaseModel
 {

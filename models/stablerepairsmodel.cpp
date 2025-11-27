@@ -1,5 +1,12 @@
 #include "stablerepairsmodel.h"
-#include "widgets/stableviewrepairs.h"
+#include <QColor>
+#include <ProjectGlobals>
+#include <SRepairsView>
+#include <SUserSettings>
+#include <SComSettings>
+#include <SPermissions>
+#include <SSqlQueryModel>
+#include <STableBaseModel>
 
 STableRepairsModel::STableRepairsModel(QObject *parent) :
     SSqlFetchingModel(parent),
@@ -19,7 +26,7 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::BackgroundRole)
     {
         if(index.column() == Columns::Status)
-            return QColor(comSettings->repairStatuses[unformattedData(index, Qt::DisplayRole).toInt()].Color);
+            return QColor(comSettings->repairStatusesVariantCopy()[unformattedData(index, Qt::DisplayRole).toInt()].Color);
 
         QString rowColor = SSqlFetchingModel::data(index.siblingAtColumn(Columns::Color)).toString();
         if(!rowColor.isEmpty())
@@ -29,7 +36,7 @@ QVariant STableRepairsModel::data(const QModelIndex &index, int role) const
     {
         switch(index.column())
         {
-            case Columns::Status:           return comSettings->repairStatuses[unformattedData(index, Qt::DisplayRole).toInt()].Name;
+            case Columns::Status:           return comSettings->repairStatusesVariantCopy()[unformattedData(index, Qt::DisplayRole).toInt()].Name;
             case Columns::RealRepairCost:   return dataLocalizedFromDouble(index);
             case Columns::InDate:
             case Columns::OutDate:          return dateTime(index);
@@ -83,7 +90,7 @@ void STableRepairsModel::initDemo()
                 case Columns::Fault:        demoConstsForUnion.append(demoFaults.at(r)); break;
                 case Columns::InDate:       demoConstsForUnion.append(QDateTime::currentDateTime().toString("yyyy.MM.dd HH:mm")); break;
                 case Columns::Client:       demoConstsForUnion.append(demoClients.at(r)); break;
-                case Columns::Office:       demoConstsForUnion.append(QString::number(userDbData->currentOffice)); break;
+                case Columns::Office:       demoConstsForUnion.append(QString::number(userDbData->currentOffice())); break;
                 case Columns::ExtNotes:     demoConstsForUnion.append(demoExtNotes.at(r)); break;
                 default:                    demoConstsForUnion.append("<data>");
             }
@@ -121,7 +128,7 @@ QModelIndex STableRepairsModel::indexForShortData(const QModelIndex &index) cons
 QVariant STableRepairsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)
-        return tr("no permissions");
+        return tr("no permissions"); // TODO: заменить "no permissions" на "Имя Ф." (как при переводе денег на карту)
 
     return dataShort(idx);
 }

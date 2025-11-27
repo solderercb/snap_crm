@@ -2,11 +2,9 @@
 #define STABPAGE_H
 
 #include <QObject>
-#include "widgets/swidget.h"
-#ifdef QT_DEBUG
-#include <QTimer>
-#include <QRandomGenerator>
-#endif
+#include <SWidget>
+
+class QTimer;
 
 class STabPage : public SWidget
 {
@@ -16,6 +14,7 @@ public:
     virtual bool pageCloseRequest();
 protected:
     void setCursorPositionsToZero();
+    QWidget *m_parentTab = nullptr;
 #ifdef QT_DEBUG
     virtual void randomFill() = 0;
     QTimer *test_scheduler, *test_scheduler2, *main_window_test_scheduler, *main_window_test_scheduler2;

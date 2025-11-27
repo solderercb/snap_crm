@@ -231,12 +231,12 @@
   <customwidget>
    <class>STableViewSalaryRecepted</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalaryreceptedissued.h</header>
+   <header location="global">SSalaryIssuedView</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalaryIssued</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalaryreceptedissued.h</header>
+   <header location="global">SSalaryIssuedView</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -400,22 +400,22 @@
   <customwidget>
    <class>STableViewSalaryRepairs</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalaryrepairs.h</header>
+   <header location="global">SSalaryRepairsView</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalaryRepairsSummary</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/spagesalaryrepairs.h</header>
+   <header location="global">SSalaryRepairsPage</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalaryRepairWorks</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalaryrepairworks.h</header>
+   <header location="global">SSalaryRepairWorksView</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalaryRepairParts</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalaryrepairparts.h</header>
+   <header location="global">SSalaryRepairPartsView</header>
   </customwidget>
  </customwidgets>
  <resources/>

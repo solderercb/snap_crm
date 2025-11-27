@@ -1,6 +1,23 @@
 #include "tabsalary.h"
 #include "ui_tabsalary.h"
-#include "global.h"
+#include <QMessageBox>
+#include <ProjectGlobals>
+#include <SPermissions>
+#include <SUserSettings>
+#include <SComSettings>
+#include <FlashPopup>
+#include <SUserModel>
+#include <SSqlQueryModel>
+#include <SSortFilterProxyModel>
+#include <SSalaryReceptedIssuedModel>
+#include <SSalaryRepairsModel>
+#include <SSalaryRepairWorksModel>
+#include <SSalaryRepairPartsModel>
+#include <SSalaryPaymentsModel>
+#include <SSalarySalesModel>
+#include <SSalaryItemsModel>
+#include <SSalarySalePartsModel>
+#include <SSalaryExtraModel>
 
 tabSalary* tabSalary::p_instance = nullptr;
 
@@ -31,7 +48,7 @@ tabSalary::tabSalary(MainWindow *parent) :
     if(permissions->viewEmployeesSalary)
         usersModelF->setFilterRegularExpression(QRegularExpression("^(?!(admin)).*$")); // без админа
     else
-        usersModelF->setFilterRegularExpression(QRegularExpression(userDbData->username)); // только своя ЗП
+        usersModelF->setFilterRegularExpression(QRegularExpression(userDbData->username())); // только своя ЗП
     usersModelF->setFilterKeyColumn(0);
     ui->comboBoxEmployee->setModel(usersModelF);
     if(usersModelF->rowCount() > 1)
@@ -42,14 +59,14 @@ tabSalary::tabSalary(MainWindow *parent) :
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &tabSalary::tabChanged);
 
     connect(ui->buttonAddExtraCharge, &QPushButton::clicked, this, &tabSalary::buttonAddExtraChargeClicked);
-    connect(ui->buttonSaveExtraChargesList, &QPushButton::clicked, m_extraCharges, &STableSalaryExtraModel::saveTable);
+    connect(ui->buttonSaveExtraChargesList, &QPushButton::clicked, ui->extra, &SPageSalaryExtra::manualSubmit);
     connect(ui->dateEditPeriod, &QDateEdit::dateChanged, this, [=](const QDate&){loadButtonPressed();});
     connect(ui->toolButtonPrevPeriod, &QToolButton::clicked, this, &tabSalary::prevPeriod);
     connect(ui->toolButtonNextPeriod, &QToolButton::clicked, this, &tabSalary::nextPeriod);
     connect(ui->toolButtonLoad, &QToolButton::clicked, this, &tabSalary::loadButtonPressed);
 #ifdef QT_DEBUG
     ui->comboBoxEmployee->setCurrentIndex(0);
-    ui->dateEditPeriod->setDate(QDate(2023,10,01));
+    ui->dateEditPeriod->setDate(QDate(2025,05,01));
     loadButtonPressed();
 #endif
     updateWidgets();
@@ -150,7 +167,7 @@ void tabSalary::periodDateChanged(const QDate date)
 {
     emit showSubsistanceGroup(date.month() == QDate::currentDate().month());
 
-    if(comSettings->salaryClassic)
+    if(comSettings->salaryClassic())
     {
         m_periodBegin.setDate(date.addDays(-date.day() + 1));
         m_periodEnd = m_periodBegin.addDays(date.daysInMonth());
@@ -187,11 +204,14 @@ void tabSalary::buttonAddExtraChargeClicked()
         return;
 
     if(m_userModel->id() != usersModelF->databaseIDByRow(ui->comboBoxEmployee->currentIndex()))
-        shortlivedNotification *newPopup = new shortlivedNotification(this,
-                                                                      tr("Информация"),
-                                                                      tr("Сначала нажмите кнопку Загрузить"),
-                                                                      QColor(255,255,255),
-                                                                      QColor(245,245,245));
+    {
+        auto *p = new shortlivedNotification(this,
+                                             tr("Информация"),
+                                             tr("Сначала нажмите кнопку Загрузить"),
+                                             QColor(255,255,255),
+                                             QColor(245,245,245));
+        Q_UNUSED(p);
+    }
 
     m_extraCharges->addNewRow();
 }
@@ -210,7 +230,7 @@ void tabSalary::prevPeriod()
 {
     QDate current = ui->dateEditPeriod->date();
 
-    if(comSettings->salaryClassic)
+    if(comSettings->salaryClassic())
     {
         current = current.addMonths(-1);
     }
@@ -226,7 +246,7 @@ void tabSalary::nextPeriod()
 {
     QDate current = ui->dateEditPeriod->date();
 
-    if(comSettings->salaryClassic)
+    if(comSettings->salaryClassic())
     {
         current = current.addMonths(1);
     }
@@ -242,7 +262,7 @@ void tabSalary::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
 
     QFont font1(font);
     font1.setBold(true);
@@ -279,7 +299,7 @@ void tabSalary::setModelUpdatedFlag(const int pos)
 /* Проверка данных перед загрузкой сведений о заработках сотрудника
  * Возвращает 1 в случае ошибки
 */
-bool tabSalary::checkInput()
+int tabSalary::checkInput()
 {
     if(ui->comboBoxEmployee->currentIndex() == -1)
     {

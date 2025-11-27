@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QSqlTableModel>
-#include "stablemodelscommonmethods.h"
+#include <STableModelCommonMethods>
 
 class SEditableBaseModel : public QSqlTableModel, public STableModelsCommonMethods
 {

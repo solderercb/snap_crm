@@ -1,4 +1,7 @@
 #include "sdevicemakersmodel.h"
+#include <QSqlQueryModel>
+#include <ProjectQueries>
+#include <SDevMdlsModel>
 
 SDeviceMakersModel::SDeviceMakersModel(QObject *parent) : QObject(parent)
 {

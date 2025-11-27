@@ -1,12 +1,6 @@
 #ifndef SAPPLOG_H
 #define SAPPLOG_H
 
-#include <QFile>
-#include <QDebug>
-#include <QStandardPaths>
-#include <QDir>
-#include <QFile>
-
 class SAppLog
 {
 public:

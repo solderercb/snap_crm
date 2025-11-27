@@ -1,4 +1,7 @@
 #include "shortlivednotification.h"
+#include <QtWidgets/QApplication>
+#include <QScreen>
+#include <QTimer>
 
 QVector<shortlivedNotification*> shortlivedNotification::p_instance;
 int shortlivedNotification::popupsCounter;

@@ -1,27 +1,68 @@
-#include "global.h"
-#include "appver.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "bottoolbarwidget.h"
-#include "tabcommon.h"
-#include "tabrepairnew.h"
-#include "tabreceptcartridge.h"
-#include "tabrepairs.h"
-#include "tabrepair.h"
-#include "tabrepaircartridges.h"
-#include "tabsale.h"
-#include "tabclients.h"
-#include "tabclient.h"
-#include "tabprintdialog.h"
-#include "tabcashoperation.h"
-#include "tabcashmoveexch.h"
-#include "tabsettings.h"
-#include "tabsalary.h"
-#include "tabtechreports.h"
-#include "modules/purchasemanager/tabmanager.h"
-#include "modules/purchasemanager/tabrequest.h"
-#include "widgets/slineedit.h"
-#include "com_sql_queries.h"
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QDateTime>
+#include <QTextCodec>
+#include <QMessageBox>
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QList>
+#include <QHeaderView>
+#include <QSortFilterProxyModel>
+#include <QWidgetAction>
+#include <QStyle>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QMdiArea>
+#include <QMdiSubWindow>
+#include <QMenu>
+#include <QToolButton>
+#include <QComboBox>
+#include <QMap>
+#include <QTimer>
+#include <QCompleter>
+#include <QFontMetrics>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QRandomGenerator>
+#include <QCloseEvent>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <appVer>
+#include <SAppLog>
+#include <SComSettings>
+#include <SLocalSettingsStructs>
+#include <BotToolbarWidget>
+#include <tabCommon>
+#include <tabRepairNew>
+#include <tabReceptCartridge>
+#include <tabRepairs>
+#include <tabRepair>
+#include <tabRepairCartridges>
+#include <tabSale>
+#include <tabClients>
+#include <tabClient>
+#include <tabPrintDialog>
+#include <tabCashOperation>
+#include <tabCashMoveExch>
+#include <tabSettings>
+#include <tabSalary>
+#include <tabTechReports>
+#include <tabPurchaseManager>
+#include <tabPartRequest>
+#include <SSqlQueryModel>
+#include <SLineEdit>
+#include <SUserSettings>
+#include <SPermissions>
+#include <SUserActivityModel>
+#include <SClientModel>
+#include <windowsDispatcher>
+#include <FlashPopup>
+#include <QtAutoUpdaterWidgets/UpdateController>
+#include <QtAutoUpdaterWidgets/UpdateButton>
 
 tabBarEventFilter::tabBarEventFilter(QObject *parent) :
     QObject(parent)
@@ -65,7 +106,7 @@ MainWindow::MainWindow(windowsDispatcher*) :
     connect(userDbData, &SUserSettings::fontSizeChanged, this, &MainWindow::applyGuiSettings);
 
     // Шуточный заголовок окна: перевёрнуто на 180° ɯɹᴐ ᴐsɐ; или зеркально 1 ⱯꓢC Cʁꟽ; или зеркально 2 ∀ƨc ᴄʁw
-    setWindowTitle(QString("SNAP CRM [%1] [%2]").arg(officesModel->getDisplayRole(userDbData->currentOffice, 2), userDbData->username));
+    setWindowTitle(QString("SNAP CRM [%1] [%2]").arg(officesModel->getDisplayRole(userDbData->currentOffice(), 2), userDbData->username()));
     initGlobalModels();
 
     tabBarEventFilter *tabBarEventFilterObj = new tabBarEventFilter(this);  // Фильтр событий tabBar. В частности, закрытие вкладки по клику средней кнопкой мыши (колёсиком)
@@ -156,7 +197,7 @@ void MainWindow::createMenu()
 
     QAction *workshop_refill = new QAction(tr("Заправка"), this);
     workshop_menu->addAction(workshop_refill);
-    workshop_refill->setVisible(comSettings->isCartridgeRepairEnabled && permissions->receptDevices);
+    workshop_refill->setVisible(comSettings->isCartridgeRepairEnabled() && permissions->receptDevices);
     QObject::connect(workshop_refill,SIGNAL(triggered()),this,SLOT(createTabReceptCartridge()));
 
     QAction *workshop_price = new QAction(tr("Прайс-лист"), this);
@@ -775,7 +816,7 @@ void MainWindow::createTabClients(int type, QWidget *caller)
     {
         //
         QObject::connect(subwindow,SIGNAL(doubleClicked(int)), this, SLOT(createTabClient(int)));
-        if (userDbData->preferRegular)
+        if (userDbData->preferRegular())
             subwindow->setCategory(SClientModel::Categories::Regulars);
         else
             subwindow->setCategory(SClientModel::Categories::All);
@@ -857,7 +898,7 @@ void MainWindow::createUpdaterWidget()
 {
     QVariantMap config;
     config.insert(QLatin1String("path"), QLatin1String("maintenancetool.exe"));
-    config.insert(QLatin1String("repoPathArg"), comSettings->updateChannel);
+    config.insert(QLatin1String("repoPathArg"), comSettings->updateChannel());
     auto updater = QtAutoUpdater::Updater::create(QLatin1String("qtifw"), config, qApp);
 //    Q_ASSERT(updater);
     updateController = new QtAutoUpdater::UpdateController(updater, this);
@@ -1179,8 +1220,8 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabCashMoveExch();
 //        createTabClients();
 //        createTabTechReports();
-        createTabPurchaseManager();
-        tabPartRequest *tpr = static_cast<tabPartRequest*>(createTabPartRequest(0));
+//        createTabPurchaseManager();
+//        tabPartRequest *tpr = static_cast<tabPartRequest*>(createTabPartRequest(0));
 //        tpr->setRepair(39699);
 //        tpr->setClient(1952);
 

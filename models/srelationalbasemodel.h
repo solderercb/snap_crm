@@ -2,8 +2,8 @@
 #define SRELATIONALBASEMODEL_H
 
 #include <QSqlRelationalTableModel>
+#include <STableModelCommonMethods>
 #include <QObject>
-#include "stablemodelscommonmethods.h"
 
 class SRelationalBaseModel : public QSqlRelationalTableModel, public STableModelsCommonMethods
 {

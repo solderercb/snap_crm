@@ -23,4 +23,5 @@ QString SNotification::typeToSubject(const int type)
         case Type::IncomingCall: return tr("Входящий звонок от: "); break;
         default: break;
     }
+    return QString();
 }

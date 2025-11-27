@@ -1,10 +1,10 @@
 #ifndef SPARTSREQUESTSGROUPINGMODEL_H
 #define SPARTSREQUESTSGROUPINGMODEL_H
 
-#include <QObject>
-#include "models/sstandarditemmodel.h"
-#include "models/stablebasemodel.h"
-#include "widgets/stableviewbase.h"
+#include <STableModelBase>
+#include <STableViewBase>
+
+class SStandardItemModel;
 
 class SPartsRequestsGroupingModel : public STableBaseModel
 {

@@ -1,8 +1,14 @@
-#include "global.h"
-#include "tabrepairs.h"
 #include "tabrepaircartridges.h"
 #include "ui_tabrepaircartridges.h"
-#include "tabprintdialog.h"
+#include <ProjectGlobals>
+#include <tabRepairs>
+#include <tabPrintDialog>
+#include <SPermissions>
+#include <SComSettings>
+#include <SRepairModel>
+#include <SRepairIssueDialog>
+#include <SCartridgeForm>
+#include <SCartridgeCard>
 
 tabRepairCartridges* tabRepairCartridges::p_instance = nullptr;
 
@@ -19,7 +25,7 @@ tabRepairCartridges::tabRepairCartridges(MainWindow *parent) :
                                                     background-color: rgb(255, 255, 255);\
                                                 }");
     connect(ui->buttonIssue, &QPushButton::clicked, this, &tabRepairCartridges::createDialogIssue);
-    connect(ui->buttonSetReadyToIssue, &QPushButton::clicked, this, &tabRepairCartridges::setReadyToIssue);
+    connect(ui->buttonSetReadyToIssue, &QPushButton::clicked, this, &tabRepairCartridges::manualSubmit);
 }
 
 bool tabRepairCartridges::eventFilter(QObject *watched, QEvent *event)
@@ -130,11 +136,11 @@ void tabRepairCartridges::updateWidgets()
     int client = 0;
 
     m_readyButtonVisible = 0;
-    m_issueButtonVisible = 1;
+    m_issueButtonVisible = permissions->issueDevices;
     bool formReady;
     bool nEmpty = 0;
 
-    if(comSettings->useSimplifiedCartridgeRepair)
+    if(comSettings->useSimplifiedCartridgeRepair())
         m_readyButtonVisible = 1;        // кнопка видна только в упрощенном режиме работы с картриджами
 
     for(auto form : existentForms())
@@ -156,15 +162,14 @@ const QList<SCartridgeForm *> tabRepairCartridges::existentForms()
     return ui->scrollAreaWidgetContents->findChildren<SCartridgeForm *>();
 }
 
-/* Перезагрузка данных моделей форм из БД
+/* обновление виджетов на формах
 */
-void tabRepairCartridges::reloadFormsData()
+void tabRepairCartridges::updateForms()
 {
     for(auto form : existentForms())
     {
-        form->reloadData();
+        form->updateWidgets();
     }
-
 }
 
 void tabRepairCartridges::createCartridgeCardForm(const int id)
@@ -198,26 +203,62 @@ void tabRepairCartridges::reloadCardModel(int)
     }
 }
 
-void tabRepairCartridges::setReadyToIssue()
+void tabRepairCartridges::beginCommit()
 {
-    bool ret = 1;
-    SRepairModel *repair;
+    m_existentForms = existentForms();
+}
 
+int tabRepairCartridges::commitStages()
+{
+    if(m_existentForms.isEmpty()) // на всякий случай
+        Global::throwError(Global::ThrowType::ConditionsError, tr("Не удалось переключить статусы картриджей на Готов; список QList<SCartridgeForm*> пуст"));
+
+    return m_existentForms.count();
+}
+
+bool tabRepairCartridges::skip(const int i)
+{
+    return (m_existentForms.at(i)->model()->stateId() == Global::RepStateIds::Ready);
+}
+
+void tabRepairCartridges::commit(const int i)
+{
+    SRepairModel *repair = m_existentForms.at(i)->model();
+
+    switch(repair->stateId())
+    {
+        case Global::RepStateIds::InWork: {
+            repair->set_stateId(Global::RepStateIds::Ready);
+            repair->commit();
+            break;
+        }
+        default: ;
+    }
+#ifdef QT_DEBUG
+//    if(i > 2)
+//        Global::throwDebug();
+#endif
+}
+
+void tabRepairCartridges::endCommit(const int i)
+{
+    m_existentForms.at(i)->model()->SSingleRowModelBase::load();
+}
+
+void tabRepairCartridges::endCommit()
+{
+    m_existentForms = QList<SCartridgeForm*>();
+    closeTab();
+}
+
+void tabRepairCartridges::throwHandler(int)
+{
     for(auto form : existentForms())
     {
-        repair = form->model();
-        switch(repair->state())
-        {
-            case Global::RepStateIds::InWork: repair->setState(Global::RepStateIds::Ready); ret &= repair->commit(); break;
-            default: continue;
-        }
+        form->model()->setFieldsFailed();
     }
 
-    tabRepairs::refreshIfTabExists();
-    if(ret)
-    {
-        closeTab();
-    }
+    updateForms();
 }
 
 void tabRepairCartridges::closeTab()
@@ -241,7 +282,7 @@ void tabRepairCartridges::createDialogIssue()
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
     connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printCartridgeWorksReports(list, false);});
     connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepairCartridges::closeTab);
-    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::reloadFormsData);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::updateForms);
 }
 
 #ifdef QT_DEBUG
@@ -260,4 +301,3 @@ void tabRepairCartridges::test_scheduler2_handler()
 
 }
 #endif
-

@@ -1,25 +1,19 @@
 #ifndef TABREPAIRNEW_H
 #define TABREPAIRNEW_H
 
-#include <QWidget>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QToolButton>
-#include <QSqlQuery>
-#include <QSqlQueryModel>
-#include <QDateEdit>
-#include "mainwindow.h"
-#include "tabcommon.h"
-#include "models/sfieldsmodel.h"
-#include "models/sdevmdlmodel.h"
-#include "models/srepairmodel.h"
-#include "models/scommentmodel.h"
-#include "models/ssortfilterproxymodel.h"
-#include "widgets/sphones.h"
-#include "widgets/ssetcombobox.h"
-#ifdef QT_DEBUG
-#include <QTest>
-#endif
+#include <tabCommon>
+
+class QWidget;
+class QStandardItemModel;
+class QSqlQueryModel;
+class SSqlQueryModel;
+class MainWindow;
+class SFieldsModel;
+class SClientModel;
+class SRepairModel;
+class SCommentModel;
+class SSortFilterProxyModel;
+class SCashRegisterModel;
 
 namespace Ui {
     class tabRepairNew;
@@ -28,12 +22,11 @@ namespace Ui {
 class tabRepairNew : public tabCommon
 {
     Q_OBJECT
-
 signals:
     void createTabSelectPrevRepair(int, QWidget *);
     void generatePrintout(QMap<QString, QVariant>);
-
 public:
+    enum EndCommitOp {CloseTab, PrepareRepeat};
     explicit tabRepairNew(MainWindow *parent = nullptr);
     static tabRepairNew* getInstance(MainWindow *parent = nullptr);
     ~tabRepairNew();
@@ -42,6 +35,7 @@ public:
 private:
     Ui::tabRepairNew *ui;
     static tabRepairNew* p_instance;
+    int m_repair = 0;
     SRepairModel *repairModel;
     SSortFilterProxyModel *paymentSystemsProxyModel;
     SCashRegisterModel *cashRegister;
@@ -62,12 +56,11 @@ private:
     QString m_checkBoxIsCheckNeededText;
     QList<SRepairModel*> m_quickRepairIssueList;
     bool m_stickersCount = 0;
+    int m_endCommitOp = CloseTab;
     void setDefaultStyleSheets();
     void getDevices();
-    bool checkInput();
+    int checkInput() override;
     bool quickRepairCheckInput();
-    int deviceId();
-    int createDeviceModel();
     void print(int);
     void initDataModels();
     void initWidgets();
@@ -78,11 +71,22 @@ private:
     void updateWidgets();
     void updateWidgetsOnQuickRepairToggled();
     void setQuickRepair(const int state);
+    void throwHandler(int) override;
+    int commitStages() override;
+    void beginCommit() override;
+    bool skip(const int) override;
+    void commitDevModel();
+    void commitClient();
+    void commitRepair();
+    void commit(const int stage) override;
+    void endCommit(const int stage) override;
+    void endCommit() override;
+    void prepareForRepeatedOp();
+    void reloadDevicesModel();
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
 public slots:
-    void fillClientCreds(const int);
     void fillDeviceCreds(int);
 private slots:
     void showLineEditPrevRepair();
@@ -91,7 +95,7 @@ private slots:
     void changeDeviceVendor(int);
     void lineEditPrevRepairButtonsHandler(int);
     void lineEditSNClearHandler(int);
-    bool createRepair();
+    void createRepair();
     void createRepairClose();
     void issueQuickRepair();
     void preferredPaymentSystemChanged(int);

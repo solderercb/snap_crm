@@ -1,4 +1,5 @@
-#include "modules/purchasemanager/sgroupingmodel.h"
+#include "sgroupingmodel.h"
+#include <SStandardItemModel>
 
 SPartsRequestsGroupingModel::SPartsRequestsGroupingModel(QObject *parent) :
     STableBaseModel{parent}

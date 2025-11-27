@@ -1,6 +1,23 @@
 #include "stableviewbase.h"
+#include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
+#include <STableViewTooltip>
+#include <SUserSettings>
+#include <QHeaderView>
+#include <QRect>
+#include <QScrollBar>
+#include <QMenu>
+#include <QAction>
+#include <QSqlDriver>
+#include <QSqlQueryModel>
+#include <QSqlRecord>
+#include <QSqlField>
+#include <ProjectGlobals>
+#include <STableViewGridLayout>
+#include <STableViewBaseItemDelegates>
+#include <STableBaseModel>
+#include <QDebug>
 
 STableViewBase::STableViewBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent) :
     QTableView(parent), m_layoutVariant(layoutVariant)
@@ -388,6 +405,7 @@ void STableViewBase::columnResized(int column, int oldWidth, int newWidth)
 
 void STableViewBase::sectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
 {
+    Q_UNUSED(oldVisualIndex);
     bool lc = i_gridLayout->$GridControl.Columns[logicalIndex].VisibleIndex != newVisualIndex;
     if(lc)
         layoutChanged(0, 0, 0);
@@ -539,7 +557,7 @@ void STableViewBase::copyToClipboard(QMap<int, QMap<int, QModelIndex> > &items) 
  * на системный (напр. точки на запятую) при вставке значения из буфера обмена.
  * Должен быть переопределён в наследующих таблицах.
  */
-bool STableViewBase::isDecimal(const int column)
+bool STableViewBase::isDecimal(const int)
 {
     return false;
 }
@@ -1111,6 +1129,8 @@ void STableViewBase::vScrollCorrection()
 
 void STableViewBase::vsp_rangeChanged(const int min, const int max)
 {
+    Q_UNUSED(min);
+
     if(max == 0)
         return;
 
@@ -1120,7 +1140,7 @@ void STableViewBase::vsp_rangeChanged(const int min, const int max)
         fetchMore(QModelIndex());
         return;
     }
-    if(verticalScrollBar()->maximum() - i_vspValue < userDbData->rowHeight)
+    if(verticalScrollBar()->maximum() - i_vspValue < userDbData->rowHeight())
     {
         fetchMore(QModelIndex());
     }
@@ -1140,6 +1160,8 @@ void STableViewBase::restoreVScrollPos()
 
 void STableViewBase::hsp_rangeChanged(const int min, const int max)
 {
+    Q_UNUSED(min);
+    Q_UNUSED(max);
 }
 
 void STableViewBase::restoreHScrollPos()
@@ -1263,7 +1285,7 @@ void STableViewBase::setModelQuery(const QString &query, const QSqlDatabase &dat
     m_model->setQuery(QSqlQuery(query, database));
 }
 
-void STableViewBase::fetchMore(const QModelIndex &parent)
+void STableViewBase::fetchMore(const QModelIndex&)
 {
     m_model->fetchMore(QModelIndex());
 }
@@ -1329,7 +1351,7 @@ void STableViewBase::delayedRefresh(const int msec)
 
 /*  Перезапуск таймера автообновления таблицы.
  *  Может быть полезен, например, при дозагрузке данных (fetchMore) или
- *  при при прокрутке таблицы — автообновление не будет "накладываться"
+ *  при прокрутке таблицы — автообновление не будет "накладываться"
  *  и интерфейс программы не будет подвисать.
  *  TODO: но правльно будет реализовать асинхронную загрузку и обновление
 */
@@ -1416,8 +1438,8 @@ void STableViewBase::refreshPending()
 
 void STableViewBase::applyGuiSettings()
 {
-    verticalHeader()->setMinimumSectionSize(userDbData->rowHeight);
-    verticalHeader()->setDefaultSectionSize(userDbData->rowHeight);
+    verticalHeader()->setMinimumSectionSize(userDbData->rowHeight());
+    verticalHeader()->setDefaultSectionSize(userDbData->rowHeight());
 }
 
 void STableViewBase::filter(const FilterList &filter)

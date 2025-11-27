@@ -1,5 +1,7 @@
 #include "stabletechreportsmodel.h"
-#include "stechreportmodel.h"
+#include <ProjectGlobals>
+#include <STechReportModel>
+#include <SPermissions>
 
 STableTechReportsModel::STableTechReportsModel(QObject *parent) : STableBaseModel(parent)
 {
@@ -39,7 +41,7 @@ QModelIndex STableTechReportsModel::indexForShortData(const QModelIndex &index) 
 QVariant STableTechReportsModel::clientName(const QModelIndex &idx) const
 {
     if(!permissions->viewClients)
-        return tr("no permissions");
+        return tr("no permissions"); // TODO: заменить "no permissions" на "Имя Ф." (как при переводе денег на карту)
 
     return dataShort(idx);
 }

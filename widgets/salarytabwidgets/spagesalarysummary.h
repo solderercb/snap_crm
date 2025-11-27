@@ -1,12 +1,16 @@
 #ifndef SPAGESALARYSUMMARY_H
 #define SPAGESALARYSUMMARY_H
 
-#include <QWidget>
-#include "spagesalarybase.h"
-#include "models/salarytabmodels/ssalarymodel.h"
-#include "models/salarytabmodels/ssalaryrepairsmodel.h"
-#include "../../squerylog.h"
-#include "models/scashregistermodel.h"
+#include <QObject>
+#include <SSalaryModel>
+#include <SSalaryBasePage>
+
+
+class QWidget;
+class SSortFilterProxyModel;
+class SClientModel;
+class SQueryLog;
+class SCashRegisterModel;
 
 namespace Ui {
 class SPageSalarySummary;
@@ -23,14 +27,15 @@ private:
     Ui::SPageSalarySummary *ui;
     SSortFilterProxyModel *paymentSystemsProxyModel;
     bool m_fillMonthChargeOnUpdate = 0;
-    SSalaryModel *salaryModel = nullptr;
-    SSalaryRepairsModel *salaryRepairsModel = nullptr;
+    std::unique_ptr<SSalaryModel> salaryModel;
+    std::unique_ptr<SCashRegisterModel> cashRegister;
     SQueryLog *m_queryLog;
-    SCashRegisterModel *cashRegister;
     SClientModel *m_userClient = nullptr;
     double m_earningSinceLastPay = 0;
     bool m_commitUserClientModelsPending = 0;
+    bool m_enableBalancePending = 0;
     double m_employeeBalanceToConvert = 0;
+    int m_paymentType = SSalaryModel::Salary;
     int createUserClientCardMsgBox();
     void createUserClientCard();
     void setDbRecordModelsData(const int type, const int system, const double amount, const QString &reason, const QDate date = QDate::currentDate());
@@ -41,13 +46,29 @@ public slots:
     void fillClientCreds(int id);
 private slots:
     void setMonthCharge();
-    void setGroupBoxSubsistanceVisible(bool visible);
+    void setGroupBoxSubsistenceVisible(bool visible);
     void setFillMonthChargeOnUpdate(const bool state);
-    void pay();
     void paySubsistence();
     void markRepairsPayed();
     void paySalary();
     void guiFontChanged() override;
+
+    // SWidget interface
+public:
+    void commit(const int) override;
+protected:
+    void commitClientUser();
+    void enableBalance();
+    void commitPayment();
+    int commitStages() override;
+    int checkInput() override;
+    QString queryLogFile() override;
+    void configureSalaryModels();
+    void configureSubsistenceModels();
+    void beginCommit() override;
+    bool skip(const int) override;
+    void endCommit(const int) override;
+    void endCommit() override;
 };
 
 #endif // SPAGESALARYSUMMARY_H

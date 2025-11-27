@@ -3,6 +3,9 @@
 */
 
 #include "qtooltipper.h"
+#include <QAbstractItemView>
+#include <QHelpEvent>
+#include <QToolTip>
 
 QToolTipper::QToolTipper(QObject* parent) :
     QObject(parent)

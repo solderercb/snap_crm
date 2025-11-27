@@ -1,22 +1,16 @@
 #ifndef LOGINWINDOW_H
 #define LOGINWINDOW_H
 
+class QGraphicsPixmapItem;
+class QGraphicsScene;
+class QTimer;
+class SSLOptionsDialog;
+namespace QtAutoUpdater {
+class UpdateController;
+};
+
 #include <QWidget>
 #include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
-#include <QTextCodec>
-#include <QCryptographicHash>
-#include <QFile>
-#include <QMessageBox>
-#include <QGraphicsPixmapItem>
-#include <QResource>
-#include <QIODevice>
-#include "models/ssloptionsdialog.h"
-#include "widgets/shortlivednotification.h"
-#include "windowsdispatcher.h"
-#include <QtAutoUpdaterWidgets/UpdateController>
-#include <QtAutoUpdaterWidgets/UpdateButton>
 
 namespace Ui {
 class LoginWindow;

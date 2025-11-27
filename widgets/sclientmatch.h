@@ -2,10 +2,11 @@
 #define SCLIENTMATCH_H
 
 #include <QWidget>
-#include "sgroupboxeventfilter.h"
-#include "stableviewbase.h"
-#include "models/ssqlfetchingmodel.h"
-#include "models/sclientmodel.h"
+#include <STableViewBase>
+#include <SSqlFetchingModel>
+
+class SClientModel;
+class SGroupBoxEventFilter;
 
 namespace Ui {
 class SClientMatch;
@@ -33,7 +34,7 @@ signals:
 
 public:
     enum NameSearchScope{LastName = 0, Name = 1, Both = 2};
-        explicit SClientMatch(QWidget *parent = nullptr);
+    explicit SClientMatch(QWidget *parent = nullptr);
     ~SClientMatch();
     void clear();
     void setClientType(int type);
@@ -48,7 +49,7 @@ private:
     QString phone;
     QString phoneMask;
     int clientType = 0;
-    int m_category = SClientModel::Categories::All;
+    int m_category;
     bool m_enabled = 1;
     void findClient();
 public slots:

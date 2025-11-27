@@ -1,297 +1,241 @@
 #include "sworkmodel.h"
-#include "ssaletablemodel.h"
+#include <SSaleTableModel>
+#include <SSqlQueryModel>
+#include <ProjectGlobals>
+#include <SStandardItemModel>
+#include <SStoreItemModel>
+#include <SLogRecordModel>
 
-SWorkModel::SWorkModel(QObject *parent) : SComRecord(parent)
+SWorkModel::SWorkModel(QObject *parent) : SSingleRowJModel(parent)
 {
+    mapFields();
+
     i_tableName = "works";
     i_obligatoryFields << "user" << "name" << "warranty";
-    i_idColumnName = "id";
-    i_logRecord->setType(SLogRecordModel::Repair);
+    setPrimaryKeyIndex(0);
+    i_logRecord->set_type(SLogRecordModel::Repair);
+    connect(this, &SSingleRowModel::beginDataChange, this, &SWorkModel::setDataRework);
 }
 
-SWorkModel::SWorkModel(const QList<QStandardItem *> &record, QObject *parent) :
-    SWorkModel(parent)
+/* Контруктор записей в журнал при добавлении новой работы.
+ * Т. к. записи в журнал включают значения нескольких полей, то на разных этапах
+ * установки значений текст может быть неполноценным. Чтобы сообщения бы законченными
+ * нужно вызвать этот метод после изменения каждого поля.
+ * Генерирование сообщений непосредственно перед коммитом, когда значения всех полей уже
+ * наверняка заданы, затрудняет автоматическое тестирование и требует отказаться от очистки
+ * буфера сообщений после коммита, что в свою очередь вызовет другие проблемы.
+ * .
+*/
+void SWorkModel::constructInitialLogMsg(const int column)
 {
-    i_id = record.at(SStoreItemModel::SaleOpColumns::ColId)->data(Qt::DisplayRole).toInt();
+    QString logText;
+    QString key; // порядок сообщений и препятствование дублированию
+    switch(column)
+    {
+        case C_name: key = "!addRename"; logText = tr("Добавлена работа \"%1\" стоимостью %2").arg(name(), sysLocale.toCurrencyString(price())); break;
+        case C_warranty: key = "warranty"; logText = tr("Срок гарантии на работу \"%1\" установлен по умолчанию (\"%2\")").arg(name(), warrantyTermsModel->getDisplayRole(warranty(), 1)); break;
+        case C_user: key = "engineer"; logText = tr("Исполнителем работы \"%1\" назначен %2").arg(name(), usersModel->getDisplayRole(user(), 1)); break;
+        default: return;
+    }
 
-    m_user = record.at(SStoreItemModel::SaleOpColumns::ColUser)->data(Qt::DisplayRole).toInt();
-    m_repair = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
-    m_name = record.at(SStoreItemModel::SaleOpColumns::ColName)->data(Qt::DisplayRole).toString();
-    m_price = record.at(SStoreItemModel::SaleOpColumns::ColPrice)->data(Qt::DisplayRole).toDouble();
-    m_count = record.at(SStoreItemModel::SaleOpColumns::ColCount)->data(Qt::DisplayRole).toInt();
-    m_warranty = record.at(SStoreItemModel::SaleOpColumns::ColWarranty)->data(Qt::DisplayRole).toInt();
-    m_priceId = record.at(SStoreItemModel::SaleOpColumns::ColItemId)->data(Qt::DisplayRole).toInt();
-    i_createdUtc = record.at(SStoreItemModel::SaleOpColumns::ColCreated)->data(Qt::DisplayRole).toDateTime();
-//    m_documentId = record.at(SStoreItemModel::SaleOpColumns::ColObjId)->data(Qt::DisplayRole).toInt();
-//    m_isPay = record.at(SStoreItemModel::SaleOpColumns::)->data(Qt::DisplayRole).toBool();
-    m_type = record.at(SStoreItemModel::SaleOpColumns::ColWorkType)->data(Qt::DisplayRole).toInt();
-    i_logRecord->setRepairId(m_repair);
-
-    if(!i_id)
-        appendLogText(tr("Добавлена работа \"%1\" стоимостью %2").arg(m_name, sysLocale.toCurrencyString(m_price)));
-
-    initQueryFields(record);
+    addAdminModeMarkToLogText(logText);
+    appendLogText(logText, key);
 }
 
-int SWorkModel::id()
+void SWorkModel::repairChanged(const QVariant &data)
 {
-    return i_id;
+    i_logRecord->setData(SLogRecordModel::C_repair, data);
+    constructInitialLogMsg(C_name);
 }
 
-void SWorkModel::load(const int)
+void SWorkModel::userChanged()
 {
-
-}
-
-int SWorkModel::user()
-{
-    return m_user;
-}
-
-void SWorkModel::setUser(const int id, const QVariant oldValue)
-{
-    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
     QString logText;
 
-    if(oldValue.isValid())
-        logText = tr("Исполнитель работы \"%1\" изменён с %2 на %3").arg(m_name, usersModel->getDisplayRole(oldValue.toInt()), usersModel->getDisplayRole(id));
+    if(int old = commitedData(C_user).value_or(QVariant()).toInt())
+        logText = tr("Исполнитель работы \"%1\" изменён с %2 на %3").arg(name(), usersModel->getDisplayRole(old), usersModel->getDisplayRole(user()));
     else
-        logText = tr("Исполнителем работы \"%1\" назначен %2").arg(m_name, usersModel->getDisplayRole(id, 1));
+    {
+        constructInitialLogMsg(C_user);
+        return;
+    }
 
-    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
-        logText.prepend("[A] ");
-
-    appendLogText(logText);
-    i_valuesMap.insert("user", id);
-    setPayRepair(usersSalaryTaxesModel->value(id, "id", "pay_repair").toInt());
-    setPayRepairQuick(usersSalaryTaxesModel->value(id, "id", "pay_repair_quick").toInt());
+    addAdminModeMarkToLogText(logText);
+    appendLogText(logText, "engineer");
 }
 
-int SWorkModel::repair()
+void SWorkModel::nameChanged()
 {
-    return m_repair;
-}
-
-void SWorkModel::setRepair(const int repair)
-{
-    i_valuesMap.insert("repair", repair);
-}
-
-int SWorkModel::documentId()
-{
-    return m_documentId;
-}
-
-void SWorkModel::setDocumentId(const int document_id)
-{
-    i_valuesMap.insert("document_id", document_id);
-}
-
-QString SWorkModel::name()
-{
-    return m_name;
-}
-
-void SWorkModel::setName(const QString name, const QVariant oldValue)
-{
-    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
     QString logText;
 
-    if(!oldValue.toString().isEmpty())
-        logText = tr("Название работы изменено с \"%1\" на \"%2\"").arg(oldValue.toString(), name);
-    else if(i_id)   // для новой произвольной работы или работы из прайс-листа запись в журнал не нужна
-        logText = tr("Название работы изменено на \"%1\"").arg(name);
+    auto old = commitedData(C_name).value_or(QVariant()).toString();
+    if(!old.isEmpty())
+        logText = tr("Название работы изменено с \"%1\" на \"%2\"").arg(old, name());
+    else if(isPrimaryKeyValid())   // для новой произвольной работы или работы из прайс-листа запись в журнал не нужна
+        logText = tr("Название работы изменено на \"%1\"").arg(name());
+    else
+    {
+        constructInitialLogMsg(C_name);
+        constructInitialLogMsg(C_user);
+        constructInitialLogMsg(C_warranty);
+        return;
+    }
 
-    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
-        logText.prepend("[A] ");
-
-    appendLogText(logText);
-    i_valuesMap.insert("name", name);
+    addAdminModeMarkToLogText(logText);
+    appendLogText(logText, "!addRename");
 }
 
-double SWorkModel::price()
+void SWorkModel::priceChanged()
 {
-    return m_price;
-}
-
-void SWorkModel::setPrice(const double price, const QVariant oldValue)
-{
-    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
     QString logText;
 
-    if(oldValue.isValid())
-        logText = tr("Стоимость работы \"%1\" изменёна с %2 на %3").arg(m_name, sysLocale.toCurrencyString(oldValue.toDouble()), sysLocale.toCurrencyString(price));
-    else if(i_id)
-        logText = tr("Стоимость работы \"%1\" установлена %1").arg(m_name, sysLocale.toCurrencyString(price));
-
-    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
-        logText.prepend("[A] ");
-
-    appendLogText(logText);
-    i_valuesMap.insert("price", price);
-}
-
-int SWorkModel::count()
-{
-    return m_count;
-}
-
-void SWorkModel::setCount(const int count, const QVariant oldValue)
-{
-    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
-    QString logText = tr("Кол-во \"%1\" изменёно с %2 на %3").arg(m_name).arg(oldValue.toInt()).arg(count);
-
-    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
-        logText.prepend("[A] ");
-
-    if(oldValue.isValid())
-        appendLogText(logText);
-
-    i_valuesMap.insert("count", count);
-}
-
-int SWorkModel::warranty()
-{
-    return m_warranty;
-}
-
-void SWorkModel::setWarranty(const int warranty, const QVariant oldValue)
-{
-    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
-    QString logText = tr("Удален товар \"%1\" стоимостью %2 в кол-ве %3ед.").arg(m_name, sysLocale.toCurrencyString(m_price)).arg(m_count);
-
-    if(!oldValue.toString().isEmpty())
-        logText = tr("Срок гарантии на работу \"%1\" изменён с \"%2\" на \"%3\"").arg(m_name, warrantyTermsModel->getDisplayRole(oldValue.toInt(), 1), warrantyTermsModel->getDisplayRole(warranty, 1));
-    else if(i_id || (!i_id && warranty != 0) )   // первое изменение срока гарантии при автосохранении списка или установка срока гарантии до первого сохранения списка
-        logText = tr("Срок гарантии на работу \"%1\" установлен \"%2\"").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
+    auto old = commitedData(C_price).value_or(QVariant(QVariant::Double));
+    if(!old.isNull())
+        logText = tr("Стоимость работы \"%1\" изменёна с %2 на %3").arg(name(), sysLocale.toCurrencyString(old.toDouble()), sysLocale.toCurrencyString(price()));
+    else if(isPrimaryKeyValid())
+        logText = tr("Стоимость работы \"%1\" установлена %2").arg(name(), sysLocale.toCurrencyString(price()));
     else
-        logText = tr("Срок гарантии на работу \"%1\" установлен по умолчанию (\"%2\")").arg(m_name, warrantyTermsModel->getDisplayRole(warranty, 1));
+    {
+        constructInitialLogMsg(C_name);
+        return;
+    }
 
-    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
-        logText.prepend("[A] ");
-
-    appendLogText(logText);
-    i_valuesMap.insert("warranty", warranty);
+    addAdminModeMarkToLogText(logText);
+    appendLogText(logText, "priceChange");
 }
 
-int SWorkModel::priceId()
+void SWorkModel::countChanged()
 {
-    return m_priceId;
+    auto old = commitedData(C_count);
+    if(!old)
+        return;
+
+    QString logText = tr("Кол-во \"%1\" изменёно с %2 на %3").arg(name()).arg(old->toInt()).arg(count());
+
+    addAdminModeMarkToLogText(logText);
+    appendLogText(logText, "qty");
 }
 
-void SWorkModel::setPriceId(const int id)
+void SWorkModel::warrantyChanged()
 {
-    if(id)
-        i_valuesMap.insert("price_id", id);
+    QString logText;
+
+    auto old = commitedData(C_warranty).value_or(QVariant());
+    if(!old.toString().isEmpty())
+        logText = tr("Срок гарантии на работу \"%1\" изменён с \"%2\" на \"%3\"").arg(name(), warrantyTermsModel->getDisplayRole(old.toInt(), 1), warrantyTermsModel->getDisplayRole(warranty(), 1));
+    else if(isPrimaryKeyValid() || (!isPrimaryKeyValid() && warranty() != 0) )   // первое изменение срока гарантии при автосохранении списка или установка срока гарантии до первого сохранения списка
+        logText = tr("Срок гарантии на работу \"%1\" установлен \"%2\"").arg(name(), warrantyTermsModel->getDisplayRole(warranty(), 1));
     else
-        i_valuesMap.insert("price_id", QVariant());
+    {
+        constructInitialLogMsg(C_warranty);
+        return;
+    }
+
+    addAdminModeMarkToLogText(logText);
+    appendLogText(logText, "warranty");
 }
 
-bool SWorkModel::isPay()
+/* При добавлении работы из прайс-листа и инициализации модели сначала задаётся
+ * процент заработка инженера payRepair, а затем id работы; поле payRepairQuick
+ * нужно инициализировать дополнительно
+*/
+void SWorkModel::priceIdChanged()
 {
-    return m_isPay;
-}
-
-void SWorkModel::setIsPay(const bool is_pay)
-{
-    i_valuesMap.insert("is_pay", is_pay);
-}
-
-void SWorkModel::setCreated(const QDateTime added)
-{
-    i_valuesMap.insert("added", added);
-}
-
-int SWorkModel::type()
-{
-    return m_type;
-}
-
-void SWorkModel::setType(const int type)
-{
-    i_valuesMap.insert("type", type);
-}
-
-int SWorkModel::payRepair()
-{
-    return m_payRepair;
-}
-
-void SWorkModel::setPayRepair(const int pay_repair)
-{
-    i_valuesMap.insert("pay_repair", pay_repair?pay_repair:QVariant());
-}
-
-int SWorkModel::payRepairQuick()
-{
-    return m_payRepair_quick;
-}
-
-void SWorkModel::setPayRepairQuick(const int pay_repair_quick)
-{
-    i_valuesMap.insert("pay_repair_quick", pay_repair_quick?pay_repair_quick:QVariant());
+    set_payRepairQuick(payRepair());
 }
 
 bool SWorkModel::remove()
 {
     bool ret = 1;
-    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
-    QString logText = tr("Удалена работа \"%1\" стоимостью %2").arg(m_name, sysLocale.toCurrencyString(m_price));
+    i_logTexts.clear();
+    QString logText = tr("Удалена работа \"%1\" стоимостью %2").arg(name(), sysLocale.toCurrencyString(price()));
 
-    if(model->state() == SSaleTableModel::State::WorkshopAdm && !logText.isEmpty())
-        logText.prepend("[A] ");
-
-    i_logRecord->setText(logText);
+    addAdminModeMarkToLogText(logText);
+    i_logRecord->set_text(logText);
     ret &= del();
     ret &= i_logRecord->commit();
 
     return ret;
 }
 
-void SWorkModel::setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue)
-{
-    switch(fieldNum)
-    {
-        case SStoreItemModel::ColUser: setUser(value.toInt(), oldValue); break;
-        case SStoreItemModel::ColObjId: setRepair(value.toInt()); break;
-        case SStoreItemModel::ColName: setName(value.toString(), oldValue); break;
-        case SStoreItemModel::ColPrice: setPrice(value.toDouble(), oldValue); break;
-        case SStoreItemModel::ColCount: setCount(value.toInt(), oldValue); break;
-        case SStoreItemModel::ColWarranty: setWarranty(value.toInt(), oldValue); break;
-        case SStoreItemModel::ColItemId: setPriceId(value.toInt()); break;
-        case SStoreItemModel::ColCreated: setCreated(value.toDateTime()); break;
-        case SStoreItemModel::ColWorkType: setType(value.toInt()); break;
-    }
-}
-
 bool SWorkModel::commit()
 {
-    if(i_id)
+    if(!isPrimaryKeyValid())
     {
-        update();
+        initMandatoryField(C_created, QDateTime::currentDateTime());
     }
-    else
-    {
-        setCreated(QDateTime::currentDateTime());
-        insert();
-    }
-    commitLogs();
-
-    return i_nErr;
+    return SSingleRowJModel::commit();
 }
 
-double SWorkModel::salarySumm() const
+void SWorkModel::setDataRework(const int index, QVariant &data)
 {
-    return m_salarySumm;
+    switch(index)
+    {
+        case C_priceId: if(!data.toInt()) data = QVariant(); break;
+        case C_user: userBeforeChange(data.toInt()); break;
+        default: break;
+    }
 }
 
-void SWorkModel::setSalarySumm(double salarySumm)
+void SWorkModel::logDataChange(const int index, const QVariant &data)
 {
-    m_salarySumm = salarySumm;
-    i_valuesMap.insert("salary_summ", salarySumm);
+    Q_UNUSED(data)
+
+    switch(index)
+    {
+        case C_user: userChanged(); break;
+        case C_repair: repairChanged(data); break;
+        case C_name: nameChanged(); break;
+        case C_price: priceChanged(); break;
+        case C_count: countChanged(); break;
+        case C_warranty: warrantyChanged(); break;
+        case C_priceId: priceIdChanged(); break;
+        default: ;
+    }
+}
+
+void SWorkModel::addAdminModeMarkToLogText(QString &text)
+{
+    if(text.isEmpty())
+        return;
+
+    if(!parent())
+        return;
+
+    SSaleTableModel *model = static_cast<SSaleTableModel*>(parent());
+    if(model->state() == WorkshopSaleModel::State::Adm)
+        text.prepend("[A] ");
+}
+
+void SWorkModel::userBeforeChange(const int userId)
+{
+    if(priceId())
+        return;
+
+    set_payRepair(usersSalaryTaxesModel->value(userId, "id", "pay_repair").toInt());
+    set_payRepairQuick(usersSalaryTaxesModel->value(userId, "id", "pay_repair_quick").toInt());
 }
 
 void SWorkModel::updateLogAssociatedRecId()
 {
     // установка id ремонта происходит в конструкторе; метод переопределён для подавления предупреждения
+}
+
+void SWorkModel::initFieldWithPrevLoaded(const int index, const QVariant &value)
+{
+    SSingleRowJModel::initFieldWithPrevLoaded(index, value);
+
+    switch (index)
+    {
+        case C_repair: i_logRecord->setData(SLogRecordModel::C_repair, value); break;
+        default: break;
+    }
+}
+
+bool SWorkModel::setData(const int index, const QVariant &data)
+{
+    if(index < 0)
+        return 1;
+
+    return SSingleRowJModel::setData(index, data);
 }

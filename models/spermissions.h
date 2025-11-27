@@ -2,127 +2,169 @@
 #define SPERMISSIONS_H
 #include <QMetaObject>
 #include <QAbstractItemModel>
-#include "propstruct.h"
-#include "com_sql_queries.h"
-#include "sdatabaseauxiliary.h"
-#include "global_ns.h"
+#include <SSettingsBase>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SSingleRowModelBase>
 
-class SPermissions : public QStandardItemModel, public SDatabaseAuxiliary
+#define PROPSTRUCT_MEMBER(name) name
+
+#undef PROPSTRUCT_DECLARE_MEMBER
+#define PROPSTRUCT_DECLARE_MEMBER(type, name)                                                           \
+    type name = type();
+
+#define PROPSTRUCT_GET(name) get_##name
+#define PROPSTRUCT_SET(name) set_##name
+
+#undef PROPSTRUCT_BIND_FIELD
+#define PROPSTRUCT_BIND_FIELD(type, name)                                                               \
+    Q_PROPERTY(type name READ PROPSTRUCT_GET(name) WRITE PROPSTRUCT_SET(name))                          \
+    private:                                                                                            \
+    type PROPSTRUCT_GET(name)() const                                                                   \
+    {                                                                                                   \
+        return name;                                                                                    \
+    }                                                                                                   \
+    void PROPSTRUCT_SET(name)(const type &var##name)                                                    \
+    {                                                                                                   \
+        name = QVariant(var##name).value<type>();                                                       \
+    }
+
+#undef PROPSTRUCT_GET_VALUE_FOR_REPORT
+#define PROPSTRUCT_GET_VALUE_FOR_REPORT(varName)                                                        \
+    public Q_SLOTS:                                                                                     \
+        QVariant get_##varName##_for_report()                                                           \
+        {                                                                                               \
+            return varName;                                                                             \
+        };
+
+#ifdef PROPSTRUCT_FIELD
+#undef PROPSTRUCT_FIELD
+#endif
+
+#define PROPSTRUCT_ENUM_FIELD(name, ...)  C_##name,
+#define PROPSTRUCT_FIELD(type, ...) PROPSTRUCT_ENUM_FIELD(__VA_ARGS__)
+
+#undef PROPSTRUCT_FIELDS
+#define PROPSTRUCT_FIELDS                                                                               \
+    PROPSTRUCT_FIELD(int, editGlobalSettings)                                                           \
+    PROPSTRUCT_FIELD(int, receptDevices)                                                                \
+    PROPSTRUCT_FIELD(int, printStickers)                                                                \
+    PROPSTRUCT_FIELD(int, issueDevices)                                                                 \
+    PROPSTRUCT_FIELD(int, saleGoods)                                                                    \
+    PROPSTRUCT_FIELD(int, incomeGoods)                                                                  \
+    PROPSTRUCT_FIELD(int, viewClients)                                                                  \
+    PROPSTRUCT_FIELD(int, createNewClient)                                                              \
+    PROPSTRUCT_FIELD(int, writeOffGoods)                                                                \
+    PROPSTRUCT_FIELD(int, editGoodsPrices)                                                              \
+    PROPSTRUCT_FIELD(int, editClients)                                                                  \
+    PROPSTRUCT_FIELD(int, createReports)                                                                \
+    PROPSTRUCT_FIELD(int, RFU13)         /* разрешения с кодами 13, 14, 17 и 19 не используются */      \
+    PROPSTRUCT_FIELD(int, RFU14)                                                                        \
+    PROPSTRUCT_FIELD(int, viewFinancialDocuments)                                                       \
+    PROPSTRUCT_FIELD(int, createCashRegisters)                                                          \
+    PROPSTRUCT_FIELD(int, RFU17)                                                                        \
+    PROPSTRUCT_FIELD(int, createZReport)                                                                \
+    PROPSTRUCT_FIELD(int, RFU19)                                                                        \
+    PROPSTRUCT_FIELD(int, viewCashOrders)                                                               \
+    PROPSTRUCT_FIELD(int, editGoods)                                                                    \
+    PROPSTRUCT_FIELD(int, readSMS)                                                                      \
+    PROPSTRUCT_FIELD(int, viewAnyRepair)                                                                \
+    PROPSTRUCT_FIELD(int, useTelephony)                                                                 \
+    PROPSTRUCT_FIELD(int, advEditRepair)                                                                \
+    PROPSTRUCT_FIELD(int, RFU26)   /* В ранних версиях АСЦ разрешения 26..37, 53 и 64 позволяли */      \
+    PROPSTRUCT_FIELD(int, RFU27)   /* включать статус ремонта из списка жестко заданных; */             \
+    PROPSTRUCT_FIELD(int, RFU28)   /* позже настройка таких разрешений была перенесена на */            \
+    PROPSTRUCT_FIELD(int, RFU29)   /* страницу редактирования статусов */                               \
+    PROPSTRUCT_FIELD(int, RFU30)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU31)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU32)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU33)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU34)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU35)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU36)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU37)                                                                        \
+    PROPSTRUCT_FIELD(int, editWorksPriceList)                                                           \
+    PROPSTRUCT_FIELD(int, editGoodsCatalog)                                                             \
+    PROPSTRUCT_FIELD(int, syncGoodsWithShop)                                                            \
+    PROPSTRUCT_FIELD(int, viewPrice1)                                                                   \
+    PROPSTRUCT_FIELD(int, viewPrice2)                                                                   \
+    PROPSTRUCT_FIELD(int, viewPrice3)                                                                   \
+    PROPSTRUCT_FIELD(int, takeGoodsForRepair)                                                           \
+    PROPSTRUCT_FIELD(int, giveGoodsForRepair)                                                           \
+    PROPSTRUCT_FIELD(int, manageWarehouse)                                                              \
+    PROPSTRUCT_FIELD(int, removeGoodsFromUnissuedRepair)                                                \
+    PROPSTRUCT_FIELD(int, paySubsistence)                                                               \
+    PROPSTRUCT_FIELD(int, remoteLogin)                                                                  \
+    PROPSTRUCT_FIELD(int, addCustomWork)                                                                \
+    PROPSTRUCT_FIELD(int, undoOutInvoice)                                                               \
+    PROPSTRUCT_FIELD(int, makeSalaryExtraCharge)                                                        \
+    PROPSTRUCT_FIELD(int, RFU53)                                                                        \
+    PROPSTRUCT_FIELD(int, viewForeignOfficeCashOrders)                                                  \
+    PROPSTRUCT_FIELD(int, setNotificationState)                                                         \
+    PROPSTRUCT_FIELD(int, undoInInvoice)                                                                \
+    PROPSTRUCT_FIELD(int, beginUnengagedRepair)                                                         \
+    PROPSTRUCT_FIELD(int, handleOnlineOrders)                                                           \
+    PROPSTRUCT_FIELD(int, changeOffice)                                                                 \
+    PROPSTRUCT_FIELD(int, setRepairEngineer)                                                            \
+    PROPSTRUCT_FIELD(int, setRepairColor)                                                               \
+    PROPSTRUCT_FIELD(int, startVideoRecording)                                                          \
+    PROPSTRUCT_FIELD(int, sendSMS)                                                                      \
+    PROPSTRUCT_FIELD(int, RFU64)                                                                        \
+    PROPSTRUCT_FIELD(int, handleCashlessOrders)                                                         \
+    PROPSTRUCT_FIELD(int, createDatabaseBackups)                                                        \
+    PROPSTRUCT_FIELD(int, createTasks)                                                                  \
+    PROPSTRUCT_FIELD(int, veiwAllTasks)                                                                 \
+    PROPSTRUCT_FIELD(int, addGoodsFromWarehouse)                                                        \
+    PROPSTRUCT_FIELD(int, enableSparepartRequestManager)                                                \
+    PROPSTRUCT_FIELD(int, createBackdatedDocuments)                                                     \
+    PROPSTRUCT_FIELD(int, moveRepairToOffice)                                                           \
+    PROPSTRUCT_FIELD(int, createQuickRepair)                                                            \
+    PROPSTRUCT_FIELD(int, viewForeignOfficeRepair)                                                      \
+    PROPSTRUCT_FIELD(int, useCashRegisterEquipment)                                                     \
+    PROPSTRUCT_FIELD(int, setRepairManager)                                                             \
+    PROPSTRUCT_FIELD(int, viewAnyWorkList)                                                              \
+    PROPSTRUCT_FIELD(int, viewRepairLog)                                                                \
+    PROPSTRUCT_FIELD(int, editCashRegisterEquipmentSettings)                                            \
+    PROPSTRUCT_FIELD(int, editCartridgeCards)                                                           \
+    PROPSTRUCT_FIELD(int, sentEmail)                                                                    \
+    PROPSTRUCT_FIELD(int, RFU82)    /* разрешения 82..100 зарезервированы для будущих версий АСЦ :-) */ \
+    PROPSTRUCT_FIELD(int, RFU83)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU84)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU85)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU86)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU87)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU88)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU89)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU90)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU91)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU92)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU93)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU94)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU95)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU96)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU97)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU98)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU99)                                                                        \
+    PROPSTRUCT_FIELD(int, RFU100)                                                                       \
+    PROPSTRUCT_FIELD(int, editRepairIncomingSet)                                                        \
+    PROPSTRUCT_FIELD(int, editAnyComment)                                                               \
+    PROPSTRUCT_FIELD(int, advEditWorkList)                                                              \
+    PROPSTRUCT_FIELD(int, viewClientPassportData)                                                       \
+    PROPSTRUCT_FIELD(int, viewClientBankData)                                                           \
+    PROPSTRUCT_FIELD(int, editPaymentSystemInCommittedCashRegisters)                                    \
+    PROPSTRUCT_FIELD(int, viewEmployeesSalary)                                                          \
+    PROPSTRUCT_FIELD(int, workWithTechReports)                                                          \
+    PROPSTRUCT_FIELD(int, viewAllPartsRequests)                                                         \
+
+class SPermissions : public QStandardItemModel//, public SSingleRowModelBase
 {
     Q_OBJECT
 public:
-    PROPSTRUCT_FIELD(int, editGlobalSettings, dummy)
-    PROPSTRUCT_FIELD(int, receptDevices, dummy)
-    PROPSTRUCT_FIELD(int, printStickers, dummy)
-    PROPSTRUCT_FIELD(int, issueDevices, dummy)
-    PROPSTRUCT_FIELD(int, saleGoods, dummy)
-    PROPSTRUCT_FIELD(int, incomeGoods, dummy)
-    PROPSTRUCT_FIELD(int, viewClients, dummy)
-    PROPSTRUCT_FIELD(int, createNewClient, dummy)
-    PROPSTRUCT_FIELD(int, writeOffGoods, dummy)
-    PROPSTRUCT_FIELD(int, editGoodsPrices, dummy)
-    PROPSTRUCT_FIELD(int, editClients, dummy)
-    PROPSTRUCT_FIELD(int, createReports, dummy)
-    PROPSTRUCT_FIELD(int, RFU13, dummy)         // разрешения с кодами 13, 14, 17 и 19 не используются
-    PROPSTRUCT_FIELD(int, RFU14, dummy)
-    PROPSTRUCT_FIELD(int, viewFinancialDocuments, dummy)
-    PROPSTRUCT_FIELD(int, createCashRegisters, dummy)
-    PROPSTRUCT_FIELD(int, RFU17, dummy)
-    PROPSTRUCT_FIELD(int, createZReport, dummy)
-    PROPSTRUCT_FIELD(int, RFU19, dummy)
-    PROPSTRUCT_FIELD(int, viewCashOrders, dummy)
-    PROPSTRUCT_FIELD(int, editGoods, dummy)
-    PROPSTRUCT_FIELD(int, readSMS, dummy)
-    PROPSTRUCT_FIELD(int, viewAnyRepair, dummy)
-    PROPSTRUCT_FIELD(int, useTelephony, dummy)
-    PROPSTRUCT_FIELD(int, advEditRepair, dummy)
-    PROPSTRUCT_FIELD(int, repairRecepted, dummy)
-    PROPSTRUCT_FIELD(int, repairDiagnostics, dummy)
-    PROPSTRUCT_FIELD(int, repairNegotiation, dummy)
-    PROPSTRUCT_FIELD(int, repairConformed, dummy)
-    PROPSTRUCT_FIELD(int, repairInProgress, dummy)
-    PROPSTRUCT_FIELD(int, repairWaitingParts, dummy)
-    PROPSTRUCT_FIELD(int, repairReady, dummy)
-    PROPSTRUCT_FIELD(int, repairReadyWithoutRepair, dummy)
-    PROPSTRUCT_FIELD(int, repairIssued, dummy)
-    PROPSTRUCT_FIELD(int, repairFaultNotDetected, dummy)
-    PROPSTRUCT_FIELD(int, repairOfficeChange, dummy)
-    PROPSTRUCT_FIELD(int, repairRefused, dummy)
-    PROPSTRUCT_FIELD(int, editWorksPriceList, dummy)
-    PROPSTRUCT_FIELD(int, editGoodsCatalog, dummy)
-    PROPSTRUCT_FIELD(int, syncGoodsWithShop, dummy)
-    PROPSTRUCT_FIELD(int, viewPrice1, dummy)
-    PROPSTRUCT_FIELD(int, viewPrice2, dummy)
-    PROPSTRUCT_FIELD(int, viewPrice3, dummy)
-    PROPSTRUCT_FIELD(int, takeGoodsForRepair, dummy)
-    PROPSTRUCT_FIELD(int, giveGoodsForRepair, dummy)
-    PROPSTRUCT_FIELD(int, manageWarehouse, dummy)
-    PROPSTRUCT_FIELD(int, removeGoodsFromUnissuedRepair, dummy)
-    PROPSTRUCT_FIELD(int, paySubsistence, dummy)
-    PROPSTRUCT_FIELD(int, remoteLogin, dummy)
-    PROPSTRUCT_FIELD(int, addCustomWork, dummy)
-    PROPSTRUCT_FIELD(int, undoOutInvoice, dummy)
-    PROPSTRUCT_FIELD(int, makeSalaryExtraCharge, dummy)
-    PROPSTRUCT_FIELD(int, repairDiagnosisConfirmation, dummy)
-    PROPSTRUCT_FIELD(int, viewForeignOfficeCashOrders, dummy)
-    PROPSTRUCT_FIELD(int, setNotificationState, dummy)
-    PROPSTRUCT_FIELD(int, undoInInvoice, dummy)
-    PROPSTRUCT_FIELD(int, beginUnengagedRepair, dummy)
-    PROPSTRUCT_FIELD(int, handleOnlineOrders, dummy)
-    PROPSTRUCT_FIELD(int, changeOffice, dummy)
-    PROPSTRUCT_FIELD(int, setRepairEngineer, dummy)
-    PROPSTRUCT_FIELD(int, setRepairColor, dummy)
-    PROPSTRUCT_FIELD(int, startVideoRecording, dummy)
-    PROPSTRUCT_FIELD(int, sendSMS, dummy)
-    PROPSTRUCT_FIELD(int, repairIssuedInCredit, dummy)
-    PROPSTRUCT_FIELD(int, handleCashlessOrders, dummy)
-    PROPSTRUCT_FIELD(int, createDatabaseBackups, dummy)
-    PROPSTRUCT_FIELD(int, createTasks, dummy)
-    PROPSTRUCT_FIELD(int, veiwAllTasks, dummy)
-    PROPSTRUCT_FIELD(int, addGoodsFromWarehouse, dummy)
-    PROPSTRUCT_FIELD(int, enableSparepartRequestManager, dummy)
-    PROPSTRUCT_FIELD(int, createBackdatedDocuments, dummy)
-    PROPSTRUCT_FIELD(int, moveRepairToOffice, dummy)
-    PROPSTRUCT_FIELD(int, createQuickRepair, dummy)
-    PROPSTRUCT_FIELD(int, viewForeignOfficeRepair, dummy)
-    PROPSTRUCT_FIELD(int, useCashRegisterEquipment, dummy)
-    PROPSTRUCT_FIELD(int, setRepairManager, dummy)
-    PROPSTRUCT_FIELD(int, viewAnyWorkList, dummy)
-    PROPSTRUCT_FIELD(int, viewRepairLog, dummy)
-    PROPSTRUCT_FIELD(int, editCashRegisterEquipmentSettings, dummy)
-    PROPSTRUCT_FIELD(int, editCartridgeCards, dummy)
-    PROPSTRUCT_FIELD(int, sentEmail, dummy)
-    PROPSTRUCT_FIELD(int, RFU82, dummy)    // разрешения 82..100 зарезервированы для будущих версий АСЦ :-, dummy)
-    PROPSTRUCT_FIELD(int, RFU83, dummy)
-    PROPSTRUCT_FIELD(int, RFU84, dummy)
-    PROPSTRUCT_FIELD(int, RFU85, dummy)
-    PROPSTRUCT_FIELD(int, RFU86, dummy)
-    PROPSTRUCT_FIELD(int, RFU87, dummy)
-    PROPSTRUCT_FIELD(int, RFU88, dummy)
-    PROPSTRUCT_FIELD(int, RFU89, dummy)
-    PROPSTRUCT_FIELD(int, RFU90, dummy)
-    PROPSTRUCT_FIELD(int, RFU91, dummy)
-    PROPSTRUCT_FIELD(int, RFU92, dummy)
-    PROPSTRUCT_FIELD(int, RFU93, dummy)
-    PROPSTRUCT_FIELD(int, RFU94, dummy)
-    PROPSTRUCT_FIELD(int, RFU95, dummy)
-    PROPSTRUCT_FIELD(int, RFU96, dummy)
-    PROPSTRUCT_FIELD(int, RFU97, dummy)
-    PROPSTRUCT_FIELD(int, RFU98, dummy)
-    PROPSTRUCT_FIELD(int, RFU99, dummy)
-    PROPSTRUCT_FIELD(int, RFU100, dummy)
-    PROPSTRUCT_FIELD(int, editRepairIncomingSet, dummy)
-    PROPSTRUCT_FIELD(int, editAnyComment, dummy)
-    PROPSTRUCT_FIELD(int, advEditWorkList, dummy)
-    PROPSTRUCT_FIELD(int, viewClientPassportData, dummy)
-    PROPSTRUCT_FIELD(int, viewClientBankData, dummy)
-    PROPSTRUCT_FIELD(int, editPaymentSystemInCommittedCashRegisters, dummy)
-    PROPSTRUCT_FIELD(int, viewEmployeesSalary, dummy)
-    PROPSTRUCT_FIELD(int, workWithTechReports, dummy)
-    PROPSTRUCT_FIELD(int, viewAllPartsRequests, dummy)
-public:
+    enum Fields {dummy = 0, PROPSTRUCT_FIELDS};
+    #undef PROPSTRUCT_FIELD
+    #define PROPSTRUCT_FIELD(type, name) PROPSTRUCT_DECLARE_MEMBER(type, name)
+    PROPSTRUCT_FIELDS
     explicit SPermissions();
-    QStringList list();
     void load(const QString &roles);
     void load();
     void save(const QString &name = QString(), const QString &description = QString());
@@ -134,37 +176,33 @@ public:
     int currentRole();
     int permissionId(const char *name);
 protected:
-    int rowToPropertyId(const QModelIndex &index) const;
+    QMap<int, int*> m_indexMap;
+    QMap<int, QString> m_nameMap;
+    void mapFields(){
+        #undef PROPSTRUCT_FIELD
+        #define PROPSTRUCT_FIELD(type, name)                                                            \
+                m_indexMap.insert(C_##name, &PROPSTRUCT_MEMBER(name));                                  \
+                m_nameMap.insert(C_##name, #name);
+        PROPSTRUCT_FIELDS
+    };
     int rowToPermissionId(const QModelIndex &index) const;
     int permissionIdToRow(const int) const;
-    int permissionIdToPropertyId(const int) const;
     void translateNames();
 private:
-    QMap<QString, QString> i_fieldNames;    // затычка; в данном классе не используется
     bool m_modelEdited = 0;
     int m_currentRole = 0;
 };
 
-#include "global.h" // Это должно быть именно здесь
-
 inline SPermissions::SPermissions()
 {
-    setRowCount(metaObject()->propertyCount() - metaObject()->propertyOffset());
+    mapFields();
+    setRowCount(m_indexMap.count());
     setColumnCount(2);
-}
-
-inline QStringList SPermissions::list()
-{
-    QStringList list;
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        list << tr(metaObject()->property(i).name());
-
-    return list;
 }
 
 inline void SPermissions::load(const QString &roles)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
     QStringList rolesList = roles.split(',');
     if(rolesList.count() == 1)
         m_currentRole = rolesList.first().toInt();
@@ -175,17 +213,17 @@ inline void SPermissions::load(const QString &roles)
     query->exec(QUERY_SEL_PERMISSIONS(roles));
     while (query->next())
     {
-        if( query->value(0).toInt() > (metaObject()->propertyCount() - metaObject()->propertyOffset()) )
+        int key = query->value(0).toInt();
+        if(!m_indexMap.contains(key))
         {
-            QString error = tr("Разрешение %1 не объявлено в классе %2!").arg(query->value(0).toInt()).arg(metaObject()->className());
-            errorToLog(metaObject()->className(), error);
+            QString error = tr("Разрешение %1 не объявлено в классе %2!").arg(key).arg(metaObject()->className());
+            Global::errorMsg(QString("%1: %2").arg(metaObject()->className(), error));
             continue;
         }
-        setData(index(permissionIdToRow(query->value(0).toInt()), 0), 2, Qt::CheckStateRole);
+        setData(index(permissionIdToRow(key), 0), 2, Qt::CheckStateRole);
     }
     m_modelEdited = 0;
 
-    delete query;
     endResetModel();
 }
 
@@ -203,38 +241,38 @@ inline void SPermissions::save(const QString &name, const QString &description)
         return;
 
     QString q;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
 
     try
     {
         q = QString("DELETE FROM `permissions_roles` WHERE `role_id` = %1").arg(m_currentRole);
-        if(!query.exec(q))
+        if(!query->exec(q))
             throw 1;
 
         q = QString("INSERT INTO `permissions_roles` (`role_id`, `permission_id`) VALUES (:role, :perm)");
-        if(!query.prepare(q))
+        if(!query->prepare(q))
             throw 2;
-        query.bindValue(":role", m_currentRole);
-        for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
+        query->bindValue(":role", m_currentRole);
+        foreach (auto f, m_indexMap)
         {
-            if(metaObject()->property(i).read(this).toInt() == 0)
+            if(*f == 0)
                 continue;
 
-            query.bindValue(":perm", permissionIdToRow(i));
-            if(!query.exec())
+            query->bindValue(":perm", m_indexMap.key(f));
+            if(!query->exec())
                 throw 3;
         }
 
         if(!name.isEmpty() || !description.isEmpty())
         {
             q = QString("UPDATE `roles` SET `name` = '%1', `description` = '%2' WHERE `id` = %3").arg(name, description).arg(m_currentRole);
-            if(!query.exec(q))
+            if(!query->exec(q))
                 throw 4;
         }
     }
     catch(int)
     {
-        Global::throwError(query.lastError(), tr("Не удалось сохранить настройки роли"));
+        Global::throwError(query->lastError(), tr("Не удалось сохранить настройки роли"));
     }
 
     m_modelEdited = 0;
@@ -245,11 +283,11 @@ inline QVariant SPermissions::data(const QModelIndex &index, int role) const
     if(role == Qt::DisplayRole)
     {
         if(index.column() == 1)
-            return tr(metaObject()->property(rowToPropertyId(index)).name());
+            return tr(m_nameMap.value(rowToPermissionId(index)).toLocal8Bit());
     }
     else if (role == Qt::CheckStateRole)
         if(index.column() == 0)
-            return metaObject()->property(rowToPropertyId(index)).read(this);
+            return *m_indexMap.value(rowToPermissionId(index));
 
     return QVariant();
 }
@@ -259,7 +297,7 @@ inline bool SPermissions::setData(const QModelIndex &index, const QVariant &valu
     if(role == Qt::CheckStateRole)
     {
         m_modelEdited = 1;
-        return metaObject()->property(rowToPropertyId(index)).write(this, value);
+        return (*(m_indexMap.value(rowToPermissionId(index))) = value.toInt());
     }
 
     return true;
@@ -275,8 +313,10 @@ inline Qt::ItemFlags SPermissions::flags(const QModelIndex &index) const
 
 inline void SPermissions::setAll(const int state)
 {
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        setData(index(i - metaObject()->propertyOffset(), 0), state, Qt::CheckStateRole);
+    foreach (auto f, m_indexMap)
+    {
+        *f = state;
+    }
 }
 
 inline bool SPermissions::isModelChanged()
@@ -291,15 +331,10 @@ inline int SPermissions::currentRole()
 
 inline int SPermissions::permissionId(const char *name)
 {
-    int id = metaObject()->indexOfProperty(name) - 1;
-    Q_ASSERT_X(id != -1, "SPermissions::permissionId(const char *name)", QString("unknown permission %1").arg(name).toLocal8Bit());
+    int index = m_nameMap.key(name, -1);
+    Q_ASSERT_X(index != -1, "SPermissions::permissionId(const char *name)", QString("unknown permission %1").arg(name).toLocal8Bit());
 
-    return id;
-}
-
-inline int SPermissions::rowToPropertyId(const QModelIndex &index) const
-{
-    return index.row() + metaObject()->propertyOffset();
+    return index;
 }
 
 inline int SPermissions::rowToPermissionId(const QModelIndex &index) const
@@ -310,11 +345,6 @@ inline int SPermissions::rowToPermissionId(const QModelIndex &index) const
 inline int SPermissions::permissionIdToRow(const int id) const
 {
     return id - 1;
-}
-
-inline int SPermissions::permissionIdToPropertyId(const int permissionId) const
-{
-    return permissionIdToRow(permissionId) + metaObject()->propertyOffset();
 }
 
 /* Перевод названий разрешений

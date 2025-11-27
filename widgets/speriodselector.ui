@@ -157,7 +157,7 @@
   <customwidget>
    <class>SDateEdit</class>
    <extends>QDateEdit</extends>
-   <header>widgets/sdateedit.h</header>
+   <header location="global">SDateEdit</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -2,9 +2,9 @@
 #define SDEVICESMODEL_H
 
 #include <QObject>
-#include <QSqlQueryModel>
-#include "sdevicemodel.h"
-#include "sdevicemakersmodel.h"
+
+class SDeviceMakersModel;
+class QSqlQueryModel;
 
 class SDevicesModel : public QObject
 {

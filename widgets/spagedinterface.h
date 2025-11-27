@@ -3,11 +3,12 @@
 
 #include <QObject>
 #include <QWidget>
-#include <QGridLayout>
-#include <QStackedWidget>
-#include <QLine>
-#include <widgets/stoolboxswitchpanel.h>
-#include "global.h"
+
+class QGridLayout;
+class QStackedWidget;
+class QLine;
+class SToolboxSwitchPanel;
+class ProjectGlobals;
 
 class SPagedInterface : public QWidget
 {

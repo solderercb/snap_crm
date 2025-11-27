@@ -2,39 +2,18 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
-#include <QDateTime>
-#include <QTextCodec>
-#include <QMessageBox>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QList>
-#include <QHeaderView>
-#include <QSortFilterProxyModel>
-#include <QWidgetAction>
-#include <QStyle>
-#include <QtWidgets/QToolBar>
-#include <QtWidgets/QMdiArea>
-#include <QMdiSubWindow>
-#include <QMenu>
-#include <QToolButton>
-#include <QComboBox>
-#include <QMap>
-#include <QTimer>
-#include <QCompleter>
-#include <QFontMetrics>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-#include <QRandomGenerator>
-#include <QCloseEvent>
-#include "windowsdispatcher.h"
-#include "widgets/shortlivednotification.h"
-#include <QtAutoUpdaterWidgets/UpdateController>
-#include <QtAutoUpdaterWidgets/UpdateButton>
+
+class QEvent;
+class windowsDispatcher;
+class QTimer;
+class QCloseEvent;
+class QModelIndex;
+class QStandardItemModel;
+class QSortFilterProxyModel;
+class QWidget;
+namespace QtAutoUpdater {
+class UpdateController;
+};
 
 namespace Ui {
 class MainWindow;

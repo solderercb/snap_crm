@@ -1,4 +1,10 @@
 #include "stableviewsummarybase.h"
+#include <QHeaderView>
+#include <SUserSettings>
+#include <STableViewGridLayout>
+#include <ProjectGlobals>
+#include <QWidget>
+#include <SComSettings>
 
 STableViewSummaryBase::STableViewSummaryBase(SLocalSettings::SettingsVariant layoutVariant, QWidget *parent) :
     STableViewBase(layoutVariant, parent)
@@ -49,6 +55,11 @@ void STableViewSummaryBase::setTotal(int column, double value, int decimals)
     setTotal(column, STableModelsCommonMethods::dataLocalizedFromDouble(value, decimals));
 }
 
+void STableViewSummaryBase::setTotal(int column, double value)
+{
+    setTotal(column, value, comSettings->classicKassa()?2:0);
+}
+
 void STableViewSummaryBase::setTotal(int column, QVariant value)
 {
     m_dataModel->setData(m_dataModel->index(0, column), value);
@@ -57,19 +68,19 @@ void STableViewSummaryBase::setTotal(int column, QVariant value)
 void STableViewSummaryBase::applyGuiSettings()
 {
     STableViewBase::applyGuiSettings();
-    setMinimumHeight(userDbData->rowHeight);
+    setMinimumHeight(userDbData->rowHeight());
 }
 
 QSize STableViewSummaryBase::minimumSizeHint() const
 {
     QSize size = STableViewBase::minimumSizeHint();
-    size.setHeight(userDbData->rowHeight);
+    size.setHeight(userDbData->rowHeight());
     return size;
 }
 
 QSize STableViewSummaryBase::sizeHint() const
 {
     QSize size = STableViewBase::sizeHint();
-    size.setHeight(userDbData->rowHeight);
+    size.setHeight(userDbData->rowHeight());
     return size;
 }

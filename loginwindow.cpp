@@ -1,8 +1,28 @@
-#include "global.h"
-#include "appver.h"
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
-#include "com_sql_queries.h"
+#include <QSettings>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QTextCodec>
+#include <QCryptographicHash>
+#include <QFile>
+#include <QIODevice>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QGraphicsPixmapItem>
+#include <QResource>
+#include <ProjectGlobals>
+#include <appVer>
+#include <SAppLog>
+#include <ProjectQueries>
+#include <SSingleRowModel>
+#include <SLocalSettings>
+#include <SLocalSettingsStructs>
+#include <SSLOptionsDialog>
+#include <FlashPopup>
+#include <windowsDispatcher>
+#include <QtAutoUpdaterWidgets/UpdateController>
+#include <QtAutoUpdaterWidgets/UpdateButton>
 
 LoginWindow::LoginWindow(QObject*) :
 	ui(new Ui::LoginWindow)
@@ -438,7 +458,7 @@ void LoginWindow::btnLoginHandler()
                     updateDB(0);    // обновление значения `config`.`version_snap`
                 }
 
-                SDatabaseRecord::checkSystemTime();
+                SSingleRowModel::checkSystemTime();
 
                 if(!checkProcessPriv())
                     throw 6;

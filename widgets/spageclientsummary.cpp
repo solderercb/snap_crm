@@ -1,5 +1,12 @@
-#include "widgets/spageclientsummary.h"
+#include "spageclientsummary.h"
 #include "ui_spageclientsummary.h"
+#include <SPermissions>
+#include <QWidget>
+#include <SClientModel>
+#include <SPhone>
+#include <SPhonesModel>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
 
 SPageClientSummary::SPageClientSummary(QWidget *parent) :
     STabPage(parent),
@@ -15,11 +22,11 @@ SPageClientSummary::SPageClientSummary(int id, QWidget *parent) :
     m_client->load(id);
     ui->phones->setEditable(SPhone::NotEditable);
     ui->phones->setModel(m_client->phones());
-    ui->labelFullName->setText(m_client->fullLongName());
+    ui->labelFullName->setText(m_client->fullLongName().toString());
     ui->lineEditId->setText(QString::number(id));
-    ui->lineEditCreated->setText(m_client->created());
+    ui->lineEditCreated->setText(m_client->created().toString());
 
-    if(m_client->balanceEnabled())
+    if(m_client->isBalanceEnabled())
     {
         ui->lineEditBalance->setText(sysLocale.toCurrencyString(m_client->balance()));
     }
@@ -51,7 +58,7 @@ SPageClientSummary::SPageClientSummary(int id, QWidget *parent) :
         ui->lineEditEmail->hide();
     }
     ui->lineEditPassword->setText(m_client->web_password());
-    fillBinaryProperties();
+    ui->listInfo->addItems(m_client->optionsList());
     if(!permissions->viewClientBankData)
         ui->groupBoxBanks->hide();
     else
@@ -98,18 +105,6 @@ void SPageClientSummary::fillBanks()
         ui->lineEditTaxField3->hide();
     }
 
-}
-
-void SPageClientSummary::fillBinaryProperties()
-{
-    int properties = m_client->options();
-    for(int i = 0; i < clientBinaryProperties->rowCount(); i++)
-    {
-        if(clientBinaryProperties->index(i, 1).data().toInt() == SClientModel::BalanceEnabled)  // Флаг о включенном балансе отображать не нужно
-            continue;
-        if(properties&(1<<i))
-            ui->listInfo->addItem(clientBinaryProperties->index(i, 0).data().toString());
-    }
 }
 
 #ifdef QT_DEBUG

@@ -1,19 +1,17 @@
 #ifndef TABCASHOPERATION_H
 #define TABCASHOPERATION_H
 
-#include <QWidget>
-#include <QSortFilterProxyModel>
-#include <QMap>
-#include "tabcommon.h"
-#include "models/slogrecordmodel.h"
-#include "models/scashregistermodel.h"
-#include "models/sclientmodel.h"
-#include "models/srepairmodel.h"
-#include "models/sinvoicemodel.h"
-#include "models/sdocumentmodel.h"
-#include "models/ssortfilterproxymodel.h"
-#include "widgets/shortlivednotification.h"
-#include "widgets/sclientselectform.h"
+#include <tabCommon>
+
+class QWidget;
+class MainWindow;
+class SClientModel;
+class SCashRegisterModel;
+class SSortFilterProxyModel;
+class SRepairModel;
+class SInvoiceModel;
+class SDocumentModel;
+class SPaymentTypesModel;
 
 #define DATE_EDIT_REFRESH_TIMER 30000
 
@@ -46,6 +44,7 @@ private:
     enum LinkType {NoLink = 0, Document = 1, Repair = 2, Invoice = 3};
     enum ClientMode {NotVisible = 0, Client = 1, Employee = 2};
     enum TemplateDataType {TmplType = 0, TmplObjId, TmplClient, TmplAmount};    // QMap сортирует данные по ключу, поэтому первым должен быть тип
+    enum EndCommitOp {SwitchToViewMode, PrepareRepeat, PaymentSystemChanged};
     static QMap<int, tabCashOperation*> p_instance;
     SCashRegisterModel *m_cashRegisterModel = nullptr;
     SPaymentTypesModel *m_operationTypesModel;
@@ -60,7 +59,7 @@ private:
     int m_linkType = LinkType::NoLink;
     bool m_clientWidgetVisible = true;
     int m_clientWidgetMode = ClientMode::Client;
-    int m_clientWidgetButtons = SClientSelectForm::AccessMode::ViewCard;
+    int m_clientWidgetButtons;
     QString m_generatedReason;
     bool m_reasonRO = 1;
     bool m_amountRO = 0;
@@ -80,8 +79,10 @@ private:
     SClientModel *m_clientModel = nullptr;
     QString m_companyLabel;
     QString m_widgetClientLabel;
+    int m_endCommitOp;
     void initModels();
     void initWidgets();
+    void updateTabPtr(const int oldId, const int newId);
     void load(const int);
     void updateWidgets();
     void initCashRegisterModel();
@@ -94,8 +95,6 @@ private:
     void updateLinkWidgets();
     void updateClientWidget();
     void setDefaultStylesheets();
-    bool checkInput();
-    bool commit(bool repeatAfter = 0);
     bool commitLink();
     bool commitSimple();
     bool commitBalance(const double amount);
@@ -103,14 +102,21 @@ private:
     bool commitInvoice();
     bool commitPrepayRepair();
     bool commitRevert();
+    void prepareForRepeatedOp();
+    void switchTabToViewMode();
+    void paymentSystemSuccessfullyChanged();
     void print();
+    int checkInput() override;
+    void beginCommit() override;
+    void commit(const int stage) override;
+    void throwHandler(int) override;
+    void endCommit() override;
     void updateReasonWidget();
     void updateAmountWidget();
     double amountAbsToSign(const double amountAbs);
     int paymentSystemId();
     void setPaymentAccountIndex(const int id);
     void updateLineEditOrderId();
-    void updateModelData();
 #ifdef QT_DEBUG
     enum RandomFillerStep {OpType = 1, LinkedObj, RClient, Amount, PaymentSys, End};
     void randomFill() override;

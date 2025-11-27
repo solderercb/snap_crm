@@ -4,22 +4,19 @@
 #ifndef STABLEVIEWBASE_H
 #define STABLEVIEWBASE_H
 
-#include <QHeaderView>
-#include <QRect>
-#include <QScrollBar>
 #include <QTableView>
-#include <QMenu>
-#include <QAction>
-#include <QSqlDriver>
-#include <QSqlQueryModel>
-#include <QSqlRecord>
-#include <QSqlField>
-#include <QDebug>
-#include "global.h"
-#include "widgets/stableviewgridlayout.h"
-#include "stableviewbaseitemdelegates.h"
-#include "models/stablebasemodel.h"
-#include "widgets/qtooltipper.h"
+#include <SLocalSettings>
+#include <STableModelCommonMethods>
+
+class QAbstractItemModel;
+class STableViewBaseItemDelegates;
+class QStringList;
+class QSqlQueryModel;
+class QFontMetrics;
+class XtraSerializer;
+class QMenu;
+class STableViewBaseItemDelegates;
+class QTimer;
 
 typedef struct FilterList FilterList;
 

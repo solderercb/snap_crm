@@ -1,9 +1,20 @@
-#include "global.h"
-#include "appver.h"
 #include "tabrepairs.h"
 #include "ui_tabrepairs.h"
-#include "com_sql_queries.h"
-#include "tabprintdialog.h"
+#include <QMenu>
+#include <QAction>
+#include <ProjectGlobals>
+#include <appVer>
+#include <ProjectQueries>
+#include <Mainwindow>
+#include <tabPrintDialog>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SPermissions>
+#include <SRepairModel>
+#include <SRepairsModel>
+#include <SRepairIssueDialog>
+#include <SSaleTableModel>
+#include <SSqlQueryModel>
 
 tabRepairs* tabRepairs::p_instance[] = {nullptr,nullptr};
 
@@ -25,7 +36,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     repairs_table = new STableRepairsModel(this);
-    if(comSettings->isCartridgeRepairEnabled)
+    if(comSettings->isCartridgeRepairEnabled())
         cartridges_table = new STableRepairsModel(this);
 
     ui->tableView->setModel(repairs_table);
@@ -38,7 +49,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     if(companiesModel->rowCount() > 1)
         tableFilterMenu->setComboBoxOfficeModel(officesModel);
-    tableFilterMenu->setComboBoRepairStateModel(comSettings->repairStatuses.Model);
+    tableFilterMenu->setComboBoRepairStateModel(comSettings->repairStatusesVariantCopy().Model);
     tableFilterMenu->setComboBoxEmployeeModel(usersModel);
     tableFilterMenu->setComboBoxClientsCatModel(clientsTypesList);
 //    tableFilterMenu->setComboBoxRfuModel(model);
@@ -47,7 +58,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     if(m_tabType == SelectRepair)
         ui->switchTableMode->setChecked(STableViewRepairs::ModeRepairs);
     else
-        ui->switchTableMode->setChecked((userDbData->defWsFilter == WorkshopFilter::CartridgesOnly)?STableViewRepairs::ModeCartridges:STableViewRepairs::ModeRepairs);
+        ui->switchTableMode->setChecked((userDbData->defWsFilter() == WorkshopFilter::CartridgesOnly)?STableViewRepairs::ModeCartridges:STableViewRepairs::ModeRepairs);
 
     connect(tableFilterMenu, SIGNAL(hidden()), this, SLOT(filterMenuClosed()));
     connect(ui->pushButtonReceipt, &QPushButton::clicked, this, &tabRepairs::buttonReceptClicked);
@@ -59,7 +70,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &tabRepairs::tableSelectionChanged);
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &tabRepairs::menuRequest);
     connect(ui->tableView, &QTableView::clicked, this, &tabRepairs::tableItemClick);
-    refreshTable();
+    tabCommon::refreshTable();
     updateWidgets();
 }
 
@@ -89,7 +100,7 @@ void tabRepairs::updateWidgets()
     ui->pushButtonReceipt->setVisible(visibility);
     ui->pushButtonRefill->setVisible(visibility && (ui->switchTableMode->isChecked() == STableViewRepairs::ModeCartridges));
     ui->pushButtonRefill->setEnabled(hasSelection);
-    ui->pushButtonIssue->setVisible(visibility);
+    ui->pushButtonIssue->setVisible(permissions->issueDevices && visibility);
     ui->pushButtonIssue->setEnabled(ui->tableView->selectedCanBeIssued());
     ui->pushButtonPrint->setVisible(visibility);
     ui->pushButtonRefresh->setVisible(true);
@@ -100,7 +111,7 @@ void tabRepairs::updateWidgets()
     else
         ui->labelTableMode->setText(tr("Ремонты"));
 
-    ui->tableView->setAlternatingRowColors(userDbData->alternateRowsBackground);
+    ui->tableView->setAlternatingRowColors(userDbData->alternateRowsBackground());
 
     if(tableFilter->filterActive)
     {
@@ -129,7 +140,7 @@ void tabRepairs::refreshIfTabExists()
     repairsTab = MainWindow::getInstance()->findChild<tabRepairs*>();
     if(repairsTab)
     {
-        repairsTab->refreshTable();
+        repairsTab->tabCommon::refreshTable();
     }
 }
 
@@ -158,7 +169,7 @@ void tabRepairs::constructQueryClause()
     // TODO: компания/офис
 
     FilterList list;
-    bool displayOutOverride = userDbData->displayOut;
+    bool displayOutOverride = userDbData->displayOut();
 
     list.op = FilterList::And;
 
@@ -184,7 +195,7 @@ void tabRepairs::constructQueryClause()
             default: additionalStates.append(tableFilter->repairState); break;
         }
         for(auto state : additionalStates)
-            repairState.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, comSettings->repairStatuses[state].Id));
+            repairState.fields.append(STableViewBase::initFilterField("t1.`state`", FilterField::Equals, comSettings->repairStatusesVariantCopy()[state].Id));
         list.childs.append(repairState);
     }
 
@@ -202,8 +213,8 @@ void tabRepairs::constructQueryClause()
         FilterList onlyCurrentUsersRepairs;
         onlyCurrentUsersRepairs.op = FilterList::Or;
         onlyCurrentUsersRepairs.Not = tableFilter->onlyCurrentUsersRepairsNot;
-        onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`current_manager`", FilterField::Equals, userDbData->id));
-        onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, userDbData->id));
+        onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`current_manager`", FilterField::Equals, userDbData->id()));
+        onlyCurrentUsersRepairs.fields.append(STableViewBase::initFilterField("t1.`master`", FilterField::Equals, userDbData->id()));
         list.childs.append(onlyCurrentUsersRepairs);
     }
 
@@ -232,7 +243,7 @@ void tabRepairs::constructQueryClause()
         FilterList searchText;
         searchText.op = FilterList::Or;
         FilterField::Op matchFlag;
-        if(userDbData->useRegExpSearch)
+        if(userDbData->useRegExpSearch())
             matchFlag = FilterField::RegExp;
         else
             matchFlag = FilterField::Contains;
@@ -270,8 +281,8 @@ void tabRepairs::refreshTable(bool preserveScrollPos, bool preserveSelection)
     if(!preserveSelection)  // при обновлении модели сигнал QItemSelectionModel::selectionChanged не генерируется
         updateWidgets();
 
-    if(userDbData->autoRefreshWorkspace)
-        ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
+    if(userDbData->autoRefreshWorkspace())
+        ui->tableView->enableAutorefresh(userDbData->refreshTime()*1000);
 }
 
 void tabRepairs::setFocusSearchField()
@@ -307,7 +318,7 @@ void tabRepairs::tableItemClick(QModelIndex index)
     if(index.column() == STableViewRepairs::Column::ClientFullName && QGuiApplication::queryKeyboardModifiers() & Qt::AltModifier)
     {
         QString searchStr = ui->tableView->model()->data(index).toString();
-        if(userDbData->useRegExpSearch)
+        if(userDbData->useRegExpSearch())
         { // TODO: добавить все спец. символы RegExp
             searchStr = searchStr.replace("(", "\\(").replace(")", "\\)");
             searchStr = searchStr.replace("[", "\\[").replace("]", "\\]");
@@ -394,17 +405,17 @@ void tabRepairs::buttonPrintClicked()
 {
     ui->tableView->enableAutorefresh(0);
     tabPrintDialog *tab = tabPrintDialog::create(ui->tableView->mode()?(Global::Reports::cartridges):(Global::Reports::repairs));
-    if(userDbData->autoRefreshWorkspace)
+    if(userDbData->autoRefreshWorkspace())
     {
 #if QT_VERSION >= 0x060000
         connect(tab, &tabPrintDialog::renderFinished, this, [=]{
-            ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
+            ui->tableView->enableAutorefresh(userDbData->refreshTime()*1000);
         }, Qt::SingleShotConnection);
 #else
         auto con = QSharedPointer<QMetaObject::Connection>::create();
         *con = QObject::connect(tab, &tabPrintDialog::renderFinished, this, [con, this]{
             QObject::disconnect(*con);
-            ui->tableView->enableAutorefresh(userDbData->refreshTime*1000);
+            ui->tableView->enableAutorefresh(userDbData->refreshTime()*1000);
         });
 #endif
     }
@@ -422,7 +433,7 @@ QList<SRepairModel*> tabRepairs::repairsListFromSelection()
     QList<SRepairModel*> list;
     QList<int> *idsList = ui->tableView->selectedRepairsList();
     SRepairModel *repair;
-    SSaleTableModel *BOQModel;
+    WorkshopSaleModel *BOQModel;
 
     for(int i = 0; i < idsList->count(); i++)
     {
@@ -430,8 +441,8 @@ QList<SRepairModel*> tabRepairs::repairsListFromSelection()
         {
             repair = new SRepairModel();
             repair->load(idsList->at(i));
-            BOQModel = new SSaleTableModel(repair);
-            BOQModel->repair_loadTable(idsList->at(i));
+            BOQModel = new WorkshopSaleModel(repair);
+            BOQModel->loadTable(idsList->at(i));
             repair->setBOQModel(BOQModel);
             list.append(repair);
         }

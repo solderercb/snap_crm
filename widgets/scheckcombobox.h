@@ -1,17 +1,12 @@
 #ifndef SCHECKCOMBOBOX_H
 #define SCHECKCOMBOBOX_H
 
-#include "qstandarditemmodel.h"
-#include "widgets/scombobox.h"
-#include <QWidget>
-#include <QDebug>
-#include <QAbstractItemModel>
-#include <QAbstractItemView>
-#include <QIdentityProxyModel>
+#include <SComboBox>
 #include <QConcatenateTablesProxyModel>
-#include <QListView>
-#include <QEvent>
-#include <QApplication>
+
+class QStandardItemModel;
+class QAbstractItemModel;
+class QEvent;
 
 class SCheckComboBoxDataModel : public QConcatenateTablesProxyModel
 {
@@ -51,8 +46,10 @@ public:
     ~SCheckComboBox();
     void setModel(QAbstractItemModel *model);
     QList<int> checked();
+    QString checkedString();
     QList<int> unchecked();
     void setChecked(const QList<int> &list);
+    void setChecked(const QString &csv_list);
     void toggleChecked(const int id);
     void toggleChecked(const QList<int> &list);
     void resetChecked();

@@ -1,6 +1,12 @@
 #include "ssupplierstable.h"
-#include "modules/purchasemanager/ssuppliersmodel.h"
-#include "widgets/sdoublespinbox.h"
+#include <QApplication>
+#include <SPartSuppliersModel>
+#include <SPartsRequestsGroupingModel>
+#include <SDoubleSpinBox>
+#include <QDesktopServices>
+#include <QWidget>
+#include <QPainter>
+#include <STableViewGridLayout>
 
 STableViewPartRequestSuppliers::STableViewPartRequestSuppliers(QWidget *parent) :
     STableViewBase(SLocalSettings::BuyRequestSuppliersGrid, parent)

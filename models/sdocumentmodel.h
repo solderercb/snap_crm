@@ -1,11 +1,42 @@
 #ifndef SDOCUMENTMODEL_H
 #define SDOCUMENTMODEL_H
 
-#include <QObject>
-#include "global.h"
-#include "scomrecord.h"
+#include <SSingleRowJModel>
 
-class SDocumentModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(type, type, int, 0)                                         \
+    TABLE_FIELD(state, state, int, 0)                                       \
+    TABLE_FIELD(is_realization, isRealization, bool, 0)                     \
+    TABLE_FIELD(payment_system, paymentSystem, int, 0)                      \
+    TABLE_FIELD(company, company, int, 0)                                   \
+    TABLE_FIELD(store, store, int, 0)                                       \
+    TABLE_FIELD(user, user, int, 0)                                         \
+    TABLE_FIELD(total, amount, double, 0)                                   \
+    TABLE_FIELD(notes, notes, QString, 0)                                   \
+    TABLE_FIELD(created, created, QDateTime, 0)                             \
+    TABLE_FIELD(updated_at, updated, QDateTime, 0)                          \
+    TABLE_FIELD(office, office, int, 0)                                     \
+    TABLE_FIELD(dealer, client, int, 0)                                     \
+    TABLE_FIELD(currency_rate, currencyRate, double, 0)                     \
+    TABLE_FIELD(img1, img1, QByteArray, 0)                                  \
+    TABLE_FIELD(img2, img2, QByteArray, 0)                                  \
+    TABLE_FIELD(img3, img3, QByteArray, 0)                                  \
+    TABLE_FIELD(reason, reason, QString, 0)                                 \
+    TABLE_FIELD(order_id, cashOrder, int, 0)                                \
+    TABLE_FIELD(price_option, priceOption, int, 0)                          \
+    TABLE_FIELD(return_percent, returnPercent, int, 0)                      \
+    TABLE_FIELD(reserve_days, reserveDays, int, 0)                          \
+    TABLE_FIELD(master_id, employee, int, 0)                                \
+    TABLE_FIELD(repair_id, repair, int, 0)                                  \
+    TABLE_FIELD(works_included, worksIncluded, bool, 0)                     \
+    TABLE_FIELD(invoice, invoice, int, 0)                                   \
+    TABLE_FIELD(track, trackingNumber, QString, 0)                          \
+    TABLE_FIELD(d_store, dStore, int, 0)                                    \
+    TABLE_FIELD(d_pay, dPay, bool, 0)
+
+class SDocumentModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
@@ -16,77 +47,25 @@ public:
     explicit SDocumentModel(QObject *parent = nullptr);
     explicit SDocumentModel(int id, QObject *parent = nullptr);
     ~SDocumentModel();
-    int id();
-    void setId(int);
-    void load();
-    void load(int);
-    int type();
-    void setType(int);
-    int state();
-    void setState(int);
-    int office() const;
-    void setOffice(int id);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    void load(int id);
     void setOfficeIndex(int index);
-    int client();
-    void setClient(int);  // установка id клиента
     void unsetClient();
-    int paymentSystem();
     int paymentSystemIndex();
-    void setPaymentSystem(int);
-    double amount();
     QString amountLocal();
-    void setAmount(double);
-    double currencyRate();
     QString currencyRateLocal();
-    void setCurrencyRate(double);
-    int company();
     int companyIndex();
-    void setCompany(int company);
     void setCompanyIndex(int company);
-    int priceOption();
     int priceOptionIndex();
-    void setPriceOption(int);
-    QString notes();
-    void setNotes(QString);
-    QString reason();
-    void setReason(QString);
-    int orderId();
-    void setOrderId(const int);
-    int reserveDays();
-    void setReserveDays(int);
-    QString trackingNumber();
-    void setTrackingNumber(const QString&);
-    bool isValid();
-    bool commit();
+    bool commit() override;
     QString title();
 private:
-    int m_id = 0;
-    int m_type = 0;
-    int m_state = 0;
-    bool m_realization = 0;
-    int m_paymentSystem = 0;
-    int m_company = 0;
-    int m_office = 0;
-    int m_store = 0;
-    int m_user = 0;
-    double m_amount = 0;
-    QString m_notes;
-    QDateTime m_updated;
-    int m_client = 0;
-    double m_currencyRate = 1.00;
-    QString m_reason;
-    int m_cashOrder = 0;
-    int m_priceOption = 0;
-    int m_returnPercent = 0;
-    int m_reserveDays = 0;
-    int m_master = 0;
-    int m_repair = 0;
-    bool m_worksIncluded = 0;
-    int m_bill = 0;
-    QString m_trackingNumber;
-    int m_d_store = 0;
-    bool m_d_pay = 0;
     void updateLogAssociatedRecId() override;
+    void trackingNumberChanged(const QString &track);
+protected slots:
+    void setDataRework(const int index, QVariant &data);
+    void logDataChange(const int index, const QVariant &data) override;
 };
 
 #endif // SDOCUMENTMODEL_H

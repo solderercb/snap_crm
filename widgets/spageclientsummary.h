@@ -1,9 +1,11 @@
 #ifndef SPAGECLIENTSUMMARY_H
 #define SPAGECLIENTSUMMARY_H
 
-#include <QWidget>
-#include "models/sclientmodel.h"
-#include "widgets/stabpage.h"
+#include <STabPage>
+
+class QWidget;
+class SClientModel;
+class SPhonesModel;
 
 namespace Ui {
 class SPageClientSummary;
@@ -24,7 +26,6 @@ private:
     SClientModel *m_client;
     SPhonesModel *m_phones;
     void fillBanks();
-    void fillBinaryProperties();
 protected slots:
 #ifdef QT_DEBUG
     void test_scheduler_handler() ;

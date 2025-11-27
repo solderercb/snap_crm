@@ -1,9 +1,10 @@
 #ifndef STABLEVIEWCLIENTS_H
 #define STABLEVIEWCLIENTS_H
 
-#include "stableviewbase.h"
-#include <QWidget>
-#include "stableviewclientsitemdelegates.h"
+#include <STableViewBase>
+
+class QWidget;
+class STableBaseModel;
 
 class STableViewClients : public STableViewBase
 {

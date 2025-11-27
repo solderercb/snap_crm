@@ -4,7 +4,9 @@
 #include <QWidget>
 #include <QFrame>
 #include <QWidgetAction>
-#include "models/sabstractitemmodel.h"
+
+class SAbstractItemModel;
+class QEvent;
 
 namespace Ui {
     class Widget;

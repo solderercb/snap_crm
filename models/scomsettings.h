@@ -1,192 +1,192 @@
 #ifndef SCOMSETTINGS_H
 #define SCOMSETTINGS_H
-#include <QObject>
-#include <QMetaObject>
-#include <QAbstractItemModel>
-#include "propstruct.h"
-#include "models/sdatabaseauxiliary.h"
-#include "models/scomsettingstypes.h"
 
-class SComSettings : public SPropertyCollection, public SDatabaseAuxiliary
+#include <SSettingsBase>
+#ifndef SKIP_INCLUDES_IN_PREPROCESSING_EVALUATION
+#include <SComSettingsTypes>
+#include <SCheckComboBox>
+#endif // SKIP_INCLUDES_IN_PREPROCESSING_EVALUATION
+class SStandardItemModel;
+
+#include "ssettings_predef.h"     // этот файл нужно подключать после SSettingsBase и до списка элементов
+#define SETTING_FIELDS                                                                                                                                                       \
+    SETTING_FIELD(id, id, int, WidgetTypes::NoWidget)                                                                                                                        \
+    SETTING_FIELD(currency, currencyId, QString, WidgetTypes::ComboBox, 0, QString())                                                                                        \
+    SETTING_FIELD(classic_kassa, classicKassa, int, WidgetTypes::CheckBox, 0)                                                                                                \
+    SETTING_FIELD(time_zone, timeZoneId, int, WidgetTypes::ComboBox, 0, QString())                                                                                           \
+    SETTING_FIELD(phone_mask1, ascPhoneMask1, QString, WidgetTypes::LineEdit, 0)                                                                                             \
+    SETTING_FIELD(phone_mask2, ascPhoneMask2, QString, WidgetTypes::LineEdit, 0)                                                                                             \
+    SETTING_FIELD(settings.update_channel, updateChannel, QString, WidgetTypes::LineEdit, 0)                                                                                 \
+                                                                                                                                                                             \
+    SETTING_FIELD(it_vis_opt, isPriceColOptVisible, int, WidgetTypes::CheckBox, 1)                                                                                           \
+    SETTING_FIELD(it_vis_opt2, isPriceColOpt2Visible, int, WidgetTypes::CheckBox, 1)                                                                                         \
+    SETTING_FIELD(it_vis_opt3, isPriceColOpt3Visible, int, WidgetTypes::CheckBox, 1)                                                                                         \
+    SETTING_FIELD(it_vis_rozn, isPriceColRoznVisible, int, WidgetTypes::CheckBox, 1)                                                                                         \
+    SETTING_FIELD(it_vis_price_for_sc, isPriceColServiceVisible, int, WidgetTypes::CheckBox, 1)                                                                              \
+                                                                                                                                                                             \
+    SETTING_FIELD(settings.voip, voipId, int, WidgetTypes::ComboBox, 2, QString())                                                                                           \
+    SETTING_FIELD(realizator_enable, isRealizatorEnable, int, WidgetTypes::CheckBox, 2)                                                                                      \
+    SETTING_FIELD(online_store, onlineStoreId, int, WidgetTypes::ComboBox, 2, QString())                                                                                     \
+    SETTING_FIELD(cartridge_enable, isCartridgeRepairEnabled, int, WidgetTypes::CheckBox, 2)                                                                                 \
+                                                                                                                                                                             \
+    SETTING_FIELD(is_master_set_on_new, isEngineerRequiredOnDeviceRecept, int, WidgetTypes::CheckBox, 3)                                                                     \
+    SETTING_FIELD(visit_source_force, isVisitSourceRequired, int, WidgetTypes::CheckBox, 3)                                                                                  \
+    SETTING_FIELD(is_sn_req, isSerialNumberRequired, int, WidgetTypes::CheckBox, 3)                                                                                          \
+    SETTING_FIELD(is_cartridge_sn_req, isCartridgeSerialNumberRequired, int, WidgetTypes::CheckBox, 3)                                                                       \
+    SETTING_FIELD(history_by_sn, isSearchOnlyBySerial, int, WidgetTypes::CheckBox, 3)                                                                                        \
+    SETTING_FIELD(is_photo_required, isPhotoOnReceptRequired, int, WidgetTypes::CheckBox, 3)                                                                                 \
+    SETTING_FIELD(is_photo_out_req, isPhotoOnIssueRequired, int, WidgetTypes::CheckBox, 3)                                                                                   \
+    SETTING_FIELD(diag_required, isDiagRequired, int, WidgetTypes::CheckBox, 3)                                                                                              \
+    SETTING_FIELD(manual_maker, isVendorAddingAllowedOnRecept, int, WidgetTypes::CheckBox, 3)                                                                                \
+    SETTING_FIELD(rep_price_by_manager, isRepairSummSetByManager, int, WidgetTypes::CheckBox, 3)                                                                             \
+    SETTING_FIELD(debt_rep_2_salary, isPaySalaryForRepairsIssuedInDebt, int, WidgetTypes::CheckBox, 3)                                                                       \
+    SETTING_FIELD(rep_auto_company, isAutoSetCompanyOnRepairRecept, int, WidgetTypes::CheckBox, 3)                                                                           \
+    SETTING_FIELD(vw_enable, isVendorWarrantyEnabled, int, WidgetTypes::CheckBox, 3)                                                                                         \
+    SETTING_FIELD(settings.use_simplified_cartridge_repair, useSimplifiedCartridgeRepair, int, WidgetTypes::CheckBox, 3)                                                     \
+    SETTING_FIELD(card_close_time, autoCloseRepairTabTimeout, int, WidgetTypes::SpinBox, 3, 0, 32400)                                                                        \
+    SETTING_FIELD(rep_img_limit, repairImagesLimit, int, WidgetTypes::SpinBox, 3, 0, 20)                                                                                     \
+                                                                                                                                                                             \
+    SETTING_FIELD_VARIANT_COPY(settings.auto_assign_users, repairDispatcherUsersJson, t_repairDispatcherUsers, WidgetTypes::NoWidget)                                        \
+    SETTING_FIELD_VARIANT_COPY(settings.auto_assign_criteria, repairDispatcherAssignCriteriaJson, t_repairDispatcherAssignCriteria, WidgetTypes::NoWidget)                   \
+    SETTING_FIELD(IGNORE, repairDispatcherUsers, QString, WidgetTypes::SCheckableComboBox, 4)                                                                                \
+    SETTING_FIELD(IGNORE, repairDispatcherDayLimit, int, WidgetTypes::SpinBox, 4, 0, 7)                                                                                      \
+    SETTING_FIELD(IGNORE, repairDispatcherStatuses, QString, WidgetTypes::SCheckableComboBox, 4)                                                                             \
+                                                                                                                                                                             \
+    SETTING_FIELD(is_patronymic_required, isClientPatronymicRequired, int, WidgetTypes::CheckBox, 5)                                                                         \
+    SETTING_FIELD(email_required, isClientEmailRequired, int, WidgetTypes::CheckBox, 5)                                                                                      \
+    SETTING_FIELD(address_required, isClientAddressRequired, int, WidgetTypes::CheckBox, 5)                                                                                  \
+    SETTING_FIELD(phone_required, isClientPhoneRequired, int, WidgetTypes::CheckBox, 5)                                                                                      \
+    SETTING_FIELD(clients_are_dealers, isAnyClientDealer, int, WidgetTypes::CheckBox, 5)                                                                                     \
+                                                                                                                                                                             \
+    SETTING_FIELD(give2user_time, timeoutForItemsRequestsHandling, int, WidgetTypes::SpinBox, 6, 0, 72)                                                                      \
+    SETTING_FIELD(diag_accept_time, timeoutForDiagnosisConfirmation, int, WidgetTypes::SpinBox, 6, 0, 72)                                                                    \
+                                                                                                                                                                             \
+    SETTING_FIELD(default_reserve_days, defaultItemReserveTime, int, WidgetTypes::SpinBox, 7, 0, 30)                                                                         \
+    SETTING_FIELD(item_img_limit, itemImagesLimit, int, WidgetTypes::SpinBox, 7, 0, 20)                                                                                      \
+    SETTING_FIELD(is_reason_req, isReasonForItemIncomeRequired, int, WidgetTypes::CheckBox, 7)                                                                               \
+                                                                                                                                                                             \
+    SETTING_FIELD(default_works_warranty, defaultWorksWarranty, int, WidgetTypes::ComboBox, 8, 31)                                                                           \
+    SETTING_FIELD(default_items_warranty, defaultNewItemsWarranty, int, WidgetTypes::ComboBox, 8, 31)                                                                        \
+    SETTING_FIELD(default_items_used_warranty, defaultUsedItemsWarranty, int, WidgetTypes::ComboBox, 8, 7)                                                                   \
+    SETTING_FIELD(default_items_rep_warranty, defaultRefItemsWarranty, int, WidgetTypes::ComboBox, 8, 31)                                                                    \
+    SETTING_FIELD(default_items_razb_warranty, defaultDisasmItemsWarranty, int, WidgetTypes::ComboBox, 8, 7)                                                                 \
+    SETTING_FIELD(default_items_other_warranty, defaultOtherItemsWarranty, int, WidgetTypes::ComboBox, 8, 0)                                                                 \
+                                                                                                                                                                             \
+    SETTING_FIELD(settings.inform_comment, notifyNewComment, int, WidgetTypes::CheckBox, 9)	/* все настройки группы 9 хранятся в табл. settings */                           \
+    SETTING_FIELD(settings.inform_comment_color, notifyNewCommentColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                                 \
+    SETTING_FIELD(settings.inform_status_color, notifyRepairStatusUpdateColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                          \
+    SETTING_FIELD(settings.inform_sms, notifyIncomingSMS, int, WidgetTypes::CheckBox, 9)                                                                                     \
+    SETTING_FIELD(settings.inform_sms_color, notifyIncomingSMSColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                                    \
+    SETTING_FIELD(settings.inform_terms_color, notifyOutOfTermAlarmColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                               \
+    SETTING_FIELD(settings.inform_task_match, notifyDeviceMatch, int, WidgetTypes::CheckBox, 9)                                                                              \
+    SETTING_FIELD(settings.inform_task_match_color, notifyDeviceMatchColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                             \
+    SETTING_FIELD(settings.inform_task_custom, notifyCustomTask, int, WidgetTypes::CheckBox, 9)                                                                              \
+    SETTING_FIELD(settings.inform_task_custom_color, notifyCustomTaskColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                             \
+    SETTING_FIELD(settings.inform_int_request, notifyItemRequest, int, WidgetTypes::CheckBox, 9)                                                                             \
+    SETTING_FIELD(settings.inform_int_request_color, notifyItemRequestColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                            \
+    SETTING_FIELD(settings.inform_task_request, notifyOrderFromOnlineStore, int, WidgetTypes::CheckBox, 9)                                                                   \
+    SETTING_FIELD(settings.inform_task_request_color, notifyOrderFromOnlineStoreColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                  \
+    SETTING_FIELD(settings.inform_call, notifyIncomingCall, int, WidgetTypes::CheckBox, 9)                                                                                   \
+    SETTING_FIELD(settings.inform_call_color, notifyIncomingCallColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                                  \
+    SETTING_FIELD(settings.inform_part_request, notifyItemPurchaseRequest, int, WidgetTypes::CheckBox, 9)                                                                    \
+    SETTING_FIELD(settings.inform_part_request_color, notifyItemPurchaseRequestColor, int, WidgetTypes::ComboBox, 9, QString("#FFFFFFFF"))                                   \
+                                                                                                                                                                             \
+    SETTING_FIELD(qs_print_pko, printPKO, int, WidgetTypes::CheckBox, 10)                                                                                                    \
+    SETTING_FIELD(qs_print_rn, printOutInvoice, int, WidgetTypes::CheckBox, 10)                                                                                              \
+    SETTING_FIELD(qs_print_pn, printInInvoice, int, WidgetTypes::CheckBox, 10)                                                                                               \
+    SETTING_FIELD(qs_print_rko, printRKO, int, WidgetTypes::CheckBox, 10)                                                                                                    \
+    SETTING_FIELD(print_warranty, printWarrantyDoc, int, WidgetTypes::CheckBox, 10)                                                                                          \
+    SETTING_FIELD(print_works, printWorksList, int, WidgetTypes::CheckBox, 10)                                                                                               \
+    SETTING_FIELD(print_diagnostic, printDiagResult, int, WidgetTypes::CheckBox, 10)                                                                                         \
+    SETTING_FIELD(print_reject, printRepairRejectDoc, int, WidgetTypes::CheckBox, 10)                                                                                        \
+    SETTING_FIELD(rko_on_pn, printRKOOnItemIncome, int, WidgetTypes::CheckBox, 10)                                                                                           \
+    SETTING_FIELD(print_check, printCheck, int, WidgetTypes::CheckBox, 10)                                                                                                   \
+    SETTING_FIELD(settings.print_new_repair_report, printRepairReceptDoc, int, WidgetTypes::CheckBox, 10)                                                                    \
+    SETTING_FIELD(settings.print_rep_stickers, printRepairStickers, int, WidgetTypes::CheckBox, 10)                                                                          \
+    SETTING_FIELD(settings.print_new_cartridge_report, printCartridgeReceptDoc, int, WidgetTypes::CheckBox, 10)                                                              \
+    SETTING_FIELD(settings.print_cartridge_stickers, printCartridgeStickers, int, WidgetTypes::CheckBox, 10)                                                                 \
+    SETTING_FIELD(rep_stickers_copy, defaultRepairStickersQty, int, WidgetTypes::SpinBox, 10, 0, 10)                                                                         \
+                                                                                                                                                                             \
+    SETTING_FIELD(auto_switch_layout, autoSwitchKeyboardLayout, int, WidgetTypes::CheckBox, 11)                                                                              \
+                                                                                                                                                                             \
+    SETTING_FIELD(aster_host, voipAsteriskHost, QString, WidgetTypes::LineEdit, 12)	/* только для asterisk */                                                                \
+    SETTING_FIELD(aster_port, voipAsteriskPort, int, WidgetTypes::SpinBox, 12, 0, 65535)                                                                                     \
+    SETTING_FIELD(aster_login, voipAsteriskLogin, QString, WidgetTypes::LineEdit, 12)                                                                                        \
+    SETTING_FIELD(aster_password, voipAsteriskPassword, QString, WidgetTypes::LineEdit, 12)                                                                                  \
+    SETTING_FIELD(aster_web_port, voipAsteriskWebPort, int, WidgetTypes::SpinBox, 12, 0, 65535)                                                                              \
+    SETTING_FIELD(settings.voip_prefix, voipPrefix, QString, WidgetTypes::LineEdit, 12)	/* используется только для Asterisk */                                               \
+    SETTING_FIELD(settings.voip_endpoint, voipEndpoint, QString, WidgetTypes::LineEdit, 12)	/* Используется только при выборе оператора Megafon */                           \
+    SETTING_FIELD(settings.voip_key, voipKey, QString, WidgetTypes::LineEdit, 12)	/* используется для операторов Zadarma, Rostelecom, Mango Telecom, Megafon */            \
+    SETTING_FIELD(settings.voip_secret, voipSecret, QString, WidgetTypes::LineEdit, 12)	/* используется для операторов Zadarma, Rostelecom, Mango Telecom */                 \
+                                                                                                                                                                             \
+    SETTING_FIELD(online_store_api, onlineStoreUrl, QString, WidgetTypes::LineEdit, 13)                                                                                      \
+    SETTING_FIELD(online_store_key, onlineStoreKey, QString, WidgetTypes::LineEdit, 13)                                                                                      \
+                                                                                                                                                                             \
+    SETTING_FIELD(settings.classic_salary, salaryClassic, int, WidgetTypes::CheckBox, 14)                                                                                    \
+    SETTING_FIELD(settings.salary_include_not_issued_by_default, salaryIncludeNotIssuedByDefault, int, WidgetTypes::CheckBox, 14)                                            \
+    SETTING_FIELD(settings.new_client_sms_enabled, newClientSmsEnabled, int, WidgetTypes::CheckBox, 14)                                                                      \
+                                                                                                                                                                             \
+    SETTING_FIELD_VARIANT_COPY(statuses, repairStatuses, t_repairStatuses, WidgetTypes::NoWidget)                                                                            \
+                                                                                                                                                                             \
+    SETTING_FIELD(IGNORE, exchangeTypeAuto, bool, WidgetTypes::RadioButton, 21)	/* Настройки-»Финансы-»Операции с валютой, exchange_type */                                  \
+    SETTING_FIELD(exchange_source, exchangeSourceId, int, WidgetTypes::ComboBox, 21, 1)	/* Настройки-»Финансы-»Операции с валютой */                                         \
+    SETTING_FIELD(IGNORE, exchangeTypeManual, bool, WidgetTypes::RadioButton, 21)                                                                                            \
+    SETTING_FIELD(exchange_rate, exchangeRate, double, WidgetTypes::DoubleSpinBox, 21, 0.00, 9999.99)	/* Настройки-»Финансы-»Операции с валютой */                         \
+    SETTING_FIELD(backup_enable, backupEnable, int, WidgetTypes::CheckBox, 31)	/* Настройки-»Резервное копирование-»Расписание */                                           \
+    SETTING_FIELD(backup_images, backupImages, int, WidgetTypes::CheckBox, 31)	/* Настройки-»Резервное копирование-»Расписание */                                           \
+    SETTING_FIELD(backup_time, backupTime, QDateTime, WidgetTypes::DateTimeEdit, 31)	/* Настройки-»Резервное копирование-»Расписание */                                   \
+                                                                                                                                                                             \
+    SETTING_FIELD_VARIANT_COPY(sms_config, smsConfigJson, t_smsConfig, WidgetTypes::NoWidget)	/* Настройки-»Оповещения-»Настройки SMS-»Настройки соединения, JSON */       \
+    SETTING_FIELD(IGNORE, smsProvider, int, WidgetTypes::ComboBox, 41, QString())                                                                                            \
+    SETTING_FIELD(IGNORE, smsAuthType, int, WidgetTypes::ComboBox, 41, QString())                                                                                            \
+    SETTING_FIELD(IGNORE, smsApiId, QString, WidgetTypes::LineEdit, 41)                                                                                                      \
+    SETTING_FIELD(IGNORE, smsLogin, QString, WidgetTypes::LineEdit, 41)                                                                                                      \
+    SETTING_FIELD(IGNORE, smsPassword, QString, WidgetTypes::LineEdit, 41)                                                                                                   \
+    SETTING_FIELD(IGNORE, smsSender, QString, WidgetTypes::LineEdit, 41)                                                                                                     \
+                                                                                                                                                                             \
+    SETTING_FIELD_VARIANT_COPY(email_config, emailConfigJson, t_emailConfig, WidgetTypes::NoWidget)	/* Настройки-»Оповещения-»Настройка почтовых уведомлений-»Настройки соединения, JSON */      \
+    SETTING_FIELD(IGNORE, emailServer, QString, WidgetTypes::LineEdit, 41)                                                                                                   \
+    SETTING_FIELD(IGNORE, emailPort, int, WidgetTypes::SpinBox, 41, 0, 65535)                                                                                                \
+    SETTING_FIELD(IGNORE, emailLogin, QString, WidgetTypes::LineEdit, 41)                                                                                                    \
+    SETTING_FIELD(IGNORE, emailPassword, QString, WidgetTypes::LineEdit, 41)                                                                                                 \
+    SETTING_FIELD(IGNORE, emailTimeout, int, WidgetTypes::SpinBox, 41, 0, 300)                                                                                               \
+    SETTING_FIELD(IGNORE, emailEnableSsl, bool, WidgetTypes::CheckBox, 41)                                                                                                   \
+    SETTING_FIELD(IGNORE, emailEnableImplicitSsl, bool, WidgetTypes::CheckBox, 41)                                                                                           \
+    SETTING_FIELD(IGNORE, emailTemplate, QString, WidgetTypes::LineEdit, 41)                                                                                                 \
+
+class SComSettings : public SSettingsBase
 {
     Q_OBJECT
-    PROPSTRUCT_COMBOBOX(QString, currencyId, 0, currency, QString())
-    PROPSTRUCT_CHECKBOX(int, classicKassa, 0, classic_kassa)
-    PROPSTRUCT_COMBOBOX(int, timeZoneId, 0, time_zone, QString())
-    PROPSTRUCT_LINEEDIT(QString, ascPhoneMask1, 0, phone_mask1)
-    PROPSTRUCT_LINEEDIT(QString, ascPhoneMask2, 0, phone_mask2)
-    PROPSTRUCT_LINEEDIT(QString, updateChannel, 0, settings.update_channel)
-
-    PROPSTRUCT_CHECKBOX(int, isPriceColOptVisible, 1, it_vis_opt)
-    PROPSTRUCT_CHECKBOX(int, isPriceColOpt2Visible, 1, it_vis_opt2)
-    PROPSTRUCT_CHECKBOX(int, isPriceColOpt3Visible, 1, it_vis_opt3)
-    PROPSTRUCT_CHECKBOX(int, isPriceColRoznVisible, 1, it_vis_rozn)
-    PROPSTRUCT_CHECKBOX(int, isPriceColServiceVisible, 1, it_vis_price_for_sc)
-
-    PROPSTRUCT_COMBOBOX(int, voipId, 2, settings.voip, QString())
-    PROPSTRUCT_CHECKBOX(int, isRealizatorEnable, 2, realizator_enable)
-    PROPSTRUCT_COMBOBOX(int, onlineStoreId, 2, online_store, QString())
-    PROPSTRUCT_CHECKBOX(int, isCartridgeRepairEnabled, 2, cartridge_enable)
-
-    PROPSTRUCT_CHECKBOX(int, isEngineerRequiredOnDeviceRecept, 3, is_master_set_on_new)
-    PROPSTRUCT_CHECKBOX(int, isVisitSourceRequired, 3, visit_source_force)
-    PROPSTRUCT_CHECKBOX(int, isSerialNumberRequired, 3, is_sn_req)
-    PROPSTRUCT_CHECKBOX(int, isCartridgeSerialNumberRequired, 3, is_cartridge_sn_req)
-    PROPSTRUCT_CHECKBOX(int, isSearchOnlyBySerial, 3, history_by_sn)
-    PROPSTRUCT_CHECKBOX(int, isPhotoOnReceptRequired, 3, is_photo_required)
-    PROPSTRUCT_CHECKBOX(int, isPhotoOnIssueRequired, 3, is_photo_out_req)
-    PROPSTRUCT_CHECKBOX(int, isDiagRequired, 3, diag_required)
-    PROPSTRUCT_CHECKBOX(int, isVendorAddingAllowedOnRecept, 3, manual_maker)
-    PROPSTRUCT_CHECKBOX(int, isRepairSummSetByManager, 3, rep_price_by_manager)
-    PROPSTRUCT_CHECKBOX(int, isPaySalaryForRepairsIssuedInDebt, 3, debt_rep_2_salary)
-    PROPSTRUCT_CHECKBOX(int, isAutoSetCompanyOnRepairRecept, 3, rep_auto_company)
-    PROPSTRUCT_CHECKBOX(int, isVendorWarrantyEnabled, 3, vw_enable)
-    PROPSTRUCT_CHECKBOX(int, useSimplifiedCartridgeRepair, 3, settings.use_simplified_cartridge_repair)
-    PROPSTRUCT_SPINBOX(int, autoCloseRepairTabTimeout, 3, card_close_time, 0, 32400)
-    PROPSTRUCT_SPINBOX(int, repairImagesLimit, 3, rep_img_limit, 0, 20)
-
-    PROPSTRUCT_JSON_ARRAY(t_repairDispatcherUsers, repairDispatcherUsersJson, settings.auto_assign_users)
-    PROPSTRUCT_JSON_OBJ(t_repairDispatcherAssignCriteria, repairDispatcherAssignCriteriaJson, settings.auto_assign_criteria)
-    PROPSTRUCT_COMBOBOX(QString, repairDispatcherUsers, 4, ignore, "")
-    PROPSTRUCT_SPINBOX(int, repairDispatcherDayLimit, 4, ignore, 0, 7)
-    PROPSTRUCT_COMBOBOX(QString, repairDispatcherStatuses, 4, ignore, "")
-
-    PROPSTRUCT_CHECKBOX(int, isClientPatronymicRequired, 5, is_patronymic_required)
-    PROPSTRUCT_CHECKBOX(int, isClientEmailRequired, 5, email_required)
-    PROPSTRUCT_CHECKBOX(int, isClientAddressRequired, 5, address_required)
-    PROPSTRUCT_CHECKBOX(int, isClientPhoneRequired, 5, phone_required)
-    PROPSTRUCT_CHECKBOX(int, isAnyClientDealer, 5, clients_are_dealers)
-
-    PROPSTRUCT_SPINBOX(int, timeoutForItemsRequestsHandling, 6, give2user_time, 0, 72)
-    PROPSTRUCT_SPINBOX(int, timeoutForDiagnosisConfirmation, 6, diag_accept_time, 0, 72)
-
-    PROPSTRUCT_SPINBOX(int, defaultItemReserveTime, 7, default_reserve_days, 0, 30)
-    PROPSTRUCT_SPINBOX(int, itemImagesLimit, 7, item_img_limit, 0, 20)
-    PROPSTRUCT_CHECKBOX(int, isReasonForItemIncomeRequired, 7, is_reason_req)
-
-    PROPSTRUCT_COMBOBOX(int, defaultWorksWarranty, 8, default_works_warranty, 31)
-    PROPSTRUCT_COMBOBOX(int, defaultNewItemsWarranty, 8, default_items_warranty, 31)
-    PROPSTRUCT_COMBOBOX(int, defaultUsedItemsWarranty, 8, default_items_used_warranty, 7)
-    PROPSTRUCT_COMBOBOX(int, defaultRefItemsWarranty, 8, default_items_rep_warranty, 31)
-    PROPSTRUCT_COMBOBOX(int, defaultDisasmItemsWarranty, 8, default_items_razb_warranty, 7)
-    PROPSTRUCT_COMBOBOX(int, defaultOtherItemsWarranty, 8, default_items_other_warranty, 0)
-
-    PROPSTRUCT_CHECKBOX(int, notifyNewComment, 9, settings.inform_comment)   // все настройки группы 9 хранятся в табл. settings
-    PROPSTRUCT_COMBOBOX(int, notifyNewCommentColor, 9, settings.inform_comment_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_COMBOBOX(int, notifyRepairStatusUpdateColor, 9, settings.inform_status_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_CHECKBOX(int, notifyIncomingSMS, 9, settings.inform_sms)
-    PROPSTRUCT_COMBOBOX(int, notifyIncomingSMSColor, 9, settings.inform_sms_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_COMBOBOX(int, notifyOutOfTermAlarmColor, 9, settings.inform_terms_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_CHECKBOX(int, notifyDeviceMatch, 9, settings.inform_task_match)
-    PROPSTRUCT_COMBOBOX(int, notifyDeviceMatchColor, 9, settings.inform_task_match_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_CHECKBOX(int, notifyCustomTask, 9, settings.inform_task_custom)
-    PROPSTRUCT_COMBOBOX(int, notifyCustomTaskColor, 9, settings.inform_task_custom_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_CHECKBOX(int, notifyItemRequest, 9, settings.inform_int_request)
-    PROPSTRUCT_COMBOBOX(int, notifyItemRequestColor, 9, settings.inform_int_request_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_CHECKBOX(int, notifyOrderFromOnlineStore, 9, settings.inform_task_request)
-    PROPSTRUCT_COMBOBOX(int, notifyOrderFromOnlineStoreColor, 9, settings.inform_task_request_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_CHECKBOX(int, notifyIncomingCall, 9, settings.inform_call)
-    PROPSTRUCT_COMBOBOX(int, notifyIncomingCallColor, 9, settings.inform_call_color, QString("#FFFFFFFF"))
-    PROPSTRUCT_CHECKBOX(int, notifyItemPurchaseRequest, 9, settings.inform_part_request)
-    PROPSTRUCT_COMBOBOX(int, notifyItemPurchaseRequestColor, 9, settings.inform_part_request_color, QString("#FFFFFFFF"))
-
-    PROPSTRUCT_CHECKBOX(int, printPKO, 10, qs_print_pko)
-    PROPSTRUCT_CHECKBOX(int, printOutInvoice, 10, qs_print_rn)
-    PROPSTRUCT_CHECKBOX(int, printInInvoice, 10, qs_print_pn)
-    PROPSTRUCT_CHECKBOX(int, printRKO, 10, qs_print_rko)
-    PROPSTRUCT_CHECKBOX(int, printWarrantyDoc, 10, print_warranty)
-    PROPSTRUCT_CHECKBOX(int, printWorksList, 10, print_works)
-    PROPSTRUCT_CHECKBOX(int, printDiagResult, 10, print_diagnostic)
-    PROPSTRUCT_CHECKBOX(int, printRepairRejectDoc, 10, print_reject)
-    PROPSTRUCT_CHECKBOX(int, printRKOOnItemIncome, 10, rko_on_pn)
-    PROPSTRUCT_CHECKBOX(int, printCheck, 10, print_check)
-    PROPSTRUCT_CHECKBOX(int, printRepairReceptDoc, 10, settings.print_new_repair_report)
-    PROPSTRUCT_CHECKBOX(int, printRepairStickers, 10, settings.print_rep_stickers)
-    PROPSTRUCT_CHECKBOX(int, printCartridgeReceptDoc, 10, settings.print_new_cartridge_report)
-    PROPSTRUCT_CHECKBOX(int, printCartridgeStickers, 10, settings.print_cartridge_stickers)
-    PROPSTRUCT_SPINBOX(int, defaultRepairStickersQty, 10, rep_stickers_copy, 0, 10)
-
-    PROPSTRUCT_CHECKBOX(int, autoSwitchKeyboardLayout, 11, auto_switch_layout)
-
-    PROPSTRUCT_LINEEDIT(QString, voipAsteriskHost, 12, aster_host)   // только для asterisk
-    PROPSTRUCT_SPINBOX(int, voipAsteriskPort, 12, aster_port, 0, 65535)
-    PROPSTRUCT_LINEEDIT(QString, voipAsteriskLogin, 12, aster_login)
-    PROPSTRUCT_LINEEDIT(QString, voipAsteriskPassword, 12, aster_password)
-    PROPSTRUCT_SPINBOX(int, voipAsteriskWebPort, 12, aster_web_port, 0, 65535)
-    PROPSTRUCT_LINEEDIT(QString, voipPrefix, 12, settings.voip_prefix)    // используется только для Asterisk
-    PROPSTRUCT_LINEEDIT(QString, voipEndpoint, 12, settings.voip_endpoint)    // Используется только при выборе оператора Megafon
-    PROPSTRUCT_LINEEDIT(QString, voipKey, 12, settings.voip_key)  // используется для операторов Zadarma, Rostelecom, Mango Telecom, Megafon
-    PROPSTRUCT_LINEEDIT(QString, voipSecret, 12, settings.voip_secret)  // используется для операторов Zadarma, Rostelecom, Mango Telecom
-
-    PROPSTRUCT_LINEEDIT(QString, onlineStoreUrl, 13, online_store_api)
-    PROPSTRUCT_LINEEDIT(QString, onlineStoreKey, 13, online_store_key)
-
-    // параметры таблицы settings, добавленные в этой программе
-    PROPSTRUCT_CHECKBOX(int, salaryClassic, 14, settings.classic_salary)
-    PROPSTRUCT_CHECKBOX(int, salaryIncludeNotIssuedByDefault, 14, settings.salary_include_not_issued_by_default)
-    PROPSTRUCT_CHECKBOX(int, newClientSmsEnabled, 14, settings.new_client_sms_enabled)
-
-    PROPSTRUCT_JSON_ARRAY(t_repairStatuses, repairStatuses, statuses)
-
-    PROPSTRUCT_RADIOBTN(bool, exchangeTypeAuto, 21, ignore) // Настройки-»Финансы-»Операции с валютой, exchange_type
-    PROPSTRUCT_COMBOBOX(int, exchangeSourceId, 21, exchange_source, 1) // Настройки-»Финансы-»Операции с валютой
-    PROPSTRUCT_RADIOBTN(bool, exchangeTypeManual, 21, ignore)
-    PROPSTRUCT_DSPINBOX(double, exchangeRate, 21, exchange_rate, 0, 9999) // Настройки-»Финансы-»Операции с валютой
-    PROPSTRUCT_CHECKBOX(int, backupEnable, 31, backup_enable) // Настройки-»Резервное копирование-»Расписание
-    PROPSTRUCT_CHECKBOX(int, backupImages, 31, backup_images) // Настройки-»Резервное копирование-»Расписание
-    PROPSTRUCT_DATETIMEEDIT(QDateTime, backupTime, 31, backup_time) // Настройки-»Резервное копирование-»Расписание
-
-    PROPSTRUCT_JSON_OBJ(t_smsConfig, smsConfigJson, sms_config)    // Настройки-»Оповещения-»Настройки SMS-»Настройки соединения, JSON
-    PROPSTRUCT_COMBOBOX(int, smsProvider, 41, ignore, QString())
-    PROPSTRUCT_COMBOBOX(int, smsAuthType, 41, ignore, QString())
-    PROPSTRUCT_LINEEDIT(QString, smsApiId, 41, ignore)
-    PROPSTRUCT_LINEEDIT(QString, smsLogin, 41, ignore)
-    PROPSTRUCT_LINEEDIT(QString, smsPassword, 41, ignore)
-    PROPSTRUCT_LINEEDIT(QString, smsSender, 41, ignore)
-
-    PROPSTRUCT_JSON_OBJ(t_emailConfig, emailConfigJson, email_config)    // Настройки-»Оповещения-»Настройки SMS-»Настройки соединения, JSON
-    PROPSTRUCT_LINEEDIT(QString, emailServer, 41, ignore)
-    PROPSTRUCT_SPINBOX(int, emailPort, 41, ignore, 0, 65535)
-    PROPSTRUCT_LINEEDIT(QString, emailLogin, 41, ignore)
-    PROPSTRUCT_LINEEDIT(QString, emailPassword, 41, ignore)
-    PROPSTRUCT_SPINBOX(int, emailTimeout, 41, ignore, 0, 300)
-    PROPSTRUCT_CHECKBOX(bool, emailEnableSsl, 41, ignore)
-    PROPSTRUCT_CHECKBOX(bool, emailEnableImplicitSsl, 41, ignore)
-    PROPSTRUCT_LINEEDIT(QString, emailTemplate, 41, ignore)
-
-    // другие параметры таблицы config
-//    (int, id, , id)
-//    (varchar, configcol, , configcol) // не нашел что это
-//    PROPSTRUCT_FIELD(QDateTime, config_modified, , config_modified)   // похоже, не используется
-//    (tinyint, print_rep_stickers, , print_rep_stickers)   // не используется, заменено значением в табл. settings
-//    (tinyint, close_clients, , close_clients)   // похоже, не используется
-//    (int, images_width, , images_width)   // похоже, не используется
-//    (int, salary_day, , salary_day)   // похоже, не используется
-//    (tinyint, parts_included, , parts_included)   // похоже, не используется
-//    (text, key, , key)    // ключ лицензии АСЦ
-//    (int, video_codec, , video_codec)     // Давным давно видеозапись отключена (говорили, что временно) и, похоже, насовсем
-//    (tinyint, print_new_repair_report, , print_new_repair_report)   // не используется, заменено значением в табл. settings
-//    (int, regular_customer_step, , regular_customer_step)     // похоже, не используется
-//    PROPSTRUCT_FIELD(QString, TimeOfWork, , TimeOfWork)     // похоже, не используется; должно быть в настройках офиса; JSON
-//    (tinyint, termsControl, , termsControl)     // похоже, не используется; параметр задаётся отдельно для каждого статусаы
-//    PROPSTRUCT_FIELD(QString, version)      // здесь это не нужно
-//    PROPSTRUCT_FIELD(QString, version_snap, , version_snap)      // здесь это не нужно
-
+    friend class TClassTest;
 public:
-    enum Table{Config = 0, Settings = 1};
+    enum Table{Config = 0, Settings = 0x200};   // для таблицы `config` в m_classDbMap зарезервированы индексы 0..511; для `settings` — 512..1023
     explicit SComSettings();
-    void initWidgets();
-    void setComboBoxModel(const QString propertyName, SStandardItemModel* model);
-    void disableWidget(const QString propertyName);
-    void load();
-    void loadFromTableSettings();
-    void loadFromJson();
-    void save();
-    void saveToTableSettings();
-    void updateJson();
+#include "ssettings_init.h"
+public:
+    void load() override;
+    void save() override;
 private:
-    void prepareUpdateList(Table table);
+    std::unique_ptr<QMap<int, int>> m_classDbMap;       // соответствие индексов полей класса полям таблицы
+    std::shared_ptr<QSqlRecord> m_record_settings;      // данные таблицы `settings` (m_record содержит данные таблицы `config`)
+    int dbFieldIndex(const int classIndex) const override;
+    void insertNewField(const int index, const QString &name) override;
+    int primaryKeyIndex() override {return C_id;};
+    QVariant primaryKeyData() override {return 1;};
+protected:
+    void configureWidgets() override;
+    QString table() override;
+    QString dbFieldName(const int classIndex) const override;
+    void loadFromTableSettings();
+    void deserializeData();
+    void loadFromJson(const int index, bool init = 0);
+    QVariant loadedValue(const int dbTableIndex) const override;
+    void updateJson(const int index, const QVariant &value);
+    void saveToTableSettings();
+    int targetTable(const int targetTableIndex) override;
     void translate();
+protected slots:
+    void setDataRework(const int index, QVariant &data);
+    void dataChangeHandler(const int index, const QVariant &data) override;
 };
 
 #endif // SCOMSETTINGS_H

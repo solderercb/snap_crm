@@ -3,6 +3,9 @@ snap_crm.pro.user*
 lang/*.qm
 appver_build_remark.h
 3rdparty/outpwd.tmp
-doc/
+doc/*.*
+doc/ASC queries
+doc/DEVMODEA (wingdi.h) - Win32 apps _ Microsoft Docs_files
 tmp/
 *.lrxml*
+test/*/.qtc_clangd/*

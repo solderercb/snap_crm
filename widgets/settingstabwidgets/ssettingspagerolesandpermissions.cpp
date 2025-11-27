@@ -1,5 +1,8 @@
 #include "ssettingspagerolesandpermissions.h"
 #include "ui_ssettingspagerolesandpermissions.h"
+#include <QMessageBox>
+#include <tabSettings>
+#include <SPermissions>
 
 SSettingsPageRolesAndPermissions::SSettingsPageRolesAndPermissions(QWidget *parent) :
     SSettingsPageBase(parent),
@@ -64,7 +67,7 @@ void SSettingsPageRolesAndPermissions::loadRolePermissions(const QModelIndex &in
         }
         else if (result == QMessageBox::Yes)
         {
-            parentTab->buttonSaveClicked();
+            parentTab->manualSubmit();
         }
     }
     ui->lineEditRoleName->setText(m_roles->data(m_roles->index(index.row(), 0)).toString());

@@ -1,12 +1,10 @@
 #ifndef SSLOPTIONSDIALOG_H
 #define SSLOPTIONSDIALOG_H
 
-#include <QWidget>
 #include <QFrame>
-#include <QWidgetAction>
-#include <QStandardItemModel>
-#include <QSignalMapper>
-#include <QFileDialog>
+
+class QWidget;
+class QSignalMapper;
 
 namespace Ui {
     class SSLOptionsDialog;

@@ -1,11 +1,18 @@
 #include "spaymenttypemodel.h"
+#include <QSqlQuery>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SLogRecordModel>
+#include <SSqlQueryModel>
 
-SPaymentTypeModel::SPaymentTypeModel(QObject *parent) : SComRecord(parent)
+SPaymentTypeModel::SPaymentTypeModel(QObject *parent) : SSingleRowJModel(parent)
 {
+    mapFields();
+
     i_tableName = "payment_types";
     i_obligatoryFields << "client" << "reason" << "payment_system";
-    i_idColumnName = "id";
-    i_logRecord->setGroup(SLogRecordModel::ACP);
+    setPrimaryKeyIndex(0);
+    i_logRecord->set_group(SLogRecordModel::ACP);
 //    i_logRecord->setType(SLogRecordModel::PaymentOperation);  // TODO: В АСЦ v3.7.31.1123 записи в журнал не производятся
 }
 
@@ -14,178 +21,127 @@ SPaymentTypeModel::~SPaymentTypeModel()
 
 }
 
-int SPaymentTypeModel::id()
-{
-    return i_id;
-}
-
-void SPaymentTypeModel::setId(const int id)
-{
-    i_valuesMap.insert("id", id);
-}
-
-void SPaymentTypeModel::load()
-{
-    QSqlQuery query(QSqlDatabase::database("connMain"));
-    query.exec(QUERY_SEL_PAYMENT_TYPE(i_id));
-    if(!query.isValid())
-        return;
-
-    query.first();
-    m_type = query.value("type").toInt();
-    m_name = query.value("name").toString();
-    m_client = query.value("client").toInt();
-    m_periodic = query.value("periodic").toBool();
-    m_payDate = query.value("pay_date").toDateTime();
-    m_defSumm = query.value("def_summ").toDouble();
-    m_reason = query.value("reason").toString();
-    m_isArchive = query.value("is_archive").toBool();
-    m_paymentSystem = query.value("payment_system").toInt();
-    m_updateTime = query.value("updated_at").toDateTime();
-}
-
 void SPaymentTypeModel::load(const int id)
 {
-    setId(id);
-    load();
+    setPrimaryKey(id);
+    SSingleRowJModel::load();
 }
 
-int SPaymentTypeModel::type()
+int SPaymentTypeModel::accountIndex()
 {
-    return m_type;
-}
-
-void SPaymentTypeModel::setType(const int type)
-{
-    if(i_id)
-        appendLogText(tr("Тип операции изменён с %1 на %2").arg(m_type, type));
-    i_valuesMap.insert("type", type);
-}
-
-QString SPaymentTypeModel::name()
-{
-    return m_name;
-}
-
-void SPaymentTypeModel::setName(const QString& name)
-{
-    if(i_id)
-        appendLogText(tr("Название операции изменено с %1 на %2").arg(m_name, name));
-    i_valuesMap.insert("name", name);
-}
-
-int SPaymentTypeModel::client()
-{
-    return m_client;
-}
-
-void SPaymentTypeModel::setClient(const int client)
-{
-    if(i_id)
-        appendLogText(tr("Контрагент изменён с %1 на %2").arg(m_client, client));
-    i_valuesMap.insert("client", client);
-}
-
-bool SPaymentTypeModel::periodic()
-{
-    return m_periodic;
-}
-
-void SPaymentTypeModel::setPeriodic(const bool periodic)
-{
-    if(i_id)
-    {
-        if(periodic)
-            appendLogText(tr("Включен режим периодичности операции"));
-        else
-            appendLogText(tr("Режим периодичности операции выключен"));
-    }
-    i_valuesMap.insert("periodic", periodic);
-}
-
-QDateTime SPaymentTypeModel::payDate()
-{
-    return m_payDate;
-}
-
-void SPaymentTypeModel::setPayDate(const QDateTime payDate)
-{
-    if(i_id)
-        appendLogText(tr("Дата периодического выполнения операции изменена с %1 на %2").arg(m_payDate.toString("dd MMM yyyy"), payDate.toString("dd MMM yyyy")));
-    i_valuesMap.insert("pay_date", payDate);
-}
-
-double SPaymentTypeModel::defSumm()
-{
-    return m_defSumm;
-}
-
-void SPaymentTypeModel::setDefSumm(const double defSumm)
-{
-    if(i_id)
-        appendLogText(tr("Сумма по умолчанию изменена с %1 на %2").arg(sysLocale.toString(m_defSumm, 'f', 2), sysLocale.toString(defSumm, 'f', 2)));
-    i_valuesMap.insert("def_summ", defSumm);
-}
-
-QString SPaymentTypeModel::reason()
-{
-    return m_reason;
-}
-
-void SPaymentTypeModel::setReason(const QString& reason)
-{
-    if(i_id)
-        appendLogText(tr("Назначение платежа по умолчнию изменено с \"%1\" на \"%2\"").arg(m_reason, reason));
-    i_valuesMap.insert("reason", reason);
-}
-
-bool SPaymentTypeModel::isArchive()
-{
-    return m_isArchive;
-}
-
-void SPaymentTypeModel::markArchive(const bool isArchive)
-{
-    if(i_id)
-    {
-        if(isArchive)
-            appendLogText(tr("Операция помечена как архивная"));
-        else
-            appendLogText(tr("Метка \"архивная\" снята с операции"));
-    }
-    i_valuesMap.insert("is_archive", isArchive);
-}
-
-int SPaymentTypeModel::paymentSystem()
-{
-    return m_paymentSystem;
-}
-
-int SPaymentTypeModel::paymentSystemIndex()
-{
-    return paymentSystemsModel->rowByDatabaseID(m_paymentSystem);
-}
-
-void SPaymentTypeModel::setPaymentSystem(const int paymentSystem)
-{
-    if(i_id)
-        appendLogText(tr("Платёжная система по умолчанию изменена с \"%1\" на \"%2\"").arg(paymentSystemsModel->getDisplayRole(m_paymentSystem, "system_id"), paymentSystemsModel->getDisplayRole(paymentSystem, "system_id")));
-    i_valuesMap.insert("payment_system", paymentSystem);
+    return paymentSystemsModel->rowByDatabaseID(account());
 }
 
 bool SPaymentTypeModel::commit()
 {
-    i_valuesMap.insert("updated_at", QDateTime::currentDateTime());
-    if(i_id)
+    bool nErr = 1;
+    set_updated(QDateTime::currentDateTime());
+
+#ifdef QT_DEBUG
+    checkTableName();
+#endif
+
+    if(isPrimaryKeyValid())
     {
-        update();
+        nErr = update();
     }
     else
     {
-        insert();
+        nErr = insert();
     }
+    setFieldsExecuted();
 //    commitLogs(); // TODO: В АСЦ v3.7.31.1123 записи в журнал не производятся
 
-    return i_nErr;
+    return nErr;
 }
 
+void SPaymentTypeModel::typeChanged(const int type)
+{
+    auto old = commitedData(C_type).value_or(QVariant());
+    if(old.isValid())
+        appendLogText(tr("Тип операции изменён с %1 на %2").arg(old.toInt(), type));
+}
+
+void SPaymentTypeModel::nameChanged(const QString name)
+{
+    auto old = commitedData(C_name).value_or(QVariant());
+    if(old.isValid())
+        appendLogText(tr("Название операции изменено с %1 на %2").arg(old.toString(), name));
+}
+
+void SPaymentTypeModel::clientChanged(const int id)
+{
+    auto old = commitedData(C_client).value_or(QVariant());
+    if(old.isValid())
+    {
+        appendLogText(tr("Контрагент изменён с %1 на %2").arg(old.toInt(), id));    // TODO: заменить id на SClientModel::fullShortName()
+    }
+}
+
+void SPaymentTypeModel::periodicStateChanged(const bool state)
+{
+    if(state)
+        appendLogText(tr("Включен режим периодичности операции"));
+    else
+        appendLogText(tr("Режим периодичности операции выключен"));
+}
+
+void SPaymentTypeModel::periodicDateChanged(const QDateTime dateTime)
+{
+    auto old = commitedData(C_pariodicDate).value_or(QVariant());
+    if(old.isValid())
+    {
+        appendLogText(tr("Дата периодического выполнения операции изменена с %1 на %2").arg(old.toDateTime().toString("dd MMM yyyy"), dateTime.toString("dd MMM yyyy")));
+    }
+}
+
+void SPaymentTypeModel::defAmountChanged(const double amount)
+{
+    auto old = commitedData(C_defAmount).value_or(QVariant());
+    if(old.isValid())
+    {
+        appendLogText(tr("Сумма по умолчанию изменена с %1 на %2").arg(sysLocale.toString(old.toDouble(), 'f', 2), sysLocale.toString(amount, 'f', 2)));
+    }
+}
+
+void SPaymentTypeModel::reasonChanged(const QString reason)
+{
+    auto old = commitedData(C_reason).value_or(QVariant());
+    if(old.isValid())
+        appendLogText(tr("Назначение платежа по умолчнию изменено с \"%1\" на \"%2\"").arg(old.toString(), reason));
+}
+
+void SPaymentTypeModel::isArchiveChanged(const bool isArchive)
+{
+    if(isArchive)
+        appendLogText(tr("Операция помечена как архивная"));
+    else
+        appendLogText(tr("Метка \"архивная\" снята с операции"));
+}
+
+void SPaymentTypeModel::accountChanged(const int id)
+{
+    auto old = commitedData(C_account).value_or(QVariant());
+    if(old.isValid())
+        appendLogText(tr("Платёжная система по умолчанию изменена с \"%1\" на \"%2\"").arg(paymentSystemsModel->getDisplayRole(old.toInt(), "system_id"), paymentSystemsModel->getDisplayRole(id, "system_id")));
+}
+
+void SPaymentTypeModel::logDataChange(const int index, const QVariant &data)
+{
+    if(!isPrimaryKeyValid())
+        return;
+
+    switch (index)
+    {
+        case C_type: typeChanged(data.toInt()); break;
+        case C_name: nameChanged(data.toString()); break;
+        case C_client: clientChanged(data.toInt()); break;
+        case C_periodicEnabled: periodicStateChanged(data.toBool()); break;
+        case C_pariodicDate: periodicDateChanged(data.toDateTime()); break;
+        case C_defAmount: defAmountChanged(data.toDouble()); break;
+        case C_reason: reasonChanged(data.toString()); break;
+        case C_isArchive: isArchiveChanged(data.toBool()); break;
+        case C_account: accountChanged(data.toInt()); break;
+        default: break;
+    }
+}

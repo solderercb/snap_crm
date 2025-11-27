@@ -367,13 +367,13 @@
   <customwidget>
    <class>SPeriodSelector</class>
    <extends>QWidget</extends>
-   <header>widgets/speriodselector.h</header>
+   <header location="global">SPeriodSelector</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SComboBox</class>
    <extends>QComboBox</extends>
-   <header>widgets/scombobox.h</header>
+   <header location="global">SComboBox</header>
   </customwidget>
  </customwidgets>
  <resources>

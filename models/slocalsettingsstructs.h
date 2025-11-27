@@ -1,6 +1,6 @@
 #ifndef SLOCALSETTINGSSTRUCTS_H
 #define SLOCALSETTINGSSTRUCTS_H
-#include <3rdparty/QSerializer/QSerializer>
+#include <QSerializer>
 #include <QQueue>
 #include <QStack>
 #include <QSize>

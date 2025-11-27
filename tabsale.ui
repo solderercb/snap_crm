@@ -847,7 +847,7 @@
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
@@ -856,13 +856,13 @@
   <customwidget>
    <class>SClientMatch</class>
    <extends>QWidget</extends>
-   <header>widgets/sclientmatch.h</header>
+   <header location="global">SClientMatch</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>STableViewBOQStore</class>
    <extends>QTableView</extends>
-   <header>widgets/stableviewboqstore.h</header>
+   <header location="global">STableViewBOQStore</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1191,38 +1191,6 @@
     <hint type="destinationlabel">
      <x>1177</x>
      <y>146</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxPaymentAccount</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>tabSale</receiver>
-   <slot>paymentSystemChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>207</x>
-     <y>73</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>7</x>
-     <y>73</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxMoneyBackAccount</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>tabSale</receiver>
-   <slot>paymentSystemChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>195</x>
-     <y>637</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>5</x>
-     <y>600</y>
     </hint>
    </hints>
   </connection>

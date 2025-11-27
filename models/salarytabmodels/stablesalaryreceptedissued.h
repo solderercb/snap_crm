@@ -1,8 +1,7 @@
 #ifndef STABLESALARYRECEPTEDISSUED_H
 #define STABLESALARYRECEPTEDISSUED_H
 
-#include "../stablebasemodel.h"
-#include <QObject>
+#include <STableModelBase>
 
 class STableSalaryReceptedIssued : public STableBaseModel
 {

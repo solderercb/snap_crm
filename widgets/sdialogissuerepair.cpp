@@ -1,8 +1,19 @@
-#include "global.h"
 #include "sdialogissuerepair.h"
 #include "ui_sdialogissuerepair.h"
-#include "tabrepairs.h"
-#include "tabrepair.h"
+#include <ProjectGlobals>
+#include <SAppLog>
+#include <tabRepairs>
+#include <tabRepair>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SSqlQueryModel>
+#include <SRepairModel>
+#include <SClientModel>
+#include <SCashRegisterModel>
+#include <SSaleTableModel>
+#include <SSortFilterProxyModel>
+#include <SWorkshopIssuedModel>
+#include <FlashPopup>
 
 SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowFlags flags, QWidget *parent) :
     SModalWidget(parent, flags),
@@ -29,7 +40,7 @@ SDialogIssueRepair::SDialogIssueRepair(QList<SRepairModel*> repairs, Qt::WindowF
 #ifdef QT_DEBUG
 //    ui->checkBoxConfirmGetOut->setChecked(true);
 //    ui->checkBoxPaymentCheckout->setChecked(true);
-//    if(ui->checkBoxIssueInCredit->isVisible() && m_clientModel->balanceEnabled())
+//    if(ui->checkBoxIssueInCredit->isVisible() && m_clientModel->isBalanceEnabled())
 //        ui->checkBoxIssueInCredit->setChecked(true);
 //    if(ui->checkBoxPaymentCheckout->isVisible() && ui->checkBoxPaymentCheckout->isEnabled())
 //        ui->checkBoxPaymentCheckout->setChecked(true);
@@ -82,11 +93,11 @@ void SDialogIssueRepair::initWidgets()
     ui->comboBoxRejectReason->setModel(rejectReasonModel);
     ui->comboBoxRejectReason->setCurrentIndex(-1);
     ui->comboBoxPaymentAccount->setModel(m_paymentSystemsProxyModel);
-    ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem, "system_id"));
+    ui->comboBoxPaymentAccount->setCurrentIndex(m_paymentSystemsProxyModel->rowByDatabaseID(userDbData->defaultPaymentSystem(), "system_id"));
     connect(ui->comboBoxRejectReason, SIGNAL(currentTextChanged(QString)), this, SLOT(otheRejectReasonShow(QString)));
     connect(ui->textEditRejectReason, SIGNAL(textChanged()), this, SLOT(textEditTextChanged()));
     connect(ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(buttonCancelClicked()));
-    connect(ui->pushButtonIssue, SIGNAL(clicked()), this, SLOT(buttonIssueClicked()));
+    connect(ui->pushButtonIssue, &QPushButton::clicked, this, &SDialogIssueRepair::manualSubmit);
     connect(ui->pushButtonLooseDocPrint, SIGNAL(clicked()), this, SLOT(createLooseDoc()));
     connect(ui->comboBoxPaymentAccount, SIGNAL(currentIndexChanged(int)), this, SLOT(paymentSystemChanged(int)));
     connect(ui->checkBoxPayFromBalance, &QCheckBox::toggled, this, &SDialogIssueRepair::checkBoxInCreditToggled);
@@ -103,10 +114,10 @@ void SDialogIssueRepair::updateWidgets()
     ui->doubleSpinBoxPrepay->setVisible(m_singleRepairWidgetsVisible);
     ui->labelAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
     ui->doubleSpinBoxAgreedAmount->setVisible(m_singleRepairWidgetsVisible);
-    ui->checkBoxPayFromBalance->setVisible(m_clientModel->balanceEnabled());
+    ui->checkBoxPayFromBalance->setVisible(m_clientModel->isBalanceEnabled());
     // checkBox "В долг" отображается только если настроен переход "Готово к выдаче"->"Выдано в долг" и включен баланс клиента
-    ui->checkBoxIssueInCredit->setVisible(m_clientModel->balanceEnabled() &&
-                                                comSettings->repairStatuses[Global::RepStateIds::Ready].Contains.contains(Global::RepStateIds::ReturnedInCredit));
+    ui->checkBoxIssueInCredit->setVisible(m_clientModel->isBalanceEnabled() &&
+                                                comSettings->repairStatusesVariantCopy()[Global::RepStateIds::Ready].Contains.contains(Global::RepStateIds::ReturnedInCredit));
     ui->checkBoxPaymentCheckout->setVisible(m_totalAmountToPay != 0);
     ui->checkBoxConfirmGetOut->setVisible(m_totalAmountToPay == 0);
     ui->labelIssuedMessage->setVisible(m_singleRepairWidgetsVisible);
@@ -127,7 +138,7 @@ void SDialogIssueRepair::initPaymentSystems()
     m_paymentSystemsProxyModel = new SSortFilterProxyModel();
     m_paymentSystemsProxyModel->setSourceModel(paymentSystemsModel);
     m_paymentSystemsProxyModel->setFilterKeyColumn(1);
-    if(!m_clientModel->balanceEnabled())
+    if(!m_clientModel->isBalanceEnabled())
     {
         m_paymentSystemsProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(Global::PaymentSystemIds::Balance) + ")).*$"));
     }
@@ -136,7 +147,7 @@ void SDialogIssueRepair::initPaymentSystems()
 /*  Проверка введённых пользователем данных и соответствия сумм
  *  Возвращает 0 если всё ОК
 */
-bool SDialogIssueRepair::checkInput()
+int SDialogIssueRepair::checkInput()
 {
     int error = 0;
     QString errMsg;
@@ -169,7 +180,10 @@ bool SDialogIssueRepair::checkInput()
     if(error)
         qDebug().nospace() << "[" << this << "] checkInput() | error: " << error;
     if(!errMsg.isEmpty())
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Ошибка"), errMsg, QColor("#FFC7AD"), QColor("#FFA477"));
+    {
+        auto *p = new shortlivedNotification(this, tr("Ошибка"), errMsg, QColor("#FFC7AD"), QColor("#FFA477"));
+        Q_UNUSED(p);
+    }
 
     return error;
 }
@@ -229,7 +243,7 @@ void SDialogIssueRepair::collectRepairsData()
         BOQModel = repairModel->BOQModel();
 
         m_singleRepairWidgetsVisible = !singleRepairWidgetsVisible;
-        if(repairModel->state() == Global::RepStateIds::ReadyNoRepair)
+        if(repairModel->stateId() == Global::RepStateIds::ReadyNoRepair)
         {
             m_rejectReasonWidgetsVisible = m_singleRepairWidgetsVisible;
         }
@@ -271,70 +285,63 @@ void SDialogIssueRepair::collectRepairsData()
     }
 }
 
-void SDialogIssueRepair::setRepairReady(SRepairModel *model)
+bool SDialogIssueRepair::manualSubmit()
 {
-    model->setState(Global::RepStateIds::Ready);
-}
-
-void SDialogIssueRepair::buttonIssueClicked()
-{
-    bool nErr = 1;
-
     getWidgetsValues();
 
-    if(checkInput())
-        return;
+    SWidget::manualSubmit();
 
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-
-    QUERY_LOG_START(parent()->metaObject()->className());
-    try
+    if(ui->checkBoxWorksDocPrint->isChecked())
     {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        issueRepairs();
-#ifdef QT_DEBUG
-//        Global::throwDebug();
-#endif
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
+        m_isListOwner = 0;  // модели не нужно удалять, т. к. производится печать отчетов
+        emit printWorksLists();
     }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
 
-        // в случае возникновения ошибки запроса нужно обновить данные моделей
-        m_clientModel->load(m_repairsModels.at(0)->clientId());
-        emit issueFailed();
-    }
-    QUERY_LOG_STOP;
+    tabRepairs::refreshIfTabExists();   // обновление списка ремонтов только при выдаче с диалоговым окном
+    this->deleteLater();
 
-    if(nErr)
-    {
-        if(ui->checkBoxWorksDocPrint->isChecked())
-        {
-            m_isListOwner = 0;  // модели не нужно удалять, т. к. производится печать отчетов
-            emit printWorksLists();
-        }
+    return 1;
+}
 
-        emit issueSuccessfull();
-
-        tabRepairs::refreshIfTabExists();
-        this->deleteLater();
-    }
+void SDialogIssueRepair::beginCommit()
+{
 }
 
 void SDialogIssueRepair::issueRepairs()
 {
-    bool nErr = 1;
+    SWidget::submit();
+}
+
+void SDialogIssueRepair::throwHandler(int)
+{
+    QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
+
+    m_clientModel->setFieldsFailed();
+
+    while(i != m_repairsModels.constEnd())
+    {
+        (*i)->setFieldsFailed();
+        i++;
+    }
+
+    emit issueFailed();
+}
+
+void SDialogIssueRepair::endCommit()
+{
+    // перезагрузка данных при необходимости должна выполняться в слоте, подключенном к сигналу
+    emit issueSuccessfull();
+}
+
+void SDialogIssueRepair::commit(const int stage)
+{
+    Q_UNUSED(stage)
     SCashRegisterModel *cashRegister;
     SRepairModel *repairModel;
-    SSaleTableModel *BOQModel;
+    WorkshopSaleModel *BOQModel;
     SWorkshopIssuedModel *workshopIssuedModel;
     QList<SRepairModel*>::const_iterator i = m_repairsModels.constBegin();
-    int repairId;
+    int repairId = 0;
     int newState;
     double amountToPay;
 
@@ -343,15 +350,19 @@ void SDialogIssueRepair::issueRepairs()
     while(i != m_repairsModels.constEnd() && m_pushButtonIssueEnabled)
     {
         repairModel = (*i);
+        newState = repairModel->stateId();
 
-        if(comSettings->useSimplifiedCartridgeRepair && repairModel->cartridge() && repairModel->state() == Global::RepStateIds::InWork)
-            setRepairReady(repairModel);
+        if(comSettings->useSimplifiedCartridgeRepair() && repairModel->cartridge() && repairModel->stateId() == Global::RepStateIds::InWork)
+        {
+            repairModel->set_stateId(Global::RepStateIds::Ready);
+            repairModel->commit();
+        }
 
         repairId = repairModel->id();
 
         amountToPay = m_repairsWithPayment.value(QString::number(repairId), 0);
 
-        switch ( ((amountToPay == 0) << BitAmountZero) | (m_isIssuingInCredit << BitInCredit) | (repairModel->quickRepair() << BitQuickRepair) | repairModel->state() )
+        switch ( ((amountToPay == 0) << BitAmountZero) | (m_isIssuingInCredit << BitInCredit) | (repairModel->isQuickRepair() << BitQuickRepair) | repairModel->stateId() )
         {
             case Global::RepStateIds::ReadyNoRepair:    // выдача без ремонта с оплатой (например, оплата диагностики)
             case Global::RepStateIds::ReadyNoRepair | AmountZero:
@@ -367,7 +378,7 @@ void SDialogIssueRepair::issueRepairs()
         }
 
         workshopIssuedModel = new SWorkshopIssuedModel();
-        workshopIssuedModel->setRepair(repairId);
+        workshopIssuedModel->set_repair(repairId);
         BOQModel = repairModel->BOQModel();
 
         if(amountToPay && m_isPayFromBalance)
@@ -375,18 +386,16 @@ void SDialogIssueRepair::issueRepairs()
             m_clientModel->updateBalance(-amountToPay, tr("Списание %1 за ремонт №%2").arg(sysLocale.toCurrencyString(amountToPay)).arg(repairId));
         }
 
+        BOQModel->commit(WorkshopSaleModel::Sale);
         repairModel->setBoxIndex(-1);
-        repairModel->setState(newState);
+        repairModel->set_stateId(newState);
         if(!m_rejectReason.isEmpty())
-            repairModel->setRejectReason(m_rejectReason);
-        BOQModel->repair_saveTables(SSaleTableModel::RepairOpType::Sale);
+            repairModel->set_rejectReason(m_rejectReason);
         repairModel->commit();
-        nErr = workshopIssuedModel->commit();
+
+        workshopIssuedModel->commit();
 
         delete workshopIssuedModel;
-
-        if(!nErr)
-            throw Global::ThrowType::QueryError;
 
         i++;
     }
@@ -397,21 +406,22 @@ void SDialogIssueRepair::issueRepairs()
     {
         cashRegister = new SCashRegisterModel();
 
-        cashRegister->setOperationType(SCashRegisterModel::RecptRepair);
+        cashRegister->set_operationType(SCashRegisterModel::RecptRepair);
         if(m_repairsModels.count() == 1)
-            cashRegister->setRepairId(repairId);
-        cashRegister->setAmount(m_totalAmountToPay);
-        cashRegister->setReason(cashRegister->constructReason(m_repairsWithPayment.keys().join(", ")));
-        cashRegister->setClient(m_clientModel->id());
-        cashRegister->setSystemId(m_paymentSystemId);
+            cashRegister->set_repair(repairId);
+        cashRegister->set_amount(m_totalAmountToPay);
+        cashRegister->set_reason(cashRegister->constructReason(m_repairsWithPayment.keys().join(", ")));
+        cashRegister->set_client(m_clientModel->id());
+        cashRegister->set_systemId(m_paymentSystemId);
         // Выбор компании и офиса пользователем не предусмотрен; используются текущие значения из userDbData
-        nErr = cashRegister->commit();
+        cashRegister->commit();
 
         delete cashRegister;
-
-        if(!nErr)
-            throw Global::ThrowType::QueryError;
     }
+
+#ifdef QT_DEBUG
+//        Global::throwDebug();
+#endif
 }
 
 /* Установка платёжной системы

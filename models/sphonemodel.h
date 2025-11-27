@@ -1,17 +1,27 @@
 #ifndef SPHONEMODEL_H
 #define SPHONEMODEL_H
 
-#include <QObject>
-#include <QSqlRecord>
-#include <QMetaEnum>
-#include "global.h"
-#include "com_sql_queries.h"
-#include "scomrecord.h"
-#include "slogrecordmodel.h"
+#include <SSingleRowJModel>
 
-class SPhoneModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+// Порядок полей должен совпадать с порядком в запросе QUERY_SEL_CLIENT_PHONES
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(phone, phone, QString, 0)                                   \
+    TABLE_FIELD(phone_clean, phoneClean, QString, 0)                        \
+    TABLE_FIELD(mask, mask, int, 0)                                         \
+    TABLE_FIELD(customer, client, int, 0)                                   \
+    TABLE_FIELD(type, type, int, 0)                                         \
+    TABLE_FIELD(note, note, QString, 0)                                     \
+    TABLE_FIELD(viber, viber, bool, 0)                                      \
+    TABLE_FIELD(telegram, telegram, bool, 0)                                \
+    TABLE_FIELD(whatsapp, whatsapp, bool, 0)                                \
+    TABLE_FIELD(notify, receiveSMS, bool, 0)
+
+class SPhoneModel : public SSingleRowJModel
 {
     Q_OBJECT
+    friend class SPhonesModel;
 signals:
     void markedPrimary(SPhoneModel*);
 public:
@@ -21,39 +31,26 @@ public:
     explicit SPhoneModel(QObject *parent = nullptr);
     explicit SPhoneModel(const QSqlRecord &record, QObject *parent = nullptr);
     ~SPhoneModel();
-    bool commit();
-    void setClient(const int id);
-    QString phone();
-    void setPhone(const QString&);
-    int mask();
-    void setMask(const int index);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    bool commit() override;
     int maskIndex();
-    int type();
-    QString note();
-    void setNote(const QString&);
+    void set_maskIndex(const int index);
     int messengers();
-    void setMessengers(const int opt, bool state = 1);
-    bool isEmpty();
-    void setPrimary(int primary = Primary);
+    void set_messengers(const int opt, bool state = 1);
+    bool isNew();
+    void set_primary(int primary = Primary);
     bool delDBRecord();
-    bool receiveSMS();
-    void setReceiveSMS(bool state);
 private:
-    int m_client_id = 0;
-    QString m_phone;
-    QString m_phoneClean;
-    QString m_note;
-    int m_type = Additional;
-    int m_mask;
-    int m_messengers = 0;
-    int m_initialMessengers = 0;
-    bool m_receiveSMS = 0;
-    QString cleanPhone(const QString &);
-    void setType(const int type);
+    QString fieldsForSelectQuery() override;
+    QString cleanupPhone(const QString &);
+    void phoneChanged(const QString &data);
+    void typeChanged(const int type);
+    void messangersChanged(const int index, bool satate);
     void updateLogAssociatedRecId() override;
-
 public slots:
     void setPrimaryUi();
+    void logDataChange(const int, const QVariant &) override;
 };
 
 #endif // SPHONEMODEL_H

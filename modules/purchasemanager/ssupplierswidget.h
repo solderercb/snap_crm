@@ -1,12 +1,12 @@
 #ifndef SPARTSUPPLIERS_H
 #define SPARTSUPPLIERS_H
 
-#include "widgets/swidget.h"
-#include <QClipboard>
-#include "widgets/stableviewbase.h"
-#include "modules/purchasemanager/sgroupingmodel.h"
-#include "modules/purchasemanager/ssuppliersmodel.h"
-#include "modules/purchasemanager/srequest.h"
+#include <SWidget>
+#include <STableViewBase>
+#include <SPartRequest>
+
+class SPartsRequestsGroupingModel;
+class SPartSuppliersModel;
 
 namespace Ui {
 class SPartSuppliers;
@@ -35,7 +35,7 @@ public:
     void setPredefSupplierId(const int id);
     void refresh(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
     void connectSuppliersTableWithManager();
-    void commit();
+    void commit(const int stage = 0) override;
 private:
     Ui::SPartSuppliers *ui;
     SPartSuppliersModel *m_model;
@@ -50,8 +50,7 @@ private:
     void initTableMenu();
     void addRow();
     void copyLink();
-protected slots:
-    virtual void manualSubmit();
+    void endCommit() override;
 public slots:
     void orderChanged(const int section, Qt::SortOrder order);
     void removeSelected();

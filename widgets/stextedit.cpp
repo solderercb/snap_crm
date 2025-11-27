@@ -1,4 +1,7 @@
 #include "stextedit.h"
+#include <QWidget>
+#include <QDebug>
+#include <QScrollBar>
 
 STextEdit::STextEdit(QWidget *parent) :
     QTextEdit(parent),

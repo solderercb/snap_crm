@@ -4,9 +4,8 @@
 #define STABLEBASEMODEL_H
 
 #include <QSqlQueryModel>
-#include "stablemodelscommonmethods.h"
+#include <STableModelCommonMethods>
 #include <QObject>
-#include <QDebug>
 
 class STableBaseModel : public QSqlQueryModel, public STableModelsCommonMethods
 {

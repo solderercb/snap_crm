@@ -1,11 +1,11 @@
 #ifndef SHORTLIVEDNOTIFICATION_H
 #define SHORTLIVEDNOTIFICATION_H
 
-#include <QtWidgets/QApplication>
 #include <QWidget>
 #include <QLabel>
-#include <QScreen>
-#include <QTimer>
+
+class QTimer;
+
 #define MAX_POPUPS 3
 #define DEFAULT_WIDTH  385
 #define DEFAULT_HEIGHT  90

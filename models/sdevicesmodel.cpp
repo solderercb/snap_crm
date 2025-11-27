@@ -2,6 +2,9 @@
  *  Представляет из себя "матрёшку", вложениями которой являются модели данных производителей и моделей устройств
  */
 #include "sdevicesmodel.h"
+#include <QSqlQueryModel>
+#include <ProjectQueries>
+#include <SDeviceMakersModel>
 
 SDevicesModel::SDevicesModel(const int office, QObject *parent) : QObject(parent)
 {

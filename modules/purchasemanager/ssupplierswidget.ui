@@ -96,7 +96,7 @@
   <customwidget>
    <class>STableViewPartRequestSuppliers</class>
    <extends>QTableView</extends>
-   <header>modules/purchasemanager/ssupplierstable.h</header>
+   <header location="global">SPartRequestSuppliersView</header>
   </customwidget>
  </customwidgets>
  <resources/>

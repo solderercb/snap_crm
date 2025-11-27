@@ -1,14 +1,16 @@
 #ifndef SCARTRIDGECARD_H
 #define SCARTRIDGECARD_H
 
-#include <QWidget>
-#include "models/scartridgecardmodel.h"
-#include "models/scartridgematerialmodel.h"
-#include "models/scartridgematerialsmodel.h"
-#include "widgets/smodalwidget.h"
-#include "widgets/stableviewbase.h"
-#include "widgets/scartridgematerialstableitemdelegates.h"
-#include "widgets/shortlivednotification.h"
+#include <QObject>
+#include <STableViewBase>
+#include <SModalWidget>
+
+class QWidget;
+class SCartridgeCardModel;
+class SCartridgeMaterialsModel;
+class SSqlQueryModel;
+class SStandardItemModel;
+class FlashPopup;
 
 namespace Ui {
 class SCartridgeCard;
@@ -62,7 +64,7 @@ public:
     void configureWidgets();
     void updateWidgets();
     static SStandardItemModel *colorsList();
-    bool checkInput();
+    int checkInput() override;
 private:
     Ui::SCartridgeCard *ui;
     int m_id = 0;
@@ -84,11 +86,15 @@ private:
     void setModelData();
     QString cartridgeName();
     void translateNames();
+protected:
+    void throwHandler(int) override;
+    void beginCommit() override;
+    void endCommit() override;
 private slots:
     void materialSelected(const QModelIndex &index);
     void removeMaterial();
     void setTonerWeight(const int weight);
-    bool commit();
+    void commit(const int stage) override;
     void closeForm();
     void sortMaterials(const int column);
 };

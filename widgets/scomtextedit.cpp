@@ -1,6 +1,12 @@
 #include "scomtextedit.h"
-#include "stextedit.h"
-#include "splaintextedit.h"
+#include <QAbstractScrollArea>
+#include <QScrollBar>
+#include <QSize>
+#include <QResizeEvent>
+#include <QTextDocument>
+#include <STextEdit>
+#include <SPlainTextEdit>
+#include <QDebug>
 
 SComTextEdit::SComTextEdit(QWidget *derived) :
     q_ptr(derived)

@@ -1,17 +1,17 @@
 #ifndef SBILLOFQUANTITIES_H
 #define SBILLOFQUANTITIES_H
 
-#include <QWidget>
-#include "models/srepairmodel.h"
-#include "models/ssaletablemodel.h"
-#include "widgets/stableviewboqworkshop.h"
-#include "widgets/stableviewboqitemdelegates.h"
+#include <QObject>
+#include <SWidget>
+
+class SRepairModel;
+class WorkshopSaleModel;
 
 namespace Ui {
 class SBillOfQuantities;
 }
 
-class SBillOfQuantities : public QWidget
+class SBillOfQuantities : public SWidget
 {
     Q_OBJECT
 signals:
@@ -23,7 +23,6 @@ public:
     void linkWithRepairModel(SRepairModel *model);
     void setReadOnly(bool state = true);
     bool isDirty();
-    void commit();
     void load(const int repair);
     bool isEmpty();
     void clearTable();
@@ -32,11 +31,14 @@ public:
 #endif
 private:
     Ui::SBillOfQuantities *ui;
-    SSaleTableModel *m_model = nullptr;
+    WorkshopSaleModel *m_model = nullptr;
     SRepairModel *m_repairModel = nullptr;
     bool m_modelRO = 1;
     bool m_modelAdmEdit = 0;
     int m_clientId = 0;
+    int checkInput() override;
+    void commit(const int) override;
+    void endCommit() override;
 public slots:
     void updateWidgets();
     void switchEditStrategy(bool);
@@ -46,7 +48,6 @@ private slots:
     bool quickAddPart(const int uid);
     void updateAmounts(const double, const double, const double);
     void saveAmounts();
-    void saveSaleTableClicked();
     void setSaveSaleTableEnabled();
     void buttonWorksAdminEdit(bool state);
     void buttonAddItemClicked();

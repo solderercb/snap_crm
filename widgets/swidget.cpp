@@ -1,23 +1,17 @@
 #include "swidget.h"
-#include "mainwindow.h"
-#include "tabcommon.h"
-#include "global.h"
-#include "models/susersettings.h"
+#include <MainWindow>
+#include <tabCommon>
+#include <ProjectGlobals>
+#include <SUserSettings>
 
 SWidget::SWidget(QWidget *parent, Qt::WindowFlags flags) :
     QWidget(parent, flags)
 {
     connect(userDbData, &SUserSettings::fontSizeChanged, this, &SWidget::guiFontChanged);
-#ifdef QT_DEBUG
-    i_queryLog = new SQueryLog();
-#endif
 }
 
 SWidget::~SWidget()
 {
-#ifdef QT_DEBUG
-    delete i_queryLog;
-#endif
 }
 
 /* Возвращающает объект QFont с новым размером (в дальнейшем и типом); предназначен для использования в методе guiFontChanged();
@@ -26,7 +20,7 @@ QFont SWidget::guiFont()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
 
     return font;
 }

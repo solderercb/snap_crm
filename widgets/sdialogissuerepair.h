@@ -1,18 +1,12 @@
 #ifndef SDIALOGISSUEREPAIR_H
 #define SDIALOGISSUEREPAIR_H
 
-#include "widgets/smodalwidget.h"
-#include <QLocale>
-#include "global.h"
-#include "shortlivednotification.h"
-#include "models/srepairmodel.h"
-#include "models/sclientmodel.h"
-#include "models/scashregistermodel.h"
-#include "models/ssaletablemodel.h"
-#include "models/ssortfilterproxymodel.h"
-#include "models/sworkshopissuedmodel.h"
-#include "models/srepairstatuslog.h"
-#include "reports/sprintposreport.h"
+#include <SModalWidget>
+
+class SRepairModel;
+class SClientModel;
+class SSaleTableModel;
+class SSortFilterProxyModel;
 
 namespace Ui {
 class SDialogIssueRepair;
@@ -67,13 +61,16 @@ private:
     void initWidgets();
     void updateWidgets();
     void initPaymentSystems();
-    bool checkInput();
+    bool manualSubmit() override;
+    int checkInput() override;
+    void beginCommit() override;
+    void commit(const int stage) override;
+    void throwHandler(int) override;
+    void endCommit() override;
     bool checkAmounts();
     void collectRepairsData();
-    void setRepairReady(SRepairModel *model);
     void getWidgetsValues();
 private slots:
-    void buttonIssueClicked();
     void buttonCancelClicked();
     void createLooseDoc();
     void otheRejectReasonShow(QString);

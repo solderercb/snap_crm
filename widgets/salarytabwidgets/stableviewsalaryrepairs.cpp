@@ -1,5 +1,6 @@
 #include "stableviewsalaryrepairs.h"
-#include "models/salarytabmodels/stablesalaryrepairsmodel.h"
+#include <STableViewGridLayout>
+#include <SSalaryRepairsModel>
 
 STableViewSalaryRepairs::STableViewSalaryRepairs(QWidget *parent) :
     STableViewBase(SLocalSettings::SalaryRepairsGrid, parent)

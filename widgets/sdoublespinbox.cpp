@@ -1,11 +1,12 @@
 #include "sdoublespinbox.h"
-#include "global.h"
+#include <ProjectGlobals>
+#include <SComSettings>
 
 SDoubleSpinBox::SDoubleSpinBox(QWidget *parent) :
     QDoubleSpinBox(parent)
 {
     setButtonSymbols(QAbstractSpinBox::NoButtons);
-    if(comSettings->classicKassa)
+    if(comSettings->classicKassa())
     {
         setDecimals(2);
     }
@@ -22,7 +23,7 @@ bool SDoubleSpinBox::eventFilter(QObject *watched, QEvent *event)
 {
     if(event->type() == QEvent::KeyPress)
     {
-        // В английской раскладке разделитель по умолчанию — точка, а в русской — запятая; при этом в Windows для стран СНГ (и других)
+        // В английской раскладке разделитель по умолчанию — точка, а в русской — запятая; при этом в Windows для стран СНГ (и других)
         // разделитель по умолчанию — запятая.
         // При вводе дробной части может быть включена не та раскладка клавиатуры и тогда символ не введётся; это дико бесит.
         QKeyEvent *e = dynamic_cast<QKeyEvent*>(event);

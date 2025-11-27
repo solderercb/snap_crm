@@ -1,9 +1,10 @@
 #ifndef STABLEVIEWPARTSREQUESTS_H
 #define STABLEVIEWPARTSREQUESTS_H
 
-#include "widgets/stableviewbase.h"
-#include "widgets/stableviewbaseitemdelegates.h"
-#include "modules/purchasemanager/srequestsmodel.h"
+#include <QMessageBox>
+#include <STableViewBase>
+#include <STableViewBaseDelegates>
+#include <SPartsRequestsModel>
 #include <QWidget>
 
 class STableViewPartsRequestsItemDelegates : public STableViewBaseItemDelegates

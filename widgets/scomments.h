@@ -1,15 +1,13 @@
 #ifndef SCOMMENTS_H
 #define SCOMMENTS_H
 
-#include <QScrollArea>
-#include "tabcommon.h"
-#include "widgets/swidget.h"
-#include "widgets/splaintextedit.h"
-#include "../models/scommentmodel.h"
-#include "../models/scommentsmodel.h"
-#ifdef QT_DEBUG
-#include <QTest>
-#endif
+#include <QTableView>
+#include <SWidget>
+
+class SCommentsModel;
+class QSqlQuery;
+class tabCommon;
+class QMenu;
 
 namespace Ui {
 class SComments;
@@ -33,7 +31,7 @@ private:
 class SComments : public SWidget
 {
     Q_OBJECT
-
+    friend class TClassTest;
 public:
     enum MenuActions{Copy = 0, Edit, Remove};
     explicit SComments(QWidget *parent = nullptr);
@@ -42,19 +40,27 @@ public:
     void setMode(const int);
     void load(const int);
 private:
+    enum OpType {Commit, Delete};
     Ui::SComments *ui;
     SCommentsModel *commentsModel;
     QSqlQuery *m_query;
     tabCommon *m_parentTab = nullptr;
     QMenu *tableMenu = nullptr;
+    int m_opType = Commit;
     bool isEditable(const int row);
     tabCommon *findParentTab();
     void checkParentTab();
     void initTableMenu();
     void appendLineTermination();
     void clearInputField();
-    void commit();
     void editLastComment();
+    int checkInput() override;
+    QString queryLogFile() override;
+    void commit(const int stage = 0) override;
+    void addComment();
+    void updateComment();
+    void deleteComment();
+    void endCommit() override;
 private slots:
     void menuRequest(QPoint pos);
     void remove();

@@ -1,7 +1,7 @@
 #ifndef STABLEVIEWSALARYITEMS_H
 #define STABLEVIEWSALARYITEMS_H
 
-#include "../stableviewbase.h"
+#include <STableViewBase>
 #include <QObject>
 
 class STableViewSalaryItems : public STableViewBase

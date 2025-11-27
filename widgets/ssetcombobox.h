@@ -7,23 +7,15 @@
 #define PATCH 1
 #define COMMIT 50
 
-#include <QCoreApplication>
-#include <QApplication>
-#include <QWidget>
 #include <QLineEdit>
-#include <QCompleter>
-#include <QEvent>
-#include <QFocusEvent>
-#include <QRandomGenerator>
-#include <QMouseEvent>
-#include <QToolButton>
-#include <QKeyEvent>
-#include <QRegularExpression>
-#include "models/ssortfilterproxymodel.h"
-#include "widgets/scombobox.h"
-//#include <QDebug>
-//#include <QTest>
-//#include <QListView>
+#include <SComboBox>
+
+class QEvent;
+class QFontMetrics;
+class QToolButton;
+class QCompleter;
+class SSortFilterProxyModel;
+class QResizeEvent;
 
 class daughterLineEdit : public QLineEdit
 {

@@ -6,9 +6,6 @@
 #define QTOOLTIPPER_H_
 
 #include <QObject>
-#include <QAbstractItemView>
-#include <QHelpEvent>
-#include <QToolTip>
 
 class QToolTipper : public QObject
 {

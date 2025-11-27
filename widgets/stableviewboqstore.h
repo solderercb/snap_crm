@@ -1,8 +1,8 @@
 #ifndef STABLEVIEWBOQSTORE_H
 #define STABLEVIEWBOQSTORE_H
-#include "widgets/stableviewbase.h"
-#include "widgets/stableviewboqitemdelegates.h"
-#include "models/ssaletablemodel.h"
+#include <STableViewBase>
+
+class SSaleTableModel;
 
 class STableViewBOQStore : public STableViewBase
 {

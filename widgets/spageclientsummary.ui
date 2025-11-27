@@ -577,13 +577,13 @@
   <customwidget>
    <class>SPhones</class>
    <extends>QWidget</extends>
-   <header>widgets/sphones.h</header>
+   <header location="global">SPhones</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
    </slots>

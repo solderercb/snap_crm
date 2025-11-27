@@ -1,9 +1,24 @@
-#include "global.h"
 #include "tabprintdialog.h"
 #include "ui_tabprintdialog.h"
-#include "com_sql_queries.h"
+#include <QWidget>
+#include <QPrinter>
+#include <QPrinterInfo>
+#include <QPageSetupDialog>
+#include <QMessageBox>
+#include <QMetaEnum>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SAppLog>
+#include <MainWindow>
+#include <SLocalSettingsStructs>
+#include <SRepairModel>
+#include <SClientModel>
+#include <FlashPopup>
+#include <SLogRecordModel>
+#include <STechReportModel>
+#include <SPrintPOSReport>
 
-tabPrintDialog::tabPrintDialog(MainWindow *parent, Global::Reports type) :
+tabPrintDialog::tabPrintDialog(MainWindow *parent, int type) :
     tabCommon(parent),
     ui(new Ui::tabPrintDialog)
 {
@@ -20,6 +35,12 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, Global::Reports type) :
     ui->comboBoxPrinters->addItems(m_printersList);
 
     connect(ui->comboBoxPrinters, &QComboBox::currentTextChanged, this, &tabPrintDialog::setPrinter);   // подключение сигнал-слот именно здесь, чтобы избежать лишних вызовов слота при установке принтеров, сохранённых в настройках
+}
+
+tabPrintDialog::tabPrintDialog(MainWindow *parent):
+    tabPrintDialog(parent, Global::Reports::not_impl)
+{
+
 }
 
 tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> report_vars):
@@ -63,7 +84,7 @@ void tabPrintDialog::startRender()
     renderDelayTimer->start(100);
 }
 
-tabPrintDialog *tabPrintDialog::create(Global::Reports type)
+tabPrintDialog *tabPrintDialog::create(int type)
 {
     MainWindow *mw = MainWindow::getInstance();
     QTabWidget *tw = mw->findChild<QTabWidget*>();
@@ -147,8 +168,8 @@ void tabPrintDialog::initRepairDataSources()
 void tabPrintDialog::initRepairStickerDataSources()
 {
     SReportsCommonFunctions::initRepairStickerDataSources();
-    logRecord->setType(SLogRecordModel::Repair);
-    logRecord->setRepairId(m_reportVars.value("repair_id").toInt());
+    logRecord->set_type(SLogRecordModel::Repair);
+    logRecord->set_repair(m_reportVars.value("repair_id").toInt());
 }
 
 void tabPrintDialog::notImplementedReport()
@@ -294,12 +315,13 @@ void tabPrintDialog::pushButtonPrintClicked()
     }
 
     m_printer->setCopyCount(ui->spinBoxCopies->value());
-    shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Информация"), tr("Отправлено на печать"), QColor(212,237,242), QColor(229,244,247));
+    auto *p = new shortlivedNotification(this, tr("Информация"), tr("Отправлено на печать"), QColor(212,237,242), QColor(229,244,247));
+    Q_UNUSED(p);
     m_previewWidget->print(m_printer);
     switch(m_reportType)
     {
-        case Global::Reports::new_rep: logRecord->setText(tr("Печать квитанции к ремонту №%1").arg(m_reportVars.value("repair_id").toInt())); logRecord->commit(); break;
-        case Global::Reports::rep_label: logRecord->setText(tr("Печать стикеров к ремонту №%1 в кол-ве %2шт.").arg(m_reportVars.value("repair_id").toInt()).arg(ui->spinBoxCopies->value())); logRecord->commit(); break;
+        case Global::Reports::new_rep: logRecord->set_text(tr("Печать квитанции к ремонту №%1").arg(m_reportVars.value("repair_id").toInt())); logRecord->commit(); break;
+        case Global::Reports::rep_label: logRecord->set_text(tr("Печать стикеров к ремонту №%1 в кол-ве %2шт.").arg(m_reportVars.value("repair_id").toInt()).arg(ui->spinBoxCopies->value())); logRecord->commit(); break;
         default: ;
     }
 }
@@ -570,7 +592,7 @@ void tabPrintDialog::printCartridgeWorksReports(QList<SRepairModel *> list, bool
     {
         // Если запрошена печать чека-акта, а стоимость ремонта равна 0 (и, соответственно, список работ пуст), то такой чек не печатается вообще
         // во всех остальных случаях производится или печать чека-акта или печать чека-квитанции
-        switch( (((*i)->realRepairCost() == 0) << 7) | (*i)->state() )
+        switch( (((*i)->realRepairCost() == 0) << 7) | (*i)->stateId() )
         {
             case (1 << 7) | Global::RepStateIds::Returned:
             case (1 << 7) | Global::RepStateIds::ReturnedNoRepair:

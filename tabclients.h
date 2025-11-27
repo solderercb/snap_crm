@@ -1,20 +1,11 @@
 #ifndef TABCLIENTS_H
 #define TABCLIENTS_H
 
-#include <QWidget>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QToolButton>
-#include <QStyle>
-#include <QTableWidget>
-#include <QLabel>
-#include <QSqlQueryModel>
-#include <QSortFilterProxyModel>
-#include <QTimer>
-#include "mainwindow.h"
-#include "tabcommon.h"
-#include "models/stableclientsmodel.h"
-#include "widgets/stableviewbase.h"
+#include <tabCommon>
+
+class QWidget;
+class MainWindow;
+class STableClientsModel;
 
 namespace Ui {
 class tabClients;
@@ -44,9 +35,8 @@ private:
 #ifdef QT_DEBUG
     void randomFill() override{};
 #endif
-
 private slots:
-    void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
+    void refreshTable(bool preserveScrollPos, bool preserveSelection) override;
     void clientTypeChanged(QModelIndex);
     void clientAdvertisingChanged(int);
     void tableItemDoubleClick(QModelIndex);

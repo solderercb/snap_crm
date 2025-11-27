@@ -2,10 +2,13 @@
 #define SPAGESALARYBASE_H
 
 #include <QObject>
-#include <QWidget>
-#include "tabsalary.h"
+#include <SWidget>
 
-class SPageSalaryBase : public QWidget
+class MainWindow;
+class tabSalary;
+class SUserModel;
+
+class SPageSalaryBase : public SWidget
 {
     Q_OBJECT
 public:

@@ -1,10 +1,7 @@
 #ifndef SMODALWIDGET_H
 #define SMODALWIDGET_H
 
-#include "widgets/swidget.h"
-#include "global.h"
-#include "shortlivednotification.h"
-#include "mainwindow.h"
+#include <SWidget>
 
 class SModalWidget : public SWidget
 {

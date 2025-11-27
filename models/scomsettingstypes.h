@@ -1,8 +1,15 @@
 #ifndef SCOMSETTINGSTYPES_H
 #define SCOMSETTINGSTYPES_H
-#include <3rdparty/QSerializer/QSerializer>
-#include "models/sstandarditemmodel.h"
-#include <QTimeZone>
+#include <QSerializer>
+#include <SStandardItemModel>
+
+/* Специальная струтура для регистрации типов данных в системе мета-объектов
+ *
+*/
+struct SComSettingsTypesRegistrator{
+public:
+    SComSettingsTypesRegistrator();
+};
 
 class t_status : public QSerializer
 {
@@ -134,6 +141,86 @@ class t_smsConfig : public QSerializer
     QS_JSON_FIELD(QString, Login)
     QS_JSON_FIELD(QString, Password)
     QS_JSON_FIELD(QString, Sender)
+};
+
+Q_DECLARE_METATYPE(t_status)
+Q_DECLARE_METATYPE(t_repairStatuses)
+Q_DECLARE_METATYPE(t_emailConfig)
+Q_DECLARE_METATYPE(t_repairDispatcherUsers)
+Q_DECLARE_METATYPE(t_repairDispatcherAssignCriteria)
+Q_DECLARE_METATYPE(t_smsConfig)
+
+inline SComSettingsTypesRegistrator::SComSettingsTypesRegistrator()
+{
+    qRegisterMetaType<t_status>("t_status");
+    qRegisterMetaType<t_repairStatuses>("t_repairStatuses");
+    qRegisterMetaType<t_emailConfig>("t_emailConfig");
+    qRegisterMetaType<t_repairDispatcherUsers>("t_repairDispatcherUsers");
+    qRegisterMetaType<t_repairDispatcherAssignCriteria>("t_repairDispatcherAssignCriteria");
+    qRegisterMetaType<t_smsConfig>("t_smsConfig");
+
+    QMetaType::registerConverter<QString, t_status>([](const QString &s) {
+        t_status val;
+        val.QSerializer::fromJson(s.toLocal8Bit());
+        return val;
+    });
+
+    QMetaType::registerConverter<t_status, QString>([](const t_status &val) {
+        return val.toRawJson();
+    });
+
+    QMetaType::registerConverter<QString, t_repairStatuses>([](const QString &s) {
+        t_repairStatuses val;
+        val.fromJsonArray(s.toLocal8Bit());
+        return val;
+    });
+
+    QMetaType::registerConverter<t_repairStatuses, QString>([](const t_repairStatuses &val) {
+        return val.toRawJsonArray();
+    });
+
+
+    QMetaType::registerConverter<QString, t_emailConfig>([](const QString &s) {
+        t_emailConfig val;
+        val.fromJson(s.toLocal8Bit());
+        return val;
+    });
+
+    QMetaType::registerConverter<t_emailConfig, QString>([](const t_emailConfig &val) {
+        return val.toRawJson();
+    });
+
+    QMetaType::registerConverter<QString, t_repairDispatcherUsers>([](const QString &s) {
+        t_repairDispatcherUsers val;
+        val.fromJsonArray(s.toLocal8Bit());
+        return val;
+    });
+
+    QMetaType::registerConverter<t_repairDispatcherUsers, QString>([](const t_repairDispatcherUsers &val) {
+        return val.toRawJsonArray();
+    });
+
+
+    QMetaType::registerConverter<QString, t_repairDispatcherAssignCriteria>([](const QString &s) {
+        t_repairDispatcherAssignCriteria val;
+        val.fromJson(s.toLocal8Bit());
+        return val;
+    });
+
+    QMetaType::registerConverter<t_repairDispatcherAssignCriteria, QString>([](const t_repairDispatcherAssignCriteria &val) {
+        return val.toRawJson();
+    });
+
+
+    QMetaType::registerConverter<QString, t_smsConfig>([](const QString &s) {
+        t_smsConfig val;
+        val.fromJson(s.toLocal8Bit());
+        return val;
+    });
+
+    QMetaType::registerConverter<t_smsConfig, QString>([](const t_smsConfig &val) {
+        return val.toRawJson();
+    });
 };
 
 #endif // SCOMSETTINGSTYPES_H

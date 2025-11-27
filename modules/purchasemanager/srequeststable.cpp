@@ -1,6 +1,10 @@
 #include "srequeststable.h"
-#include "../../global.h"
-#include "qlistview.h"
+#include <ProjectGlobals>
+#include <QListView>
+#include <QTimeZone>
+#include <SStandardItemModel>
+#include <STableViewGridLayout>
+#include <QSpinBox>
 
 STableViewPartsRequests::STableViewPartsRequests(QWidget *parent) :
     STableViewBase(SLocalSettings::BuyRequestManagerGrid, parent)

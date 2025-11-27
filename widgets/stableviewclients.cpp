@@ -1,4 +1,8 @@
 #include "stableviewclients.h"
+#include <STableViewGridLayout>
+#include <STableBaseModel>
+#include <QWidget>
+#include <SClientsDelegates>
 
 STableViewClients::STableViewClients(QWidget *parent) :
     STableViewBase(SLocalSettings::CustomersGrid, parent)

@@ -1,4 +1,18 @@
 #include "stableviewboqitemdelegates.h"
+#include <ProjectGlobals>
+#include <SSqlQueryModel>
+#include <SStoreSaleItemModel>
+#include <SStandardItemModel>
+#include <QApplication>
+#include <QStyledItemDelegate>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QLineEdit>
+#include <QMouseEvent>
+#include <QAbstractItemView>
+#include <SSaleTableModel>
 
 STableViewBOQItemDelegates::STableViewBOQItemDelegates(QObject *parent) : STableViewBaseItemDelegates(parent)
 {
@@ -20,13 +34,13 @@ QWidget *STableViewBOQItemDelegates::createEditor(QWidget *parent, const QStyleO
 {
     switch (index.column())
     {
-        case SStoreItemModel::SaleOpColumns::ColCount:
+        case SSaleTableModel::Columns::Count:
             return createSpinBox(parent, index); break;
-        case SStoreItemModel::SaleOpColumns::ColPrice:
+        case SSaleTableModel::Columns::Price:
             return createDoubleSpinBox(parent, index); break;
-        case SStoreItemModel::SaleOpColumns::ColWarranty:
+        case SSaleTableModel::Columns::Warranty:
             return createComboBox(parent, warrantyTermsModel); break;
-        case SStoreItemModel::SaleOpColumns::ColUser:
+        case SSaleTableModel::Columns::User:
             return createComboBox(parent, usersModel); break;
         default:
             return STableViewBaseItemDelegates::createEditor(parent, option, index);
@@ -37,12 +51,12 @@ void STableViewBOQItemDelegates::setEditorData(QWidget *editor, const QModelInde
 {
     switch (index.column())
     {
-        case SStoreItemModel::SaleOpColumns::ColCount:
+        case SSaleTableModel::Columns::Count:
             setSpinBoxData(editor, index.data().toInt()); return;
-        case SStoreItemModel::SaleOpColumns::ColPrice:
+        case SSaleTableModel::Columns::Price:
             setDoubleSpinBoxData(editor, sysLocale.toDouble(index.data().toString())); return;
-        case SStoreItemModel::SaleOpColumns::ColWarranty:
-        case SStoreItemModel::SaleOpColumns::ColUser:
+        case SSaleTableModel::Columns::Warranty:
+        case SSaleTableModel::Columns::User:
             setComboBoxData(editor, index.data().toString()); return;
         default:
             STableViewBaseItemDelegates::setEditorData(editor, index);
@@ -53,12 +67,12 @@ void STableViewBOQItemDelegates::setModelData(QWidget *editor, QAbstractItemMode
 {
     switch (index.column())
     {
-        case SStoreItemModel::SaleOpColumns::ColCount:
+        case SSaleTableModel::Columns::Count:
             setModelDataFromSpinBox(editor, model, index); return;
-        case SStoreItemModel::SaleOpColumns::ColPrice:
+        case SSaleTableModel::Columns::Price:
             setModelDataFromDoubleSpinBox(editor, model, index); return;
-        case SStoreItemModel::SaleOpColumns::ColWarranty:
-        case SStoreItemModel::SaleOpColumns::ColUser:
+        case SSaleTableModel::Columns::Warranty:
+        case SSaleTableModel::Columns::User:
             setModelDataFromComboBox(editor, model, index); return;
         default:
             STableViewBaseItemDelegates::setModelData(editor, model, index);
@@ -68,21 +82,21 @@ void STableViewBOQItemDelegates::setModelData(QWidget *editor, QAbstractItemMode
 void STableViewBOQItemDelegates::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
-    if(index.column() == SStoreItemModel::SaleOpColumns::ColId )
+    if(index.column() == SSaleTableModel::Columns::Id )
     {
-        switch (rowConditionsForPixmap(index))
+        switch (m_tableModel->pixmapFlags(index))
         {
-            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreNew << 8                                                       | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreReserved << 8                                                  | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8                                                      | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopAdm << 8                                                    | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8                                                     | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, RemovePart, painter); drawPixmap(option.rect, Part, painter); break;
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopAdm << 8                                                    | SSaleTableModel::RecordType::Work):
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRW << 8                                                     | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, RemoveWork, painter); drawPixmap(option.rect, Work, painter); drawPixmap(option.rect, AddPart, painter); break;
-            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8     | SStoreSaleItemModel::Cancelled << 1            | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreCancelled << 8| SStoreSaleItemModel::Cancelled << 1            | SSaleTableModel::RecordType::Item):
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, Part, painter); break;
-            case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                     | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, Work, painter); break;
+            case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::New << 8                                              | SSaleTableModel::RecordType::Item):
+            case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::Reserved << 8                                         | SSaleTableModel::RecordType::Item):
+            case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::Sold << 8                                             | SSaleTableModel::RecordType::Item):
+            case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::Adm << 8                                           | SSaleTableModel::RecordType::Item):
+            case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::RW << 8                                            | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, RemovePart, painter); drawPixmap(option.rect, Part, painter); break;
+            case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::Adm << 8                                           | SSaleTableModel::RecordType::Work):
+            case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::RW << 8                                            | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, RemoveWork, painter); drawPixmap(option.rect, Work, painter); drawPixmap(option.rect, AddPart, painter); break;
+            case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::Sold << 8      | SStoreSaleItemModel::Cancelled << 1  | SSaleTableModel::RecordType::Item):
+            case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::Cancelled << 8 | SStoreSaleItemModel::Cancelled << 1  | SSaleTableModel::RecordType::Item):
+            case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::RO << 8                                            | SSaleTableModel::RecordType::Item): drawPixmap(option.rect, Part, painter); break;
+            case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::RO << 8                                            | SSaleTableModel::RecordType::Work): drawPixmap(option.rect, Work, painter); break;
         }
     }
     else
@@ -122,25 +136,17 @@ void STableViewBOQItemDelegates::drawPixmap(const QRect &rect, PixmapType p, QPa
     QApplication::style()->drawItemPixmap(painter, pixmapRect(rect, p), 1, pixmap.scaled(PIXMAP_W,PIXMAP_H));
 }
 
-int STableViewBOQItemDelegates::rowConditionsForPixmap(const QModelIndex &index) const
-{
-    return m_tableModel->mode() << 16 |\
-           m_tableModel->state() << 8 |\
-           index.data(SSaleTableModel::DataRoles::State).toBool() << 1 |\
-                               index.data(SSaleTableModel::DataRoles::RecordType).toBool();
-}
-
 void STableViewBOQItemDelegates::buttonHandler(const int buttonNum, const int row)
 {
     // действия при прямой продаже и в карте ремонта разные; формируем уникальный идентификатор
-    int action = m_tableModel->mode() << 8 | m_tableModel->recordType(row) << 4 | buttonNum;
+    int action = m_tableModel->saleMode() << 8 | m_tableModel->recordType(row) << 4 | buttonNum;
     switch(action)
     {
-        case (SSaleTableModel::StoreSale << 8    | SSaleTableModel::RecordType::Item << 4 | 1):
-        case (SSaleTableModel::WorkshopSale << 8 | SSaleTableModel::RecordType::Work << 4 | 0):
-        case (SSaleTableModel::WorkshopSale << 8 | SSaleTableModel::RecordType::Item << 4 | 1): m_tableModel->removeRow(row); break; // кнопка "удалить"
-        case (SSaleTableModel::WorkshopSale << 8 | SSaleTableModel::RecordType::Work << 4 | 2): emit addItem(); break; // кнопка "добавить деталь"
-        case (SSaleTableModel::StoreSale << 8    | 2): ; break; // нет действия
+        case (StoreSaleModel::SaleMode << 8    | SSaleTableModel::RecordType::Item << 4 | 1):
+        case (WorkshopSaleModel::SaleMode << 8 | SSaleTableModel::RecordType::Work << 4 | 0):
+        case (WorkshopSaleModel::SaleMode << 8 | SSaleTableModel::RecordType::Item << 4 | 1): m_tableModel->removeRow(row); break; // кнопка "удалить"
+        case (WorkshopSaleModel::SaleMode << 8 | SSaleTableModel::RecordType::Work << 4 | 2): emit addItem(); break; // кнопка "добавить деталь"
+        case (StoreSaleModel::SaleMode << 8    | 2): ; break; // нет действия
     }
 }
 
@@ -149,15 +155,15 @@ bool STableViewBOQItemDelegates::editorEvent(QEvent *event, QAbstractItemModel *
     if( event->type() == QEvent::MouseButtonRelease )
     {
         QMouseEvent * e = (QMouseEvent *)event;
-        if( index.column() == SStoreItemModel::SaleOpColumns::ColId )
+        if( index.column() == SSaleTableModel::Columns::Id )
         {
-            switch (rowConditionsForPixmap(index)) // условия, при которых обработка не требуется
+            switch (m_tableModel->pixmapFlags(index)) // условия, при которых обработка не требуется
             {
-                case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreCancelled << 8 | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreReserved << 8  | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::StoreSale << 16    | SSaleTableModel::StoreSold << 8      | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                      | SSaleTableModel::RecordType::Item):
-                case (SSaleTableModel::TablesSet::WorkshopSale << 16 | SSaleTableModel::WorkshopRO << 8                                                      | SSaleTableModel::RecordType::Work): return true;
+                case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::Cancelled << 8 | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
+                case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::Reserved << 8  | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
+                case (StoreSaleModel::SaleMode << 16    | StoreSaleModel::Sold << 8      | SStoreSaleItemModel::State::Cancelled << 1     | SSaleTableModel::RecordType::Item):
+                case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::RO << 8                                                      | SSaleTableModel::RecordType::Item):
+                case (WorkshopSaleModel::SaleMode << 16 | WorkshopSaleModel::RO << 8                                                      | SSaleTableModel::RecordType::Work): return true;
             }
 
             // кнопка в ячеейке tableView; взято: https://stackoverflow.com/a/11778012
@@ -196,7 +202,7 @@ QSpinBox *STableViewBOQItemDelegates::createSpinBox(QWidget *parent, const QMode
 {
     QSpinBox *sb = STableViewBaseItemDelegates::createSpinBox(parent, index);
     sb->setMinimum(1);
-    sb->setMaximum(m_tableModel->index(index.row(), SStoreItemModel::SaleOpColumns::ColAvail).data().toInt());
+    sb->setMaximum(m_tableModel->index(index.row(), SSaleTableModel::Columns::Avail).data().toInt());
     return sb;
 }
 
@@ -205,7 +211,7 @@ QDoubleSpinBox *STableViewBOQItemDelegates::createDoubleSpinBox(QWidget *parent,
     QDoubleSpinBox *sb = STableViewBaseItemDelegates::createDoubleSpinBox(parent, index);
 
     // в гарантийном ремонте минимальная цена может быть равна нулю
-    if(m_tableModel->isWarranty() || !m_tableModel->index(index.row(), 0).data(SSaleTableModel::DataRoles::RecordType).toBool())
+    if(m_tableModel->isWarranty() || !m_tableModel->index(index.row(), SSaleTableModel::Columns::RecordType).data().toBool())
         sb->setMinimum(0);
 
     return sb;

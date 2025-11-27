@@ -448,12 +448,12 @@
   <customwidget>
    <class>STableViewSalaryItems</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalaryitems.h</header>
+   <header location="global">SSalaryItemsView</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalaryItemsSummary</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/spagesalaryitems.h</header>
+   <header location="global">SSalaryItemsPage</header>
   </customwidget>
  </customwidgets>
  <resources/>

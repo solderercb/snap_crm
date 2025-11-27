@@ -2,25 +2,16 @@
 #define SREPORTSCOMMONFUNCTIONS_H
 
 #include <LimeReport>
-#include <QDir>
 #include <QFile>
 #include <QStringList>
-#include <QSqlQueryModel>
-#include <QSqlRecord>
 #include <QMap>
 #include <QString>
-#include <QByteArray>
 #include <QVariant>
-#include <QCryptographicHash>
-#include "models/ssqlquerymodel.h"
-#include "models/sclientmodel.h"
-#include "models/srepairmodel.h"
-#include "models/sphonesmodel.h"
-#include "models/sfieldsmodel.h"
-#include "models/ssaletablemodel.h"
-#include "models/stablerepairsmodel.h"
-#include "models/stabletechreportsmodel.h"
-#include "models/stechreportmodel.h"
+
+class QByteArray;
+class SRepairModel;
+class STechReportModel;
+class STableRepairsModel;
 
 /* Класс для обработки callback-сигналов объекта LimeReport::ICallbackDatasource
  * Необходим как прокладка, поскольку класс SReportsCommonFunctions не заявлен как Q_OBJECT и не

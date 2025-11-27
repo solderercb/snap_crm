@@ -1,43 +1,29 @@
 #ifndef SDEVICEMODEL_H
 #define SDEVICEMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
+#include <SSingleRowJModel>
 
-class SDeviceModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(name, name, QString, 0)                                     \
+    TABLE_FIELD(position, position, int, 0)                                 \
+    TABLE_FIELD(enable, enable, bool, 0)                                    \
+    TABLE_FIELD(refill, refill, bool, 0)                                    \
+    TABLE_FIELD(fault_list, faultList, QString, 0)                          \
+    TABLE_FIELD(look_list, lookList, QString, 0)                            \
+    TABLE_FIELD(complect_list, complectList, QString, 0)                    \
+    TABLE_FIELD(company_list, companyList, QString, 0)
+
+class SDeviceModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
     explicit SDeviceModel(QObject *parent = nullptr);
     ~SDeviceModel();
-    int id();
-    void setId(const int);
-    QString name();
-    void setName(const QString);
-    int position();
-    void setPosition(const int);
-    bool isEnable();
-    void setEnabled(const bool);
-    bool isRefill();
-    void setRefill(const bool);
-    QString faultList();
-    void setFaultList(const QString);
-    QString lookList();
-    void setLookList(const QString);
-    QString complectList();
-    void setComplectList(const QString);
-    QString companyList();
-    void setCompanyList(const QString);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
 private:
-    int m_id;
-    QString m_name;
-    int m_position;
-    bool m_isEnable;
-    bool m_isRefill;
-    QString m_faultList;
-    QString m_lookList;
-    QString m_complectList;
-    QString m_companyList;
 };
 
 #endif // SDEVICEMODEL_H

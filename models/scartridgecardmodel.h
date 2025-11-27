@@ -1,60 +1,42 @@
 #ifndef SCARTRIDGECARDMODEL_H
 #define SCARTRIDGECARDMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
-#include "scartridgematerialmodel.h"
-#include "widgets/shortlivednotification.h"
-#include "models/sworkmodel.h"
+#include <SSingleRowJModel>
+#include <SWorkModel>
+#include <SCartridgeMaterialModel>
 
-class SCartridgeCardModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(name, name, QString, 0)                                     \
+    TABLE_FIELD(maker, vendor, int, 0)                                      \
+    TABLE_FIELD(full_weight, fullWeight, double, 0)                         \
+    TABLE_FIELD(toner_weight, tonerWeight, double, 0)                       \
+    TABLE_FIELD(resource, resource, int, 0)                                 \
+    TABLE_FIELD(created, created, QDateTime, 0)                             \
+    TABLE_FIELD(user, user, int, 0)                                         \
+    TABLE_FIELD(notes, notes, QString, 0)                                   \
+    TABLE_FIELD(photo, photo, int, 0)                                       \
+    TABLE_FIELD(color, color, int, 0)                                       \
+    TABLE_FIELD(archive, archive, bool, 0)
+
+class SCartridgeCardModel : public SSingleRowJModel
 {
     Q_OBJECT
 public:
     explicit SCartridgeCardModel(QObject *parent = nullptr);
     ~SCartridgeCardModel();
-    int id();
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
     void load(const int id);
     void loadError(const int type);
     void initMaterials();
     void removeMaterials();
     bool commit();
-    QString name();
-    void setName(const QString&);
-    int vendor();
-    void setVendor(const int vendor);
-    double fullWeight();
-    void setFullWeight(const double);
-    double tonerWeight();
-    void setTonerWeight(const double);
-    int resource();
-    void setResource(const int);
-    void setCreated(const QDateTime);
-    int user();
-    void setUser(const int);
-    QString notes();
-    void setNotes(const QString&);
-    int photo();
-    void setPhoto(const int);
-    int color();
-    void setColor(const int);
-    bool archive();
-    void setArchive(const bool);
     SCartridgeMaterialModel *material(const SCartridgeMaterialModel::Type type);
     SCartridgeMaterialModel *material(const SWorkModel::Type type);
     bool isMaterialSet(const int type);
 private:
-    QString m_name;
-    int m_vendor = 0;
-    double m_fullWeight = 0;
-    double m_tonerWeight = 0;
-    int m_resource = 0;
-    QDateTime m_created;
-    int m_user = 0;
-    QString m_notes;
-    int m_photo = 0;
-    int m_color = 0;
-    bool m_archive = 0;
     QMap<int, SCartridgeMaterialModel*> m_materials;
 };
 

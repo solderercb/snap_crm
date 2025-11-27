@@ -1,7 +1,17 @@
 #include "scombobox.h"
 #ifndef SCOMBOBOX_STANDALONE
-#include "global.h"
+#include <ProjectGlobals>
 #endif // SCOMBOBOX_STANDALONE
+#include <SUserSettings>
+#include <QCoreApplication>
+#include <QListView>
+#include <SLineEdit>
+#include <QEvent>
+#include <QMouseEvent>
+#include <QFocusEvent>
+#include <QResizeEvent>
+#include <QTimer>
+#include <QDebug>
 
 SComboBox::SComboBox(QWidget *parent) :
     QComboBox(parent)
@@ -371,7 +381,7 @@ void SComboBox::applyGuiSettings()
 {
 
 #ifndef SCOMBOBOX_STANDALONE
-   m_listRowHeight = userDbData->rowHeight;
+   m_listRowHeight = userDbData->rowHeight();
 #else
     QStyleOptionViewItem *opt = new QStyleOptionViewItem();
     QStyle *style = this->style();

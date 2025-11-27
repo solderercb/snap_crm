@@ -1,4 +1,5 @@
 #include "sdevmdlsmodel.h"
+#include <QSqlQueryModel>
 
 SDevMdlsModel::SDevMdlsModel(QObject *parent) : QObject(parent)
 {

@@ -1,4 +1,9 @@
 #include "slineedit.h"
+#include <QToolButton>
+#include <QStyle>
+#include <QSignalMapper>
+#include <QResizeEvent>
+#include <QDebug>
 
 SLineEdit::SLineEdit(QWidget *parent)
     : QLineEdit(parent)

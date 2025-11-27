@@ -1,10 +1,11 @@
 #ifndef TABTECHREPORTS_H
 #define TABTECHREPORTS_H
 
-#include "tabcommon.h"
-#include "widgets/stableviewbase.h"
-#include "models/stechreportmodel.h"
-#include "models/stabletechreportsmodel.h"
+#include <tabCommon>
+
+class QTimer;
+class STechReportModel;
+class STableTechReportsModel;
 
 namespace Ui {
 class tabTechReports;
@@ -31,7 +32,7 @@ private slots:
     void buttonRefreshClicked();
     void lineEditSearchTextChanged(QString);
 public slots:
-    void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
+    void refreshTable(bool preserveScrollPos, bool preserveSelection) override;
     void buttonPrintClicked();
 };
 

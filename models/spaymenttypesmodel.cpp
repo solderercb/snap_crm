@@ -1,5 +1,6 @@
 #include "spaymenttypesmodel.h"
-#include "scashregistermodel.h"
+#include <SCashRegisterModel>
+#include <ProjectQueries>
 
 SPaymentTypesModel::SPaymentTypesModel(const int type, QObject *parent) : SStandardItemModel(parent)
 {

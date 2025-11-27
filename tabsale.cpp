@@ -1,8 +1,38 @@
-#include "global.h"
-#include "appver.h"
 #include "tabsale.h"
 #include "ui_tabsale.h"
-#include "models/sofficemodel.h"
+#include <QWidget>
+#include <QSqlQueryModel>
+#include <QDateTime>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QToolButton>
+#include <QScrollBar>
+#include <QMessageBox>
+#include <ProjectGlobals>
+#include <appVer>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SPermissions>
+#include <SOfficeModel>
+#include <SPhoneModel>
+#include <SPhonesModel>
+#include <SDocumentModel>
+#include <SStandardItemModel>
+#include <SSortFilterProxyModel>
+#include <SSqlQueryModel>
+#include <SSaleTableModel>
+#include <SLogRecordModel>
+#include <SCashRegisterModel>
+#include <SClientModel>
+#include <STableViewBOQItemDelegates>
+#include <SSaleTabSettingsMenu>
+#include <FlashPopup>
+#include <STableViewBase>
+#include <SStoreItemModel>
+#include <QToolTipper>
+#include <SLogRecordModel>
+#include <SClientInputFormBase>
 
 QMap<int, tabSale*> tabSale::p_instance;
 
@@ -16,15 +46,14 @@ tabSale::tabSale(int doc, MainWindow *parent) :
     ui->setupUi(this);
     tabSale::guiFontChanged();
     docModel = new SDocumentModel();
-    tableModel = new SSaleTableModel(this);
+    tableModel = new StoreSaleModel(this);
     clientModel = new SClientModel();
     cashRegister = new SCashRegisterModel();
 
-    tableModel->setMode(SSaleTableModel::TablesSet::StoreSale);
     params = new int;
     *params = 0;
-    *params |= comSettings->printOutInvoice?tabSaleSettingsMenu::PrintDoc:0;
-    *params |= comSettings->printPKO?tabSaleSettingsMenu::PrintCheck:0;
+    *params |= comSettings->printOutInvoice()?tabSaleSettingsMenu::PrintDoc:0;
+    *params |= comSettings->printPKO()?tabSaleSettingsMenu::PrintCheck:0;
     widgetAction = new tabSaleSettingsMenu(this);
     ui->buttonParams->addAction(widgetAction);
     widgetAction->setParamsModel(params);
@@ -53,7 +82,7 @@ tabSale::tabSale(int doc, MainWindow *parent) :
 //    connect(ui->buttonReserve, SIGNAL(clicked()), this, SLOT(reserveButtonClicked()));    // подключены в дизайнере
 //    connect(ui->buttonSale, SIGNAL(clicked()), this, SLOT(saleButtonClicked()));    // подключены в дизайнере
     connect(ui->comboBoxPriceCol, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPriceCol(int)));    // нужно подключать здесь, иначе возникает глюк с доступом к QMap<> fields
-    connect(tableModel, SIGNAL(amountChanged(double, double, double)), this, SLOT(updateTotalSumms(double, double, double)));
+    connect(tableModel, &SSaleTableModel::amountChanged, this, &tabSale::updateTotalSumms);
     if(permissions->viewClients)
     {
         connect(ui->lineEditClientLastName, &QLineEdit::textEdited, ui->widgetClientMatch, &SClientMatch::findByName);
@@ -94,6 +123,16 @@ QString tabSale::tabTitle()
     if(doc_id)
         return tr("Расходная накладная %1").arg(doc_id);
     return tr("Продажа");
+}
+
+// TODO: идентичный метод есть в классе tabPartRequest; возможно стоит его перенести в tabCommon
+void tabSale::updateTabPtr(const int oldId, const int newId)
+{
+    if(oldId == newId)
+        return;
+
+    p_instance.remove(oldId);
+    p_instance.insert(newId, this);
 }
 
 void tabSale::initPriceColModel()
@@ -140,19 +179,19 @@ void tabSale::updateWidgets()
     setDefaultStyleSheets();
     if(doc_id)
     {
-        tableModel->setState(SSaleTableModel::StoreSold);
+        int docState = -1;
+        tableModel->setState(StoreSaleModel::Sold);
         docModel->load(doc_id);
-        if(!docModel->isValid())
+        if(!docModel->isPrimaryKeyValid())
             return;
-        m_docState = docModel->state();
-        client = docModel->client();
+        docState = docModel->state();
 
         ui->labelDocNum->show();
         ui->lineEditDocNum->show();
         ui->lineEditDocNum->setText(QString::number(doc_id));
         ui->labelDate->show();
         ui->lineEditDate->show();
-        ui->lineEditDate->setText(docModel->created());
+        ui->lineEditDate->setText(docModel->createdStr());
         ui->comboBoxPaymentAccount->setCurrentIndex(docModel->paymentSystemIndex());
         ui->comboBoxPaymentAccount->setEnabled(false);
         ui->comboBoxMoneyBackAccount->setCurrentIndex(docModel->paymentSystemIndex());  // возврат на тот же счет, куда поступала оплата
@@ -162,15 +201,15 @@ void tabSale::updateWidgets()
         ui->lineEditTrack->setText(docModel->trackingNumber());
         ui->buttonLog->show();
         ui->buttonReserve->hide();   // не допускается повтоное нажатие "Резерв"
-        if(client)
+        if(auto client = docModel->client())
         {
             fillClientCreds(client);
         }
         else
             ui->checkBoxAnonymous->setChecked(true);
 
-        ui->comboBoxPriceCol->setEnabled(false);
         ui->comboBoxPriceCol->setCurrentIndex(docModel->priceOptionIndex());
+        ui->comboBoxPriceCol->setEnabled(false);
         ui->checkBoxAnonymous->setEnabled(false);
         ui->lineEditComment->setText(docModel->notes());
         ui->lineEditComment->setReadOnly(true);
@@ -178,10 +217,10 @@ void tabSale::updateWidgets()
         ui->pushButtonClientCredsClearAll->setEnabled(false);
         ui->pushButtonClientFromDB->setEnabled(false);
 
-        if(m_docState == SDocumentModel::ItemsReserved)
+        if(docState == SDocumentModel::ItemsReserved)
         {
-            tableModel->setState(SSaleTableModel::StoreReserved);
-            m_opType = SaleReserved;    // это флаг для функции sale()
+            tableModel->setState(StoreSaleModel::Reserved);
+            m_opType = SaleReserved;
             ui->comboBoxPaymentAccount->setEnabled(true);
             ui->comboBoxPriceCol->setEnabled(true);
             ui->lineEditTakeIn->setReadOnly(false);
@@ -201,14 +240,14 @@ void tabSale::updateWidgets()
             ui->buttonReserveCancel->show();
             ui->buttonSaleMore->show();
             ui->buttonSale->show();
-            tableModel->store_loadTable(doc_id);
+            tableModel->loadTable(doc_id);
 #ifdef QT_DEBUG
             ui->lineEditTakeIn->setText(sysLocale.toString(sysLocale.toDouble(ui->lineEditTotal->text()) + QRandomGenerator::global()->bounded(100), 'f', 2)); // это для отладки
 #else
             ui->lineEditTakeIn->setText(sysLocale.toString(0.00, 'f', 2));
 #endif
         }
-        else if(m_docState == SDocumentModel::ReserveCancelled || m_docState == SDocumentModel::OutInvoiceCancelled)   // если открыта РН снятого резерва или распроведённая РН
+        else if(docState == SDocumentModel::ReserveCancelled || docState == SDocumentModel::OutInvoiceCancelled)   // если открыта РН снятого резерва или распроведённая РН
         {
             ui->lineEditTakeIn->setReadOnly(true);
             ui->lineEditAddByUID->setReadOnly(true);
@@ -224,8 +263,8 @@ void tabSale::updateWidgets()
             ui->buttonSale->hide();
             ui->labelTrack->hide();
             ui->lineEditTrack->hide();
-            tableModel->setState(SSaleTableModel::StoreCancelled);
-            tableModel->store_loadTable(doc_id);
+            tableModel->setState(StoreSaleModel::Cancelled);
+            tableModel->loadTable(doc_id);
             ui->lineEditTakeIn->setText(sysLocale.toString(0.00, 'f', 2));
             ui->comboBoxCompany->setEnabled(false);
         }
@@ -251,8 +290,8 @@ void tabSale::updateWidgets()
             {
                 ui->groupBoxAdm->hide();
             }
-            tableModel->setState(SSaleTableModel::StoreSold);
-            tableModel->store_loadTable(doc_id);
+            tableModel->setState(StoreSaleModel::Sold);
+            tableModel->loadTable(doc_id);
             ui->lineEditTotal->setText(docModel->amountLocal());  // устанавливать суммы нужно только после заполнения таблицы
             ui->lineEditTakeIn->setReadOnly(true);
             ui->lineEditTakeIn->setText(tableModel->amountTotalLocale());  // тут применю хитрость: поля будут заполняться из разных "источников" и, в случае возврата товаров, сравниваться
@@ -291,7 +330,7 @@ void tabSale::updateWidgets()
             ui->labelCompany->setVisible(false);
         }
         ui->comboBoxCompany->setEnabled(true);
-        ui->spinBoxReserve->setValue(comSettings->defaultItemReserveTime);
+        ui->spinBoxReserve->setValue(comSettings->defaultItemReserveTime());
         ui->spinBoxReserve->setReadOnly(false);
         ui->lineEditAddByUID->setReadOnly(false);
         ui->buttonPrint->hide();            // будут отображаться только кнопки "Параметры", "Добавить", "Резерв", "Продать ещё" и "Продать"
@@ -305,7 +344,7 @@ void tabSale::updateWidgets()
         ui->pushButtonClientCredsClearAll->setEnabled(true);
         ui->pushButtonClientFromDB->setEnabled(permissions->viewClients);
 
-        tableModel->setState(SSaleTableModel::StoreNew);
+        tableModel->setState(StoreSaleModel::New);
 
 #ifdef QT_DEBUG
         test_scheduler_counter = 0;
@@ -315,17 +354,15 @@ void tabSale::updateWidgets()
     ui->widgetClientMatch->hide();
 }
 
-bool tabSale::checkInput()
+int tabSale::checkInputNew()
 {
     int error = 0;
 
     // TODO: часть кода взята из класса tabRepairNew; возможно стоит создать общую функцию для проверки введённых данных
 
-    setDefaultStyleSheets();
-
     if( !ui->checkBoxAnonymous->isChecked() )
     {
-        if (ui->lineEditClientLastName->text() == "" && !clientModel->type())       // если не указана фамилия (обычный клиент; у юрика может быть пустым)
+        if (ui->lineEditClientLastName->text() == "" && !clientModel->isCompany())       // если не указана фамилия (обычный клиент; у юрика может быть пустым)
         {
             ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheetRed);
             error = 1;
@@ -335,24 +372,24 @@ bool tabSale::checkInput()
             ui->lineEditClientFirstName->setStyleSheet(commonLineEditStyleSheetRed);
             error = 2;
         }
-        if (ui->lineEditClientPatronymic->text() == "" && comSettings->isClientPatronymicRequired && !client)   // если не указано отчество и оно обязятельно
+        if (ui->lineEditClientPatronymic->text() == "" && comSettings->isClientPatronymicRequired() && !m_client)   // если не указано отчество и оно обязятельно
         {
             ui->lineEditClientPatronymic->setStyleSheet(commonLineEditStyleSheetRed);
             error = 3;
         }
-        if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->isVisitSourceRequired && !client)        // если не указан источник обращения, а он обязателен и клиент новый
+        if (ui->comboBoxClientAdType->currentIndex() < 0 && comSettings->isVisitSourceRequired() && !m_client)        // если не указан источник обращения, а он обязателен и клиент новый
         {
             ui->comboBoxClientAdType->setStyleSheet(commonComboBoxStyleSheetRed);
             error = 4;
         }
-        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->isClientPhoneRequired && clientModel->isNew())   // если не указан телефон и он обязятелен
+        if (!ui->lineEditClientPhone->hasAcceptableInput() && comSettings->isClientPhoneRequired() && clientModel->isNew())   // если не указан телефон и он обязятелен
         {
             ui->lineEditClientPhone->setStyleSheet(commonLineEditStyleSheetRed);
             error = 5;
         }
     }
     if( (paymentSystemsModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id") == -2) && \
-            (!(clientModel->options()&SClientModel::BalanceEnabled) || ui->checkBoxAnonymous->isChecked()) )
+            (!(clientModel->isBalanceEnabled()) || ui->checkBoxAnonymous->isChecked()) )
     {
         ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 6;
@@ -375,18 +412,18 @@ bool tabSale::checkInput()
     }
     for(int i = 0; i < tableModel->rowCount(); i++) // TODO: Это нужно перенести в SSaleTableModel
     {
-        if(!tableModel->value(i, SStoreItemModel::SaleOpColumns::ColState).toBool())   // только не помеченные на снятие резерва/возврат
+        if(!tableModel->state(i))   // только не помеченные на снятие резерва/возврат
         {
-            if ( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() <= 0 ) // цена меньше нуля
+            if ( tableModel->price(i) <= 0 ) // цена меньше нуля
             {
-                tableModel->setData(tableModel->index(i, SStoreItemModel::SaleOpColumns::ColPrice), QColor(255, 209, 209), Qt::BackgroundRole);
+                tableModel->setData(tableModel->index(i, SSaleTableModel::Columns::Price), QColor(255, 209, 209), Qt::BackgroundRole);
 
                 error = 11;
             }
-            if( tableModel->value(i, SStoreItemModel::SaleOpColumns::ColPrice).toDouble() < tableModel->value(i, SStoreItemModel::SaleOpColumns::ColInPrice).toDouble() ) // цена меньше закупочной
+            if( tableModel->price(i) < tableModel->unformattedData(i, SSaleTableModel::Columns::InPrice).toDouble() ) // цена меньше закупочной
             {
                 QMessageBox::StandardButton resBtn = QMessageBox::question( this, "SNAP CRM",
-                                                                            tr("Цена ниже закупочной, продолжить?\n\"%1\"").arg(tableModel->value(i, SStoreItemModel::SaleOpColumns::ColName).toString()),
+                                                                            tr("Цена ниже закупочной, продолжить?\n\"%1\"").arg(tableModel->name(i)),
                                                                             QMessageBox::No | QMessageBox::Yes,
                                                                             QMessageBox::No);
                 if (resBtn == QMessageBox::No)
@@ -410,51 +447,42 @@ bool tabSale::checkInput()
     if (error)
     {
         qDebug() << "Ошибка создания РН: возможно, не все обязательные поля заполнены (error " << error << ")";
-        return false;
+        return 1;
     }
 
-    return true;   // return 1 — OK, return 0 - ошибка
+    return 0;
 }
 
-bool tabSale::createClient()
+void tabSale::commitClient()
 {
-    bool nErr = 1;
-
-    clientModel->setFirstName(ui->lineEditClientFirstName->text());
-    clientModel->setLastName(ui->lineEditClientLastName->text());
-    clientModel->setPatronymicName(ui->lineEditClientPatronymic->text());
+    clientModel->set_firstName(ui->lineEditClientFirstName->text());
+    clientModel->set_lastName(ui->lineEditClientLastName->text());
+    clientModel->set_patronymicName(ui->lineEditClientPatronymic->text());
     clientModel->appendLogText(tr("Быстрое создание клиента из формы продажи"));
-    clientModel->setAdType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
+    clientModel->set_adType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
     if (ui->lineEditClientPhone->hasAcceptableInput())
     {
         clientModel->addPhone(ui->lineEditClientPhone->text(),
                               ui->comboBoxClientPhoneType->currentIndex());
     }
-    nErr = clientModel->commit();
-    client = clientModel->id();
+    clientModel->commit();
 
-    return nErr;
+#ifdef QT_DEBUG
+//    Global::throwDebug();
+#endif
 }
 
-bool tabSale::createNewDoc()
+int tabSale::checkInput()
 {
-    int reserveDays = 5, priceCol = 2;
-    double amount, currency = 0.00 /* TODO: запрос валюты, даже если программа не перезапускалась несколько дней */;
 
-    reserveDays = ui->spinBoxReserve->value();
-    priceCol = priceColModel->index(ui->comboBoxPriceCol->currentIndex(), 1).data().toInt();
-    amount = tableModel->amountTotal();
-
-    docModel->setType(SDocumentModel::OutInvoice);
-    docModel->setState(0);
-    docModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-    docModel->setClient(clientModel->id());
-    // Выбор офиса пользователем не предусмотрен; используется текущее значение из класса userDbData
-    docModel->setAmount(amount);
-    docModel->setNotes(ui->lineEditComment->text());
-    docModel->setPriceOption(priceCol);
-    docModel->setReserveDays(reserveDays);
-    return docModel->commit();
+    setDefaultStyleSheets();
+    switch(m_opType)
+    {
+        case CancelReserve:
+        case SetTrack: return 0;
+        case Unsale: return checkInputUnsale();
+        default: return checkInputNew();
+    }
 }
 
 void tabSale::updateTotalSumms(const double amountTotal, const double, const double)
@@ -476,8 +504,14 @@ void tabSale::phoneNumberEdited(QString)
 void tabSale::clearClientCreds(bool hideCoincidence)
 {
     setDefaultStyleSheets();
-    clientModel->clear();
-    client = 0;
+    if(!m_client)
+        return;
+
+    if(clientModel->id())
+        clientModel->clear();
+
+    m_client = 0;
+    bool updatePriceOption = tableModel->state() != StoreSaleModel::New || !docModel->isDirty();
     price_col = 2;
     ui->comboBoxPriceCol->setCurrentText(priceColModel->getDisplayRole(price_col, 1));
     ui->lineEditClientLastName->setReadOnly(false);     // разрешаем ввод текста (вдруг он был запрещён)
@@ -505,20 +539,25 @@ void tabSale::clearClientCreds(bool hideCoincidence)
 
 void tabSale::fillClientCreds(int id)
 {
+    if(m_client == id)
+        return;
+
     clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
-    client = id;                // установка нового значения должна выполняться после очистки
-    clientModel->load(client);
-    tableModel->setClient(client);
-    cashRegister->setClient(client);
-    ui->lineEditClientFirstName->setText(permissions->viewClients?clientModel->firstName():tr("no permissions"));
-    ui->lineEditClientLastName->setText(permissions->viewClients?clientModel->lastName():tr("no permissions"));
-    ui->lineEditClientPatronymic->setText(permissions->viewClients?clientModel->patronymicName():tr("no permissions"));
+    bool updatePriceOption = tableModel->state() != StoreSaleModel::New || !docModel->isDirty();
+    m_client = id;                // установка нового значения должна выполняться после очистки
+    clientModel->load(m_client);
+    docModel->set_client(m_client);
+    tableModel->setClient(m_client);
+    cashRegister->set_client(m_client);
+    ui->lineEditClientFirstName->setText(clientModel->firstName());
+    ui->lineEditClientLastName->setText(clientModel->lastName());
+    ui->lineEditClientPatronymic->setText(clientModel->patronymicName());
     ui->lineEditClientFirstName->setReadOnly(true);
     ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
     ui->lineEditClientPatronymic->setReadOnly(true);
 
-    ui->comboBoxClientPhoneType->setCurrentIndex(permissions->viewClients?clientModel->phones()->primary()->maskIndex():-1);
-    ui->lineEditClientPhone->setText(permissions->viewClients?clientModel->phones()->primary()->phone():tr("no permissions"));
+    ui->comboBoxClientPhoneType->setCurrentIndex(clientModel->phones()->primary()->maskIndex());
+    ui->lineEditClientPhone->setText(clientModel->phones()->primary()->phone());
     ui->lineEditClientPhone->setReadOnly(true);
     ui->comboBoxClientPhoneType->setEnabled(false);
 
@@ -526,10 +565,10 @@ void tabSale::fillClientCreds(int id)
     ui->comboBoxClientAdType->setEnabled(false);
     ui->checkBoxAnonymous->setChecked(false);
 
-    if(tableModel->state() == SSaleTableModel::StoreNew)
+    if(updatePriceOption)
         ui->comboBoxPriceCol->setCurrentIndex(clientModel->priceColumnIndex());
     ui->comboBoxClientAdType->setCurrentIndex(clientModel->adTypeIndex());
-    if(clientModel->options() & SClientModel::BalanceEnabled)
+    if(clientModel->isBalanceEnabled())
     {
         setBalanceWidgetsVisible(true);
         ui->checkBoxSaleInCredit->setEnabled(true);
@@ -546,12 +585,12 @@ void tabSale::buttonSelectExistingClientHandler()
 
 void tabSale::buttonCreateTabClientHandler()
 {
-    emit createTabClient(client);
+    emit createTabClient(m_client);
 }
 
 void tabSale::tableRowDoubleClick(QModelIndex tableIndex)
 {
-    emit createTabSparePart(tableModel->value(tableIndex.row(), SStoreItemModel::SaleOpColumns::ColItemId).toInt());
+    emit createTabSparePart(tableModel->itemId(tableIndex.row()));
 }
 
 void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
@@ -568,29 +607,37 @@ void tabSale::hideGroupBoxClient(bool isAnonymousBuyer)
     {
         ui->groupBoxClient->show();
         ui->buttonReserve->setEnabled(true);
-        if(client)
+        if(m_client)
         {
-            cashRegister->setClient(client);
-            tableModel->setClient(client);
-            docModel->setClient(client);
+            cashRegister->set_client(m_client);
+            tableModel->setClient(m_client);
+            docModel->set_client(m_client);
         }
     }
 }
 
 void tabSale::selectPriceCol(int index)
 {
-    if(tableModel->state() == SSaleTableModel::State::StoreNew || tableModel->state() == SSaleTableModel::State::StoreReserved)
+    if(tableModel->state() == StoreSaleModel::New || tableModel->state() == StoreSaleModel::Reserved)
         tableModel->setPriceColumn((SStoreItemModel::PriceOption)m_priceColProxyModel->databaseIDByRow(index));
 }
 
 void tabSale::addItemByUID()
 {
-    if(tableModel->addItemByUID(ui->lineEditAddByUID->text().toInt()))
+    if(tableModel->addItemByID(ui->lineEditAddByUID->text().toInt()))
         ui->lineEditAddByUID->setText("");
 }
 
 void tabSale::print()
 {
+    switch(m_opType)
+    {
+        case Reserve:
+        case CancelReserve: return;
+        case Unsale: /* TODO: печать РКО */ return;
+        case SetTrack: return;
+    }
+
     if(*params & tabSaleSettingsMenu::PrintDoc)     // печать РН
     {
         QMap<QString, QVariant> report_vars;
@@ -598,97 +645,70 @@ void tabSale::print()
         report_vars.insert("doc_id", doc_id);
         emit generatePrintout(report_vars);
     }
-    if(*params & tabSaleSettingsMenu::PrintCheck && cashRegister->lastInsertId())   // печать ПКО
+    if(*params & tabSaleSettingsMenu::PrintCheck && cashRegister->isPrimaryKeyValid())   // печать ПКО
     {
         QMap<QString, QVariant> report_vars;
         report_vars.insert("type", Global::Reports::pko);
-        report_vars.insert("order_id", cashRegister->lastInsertId());
+        report_vars.insert("order_id", cashRegister->isPrimaryKeyValid());
         emit generatePrintout(report_vars);
     }
 
     // TODO: печать чека с пом. РРО
 }
 
-bool tabSale::unSale()  // распроведение
+int tabSale::commitStages()
 {
-    // TODO: нужно изучить вопрос возврата товара при условии использования РРО, возможно, для этого нужно создавать отдельный документ на возврат
-    bool nErr = 1, balance = 0;
-    int paymentAccount = 0;
-    double amount;
+    switch(m_opType)
+    {
+        case Unsale:
+        case CancelReserve:
+        case SetTrack: return 1;
+        case Sale:
+        case Reserve: return 2;   // 2 этапа: запись данных клиента, запись данных о продаже/резерве
+        case SaleReserved: return 2; // в случае продажи ранее зарезервированного товара, первый этап будет пропущен
+    }
 
-    tableModel->setClient(clientModel->id());
-    paymentAccount = paymentSystemsModel->databaseIDByRow(ui->comboBoxMoneyBackAccount->currentIndex(), "system_id");
-    balance = (paymentAccount == -2);
-    if( balance && (!(clientModel->options() & SClientModel::BalanceEnabled) || ui->checkBoxAnonymous->isChecked()) )
+    return 0;
+}
+
+int tabSale::checkInputUnsale()
+{
+    bool balance = (targetPaymentAccount() == -2);
+    if( balance && (!(clientModel->isBalanceEnabled()) || ui->checkBoxAnonymous->isChecked()) )
     {
         ui->comboBoxMoneyBackAccount->setStyleSheet(commonComboBoxStyleSheetRed);
-        return true; // return 0 — OK, return 1 - ошибка
+        return 1;
     }
 
-    QSqlQuery query(QSqlDatabase::database("connThird"));
+    return 0;
+}
 
-    QUERY_LOG_START(metaObject()->className());
+void tabSale::commitUnsale()  // распроведение
+{
+    // TODO: нужно изучить вопрос возврата товара при условии использования РРО, возможно, для этого нужно создавать отдельный документ на возврат
+    double amount = 0;
+    int paymentAccount = targetPaymentAccount();
+    bool isAnonymous = ui->checkBoxAnonymous->isChecked();
 
-    try
-    {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
+    tableModel->backOutItems(StoreSaleModel::OpType::Unsale);
+    docModel->commit();
 
-        tableModel->unsaleItems(ui->textEditRevertReason->toPlainText());
+    if(!isAnonymous)
         clientModel->updatePurchases(-tableModel->itemsAffected());
-
-        // если в следствие (нескольких) частичных распроведений были возвращены все товары, то нужно изменить статус документа
-        if(tableModel->amountTotal() == 0)
-        {
-            QStringList logText;
-            logText << tr("Расходная накладная №%1 распроведена").arg(doc_id);
-            QString reason = ui->textEditRevertReason->toPlainText();
-            if(reason.length())
-                logText << tr("основание: ", "основание распроведения РН") + reason;
-            docModel->setAmount(0.00);
-            docModel->setState(SDocumentModel::OutInvoiceCancelled);
-            docModel->appendLogText(logText.join(", "));
-        }
-        else
-            docModel->setAmount(tableModel->amountTotal());
-
-        amount = sysLocale.toDouble(ui->lineEditCharge->text()); // в поле Сдача будет записана сумма товаров, помеченных на удаление (т. е. сумма возврата)
-
-        docModel->commit();
-
-        if(balance)
-        {
-            clientModel->updateBalance(amount, QString("Зачисление %1 - возврат за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), SBalanceLogRecordModel::RoyaltyReason::Document, doc_id);
-        }
-        else
-        {
-            cashRegister->setId(0); // обнулить Id, иначе будет произведён update, а не insert
-            cashRegister->setOperationType(SCashRegisterModel::ExpGoods);
-            cashRegister->setCompany(docModel->company());
-            cashRegister->setDocumentId(doc_id);
-            cashRegister->setReason(QString("Расход денег в размере %2 - возврат за товары по РН №%1").arg(doc_id).arg(sysLocale.toCurrencyString(amount)));
-            cashRegister->commit(-amount);
-        }
+    amount = sysLocale.toDouble(ui->lineEditCharge->text()); // в поле Сдача будет записана сумма товаров, помеченных на удаление (т. е. сумма возврата)
+    if(paymentAccount == -2)
+    {
+        clientModel->updateBalance(amount, QString("Зачисление %1 - возврат за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), SBalanceLogRecordModel::RoyaltyReason::Document, doc_id);
+    }
+    else
+    {
+        prepareCashRegisterModel(amount, paymentAccount);
+        cashRegister->commit(-amount);
+    }
 
 #ifdef QT_DEBUG
-//        Global::throwDebug();
+//    Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-    }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-    }
-
-    QUERY_LOG_STOP;
-
-    if(nErr)
-        return false;
-    else
-        return true; // return 0 — OK, return 1 - ошибка
 }
 
 void tabSale::clearAll()
@@ -698,162 +718,279 @@ void tabSale::clearAll()
     ui->lineEditTotal->setText(sysLocale.toString(0.00, 'f', 2));
     ui->lineEditTakeIn->setText("");
     ui->lineEditComment->setText("");
-    tableModel->removeRows(0, tableModel->rowCount());
+    tableModel->clear();
     delete docModel;
     delete clientModel;
     docModel = new SDocumentModel();
     clientModel = new SClientModel();
-
 }
 
-bool tabSale::sale()
+int tabSale::targetPaymentAccount()
 {
-    if(!checkInput())
-        return true; // return 0 — OK, return 1 - ошибка
+    int paymentSystemIndex = -1;
+    if(m_opType == Unsale)
+    {
+        paymentSystemIndex = ui->comboBoxMoneyBackAccount->currentIndex();
+    }
+    else    // Sale, SaleReserved
+    {
+        if(ui->checkBoxSaleInCredit->isChecked())
+            return -2;
+        else
+            paymentSystemIndex = ui->comboBoxPaymentAccount->currentIndex();
+    }
 
-    bool nErr = 1, balance = 0, isAnonBuyer = 0;
-    int paymentAccount = 0, initial_doc_id = doc_id;
-    double amount;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
+    return paymentSystemsModel->databaseIDByRow(paymentSystemIndex, "system_id");
+}
+
+/* Подготовка модели документа
+*/
+void tabSale::prepareDocModel()
+{
+    switch(m_opType)
+    {
+        case CancelReserve: tableModel->prepareFreeItems(); break;
+        case Unsale: tableModel->prepareUnsaleItems(ui->textEditRevertReason->toPlainText()); break;
+        case SetTrack: return;
+        default: ;
+    }
+
+    int reserveDays = 5, priceCol = 2;
+    double amount, currency = 0.00 /* TODO: запрос валюты, даже если программа не перезапускалась несколько дней */;
 
     amount = tableModel->amountTotal();
+    priceCol = priceColModel->index(ui->comboBoxPriceCol->currentIndex(), 1).data().toInt();
+    reserveDays = ui->spinBoxReserve->value();
 
-    QUERY_LOG_START(metaObject()->className());
-
-    isAnonBuyer = ui->checkBoxAnonymous->isChecked();
-
-    // в этом месте у АСЦ недоработка: не зависимо от установки галочки "с баланса", код `payment_system` в табл. docs записывается соответствующий выбранному счету в комбобоксе
-    if(ui->checkBoxSaleInCredit->isChecked())
+    int type = SDocumentModel::OutInvoice;
+    int state = docModel->state();
+    int paymentAccount = targetPaymentAccount();
+    docModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
+    // Выбор офиса пользователем не предусмотрен; используется текущее значение из класса userDbData
+    docModel->set_amount(amount);
+    docModel->set_notes(ui->lineEditComment->text());
+    docModel->set_priceOption(priceCol);
+    docModel->set_reserveDays(reserveDays);
+    switch (m_opType)
     {
-        paymentAccount = -2;
-        balance = 1;
+        case Sale: state = SDocumentModel::OutInvoicePayed; break;
+        case Reserve: type = SDocumentModel::ReserveInvoice; state = SDocumentModel::ItemsReserved; break;
+        case SaleReserved: state = SDocumentModel::OutInvoicePayed; break;
+        case Unsale: if(amount == 0) {state = SDocumentModel::OutInvoiceCancelled;}; paymentAccount = docModel->paymentSystem(); break;
+        case CancelReserve: if(amount == 0) {state = SDocumentModel::ReserveCancelled;}; break;
+        default: break;
+    }
+    docModel->set_type(type);
+    docModel->set_state(state);
+    docModel->set_paymentSystem(paymentAccount);
+}
+
+void tabSale::prepareCashRegisterModel(const double amount, const int account)
+{
+    if(account == -2)    // баланс
+        return;
+
+    switch(m_opType)
+    {
+        case Reserve:
+        case CancelReserve:
+        case SetTrack: return;
+        default: ;
+    }
+
+    cashRegister->set_company(docModel->company());
+    cashRegister->set_document(doc_id);
+    cashRegister->set_systemId(account);
+    cashRegister->set_client(docModel->client());
+
+    if(m_opType == Unsale)
+    {
+        cashRegister->set_operationType(SCashRegisterModel::ExpGoods);
+        cashRegister->set_reason(QString("Расход денег в размере %2 - возврат за товары по РН №%1").arg(doc_id).arg(sysLocale.toCurrencyString(amount)));
     }
     else
     {
-        paymentAccount = paymentSystemsModel->databaseIDByRow(ui->comboBoxPaymentAccount->currentIndex(), "system_id");
-        balance = paymentAccount == -2;
+        cashRegister->set_operationType(SCashRegisterModel::RecptGoods);
+        cashRegister->set_reason(QString("Поступление денег в размере %2 по расходной накладной №%1").arg(doc_id).arg(sysLocale.toCurrencyString(amount)));
+    }
+}
+
+QString tabSale::prepareUnsaleNote()
+{
+    QStringList logText;
+    logText << tr("Расходная накладная №%1 распроведена").arg(doc_id);
+    QString reason = ui->textEditRevertReason->toPlainText();
+    if(reason.length())
+        logText << tr("основание: ", "основание распроведения РН") + reason;
+
+    return logText.join(", ");
+}
+
+void tabSale::beginCommit()
+{
+    prepareDocModel();
+}
+
+bool tabSale::skip(const int stage)
+{
+    switch(m_opType)
+    {
+        case Sale:
+        case Reserve: return ((stage == 0) && (ui->checkBoxAnonymous->isChecked() || !clientModel->isNew()));
+        case SaleReserved: return (stage == 0);
+        case SetTrack: return (QString::compare(ui->lineEditTrack->text(), docModel->trackingNumber()) == 0);
     }
 
-    try
+    return 0;
+}
+
+void tabSale::commit(const int stage)
+{
+    int stg = stage;
+    switch(m_opType)
     {
-        if(!isAnonBuyer)
+        case Unsale: commitUnsale(); stg = -1; break;   // -1 чтобы пропустить следующий switch
+        case CancelReserve: commitCancelReserve(); stg = -1; break;
+        case SetTrack: commitTrack(); return;
+        default: ;
+    }
+
+    switch(stg)
+    {
+        case 0: commitClient(); return;
+        case 1: commitNew(); break;
+        default: ;
+    }
+
+    commitLogs();
+}
+
+void tabSale::commitNew()
+{
+    double amount = tableModel->amountTotal();
+    int paymentAccount = targetPaymentAccount();
+    bool isAnonymous = ui->checkBoxAnonymous->isChecked();
+
+    if(paymentAccount == -2)
+        if(!clientModel->balanceEnough(-amount))
+            Global::throwError(Global::ThrowType::UserCanceled);
+
+    if(m_opType == Sale || m_opType == Reserve)
+    {
+        docModel->commit();
+        doc_id = docModel->id();
+        tableModel->setDocumentId(doc_id);
+    }
+
+    if(m_opType == Reserve)
+    {
+        tableModel->commit(StoreSaleModel::OpType::Reserve);
+    }
+    else
+    {
+        tableModel->commit(StoreSaleModel::OpType::Sale);
+
+        if(paymentAccount == -2)   // если продажа в долг
         {
-            if (clientModel->isNew())
-            {
-                QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-                nErr = createClient();
-                QUERY_COMMIT_ROLLBACK(&query,nErr);
-                fillClientCreds(client);
-            }
-        }
-
-        tableModel->setClient(client);
-
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-
-        if(balance)
-            if(!clientModel->balanceEnough(-amount))
-                Global::throwError(Global::ThrowType::UserCanceled);
-
-        if(m_opType == Sale || m_opType == Reserve)
-        {
-            createNewDoc();
-            doc_id = docModel->id();
-            tableModel->setDocumentId(doc_id);
-        }
-
-        docModel->setPaymentSystem(paymentAccount);
-
-        if(m_opType == Reserve)
-        {
-            tableModel->store_saveTables(SSaleTableModel::StoreOpType::Reserve);
-            docModel->setType(SDocumentModel::ReserveInvoice);
-            docModel->appendLogText(QString("Расходная накладная №%1 создана (резерв)").arg(doc_id));
-            docModel->setState(SDocumentModel::ItemsReserved);
+            clientModel->updateBalance(-amount, QString("Списание %1 за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), SBalanceLogRecordModel::RoyaltyReason::Document, doc_id);
         }
         else
         {
-            tableModel->store_saveTables(SSaleTableModel::StoreOpType::Sale);
-            if(m_opType == SaleReserved)
-            {
-                docModel->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-                docModel->setAmount(amount);
-                docModel->appendLogText(QString("Расходная накладная №%1 проведена").arg(doc_id));
-                docModel->setType(SDocumentModel::OutInvoice);
-                docModel->setState(SDocumentModel::OutInvoicePayed);
-            }
-            else                // простая продажа
-            {
-                docModel->appendLogText(QString("Расходная накладная №%1 создана").arg(doc_id));
-                docModel->setState(SDocumentModel::OutInvoicePayed);
-            }
+            prepareCashRegisterModel(amount, paymentAccount);
+            cashRegister->commit(amount);
+            docModel->set_cashOrder(cashRegister->id());
+        }
 
-            if(balance)   // если продажа в долг
-            {
-                clientModel->updateBalance(-amount, QString("Списание %1 за товары по РН №%2").arg(sysLocale.toCurrencyString(amount)).arg(doc_id), SBalanceLogRecordModel::RoyaltyReason::Document, doc_id);
-            }
-            else
-            {
-                cashRegister->setId(0); // обнулить Id, иначе будет произведён update, а не insert
-                cashRegister->setCompanyIndex(ui->comboBoxCompany->currentIndex());
-                cashRegister->setClient(clientModel->id());
-                cashRegister->setOperationType(SCashRegisterModel::RecptGoods);
-                cashRegister->setDocumentId(doc_id);
-                cashRegister->setReason(QString("Поступление денег в размере %2 по расходной накладной №%1").arg(doc_id).arg(sysLocale.toCurrencyString(amount)));
-                cashRegister->commit(amount);
-            }
-
+        if(!isAnonymous)
             clientModel->updatePurchases(tableModel->itemsAffected());
-        }
-        docModel->commit();
+    }
+    docModel->commit();
 
 #ifdef QT_DEBUG
-//        Global::throwDebug();
+//    Global::throwDebug();
 #endif
+}
 
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-    }
-    catch (Global::ThrowType type)
+void tabSale::throwHandler(int)
+{
+    clientModel->setFieldsFailed();     // в случаях сбоев при создании нового клиента или изменении баланса
+    cashRegister->setFieldsFailed();
+    switch(m_opType)
     {
-        nErr = 0;
-        if(m_opType == Sale || m_opType == Reserve)
-        {
-            doc_id = initial_doc_id;
-            docModel->setId(0);
+        case Sale:
+        case Reserve:
+        case SaleReserved:
+        case Unsale:
+        case CancelReserve: {
+            doc_id = 0;
+            docModel->setFieldsFailed();
+            docModel->setData(SDocumentModel::C_cashOrder, QVariant());
+            break;
         }
-
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
     }
+}
 
-#ifdef QT_DEBUG
-//    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
-#endif
-
-    QUERY_LOG_STOP;
-
-    if(nErr)
+void tabSale::endCommit(const int stage)
+{
+    switch(m_opType)
     {
-        p_instance.remove(initial_doc_id);   // Если всё ОК, то нужно заменить указатель
-        p_instance.insert(doc_id, this);    // иначе будет падать при попытке создать новую вкладку продажи
+        case SaleReserved:
+        case Unsale:
+        case CancelReserve: return; // при продаже ранее зарезервированного товара, распроведении РН или отмене резерва дополнительных действий не требуется
+        case SetTrack: new shortlivedNotification(this, "Успешно", "ТТН задана", QColor(214,239,220), QColor(229,245,234)); return;
+        default: ;
+    }
 
-        print();
-        return false;
-    }
-    else
+    switch(stage)   // Создание нового клиента может быть только при продаже или резервировании товара
     {
-        return true; // return 0 — OK, return 1 - ошибка
+        case 0: fillClientCreds(clientModel->id()); break;
+        default: ;
     }
+}
+
+void tabSale::endCommit()
+{
+    switch(m_opType)
+    {
+        case SetTrack: return;  // вызывать updateWidgets() не требуется
+        default: ;
+    }
+
+    if(!ui->checkBoxAnonymous->isChecked())
+        clientModel->SSingleRowModelBase::load();
+
+    print();
+
+    switch(m_endCommitOp)
+    {
+        case SwitchToViewMode: switchTabToViewMode(); break;
+        case PrepareRepeat: prepareForRepeatedOp(); break;
+    }
+
+    updateWidgets();
+}
+
+void tabSale::prepareForRepeatedOp()
+{
+    doc_id = 0;
+    m_opType = Sale;
+    new shortlivedNotification(this, "Успешно", "Расходная накладная проведена", QColor(214,239,220), QColor(229,245,234));
+    docModel->clearEverything();
+    cashRegister->clearEverything();
+}
+
+void tabSale::switchTabToViewMode()
+{
+    docModel->SSingleRowModelBase::load();
+    cashRegister->SSingleRowModelBase::load();
+    updateTabPtr(0, doc_id);
 }
 
 void tabSale::saleButtonClicked()
 {
-    if (sale())
-        return;
+    m_endCommitOp = SwitchToViewMode;
 
-    updateWidgets();
+    manualSubmit();
 }
 
 /* На вкладке продажа задумка с кнопками "Продать ещё" и "Продать" несколько другая, чем аналогичные кнопки
@@ -864,13 +1001,9 @@ void tabSale::saleButtonClicked()
  */
 void tabSale::saleMoreButtonClicked()
 {
-    if(sale())
-        return;
+    m_endCommitOp = PrepareRepeat;
 
-    shortlivedNotification *newPopup = new shortlivedNotification(this, "Успешно", "Расходная накладная проведена", QColor(214,239,220), QColor(229,245,234));
-    doc_id = 0;
-    m_opType = Sale;
-    updateWidgets();
+    manualSubmit();
 }
 
 /* При нажатии "Резерв" вызывается тот же метод, что и при продаже; для изменения набора запросов к БД используется
@@ -879,11 +1012,9 @@ void tabSale::saleMoreButtonClicked()
 void tabSale::reserveButtonClicked()
 {
     m_opType = Reserve;
+    m_endCommitOp = SwitchToViewMode;
 
-    if(sale())
-        return;
-
-    updateWidgets();
+    manualSubmit();
 }
 
 void tabSale::addItemButtonClicked()
@@ -918,34 +1049,32 @@ void tabSale::phoneTypeChanged(int index)
     ui->lineEditClientPhone->setInputMask(clientPhoneTypesModel->index(index, 2).data().toString() + ";_");  // Here ";_" for filling blank characters with underscore
 }
 
-void tabSale::setTrackNum()     // слот вызываемый по нажатию Return
+void tabSale::commitTrack()
 {
-    bool nErr = 1;
+    docModel->set_trackingNumber(ui->lineEditTrack->text());
+    docModel->commit();
+}
 
-    if( QString::compare(ui->lineEditTrack->text(), docModel->trackingNumber()) == 0 )
-        return;
-
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-
-    try
+void tabSale::commitLogs()
+{
+    auto log = std::make_unique<SLogRecordModel>();
+    log->set_type(SLogRecordModel::Doc);
+    log->set_document(docModel->id());
+    switch (m_opType)
     {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        docModel->setTrackingNumber(ui->lineEditTrack->text());
-        nErr = docModel->commit();
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
+        case Sale: log->commit(QString("Расходная накладная №%1 создана").arg(doc_id)); break;
+        case Reserve: log->commit(QString("Расходная накладная №%1 создана (резерв)").arg(doc_id)); break;
+        case SaleReserved: log->commit(QString("Расходная накладная №%1 проведена").arg(doc_id)); break;
+        case Unsale: if(docModel->state() == SDocumentModel::OutInvoiceCancelled) log->commit(prepareUnsaleNote()); break;
+        case CancelReserve: if(docModel->state() == SDocumentModel::ReserveCancelled) log->commit(tr("Резерв товара по РН №%1 снят").arg(doc_id)); break;
+        default: break;
     }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
+}
 
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-    }
-
-    if(nErr)
-        shortlivedNotification *newPopup = new shortlivedNotification(this, "Успешно", "ТТН задана", QColor(214,239,220), QColor(229,245,234));
+void tabSale::setTrackNum()
+{
+    m_opType = SetTrack;
+    manualSubmit();
 }
 
 void tabSale::setTrackNum(int)
@@ -955,50 +1084,22 @@ void tabSale::setTrackNum(int)
 
 void tabSale::reserveCancelButtonClicked()
 {
-    if(m_docState != SDocumentModel::ItemsReserved)   // проверка на всякий случай, вдруг накосячу с отображением кнопок в разных режимах
+    if(docModel->state() != SDocumentModel::ItemsReserved)   // проверка на всякий случай, вдруг накосячу с отображением кнопок в разных режимах
         return;
 
-    bool nErr = 1;
+    m_opType = CancelReserve;
+    manualSubmit();
+}
 
-    QSqlQuery query(QSqlDatabase::database("connThird"));
+void tabSale::commitCancelReserve()
+{
 
-    QUERY_LOG_START(metaObject()->className());
-
-    try
-    {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-
-        nErr = tableModel->freeItems();
-
-        // если в следствие (нескольких) частичных распроведений были возвращены все товары, то нужно изменить статус документа
-        if(tableModel->amountTotal() == 0)
-        {
-            docModel->setAmount(0.00);
-            docModel->setState(SDocumentModel::ReserveCancelled);
-            docModel->appendLogText(tr("Резерв товара по РН №%1 снят").arg(doc_id));
-        }
-        else
-            docModel->setAmount(tableModel->amountTotal());
-
-        docModel->commit();
+    tableModel->backOutItems(StoreSaleModel::OpType::FreeReserved);
+    docModel->commit();
 
 #ifdef QT_DEBUG
-//        Global::throwDebug();
+//    Global::throwDebug();
 #endif
-        QUERY_COMMIT_ROLLBACK(&query,nErr);
-    }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
-        if(type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-    }
-
-    QUERY_LOG_STOP;
-
-    updateWidgets();
 }
 
 void tabSale::printButtonClicked()
@@ -1013,7 +1114,7 @@ void tabSale::logButtonClicked()
 
 void tabSale::unSaleButtonClicked()
 {
-    if(m_docState != SDocumentModel::OutInvoicePayed)   // проверка на всякий случай, вдруг накосячу с отображением кнопок в разных режимах
+    if(docModel->state() != SDocumentModel::OutInvoicePayed)   // проверка на всякий случай, вдруг накосячу с отображением кнопок в разных режимах
         return;
 
     QMessageBox resBtn( QMessageBox::Question, "SNAP CRM",
@@ -1026,22 +1127,15 @@ void tabSale::unSaleButtonClicked()
     if (resBtn.clickedButton() == noButton)
         return;
 
-    if(unSale())
-        return;
-    updateWidgets();
-}
-
-void tabSale::paymentSystemChanged(int index)
-{
-    int sysId = paymentSystemsModel->databaseIDByRow(index, "system_id");
-    cashRegister->setSystemId(sysId);
+    m_opType = Unsale;
+    manualSubmit();
 }
 
 void tabSale::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
 
     ui->lineEditClientLastName->setFont(font);
     ui->lineEditClientFirstName->setFont(font);
@@ -1075,11 +1169,8 @@ void tabSale::randomFill()
         if (val > 66)  // или выбираем из уже имеющихся клиентов или создаём нового или включаем галочку анонимный
         {
 //            fillClientCreds(143);
-            fillClientCreds(QRandomGenerator::global()->bounded(7538)); // пытаемся заполнить данные уже имеющимся клиентом
-            if (ui->lineEditClientLastName->text() == "")
-                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // если попался id несуществующего клиета
-            else if (ui->lineEditClientLastName->text() == "")
-                fillClientCreds(QRandomGenerator::global()->bounded(7538)); // и еще раз, на всякий пожарный
+            int id = SClientInputFormBase::randomClientIdFromDB();
+            fillClientCreds(id);
         }
         else if (val > 33)    // ввод данных из тестового списка
         {
@@ -1156,7 +1247,9 @@ void tabSale::createTestPanel()
     testBtnAddRandomItem = new QPushButton(testPanel);
     testBtnAddRandomItem->setGeometry(95,30, 90, 20);
     testBtnAddRandomItem->setText("AddRandomItem");
-    connect(testBtnAddRandomItem, &QPushButton::clicked, tableModel, &SSaleTableModel::dbgAddRandomItem);
+#if defined QT_DEBUG || defined QT_TEST
+    connect(testBtnAddRandomItem, &QPushButton::clicked, tableModel, &StoreSaleModel::dbgAddRandomItem);
+#endif
     testPanel->show();
 }
 

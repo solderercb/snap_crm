@@ -1,8 +1,17 @@
-#include "sapplication.h"
-#include "modules/purchasemanager/tabrequest.h"
+#include "tabrequest.h"
 #include "ui_tabrequest.h"
-#include "modules/purchasemanager/tabmanager.h"
-#include "tabrepair.h"
+#include <SAppLog>
+#include <Mainwindow>
+#include <tabPurchaseManager>
+#include <tabRepair>
+#include <SUserSettings>
+#include <SPermissions>
+#include <SPartRequest>
+#include <SClientModel>
+#include <SCommentModel>
+#include <SStandardItemModel>
+#include <SSqlQueryModel>
+#include <FlashPopup>
 
 QMap<int, tabPartRequest*> tabPartRequest::p_instance;
 
@@ -20,23 +29,26 @@ tabPartRequest::tabPartRequest(int id, MainWindow *parent) :
     m_requestId(id)
 {
     ui->setupUi(this);
+    logUserActivity();
 
     m_partRequest = new SPartRequest(this);
     m_clientModel = new SClientModel();
     m_dealerModel = new SClientModel();
-    connect(m_dealerModel, &SClientModel::modelUpdated, this, [=]{ui->widgetSuppliers->addSupplierRecord(m_dealerModel->id());});
+
+    if(id)
+        m_partRequest->setPrimaryKey(id);
 
     initWidgets();
 
     if(id)
         load(id);
-
-    logUserActivity();
+    else
+        updateWidgets();
 
 #ifdef QT_DEBUG
     if(!id)
     {
-        test_scheduler->start(1000);
+        test_scheduler->start(300);
     }
 #endif
 }
@@ -88,7 +100,7 @@ bool tabPartRequest::tabCloseRequest()
 
         switch(result)
         {
-            case QMessageBox::Yes: return commit(0);
+            case QMessageBox::Yes: save(); break;
             case QMessageBox::Cancel: return 0;
         }
     }
@@ -107,7 +119,7 @@ void tabPartRequest::copyRequest(const int id)
     ui->widgetDealerInput->fillCreds(old->dealer());
     m_dealerModel->blockSignals(false);
     if(old->client())
-        ui->widgetClientInput->fillCreds(old->client());
+        setClient(old->client());
     ui->spinBoxCount->setValue(old->count());
     ui->widgetSuppliers->setPredefSupplierId(old->dealer());
     ui->widgetSuppliers->copyLinks(id);
@@ -117,14 +129,28 @@ void tabPartRequest::copyRequest(const int id)
 
 void tabPartRequest::setRepair(const int id)
 {
-    m_partRequest->setRepair(id);
-    updateWidgets();
+    bool repairVisible = id > 0;
+    ui->labelRepair->setVisible(repairVisible);
+    ui->lineEditRepair->setVisible(repairVisible);
+    ui->pushButtonRepair->setVisible(repairVisible);
+
+    if(ui->lineEditRepair->text().toInt() == id)
+        return;
+
+    if(repairVisible)
+        ui->lineEditRepair->setText(QString::number(id));
+    ui->lineEditRepair->setReadOnly(true);
 }
 
 void tabPartRequest::setClient(const int id)
 {
-    m_partRequest->setClient(id);
-    updateWidgets();
+    ui->widgetClientInput->setVisible(id > 0);
+
+    if(m_clientModel->id() == id)
+        return;
+
+    ui->widgetClientInput->fillCreds(id);
+    ui->widgetClientInput->setHandlingButtons(SClientSelectForm::AccessMode::ViewCard);
 }
 
 void tabPartRequest::load(const int id)
@@ -143,7 +169,7 @@ void tabPartRequest::load(const int id)
 void tabPartRequest::initWidgets()
 {
     ui->comboBoxCreator->setModel(usersModel);
-    ui->comboBoxCreator->setCurrentIndex(usersModel->rowByDatabaseID(m_partRequest->employee()));
+    ui->comboBoxCreator->setCurrentIndex(usersModel->rowByDatabaseID(userDbData->id()));
     ui->comboBoxCreator->setEnabled(false);
     ui->comboBoxManagers->setModel(partRequestManagersModel);
     ui->comboBoxManagers->showSelectAllRow(true);
@@ -160,7 +186,7 @@ void tabPartRequest::initWidgets()
     ui->comboBoxState->hideRow(partRequestStatesListModel->rowByDatabaseID(SPartRequest::NewUncommitted));
 
     ui->comboBoxPriority->setModel(partRequestPrioritiesListModel);
-    ui->comboBoxPriority->setCurrentIndex(SPartRequest::Priority::Regular - 1);
+    ui->comboBoxPriority->setCurrentIndex(partRequestPrioritiesListModel->rowByDatabaseID(SPartRequest::Priority::Regular));
 
 //    ui->lineEditName->setButtons("Search"); // когда будет готова вкладка Товары
 //    ui->lineEditRepair->setButtons("Search");
@@ -191,8 +217,8 @@ void tabPartRequest::initWidgets()
     ui->widgetComments->setParentTab(this);
     ui->widgetComments->setMode(SCommentModel::Mode::PartRequest);
 
-    connect(m_partRequest, &SPartRequest::modelReset, this, &tabPartRequest::updateWidgets);
-    updateWidgets();
+    connect(m_dealerModel, &SClientModel::modelUpdated, this, [=]{ui->widgetSuppliers->addSupplierRecord(m_dealerModel->id());});
+    connect(m_partRequest, &SPartRequest::modelUpdated, this, &tabPartRequest::updateWidgets);
 }
 
 void tabPartRequest::setDefaultStyleSheets()
@@ -208,7 +234,7 @@ void tabPartRequest::setDefaultStyleSheets()
     ui->spinBoxCount->setStyleSheet(commonLineEditStyleSheet);
 }
 
-bool tabPartRequest::checkInput()
+int tabPartRequest::checkInput()
 {
     int error = 0;
     int step = 0;
@@ -258,9 +284,9 @@ bool tabPartRequest::checkInput()
     {
         qDebug() << QString("Ошибка создания заявки: возможно, не все обязательные поля заполнены (error 0b%1)").arg(error, 0, 2);
         appLog->appendRecord(QString("Error while creating part request: probably some obligatory fields empty (error 0b%1)").arg(error, 0, 2));
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 /* Проверка изменений отмеченных менеджеров
@@ -294,140 +320,121 @@ void tabPartRequest::setModelData()
     QDate plannedEnd = ui->dateEditPlanEndDate->date();
     int newState;
 
-    m_partRequest->setEmployee(usersModel->databaseIDByRow(ui->comboBoxCreator->currentIndex()));
+    m_partRequest->set_employee(usersModel->databaseIDByRow(ui->comboBoxCreator->currentIndex()));
     // Обновление списка ответственных сотрудников должно производиться только после записи данных в БД
     if(m_newRequest)
     {
         newState = SPartRequest::State::Created;
-        m_partRequest->setCreated(ui->dateEditBeginDate->dateTime());
+        if(QDate::currentDate().daysTo(ui->dateEditBeginDate->date()) > 0)
+            m_partRequest->set_created(ui->dateEditBeginDate->dateTime());
+        else
+            m_partRequest->set_created(QDateTime::currentDateTime());
     }
     else
     {
         newState = partRequestStatesListModel->databaseIDByRow(ui->comboBoxState->currentIndex());
-        m_partRequest->setTracking(ui->lineEditTrack->text());
-        m_partRequest->setAmount(ui->doubleSpinBoxAmount->value());
+        m_partRequest->set_tracking(ui->lineEditTrack->text());
+        m_partRequest->set_amount(ui->doubleSpinBoxAmount->value());
     }
 
     if(plannedEnd.isValid())
-        m_partRequest->setPlanEndDate(plannedEnd);
-    m_partRequest->setState(newState);
-    m_partRequest->setPriority(partRequestPrioritiesListModel->databaseIDByRow(ui->comboBoxPriority->currentIndex()));
+        m_partRequest->set_planEndDate(plannedEnd);
+    m_partRequest->set_state(newState);
+    m_partRequest->set_priority(partRequestPrioritiesListModel->databaseIDByRow(ui->comboBoxPriority->currentIndex()));
 
-    m_partRequest->setName(ui->lineEditName->text());
-    m_partRequest->setDealer(m_dealerModel->id());
-    m_partRequest->setClient(m_clientModel->id());
-    m_partRequest->setRepair(ui->lineEditRepair->text().toInt());
-    m_partRequest->setCount(ui->spinBoxCount->value());
-    m_partRequest->setNotes(ui->textEditNotes->toPlainText());
-
-    m_partRequest->setDirty(true);
+    m_partRequest->set_name(ui->lineEditName->text());
+    m_partRequest->set_dealer(m_dealerModel->id());
+    m_partRequest->set_client(m_clientModel->id());
+    m_partRequest->set_repair(ui->lineEditRepair->text().toInt());
+    m_partRequest->set_count(ui->spinBoxCount->value());
+    m_partRequest->set_notes(ui->textEditNotes->toPlainText());
 }
 
-bool tabPartRequest::commit(bool repeatAfter)
+void tabPartRequest::beginCommit()
 {
-    if(!checkInput())
-        return false;
-
-    bool nErr = 1;
-    QSqlDatabase db = QSqlDatabase::database("connThird");
-    QSqlQuery query(db);
-
     setModelData();
 
     setDefaultStyleSheets();
+}
 
-    QUERY_LOG_START(metaObject()->className());
-
-    try
+void tabPartRequest::commit(const int stage)
+{
+    Q_UNUSED(stage)
+    m_partRequest->commit();
+    if(m_newRequest)
     {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-
-        m_partRequest->commit();
-        if(m_newRequest)
-        {
-            m_requestId = m_partRequest->id();
-            ui->widgetSuppliers->setRequestId(m_requestId);
-            m_partRequest->updateAdditionalModelsFilters(m_requestId);
-        }
-
-        if(isManagersChanged() || m_newRequest)
-        {
-            m_partRequest->setManagers(ui->comboBoxManagers->checked());
-            m_partRequest->commitManagers();
-        }
-        ui->widgetSuppliers->commit();
-
-#ifdef QT_DEBUG
-//        Global::throwDebug();
-#endif
-        QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-    catch (Global::ThrowType type)
-    {
-        nErr = 0;
-        if(m_newRequest)
-        {
-            m_requestId = 0;
-            m_partRequest->setId(0);
-            m_partRequest->setState(SPartRequest::NewUncommitted);
-        }
-        if (type != Global::ThrowType::ConnLost)
-        {
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
+        m_requestId = m_partRequest->id();
+        ui->widgetSuppliers->setRequestId(m_requestId);
+        m_partRequest->updateAdditionalModelsFilters(m_requestId);
     }
 
-#ifdef QT_DEBUG
-//    nErr = 1; // и это для отладки (чтобы проверить работу дальше)
-#endif
+    if(isManagersChanged() || m_newRequest)
+    {
+        m_partRequest->setManagers(ui->comboBoxManagers->checked());
+        m_partRequest->commitManagers();
+    }
+    ui->widgetSuppliers->commit();
+}
+
+void tabPartRequest::throwHandler(int)
+{
+    if(m_newRequest)
+    {
+        m_requestId = 0;
+    }
+    m_partRequest->setFieldsFailed();
+}
+
+void tabPartRequest::endCommit()
+{
+    QString message;
+    if(m_newRequest)
+        message = tr("Успешно сохранёна");
+    else
+        message = tr("Изменения успешно сохранёны");
+    auto *p = new shortlivedNotification(this, tr("Заявка на закупку"), message, QColor(214,239,220), QColor(229,245,234));
+    Q_UNUSED(p);
+
+    m_partRequest->SSingleRowModelBase::load();
 
     int rep = m_partRequest->repair();
+    if(rep)
+        tabRepair::refreshIfTabExists(rep);
+    tabPurchaseManager::refreshIfTabExists();
 
-    if (nErr)   // если все запросы выполнены без ошибок
+    switch(m_endCommitOp)
     {
-        QString message;
-        if(m_newRequest)
-            message = tr("Успешно сохранёна");
-        else
-            message = tr("Изменения успешно сохранёны");
-        shortlivedNotification *newPopup = new shortlivedNotification(this, tr("Заявка на закупку"), message, QColor(214,239,220), QColor(229,245,234));
-
-        // TODO: аналогичный код используется в классе tabCashOperation; нужно унифицировать
-        if(!repeatAfter)
-        {
-            if(m_newRequest)
-            {
-                updateTabPtr(m_initialRequestId, m_requestId);
-                emit updateTabTitle(this);
-            }
-
-            ui->widgetClientInput->setHandlingButtons(SClientSelectForm::ViewCard);
-            m_partRequest->load(m_requestId, db);
-            ui->widgetSuppliers->setRequestState(m_partRequest->state());
-            ui->widgetSuppliers->select(m_requestId);
-        }
-        else
-        {
-            m_requestId = m_initialRequestId;
-            m_partRequest->deleteLater();
-            m_partRequest = new SPartRequest(this);
-            m_partRequest->setRepair(rep);
-            ui->widgetSuppliers->clearModel();
-            ui->widgetSuppliers->addSupplierRecord(m_dealerModel->id());
-        }
+        case SwitchToViewMode: switchTabToViewMode(); break;
+        case PrepareRepeat: prepareForRepeatedOp(); break;
+        case UpdateWidgets: m_partRequest->load(m_requestId); return;   // return т.к. updateWidgets() вызовется по сигналу modelReset()
+        default: break;
     }
 
-    QUERY_LOG_STOP;   // остановка записи сейчас, чтобы в журнал sql не попали запросы не касающиеся этой сессии
+    updateWidgets();
+}
 
-    if (nErr)
+void tabPartRequest::switchTabToViewMode()
+{
+    if(m_newRequest)
     {
-        updateWidgets();
-        if(rep)
-            tabRepair::refreshIfTabExists(rep);
-
-        tabPurchaseManager::refreshIfTabExists();
+        updateTabPtr(m_initialRequestId, m_requestId);
+        emit updateTabTitle(this);
     }
-    return nErr;
+
+    ui->widgetClientInput->setHandlingButtons(SClientSelectForm::ViewCard);
+    m_partRequest->load(m_requestId);
+    ui->widgetSuppliers->setRequestState(m_partRequest->state());
+    ui->widgetSuppliers->select(m_requestId);
+}
+
+void tabPartRequest::prepareForRepeatedOp()
+{
+    m_requestId = m_initialRequestId;
+    m_partRequest->deleteLater();
+    m_partRequest = new SPartRequest(this);
+    m_partRequest->set_repair(m_partRequest->repair());
+    ui->widgetSuppliers->clearModel();
+    ui->widgetSuppliers->addSupplierRecord(m_dealerModel->id());
 }
 
 void tabPartRequest::stateHandler(const int state)
@@ -457,6 +464,7 @@ void tabPartRequest::stateHandler(const int state)
 
 /* Замена ключа в списке singletone-вкладок
 */
+// TODO: идентичный метод есть в классе tabCashOperation; возможно стоит его перенести в tabCommon
 void tabPartRequest::updateTabPtr(const int oldId, const int newId)
 {
     if(oldId == newId)
@@ -468,17 +476,18 @@ void tabPartRequest::updateTabPtr(const int oldId, const int newId)
 
 void tabPartRequest::updateWidgets()
 {
-    bool clientVisible = m_partRequest->client();
-    bool repairVisible = m_partRequest->repair();
     setDefaultStyleSheets();
     stateHandler(m_partRequest->state());
 
     ui->comboBoxManagers->setChecked(m_partRequest->managers());
     ui->comboBoxManagers->setEnabled(!m_requestRO);
 
-
     ui->dateEditBeginDate->setAllowBackDate(!m_newRequest);
-    ui->dateEditBeginDate->setDateTime(m_partRequest->createdUtc().toLocalTime());
+    if(!m_newRequest)
+    {
+        ui->dateEditBeginDate->setDateTime(m_partRequest->created());
+        ui->comboBoxPriority->setCurrentIndex(partRequestPrioritiesListModel->rowByDatabaseID(m_partRequest->priority()));
+    }
     ui->dateEditBeginDate->setReadOnly(!m_newRequest);
 
     ui->labelPlanEndDate->setVisible(m_deadlineVisible);
@@ -496,7 +505,6 @@ void tabPartRequest::updateWidgets()
     ui->comboBoxState->setCurrentIndex(partRequestStatesListModel->rowByDatabaseID(m_partRequest->state()));
     ui->comboBoxState->setDisabled(m_newRequest || m_requestRO);
 
-    ui->comboBoxPriority->setCurrentIndex(partRequestPrioritiesListModel->rowByDatabaseID(m_partRequest->priority()));
     ui->comboBoxPriority->setEnabled(!m_requestRO);
 
     ui->labelTrack->setVisible(m_commentsVisible);
@@ -514,19 +522,8 @@ void tabPartRequest::updateWidgets()
 
     ui->widgetDealerInput->setHandlingButtons(m_dealerRO);
 
-    ui->widgetClientInput->setVisible(clientVisible);
-    if(clientVisible)
-    {
-        ui->widgetClientInput->fillCreds(m_partRequest->client());
-        ui->widgetClientInput->setHandlingButtons(SClientSelectForm::AccessMode::ViewCard);
-    }
-
-    ui->labelRepair->setVisible(repairVisible);
-    ui->lineEditRepair->setVisible(repairVisible);
-    ui->lineEditRepair->setReadOnly(m_requestRO);
-    ui->pushButtonRepair->setVisible(repairVisible);
-    if(repairVisible)
-        ui->lineEditRepair->setText(QString::number(m_partRequest->repair()));
+    setClient(m_partRequest->client());
+    setRepair(m_partRequest->repair());
 
     ui->spinBoxCount->setValue(m_partRequest->count());
     ui->spinBoxCount->setReadOnly(m_requestRO);
@@ -548,12 +545,14 @@ void tabPartRequest::updateWidgets()
 
 void tabPartRequest::create()
 {
-    commit(0);
+    m_endCommitOp = EndCommitOp::SwitchToViewMode;
+    manualSubmit();
 }
 
 void tabPartRequest::createAndRepeat()
 {
-    commit(1);
+    m_endCommitOp = EndCommitOp::PrepareRepeat;
+    manualSubmit();
 }
 
 void tabPartRequest::createCopyTab()
@@ -567,7 +566,8 @@ void tabPartRequest::createCopyTab()
 
 void tabPartRequest::save()
 {
-    commit(0);
+    m_endCommitOp = EndCommitOp::UpdateWidgets;
+    manualSubmit();
 }
 
 void tabPartRequest::guiFontChanged()
@@ -589,7 +589,23 @@ void tabPartRequest::randomFill()
     if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50
         ui->widgetDealerInput->fillCreds(SClientInputFormBase::randomClientIdFromDB("is_dealer", 1));
     if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50
+    {
         ui->widgetClientInput->fillCreds(SClientInputFormBase::randomClientIdFromDB("is_dealer", 0));
+        ui->widgetClientInput->setVisible(true);
+    }
+
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    for(int j = 0; j < 3; j++)
+    {
+        query->exec(QString("SELECT `name` FROM (SELECT ROUND(@i * RAND(), 0) AS 'rand') AS `rand` LEFT JOIN (SELECT @i := @i + 1 AS 'num', t1.`id`, t1.`name` FROM store_items AS t1 CROSS JOIN (SELECT @i := 0) AS dummy WHERE t1.`count` - t1.`reserved` > 0 AND t1.`is_realization` = 1) AS t1 ON t1.`num` = `rand`.`rand`;"));
+        if(j<2)
+            continue;   // после обновления сервера на mysql 5.6.51 (win) пришлось чуть-чуть изменить запрос для случайного товара; также в только что открытой сессии результаты первых двух запросов будут состоять из NULL, поэтому пропускаем их
+
+        query->first();
+        if(query->isValid())
+            ui->lineEditName->setText(query->value(0).toString());
+    }
+
     i = QRandomGenerator::global()->bounded(10);
     if(i)
         i *= 5;

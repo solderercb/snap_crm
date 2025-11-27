@@ -1,12 +1,23 @@
-#include "sapplication.h"
+#include <SApplication>
 #include "susersettings.h"
-#include "global.h"
-#include "tabprintdialog.h"
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <tabPrintDialog>
+#include <SLocalSettingsStructs>
+#include <QListView>
+#include <SSqlQueryModel>
+#include <QPrinterInfo>
+#include <SStandardItemModel>
 
 static QString errMsg(QObject::tr("Не удалось сохранить персональные настройки пользователя"));
 
-SUserSettings::SUserSettings()
+SUserSettings::SUserSettings() :
+    SSettingsBase()
 {
+    m_record_settings = std::make_shared<QSqlRecord>();
+    m_classDbMap = std::make_unique<QMap<int, int>>();  // создание объекта до вызова mapFields()
+    mapFields();
+    registerReportFields();
 }
 
 SUserSettings::~SUserSettings()
@@ -15,259 +26,273 @@ SUserSettings::~SUserSettings()
         delete xlsColumnsList;
 }
 
-void SUserSettings::initWidgets()
+void SUserSettings::insertNewField(const int index, const QString &name)
 {
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        metaObject()->invokeMethod(this, QByteArray("init__widget").insert(5, metaObject()->property(i).name()), Qt::DirectConnection);
+    QSqlField f;
+    if(name.startsWith("usersParams."))
+    {
+        m_classDbMap->insert(index, (Table::UsersParams | m_record_settings->count()));
+        f.setName(name.split('.').at(1));
+        m_record_settings->append(f);
+    }
+    else
+    {
+        m_classDbMap->insert(index, m_record->count());
+        f.setName(name);
+        m_record->append(f);
+    }
+}
 
-    m_printersList = QPrinterInfo::availablePrinterNames();
-    static_cast<QComboBox*>(i_editorWidgets.value("defaultDocumentPrinter"))->addItems(m_printersList);
-    static_cast<QComboBox*>(i_editorWidgets.value("defaultStickerPrinter"))->addItems(m_printersList);
-    static_cast<QComboBox*>(i_editorWidgets.value("defaultPosPrinter"))->addItems(m_printersList);
+void SUserSettings::configureWidgets()
+{
+    configureWidgetsForLocalSettings();
 
     QMetaEnum types = SUserSettings::staticMetaObject.enumerator(SUserSettings::staticMetaObject.indexOfEnumerator("XlsColumns"));
     xlsColumnsList = SStandardItemModel::modelFromEnum(types, tr);
     xlsColumnsList->setObjectName("xlsColumns");
     xlsColumnsList->setHorizontalHeaderLabels({"name", "id"});
-    for(int i = 1; i < 16; i++)
-        static_cast<QComboBox*>(i_editorWidgets.value("xlsC" + QString::number(i)))->setModel(xlsColumnsList);
-
-
-    // Модели данных виджетов (ComboBox) должны быть заданы до загрузки данных, иначе будет падать.
-//   static_cast<QComboBox*>(i_editorWidgets.value("..."))->setModel(...);
+    const QList<int> xlsIndexes = i_propertyGroup.keys(16);
+    foreach (auto i, xlsIndexes)
+    {
+        static_cast<QComboBox*>(i_editorWidgets.value(i))->setModel(xlsColumnsList);
+    }
 
     QStringList wsModes = {"", tr("Картриджи"), tr("Ремонты")};
-    static_cast<QComboBox*>(i_editorWidgets.value("defWsFilter"))->addItems(wsModes);
-    qobject_cast<QListView *>(static_cast<QComboBox*>(i_editorWidgets.value("defWsFilter"))->view())->setRowHidden(0, true);
+    static_cast<QComboBox*>(i_editorWidgets.value(C_defWsFilter))->addItems(wsModes);
+    qobject_cast<QListView *>(static_cast<QComboBox*>(i_editorWidgets.value(C_defWsFilter))->view())->setRowHidden(0, true);
 
-    setComboBoxModel("defaultPaymentSystem", paymentSystemsModel);
-
-    load(username);
+    setComboBoxModel(C_defaultPaymentSystem, paymentSystemsModel);
 
 /**************************************************************************************/
 /******************* Виджеты, работа с которыми еще не реализована ********************/
 /******************** см. метод SUserSettings::prepareUpdateList() ********************/
 /**************************************************************************************/
-    disableWidget("rowColor");
-    disableWidget("colorLabelWs");
-    disableWidget("fontFamily");
-    disableWidget("geHighlightColor");
-    disableWidget("issuedColor");
-    disableWidget("defStore");
-    disableWidget("workspaceRepairs");
-    disableWidget("workspaceItems");
-    disableWidget("roles");
-    disableWidget("office");
-    disableWidget("kkt");
-    disableWidget("pinpad");
-    disableWidget("defOffice");
-    disableWidget("defEmployee");
-    disableWidget("defStatus");
-    disableWidget("phoneMask");
-    disableWidget("phone2Mask");
+    disableWidget(C_rowColor);
+    disableWidget(C_fontFamily);
+    disableWidget(C_geHighlightColor);
+    disableWidget(C_issuedColor);
+    disableWidget(C_defStore);
+    disableWidget(C_roles);
+    disableWidget(C_office);
+    disableWidget(C_kkt);
+    disableWidget(C_pinpad);
+    disableWidget(C_defOffice);
+    disableWidget(C_defEmployee);
+    disableWidget(C_defStatus);
+    disableWidget(C_phoneMask);
+    disableWidget(C_phone2Mask);
 }
 
-void SUserSettings::disableWidget(const QString propertyName)
+/* Конфигурация виджетов, значения которых хранятся в localSettings:
+ *  - принтеры по умолчанию
+ *  - шрифт
+ *  - высота строк в таблицах
+*/
+void SUserSettings::configureWidgetsForLocalSettings()
 {
-    i_editorWidgets.value(propertyName)->setEnabled(false);
+    m_printersList = QPrinterInfo::availablePrinterNames();
+    static_cast<QComboBox*>(i_editorWidgets.value(C_defaultDocumentPrinter))->addItems(m_printersList);
+    static_cast<QComboBox*>(i_editorWidgets.value(C_defaultStickerPrinter))->addItems(m_printersList);
+    static_cast<QComboBox*>(i_editorWidgets.value(C_defaultPosPrinter))->addItems(m_printersList);
+    setCacheData(C_defaultDocumentPrinter, tabPrintDialog::findPrinterIndex(m_printersList, userLocalData->DocsPrinter.value), ModifiedField::Executed);
+    setCacheData(C_defaultStickerPrinter, tabPrintDialog::findPrinterIndex(m_printersList, userLocalData->StickersPrinter.value), ModifiedField::Executed);
+    setCacheData(C_defaultPosPrinter, tabPrintDialog::findPrinterIndex(m_printersList, userLocalData->PosPrinter.value), ModifiedField::Executed);
+
+    setCacheData(C_fontFamily, userLocalData->FontFamily.value, ModifiedField::Executed);
 }
 
 void SUserSettings::load(const QString &connectionLogin)
 {
-    QString q;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    int i = 0;
+    i_primaryKeyIndex = C_username;
+    setPrimaryKey(connectionLogin);
 
-    for(i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-        metaObject()->invokeMethod(this, QByteArray("register__db_field").insert(9, metaObject()->property(i).name()), Qt::DirectConnection);
+    this->load();
+}
 
-    // "переворот" таблицы users
-    q = QString("SELECT @smth := CONCAT(IF(@smth IS NOT NULL, CONCAT(@smth, '\\\nUNION ALL\\\n'), ''), 'SELECT \\\'', `COLUMN_NAME`, '\\\', `', `COLUMN_NAME`, '` FROM `users` WHERE `username` = \\\'%1\\\'') FROM information_schema.`COLUMNS` WHERE `TABLE_SCHEMA` = SCHEMA() AND `TABLE_NAME` = 'users';").arg(connectionLogin);
-    query->exec("SET @smth := NULL");
-    query->exec(q);
-
-    query->last();
-    q = query->value(0).toString();
-    query->exec(q);
-    while (query->next())
-    {
-        i = fieldToPropertyId(query->value(0).toString());
-        if(i < 0)
-            continue;
-
-        metaObject()->property(i).write(this, query->value(1));
-    }
-
-    q = QString("SELECT GROUP_CONCAT(`role_id`) AS 'roles' FROM `roles_users` WHERE `user_id` = %1 GROUP BY `user_id`  LIMIT 1;").arg(id);
-    query->exec(q);
-    if(query->first())
-        roles = query->value(0).toString();
-
+void SUserSettings::load()
+{
+    SSettingsBase::load();    // загрузка из таблицы `users`, очистка кэша
     // инициализация поля company происходит в windowsDispatcher::createMainWindow()
-
-    delete query;
-
+    loadPermissions();
     loadFromUsersParams();
 
-    loadPrinterSettings();
+    deserializeData();
+}
+
+void SUserSettings::loadPermissions()
+{
+    auto q = QString("SELECT GROUP_CONCAT(`role_id`) AS 'roles' FROM `roles_users` WHERE `user_id` = %1 GROUP BY `user_id`  LIMIT 1;").arg(id());
+    i_query->exec(q);
+    if(i_query->first())
+        setCacheData(C_roles, i_query->value(0).toString(), ModifiedField::Executed);
 }
 
 void SUserSettings::loadFromUsersParams()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
-    int i = 0;
+    int recordIndex = -1;
+    int classIndex = 0;
 
     m_params.clear();
-    query->exec(QString("SELECT t1.`name`, IFNULL(t2.`value`, t1.`default_value`) AS 'value', t1.`id` FROM `user_params` AS t1 LEFT JOIN (SELECT `param_id`, `value` FROM users_params WHERE `user_id` = %1)  t2 ON t1.`id` = t2.`param_id`;").arg(id));
-    while (query->next())
+    i_query->exec(QString("SELECT t1.`name`, IFNULL(t2.`value`, t1.`default_value`) AS 'value', t1.`id` FROM `user_params` AS t1 LEFT JOIN (SELECT `param_id`, `value` FROM users_params WHERE `user_id` = %1)  t2 ON t1.`id` = t2.`param_id`;").arg(id()));
+    while (i_query->next())
     {
-        i = fieldToPropertyId("usersParams." + query->value(0).toString());
-        if(i < 0)
+        recordIndex = m_record_settings->indexOf(i_query->value(0).toString());
+        if(recordIndex < 0)
             continue;
 
-        m_params.insert(query->value(0).toString(), query->value(2).toInt());
-        metaObject()->property(i).write(this, query->value(1));
+        m_record_settings->setValue(recordIndex, i_query->value(1));
+
+        classIndex = m_classDbMap->key(Table::UsersParams | recordIndex);
+        m_params.insert(classIndex, i_query->value(2).toInt());   // сохранение id параметра, он будет использоваться запросе INSERT (UPDATE)
     }
-
-    delete query;
 }
 
-void SUserSettings::loadPrinterSettings()
+QString SUserSettings::table()
 {
-    int i;
+    return "users";
+}
 
-    i = metaObject()->indexOfProperty("defaultDocumentPrinter");
-    metaObject()->property(i).write(this, tabPrintDialog::findPrinterIndex(m_printersList, userLocalData->DocsPrinter.value));
-    i = metaObject()->indexOfProperty("defaultStickerPrinter");
-    metaObject()->property(i).write(this, tabPrintDialog::findPrinterIndex(m_printersList, userLocalData->StickersPrinter.value));
-    i = metaObject()->indexOfProperty("defaultPosPrinter");
-    metaObject()->property(i).write(this, tabPrintDialog::findPrinterIndex(m_printersList, userLocalData->PosPrinter.value));
+/* Инициализация отдельных полей класса при загрузке:
+ *  - обработка полей с JSON;
+ *  - обработка полей, связанных с виджетами RadioButton
+*/
+void SUserSettings::deserializeData()
+{
+    updateWorkspaceSwitch();
+}
+
+/* Обработка полей таблиц, представленных в виде JSON и копирование значений в отдельные поля класса
+ * (такие поля хранятся только в кэше)
+*/
+void SUserSettings::loadFromJson(const int, bool)
+{
 
 }
 
-bool SUserSettings::commit()
+void SUserSettings::updateWorkspaceSwitch()
 {
-    bool nErr = 1;
-    QString q;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
+    int val = workspaceMode();
+    bool workspaceRepairs = 1, workspaceItems = 0;
+    switch (val)
+    {
+        case 0: break;
+        case 1: workspaceRepairs = 0; workspaceItems = 1; break;
+        default: break;
+    }
+    setCacheData(C_workspaceRepairs, (Qt::CheckState)(workspaceRepairs), ModifiedField::Executed);
+    setCacheData(C_workspaceItems, (Qt::CheckState)(workspaceItems), ModifiedField::Executed);
+}
 
-    fieldsUpdFormatter();
-    if(i_valuesMap.isEmpty())
+void SUserSettings::updateWorkspaceField()
+{
+    int v = 1*workspaceItems();
+    setCacheData(C_workspaceMode, v, ModifiedField::Updated);
+}
+
+QVariant SUserSettings::loadedValue(const int dbTableIndex) const
+{
+    if(dbTableIndex & Table::UsersParams)
+        return m_record_settings->value(dbTableIndex & (Table::UsersParams - 1));
+    else
+        return rec()->value(dbTableIndex);
+}
+
+void SUserSettings::updateJson(const int, const QVariant&)
+{
+
+}
+
+int SUserSettings::dbFieldIndex(const int classIndex) const
+{
+    return m_classDbMap->value(classIndex, -1);
+}
+
+QString SUserSettings::dbFieldName(const int classIndex) const
+{
+    int dbi = dbFieldIndex(classIndex);
+    if(dbi&Table::UsersParams)
+        return m_record_settings->fieldName(dbi&(Table::UsersParams-1));
+
+    return rec()->fieldName(dbi);
+}
+
+int SUserSettings::targetTable(const int targetTableIndex)
+{
+    if(targetTableIndex&Table::UsersParams)
         return 1;
 
-    q = QString("UPDATE\n  `users`\nSET\n  %2\nWHERE `id` = %1;").arg(id).arg(fields.join(",\n  "));
-    if(!query.exec(q))
-        Global::throwError(query.lastError(), errMsg);
-
-    i_valuesMap.clear();
-
-    return 1;
+    return 0;
 }
 
-// распределение изменённых значений по группам по названию таблиц
-void SUserSettings::prepareUpdateList(Table table)
+void SUserSettings::dataChangeHandler(const int index, const QVariant &data)
 {
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
+    loadFromJson(index);
+    updateJson(index, data);
+    switch (index)
     {
-        QString propName = metaObject()->property(i).name();
-        QString field = i_fieldNames.value(propName);
-        if(field.startsWith("usersParams") != table)
-            continue;
-
-        if(table)   // Table::UsersParams
-            field = field.replace("usersParams.", "");
-
-        QVariant val = i_fieldModified.value(propName);
-        if(!val.isValid())
-            val = i_jsonFieldModified.value(propName);
-        if(!val.isValid())
-            continue;
-
-/******* TEMPORARY *******/
-        // Данные отключенных виджетов не записывать в БД
-        QWidget *w = i_editorWidgets.value(propName);
-        if(w && !w->isEnabled())
-            continue;
-/**************/
-
-        i_valuesMap.insert(field, val);
+        case C_rowHeight: {
+            emit rowHeightChanged();
+            break;
+        }
+        case C_fontSize:
+        case C_fontFamily: {
+            QFont f;
+            f.setFamily(fontFamily());
+            f.setPixelSize(fontSize());
+            QApplication::setFont(f);
+            emit fontSizeChanged();
+            break;
+        }
+        case C_workspaceMode: updateWorkspaceSwitch(); break;
+        case C_workspaceRepairs: break; // этот RadioButton пропускаем
+        case C_workspaceItems: updateWorkspaceField(); break;   // в поле workspaceMode записываем только когда обрабатаем все
+        default: break;
     }
 }
 
 void SUserSettings::save()
 {
-    QString oldFontFamily;
-
-    for(int i = metaObject()->propertyOffset(); i < metaObject()->propertyCount(); i++)
-    {
-        QString propName = metaObject()->property(i).name();
-        /******* TEMPORARY *******/
-        // Данные отключенных виджетов не считывать в структуру
-        QWidget *w = i_editorWidgets.value(propName);
-        if(w && !w->isEnabled())
-            continue;
-        /**************/
-
-        metaObject()->property(i).read(this);
-    }
-
-    savePrinterSettings();
-    oldFontFamily = userLocalData->FontFamily.value;
-//    userLocalData->FontFamily.value = fontFamily; // TODO: модель данных шрифтов
-
-    i_valuesMap.clear();
-    prepareUpdateList(Table::Users);
-
-    if(i_valuesMap.contains("fontsize") || oldFontFamily.compare(fontFamily) != 0)
-    {
-        QFont f;
-        f.setFamily(userLocalData->FontFamily.value);
-        f.setPixelSize(userDbData->fontSize);
-        QApplication::setFont(f);
-        emit fontSizeChanged();
-    }
-
-    if(i_valuesMap.contains("rowheight"))
-    {
-        emit rowHeightChanged();
-    }
-
-    commit();
-
+    SSettingsBase::save();
     saveToUsersParams();
+    savePrinterSettings();
 
-    i_fieldModified.clear();
+//    userLocalData->FontFamily.value = fontFamily; // TODO: модель данных шрифтов
 }
 
 void SUserSettings::saveToUsersParams()
 {
+    if(!isDirty(1))
+        return;
+
     bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
 
-    i_valuesMap.clear();
-    prepareUpdateList(Table::UsersParams);
+    i_query->prepare(QString("INSERT INTO `users_params` (`user_id`, `param_id`, `value`) VALUES (:user_id, :param_id, :value) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);"));
+    i_query->bindValue(":user_id", id());
 
-    query.prepare(QString("INSERT INTO `users_params` (`user_id`, `param_id`, `value`) VALUES (:user_id, :param_id, :value) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);"));
-    query.bindValue(":user_id", id);
-    QMap<QString, QVariant>::const_iterator i = i_valuesMap.constBegin();
-    while(i != i_valuesMap.constEnd())
+    CacheMap::ConstIterator i = cache.constBegin();
+    CacheMap::ConstIterator e = cache.constEnd();
+    for (; i != e; ++i)
     {
-        query.bindValue(":param_id", m_params.value(i.key()));
-        query.bindValue(":value", i.value());
-        if(!query.exec())
-            Global::throwError(query.lastError(), errMsg);
+        if(!((*i)->state() & (ModifiedField::Updated | ModifiedField::Failed)))
+            continue;
+        if(dbFieldIndex(i.key()) >= 0)
+        {
+            i_query->bindValue(":param_id", m_params.value(i.key()));
+            i_query->bindValue(":value", fieldValueHandler((*i)->data()));
+            nErr = i_query->exec();
+        }
+        if(!nErr)
+            Global::throwError(i_query->lastError(), errMsg);
 
-        i++;
+        setState(*i, ModifiedField::Executed);
     }
-
-    i_valuesMap.clear();
 }
 
 void SUserSettings::savePrinterSettings()
 {
-    userLocalData->DocsPrinter.value = m_printersList.value(defaultDocumentPrinter, "");
-    userLocalData->StickersPrinter.value = m_printersList.value(defaultStickerPrinter, "");
-    userLocalData->PosPrinter.value = m_printersList.value(defaultPosPrinter, "");
+    userLocalData->DocsPrinter.value = m_printersList.value(defaultDocumentPrinter(), "");
+    userLocalData->StickersPrinter.value = m_printersList.value(defaultStickerPrinter(), "");
+    userLocalData->PosPrinter.value = m_printersList.value(defaultPosPrinter(), "");
 }
 
 void SUserSettings::updateLoginTimestamp()
@@ -278,8 +303,8 @@ void SUserSettings::updateLoginTimestamp()
     try
     {
         QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        i_valuesMap.insert("last_login", QDateTime::currentDateTime());
-        nErr = commit();
+        set_lastLogin(QDateTime::currentDateTime());
+        SSettingsBase::save();
         QUERY_COMMIT_ROLLBACK(&query, nErr);
     }
     catch(Global::ThrowType type)
@@ -293,16 +318,19 @@ void SUserSettings::updateLoginTimestamp()
 
 void SUserSettings::updateActivityTimestamp()
 {
-    i_valuesMap.insert("last_activity", QDateTime::currentDateTime());
-    commit();
+    set_lastActivity(QDateTime::currentDateTime());
+    SSettingsBase::save();
 }
 
-void SUserSettings::setComboBoxModel(const QString propertyName, SSqlQueryModel *model)
+void SUserSettings::setComboBoxModel(const int index, SSqlQueryModel *model)
 {
+    if(i_editorWidgetsTypes.value(index) != WidgetTypes::ComboBox)
+        return;
+
     QComboBox *cb;
 
-    cb = static_cast<QComboBox*>(i_editorWidgets.value(propertyName));
-    Q_ASSERT_X(cb, metaObject()->className(), QString("comboBox %1 wasn't found").arg(propertyName).toLocal8Bit());
+    cb = static_cast<QComboBox*>(i_editorWidgets.value(index));
+    Q_ASSERT_X(cb, metaObject()->className(), QString("comboBox for field %1 wasn't found").arg(index).toLocal8Bit());
 
     cb->setModel(model);
 }
@@ -406,3 +434,4 @@ void SUserSettings::translate()
     tr("ColumnK"); tr("ColumnL"); tr("ColumnM"); tr("ColumnN"); tr("ColumnO");
     tr("NoColumn");
 }
+

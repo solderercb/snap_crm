@@ -847,12 +847,12 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
+   <header location="global">SDoubleSpinBox</header>
   </customwidget>
   <customwidget>
    <class>SPlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
-   <header location="global">widgets/splaintextedit.h</header>
+   <header location="global">SPlainTextEdit</header>
   </customwidget>
  </customwidgets>
  <resources>

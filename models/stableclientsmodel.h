@@ -1,8 +1,7 @@
 #ifndef STABLECLIENTSMODEL_H
 #define STABLECLIENTSMODEL_H
 
-#include "stablebasemodel.h"
-#include <QObject>
+#include <STableModelBase>
 
 class STableClientsModel : public STableBaseModel
 {

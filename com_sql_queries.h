@@ -1,10 +1,8 @@
 #ifndef COM_SQL_QUERIES_H
 #define COM_SQL_QUERIES_H
 
-#include "appver.h"
+#include <appVer>
 
-#define QUERY_SEL_CLIENT(id)                QString("SELECT  `id`,  `name`,  `surname`,  `patronymic`,  `agent_phone_mask`,  `agent2_phone_mask`,  `address`,  `post_index`,  `type`,  `memorial`,  `notes`,  `prefer_cashless`,  `visit_source`,  `ur_name`, `short_name`,  `email`,  `balance_enable`,  `price_col`,  `repairs`,  `purchases`, `creator`,  `post_index`,  `passport_num`,  `passport_date`,  `passport_organ`,  `state`,  `birthday`,  `is_regular`,  `is_dealer`,  `take_long`,  `ignore_calls`,  `is_bad`,  `is_realizator`,  `is_agent`,  `photo_id`,  `INN`,  `KPP`,  `OGRN`,  `web_password`,  `icq`,  `skype`,  `viber`,  `telegram`,  `site`,  `whatsapp`,  `agent_name`,  `agent_surname`,  `agent_patronymic`,  `agent_phone`,  `agent_phone_clean`,  `agent2_name`,  `agent2_surname`,  `agent2_patronymic`,  `agent2_phone`,  `agent2_phone_clean`,  `created`,  `token` FROM `clients` WHERE `id` = %1 AND `state` = 1").arg((id))
-#define QUERY_SEL_BALANCE(id)               QString("SELECT ROUND(`balance`, 2) AS 'balance' FROM clients WHERE `id` = %1;").arg((id))
 #define QUERY_SEL_CLIENT_AD_TYPES           QString("SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC;")
 #define QUERY_SEL_CLIENT_MATCH_STATIC       QString(\
                                                 "SELECT                                                                      \n"\
@@ -25,7 +23,7 @@
                                                 "  `clients` AS t1                                                           \n"\
                                                 "  LEFT JOIN `tel` AS t2                                                     \n"\
                                                 "    ON t1.`id` = t2.`customer`                                              \n")
-#define QUERY_SEL_CLIENT_PHONES(id)         QString("SELECT `phone`, `mask`, `type`, `phone_clean`, `note`, `viber`, `telegram`, `whatsapp`, `notify`, `id`, `customer` FROM `tel` WHERE `customer` = " + QString::number((id)) + " ORDER BY `type` DESC, `id` DESC")
+#define QUERY_SEL_CLIENT_PHONES(id)         QString("SELECT `id`, `phone`, `phone_clean`, `mask`, `customer`, `type`, `note`, `viber`, `telegram`, `whatsapp`, `notify` FROM `tel` WHERE `customer` = " + QString::number((id)) + " ORDER BY `type` DESC, `id` DESC")
 #define QUERY_SEL_USER_STATE(username)      QString("SELECT `id` FROM `users` WHERE `username` = '%1' AND `state` = 1 AND `is_bot` = 0 LIMIT 1;").arg((username))
 #define QUERY_SEL_USER_DATA(username)       QString("SELECT `users`.`id`, GROUP_CONCAT(`role_id`) AS 'roles', `name`,  `surname`,  `patronymic`, CONCAT(IF(users.`surname` IS NULL OR users.`surname` = '', '', CONCAT(users.`surname`, ' ')), IF(users.`name` IS NULL OR users.`name` = '', '', CONCAT(LEFT(users.`name`, 1), '. ')), IF(users.`patronymic` IS NULL OR users.`patronymic` = '', '', CONCAT(LEFT(users.`patronymic`, 1), '.'))) AS 'fio', `office`,  `def_office`,  `def_store`,  `def_item_state`,  `def_employee`,  `def_status`,  `def_ws_filter`,  `salary_rate`,  `pay_day`,  `pay_day_off`,  `pay_repair`,  `pay_repair_quick`,  `pay_sale`,  `pay_repair_q_sale`,  `pay_cartridge_refill`,  `pay_device_in`,  `pay_device_out`,  `pay_4_sale_in_repair`,  `row_color`,  `ge_highlight_color`,  `color_label_ws`,  `workspace_mode`,  `preview_before_print`,  `new_rep_doc_copies`,  `auto_refresh_workspace`,  `refresh_time`,  `xls_c1`,  `xls_c2`,  `xls_c3`,  `xls_c4`,  `xls_c5`,  `xls_c6`,  `xls_c7`,  `xls_c8`,  `xls_c9`,  `xls_c10`,  `xls_c11`,  `xls_c12`,  `xls_c13`,  `xls_c14`,  `xls_c15`,  `display_out`,  `display_complete`,  `new_on_top`,  `issued_color`, `fields_cfg`,  `save_state_on_close`,  `group_store_items`,  `track_activity`,  `card_on_call`,  `inn`,  `inform_comment`,  `inform_status`,  `kkt`,  `pinpad`,  `advance_disable`,  `salary_disable`,  `kkm_pass`,  `prefer_regular`,  `fontsize`,  `rowheight`,  `animation`, `username` FROM `users` LEFT JOIN `roles_users` ON `users`.`id` = `roles_users`.`user_id` WHERE `username` = '%1' GROUP BY `users`.`id`  LIMIT 1;").arg((username))
 #define QUERY_SEL_USER_DATA2(id)            QString("SELECT `users`.`id`, `sip_user_id`, `client_user_id`, `username`, `name`, `surname`, `patronymic`, `phone`, `phone2`, `phone_mask`, `phone2_mask`, `address`, `passport_num`, `passport_date`, `passport_organ`, `state`, `created`, `office`, `birthday`, `def_office`, `def_store`, `def_item_state`, `def_employee`, `def_status`, `def_ws_filter`, `last_login`, `last_activity`, `email`, `sex`,  `photo`, `salary_rate`, `pay_day`, `pay_day_off`, `pay_repair`, `pay_repair_quick`, `pay_sale`, `pay_repair_q_sale`, `pay_cartridge_refill`, `pay_device_in`, `pay_device_out`, `pay_4_sale_in_repair`, `row_color`, `ge_highlight_color`, `color_label_ws`, `workspace_mode`, `preview_before_print`, `new_rep_doc_copies`, `auto_refresh_workspace`, `refresh_time`, `xls_c1`, `xls_c2`, `xls_c3`, `xls_c4`, `xls_c5`, `xls_c6`, `xls_c7`, `xls_c8`, `xls_c9`, `xls_c10`, `xls_c11`, `xls_c12`, `xls_c13`, `xls_c14`, `xls_c15`, `display_out`, `display_complete`, `is_bot`, `new_on_top`, `issued_color`,  `fields_cfg`, `save_state_on_close`, `group_store_items`, `track_activity`, `card_on_call`, `inn`, `inform_comment`, `inform_status`, `kkt`, `pinpad`, `advance_disable`, `salary_disable`, `notes`, `signature`, `kkm_pass`, `prefer_regular`, `fontsize`, `rowheight`, `animation` FROM `users` LEFT JOIN `roles_users` ON `users`.`id` = `roles_users`.`user_id` WHERE `users`.`id` = '%1' GROUP BY `users`.`id` LIMIT 1;").arg((id))
@@ -105,14 +103,7 @@
 
 #define QUERY_SEL_ADDITIONAL_FIELDS_TYPES(isRepair, id) QString(\
                                                 "SELECT\n"\
-                                                "  `name`,\n"\
-                                                "  REPLACE(`def_values`,'\r','') AS 'def_values',\n"\
-                                                "  `type`,\n"\
-                                                "  `id`,\n"\
-                                                "  `required`,\n"\
-                                                "  `printable`,\n"\
-                                                "  `dev_match`,\n"\
-                                                "  `input_mask`\n"\
+                                                "  `id`\n"\
                                                 "FROM\n"\
                                                 "  `fields`\n"\
                                                 "WHERE\n"\
@@ -124,6 +115,7 @@
                                                 .arg((isRepair?0:1))\
                                                 .arg((id))\
                                                 .arg((isRepair?"devices":"categories"))
+
 #define QUERY_SEL_DEVICE_MATCH              QString(\
                                                 "SELECT\n"\
                                                 "  t1.`id`,\n"\
@@ -249,7 +241,7 @@
                                                 "  t1.`id` = %1;")\
                                                 .arg((id))
 
-#define QUERY_SEL_COMMENTS(field, id)           QString("SELECT `id`, `created`, `user`, `text` FROM `comments` WHERE `%1` = %2 ORDER BY `created` DESC,`id` DESC;").arg((field)).arg((id)), QSqlDatabase::database("connMain")
+#define QUERY_SEL_COMMENTS(field, id)           QString("SELECT `id`, `created`, `user`, `text` FROM `comments` WHERE `%1` = %2 ORDER BY `created` DESC,`id` DESC;").arg((field)).arg((id))
 
 #define QUERY_SEL_REPAIR_WORKS_AND_PARTS(id)    QString(\
                                                 "SELECT `id`, `UID`, `name`, `count`, `avail`, `price`, `summ`, `box`, `sn`, `warranty`, `user`, `is_realization`, `return_percent`, `state`, `notes`, `item_id`, `in_price`, `obj_id`, `dealer`, `buyer`, `created`, `work_id`, `is_item`, `work_type` FROM (\n"\
@@ -326,9 +318,9 @@
 #define QUERY_SEL_REPAIR_PARTS(R)           QString("SELECT SUM(`price` * `count`) AS `summa` FROM `store_int_reserve` WHERE `state` IN (2, 3) AND `repair_id` = %1;").arg((R))
 #define QUERY_SEL_REPAIR_MNGR_ENGR(R)       QString("SELECT `current_manager`, `master` FROM workshop WHERE `id` = %1").arg((R))
 #define QUERY_SEL_REPAIR_LOCK(db, id)       QString("SELECT IFNULL(t1.`user_lock`, 0) AS 'user_id', IF(t3.`USER` IS NULL, 0, 1) AS 'is_user_online', t1.`lock_datetime` FROM `%1`.`workshop` AS t1 LEFT JOIN `%1`.`users` AS t2 ON t1.`user_lock` = t2.`id` LEFT JOIN `information_schema`.`PROCESSLIST` AS t3 ON t2.`username` = t3.`USER` AND  t3.`DB` = '%1' WHERE t1.`id` = %2 GROUP BY t1.`id`;").arg((db)).arg((id))
-#define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R))
-#define QUERY_SEL_ADD_FIELD(id)             QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`id` = %1;").arg((id))
-#define QUERY_SEL_ITEM_ADD_FIELDS(I)        QString("SELECT t1.`id`, t2.`name`, t1.`value`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, '' AS 'comment', t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`item_id` = %1 ORDER BY t1.`field_id` ASC;").arg((I))
+#define QUERY_SEL_REPAIR_ADD_FIELDS(R)      QString("SELECT t1.`id`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, t1.`value`, t2.`name`, t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`repair_id` = %1 ORDER BY t1.`field_id` ASC;").arg((R))
+#define QUERY_SEL_ITEM_ADD_FIELDS(I)        QString("SELECT t1.`id`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, t1.`value`, t2.`name`, t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`item_id` = %1 ORDER BY t1.`field_id` ASC;").arg((I))
+#define QUERY_SEL_ADD_FIELD(id)             QString("SELECT t1.`id`, t1.`field_id`, t1.`repair_id`, t1.`item_id`, t1.`value`, t2.`name`, t2.`printable` FROM `field_values` AS t1 LEFT JOIN `fields` AS t2 ON t1.`field_id` = t2.`id` WHERE t1.`id` = %1;").arg((id))
 #define QUERY_SEL_IS_BALANCE_EN(C)          QString("SELECT SUM(`summ`) AS 'summa' FROM `balance` WHERE `client` = %1;").arg((C))
 #define QUERY_SEL_DOC(id)                   QString("SELECT  `id`,  `type`,  `state`,  `is_realization`,  `payment_system`,  `company`,  `store`,  `user`,  `total`,  `notes`,  `created`,  `updated_at`,  `office`,  `dealer`,  `currency_rate`,  `reason`,  `order_id`,  `price_option`,  `return_percent`,  `reserve_days`, DiffDays(UTC_TIMESTAMP(), `created`) AS 'diff_days', `master_id`,  `repair_id`,  `works_included`,  `invoice`,  `track`,  `d_store`,  `d_pay` FROM `docs` WHERE `id` = %1;").arg((id))
 
@@ -484,6 +476,39 @@
                                                         .arg((uid))\
                                                         .arg((count))
 
+#define QUERY_SEL_WORK_FROM_PRICELIST(uid, price_field_name)  QString(\
+                                                        "SELECT\n"\
+                                                        "  0 AS 'id',\n"\
+                                                        "  LPAD(`id`, 6, '0') AS 'UID',\n"\
+                                                        "  `name`,\n"\
+                                                        "  1 AS 'count',\n"\
+                                                        "  9999 AS 'avail',\n"\
+                                                        "  %2 AS 'price',\n"\
+                                                        "  0 AS 'summ',\n"\
+                                                        "  '' AS 'box',\n"\
+                                                        "  '' AS 'sn',\n"\
+                                                        "  `warranty`,\n"\
+                                                        "  0 AS 'user',\n"\
+                                                        "  0 AS 'is_realization',\n"\
+                                                        "  `master_part` AS 'return_percent',\n"\
+                                                        "  0 AS 'state',\n"\
+                                                        "  NULL  AS 'notes',\n"\
+                                                        "  `id` AS 'item_id',\n"\
+                                                        "  0 AS 'in_price',\n"\
+                                                        "  0 AS 'obj_id',\n"\
+                                                        "  `vendor_id` AS 'dealer',\n"\
+                                                        "  0 AS 'buyer',\n"\
+                                                        "  NULL AS 'created',\n"\
+                                                        "  NULL AS 'work_id',\n"\
+                                                        "  0 AS 'is_item',\n"\
+                                                        "  0 AS 'work_type'\n"\
+                                                        "FROM\n"\
+                                                        "  workshop_price\n"\
+                                                        "WHERE\n"\
+                                                        "  `id` IN (%1);")\
+                                                        .arg((uid))\
+                                                        .arg((price_field_name))
+
 #define QUERY_SEL_ITEM_ACTUAL_QTY(item_id)   QString(\
                                                         "SELECT\n"\
                                                         "  `count`,\n"\
@@ -525,6 +550,8 @@
                                                         "  `cash_orders`\n"\
                                                         "WHERE\n"\
                                                         "  `id` = %1;").arg((id))
+
+// см. комментарий к методу SInvoiceModel::constructSelectQuery()
 #define QUERY_SEL_INVOICE(id)               QString(\
                                                         "SELECT\r\n"\
                                                         "  t1.`id`,\r\n"\
@@ -532,9 +559,7 @@
                                                         "  t1.`created`,\r\n"\
                                                         "  t1.`user`,\r\n"\
                                                         "  t1.`seller`,\r\n"\
-                                                        "  t1.`customer` AS 'covenantor',\r\n"\
-                                                        "  t2.`ur_name` AS 'covenantor_name',\r\n"\
-                                                        "  t2.`client` AS 'client_id',\r\n"\
+                                                        "  t1.`customer`,\r\n"\
                                                         "  t1.`paid`,\r\n"\
                                                         "  t1.`tax`,\r\n"\
                                                         "  t1.`summ`,\r\n"\
@@ -542,7 +567,9 @@
                                                         "  t1.`total`,\r\n"\
                                                         "  t1.`state`,\r\n"\
                                                         "  t1.`office`,\r\n"\
-                                                        "  t1.`type`\r\n"\
+                                                        "  t1.`type`,\r\n"\
+                                                        "  t2.`ur_name` AS 'customer_name',\r\n"\
+                                                        "  t2.`client` AS 'client_id'\r\n"\
                                                         "FROM\r\n"\
                                                         "  `invoice` AS t1\r\n"\
                                                         "LEFT JOIN\r\n"\
@@ -635,16 +662,6 @@
 
 #define QUERY_SET_REJ_REASON(R, t)          QString("UPDATE `workshop` SET `reject_reason` = '%2' WHERE `id` = %1;").arg((R)).arg((t))
 
-#define QUERY_UPDATE_BALANCE(C,S)           QString(\
-                                                "UPDATE\n"\
-                                                "  `clients`\n"\
-                                                "SET\n"\
-                                                "  `balance` = %2\n"\
-                                                "WHERE\n"\
-                                                "  `id`=%1;")\
-                                                .arg((C))\
-                                                .arg((S), 0, 'f', 4)
-
 #define QUERY_VRFY_BALANCE(C)               QString(\
                                                 "SELECT\n"\
                                                 "  IF(ROUND(t1.`balance`, 2) = ROUND(SUM(t2.`summ`), 2), 21930, 0) AS 'control',\n"\
@@ -662,6 +679,7 @@
 
 // для интерактивного обновления цен уже добавленных в список товаров используется prepaired statement
 #define QUERY_SEL_STORE_ITEMS_ITEM_PRICE(column)    QString("SELECT %1 FROM store_items WHERE `id` = :id;").arg(column)
+#define QUERY_SEL_STORE_ITEM_UID_NAME(id)   QString("SELECT CONCAT(`articul`, '-', `id`) AS 'UID', `name` FROM store_items WHERE `id` = %1;").arg((id))
 
 #define QUERY_SEL_SALARY_REPAIRS(date1, date2, statuses, user)    QString(                                                                                                                                                \
                                                 "SELECT                                                                                                                                                                \n"\
@@ -1140,9 +1158,6 @@
 #define QUERY_SEL_PRT_RQST_SUPPLIERS(rqstId) QString("SELECT `id`, `request_id`, `supplier_id`, `supplier_url`, `item_url`, `moq`, `price`, `select`, `notes` FROM `parts_request_suppliers` WHERE `request_id` = %1;").arg((rqstId))
 
 #define QUERY_UPD_PRT_RQST_SUPPLIERS_SEL(id, rqst)   QString("UPDATE `parts_request_suppliers` SET `select` = IF(`id` = %1, 1, 0) WHERE `request_id` = %2;").arg((id)).arg((rqst))
-
-#define QUERY_UPD_CLIENT_PURCHASES(id, num)      QString("UPDATE `clients` SET `purchases`=`purchases`+(%2) WHERE `id` = %1;").arg((id)).arg((num))
-#define QUERY_UPD_CLIENT_REPAIRS(id)      QString("UPDATE `clients` SET `repairs`=`repairs`+1 WHERE `id` = %1;").arg((id))
 
 #define QUERY_INS_SCHEMAVERSIONS(scriptName)       QString("INSERT INTO `schemaversions` (ScriptName, Applied) VALUES ('%1',UTC_TIMESTAMP());").arg(scriptName)
 #define QUERY_UPD_APP_VER(appVer)                  QString("UPDATE `config` SET `version_snap`='%1' WHERE `id`=1;").arg(appVer)

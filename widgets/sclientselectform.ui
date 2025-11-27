@@ -145,12 +145,12 @@
   <customwidget>
    <class>SDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">widgets/sdoublespinbox.h</header>
+   <header location="global">SDoubleSpinBox</header>
   </customwidget>
   <customwidget>
    <class>SLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>widgets/slineedit.h</header>
+   <header location="global">SLineEdit</header>
    <slots>
     <signal>buttonClicked(int)</signal>
     <signal>mouseDoubleClick()</signal>
@@ -159,7 +159,7 @@
   <customwidget>
    <class>SClientMatch</class>
    <extends>QWidget</extends>
-   <header>widgets/sclientmatch.h</header>
+   <header location="global">SClientMatch</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,11 +1,13 @@
 #ifndef SPLAINTEXTEDIT_H
 #define SPLAINTEXTEDIT_H
 
-#include <QWidget>
+#include <QObject>
 #include <QPlainTextEdit>
-#include <QDebug>
-#include <QScrollBar>
-#include "widgets/scomtextedit.h"
+#include <SComTextEdit>
+
+class QWidget;
+class QFocusEvent;
+class QResizeEvent;
 
 class SPlainTextEdit : public QPlainTextEdit, public SComTextEdit
 {

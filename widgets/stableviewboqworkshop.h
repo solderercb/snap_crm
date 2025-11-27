@@ -1,7 +1,8 @@
 #ifndef STABLEVIEWBOQWORKSHOP_H
 #define STABLEVIEWBOQWORKSHOP_H
-#include "widgets/stableviewbase.h"
-#include "models/ssaletablemodel.h"
+#include <STableViewBase>
+
+class SSaleTableModel;
 
 class STableViewBOQWorkshop : public STableViewBase
 {

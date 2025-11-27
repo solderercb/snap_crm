@@ -1,10 +1,10 @@
 #ifndef SSETTINGSPAGEROLESANDPERMISSIONS_H
 #define SSETTINGSPAGEROLESANDPERMISSIONS_H
 
-#include "..\stabpage.h"
 #include <QObject>
-#include "models/spermissions.h"
-#include "widgets/settingstabwidgets/ssettingspagebase.h"
+#include <SSettingsPageBase>
+
+class SPermissions;
 
 namespace Ui {
 class SSettingsPageRolesAndPermissions;

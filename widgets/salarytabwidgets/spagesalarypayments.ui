@@ -52,12 +52,12 @@
   <customwidget>
    <class>STableViewSalaryPaymentsSummary</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/spagesalarypayments.h</header>
+   <header location="global">SSalaryPaymentsPage</header>
   </customwidget>
   <customwidget>
    <class>STableViewSalaryPayments</class>
    <extends>QTableView</extends>
-   <header>widgets/salarytabwidgets/stableviewsalarypayments.h</header>
+   <header location="global">SSalaryPaymentsView</header>
   </customwidget>
  </customwidgets>
  <resources/>

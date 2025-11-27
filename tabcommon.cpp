@@ -1,5 +1,13 @@
 #include "tabcommon.h"
-#include "global.h"
+#include <ProjectGlobals>
+#include <SUserSettings>
+#include <SUserActivityModel>
+#include <Mainwindow>
+#include <STableViewBase>
+#ifdef QT_DEBUG
+#include <QTimer>
+#include <QRandomGenerator>
+#endif
 
 tabCommon::tabCommon(MainWindow *p) :
     SWidget(p)
@@ -18,25 +26,8 @@ tabCommon::tabCommon(MainWindow *p) :
 
 tabCommon::~tabCommon()
 {
-    bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
-
-    try
-    {
-        QUERY_EXEC_TH(&query,nErr,QUERY_BEGIN);
-        userDbData->updateActivityTimestamp();
-        QUERY_COMMIT_ROLLBACK(&query, nErr);
-    }
-    catch(Global::ThrowType type)
-    {
-        if (type != Global::ThrowType::ConnLost)
-        {
-            bool nErr = 1;
-            QSqlQuery query(QSqlDatabase::database("connThird"));
-
-            QUERY_COMMIT_ROLLBACK(&query, nErr);
-        }
-    }
+    m_opType = ActionsOnClose;
+    manualSubmit();
 
     while(tabList.removeOne(this));
     // если вкладка создана с другой вкладки (выбор клиента/ремонта/др.), то сработает механизм переключения на вызвавшую вкладку,
@@ -88,4 +79,29 @@ void tabCommon::setCursorPositionsToZero()
 void tabCommon::logUserActivity()
 {
     userActivityLog->appendRecordStandalone("Navigation " + tabTitle());
+}
+
+void tabCommon::commit(const int)
+{
+    switch (m_opType)
+    {
+        case ActionsOnClose: userDbData->updateActivityTimestamp(); break;
+        default: break;
+    }
+}
+
+void tabCommon::refreshTable()
+{
+    refreshTable(STableViewBase::ScrollPosPreserve, STableViewBase::SelectionReset);
+}
+
+void tabCommon::refreshTable(bool preserveScrollPos)
+{
+    refreshTable(preserveScrollPos, STableViewBase::SelectionReset);
+}
+
+void tabCommon::refreshTable(bool preserveScrollPos, bool preserveSelection)
+{
+    Q_UNUSED(preserveScrollPos);
+    Q_UNUSED(preserveSelection);
 }

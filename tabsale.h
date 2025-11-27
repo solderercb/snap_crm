@@ -1,29 +1,15 @@
 #ifndef TABSALE_H
 #define TABSALE_H
 
-#include <QWidget>
-#include <QSqlQueryModel>
-#include <QDateTime>
-#include <QLabel>
-#include <QPushButton>
-#include <QToolButton>
-#include <QScrollBar>
-#include <QMessageBox>
-#include "tabcommon.h"
-#include "models/sdocumentmodel.h"
-#include "models/sstandarditemmodel.h"
-#include "models/ssortfilterproxymodel.h"
-#include "models/ssqlquerymodel.h"
-#include "models/ssaletablemodel.h"
-#include "models/slogrecordmodel.h"
-#include "models/scashregistermodel.h"
-#include "models/sclientmodel.h"
-#include "models/sphonemodel.h"
-#include "widgets/stableviewboqitemdelegates.h"
-#include "widgets/tabsalesettingsmenu.h"
-#include "widgets/shortlivednotification.h"
-#include "widgets/stableviewbase.h"
-#include "widgets/qtooltipper.h"
+#include <tabCommon>
+
+class SDocumentModel;
+class SClientModel;
+class QSqlQueryModel;
+class StoreSaleModel;
+class tabSaleSettingsMenu;
+class SCashRegisterModel;
+class SSortFilterProxyModel;
 
 namespace Ui {
 class tabSale;
@@ -41,7 +27,8 @@ signals:
     void createTabSelectItem(int, QWidget*);
 
 public:
-    enum OpType {Sale = 0, Reserve = 1, SaleReserved = 2};
+    enum OpType {Sale = 0, Reserve = 1, SaleReserved = 2, Unsale = 3, CancelReserve = 4, SetTrack = 5};
+    enum EndCommitOp {SwitchToViewMode, PrepareRepeat};
     explicit tabSale(int, MainWindow *parent = nullptr);
     static tabSale* getInstance(int, MainWindow *parent = nullptr);
     ~tabSale();
@@ -53,24 +40,43 @@ private:
     SDocumentModel *docModel;
     SClientModel *clientModel;
     QSqlQueryModel* clientPhonesModel;
-    SSaleTableModel *tableModel;
+    StoreSaleModel *tableModel;
     tabSaleSettingsMenu *widgetAction;
     SCashRegisterModel *cashRegister;
     SSortFilterProxyModel *m_priceColProxyModel;
-    int client = 0;
+    int m_client = 0;
     int price_col = 2;
-    int m_opType = 0;
+    int m_opType = Sale;
     int *params;
-    int m_docState = 0;
+    int m_endCommitOp = SwitchToViewMode;
+    void updateTabPtr(const int oldId, const int newId);
     void initPriceColModel();
     void eventResize(QResizeEvent *);
     void setDefaultStyleSheets();
     void setBalanceWidgetsVisible(bool);
     void updateWidgets();
-    bool checkInput();
-    bool createClient();
-    bool createNewDoc();
-    bool sale();
+    int checkInputNew();
+    int checkInputUnsale();
+    int checkInput() override;
+    int commitStages() override;
+    int targetPaymentAccount();
+    void prepareCashRegisterModel(const double amount, const int account = 0);   // по умолчанию Наличные
+    QString prepareUnsaleNote();
+    void prepareDocModel();
+    void beginCommit() override;
+    bool skip(const int stage) override;
+    void commit(const int stage) override;
+    void commitClient();
+    void commitNew();
+    void commitUnsale();
+    void commitCancelReserve();
+    void commitTrack();
+    void commitLogs();
+    void throwHandler(int) override;
+    void endCommit(const int stage) override;
+    void endCommit() override;
+    void prepareForRepeatedOp();
+    void switchTabToViewMode();
     void clearAll();
     void print();
 #ifdef QT_DEBUG
@@ -96,7 +102,6 @@ private slots:
     void hideGroupBoxClient(bool);
     void selectPriceCol(int);
     void addItemByUID();
-    bool unSale();
     void saleButtonClicked();
     void saleMoreButtonClicked();
     void reserveButtonClicked();
@@ -110,7 +115,6 @@ private slots:
     void printButtonClicked();
     void logButtonClicked();
     void unSaleButtonClicked();
-    void paymentSystemChanged(int);
     void guiFontChanged() override;
 #ifdef QT_DEBUG
     void test_scheduler_handler() override;

@@ -5,36 +5,52 @@
 #ifndef SCASHREGISTERMODEL_H
 #define SCASHREGISTERMODEL_H
 
-#include <QObject>
-#include "global.h"
-#include "amountToWords/amountToWords.h"
-#include "com_sql_queries.h"
-#include "models/scomrecord.h"
-#include "models/slogrecordmodel.h"
+#include <SSingleRowJModel>
 
-class SCashRegisterModel : public SComRecord
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 1)                                             \
+    TABLE_FIELD(created, created, QDateTime, 1)                             \
+    TABLE_FIELD(type, operationType, int, 1)                                \
+    TABLE_FIELD(summa, amount, double, 1)                                   \
+    TABLE_FIELD(summa_str, amountStr, QString, 1)                           \
+    TABLE_FIELD(invoice, invoice, int, 1)                                   \
+    TABLE_FIELD(client, client, int, 1)                                     \
+    TABLE_FIELD(to_user, employee, int, 1)                                  \
+    TABLE_FIELD(user, user, int, 1)                                         \
+    TABLE_FIELD(company, company, int, 1)                                   \
+    TABLE_FIELD(office, office, int, 1)                                     \
+    TABLE_FIELD(notes, reason, QString, 1)                                  \
+    TABLE_FIELD(repair, repair, int, 1)                                     \
+    TABLE_FIELD(document, document, int, 1)                                 \
+    TABLE_FIELD(img, imgId, int, 1)                                         \
+    TABLE_FIELD(payment_system, systemId, int, 1)                           \
+    TABLE_FIELD(card_fee, cardFee, double, 1)                               \
+    TABLE_FIELD(is_backdate, isBackdate, bool, 1)                           \
+    TABLE_FIELD(card_info, cardInfo, int, 1)                                \
+    TABLE_FIELD(customer_email, customerEmail, QString, 1)                  \
+    TABLE_FIELD(fdn, fiscalDocNum, int, 1)                                  \
+    TABLE_FIELD(payment_item_sign, paymentItemSign, int, 1)
+
+// Список дополнительных полей для отчетов
+// Описание смотри в sdatabaserecord_new.h
+#undef ADDITIONAL_REPORT_FIELDS
+#define ADDITIONAL_REPORT_FIELDS                                            \
+    ADDITIONAL_REPORT_FIELD(invoiceNum, invoiceNum)                         \
+    ADDITIONAL_REPORT_FIELD(haveCardFee, haveCardFee)                       \
+    ADDITIONAL_REPORT_FIELD(haveFiscalDocumentNumber, haveFiscalDocumentNumber) \
+    ADDITIONAL_REPORT_FIELD(img, img)                                       \
+    ADDITIONAL_REPORT_FIELD(cardAmount, cardAmount)                         \
+    ADDITIONAL_REPORT_FIELD(cardName, cardName)                             \
+    ADDITIONAL_REPORT_FIELD(card, card)                                     \
+    ADDITIONAL_REPORT_FIELD(cardExpiryDate, cardExpiryDate)                 \
+    ADDITIONAL_REPORT_FIELD(cardAuthCode, cardAuthCode)                     \
+    ADDITIONAL_REPORT_FIELD(pinpadId, pinpadId)                             \
+    ADDITIONAL_REPORT_FIELD(terminalNum, terminalNum)
+
+class SCashRegisterModel : public SSingleRowJModel
 {
     Q_OBJECT
-    Q_PROPERTY(int id READ id)
-    Q_PROPERTY(int operationType READ operationType)
-    Q_PROPERTY(double amount READ amount)
-    Q_PROPERTY(QString amountStr READ amountStr)
-    Q_PROPERTY(int invoiceId READ invoiceId)
-    Q_PROPERTY(int client READ client)
-    Q_PROPERTY(QString reason READ reason)
-    Q_PROPERTY(int repairId READ repairId)
-    Q_PROPERTY(int documentId READ documentId)
-    Q_PROPERTY(int systemId READ systemId)
-    Q_PROPERTY(int employee READ employee)
-    Q_PROPERTY(int user READ user)
-    Q_PROPERTY(int company READ company)
-    Q_PROPERTY(int office READ office)
-    Q_PROPERTY(int img READ img)
-    Q_PROPERTY(int cardInfo READ cardInfo)
-    Q_PROPERTY(double cardFee READ cardFee)
-    Q_PROPERTY(bool isBackdate READ isBackdate)
-    Q_PROPERTY(int fdn READ fdn)
-    Q_PROPERTY(int paymentItemSign READ paymentItemSign)
 public:
     enum PaymentType{ExpSimple = 1, ExpInvoice = 2, ExpZ = 3, ExpBalance = 4, ExpSubsist = 5,
                      ExpSalary = 6, AddSubCash = 7, ExpRepair = 8, ExpGoods = 9, RecptSimple = 11,
@@ -44,94 +60,49 @@ public:
     explicit SCashRegisterModel(QObject *parent = nullptr);
     explicit SCashRegisterModel(int systemId, QObject *parent = nullptr);
     ~SCashRegisterModel();
-    int id();
-    void setId(const int);
-    void load();
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    void load() override;
     void load(int);
-    bool commit();
+    bool commit() override;
     bool commit(double);
-    int operationType();
-    void setOperationType(int);
-    double amount();
     double amountAbs();
-    void setAmount(double);
-    int client();
-    void setClient(int);
     void unsetClient(); // удаление id клиента (анонимный)
-    int systemId();
-    void setSystemId(int);   // ID платёжной системы (`payment_systems`.`system_id`)
-    QString reason();
-    void setReason(const QString &);
-    int currency();
-    void setCurrency(int);
-    void setCreated(const QDateTime &timestamp);
-    void setCreatedDate(const QDate &date);
-    void setCreatedTime(const QTime &time);
-    int documentId();
-    void setDocumentId(int);
-    int repairId();
-    void setRepairId(int);
-    int invoiceId();
-    void setInvoiceId(int);
-    void setLogText(const QString &);
+    void set_createdDate(const QDate &date);
+    void set_createdTime(const QTime &time);
+    void set_logText(const QString &);
     QString constructReason(const QString&);
     QString constructReason(int);
-    void setSkipLogRecording(bool state = true);
-    void setOffice(const int);
-    void setOfficeIndex(const int);
-    QString amountStr();
-    void setAmountStr(const QString);//summa_str
-    int employee();
-    void setEmployee(const int id);//to_user
-    int user();
-    void setUser(const int);//user
-    int company();
+    void set_skipLogRecording(bool state = true);
+    void set_officeIndex(const int);
     int companyIndex();
-    void setCompany(const int id);
-    void setCompanyIndex(const int index);
-    int office();
-    int img();
-    void setImg(const int);//img
-    int cardInfo();
-    void setCardInfo(const int);//card_info
-    double cardFee();
-    void setCardFee(const double);//card_fee
-    bool isBackdate();
-    void setIsBackdate(const bool);//is_backdate
-    QString customerEmail();
-    void setCustomerEmail(const QString &email);
-    int fdn();
-    void setFdn(const int);//fdn
-    int paymentItemSign();
-    void setPaymentItemSign(const int);//payment_item_sign
+    void set_companyIndex(const int index);
     void initDemo() override;
 private:
-    void fieldsVerifyFormatter();
-    int m_type = -1;
-    int m_systemId = userDbData->defaultPaymentSystem;       // ID платёжной системы (DB: payment_systems.system_id)
-    int m_client = 0;
-    int m_currency = 0;
-    QStringList fields_verify;
-    double m_amount = 0;
-    QString m_amount_str;
-    QString m_amount_words;
-    QString m_reason;
-    int m_toUser;
-    int m_user;
-    int m_company;
-    int m_office;
-    int m_invoice = 0;
-    int m_repair = 0;
-    int m_document = 0;
-    int m_img;
-    int m_cardInfo;
-    double m_cardFee;
-    bool m_isBackdate;
-    QString m_customerEmail;
-    int m_fdn;
-    int m_paymentItemAttribute;
+    QStringList fieldsVerifyFormatter();
     bool m_skipLogRecording = 0;
-signals:
+    void amountChanged(double amount);
+    void reasonChanged(const QString &text);
+    void employeeChanged(const int id);
+    void documentChanged(int id);
+    void repairChanged(int id);
+    void invoiceChanged(int id);
+public Q_SLOTS:
+    // эти методы возвращают данные дополнительных полей в отчетах
+    QVariant invoiceNum(){return "not_implemented";};
+    QVariant haveCardFee(){return (cardFee() > 0);};
+    QVariant haveFiscalDocumentNumber(){return (fiscalDocNum() > 0);};
+    QVariant img(){return "not_implemented";};
+    QVariant cardAmount(){return 0;};  // в АСЦ всегда выводится 0
+    QVariant cardName(){return "not_implemented";};
+    QVariant card(){return "not_implemented";};
+    QVariant cardExpiryDate(){return "not_implemented";};
+    QVariant cardAuthCode(){return "not_implemented";};
+    QVariant pinpadId(){return 0;};  // в АСЦ всегда выводится 0
+    QVariant terminalNum(){return "not_implemented";};
+private slots:
+    void setDataRework(const int index, QVariant &data);
+    void logDataChange(const int index, const QVariant &data) override;
 };
 
 #endif // SCASHREGISTERMODEL_H

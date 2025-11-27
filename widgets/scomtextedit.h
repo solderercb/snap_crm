@@ -1,11 +1,12 @@
 #ifndef SCOMTEXTEDIT_H
 #define SCOMTEXTEDIT_H
 
-#include <QAbstractScrollArea>
-#include <QTextDocument>
-#include <QTextEdit>
-#include <QPlainTextEdit>
-#include <QDebug>
+class QWidget;
+class QFontMetrics;
+class QTextDocument;
+class QAbstractScrollArea;
+class QSize;
+class QResizeEvent;
 
 class SComTextEdit
 {

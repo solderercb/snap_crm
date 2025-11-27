@@ -1,5 +1,14 @@
 #include "spagesalaryreceptedissued.h"
 #include "ui_spagesalaryreceptedissued.h"
+#include <QWidget>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SComSettings>
+#include <Mainwindow>
+#include <tabSalary>
+#include <SUserSettings>
+#include <SUserModel>
+#include <SSalaryReceptedIssuedModel>
 
 SPageSalaryReceptedIssued::SPageSalaryReceptedIssued(QWidget *parent) :
     SPageSalaryBase(parent),
@@ -46,7 +55,7 @@ void SPageSalaryReceptedIssued::updateWidgets()
     ui->labelReceptedSummaryValue->setText(QString::number(recepted));
     ui->labelIssuedSummaryValue->setText(QString::number(issued));
     ui->labelRepairsSummaryValue->setText(QString::number(recepted + issued));
-    ui->labelSummValue->setText(sysLocale.toString(summReceptedIssued, 'f', comSettings->classicKassa?2:0));
+    ui->labelSummValue->setText(sysLocale.toString(summReceptedIssued, 'f', comSettings->classicKassa()?2:0));
 }
 
 void SPageSalaryReceptedIssued::tableRepairsRowDoubleClicked(const QModelIndex &index)
@@ -58,7 +67,7 @@ void SPageSalaryReceptedIssued::guiFontChanged()
 {
     QFont font;
 //    font.setFamily(userLocalData->FontFamily.value);
-    font.setPixelSize(userDbData->fontSize);
+    font.setPixelSize(userDbData->fontSize());
     font.setBold(true);
 
     ui->labelIssuedSummaryValue->setFont(font);

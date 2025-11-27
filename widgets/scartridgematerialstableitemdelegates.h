@@ -2,8 +2,9 @@
 #define SCARTRIDGEMATERIALSTABLEITEMDELEGATES_H
 
 #include <QObject>
-#include "stableviewbaseitemdelegates.h"
-#include "models/scartridgematerialsmodel.h"
+#include <STableViewBaseDelegates>
+
+class SCartridgeMaterialsModel;
 
 class SCartridgeMaterialsTableItemDelegates : public STableViewBaseItemDelegates
 {

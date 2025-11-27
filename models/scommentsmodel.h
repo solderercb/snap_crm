@@ -1,11 +1,13 @@
 #ifndef SCOMMENTSMODEL_H
 #define SCOMMENTSMODEL_H
 
-#include <QObject>
-#include "sstandarditemmodel.h"
-#include "scommentmodel.h"
+#include <QSqlDatabase>
+#include <SStandardItemModel>
+#include <STableModelCommonMethods>
 
-class SCommentsModel : public SStandardItemModel
+class SCommentModel;
+
+class SCommentsModel : public SStandardItemModel, public STableModelsCommonMethods
 {
     Q_OBJECT
 signals:
@@ -27,16 +29,16 @@ public:
     QDateTime created(const int row) const;
     QString text(const int row);
     bool setText(const int row, const QString &text);
-
+    void clear();
 private:
     QSqlQueryModel *m_queryData;
-    int m_mode = SCommentModel::NotSet;
+    int m_mode;
     int m_objId = 0;
     int m_hiddenColumns = 0xFFF1;
+    std::shared_ptr<SSingleRowJModel> singleRowModel(const int row) override;
+    void initSingleRowModel(const int row, std::shared_ptr<SSingleRowJModel> model);
     void setQuery(const QString&, const QSqlDatabase &db = QSqlDatabase());
-    QList<QStandardItem *> row(int) const;
     QString createdStr(const QModelIndex &index) const;
-    void clearChangedFlagForAllField();
 private slots:
     void sqlDataChanged();
 };

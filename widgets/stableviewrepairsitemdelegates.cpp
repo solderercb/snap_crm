@@ -1,6 +1,11 @@
 #include "stableviewrepairsitemdelegates.h"
-#include "models/stablerepairsmodel.h"
-#include "widgets/stableviewrepairs.h"
+#include <QTimeZone>
+#include <ProjectGlobals>
+#include <SRepairsModel>
+#include <SRepairsView>
+#include <SComSettings>
+#include <QPainter>
+#include <SRepairsModel>
 
 STableViewRepairsItemDelegates::STableViewRepairsItemDelegates(QObject *parent) : STableViewBaseItemDelegates(parent)
 {
@@ -31,7 +36,7 @@ void STableViewRepairsItemDelegates::paintStatusProgressBar(QPainter *painter, c
 {
     uint progressStatus = 0;
     uint repairStatus = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::Status)).toInt();
-    qint64 statusTermSecons = comSettings->repairStatuses[repairStatus].TermsSec;
+    qint64 statusTermSecons = comSettings->repairStatusesVariantCopy()[repairStatus].TermsSec;
     QDateTime statusChanged = m_tableModel->unformattedData(index.siblingAtColumn(STableRepairsModel::Columns::LastStatusChanged)).toDateTime();
     statusChanged.setTimeZone(QTimeZone::utc());
     qint64 secondsSinceStatusChanged = statusChanged.secsTo(QDateTime::currentDateTimeUtc()) + 1;
@@ -84,9 +89,9 @@ void STableViewRepairsItemDelegates::paintRepairProgressBar(QPainter *painter, c
     qint64 secondsSinceInDate = inDate.secsTo(currentOrOutDate);
     qint64 daysSinceInDate = inDate.daysTo(currentOrOutDate);
 
-    if(comSettings->repairStatuses.RepairTermSec)
+    if(comSettings->repairStatusesVariantCopy().RepairTermSec)
     {
-        progressRepair = qMin(100, (int)((100 * secondsSinceInDate)/comSettings->repairStatuses.RepairTermSec));
+        progressRepair = qMin(100, (int)((100 * secondsSinceInDate)/comSettings->repairStatusesVariantCopy().RepairTermSec));
 
         QStyleOptionProgressBar progressBarRepair;
         QRect r2 = option.rect;

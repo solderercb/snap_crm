@@ -1,10 +1,11 @@
 #ifndef SSQLFETCHINGMODEL_H
 #define SSQLFETCHINGMODEL_H
 
-#include <QStandardItemModel>
-#include <QSqlQuery>
 #include <QObject>
-#include <QDebug>
+#include <QSqlQueryModel>
+#include <QSqlRecord>
+
+class QSqlQuery;
 
 class SSqlFetchingModel : public QSqlQueryModel
 {

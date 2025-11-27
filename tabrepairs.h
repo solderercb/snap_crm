@@ -1,23 +1,14 @@
 #ifndef TABREPAIRS_H
 #define TABREPAIRS_H
 
-#include <QWidget>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QToolButton>
-#include <QStyle>
-#include <QTableWidget>
-#include <QLabel>
-#include <QSqlQueryModel>
-#include <QRegularExpressionValidator>
-#include <QFrame>
-#include <QWidgetAction>
-#include <QTimer>
-#include "tabcommon.h"
-#include "models/stablerepairsmodel.h"
-#include "widgets/srepairstablefiltermenu.h"
-#include "widgets/stableviewbase.h"
-#include "widgets/sdialogissuerepair.h"
+#include <tabCommon>
+#include <SRepairsViewFilterMenu>
+
+class QWidget;
+class MainWindow;
+class STableRepairsModel;
+class SDialogIssueRepair;
+class SRepairModel;
 
 namespace Ui {
 class tabRepairs;
@@ -64,7 +55,7 @@ private:
     void randomFill() override{};
 #endif
 public slots:
-    void refreshTable(bool preserveScrollPos = STableViewBase::ScrollPosPreserve, bool preserveSelection = STableViewBase::SelectionReset);
+    void refreshTable(bool preserveScrollPos, bool preserveSelection) override;
     void setFocusSearchField();
 private slots:
     void tableItemDoubleClick(QModelIndex);

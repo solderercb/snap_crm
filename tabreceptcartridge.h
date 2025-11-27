@@ -1,14 +1,13 @@
 #ifndef TABRECEPTCARTRIDGE_H
 #define TABRECEPTCARTRIDGE_H
 
-#include <QWidget>
-#include <QComboBox>
-#include "mainwindow.h"
-#include "tabcommon.h"
-#include "models/ssqlquerymodel.h"
-#include "models/srepairmodel.h"
-#include "widgets/scartridgeform.h"
-#include "widgets/scartridgecard.h"
+#include <tabCommon>
+
+class QWidget;
+class MainWindow;
+class SClientModel;
+class SSqlQueryModel;
+class SCartridgeForm;
 
 namespace Ui {
 class tabReceptCartridge;
@@ -20,6 +19,7 @@ class tabReceptCartridge : public tabCommon
 signals:
     void generatePrintout(QMap<QString, QVariant>);
 public:
+    enum EndCommitOp {CloseTab, PrepareRepeat};
     explicit tabReceptCartridge(MainWindow *parent = nullptr);
     ~tabReceptCartridge();
     static tabReceptCartridge* getInstance(MainWindow *parent = nullptr);
@@ -37,15 +37,26 @@ private:
     bool m_closePending = 0;
     SClientModel *m_client = nullptr;
     bool m_printReport = 0;
+    int m_endCommitOp = CloseTab;
     void setDefaultStyleSheets();
     void initWidgets();
     void clearWidgets();
-    bool checkInput();
+    int checkInput() override;
     bool checkInputBeforeAdd();
     void initReceiptCartridgeForm(SCartridgeForm *&form, const QSqlRecord &record = QSqlRecord());
     void appendToList(SCartridgeForm *form);
     void print();
     const QList<SCartridgeForm*> existentForms();
+    int commitStages() override;
+    void beginCommit() override;
+    bool skip(const int) override;
+    void commitClient();
+    void commitRepairs();
+    void commit(const int stage) override;
+    void throwHandler(int) override;
+    void endCommit(const int) override;
+    void endCommit() override;
+    void prepareForRepeatedOp();
 #ifdef QT_DEBUG
     void randomFill() override;
 #endif
@@ -54,7 +65,7 @@ public slots:
     void serialTextEdited(QString text);
     void findAndAddBySerial();
 private slots:
-    bool createRepairs();
+    void createRepairs();
     void createRepairsAndClose();
     void comboBoxModelButtonClickHandler(int);
     void appendToList();

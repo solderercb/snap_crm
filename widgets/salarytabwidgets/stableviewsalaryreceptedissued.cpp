@@ -1,4 +1,5 @@
 #include "stableviewsalaryreceptedissued.h"
+#include <STableViewGridLayout>
 
 STableViewSalaryRecepted::STableViewSalaryRecepted(QWidget *parent) :
     STableViewBase(SLocalSettings::SalaryReceptedGrid, parent)

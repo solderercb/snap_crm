@@ -283,7 +283,7 @@
   <customwidget>
    <class>SCheckBox</class>
    <extends>QCheckBox</extends>
-   <header>widgets/sphone.h</header>
+   <header location="global">SPhone</header>
   </customwidget>
  </customwidgets>
  <resources>

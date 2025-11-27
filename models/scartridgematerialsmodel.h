@@ -1,12 +1,9 @@
 #ifndef SCARTRIDGEMATERIALSMODEL_H
 #define SCARTRIDGEMATERIALSMODEL_H
 
-#include <QObject>
-#include <QSqlField>
-#include <QSqlIndex>
-#include "models/seditablebasemodel.h"
-#include "models/sstandarditemmodel.h"
-#include "models/scartridgematerialmodel.h"
+#include <SEditableBaseModel>
+
+class SStandardItemModel;
 
 class SCartridgeMaterialsModel : public SEditableBaseModel
 {
@@ -25,7 +22,6 @@ public:
     int findNextMaterial(const int targetRow = -1);
 private:
     int m_cardId = 0;
-    QSqlIndex m_primaryKey;
     int m_defaultTonerWeight = 100;
     void translateNames();
     bool insertRowIntoTable(const QSqlRecord &values) override;

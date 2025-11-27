@@ -1,38 +1,30 @@
 #ifndef SPARTSUPPLIER_H
 #define SPARTSUPPLIER_H
 
-#include "models/scomrecord.h"
-#include <QObject>
+#include <SSingleRowJModel>
 
-class SPartSupplier : public SComRecord
+#include "../../models/ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(request_id, requestId, int, 0)                              \
+    TABLE_FIELD(supplier_id, supplierId, int, 0)                            \
+    TABLE_FIELD(supplier_url, supplierUrl, QString, 0)                      \
+    TABLE_FIELD(item_url, itemUrl, QString, 0)                              \
+    TABLE_FIELD(moq, moq, int, 0)                                           \
+    TABLE_FIELD(price, price, double, 0)                                    \
+    TABLE_FIELD(select, select, int, 0)                                     \
+    TABLE_FIELD(notes, notes, QString, 0)
+
+class SPartSupplier : public SSingleRowJModel
 {
     Q_OBJECT
 public:
     explicit SPartSupplier(QObject *parent = nullptr);
-    int id();
+#include "../../models/ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    using SSingleRowJModel::load;
     void load(const int &id);
-    int requestId();
-    void setRequestId(const int &id);
-    int supplierId();
-    void setSupplierId(const int &id);
-    QString supplierUrl();
-    void setSupplierUrl(const QString &url);
-    QString itemUrl();
-    void setItemUrl(const QString &url);
-    int moq();
-    void setMoq(const int &moq);
-    double price();
-    void setPrice(const double &price);
-    QString notes();
-    void setNotes(const QString &notes);
 protected:
-    int m_requestId;
-    int m_supplierId;
-    QString m_supplierUrl;
-    QString m_itemUrl;
-    int m_moq;
-    double m_price;
-    QString m_notes;
 };
 
 #endif // SPARTSUPPLIER_H

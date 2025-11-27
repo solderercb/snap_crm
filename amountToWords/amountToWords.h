@@ -2,8 +2,8 @@
 #ifndef AMOUNTTOWORDS_H
 #define AMOUNTTOWORDS_H
 
-#include "global.h"
-#include "models/scomsettings.h"
+#include <ProjectGlobals>
+#include <SComSettings>
 #include "amountToWordsRu.h"
 #include "amountToWordsUa.h"
 #include "amountToWordsBg.h"

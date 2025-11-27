@@ -1,73 +1,66 @@
 #ifndef SREPAIRSALEITEMMODEL_H
 #define SREPAIRSALEITEMMODEL_H
 
-#include "scomrecord.h"
-#include <QObject>
-#include <QSqlRecord>
-#include "models/sstoreitemmodel.h"
-#include "widgets/shortlivednotification.h"
+#include <SSingleRowJModel>
 
-class SRepairSaleItemModel : public SComRecord
+class SStoreItemModel;
+
+#include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
+
+#define TABLE_FIELDS                                                        \
+    TABLE_FIELD(id, id, int, 0)                                             \
+    TABLE_FIELD(item_id, itemId, int, 0)                                    \
+    TABLE_FIELD(name, name, QString, 0)                                     \
+    TABLE_FIELD(count, count, int, 0)                                       \
+    TABLE_FIELD(created, created, QDateTime, 0)                             \
+    TABLE_FIELD(from_user, fromUser, int, 0)                                \
+    TABLE_FIELD(to_user, toUser, int, 0)                                    \
+    TABLE_FIELD(notes, notes, QString, 0)                                   \
+    TABLE_FIELD(state, state, int, 0)                                       \
+    TABLE_FIELD(repair_id, repairId, int, 0)                                \
+    TABLE_FIELD(work_id, workId, int, 0)                                    \
+    TABLE_FIELD(price, price, double, 0)                                    \
+    TABLE_FIELD(sn, sn, QString, 0)                                         \
+    TABLE_FIELD(warranty, warranty, int, 0)                                 \
+    TABLE_FIELD(r_lock, rLock, bool, 0)
+
+class SRepairSaleItemModel : public SSingleRowJModel
 {
     Q_OBJECT
+    friend class SRepairSaleItemModelExt;
+    friend class TClassTest;
 public:
-    enum State {Requested = 0, EngineerBasket = 1, RepairLinked = 2, Sold = 3, Archive = 4};
+    enum State {Requested = 0, EngineerBasket = 1, RepairLinked = 2, Sold = 3, Archive = 4, New = 255};
     explicit SRepairSaleItemModel(QObject *parent = nullptr);
-    explicit SRepairSaleItemModel(const QList<QStandardItem *> &record, QObject *parent = nullptr);
     ~SRepairSaleItemModel();
-    int id();
-    void load(const int);
-    int itemId();
-    void setItemId(const int);
-    QString name();
-    void setName(const QString);
-    int count();
-    void setCount(const int, const QVariant oldValue = QVariant());
-    int fromUser();
-    void setFromUser(const int);
-    int toUser();
+    int count_();
     void setToUser(const int, const QVariant oldValue = QVariant());
-    QString notes();
-    void setNotes(const QString);
-    int state();
-    void setState(const int);
-    int repairId();
-    void setRepairId(const int);
-    int workId();
-    void setWorkId(const int);
-    double price();
-    void setPrice(const double, const QVariant oldValue = QVariant());
-    QString sn();
-    void setSN(const QString, const QVariant oldValue = QVariant());
-    int warranty();
-    void setWarranty(const int, const QVariant oldValue = QVariant());
-    bool rLock();
-    void setRLock(const bool);
+    void repairChanged(const QVariant &data);
+    void priceChanged(const QVariant &value);
+    void serialChanged(const QVariant &value);
+    void warrantyChanged(const QVariant &value);
+#include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
+public:
+    void initFieldWithPrevLoaded(const int index, const QVariant &value) override;
+    bool setData(const int index, const QVariant &value) override;
+    void load() override;
     bool request();
     bool reserve();
-    bool commit();
+    bool commit() override;
     bool sale();
     bool unsale();
     bool unlinkRepair();
     bool free();
-    void setQueryField(const int fieldNum, const QVariant value, const QVariant oldValue) override;
 private:
-    SStoreItemModel *m_storeItem = nullptr;
-    bool m_storeItemUpdated = 0;
-    int m_itemId;
-    QString m_name;
-    int m_savedCount;
-    int m_count;
-    int m_fromUser;
-    int m_toUser;
-    QString m_notes;
-    int m_state;
-    int m_repairId;
-    int m_workId;
-    double m_price;
-    QString m_sn;
-    int m_warranty;
-    bool m_rLock;
+    std::shared_ptr<SStoreItemModel> m_storeItem;
+    void updateLogAssociatedRecId() override;
+    void engineerChanged();
+    void countChanged(const QVariant &value);
+    void addRemoveHook();
+    void constructNote();
+protected slots:
+    void logDataChange(const int index, const QVariant &data) override;
+    void setDataRework(const int index, QVariant &data);
 };
 
 #endif // SREPAIRSALEITEMMODEL_H

@@ -1,27 +1,33 @@
 #include "sclientmodel.h"
-#include "global.h"
-#include "sstoreitemmodel.h"
+#include <QMetaEnum>
+#include <QRandomGenerator>
+#include <ProjectGlobals>
+#include <ProjectQueries>
+#include <SPermissions>
+#include <SComSettings>
+#include <SUserSettings>
+#include <SPhoneModel>
+#include <SPhonesModel>
+#include <SSqlQueryModel>
+#include <SLogRecordModel>
 
 SClientModel::SClientModel(int id, QObject *parent) :
-    SComRecord(parent)
+    SSingleRowJModel(parent)
 {
+    mapFields();
+
     i_obligatoryFields << "name" << "notes";
     i_tableName = "clients";
-    i_idColumnName = "id";
+    setPrimaryKeyIndex(0);
+    connect(this, &SSingleRowModel::beginDataChange, this, &SClientModel::setDataRework);
 
     m_phones = new SPhonesModel();
 
-    i_logRecord->setType(SLogRecordModel::Client);
+    i_logRecord->set_type(SLogRecordModel::Client);
 
     if(id)
     {
         load(id);
-    }
-    else
-    {
-        i_valuesMap.clear();
-        i_valuesMap.insert("creator", userDbData->id);
-        i_valuesMap.insert("notes", "");
     }
 }
 
@@ -59,144 +65,94 @@ SStandardItemModel *SClientModel::categoriesList()
 
 bool SClientModel::isNew()
 {
-    if(i_id)
-        return false;
+    return !isPrimaryKeyValid();
+}
 
-    return true;
+QString SClientModel::fieldsForSelectQuery()
+{
+    QString fields;
+
+    // TODO: заменить "no permissions" на частично скрытое значение (например, "Имя Ф.", как при переводе денег на карту)
+    auto viewClient = [=](int index){if(!permissions->viewClients) return restrictedFieldForSelectQuery(index); return fieldForSelectQuery(index);};
+    auto viewPassport = [=](int index){if(!permissions->viewClientPassportData) return restrictedFieldForSelectQuery(index); return fieldForSelectQuery(index);};
+    for(int i = 0; i < rec()->count(); i++)
+    {
+        if(!fields.isEmpty())
+            fields.append(",\n");
+
+        switch (i)
+        {
+            case C_firstName:
+            case C_lastName:
+            case C_patronymicName:
+            case C_address:
+            case C_email: fields.append(viewClient(i)); break;
+            case C_passportNum:
+            case C_passportIssuedDate:
+            case C_passportIssuedBy:
+            case C_INN:
+            case C_KPP:
+            case C_OGRN: fields.append(viewPassport(i)); break;
+            default: fields.append(fieldForSelectQuery(i)); break;
+        }
+    }
+
+    return fields;
+}
+
+void SClientModel::load()
+{
+    SSingleRowJModel::load();
+    m_phones->load(id());
+    i_logRecord->set_client(id());
+    if(permissions->viewClients && !notes().isEmpty() && !m_notificationShown)
+    {
+        m_notificationShown = 1;
+        showNotification(notes(), QMessageBox::Information);
+    }
+    if(isBalanceEnabled())
+    {
+        deleteBalanceObj(); // при перезагрузке данных клиента объект должен быть удалён
+        createBalanceObj();
+    }
 }
 
 void SClientModel::load(int id)
 {
-    QSqlQueryModel *clientModel = new QSqlQueryModel(this);
-    clientModel->setQuery(QUERY_SEL_CLIENT(id), QSqlDatabase::database("connMain"));
-
-    if(clientModel->rowCount())
-    {
-        i_id = id;
-        i_valuesMap.clear();
-        m_phones->load(i_id);
-        i_logRecord->setClient(i_id);
-        m_firstName = clientModel->record(0).value("name").toString();
-        m_lastName = clientModel->record(0).value("surname").toString();
-        m_patronymicName = clientModel->record(0).value("patronymic").toString();
-        m_address = clientModel->record(0).value("address").toString();
-        m_postIndex = clientModel->record(0).value("post_index").toString();
-        if(permissions->viewClientPassportData)
-        {
-            m_passportNum = clientModel->record(0).value("passport_num").toString();
-            m_passportIssuedDate = clientModel->record(0).value("passport_date").toString();
-            m_passportIssuedBy = clientModel->record(0).value("passport_organ").toString();
-            m_INN = clientModel->record(0).value("INN").toString();
-            m_KPP = clientModel->record(0).value("KPP").toString();
-            m_OGRN = clientModel->record(0).value("OGRN").toString();
-        }
-        else
-        {
-            m_passportNum = tr("недостаточно прав");
-            m_passportIssuedDate = tr("недостаточно прав");
-            m_passportIssuedBy = tr("недостаточно прав");
-            m_INN = tr("недостаточно прав");
-            m_KPP = tr("недостаточно прав");
-            m_OGRN = tr("недостаточно прав");
-        }
-        m_state = clientModel->record(0).value("state").toBool();
-        m_type = clientModel->record(0).value("type").toBool();
-        m_birthday = clientModel->record(0).value("birthday").toString();
-        m_memorial = clientModel->record(0).value("memorial").toString();
-        m_notes = clientModel->record(0).value("notes").toString();
-        if(permissions->viewClients && !m_notes.isEmpty() && !m_notificationShown)
-        {
-            m_notificationShown = 1;
-            showNotification(m_notes, QMessageBox::Information);
-        }
-        initBinaryOptions(clientModel);
-        if(m_options&BinaryOption::BalanceEnabled)
-        {
-            deleteBalanceObj(); // при перезагрузке данных клиента объект должен быть удалён
-            createBalanceObj();
-        }
-//        m_photo = ;
-        m_photoId = clientModel->record(0).value("photo_id").toInt();
-        m_visitSource = clientModel->record(0).value("visit_source").toInt();
-        m_webPassword = clientModel->record(0).value("web_password").toString();
-        m_urName = clientModel->record(0).value("ur_name").toString();
-        m_shortName = clientModel->record(0).value("short_name").toString();
-        m_email = clientModel->record(0).value("email").toString();
-        m_icq = clientModel->record(0).value("icq").toString();
-        m_skype = clientModel->record(0).value("skype").toString();
-        m_viber = clientModel->record(0).value("viber").toString();
-        m_telegram = clientModel->record(0).value("telegram").toString();
-        m_site = clientModel->record(0).value("site").toString();
-        m_whatsapp = clientModel->record(0).value("whatsapp").toString();
-        m_agentName = clientModel->record(0).value("agent_name").toString();
-        m_agentSurname = clientModel->record(0).value("agent_surname").toString();
-        m_agentPatronymic = clientModel->record(0).value("agent_patronymic").toString();
-        m_agentPhone = clientModel->record(0).value("agent_phone").toString();
-        m_agentPhoneClean = clientModel->record(0).value("agent_phone_clean").toString();
-        m_agent2Name = clientModel->record(0).value("agent2_name").toString();
-        m_agent2Surname = clientModel->record(0).value("agent2_surname").toString();
-        m_agent2Patronymic = clientModel->record(0).value("agent2_patronymic").toString();
-        m_agent2Phone = clientModel->record(0).value("agent2_phone").toString();
-        m_agent2PhoneClean = clientModel->record(0).value("agent2_phone_clean").toString();
-        m_priceColumn = clientModel->record(0).value("price_col").toInt();
-        m_repairs = clientModel->record(0).value("repairs").toInt();
-        m_purchases = clientModel->record(0).value("purchases").toInt();
-        m_token = clientModel->record(0).value("token").toString();
-        i_createdUtc = clientModel->record(0).value("created").toDateTime();
-
-        emit modelUpdated();
-    }
-
-    delete clientModel;
-}
-
-void SClientModel::initBinaryOptions(QSqlQueryModel *clientModel)
-{
-    m_options = 0;
-    for(int i=0; i < clientBinaryProperties->rowCount(); i++)
-    {
-        if(clientBinaryProperties->index(i, 1).data().toInt() == BinaryOption::Archived)
-            continue;
-        m_options |= clientModel->record(0).value(clientBinaryProperties->index(i, 2).data().toString()).toBool()?clientBinaryProperties->index(i, 1).data().toInt():0;
-    }
-    m_options |= clientModel->record(0).value("state").toBool()?0:1;
+    setPrimaryKey(id);
+    load();
 }
 
 void SClientModel::initDemo()
 {
-    i_id = 123;
-    m_firstName = "Андрей";
-    m_lastName = "Андреев";
-    m_patronymicName = "Андреевич";
-    m_address = "пр. Дружбы народов, д. 5";
-    m_postIndex = "123000";
-    m_passportNum = "111111";
-    m_passportIssuedDate = QDate::currentDate().toString("dd.MM.yyyy");
-    m_passportIssuedBy = "АБ ВГД Центрального района";
-    m_state = 1;
-    m_type = 0;
-    m_birthday = QDate::currentDate().toString("dd.MM.yyyy");
-    m_notes = "делать скидки на ремонт";
-    m_options = BinaryOption::Regular;
-    m_visitSource = clientAdTypesList->index(0, 1).data().toInt();
-    m_INN = "1234567890";
-    m_KPP = "4567";
-    m_OGRN = "123789";
-    m_webPassword = "FC9Y76U3";
-    m_urName = "";
-    m_email = "admin@example.com";
-    m_skype = "user_skype";
-    m_site = "example.com";
-    m_balance = 999999;
-    m_priceColumn = priceColModel->index(0, 1).data().toInt();
-    m_repairs = 10;
-    m_purchases = 20;
-    i_createdUtc = QDateTime::currentDateTimeUtc();
-}
-
-void SClientModel::setEmployeeId(const int id)
-{
-    i_valuesMap.insert("employee", id);
+    m_record->setValue(C_id, 123);
+    m_record->setValue(C_firstName, "Андрей");
+    m_record->setValue(C_lastName, "Андреев");
+    m_record->setValue(C_patronymicName, "Андреевич");
+    m_record->setValue(C_address, "пр. Дружбы народов, д. 5");
+    m_record->setValue(C_postIndex, "123000");
+    m_record->setValue(C_passportNum, "111111");
+    m_record->setValue(C_passportIssuedDate, QDate::currentDate().toString("dd.MM.yyyy"));
+    m_record->setValue(C_passportIssuedBy, "АБ ВГД Центрального района");
+    m_record->setValue(C_state, 1);
+    m_record->setValue(C_isCompany, 0);
+    m_record->setValue(C_birthday, QDate::currentDate().toString("dd.MM.yyyy"));
+    m_record->setValue(C_notes, "делать скидки на ремонт");
+    m_record->setValue(C_isRegular, 1);
+    m_record->setValue(C_adType, clientAdTypesList->index(0, 1).data().toInt());
+    m_record->setValue(C_INN, "1234567890");
+    m_record->setValue(C_KPP, "4567");
+    m_record->setValue(C_OGRN, "123789");
+    m_record->setValue(C_web_password, "FC9Y76U3");
+    m_record->setValue(C_urName, "");
+    m_record->setValue(C_email, "admin@example.com");
+    m_record->setValue(C_skype, "user_skype");
+    m_record->setValue(C_site, "example.com");
+    m_record->setValue(C_balance, 999999);
+    m_record->setValue(C_priceColumn, priceColModel->index(0, 1).data().toInt());
+    m_record->setValue(C_repairs, 10);
+    m_record->setValue(C_purchases, 20);
+    m_record->setValue(C_created, QDateTime::currentDateTime());
 }
 
 /* Состояние флага "Акт выполненных работ" по умолчанию.
@@ -209,67 +165,13 @@ bool SClientModel::printBOQDefaultState()
     // TODO: возможно, стоит добавить дополнительную настройку для включения этого т. н. расширенного режима
     // TODO: возможно, стоит добавить дополнительное свойство в карточку клиента, указывающее на обязательную печать Акта вып. работ
     //       (например, большинству постоянных клиентов акт не нужен, но есть один особый клиент, которому он нужен обязательно)
-    return comSettings->printWorksList && !(options() & (SClientModel::BalanceEnabled | SClientModel::Company | SClientModel::Regular));
+    return comSettings->printWorksList() && !(isBalanceEnabled() | isCompany() | isRegular());
 }
 
 void SClientModel::clear()
 {
-    i_id = 0;
-    i_valuesMap.clear();
-    i_valuesMap.insert("creator", userDbData->id);
-    i_valuesMap.insert("notes", "");
-
-    m_firstName = "";
-    m_lastName = "";
-    m_patronymicName = "";
-    m_address = "";
-    m_postIndex = "";
-
-
-        m_passportNum = "";
-        m_passportIssuedDate = "";
-        m_passportIssuedBy = "";
-        m_INN = "";
-        m_KPP = "";
-        m_OGRN = "";
-
-
-    m_state = 0;
-    m_type = 0;
-    m_birthday = "";
-    m_memorial = "";
-    m_notes = "";
-    m_options = 0;
-    m_photoId = 0;
-    m_visitSource = -1;
-    m_webPassword = "";
-    m_urName = "";
-    m_email = "";
-    m_icq = "";
-    m_skype = "";
-    m_viber = "";
-    m_telegram = "";
-    m_site = "";
-    m_whatsapp = "";
-    m_agentName = "";
-    m_agentSurname = "";
-    m_agentPatronymic = "";
-    m_agentPhone = "";
-    m_agentPhoneClean = "";
-    m_agent2Name = "";
-    m_agent2Surname = "";
-    m_agent2Patronymic = "";
-    m_agent2Phone = "";
-    m_agent2PhoneClean = "";
-    m_priceColumn = SStoreItemModel::PriceOptionRetail;
-    m_repairs = 0;
-    m_purchases = 0;
-    m_token = "";
-    i_createdUtc = QDateTime();
-    m_balance = 0;
-    m_shortName = QString();
+    clearEverything();
     deleteBalanceObj();
-
     m_phones->reset();
 
     emit modelUpdated();
@@ -285,85 +187,56 @@ bool SClientModel::isStandAlone()
     return m_standAlone;
 }
 
-int SClientModel::id()
+QVariant SClientModel::fullLongName()
 {
-    return i_id;
-}
+    if(!permissions->viewClients)
+        return tr("no permissions"); // TODO: заменить "no permissions" на "Имя Ф." (как при переводе денег на карту)
 
-void SClientModel::setId(const int id)
-{
-    i_id = id;
-}
-
-QString SClientModel::firstName()
-{
-    return m_firstName;
-}
-
-void SClientModel::setFirstName(const QString &text)
-{
-    i_valuesMap.insert("name", text);
-}
-
-QString SClientModel::lastName()
-{
-    return m_lastName;
-}
-
-void SClientModel::setLastName(const QString &text)
-{
-    i_valuesMap.insert("surname", text);
-}
-
-QString SClientModel::patronymicName()
-{
-    return m_patronymicName;
-}
-
-void SClientModel::setPatronymicName(const QString &text)
-{
-    i_valuesMap.insert("patronymic", text);
-}
-
-QString SClientModel::fullLongName()
-{
     QString ret;
-    if(m_type)
+    if(isCompany())
     {
-        if(!m_urName.isEmpty())
-            ret = m_urName;
+        if(!urName().isEmpty())
+            ret = urName();
         else
-            ret = m_firstName;
+            ret = firstName();
     }
     else
     {
-        ret = m_lastName;
-        if(!m_firstName.isEmpty())
-            ret.append(" " + m_firstName);
-        if(!m_patronymicName.isEmpty())
-            ret.append(" " + m_patronymicName);
+        ret = lastName();
+        if(!firstName().isEmpty())
+            ret.append(" " + firstName());
+        if(!patronymicName().isEmpty())
+            ret.append(" " + patronymicName());
     }
 
     return ret;
 }
 
-QString SClientModel::fullShortName()
+QVariant SClientModel::fullShortName()
 {
+    if(!permissions->viewClients)
+        return tr("no permissions");
+
     QString ret;
-    if(m_type)
+    if(isCompany())
     {
         return fullLongName();
     }
     else
     {
-        ret = m_lastName;
-        if(!m_firstName.isEmpty())
-            ret.append(" ").append(m_firstName.front()).append(".");
-        if(!m_patronymicName.isEmpty())
-            ret.append(" ").append(m_patronymicName.front()).append(".");
+        ret = lastName();
+        if(!firstName().isEmpty())
+            ret.append(" ").append(firstName().front()).append(".");
+        if(!patronymicName().isEmpty())
+            ret.append(" ").append(patronymicName().front()).append(".");
     }
 
     return ret;
+}
+
+QVariant SClientModel::isArchived()
+{
+    return !state();
 }
 
 SPhonesModel* SClientModel::phones()
@@ -374,103 +247,12 @@ SPhonesModel* SClientModel::phones()
 void SClientModel::addPhone(const QString &number, int comboBoxMaskIndex, int messengers)
 {
     SPhoneModel *phone = new SPhoneModel();
-    phone->setPhone(number);
-    phone->setMask(comboBoxMaskIndex);
+    phone->set_phone(number);
+    phone->set_maskIndex(comboBoxMaskIndex);
     if(m_phones->isEmpty())
-        phone->setPrimary();
-    phone->setMessengers(messengers);
+        phone->set_primary();
+    phone->set_messengers(messengers);
     m_phones->add(phone);
-}
-
-QString SClientModel::address()
-{
-    return m_address;
-}
-
-void SClientModel::setAddress(const QString &text)
-{
-    i_valuesMap.insert("address", text);
-}
-
-QString SClientModel::postIndex()
-{
-    return m_postIndex;
-}
-
-void SClientModel::setPostIndex(const QString &text)
-{
-    i_valuesMap.insert("post_index", text);
-}
-
-QString SClientModel::passportNum()
-{
-
-    return m_passportNum;
-}
-
-void SClientModel::setPassportNum(const QString &text)
-{
-    i_valuesMap.insert("passport_num", text);
-}
-
-QString SClientModel::passportIssuedDate()
-{
-    return m_passportIssuedDate;
-}
-
-void SClientModel::setPassportIssuedDate(const QString &text)
-{
-    i_valuesMap.insert("passport_date", text);
-}
-
-QString SClientModel::passportIssuedBy()
-{
-    return m_passportIssuedBy;
-}
-
-void SClientModel::setPassportIssuedBy(const QString &text)
-{
-    i_valuesMap.insert("passport_organ", text);
-}
-
-bool SClientModel::state()
-{
-    return m_state;
-}
-
-bool SClientModel::type()
-{
-    return m_type;
-}
-
-void SClientModel::setType(const int type)
-{
-    i_valuesMap.insert("type", type);
-}
-
-QString SClientModel::birthday()
-{
-    return m_birthday;
-}
-
-void SClientModel::setBirthday(const QString &text)
-{
-    i_valuesMap.insert("birthday", text);
-}
-
-QString SClientModel::memorial()
-{
-    return m_memorial;
-}
-
-QString SClientModel::notes()
-{
-    return m_notes;
-}
-
-int SClientModel::options()
-{
-    return m_options;
 }
 
 /*  Список свойств клиента, которые необходимо отображать в карточке ремонта
@@ -479,240 +261,65 @@ int SClientModel::options()
 QStringList SClientModel::optionsList(int format)
 {
     int col = 0;
-    bool skip;
+    bool flag;
     if(format == OptionsOutputForm::Short)
         col = 3;
     QStringList list;
     for(int i = 0; i < clientBinaryProperties->rowCount(); i++)
     {
-        switch(m_options & (1<<i))
+        switch(1<<i)
         {
 //            case BinaryOption::Company:   // type()
 //            case BinaryOption::BalanceEnabled:    // balanceEnabled()
 //            case BinaryOption::Archived:  //  state()
-            case BinaryOption::Supplier:
-            case BinaryOption::SaleOrReturn:
-            case BinaryOption::Regular:
-            case BinaryOption::Broker:
-            case BinaryOption::IgnoreCalls:
-            case BinaryOption::PreferCashless:
-            case BinaryOption::TakeLong:
-            case BinaryOption::Bad: skip = 0; break;
-            default: skip = 1;
+            case BinaryOption::Supplier: flag = isSupplier(); break;
+            case BinaryOption::SaleOrReturn: flag = isGivesItemsForSale(); break;
+            case BinaryOption::Regular: flag = isRegular(); break;
+            case BinaryOption::Broker: flag = isBroker(); break;
+            case BinaryOption::IgnoreCalls: flag = isIgnoreCalls(); break;
+            case BinaryOption::PreferCashless: flag = isPreferCashless(); break;
+            case BinaryOption::TakeLong: flag = isTakeLong(); break;
+            case BinaryOption::Bad: flag = isBad(); break;
+            default: flag = 0;
         }
-        if(!skip)
+        if(flag)
             list << clientBinaryProperties->index(i, col).data().toString();
     }
     return list;
 }
 
-bool SClientModel::isSupplier()
-{
-    return m_options & BinaryOption::Supplier;
-}
-
-bool SClientModel::isGivesItemsForSale()
-{
-    return m_options & BinaryOption::SaleOrReturn;
-}
-
-bool SClientModel::isArchived()
-{
-    return !state();
-}
-
-bool SClientModel::isRegular()
-{
-    return m_options & BinaryOption::Regular;
-}
-
-bool SClientModel::isBroker()
-{
-    return m_options & BinaryOption::Broker;
-}
-
-bool SClientModel::isIgnoreCalls()
-{
-    return m_options & BinaryOption::IgnoreCalls;
-}
-
-bool SClientModel::isPreferCashless()
-{
-    return m_options & BinaryOption::PreferCashless;
-}
-
-bool SClientModel::isTakeLong()
-{
-    return m_options & BinaryOption::TakeLong;
-}
-
-bool SClientModel::isBad()
-{
-    return m_options & BinaryOption::Bad;
-}
-
-int SClientModel::adType()
-{
-    return m_visitSource;
-}
-
-void SClientModel::setAdType(const int id)
-{
-    i_valuesMap.insert("visit_source", id);
-}
 
 void SClientModel::setAdTypeIndex(const int index)
 {
     if(index == -1)
-        i_valuesMap.insert("visit_source", QVariant());
+        setData(C_adType, QVariant());
     else
-        setAdType(clientAdTypesList->databaseIDByRow(index));
+        set_adType(clientAdTypesList->databaseIDByRow(index));
 }
 
 int SClientModel::adTypeIndex()
 {
-    return clientAdTypesList->rowByDatabaseID(m_visitSource, 1);
+    return clientAdTypesList->rowByDatabaseID(adType(), 1);
 }
 
-QString SClientModel::adTypeStr()
+QVariant SClientModel::adTypeStr()
 {
     return clientAdTypesList->getDisplayRole(adType(), "id");
 }
 
-QByteArray* SClientModel::photo()
+QVariant SClientModel::photo()
 {
-    return nullptr;
+    return QByteArray();
 }
 
-QString SClientModel::INN()
+void SClientModel::setDataRework(const int index, QVariant &data)
 {
-    return m_INN;
-}
+    switch (index)
+    {
+        case C_isBalanceEnabled: if(isPrimaryKeyValid()) data = isBalanceEnabled(); break; // подавление прямого изменения; для включения/выключения необходимо вызвать метод setBalanceEnabled()
+        default: break;
+    }
 
-QString SClientModel::KPP()
-{
-    return m_KPP;
-}
-
-QString SClientModel::OGRN()
-{
-    return m_OGRN;
-}
-
-QString SClientModel::web_password()
-{
-    return m_webPassword;
-}
-
-QString SClientModel::urName()
-{
-    return m_urName;
-}
-
-void SClientModel::setUrName(const QString &name)
-{
-    i_valuesMap.insert("ur_name", name);
-}
-
-const QString SClientModel::shortName()
-{
-    return m_shortName;
-}
-
-void SClientModel::setShortName(const QString &shortName)
-{
-    m_shortName = shortName;
-    i_valuesMap.insert("short_name", shortName);
-}
-
-QString SClientModel::email()
-{
-    return m_email;
-}
-
-QString SClientModel::icq()
-{
-    return m_icq;
-}
-
-QString SClientModel::skype()
-{
-    return m_skype;
-}
-
-QString SClientModel::viber()
-{
-    return m_viber;
-}
-
-QString SClientModel::telegram()
-{
-    return m_telegram;
-}
-
-QString SClientModel::site()
-{
-    return m_site;
-}
-
-QString SClientModel::whatsapp()
-{
-    return m_whatsapp;
-}
-
-QString SClientModel::agentName()
-{
-    return m_agentName;
-}
-
-QString SClientModel::agentSurname()
-{
-    return m_agentSurname;
-}
-
-QString SClientModel::agentPatronymic()
-{
-    return m_agentPatronymic;
-}
-
-QString SClientModel::agentPhone()
-{
-    return m_agentPhone;
-}
-
-QString SClientModel::agentPhoneClean()
-{
-    return m_agentPhoneClean;
-}
-
-QString SClientModel::agent2Name()
-{
-    return m_agent2Name;
-}
-
-QString SClientModel::agent2Surname()
-{
-    return m_agent2Surname;
-}
-
-QString SClientModel::agent2Patronymic()
-{
-    return m_agent2Patronymic;
-}
-
-QString SClientModel::agent2Phone()
-{
-    return m_agent2Phone;
-}
-
-QString SClientModel::agent2PhoneClean()
-{
-    return m_agent2PhoneClean;
-}
-
-bool SClientModel::balanceEnabled()
-{
-    return m_options&BalanceEnabled;
 }
 
 /*  Включение/отключение баланса клиента
@@ -720,18 +327,17 @@ bool SClientModel::balanceEnabled()
 */
 bool SClientModel::setBalanceEnabled(bool state)
 {
-    if( state != (bool)(m_options&BalanceEnabled) )
+    if( state != isBalanceEnabled() )
     {
 
         if(state)
         {
             appendLogText(tr("Включен баланс клиента"));
             createBalanceObj();
-            m_options |= BalanceEnabled;
         }
         else
         {
-            if(m_balance != 0)
+            if(balance() != 0)
             {
                 // TODO: переделать с использованием shortlivedNotification
                 // или предложить пользователю автоматически создать РКО/ПКО
@@ -746,22 +352,24 @@ bool SClientModel::setBalanceEnabled(bool state)
             {
                 appendLogText(tr("Баланс клиента отключен"));
                 deleteBalanceObj();
-                m_options &= ~BalanceEnabled;
             }
         }
-        i_valuesMap.insert("balance_enable", state);
+        blockSignals(true);
+        set_isBalanceEnabled(state);
+        blockSignals(false);
 
-        QSqlQuery query(QSqlDatabase::database("connThird"));
-        QUERY_EXEC_TH(&query,i_nErr,QUERY_BEGIN);
         commit();
-        QUERY_COMMIT_ROLLBACK(&query,i_nErr);
     }
-    return i_nErr;
+    return 1;
 }
 
-double SClientModel::balance()
+void SClientModel::loadBalance()
 {
-    return m_balance;
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird")); // это не ошибка, используется соединение для записи в БД
+    query->exec(wrapSelectQueryFields(fieldForSelectQuery(C_balance)));
+    query->first();
+    if(query->isValid())
+        m_record->setValue(C_balance, query->value(0));
 }
 
 QString SClientModel::balanceStr()
@@ -771,13 +379,8 @@ QString SClientModel::balanceStr()
 
 void SClientModel::createBalanceObj()
 {
-    balanceLog = new SBalanceLogRecordModel(i_id);
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connThird")); // это не ошибка, используется соединение для записи в БД
-    query->exec(QUERY_SEL_BALANCE(i_id));
-    query->first();
-    if(query->isValid())
-        m_balance = query->value(0).toDouble();
-    delete query;
+    balanceLog = new SBalanceLogRecordModel(id());
+    loadBalance();
 }
 
 SBalanceLogRecordModel *SClientModel::balanceObj()
@@ -800,19 +403,25 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
     if(isNew())   // TODO: проверка включен ли баланс у клиента
         Global::throwError(Global::ThrowType::InputError);
 
-    balanceLog->setText(text);
-    balanceLog->setClient(i_id);
+    bool nErr = 1;
+    balanceLog->set_reason(text);
+    balanceLog->set_client(id());
     // Выбор офиса пользователем не предусмотрен; используется текущее значение из класса userDbData
-    i_nErr = balanceLog->commit(amount);
-    double newAmount = m_balance + amount;
+    nErr &= balanceLog->commit(amount);
+    double newAmount = balance() + amount;
 
-    QUERY_EXEC_TH(i_query,i_nErr,QUERY_UPDATE_BALANCE(i_id, newAmount));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    checkSystemTime();
+    set_balance(newAmount);
+    QString q = wrapUpdateQueryPairs(fieldForUpdateQuery(C_balance) + fieldValueHandler(newAmount));
 
-    QUERY_EXEC_TH(i_query,i_nErr,QUERY_VRFY_BALANCE(i_id));
-    QUERY_EXEC_VRFY(i_query,i_id);
+    QUERY_EXEC_TH(query, nErr, q);
+    setState(C_balance, SSingleRowModelBase::ModifiedField::Executed);
 
-    m_balance = i_query->value("balance").toDouble();
-    return i_nErr;
+    QUERY_EXEC_TH(query,nErr,QUERY_VRFY_BALANCE(id()));
+    QUERY_EXEC_VRFY(query,id());
+
+    return nErr;
 }
 
 bool SClientModel::updateBalance(const double amount, const QString &text, const SBalanceLogRecordModel::RoyaltyReason reason, const int reason_id)
@@ -823,9 +432,8 @@ bool SClientModel::updateBalance(const double amount, const QString &text, const
         case SBalanceLogRecordModel::RoyaltyReason::Document: balanceLog->setDocumentId(reason_id); break;
         case SBalanceLogRecordModel::RoyaltyReason::CashOrder: balanceLog->setCashOrderId(reason_id); break;
     }
-    updateBalance(amount, text);
 
-    return i_nErr;
+    return updateBalance(amount, text);
 }
 
 /* Проверка достаточности средств на балансе
@@ -834,7 +442,7 @@ bool SClientModel::updateBalance(const double amount, const QString &text, const
 */
 bool SClientModel::balanceEnough(const double amount)
 {
-    if( amount < 0 && m_balance >= -amount )
+    if( amount < 0 && balance() >= -amount )
         return 1;
 
     QMessageBox resBtn( QMessageBox::Question, "SNAP CRM",
@@ -850,17 +458,12 @@ bool SClientModel::balanceEnough(const double amount)
     return 1;
 }
 
-int SClientModel::priceColumn()
-{
-    return m_priceColumn;
-}
-
 int SClientModel::priceColumnIndex()
 {
-    if(!m_priceColumn)  // на случай ошибок в БД, по умолчанию тип цен — Розница
+    if(!priceColumn())  // на случай ошибок в БД, по умолчанию тип цен — Розница
         return priceColModel->rowByDatabaseID(2, 1);
 
-    return priceColModel->rowByDatabaseID(m_priceColumn, 1);
+    return priceColModel->rowByDatabaseID(priceColumn(), 1);
 }
 
 QString SClientModel::priceColumnStr()
@@ -868,48 +471,36 @@ QString SClientModel::priceColumnStr()
     return priceColModel->getDisplayRole(priceColumn(), "id");
 }
 
-int SClientModel::repairs()
-{
-    return m_repairs;
-}
-
-void SClientModel::setRepairs(const int val)
-{
-    i_valuesMap.insert("repairs", val);
-}
-
 void SClientModel::updateRepairs(const int val)
 {
-    if(i_id == 0)
+    if(!isPrimaryKeyValid())
         return;
 
-    QUERY_EXEC_TH(i_query, i_nErr, QString("SELECT `repairs` FROM `clients` WHERE `id` = %1;").arg(i_id));
-    i_query->first();
-    m_repairs = i_query->value(0).toInt();
-    setRepairs(m_repairs + val);
+    bool nErr = 1;
+    auto sql = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    QString query = wrapSelectQueryFields(fieldForSelectQuery(C_repairs));
+    QUERY_EXEC_TH(sql, nErr, query);
+    sql->first();
+    m_record->setValue(C_repairs, sql->value(0).toInt());
+    set_repairs(repairs() + val);
     commit();
-
-    m_repairs += val;
-}
-
-int SClientModel::purchases()
-{
-    return m_purchases;
 }
 
 void SClientModel::updatePurchases(int items)
 {
-    if(i_id == 0)
+    if(!isPrimaryKeyValid())
         return;
 
     // в АСЦ с кол-вом покупок то ли глюк, то ли странная задумка: в таблице клиентов отображается кол-во РН, а в самой карте клиента кол-во записей в таблице store_sales
     // TODO: разобраться с этим
-    QUERY_EXEC_TH(i_query,i_nErr,QUERY_UPD_CLIENT_PURCHASES(i_id, items));
-}
-
-QString SClientModel::token()
-{
-    return m_token;
+    bool nErr = 1;
+    auto sql = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    QString query = wrapSelectQueryFields(fieldForSelectQuery(C_purchases));
+    QUERY_EXEC_TH(sql, nErr, query);
+    sql->first();
+    m_record->setValue(C_purchases, sql->value(0).toInt());
+    set_purchases(purchases() + items);
+    commit();
 }
 
 /* Поступление денег на баланс клиента
@@ -930,7 +521,7 @@ void SClientModel::showNotification(const QString &message, const QMessageBox::I
 {
     QMessageBox msgBox;
 
-    msgBox.setWindowTitle(fullShortName());
+    msgBox.setWindowTitle(fullShortName().toString());
     msgBox.setText(message);
     msgBox.setIcon(icon);
     msgBox.exec();
@@ -952,55 +543,47 @@ QString SClientModel::genWebPass()
     return randomString;
 }
 
-/* Добавление текста журнала
- * При редактировании карточки клиента, пользователь может изменить несколько свойств
- * за раз и при использовании стратегии OnManualSubmit обо всех изменениях нужно
- * сделать запись в журнал.
- */
-void SClientModel::appendLogText(const QString &text)
-{
-    SComRecord::appendLogText(text);
-}
-
 bool SClientModel::commit()
 {
-    if(i_id)
+    bool nErr = 1;
+
+    if(!isPrimaryKeyValid())
     {
-        update();
-    }
-    else
-    {
-        i_valuesMap.insert("created", QDateTime::currentDateTime());
-        i_valuesMap.insert("web_password", genWebPass());
-        insert();
+        initMandatoryField(C_created, QDateTime::currentDateTime());
+        initMandatoryField(C_web_password, genWebPass());
+        initMandatoryField(C_creator, userDbData->id());
+        initMandatoryField(C_notes, "");
     }
 
-    commitLogs();
+    nErr &= SSingleRowJModel::commit();
 
-    m_phones->setClient(i_id);
-    m_phones->commit();
+    m_phones->setClient(id());
+    nErr &= m_phones->commit();
 
-    return i_nErr;
+    return nErr;
 }
 
 void SClientModel::updateLogAssociatedRecId()
 {
-    i_logRecord->setClient(i_id);
+    i_logRecord->set_client(id());
 }
 
 SBalanceLogRecordModel::SBalanceLogRecordModel(QObject *parent):
-    SComRecord(parent)
+    SSingleRowJModel(parent)
 {
+    mapFields();
+
     i_obligatoryFields << "client" << "summ" << "direction" << "reason" << "created" << "office" << "uid";
     i_tableName = "balance";
-    i_idColumnName = "id";
-    i_logRecord->setType(SLogRecordModel::Client);
+    setPrimaryKeyIndex(0);
+    setQueryIdBeforeInsert(false);
+    i_logRecord->set_type(SLogRecordModel::Client);
 }
 
 SBalanceLogRecordModel::SBalanceLogRecordModel(int client, QObject *parent):
     SBalanceLogRecordModel(parent)
 {
-    setClient(client);
+    set_client(client);
 }
 
 SBalanceLogRecordModel::~SBalanceLogRecordModel()
@@ -1008,84 +591,96 @@ SBalanceLogRecordModel::~SBalanceLogRecordModel()
 
 }
 
-int SBalanceLogRecordModel::id()
-{
-    return i_id;
-}
-
-void SBalanceLogRecordModel::setClient(int id)
-{
-    m_client = id;
-    i_logRecord->setClient(id);
-    i_valuesMap.insert("client", id);
-}
-
-void SBalanceLogRecordModel::setText(const QString &text)
-{
-    i_logRecord->setText(text);
-    i_valuesMap.insert("reason", text);
-}
-
-void SBalanceLogRecordModel::setDirection(double amount)
-{
-    if(amount > 0)
-        i_valuesMap.insert("direction", 1);
-    else
-        i_valuesMap.insert("direction", 0);
-}
-
 void SBalanceLogRecordModel::setRepair(const int id)
 {
-    i_logRecord->setRepairId(id);
+    i_logRecord->set_repair(id);
+    i_logRecord->setData(SLogRecordModel::C_document, QVariant());
+    i_logRecord->setData(SLogRecordModel::C_cashOrder, QVariant());
 }
 
 void SBalanceLogRecordModel::setDocumentId(const int id)
 {
-    i_logRecord->setDocumentId(id);
+    i_logRecord->set_document(id);
+    i_logRecord->setData(SLogRecordModel::C_repair, QVariant());
+    i_logRecord->setData(SLogRecordModel::C_cashOrder, QVariant());
 }
 
 void SBalanceLogRecordModel::setCashOrderId(const int id)
 {
-    i_logRecord->setCashOrderId(id);
-}
-
-void SBalanceLogRecordModel::setOffice(const int id)
-{
-    i_valuesMap.insert("office", id);
+    i_logRecord->set_cashOrder(id);
+    i_logRecord->setData(SLogRecordModel::C_document, QVariant());
+    i_logRecord->setData(SLogRecordModel::C_repair, QVariant());
 }
 
 void SBalanceLogRecordModel::setOfficeIndex(const int index)
 {
-    setOffice(officesModel->databaseIDByRow(index, "id"));
+    set_office(officesModel->databaseIDByRow(index, "id"));
+}
+
+/* Переопределённый метод
+ * Требуется пометка только поля id. Остальные поля остаются в статусе Updated, т. к. может выполняться несколько записей подряд (например, при выдаче нескольких ремонтов).
+ * В тестах это позволит проверить последнюю запись на предмет правильно отработавших алгоритмов коммита
+*/
+void SBalanceLogRecordModel::setAllState(ModifiedField::State state)
+{
+    if(!m_queryIdBeforeInsert)
+        return;
+
+    CacheMap::iterator i = cache.find(C_id);
+    if(i != cache.end())
+    {
+        setState(*i, state);
+    }
+}
+
+bool SBalanceLogRecordModel::commit()
+{
+    return SSingleRowJModel::commit();
 }
 
 bool SBalanceLogRecordModel::commit(const double amount)
 {
-    setDirection(amount);
-    i_valuesMap.insert("uid", userDbData->id);
-    if(!i_valuesMap.contains("office"))
-        i_valuesMap.insert("office", userDbData->currentOffice);
-    i_valuesMap.insert("summ", amount);
-    if(!i_valuesMap.contains("created"))
-        i_valuesMap.insert("created", QDateTime::currentDateTime());
+    bool nErr = 1;
 
-    insert();
+    set_amount(amount);
+    initMandatoryField(C_user, userDbData->id());
+    initMandatoryField(C_office, userDbData->currentOffice());
+    initMandatoryField(C_created, QDateTime::currentDateTime());
 
-    i_logRecord->commit();
-    return i_nErr;
+#ifdef QT_DEBUG
+    checkTableName();
+#endif
+    checkSystemTime();
+
+    nErr &= insert();
+    nErr &= i_logRecord->commit();
+    setFieldsExecuted();
+
+    return nErr;
 }
 
 bool SBalanceLogRecordModel::commit(const double amount, const QString &text)
 {
-    setText(text);
-    commit(amount);
-    return i_nErr;
+    set_reason(text);
+
+    return commit(amount);
 }
 
 void SBalanceLogRecordModel::updateLogAssociatedRecId()
 {
     // запись в журнал об изменении баланса связана только с id клиента; его установка происходит при создании объекта
     // метод переопределён для подавления предупреждения
+}
+
+void SBalanceLogRecordModel::logDataChange(const int index, const QVariant &data)
+{
+    switch (index)
+    {
+        case C_amount: set_direction(data.toDouble() > 0); break;
+        case C_client: i_logRecord->set_client(data.toInt()); break;
+        case C_reason: i_logRecord->setData(SLogRecordModel::C_text, data); break;
+        default: break;
+    }
 }
 
 void SClientModel::translateNames()
