@@ -942,12 +942,12 @@ void MainWindow::btnClick()
 {
     enum {store_cats_id, store_cats_parent, store_cats_name, store_cats_position};
 
-    if (!(QSqlDatabase::database("connMain").isOpen()))
+    if (!(QSqlDatabase::database(TdConn::main()).isOpen()))
     {
         return;
     }
 
-    QSqlQuery* cat_tree = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery* cat_tree = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
 //    QStandardItem* parentItem;
 //    QStandardItem* childItem;
     QVector<uint32_t> store_cats_ids;
@@ -1007,7 +1007,7 @@ void MainWindow::on_treeView_activated(const QModelIndex &index)
 
 void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_code)
 {
-    if (!(QSqlDatabase::database("connMain").isOpen()))
+    if (!(QSqlDatabase::database(TdConn::main()).isOpen()))
     {
         return;
     }
@@ -1020,7 +1020,7 @@ void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_co
                                          + b.toString()); // Работает. НЕ ТРОГАТЬ!
 
     tableGoodsModel->setRowCount(0); // Удаляем имеющиеся строки
-    QSqlQuery* goods = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery* goods = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     QString query;
     QStandardItem* newCol;
 
@@ -1045,12 +1045,12 @@ void MainWindow::readGoods(const QModelIndex &index, const QString &warehouse_co
 
 void MainWindow::get_warehouses_list()
 {
-    if (!(QSqlDatabase::database("connMain").isOpen()))
+    if (!(QSqlDatabase::database(TdConn::main()).isOpen()))
     {
         return;
     }
 
-    QSqlQuery* warehouse_list = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery* warehouse_list = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     QString query;
     QStandardItem *newRow;
     QStandardItem *newRow2;
@@ -1160,7 +1160,7 @@ void MainWindow::on_tableGoods_clicked(const QModelIndex &index)
 
 void MainWindow::readConsignments(const QModelIndex &index, const QString &warehouse_code)
 {
-    if (!(QSqlDatabase::database("connMain").isOpen()))
+    if (!(QSqlDatabase::database(TdConn::main()).isOpen()))
     {
         return;
     }
@@ -1168,7 +1168,7 @@ void MainWindow::readConsignments(const QModelIndex &index, const QString &wareh
     ui->label->setText("Art: " + index.model()->index(index.row(),0).data().toString());
 
     tableConsignmentsModel->setRowCount(0); // Удаляем имеющиеся строки
-    QSqlQuery* consignments = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery* consignments = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     QString query;
     QStandardItem* newCol;
 //	"Артикул" << "Наименование" << "Примечание" << "Кол-во" << "Реализация" << "Резерв" << "Цена" << "Место"
@@ -1197,7 +1197,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 {
     qDebug() << "test_scheduler_handler(), test_scheduler_counter = " << test_scheduler_counter++;
 //    createTabClients(0);
-//    QSqlQuery rand_rep_id = QSqlQuery(QSqlDatabase::database("connMain"));
+//    QSqlQuery rand_rep_id = QSqlQuery(QSqlDatabase::database(TdConn::main()));
 //    rand_rep_id.exec("SELECT ROUND(RAND()*25000, 0) INTO @id;");
 //    rand_rep_id.exec("SELECT `id` FROM `workshop` WHERE `id` >= @id AND `hidden` = 0 LIMIT 1;");
 //    qDebug() << rand_rep_id.lastError().databaseText();

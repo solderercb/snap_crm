@@ -784,7 +784,7 @@ bool SCartridgeForm::checkWorkMaterialItemCount()
     }
 
     SCartridgeMaterialModel *material;
-    auto workMaterial = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    auto workMaterial = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
 
     m_workMaterialItemId = 0;
     material =  m_cartridgeCard->material((SWorkModel::Type)m_workType);
@@ -875,7 +875,7 @@ bool SCartridgeForm::workAndPartHandler(const int workType, const int checkboxSt
 */
 int SCartridgeForm::prevRepairsCount()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     query->exec(QUERY_SEL_CARTRIDGE_RESOURCE(m_repairId, m_serialNumber, SWorkModel::Type::CartridgeRefill));
     if(query->first())

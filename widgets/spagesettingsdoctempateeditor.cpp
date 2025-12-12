@@ -21,7 +21,7 @@ SPageSettingsDocTempateEditor::SPageSettingsDocTempateEditor(QWidget *parent) :
     ui->lineEdit->hide();   // TODO: реализовать переименование
 
     docTemplatesList = new SSqlQueryModel();
-    docTemplatesList->setQuery(QUERY_SEL_DOC_TEMPLATES_LIST, QSqlDatabase::database("connMain"));
+    docTemplatesList->setQuery(QUERY_SEL_DOC_TEMPLATES_LIST, QSqlDatabase::database(TdConn::main()));
     docTemplatesList->setObjectName("docTemplates");
 //    QMetaEnum docTemplates = Global::staticMetaObject.enumerator(Global::staticMetaObject.indexOfEnumerator("Reports"));
 //    docTemplatesList = SStandardItemModel::modelFromEnum(docTemplates, tr);
@@ -97,7 +97,7 @@ int SPageSettingsDocTempateEditor::checkInput()
     // перезаписи данных в БД (выведется сообщение) даже если не вносились изменения. Это происходит
     // потому, что механизм (де-)сериализации данных не сохраняет порядок аттрибутов в тэгах XML
     // при открытии/сохранении шаблона. Т. е. дизайн шаблона не изменяется, но хэш будет отличаться.
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec(QUERY_SEL_DOC_TEMPL_CHECKSUM(m_reportName));
     query->first();
     if(query->isValid())
@@ -116,7 +116,7 @@ int SPageSettingsDocTempateEditor::checkInput()
 
 void SPageSettingsDocTempateEditor::commit(const int)
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
 
     QUERY_EXEC_TH(query, 1, QUERY_UPD_DOC_TEMPL_DATA(m_reportName, QString(m_templateBuffer->toHex()), *m_templateHash));
     QUERY_EXEC_TH(query, 1, QUERY_SEL_DOC_TEMPL_DATA(m_reportName));

@@ -41,7 +41,7 @@ tabClients::tabClients(bool type, MainWindow *parent) :
 
     clientsTable = new STableClientsModel(this);
     ui->tableView->setModel(clientsTable);
-    ui->tableView->setQuery(QUERY_SEL_CLIENTS_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setQuery(QUERY_SEL_CLIENTS_STATIC, QSqlDatabase::database(TdConn::main()));
     ui->tableView->setUniqueIdColumn(0);
     ui->tableView->enableAutorefresh(userDbData->refreshTime()*1000);
     if (type == 1)

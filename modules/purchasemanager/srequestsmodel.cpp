@@ -190,10 +190,10 @@ bool SPartsRequestsModel::updateRowInTable(int row, const QSqlRecord &values)
     QSqlField whereField = record(row).field(Columns::Id);
     whereField.setGenerated(true);
     whereValues.append(whereField);
-    QString query = QSqlDatabase::database("connThird").driver()->sqlStatement(QSqlDriver::UpdateStatement, "parts_request", values, 0) + " " +
-                    QSqlDatabase::database("connThird").driver()->sqlStatement(QSqlDriver::WhereStatement, "parts_request", whereValues, 0);
+    QString query = QSqlDatabase::database(TdConn::session()).driver()->sqlStatement(QSqlDriver::UpdateStatement, "parts_request", values, 0) + " " +
+                    QSqlDatabase::database(TdConn::session()).driver()->sqlStatement(QSqlDriver::WhereStatement, "parts_request", whereValues, 0);
 
-    if(QSqlDatabase::database("connThird").exec(query).lastError().isValid())
+    if(QSqlDatabase::database(TdConn::session()).exec(query).lastError().isValid())
     {
         return 0;
     }

@@ -46,7 +46,7 @@ void TClassTest::cleanupTestCase()
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 
@@ -61,7 +61,7 @@ void TClassTest::test_newEmptyModel()
 void TClassTest::test_modelCommit()
 {
     auto cut = std::make_unique<SRepairStatusLog>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec("BEGIN;");
 
@@ -84,7 +84,7 @@ void TClassTest::test_modelCommit()
 void TClassTest::test_modelCommit2()
 {
     auto cut = std::make_unique<SRepairStatusLog>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     cut->set_managerIndex(0);
@@ -112,7 +112,7 @@ void TClassTest::test_modelCommit2()
 void TClassTest::test_modelRepeatedCommit()
 {
     auto cut = std::make_unique<SRepairStatusLog>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     cut->set_managerIndex(0);

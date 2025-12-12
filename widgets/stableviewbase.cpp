@@ -1417,7 +1417,7 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
         m_queryConditionsChanged = 0;
     }
 
-    setModelQuery(m_query, QSqlDatabase::database("connMain"));
+    setModelQuery(m_query, QSqlDatabase::database(TdConn::main()));
     if (m_sortColumn >= 0)
     {
         horizontalHeader()->blockSignals(true);

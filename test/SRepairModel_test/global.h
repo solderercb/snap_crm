@@ -10,6 +10,7 @@
 #include <QString>
 #include <QSqlError>
 #include <QDebug>
+#include <QThread>
 #include <SStandardItemModel>
 #include <SSqlQueryModel>
 #include <SAppLog>
@@ -34,14 +35,14 @@ class SUserSettings : public QObject
 signals:
     void rowHeightChanged();
 public:
-    explicit SUserSettings(){};
-    int id() {return m_id;};
-    void set_id(const int id) {m_id = id;};
+    explicit SUserSettings(){set_id(1);};
+    int id() {return m_id.value((quintptr)QThread::currentThreadId());};
+    void set_id(const int id) {m_id.insert((quintptr)QThread::currentThreadId(), id);};
     int company() {return 1;};
     int currentOffice() {return 1;};
     int rowHeight() {return 16;};
 private:
-    int m_id = 1;
+    QMap<quintptr, int> m_id;
 };
 
 class SPermissions
@@ -50,6 +51,7 @@ public:
     bool viewClients = 1;
 };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SComSettings *comSettings;
 extern SUserSettings *userDbData;
 extern SSqlQueryModel *usersModel;

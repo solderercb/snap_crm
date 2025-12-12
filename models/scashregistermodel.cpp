@@ -82,7 +82,7 @@ bool SCashRegisterModel::commit()
         if(amount() == 0)
             return 1;
 
-        QSqlQuery query(QSqlDatabase::database("connThird"));
+        QSqlQuery query(QSqlDatabase::database(TdConn::session()));
         QString q;
 
         initMandatoryField(C_user, userDbData->id());

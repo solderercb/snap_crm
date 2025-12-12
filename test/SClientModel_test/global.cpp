@@ -23,6 +23,7 @@ void Global::throwError(const int type, const QString&)
     throw (ThrowType)type;
 }
 
+QMap<QString, QVariant> *loginCreds = new QMap<QString, QVariant>;
 SComSettings *comSettings = new SComSettings;
 SUserSettings *userDbData = new SUserSettings;
 SSqlQueryModel *usersModel = new SSqlQueryModel();

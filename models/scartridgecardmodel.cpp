@@ -40,7 +40,7 @@ void SCartridgeCardModel::loadError(const int type)
 
 void SCartridgeCardModel::initMaterials()
 {
-    QSqlQuery query(QSqlDatabase::database("connMain"));
+    QSqlQuery query(QSqlDatabase::database(TdConn::main()));
     SCartridgeMaterialModel *material;
 
     removeMaterials();

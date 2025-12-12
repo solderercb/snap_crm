@@ -27,11 +27,11 @@ SPartRequest::SPartRequest(QObject *parent) :
 
 //    int m_state = State::NewUncommitted;
 
-    m_managers = new SEditableBaseModel(this, QSqlDatabase::database("connThird"));
+    m_managers = new SEditableBaseModel(this, QSqlDatabase::database(TdConn::session()));
     m_managers->setEditStrategy(QSqlTableModel::OnManualSubmit);
     m_managers->setTable("parts_request_employees");
 
-    m_notifications = new SEditableBaseModel(this, QSqlDatabase::database("connThird"));
+    m_notifications = new SEditableBaseModel(this, QSqlDatabase::database(TdConn::session()));
     m_notifications->setEditStrategy(QSqlTableModel::OnManualSubmit);
     m_notifications->setTable("notifications");
 
@@ -77,7 +77,7 @@ SStandardItemModel *SPartRequest::prioritiesList()
 SSqlQueryModel *SPartRequest::managersList()
 {
     SSqlQueryModel *model = new SSqlQueryModel;
-    model->setQuery(QUERY_SEL_PRT_RQST_MANAGERS(SPermissions::C_enableSparepartRequestManager), QSqlDatabase::database("connMain"));
+    model->setQuery(QUERY_SEL_PRT_RQST_MANAGERS(SPermissions::C_enableSparepartRequestManager), QSqlDatabase::database(TdConn::main()));
     model->setObjectName("partRequestManagersModel");
 
     return model;

@@ -10,7 +10,7 @@
 
 /* специальная структура для инициализации полей SStoreSaleItemModel
  * data значение поля
- * changedFlag признак обновлённого значения: если 0, то init_data будет записано в SSingleRowModelBase::m_record, если 1 — в кэш
+ * changedFlag признак обновлённого значения: если 0, то init_data будет записано в SSingleRowModelBase::m_record, если 1 — в кэш
  * oldData "предыдущее" значение, будет записано в SSingleRowModelBase::m_record
  * skip указание на пропуск поля (т. е. поле останется не инициализированным)
 */
@@ -136,7 +136,7 @@ void TClassTest::cleanupTestCase()
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 
@@ -204,7 +204,7 @@ void TClassTest::test_addItemFromBasket()
     QCOMPARE(cut->i_logTexts.values().contains(testStr), 1);
     QVERIFY(cut->m_storeItem != nullptr);
     QCOMPARE(cut->m_storeItem->m_commitedExpense, 1);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
@@ -271,7 +271,7 @@ void TClassTest::test_addItemFromBasket2()
     QCOMPARE(cut->m_storeItem->m_commitedExpense, 1);
     QCOMPARE(cut->m_storeItem->m_lastOp, -1);
     QCOMPARE(cut->m_storeItem->m_commited, 0);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
@@ -458,7 +458,7 @@ void TClassTest::test_loadBoqAndRemoveItem()
               .arg(cut->count());
     QCOMPARE(cut->i_logTexts.values().contains(testStr), 1);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
@@ -507,7 +507,7 @@ void TClassTest::test_loadBoqAndRemoveItem2()
               .arg(cut->count());
     QCOMPARE(cut->i_logTexts.values().contains(testStr), 1);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
@@ -546,7 +546,7 @@ void TClassTest::test_loadBoqAndIssue()
         QCOMPARE(cut->i_logRecord->repair(), testData.value("repair").toInt());
         QCOMPARE(cut->i_logTexts.count(), 0);
 
-        auto db = QSqlDatabase::database("connThird");
+        auto db = QSqlDatabase::database(TdConn::session());
         auto query = std::make_unique<QSqlQuery>(db);
         debugStuff->startSqlLog(db, __func__);
         query->exec(QString("# =========================================== %1").arg(__func__));
@@ -573,7 +573,7 @@ void TClassTest::test_loadBoqAndIssue()
 void TClassTest::test_addItemToBasket()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     auto cut = std::make_shared<SRepairSaleItemModel>();
 
@@ -632,7 +632,7 @@ void TClassTest::test_addItemToBasket()
 void TClassTest::test_addItemToBasket2()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     auto cut = std::make_shared<SRepairSaleItemModel>();
 
@@ -672,7 +672,7 @@ void TClassTest::test_addItemToBasket2()
 void TClassTest::test_requestItem()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     auto cut = std::make_shared<SRepairSaleItemModel>();
 
@@ -703,7 +703,7 @@ void TClassTest::test_requestItem()
 void TClassTest::test_returnItemToWarehouse()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     auto cut = std::make_shared<SRepairSaleItemModel>();
 

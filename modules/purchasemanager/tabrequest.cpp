@@ -594,7 +594,7 @@ void tabPartRequest::randomFill()
         ui->widgetClientInput->setVisible(true);
     }
 
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     for(int j = 0; j < 3; j++)
     {
         query->exec(QString("SELECT `name` FROM (SELECT ROUND(@i * RAND(), 0) AS 'rand') AS `rand` LEFT JOIN (SELECT @i := @i + 1 AS 'num', t1.`id`, t1.`name` FROM store_items AS t1 CROSS JOIN (SELECT @i := 0) AS dummy WHERE t1.`count` - t1.`reserved` > 0 AND t1.`is_realization` = 1) AS t1 ON t1.`num` = `rand`.`rand`;"));

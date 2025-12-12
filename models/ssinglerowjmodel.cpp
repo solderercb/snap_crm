@@ -53,6 +53,7 @@ bool SSingleRowJModel::commitLogs()
 
     QString logText;
     updateLogAssociatedRecId();
+    i_logRecord->set_created(QDateTime::currentDateTime());
     foreach(logText, i_logTexts)
     {
         i_logRecord->set_text(logText);

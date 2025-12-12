@@ -23,7 +23,7 @@ SClientMatch::SClientMatch(QWidget *parent) :
     connect(groupBoxEventFilter,SIGNAL(toggleElementsVisibility()),this,SLOT(toggleElementsVisibility()));
     clientsMatchTable = new STableClientMatchModel(this);
     ui->tableView->setModel(clientsMatchTable);
-    ui->tableView->setQuery(QUERY_SEL_CLIENT_MATCH_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setQuery(QUERY_SEL_CLIENT_MATCH_STATIC, QSqlDatabase::database(TdConn::main()));
 }
 
 SClientMatch::~SClientMatch()

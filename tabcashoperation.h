@@ -60,7 +60,6 @@ private:
     bool m_clientWidgetVisible = true;
     int m_clientWidgetMode = ClientMode::Client;
     int m_clientWidgetButtons;
-    QString m_generatedReason;
     bool m_reasonRO = 1;
     bool m_amountRO = 0;
     double m_minAmount = 0;

@@ -27,6 +27,7 @@ SOURCES +=  \
     ../../models/seditablebasemodel.cpp \
     ../../models/stablemodelscommonmethods.cpp \
     ../../modules/purchasemanager/srequest.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../slocalsettings.cpp \
     ../tdebugstuff.cpp \
@@ -48,6 +49,7 @@ HEADERS += \
     ../../models/seditablebasemodel.h \
     ../../models/stablemodelscommonmethods.h \
     ../../modules/purchasemanager/srequest.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../slocalsettings.h \
     ../tdebugstuff.h \

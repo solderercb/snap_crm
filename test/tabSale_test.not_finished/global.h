@@ -56,6 +56,7 @@ public:
     bool undoOutInvoice = 1;
 };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SUserSettings *userDbData;
 extern SAppLog *appLog;
 extern QLocale sysLocale;

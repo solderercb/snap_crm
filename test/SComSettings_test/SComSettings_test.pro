@@ -30,6 +30,7 @@ SOURCES +=  \
     ../../widgets/scheckcombobox.cpp \
     ../../widgets/scombobox.cpp \
     ../../widgets/slineedit.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     global.cpp \
     slocalsettings.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     ../../widgets/scheckcombobox.h \
     ../../widgets/scombobox.h \
     ../../widgets/slineedit.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     global.h \
     slocalsettings.h

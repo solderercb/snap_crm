@@ -305,7 +305,7 @@ void SFieldsModel::initValueModel(const QSqlRecord &rec)
 
 void SFieldsModel::initSqlQuery()
 {
-    initSqlQuery(QSqlDatabase::database("connMain"));
+    initSqlQuery(QSqlDatabase::database(TdConn::main()));
 }
 
 void SFieldsModel::initSqlQuery(QSqlDatabase database)

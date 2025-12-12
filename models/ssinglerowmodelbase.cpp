@@ -272,7 +272,10 @@ void SSingleRowModelBase::setDatabase(const QSqlDatabase &database)
 
 void SSingleRowModelBase::initSqlQuery()
 {
-    initSqlQuery(QSqlDatabase::database("connThird"));
+    if(i_query)
+        return;
+
+    initSqlQuery(QSqlDatabase::database(TdConn::session()));
 }
 
 void SSingleRowModelBase::initSqlQuery(QSqlDatabase database)

@@ -361,7 +361,7 @@ void SRepairModel::boxChanged(const int newId)
 double SRepairModel::paymentsAmount(const SCashRegisterModel::PaymentType type)
 {
     double summ;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     query->exec(QUERY_SEL_REPAIR_PAYMENTS(id(), QString::number(type)));
     query->first();
     summ = query->value(0).toDouble();
@@ -395,7 +395,7 @@ void SRepairModel::addPrepay(double amount, QString reason)
 double SRepairModel::realWorksCost()
 {
     double summ;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     query->exec(QUERY_SEL_REPAIR_WORKS(id()));
     query->first();
     summ = query->value(0).toDouble();
@@ -408,7 +408,7 @@ double SRepairModel::realWorksCost()
 double SRepairModel::realPartsCost()
 {
     double summ;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     query->exec(QUERY_SEL_REPAIR_PARTS(id()));
     query->first();
     summ = query->value(0).toDouble();
@@ -511,49 +511,41 @@ bool SRepairModel::commit()
 bool SRepairModel::lock(bool state)
 {
     bool nErr = 1;
+    QMap<int, QVariant> values;
     if(state)
     {
-        setCacheData(C_userLock, userDbData->id());
-        setCacheData(C_lockDateTime, QDateTime::currentDateTime());
+        values.insert(C_userLock, userDbData->id());
+        values.insert(C_lockDateTime, QDateTime::currentDateTime());
     }
     else
     {
-        setCacheData(C_userLock, QVariant());
-        setCacheData(C_lockDateTime, QVariant());
+        values.insert(C_userLock, QVariant());
+        values.insert(C_lockDateTime, QVariant());
     }
 
-    auto pair = [&](const int index){return QString("  `%1` = %2").arg(dbFieldName(index)).arg(fieldValueHandler(data(index)));};
-    auto upd_states = [&](ModifiedField::State state){setState(C_userLock, state); setState(C_lockDateTime, state);};
+    auto pair = [&](const int index){return QString("  `%1` = %2").arg(dbFieldName(index)).arg(fieldValueHandler(values.value(index)));};
     auto fieldsPairs = QString("  %1,\n"\
                                "  %2")\
                                .arg(pair(C_userLock))
                                .arg(pair(C_lockDateTime));
 
-    blockSignals(true); // в данном случае отправлять сигнал об обновлении модели не нужно
     try
     {
-        QUERY_EXEC_TH(i_query, 1, QUERY_BEGIN);
         QUERY_EXEC_TH(i_query, 1, wrapUpdateQueryPairs(fieldsPairs));
-        upd_states(ModifiedField::Executed);
-        QUERY_EXEC_TH(i_query, 1, QUERY_COMMIT);
+        setCacheData(C_userLock, values.value(C_userLock), ModifiedField::Executed);
+        setCacheData(C_lockDateTime, values.value(C_lockDateTime), ModifiedField::Executed);
     }
     catch (Global::ThrowType type)
     {
         nErr = 0;
-        if(type != Global::ThrowType::ConnLost)
-        {
-            upd_states(ModifiedField::Failed);
-            QUERY_EXEC_TH(i_query, 1, QUERY_ROLLBACK);
-        }
     }
-    blockSignals(false);
     return nErr;
 }
 
 bool SRepairModel::isLock()
 {
     bool nErr = 1;
-    QUERY_EXEC(i_query, nErr)(QUERY_SEL_REPAIR_LOCK(QSqlDatabase::database("connMain").databaseName(), id()));
+    QUERY_EXEC(i_query, nErr)(QUERY_SEL_REPAIR_LOCK(loginCreds->value("database").toString(), id()));
     i_query->first();
     if(i_query->value(0).toInt() == userDbData->id()) // имеется запись о блокировке, но пользователь совпадает
         return 0;

@@ -16,6 +16,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `snap_app_test`
+--
+
+/*!40000 DROP DATABASE IF EXISTS `snap_app_test`*/;
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `snap_app_test` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+
+USE `snap_app_test`;
+
+--
 -- Table structure for table `additional_payments`
 --
 
@@ -4784,3 +4794,29 @@ DELIMITER ;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-20  9:35:34
+
+# Таблица для хранения "глобальных" переменных пользователя.
+CREATE TABLE IF NOT EXISTS `global_user_variables` (
+  `name` CHAR(50) NULL DEFAULT NULL,
+  `value` CHAR(50) NULL DEFAULT NULL,
+  UNIQUE INDEX `name` (`name`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB;
+
+INSERT INTO `global_user_variables` (`name`, `value`) VALUES ('test_trig_balance_fuckuper', 0) ON DUPLICATE KEY UPDATE `value` = `value`;
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS `balance_fuckuper`$$
+CREATE DEFINER=`root`@`%` TRIGGER `balance_fuckuper` BEFORE INSERT ON `balance` FOR EACH ROW
+BEGIN
+  SELECT IFNULL(t1.`value`, 0) FROM (SELECT 0 AS 'value') `dummy` LEFT JOIN (SELECT `value` FROM `global_user_variables` WHERE `name` = 'test_trig_balance_fuckuper') `t1` ON 1 INTO @is_trig_en;
+
+  IF(@is_trig_en) THEN
+    SET
+      NEW.`summ` = NEW.`summ` + 1;
+  END IF;
+END$$
+
+DELIMITER ;

@@ -20,6 +20,7 @@ SOURCES +=  \
     ../../models/ssinglerowjmodel.cpp \
     ../../models/slogrecordmodel.cpp \
     ../../models/sworkmodel.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../slocalsettings.cpp \
     ../tdebugstuff.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     ../../models/ssinglerowjmodel.h \
     ../../models/slogrecordmodel.h \
     ../../models/sworkmodel.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../slocalsettings.h \
     ../tdebugstuff.h \

@@ -188,14 +188,14 @@ bool SStandardItemModel::isDirty()
 QSqlDatabase SStandardItemModel::loadConnection() const
 {
     if(!m_connection)
-        return QSqlDatabase::database("connMain");
+        return QSqlDatabase::database(TdConn::main());
     return *(m_connection.get());
 }
 
 QSqlDatabase SStandardItemModel::commitConnection() const
 {
     if(!m_connection)
-        return QSqlDatabase::database("connThird");
+        return QSqlDatabase::database(TdConn::session());
     return *(m_connection.get());
 }
 

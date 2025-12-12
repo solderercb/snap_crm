@@ -12,6 +12,7 @@ DEFINES += _PWD=$${PWD}/..
 INCLUDEPATH += $${PWD}/include
 
 SOURCES +=  \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../../models/sabstractitemmodel.cpp \
     ../../models/ssinglerowjmodel.cpp \
@@ -26,6 +27,7 @@ SOURCES +=  \
     tclasstest.cpp
 
 HEADERS += \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../../models/sabstractitemmodel.h \
     ../../models/ssinglerowjmodel.h \

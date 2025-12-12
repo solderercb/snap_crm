@@ -11,8 +11,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlField>
+#include <TdConn>
 #endif // SKIP_INCLUDES_IN_PREPROCESSING_EVALUATION
-
 
 class SSingleRowModelBase
 {

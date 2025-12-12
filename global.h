@@ -8,6 +8,7 @@
 #define DBG_VAR_OUT(var)   STR(| var:) << (var)
 
 #include "global_ns.h"
+#include <TdConn>
 #ifdef QT_DEBUG
 #include <SClient4Test>
 #endif
@@ -117,7 +118,7 @@ extern SAppLog *appLog;
 extern SUserActivityModel *userActivityLog;
 extern SStandardItemModel *clientBinaryProperties;
 extern QSettings *debugOptions;
-extern QMap<QString, QVariant> *debugLoginOptions;
+extern QMap<QString, QVariant> *loginCreds;
 extern SStandardItemModel* storeItemsIntReserveStatesModel;
 extern QVector<QWidget*> tabList;
 extern SStandardItemModel *cartridgeRepeatReason;

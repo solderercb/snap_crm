@@ -18,6 +18,7 @@ SOURCES +=  \
     global.cpp \
     ../tdebugstuff.cpp \
     ../slocalsettings.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../../models/ssinglerowjmodel.cpp \
     ../../models/ssinglerowmodelbase.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     global.h \
     ../tdebugstuff.h \
     ../slocalsettings.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../../models/ssinglerowjmodel.h \
     ../../models/ssinglerowmodelbase.h \

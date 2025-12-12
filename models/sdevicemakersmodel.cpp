@@ -18,7 +18,7 @@ SDeviceMakersModel::~SDeviceMakersModel()
 void SDeviceMakersModel::load(const int device)
 {
     QString query = QUERY_SEL_DEVICE_MAKERS(device);
-    m_sqlModel->setQuery(query, QSqlDatabase::database("connMain"));
+    m_sqlModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
 }
 
 QSqlQueryModel *SDeviceMakersModel::makers()

@@ -123,7 +123,7 @@ void TClassTest::cleanupTestCase()
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 
@@ -166,7 +166,7 @@ void TClassTest::test_sale()
 
     QCOMPARE(cut->cache.count(), 18);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("BEGIN;");
@@ -200,7 +200,7 @@ void TClassTest::test_reserve()
 
     QCOMPARE(cut->cache.count(), 18);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("BEGIN;");
@@ -233,7 +233,7 @@ void TClassTest::test_saleReserved()
 
     QCOMPARE(cut->cache.count(), 0);    // при продаже ранее зарезервированного товара в таблице store_sales ничего не зименяется
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("BEGIN;");
@@ -266,7 +266,7 @@ void TClassTest::test_saleReservedIncrCount()
     QCOMPARE(cut->cache.count(), 1);
     QCOMPARE(cut->commitedData(SStoreSaleItemModel::C_count)->toInt(), oldValue);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("BEGIN;");
@@ -301,7 +301,7 @@ void TClassTest::test_saleReservedDecrCount()
 
     QCOMPARE(cut->cache.count(), 1);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("BEGIN;");
@@ -335,7 +335,7 @@ void TClassTest::test_unsale()
 
     QCOMPARE(cut->cache.count(), 2);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("BEGIN;");
@@ -371,7 +371,7 @@ void TClassTest::test_free()
 
     QCOMPARE(cut->cache.count(), 1);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("BEGIN;");

@@ -1,4 +1,5 @@
 #include "squerylog.h"
+#include <ProjectGLobals>
 #include <SLocalSettings>
 #include <QApplication>
 #include <QSqlQuery>
@@ -6,6 +7,7 @@
 #include <QByteArray>
 #include <QVariant>
 #include <QDebug>
+#include <TdConn>
 
 SQueryLog::SQueryLog(QSqlQuery *q) :
     query(q)
@@ -19,7 +21,7 @@ SQueryLog::SQueryLog(QSqlQuery *q) :
 }
 
 SQueryLog::SQueryLog() :
-    SQueryLog(new QSqlQuery(QSqlDatabase::database("connThird")))
+    SQueryLog(new QSqlQuery(QSqlDatabase::database(TdConn::session())))
 {
 }
 
@@ -78,7 +80,7 @@ bool SQueryLog::saveLog()
                                 "  AND `user_host` LIKE '%%1%'"\
                                 "  AND `argument` NOT IN ('')"\
                                 "  AND `argument` NOT LIKE '%mysql.general_log%';")\
-                        .arg(QSqlDatabase::database("connThird").userName()));
+                        .arg(loginCreds->value("user").toString()));
 
             while(query->next())
             {

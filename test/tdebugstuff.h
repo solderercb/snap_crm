@@ -19,8 +19,7 @@ class TDebugStuff
 {
 public:
     TDebugStuff();
-    std::unique_ptr<QSettings> debugOptions;
-    QMap<QString, QVariant> debugLoginOptions;
+    std::shared_ptr<QSettings> debugOptions;
     QSqlDatabase connMain;
     QSqlDatabase connNtfy;
     QSqlDatabase connThird;

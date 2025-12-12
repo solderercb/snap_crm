@@ -94,7 +94,7 @@ SAppLog *appLog;
 SUserActivityModel *userActivityLog;
 SStandardItemModel *clientBinaryProperties;
 QSettings *debugOptions = nullptr;
-QMap<QString, QVariant> *debugLoginOptions = nullptr;
+QMap<QString, QVariant> *loginCreds = new QMap<QString, QVariant>;
 SStandardItemModel* storeItemsIntReserveStatesModel = new SStandardItemModel;
 QVector<QWidget*> tabList;
 SStandardItemModel *cartridgeRepeatReason = new SStandardItemModel();
@@ -123,38 +123,38 @@ void initGlobalModels()
     comSettings->ascPhoneMask1() =  comSettings->ascPhoneMask1().replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
     comSettings->ascPhoneMask2() =  comSettings->ascPhoneMask2().replace('0', '9'); // предупреждалка пусть орёт, но чтобы работала проверка, изменим маску внаглую
 
-    clientPhoneTypesModel->setQuery(QUERY_SEL_PHONE_TYPES, QSqlDatabase::database("connMain"));
+    clientPhoneTypesModel->setQuery(QUERY_SEL_PHONE_TYPES, QSqlDatabase::database(TdConn::main()));
     clientPhoneTypesModel->setObjectName("clientPhoneTypesModel");
 //    clientPhoneTypesModel->setHorizontalHeaderLabels({"name", "id", "mask"});
 
-    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->currentOffice()), QSqlDatabase::database("connMain"));
+    warehousesModel->setQuery(QUERY_SEL_WAREHOUSES(userDbData->currentOffice()), QSqlDatabase::database(TdConn::main()));
     warehousesModel->setObjectName("warehousesModel");
-    allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database("connMain"));
+    allUsersModel->setQuery(QUERY_SEL_ALL_USERS, QSqlDatabase::database(TdConn::main()));
     allUsersModel->setDisplayRoleColumn("username");
     allUsersModel->setObjectName("allUsersModel");
     for(int i = 0; i < allUsersModel->rowCount(); i++)
     {
         allUsersMap->insert(allUsersModel->record(i).value("id").toInt(), allUsersModel->record(i).value("username").toString());
     }
-    usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database("connMain"));
+    usersModel->setQuery(QUERY_SEL_USERS, QSqlDatabase::database(TdConn::main()));
     usersModel->setDisplayRoleColumn("username");
     usersModel->setObjectName("usersModel");
-    usersSalaryTaxesModel->setQuery(QUERY_SEL_USERS_SALARY_TAXES, QSqlDatabase::database("connMain"));
+    usersSalaryTaxesModel->setQuery(QUERY_SEL_USERS_SALARY_TAXES, QSqlDatabase::database(TdConn::main()));
     usersSalaryTaxesModel->setObjectName("usersSalaryTaxesModel");
-    managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database("connMain"));
+    managersModel->setQuery(QUERY_SEL_MANAGERS, QSqlDatabase::database(TdConn::main()));
     managersModel->setDisplayRoleColumn("username");
     managersModel->setObjectName("managersModel");
-    engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database("connMain"));
+    engineersModel->setQuery(QUERY_SEL_ENGINEERS, QSqlDatabase::database(TdConn::main()));
     engineersModel->setDisplayRoleColumn("username");
     engineersModel->setObjectName("engineersModel");
-    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->currentOffice()), QSqlDatabase::database("connMain"));
+    itemBoxesModel->setQuery(QUERY_SEL_ITEM_BOXES(userDbData->currentOffice()), QSqlDatabase::database(TdConn::main()));
     itemBoxesModel->setObjectName("itemBoxesModel");
-    repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database("connMain"));
+    repairBoxesModel->setQuery(QUERY_SEL_REPAIR_BOXES, QSqlDatabase::database(TdConn::main()));
     repairBoxesModel->setObjectName("repairBoxesModel");
 
     // TODO: нужна прокси-модель для отображения платёжных систем в соответствии с правами пользователя
     // а также таблица payment_systems_users, содержащая права на видимость
-    paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database("connMain"));
+    paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database(TdConn::main()));
     paymentSystemsModel->setObjectName("paymentSystemsModel");
 
     receiptTypesModel = new SPaymentTypesModel(SPaymentTypesModel::Type::PKO);
@@ -162,7 +162,7 @@ void initGlobalModels()
     expenditureTypesModel = new SPaymentTypesModel(SPaymentTypesModel::Type::RKO);
     expenditureTypesModel->setObjectName("expenditureTypesModel");
 
-    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
+    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database(TdConn::main()));
     clientAdTypesList->setObjectName("clientAdTypesList");
 
     clientsTypesList = SClientModel::categoriesList();
@@ -269,7 +269,7 @@ void initGlobalModels()
 
 void initUserDbData()
 {
-    userDbData->load(QSqlDatabase::database("connMain").userName());
+    userDbData->load(loginCreds->value("user").toString());
 }
 
 void initPermissions()
@@ -279,13 +279,13 @@ void initPermissions()
 
 void initCompanies()    // Список компаний.
 {
-    companiesModel->setQuery(QUERY_SEL_COMPANIES, QSqlDatabase::database("connMain"));
+    companiesModel->setQuery(QUERY_SEL_COMPANIES, QSqlDatabase::database(TdConn::main()));
     companiesModel->setObjectName("companiesModel");
 }
 
 void initOffices()      // Список офисов
 {
-    officesModel->setQuery(QUERY_SEL_OFFICES(userDbData->company()), QSqlDatabase::database("connMain"));
+    officesModel->setQuery(QUERY_SEL_OFFICES(userDbData->company()), QSqlDatabase::database(TdConn::main()));
     officesModel->setObjectName("officesModel");
 }
 

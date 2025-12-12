@@ -23,5 +23,6 @@ void Global::throwError(const int type, const QString &errorText)
     throw;
 }
 
+QMap<QString, QVariant> *loginCreds = new QMap<QString, QVariant>;
 SUserSettings *userDbData = new SUserSettings;
 QLocale sysLocale = QLocale::system();

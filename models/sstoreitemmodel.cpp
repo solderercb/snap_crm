@@ -118,6 +118,11 @@ bool SStoreItemModel::checkBeforeSale()
 {
     m_itemQtysBefore = loadQtys();
 
+    // обновление значений полей
+    setCacheData(C_count, m_itemQtysBefore->count, ModifiedField::Executed);
+    setCacheData(C_sold, m_itemQtysBefore->sold, ModifiedField::Executed);
+    setCacheData(C_reserved, m_itemQtysBefore->reserved, ModifiedField::Executed);
+
     // При продаже ранее зарезервированного товара допускается изменение кол-ва (вдруг клиент решил купить меньше/больше);
     // в этом случае при проверке не будет учитываться старое кол-во
     if(m_newExpense > (m_itemQtysBefore->count - m_itemQtysBefore->reserved + m_commitedExpense) )

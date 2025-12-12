@@ -75,7 +75,7 @@ void STableRepairsModel::initDemo()
     demoQuery.replace(STableBaseModel::queryPrepareRegexpPattern, "\n");
     demoQuery  += " WHERE t1.`id` IS NULL";
 
-    SSqlFetchingModel::setQuery(demoQuery, QSqlDatabase::database("connMain"));
+    SSqlFetchingModel::setQuery(demoQuery, QSqlDatabase::database(TdConn::main()));
 
     for(int r = 0; r < demoIds.count(); r++)
     {
@@ -99,7 +99,7 @@ void STableRepairsModel::initDemo()
                      "SELECT '" + demoConstsForUnion.join("', '") + "'";
     }
 
-    SSqlFetchingModel::setQuery(demoQuery, QSqlDatabase::database("connMain"));
+    SSqlFetchingModel::setQuery(demoQuery, QSqlDatabase::database(TdConn::main()));
 }
 
 void STableRepairsModel::reportCallbackData(const LimeReport::CallbackInfo &info, QVariant &data)

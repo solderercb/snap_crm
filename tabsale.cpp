@@ -362,7 +362,7 @@ int tabSale::checkInputNew()
 
     if( !ui->checkBoxAnonymous->isChecked() )
     {
-        if (ui->lineEditClientLastName->text() == "" && !clientModel->isCompany())       // если не указана фамилия (обычный клиент; у юрика может быть пустым)
+        if (ui->lineEditClientLastName->text() == "" && !clientModel->id())       // проверка фамилии только при создании нового клиента
         {
             ui->lineEditClientLastName->setStyleSheet(commonLineEditStyleSheetRed);
             error = 1;
@@ -394,8 +394,7 @@ int tabSale::checkInputNew()
         ui->comboBoxPaymentAccount->setStyleSheet(commonComboBoxStyleSheetRed);
         error = 6;
     }
-
-    if (sysLocale.toDouble(ui->lineEditTakeIn->text()) < sysLocale.toDouble(ui->lineEditTotal->text()) )   //
+    if ((m_opType != Reserve) && (sysLocale.toDouble(ui->lineEditTakeIn->text()) < sysLocale.toDouble(ui->lineEditTotal->text())) )   //
     {
         ui->lineEditTakeIn->setStyleSheet(commonLineEditStyleSheetRed);
         error = 7;
@@ -458,9 +457,10 @@ void tabSale::commitClient()
     clientModel->set_firstName(ui->lineEditClientFirstName->text());
     clientModel->set_lastName(ui->lineEditClientLastName->text());
     clientModel->set_patronymicName(ui->lineEditClientPatronymic->text());
-    clientModel->appendLogText(tr("Быстрое создание клиента из формы продажи"));
-    clientModel->set_adType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
-    if (ui->lineEditClientPhone->hasAcceptableInput())
+    clientModel->appendLogText(tr("Быстрое создание клиента из формы продажи"), "!");
+    if(ui->comboBoxClientAdType->currentIndex() >= 0)
+        clientModel->set_adType(clientAdTypesList->databaseIDByRow(ui->comboBoxClientAdType->currentIndex()));
+    if (clientModel->phones()->isEmpty() && ui->lineEditClientPhone->hasAcceptableInput())
     {
         clientModel->addPhone(ui->lineEditClientPhone->text(),
                               ui->comboBoxClientPhoneType->currentIndex());

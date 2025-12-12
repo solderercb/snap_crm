@@ -60,6 +60,7 @@ public:
     bool editAnyComment = 1;
 };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SAppLog *appLog;
 extern SUserActivityModel *userActivityLog;
 extern QLocale sysLocale;

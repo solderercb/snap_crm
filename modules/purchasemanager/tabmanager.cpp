@@ -145,7 +145,7 @@ void tabPurchaseManager::groupChanged(int index)
     }
 
     ui->widgetPartSuppliers->setGroupingMode(index);
-    ui->tableViewSubgroups->setQuery(query, QSqlDatabase::database("connMain"));
+    ui->tableViewSubgroups->setQuery(query, QSqlDatabase::database(TdConn::main()));
     ui->tableViewSubgroups->refresh();
 
     MAINCONN_QUERY_LOG_STOP;
@@ -460,7 +460,7 @@ void tabPurchaseManager::undoComboBoxIndexChange(QComboBox *widget, int &oldInde
 
 void tabPurchaseManager::lineEditSearchTextChanged(QString)
 {
-    ui->tableViewSubgroups->setQuery(constructSubgroupListQuery(ui->comboBoxGrouping->currentIndex()), QSqlDatabase::database("connMain"));
+    ui->tableViewSubgroups->setQuery(constructSubgroupListQuery(ui->comboBoxGrouping->currentIndex()), QSqlDatabase::database(TdConn::main()));
     ui->tableViewSubgroups->delayedRefresh(350);
 }
 

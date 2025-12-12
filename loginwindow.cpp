@@ -34,31 +34,30 @@ LoginWindow::LoginWindow(QObject*) :
     ui->graphicsLogo->setScene(logoScene);
     ui->labelAppVer->setText(QString(APP_VER_STR));
 
-    debugInitLoginOptions();
     userLocalData = new t_userSettings;
+    localSettings->read(userLocalData);
+
+    if(setDebugLoginCreds())
+    {
+        debugLoginDelay = std::make_unique<QTimer>(); // задержка нужна, чтобы автоматически выполняемые при отладке действия гарантированно запускались после вызова QApplication::exec()
+        debugLoginDelay->setSingleShot(true);
+        connect(debugLoginDelay.get(), &QTimer::timeout, this, &LoginWindow::debugLogin);
+    }
+    else
+        fillConnectionParams();
 
 //  shortlivedNotification::setSize(385, 90);
     shortlivedNotification::setAppearance(this, shortlivedNotification::bottomRight);
     statusBarDelay = new QTimer();
     statusBarDelay->setSingleShot(true);
 
-    if(debugLoginOptions)
-    {
-        debugLoginDelay = new QTimer(); // задержка нужна, чтобы автоматически выполняемые при отладке действия гарантированно запускались после вызова QApplication::exec()
-        debugLoginDelay->setSingleShot(true);
-        connect(debugLoginDelay, &QTimer::timeout, this, &LoginWindow::debugLogin);
-    }
-
     connect(statusBarDelay, SIGNAL(timeout()), this, SLOT(clearStatusLabel()));
     connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
     connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
     connect(ui->pushButtonSettingsImport, &QPushButton::clicked, this, &LoginWindow::selectAscExe);
 
-    localSettings->read(userLocalData);
     if(userLocalData->FontFamily.value.isEmpty())
         userLocalData->FontFamily.value = "Segoe UI";
-    if(!debugLoginOptions)
-        fillConnectionParams();
 }
 
 LoginWindow::~LoginWindow()
@@ -83,7 +82,7 @@ void LoginWindow::startMaintanaceTool()
 {
     QString targerUpdateVer;
     QString updateChannel ;
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery query = QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     query.exec(QUERY_SEL_UPDATE_CHANNEL);
     query.first();
@@ -111,7 +110,7 @@ void LoginWindow::startMaintanaceTool()
 void LoginWindow::show()
 {
     QWidget::show();
-    if(debugLoginOptions)
+    if(debugLoginDelay)
         debugLoginDelay->start(100);
 }
 
@@ -130,7 +129,7 @@ void LoginWindow::statusBarMsg(const QString &text, int delay)
 bool LoginWindow::checkAppVer()
 {
     QStringList appVer;
-    QSqlQuery queryCheckAppVer = QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery queryCheckAppVer = QSqlQuery(QSqlDatabase::database(TdConn::main()));
     queryCheckAppVer.exec(QUERY_SEL_APP_VER);
     queryCheckAppVer.first();
     appVer = queryCheckAppVer.value(0).toString().split('.');
@@ -148,7 +147,7 @@ bool LoginWindow::checkAppVer()
 int LoginWindow::checkSchema()
 {
     QString fileName;
-    QSqlQuery queryCheckSchema = QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery queryCheckSchema = QSqlQuery(QSqlDatabase::database(TdConn::main()));
     int i = 1;
 
     queryCheckSchema.exec(QUERY_SEL_ASC_SCHEMA_VER);
@@ -181,7 +180,7 @@ int LoginWindow::checkSchema()
 bool LoginWindow::checkProcessPriv()
 {
     bool ret = 0;
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     QString grants;
     int end;
     query->exec("SHOW GRANTS;");
@@ -209,10 +208,10 @@ bool LoginWindow::checkProcessPriv()
  */
 QStringList LoginWindow::usersOnline()
 {
-    QSqlQuery queryCheckUsersOnline = QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery queryCheckUsersOnline = QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     // запрос активных соединений
-    queryCheckUsersOnline.exec(QUERY_SEL_ACTIVE_USERS(QSqlDatabase::database("connMain").databaseName()));
+    queryCheckUsersOnline.exec(QUERY_SEL_ACTIVE_USERS(loginCreds->value("database").toString()));
     queryCheckUsersOnline.first();
     if(queryCheckUsersOnline.size())
         return queryCheckUsersOnline.value(0).toString().split(',');
@@ -238,9 +237,9 @@ bool LoginWindow::updateDB(int startFrom)
     QFile file;
     QByteArray fileContent;
     int i = startFrom;
-    QSqlQuery queryUpdate = QSqlQuery(QSqlDatabase::database("connThird"));
+    QSqlQuery queryUpdate = QSqlQuery(QSqlDatabase::database(TdConn::session()));
 
-    if (QSqlDatabase::database("connMain").userName() == "admin")  // только админ может обновлять БД
+    if (loginCreds->value("user").toString() == "admin")  // только админ может обновлять БД
     {
         qDebug() << "startFrom =" << startFrom;
         if(usersOnline().isEmpty())
@@ -308,36 +307,33 @@ void LoginWindow::closeConnections()
     }
 }
 
-void LoginWindow::debugInitLoginOptions()
+/* Инициализация контейнера с данными для подключения к БД.
+ * Возвращает 1 если контейнер инициализирован данными, заданными в debug.ini.
+*/
+bool LoginWindow::setDebugLoginCreds()
 {
     QVariant tmp;
     if(debugOptions == nullptr)
-        return;
+        return 0;
 
-    if (debugOptions->childGroups().contains("debugLogin"))
+    if (!debugOptions->childGroups().contains("debugLogin"))
+        return 0;
+
+    debugOptions->beginGroup("debugLogin");
+
+    QStringList allKeys = debugOptions->allKeys();
+    for(int i = 0; i < allKeys.size(); i++)
     {
-        debugLoginOptions = new QMap<QString, QVariant>;
-        QStringList loginCreds;
-        debugOptions->beginGroup("debugLogin");
-
-        QStringList allKeys = debugOptions->allKeys();
-        for(int i = 0; i < allKeys.size(); i++)
+        tmp = debugOptions->value(allKeys.at(i));
+        if(tmp.isValid())
         {
-            tmp = debugOptions->value(allKeys.at(i));
-            if(tmp.isValid())
-            {
-                debugLoginOptions->insert(allKeys.at(i), tmp);
-            }
-
+            loginCreds->insert(allKeys.at(i), tmp);
         }
-        debugOptions->endGroup();
 
-        if(!loginCreds.isEmpty())
-        {
-            qDebug().noquote() << "Connection creds got from " << debugOptions->property("fileName").toString() << ": " << loginCreds.join(", ");
-            appLog->appendRecord(QString("Connection creds got from %1: %2").arg(debugOptions->property("fileName").toString()).arg(loginCreds.join(", ")));
-        }
     }
+    debugOptions->endGroup();
+
+    return 1;
 }
 
 void LoginWindow::editPassword_onReturnPressed()
@@ -349,7 +345,6 @@ void LoginWindow::editPassword_onReturnPressed()
 void LoginWindow::debugLogin()
 {
     btnLoginHandler();
-    delete debugLoginDelay;
 }
 
 void LoginWindow::btnLoginHandler()
@@ -360,22 +355,14 @@ void LoginWindow::btnLoginHandler()
     QResource res;
 
     connections.clear();
-    connMain = QSqlDatabase::addDatabase("QMYSQL", "connMain");       // это соединение для получения данных (ремонты, клиенты и т. д.)
+    connMain = QSqlDatabase::addDatabase("QMYSQL", TdConn::main());       // это основное соединение; используется преимущественно для запросов SELECT
     connections.append(&connMain);
-    connNtfy = QSqlDatabase::addDatabase("QMYSQL", "connNtfy");
-    connections.append(&connNtfy);
-    connThird = QSqlDatabase::addDatabase("QMYSQL", "connThird");     // это соединение для записи данных в БД и вспом. операций
+    connThird = QSqlDatabase::addDatabase("QMYSQL", TdConn::session());   // это соединение для транзакционных запросов (BEGIN ... COMMIT)
     connections.append(&connThird);
+//    connNtfy = QSqlDatabase::addDatabase("QMYSQL", "connNtfy");
+//    connections.append(&connNtfy);
 //    connFourth = QSqlDatabase::addDatabase("QMYSQL", "connFourth"); // в АСЦ сразу четыре соединения, зачем — ХЗ; понадобятся, тогда включим.
 //    connections.append(&connFourth);
-
-
-    // паролем пользователя БД — это MD5-хэш пароля пользователя АСЦ; это сделано для того, чтобы пользователь не мог получить доступ непосредственно к базе
-    // TODO: Придумать механизм защиты (например, нестандартный инициализирующий вектор для алгоритма MD5 или другой алгоритм) с которым будет скомпилировано
-    // приложение, а любознательный пользователь, обнаруживший исходные коды проекта в Интернет, опять же не мог получить доступ непосредственно к базе
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(ui->editPassword->text().toUtf8(), ui->editPassword->text().length());
-//    qDebug() << hash.result().toHex();
 
     connOptions << ("MYSQL_OPT_RECONNECT=1") << "MYSQL_OPT_CONNECT_TIMEOUT=3";
     if(ui->checkBoxSSL->isChecked())
@@ -388,23 +375,27 @@ void LoginWindow::btnLoginHandler()
     }
     for (int i=0; i<connections.size(); i++)
     {
-        if(debugLoginOptions)
+        if(!loginCreds->contains("password")) // по наличию пароля в контейнере определяем отладочный/рабочий режим
         {
-            connections[i]->setUserName(debugLoginOptions->value("user", "user").toString());
-            connections[i]->setPassword(debugLoginOptions->value("password", "password").toString());
-            connections[i]->setHostName(debugLoginOptions->value("host", "127.0.0.2").toString());
-            connections[i]->setPort(debugLoginOptions->value("port", 3306).toInt());
-            connections[i]->setDatabaseName(debugLoginOptions->value("database", "service").toString());
+            // паролем пользователя БД — это MD5-хэш пароля пользователя АСЦ; это сделано для того, чтобы пользователь не мог получить доступ непосредственно к базе
+            // TODO: Придумать механизм защиты (например, нестандартный инициализирующий вектор для алгоритма MD5 или другой алгоритм) с которым будет скомпилировано
+            // приложение, а любознательный пользователь, обнаруживший исходные коды проекта в Интернет, опять же не мог получить доступ непосредственно к базе
+            QCryptographicHash hash(QCryptographicHash::Md5);
+            hash.addData(ui->editPassword->text().toUtf8(), ui->editPassword->text().length());
+            //    qDebug() << hash.result().toHex();
+
+            loginCreds->insert("user", ui->editLogin->text());
+            loginCreds->insert("password", hash.result().toHex());
+            loginCreds->insert("host", ui->editIPaddr->text());
+            loginCreds->insert("port", ui->editPort->text().toUInt());
+            loginCreds->insert("database", ui->editDBName->text());
         }
-        else
-        {
-            connections[i]->setUserName(ui->editLogin->text());
-            connections[i]->setPassword(hash.result().toHex());
-            connections[i]->setHostName(ui->editIPaddr->text());
-            connections[i]->setPort(ui->editPort->text().toUInt());
-            connections[i]->setDatabaseName(ui->editDBName->text());
-        }
-    connections[i]->setConnectOptions(connOptions.join(";")+";");
+        connections[i]->setUserName(loginCreds->value("user", "user").toString());
+        connections[i]->setPassword(loginCreds->value("password", "password").toString());
+        connections[i]->setHostName(loginCreds->value("host", "127.0.0.1").toString());
+        connections[i]->setPort(loginCreds->value("port", 3306).toInt());
+        connections[i]->setDatabaseName(loginCreds->value("database", "service").toString());
+        connections[i]->setConnectOptions(connOptions.join(";")+";");
     }
 
     if (!connMain.open())
@@ -417,12 +408,12 @@ void LoginWindow::btnLoginHandler()
         qDebug("DB successfully opened.");
 
         // установка режимов; начиная с MySQL v5.7.5 по умолчанию включен режим  ONLY_FULL_GROUP_BY
-        QSqlQuery querySetSqlMode = QSqlQuery(QSqlDatabase::database("connMain"));
+        QSqlQuery querySetSqlMode = QSqlQuery(QSqlDatabase::database(TdConn::main()));
         querySetSqlMode.exec("SET SESSION sql_mode = sys.list_drop(@@session.sql_mode, 'ONLY_FULL_GROUP_BY');");
 
         // проверка состояния учетной записи пользователя (база программы, а не mysql)
-        QSqlQuery queryCheckUser = QSqlQuery(QSqlDatabase::database("connMain"));
-        queryCheckUser.exec(QUERY_SEL_USER_STATE(QSqlDatabase::database("connMain").userName()));
+        QSqlQuery queryCheckUser = QSqlQuery(QSqlDatabase::database(TdConn::main()));
+        queryCheckUser.exec(QUERY_SEL_USER_STATE(loginCreds->value("user").toString()));
         queryCheckUser.first();
         try
         {

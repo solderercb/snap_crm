@@ -282,7 +282,7 @@ QString SSingleRowModel::createdStr()
 
 bool SSingleRowModel::checkSystemTime()
 {
-    auto serverTime = std::make_shared<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto serverTime = std::make_shared<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     QDateTime date;
     int secDiff;
     QString error;

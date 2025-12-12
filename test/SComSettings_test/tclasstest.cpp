@@ -137,17 +137,17 @@ void TClassTest::initTestCase()
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
 }
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
 //    QVERIFY(SSingleRowModel::checkSystemTime() == 1);
     initAuxiliaryModels();
 }
@@ -196,7 +196,7 @@ void TClassTest::test_load()
 {
 //    QSKIP("");
     auto cut = std::make_unique<SComSettings>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -225,7 +225,7 @@ void TClassTest::test_loadAndInitWidgets()
 {
 //    QSKIP("");
     auto cut = std::make_unique<SComSettings>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -287,7 +287,7 @@ void TClassTest::test_save()
 {
 //    QSKIP("");
     auto cut = std::make_unique<SComSettings>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -319,7 +319,7 @@ void TClassTest::test_updateWidgetsAndSave()
 {
 //    QSKIP("");
     auto cut = std::make_unique<SComSettings>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -370,7 +370,7 @@ void TClassTest::test_loadUpdateSave()
         return count;
     };
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);

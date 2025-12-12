@@ -9,6 +9,8 @@
 #include <SAppLog>
 #include <SComSettings>
 #include <SLocalSettings>
+#include <SCompanyModel>
+#include <SOfficeModel>
 #include <SUserSettings>
 #include <FieldFactory>
 #include <SRepairModel>
@@ -100,7 +102,7 @@ bool SReportsCommonFunctions::writeFile(QFile &file, QByteArray *data)
  */
 bool SReportsCommonFunctions::loadTemplateFromFile()
 {
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery query = QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     if(!CurrentFile.exists())
     {
@@ -136,7 +138,7 @@ bool SReportsCommonFunctions::loadTemplateFromFile()
 bool SReportsCommonFunctions::loadTemplateFromDB()
 {
     QByteArray buffer;
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery query = QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     query.exec(QUERY_SEL_DOC_TEMPL_DATA(m_reportName));
     query.first();
@@ -166,23 +168,20 @@ QStandardItemModel *SReportsCommonFunctions::initDemoModel(const QStringList &de
 
 void SReportsCommonFunctions::initDataSources()
 {
-    // Преобразование QMap<QString, QVariant> в QStandardItemModel
     m_reportDatasouces << "user";
     LimeReport::ICallbackDatasource *userDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
     QObject::connect(userDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), userDbData, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
     QObject::connect(userDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), userDbData, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
 
-    m_report->dataManager()->addModel("company", companiesModel, false);
-//    m_reportDatasouces << "company";
-//    LimeReport::ICallbackDatasource *userDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
-//    QObject::connect(companyDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), companiesModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
-//    QObject::connect(companyDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), companiesModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+    m_reportDatasouces << "company";
+    LimeReport::ICallbackDatasource *companyDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(companyDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), SCompanyModel::current(), SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(companyDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), SCompanyModel::current(), SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
 
-    m_report->dataManager()->addModel("office", officesModel, false);
-//    m_reportDatasouces << "office";
-//    LimeReport::ICallbackDatasource *userDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
-//    QObject::connect(officeDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), officesModel, SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
-//    QObject::connect(officeDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), officesModel, SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
+    m_reportDatasouces << "office";
+    LimeReport::ICallbackDatasource *officeDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
+    QObject::connect(officeDS, SIGNAL(getCallbackData(LimeReport::CallbackInfo,QVariant&)), SOfficeModel::current(), SLOT(reportCallbackData(LimeReport::CallbackInfo,QVariant&)));
+    QObject::connect(officeDS, SIGNAL(changePos(LimeReport::CallbackInfo::ChangePosType,bool&)), SOfficeModel::current(), SLOT(reportCallbackDataChangePos(LimeReport::CallbackInfo::ChangePosType,bool&)));
 
     m_reportDatasouces << "config";
     LimeReport::ICallbackDatasource *configDS = m_report->dataManager()->createCallbackDatasource(m_reportDatasouces.last());
@@ -312,7 +311,7 @@ void SReportsCommonFunctions::initItemStickerDataSources()
 
     m_reportDatasouces << "demoList";
     itemsModel = new QSqlQueryModel();
-    itemsModel->setQuery("SELECT CONCAT(LPAD(store_items.`id`, 6, '0'), '-', LPAD(store_items.`articul`, 6, '0')) AS 'UID', store_items.* FROM store_items LIMIT 2;", QSqlDatabase::database("connMain"));
+    itemsModel->setQuery("SELECT CONCAT(LPAD(store_items.`id`, 6, '0'), '-', LPAD(store_items.`articul`, 6, '0')) AS 'UID', store_items.* FROM store_items LIMIT 2;", QSqlDatabase::database(TdConn::main()));
     m_report->dataManager()->addModel(m_reportDatasouces.last(), itemsModel, true);
 }
 

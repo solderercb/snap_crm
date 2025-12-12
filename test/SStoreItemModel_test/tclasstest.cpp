@@ -105,7 +105,7 @@ void TClassTest::cleanupTestCase()
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 
@@ -134,7 +134,7 @@ void TClassTest::test_newModelFromRec()
 void TClassTest::test_sale()
 {
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     int count = 123, sold = 77, reserved = 0;
     auto loadQtys = [&](SStoreItemModel::itemQtys*& item){
@@ -147,7 +147,7 @@ void TClassTest::test_sale()
 
     auto commit = [&](std::optional<bool> &ret){
         QCOMPARE(cut->m_opOnItemType, SStoreItemModel::OpOnItem::Sale);
-        QCOMPARE(cut->cache.count(), 2);
+        QCOMPARE(cut->cache.count(), 3);
         QCOMPARE(cut->cache[SStoreItemModel::C_count]->data().toInt(), 122);
         QCOMPARE(cut->cache[SStoreItemModel::C_sold]->data().toInt(), 78);
         QCOMPARE(cut->i_logTexts.count(), 1);
@@ -170,7 +170,7 @@ void TClassTest::test_sale()
 void TClassTest::test_unsale()
 {
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     int count = 123, sold = 77, reserved = 0;
     auto loadQtys = [&](SStoreItemModel::itemQtys*& item){
@@ -183,7 +183,7 @@ void TClassTest::test_unsale()
 
     auto commit = [&](std::optional<bool> &ret){
         QCOMPARE(cut->m_opOnItemType, SStoreItemModel::OpOnItem::Unsale);
-        QCOMPARE(cut->cache.count(), 2);
+        QCOMPARE(cut->cache.count(), 3);
         QCOMPARE(cut->cache[SStoreItemModel::C_count]->data().toInt(), 124);
         QCOMPARE(cut->cache[SStoreItemModel::C_sold]->data().toInt(), 76);
         QCOMPARE(cut->i_logTexts.count(), 1);
@@ -207,7 +207,7 @@ void TClassTest::test_unsale()
 void TClassTest::test_reserve()
 {
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     int count = 123, sold = 77, reserved = 0;
     auto loadQtys = [&](SStoreItemModel::itemQtys*& item){
@@ -220,7 +220,7 @@ void TClassTest::test_reserve()
 
     auto commit = [&](std::optional<bool> &ret){
         QCOMPARE(cut->m_opOnItemType, SStoreItemModel::OpOnItem::Reserve);
-        QCOMPARE(cut->cache.count(), 1);
+        QCOMPARE(cut->cache.count(), 3);
         QCOMPARE(cut->cache[SStoreItemModel::C_reserved]->data().toInt(), 1);
         QCOMPARE(cut->i_logTexts.count(), 1);
         ret = cut->SStoreItemModel::commit();
@@ -242,7 +242,7 @@ void TClassTest::test_reserve()
 void TClassTest::test_saleStore()
 {
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     int count = 123, sold = 77, reserved = 1;
     auto loadQtys = [&](SStoreItemModel::itemQtys*& item){
@@ -280,7 +280,7 @@ void TClassTest::test_saleStore()
 void TClassTest::test_saleRepair()
 {
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     int count = 123, sold = 77, reserved = 1;
     auto loadQtys = [&](SStoreItemModel::itemQtys*& item){
@@ -318,7 +318,7 @@ void TClassTest::test_saleRepair()
 void TClassTest::test_unsaleRepair()
 {
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     int count = 123, sold = 77, reserved = 0;
     auto loadQtys = [&](SStoreItemModel::itemQtys*& item){
@@ -356,7 +356,7 @@ void TClassTest::test_unsaleRepair()
 void TClassTest::test_free()
 {
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     int count = 123, sold = 77, reserved = 5;
     auto loadQtys = [&](SStoreItemModel::itemQtys*& item){
@@ -369,7 +369,7 @@ void TClassTest::test_free()
 
     auto commit = [&](std::optional<bool> &ret){
         QCOMPARE(cut->m_opOnItemType, SStoreItemModel::OpOnItem::Free);
-        QCOMPARE(cut->cache.count(), 1);
+        QCOMPARE(cut->cache.count(), 3);
         QCOMPARE(cut->cache[SStoreItemModel::C_reserved]->data().toInt(), 4);
         QCOMPARE(cut->i_logTexts.count(), 1);
         ret = cut->SStoreItemModel::commit();
@@ -393,7 +393,7 @@ void TClassTest::test_writeOff()
 {
     QSKIP("Не реализован метод SStoreItemModelTest::writeOff()");
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
 
     cut->setDatabase(db);
@@ -411,7 +411,7 @@ void TClassTest::test_cancelWriteOff()
 {
     QSKIP("Не реализован метод SStoreItemModelTest::cancelWriteOff()");
     auto cut = prepareModel();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
 
     cut->setDatabase(db);

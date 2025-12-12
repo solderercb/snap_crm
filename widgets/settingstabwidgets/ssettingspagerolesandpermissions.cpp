@@ -34,7 +34,7 @@ SSettingsPageRolesAndPermissions::SSettingsPageRolesAndPermissions(QWidget *pare
 
 void SSettingsPageRolesAndPermissions::updateModels()
 {
-    m_roles->setQuery(QString("SELECT `name`, `description`, `id` FROM `roles` ORDER BY `name` ASC"), QSqlDatabase::database("connMain"));
+    m_roles->setQuery(QString("SELECT `name`, `description`, `id` FROM `roles` ORDER BY `name` ASC"), QSqlDatabase::database(TdConn::main()));
     m_permissionsModel->load();
 
     ui->tableViewRoles->hideColumn(2);

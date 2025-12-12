@@ -23,9 +23,10 @@ SPhoneModel *SPhonesModel::primary()
     if(m_phonesList.isEmpty())  // если в БД нет телефонных номеров клиента
     {
         SPhoneModel *dummyPhone = new SPhoneModel(this);
-        dummyPhone->set_primary();  // Первый всегда основной
-        dummyPhone->set_client(m_client);
-        add(dummyPhone);
+
+        dummyPhone->setPrimaryKey(1);
+        dummyPhone->setCacheData(SPhoneModel::C_client, m_client, SSingleRowModelBase::ModifiedField::Executed);
+        m_phonesList.append(dummyPhone);
     }
 
     return m_phonesList.first();
@@ -41,7 +42,7 @@ bool SPhonesModel::load(int client)
     clear();
 
     m_client = client;
-    auto q = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto q = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     auto dummy = std::make_unique<SPhoneModel>();
 
     QString query = dummy->fieldsForSelectQuery();

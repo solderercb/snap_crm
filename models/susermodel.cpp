@@ -65,7 +65,7 @@ void SUserModel::loadSalaryRate()
     if(m_salaryRateStartDate.isNull())
         return;
 
-    QSqlQuery *record = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *record = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     record->exec(QString("SELECT * FROM `salary_rates` WHERE `user_id` = %1 AND `start_from` <= '%2' ORDER BY `created_at` DESC LIMIT 1;").arg(id()).arg(m_salaryRateStartDate.toString("yyyy-MM-dd")));
     if(!record->first())
         return;
@@ -109,26 +109,36 @@ bool SUserModel::commit()
     return SSingleRowJModel::commit();
 }
 
-QString SUserModel::fullLongName()
+QString SUserModel::fullLongName(const QString &surname, const QString &name, const QString &patronymic)
 {
     QString ret;
-    ret = surname();
-    if(!name().isEmpty())
-        ret.append(" " + name());
-    if(!patronymic().isEmpty())
-        ret.append(" " + patronymic());
+    ret = surname;
+    if(!name.isEmpty())
+        ret.append(" " + name);
+    if(!patronymic.isEmpty())
+        ret.append(" " + patronymic);
 
     return ret;
 }
 
-QString SUserModel::fullShortName()
+QString SUserModel::fullShortName(const QString &surname, const QString &name, const QString &patronymic)
 {
     QString ret;
-    ret = surname();
-    if(!name().isEmpty())
-        ret.append(" ").append(name().front()).append(".");
-    if(!patronymic().isEmpty())
-        ret.append(" ").append(patronymic().front()).append(".");
+    ret = surname;
+    if(!name.isEmpty())
+        ret.append(" ").append(name.front()).append(".");
+    if(!patronymic.isEmpty())
+        ret.append(" ").append(patronymic.front()).append(".");
 
     return ret;
+}
+
+QString SUserModel::fullLongName()
+{
+    return fullLongName(surname(), name(), patronymic());
+}
+
+QString SUserModel::fullShortName()
+{
+    return fullShortName(surname(), name(), patronymic());
 }

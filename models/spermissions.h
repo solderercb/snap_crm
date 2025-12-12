@@ -202,7 +202,7 @@ inline SPermissions::SPermissions()
 
 inline void SPermissions::load(const QString &roles)
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     QStringList rolesList = roles.split(',');
     if(rolesList.count() == 1)
         m_currentRole = rolesList.first().toInt();
@@ -241,7 +241,7 @@ inline void SPermissions::save(const QString &name, const QString &description)
         return;
 
     QString q;
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
 
     try
     {

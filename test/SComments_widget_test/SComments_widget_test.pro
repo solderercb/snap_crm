@@ -35,6 +35,7 @@ SOURCES +=  \
     ../../widgets/splaintextedit.cpp \
     ../../widgets/stextedit.cpp \
     ../../widgets/scomments.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     global.cpp \
     applog.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
     ../../widgets/splaintextedit.h \
     ../../widgets/stextedit.h \
     ../../widgets/scomments.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     com_sql_queries.h \
     global.h \

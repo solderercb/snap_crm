@@ -29,7 +29,7 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
     logUserActivity();
 
     QString query;
-    QSqlQuery q(QSqlDatabase::database("connMain"));
+    QSqlQuery q(QSqlDatabase::database(TdConn::main()));
 
     ui->setupUi(this);
     tabReceptCartridge::guiFontChanged();
@@ -51,7 +51,7 @@ tabReceptCartridge::tabReceptCartridge(MainWindow *parent) :
 
     m_deviceClassId = q.value(0).toInt();
     query = QUERY_SEL_DEVICE_MAKERS(q.value(1).toString());
-    m_vendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    m_vendorsModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
     if(m_vendorsModel->lastError().isValid())
         Global::errorMsg(m_vendorsModel->lastError(), errQuerySelDeviceMakers);
     else if(m_vendorsModel->rowCount() == 0)
@@ -374,7 +374,7 @@ void tabReceptCartridge::closeCartridgeCardForm()
 void tabReceptCartridge::updateDevicesModel(const int id)
 {
     int vendorId = m_vendorsModel->databaseIDByRow(ui->comboBoxVendor->currentIndex());
-    m_cartridgesModel->setQuery(QUERY_SEL_CARTRIDGE_MODELS(vendorId), QSqlDatabase::database("connMain"));
+    m_cartridgesModel->setQuery(QUERY_SEL_CARTRIDGE_MODELS(vendorId), QSqlDatabase::database(TdConn::main()));
     ui->comboBoxModel->setCurrentIndex(m_cartridgesModel->rowByDatabaseID(id));
 }
 
@@ -502,7 +502,7 @@ void tabReceptCartridge::findAndAddBySerial()
     if(ui->lineEditSerial->text().isEmpty())
         return;
 
-    QSqlQuery q(QSqlDatabase::database("connMain"));
+    QSqlQuery q(QSqlDatabase::database(TdConn::main()));
     QString query;
     QStringList query_conditions;
 

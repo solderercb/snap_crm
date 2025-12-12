@@ -57,7 +57,7 @@ bool SRepairSaleItemModel::reserve()
     switch (commitedState)
     {
         case State::New:
-        case State::Requested: m_storeItem->reserve(notes()); break;
+        case State::Requested: m_storeItem->reserve(notes()); return 1;
         default: break;
     }
     if(cacheRef(C_count)->state() == ModifiedField::Updated)
@@ -107,7 +107,7 @@ bool SRepairSaleItemModel::commit()
         initMandatoryField(C_created, QDateTime::currentDateTime());
         initMandatoryField(C_fromUser, userDbData->id());
         initMandatoryField(C_toUser, userDbData->id());
-//        initMandatoryField(C_notes, tr("Выдача товара \"%1\" сотруднику %2").arg(name(), QSqlDatabase::database("connMain").userName()));
+//        initMandatoryField(C_notes, tr("Выдача товара \"%1\" сотруднику %2").arg(name(), loginCreds->value("user").toString()));
     }
 
     switch(state())

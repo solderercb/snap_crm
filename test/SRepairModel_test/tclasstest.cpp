@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <QStandardItem>
+#include <QThread>
 #include "../tdebugstuff.h"
 #include <ProjectGlobals>
 #include <SCartridgeRepairModel>
@@ -7,6 +8,108 @@
 #include "../../models/srepairmodel.h"
 #include <SLocalSettings>
 #include <SLogRecordModel>
+
+std::shared_ptr<TDebugStuff> debugStuff;
+
+class ThreadPerUser : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ThreadPerUser(int id = 0)
+        : m_id(id){};
+    ~ThreadPerUser(){
+        auto db = QSqlDatabase::database(connNameForThread());
+        db.close();
+        QSqlDatabase::removeDatabase(connNameForThread());
+    };
+public slots:
+    void init()
+    {
+        userDbData->set_id(1);
+
+        auto settings = debugStuff->debugOptions;
+        settings->beginGroup("debugLogin");
+        auto db = QSqlDatabase::addDatabase("QMYSQL", connNameForThread());
+        db.setUserName(settings->value("user").toString());
+        db.setPassword(settings->value("password").toString());
+        db.setHostName(settings->value("host").toString());
+        db.setPort(settings->value("port").toInt());
+        db.setDatabaseName(settings->value("database").toString());
+        settings->endGroup();
+
+        overrideCreds(db);
+
+        if (!db.open()) {
+            qWarning() << connNameForThread() << "open failed:" << db.lastError();
+            return;
+        }
+    };
+    bool isConnOpen(){
+        return QSqlDatabase::database(connNameForThread()).isOpen();
+    };
+    void initCUT(const int id){
+        m_cut = std::make_shared<SRepairModel>();
+        m_cut->setDatabase(QSqlDatabase::database(connNameForThread()));
+        m_cut->setPrimaryKey(id);
+        loadCUT();
+    };
+    void loadCUT(){
+        m_cut->load();
+    };
+    void setCUTLock(const bool state){
+        m_cut->lock(state);
+    };
+    void setCUTLock(const QVariant &userId, const QDateTime &time = QDateTime()){
+        m_cut->setData(SRepairModel::C_userLock, userId);
+        m_cut->setData(SRepairModel::C_lockDateTime, time);
+        m_cut->commit();
+    };
+    bool isCUTLocked(){
+        auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(connNameForThread()));
+        bool ret = m_cut->isLock();
+        return ret;
+    };
+protected:
+    QString m_conn;
+    virtual void overrideCreds(QSqlDatabase&){};
+    QString connNameForThread(){
+        return TdConn::session(); // QString("test_lock_conn_%1").arg(m_id)
+    };
+    QSqlDatabase connForThread(){
+        return QSqlDatabase::database(connNameForThread());
+    };
+private:
+    int m_id;
+    std::shared_ptr<SRepairModel> m_cut;
+};
+
+class FirstUserThread : public ThreadPerUser
+{
+public:
+    explicit FirstUserThread() : ThreadPerUser(1){};
+};
+
+class SecondUserThread : public ThreadPerUser
+{
+public:
+    explicit SecondUserThread(const QString& login, const QString& password, const int userId) :
+        ThreadPerUser(2),
+        m_login(login),
+        m_password(password),
+        m_uid(userId)
+    {
+    };
+    void overrideCreds(QSqlDatabase &db) override
+    {
+        db.setUserName(m_login);
+        db.setPassword(m_password);
+        userDbData->set_id(m_uid);
+    };
+private:
+    QString m_login;
+    QString m_password;
+    int m_uid;
+};
 
 class TClassTest : public QObject
 {
@@ -16,7 +119,6 @@ public:
     TClassTest();
     ~TClassTest();
 private:
-    std::unique_ptr<TDebugStuff> debugStuff;
     QMap<QString, QVariant> testData;
     void initAuxiliaryModels();
     QDateTime currentDateTime();
@@ -70,16 +172,16 @@ void TClassTest::initTestCase()
 //    QTextCodec *codec = QTextCodec::codecForName("UTF8");
 //    QTextCodec::setCodecForLocale(codec);
     TDebugStuff::setSettingsPath(STR(_PWD/debug.ini));
-    debugStuff = std::make_unique<TDebugStuff>();
+    debugStuff = std::make_shared<TDebugStuff>();
     debugStuff->readTestData("SRepairModel_test", testData);
 }
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
 
@@ -87,7 +189,7 @@ void TClassTest::cleanupTestCase()
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
     initAuxiliaryModels();
 }
@@ -99,7 +201,7 @@ void TClassTest::test_newModel()
     QCOMPARE(cut->cache.count(), 0);
     QCOMPARE(cut->i_logRecord->type(), SLogRecordModel::Repair);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -175,7 +277,7 @@ void TClassTest::test_stateChange()
     QVERIFY(std::abs(cut->lastStatusChanged().secsTo(now)) < 1);
     QVERIFY(std::abs(cut->lastSave().secsTo(now)) < 1);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -195,7 +297,7 @@ void TClassTest::test_informedStateChange()
     QCOMPARE(cut->i_logTexts.count(), 1);
     QCOMPARE(cut->i_logTexts.values().contains(tr("Статус информирования клиента изменён на \"%1\"").arg(notifyStatusesModel->getDisplayRole(testData.value("informStatus").toInt()))), 1);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -211,7 +313,7 @@ void TClassTest::test_boxChange()
     auto cut = std::make_unique<SRepairModel>();
 
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -247,7 +349,7 @@ void TClassTest::test_paymentsSumm()
 //    QSKIP("");
     auto cut = std::make_unique<SRepairModel>();
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);
@@ -270,7 +372,7 @@ void TClassTest::test_addPrepay()
 //    QSKIP("");
     auto cut = std::make_unique<SRepairModel>();
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->setDatabase(db);
@@ -302,7 +404,7 @@ void TClassTest::test_usersChange()
 //    QSKIP("");
     auto cut = std::make_unique<SRepairModel>();
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->setDatabase(db);
     cut->load(testData.value("id").toInt());
@@ -326,7 +428,7 @@ void TClassTest::test_diagChange()
 //    QSKIP("");
     auto cut = std::make_unique<SRepairModel>();
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->setDatabase(db);
     cut->load(testData.value("id").toInt());
@@ -353,7 +455,7 @@ void TClassTest::test_timestamps()
     QDateTime nowUtc = now.toUTC();
     auto cut = std::make_unique<SRepairModel>();
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->setDatabase(db);
     cut->load(testData.value("id").toInt());
@@ -395,61 +497,125 @@ void TClassTest::test_lock()
     int uidBackup = userDbData->id();
     QDateTime now = currentDateTime();
     QDateTime nowUtc = now.toUTC();
-    auto cut = std::make_unique<SRepairModel>();
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
-    cut->setDatabase(db);
-    cut->load(testData.value("id").toInt());
-    QVERIFY(cut->isLock() == 0);
-    debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
-    query->exec("BEGIN;");
+    query->exec(QString("UPDATE `workshop` SET `user_lock` = NULL, `lock_datetime` = NULL WHERE `id` = %1;").arg(testData.value("id").toInt()));
 
-    cut->set_lockDateTime(now);
-    cut->commit();
-    QVERIFY(cut->isLock() == 0);    // если поле lock_datetime по какой-то причине не равно NULL, а поле lock_user равно NULL, то карточка не считается заблокированной
+    // Проверка привилегии PROCESS
+    auto checkGrants = [&](){
+        bool ret = 0;
+        QString grants;
+        int end;
+        while(query->next() && !ret)
+        {
+            grants = query->value(0).toString();
+            grants.replace("GRANT ", "");
+            end = grants.indexOf(" ON *.*");
+            if(end < 0)
+                continue;
 
-    cut->set_lockDateTime(QDateTime());
-    cut->set_userLock(1);
-    cut->commit();
-    QVERIFY(cut->isLock() == 0);    // если поле lock_user не равно NULL, а поле lock_datetime по какой-то причине равно NULL, то карточка также не считается заблокированной
+            grants = grants.left(end).replace(", ", ",");
+            QStringList grantsLst = grants.split(',');
+            ret = grantsLst.contains("PROCESS") || grantsLst.contains("ALL PRIVILEGES");
+        }
+        return ret;
+    };
+    query->exec("SHOW GRANTS FOR 'admin';");
+    QVERIFY(checkGrants() == 1);
+    query->exec("SHOW GRANTS FOR 'test';");
+    QVERIFY2(checkGrants() == 1, "Для теста блокировки необходимо, чтобы пользователь 'test'@'%' обладал привилегией PROCESS");
 
-    query->exec("ROLLBACK;");   // ROLLBACK сейчас, т. к. метод SRepairModel::lock() открывает новую сессию
+    QThread* qtd1 = new QThread();
+    FirstUserThread *thread1 = new FirstUserThread();
+    thread1->moveToThread(qtd1);
+    QObject::connect(qtd1, &QThread::started, thread1, &FirstUserThread::init);
+    qtd1->start();
 
-    cut->load();    // перезагрузка модели, чтобы очистить кэш
-    userDbData->set_id(testData.value("lockUserId").toInt());    // для имитации блокировки другим пользователем
-    cut->lock(true);
-    userDbData->set_id(uidBackup);
-    QVERIFY(cut->isLock() == 0);    // карта не заблокирована, т. к. пользователь оффлайн
+    bool isOpen = 0;
+    QMetaObject::invokeMethod(thread1, "isConnOpen", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isOpen));
+    QVERIFY(isOpen == 1);
+
+    bool isLocked = 0;
+    QMetaObject::invokeMethod(thread1, "initCUT", Qt::BlockingQueuedConnection, Q_ARG(int, testData.value("id").toInt()));
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);
+
+    // если поле lock_datetime по какой-то причине не равно NULL, а поле lock_user равно NULL, то карточка не считается заблокированной
+    QMetaObject::invokeMethod(thread1, "setCUTLock", Qt::BlockingQueuedConnection, Q_ARG(QVariant, QVariant()), Q_ARG(QDateTime, now));
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);
+
+    // если поле lock_user не равно NULL, а поле lock_datetime по какой-то причине равно NULL, то карточка также не считается заблокированной
+    QMetaObject::invokeMethod(thread1, "setCUTLock", Qt::BlockingQueuedConnection, Q_ARG(QVariant, 1), Q_ARG(QDateTime, QDateTime()));
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);
+
+    QMetaObject::invokeMethod(thread1, "loadCUT", Qt::BlockingQueuedConnection);    // перезагрузка модели, чтобы очистить кэш
+    QMetaObject::invokeMethod(thread1, "setCUTLock", Qt::BlockingQueuedConnection, Q_ARG(QVariant, testData.value("lockUserId").toInt()), Q_ARG(QDateTime, now));
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);    // карта не заблокирована, т. к. другой пользователь оффлайн
 
     QVERIFY2(testData.value("lockUserPwd").toString().isEmpty() == false, "Не указан пароль пользователя 'test' в файле debug.ini");
     query->exec("# New database connection to simulate online status of the user who locked the repair is being established right now…");
-    QSqlDatabase connTestLock = QSqlDatabase::addDatabase("QMYSQL", "conn_test_lock");
-    connTestLock.setUserName(testData.value("lockUsername").toString());
-    connTestLock.setPassword(testData.value("lockUserPwd").toString());
-    connTestLock.setHostName(db.hostName());
-    connTestLock.setPort(db.port());
-    connTestLock.setDatabaseName(db.databaseName());
-    connTestLock.open();
-    QVERIFY2(connTestLock.isOpen() == 1, "Не удалось подключиться к БД пользователем 'test'");
+    QThread* qtd2 = new QThread();
+    SecondUserThread *thread2 = new SecondUserThread(
+                                        testData.value("lockUsername").toString(),
+                                        testData.value("lockUserPwd").toString(),
+                                        testData.value("lockUserId").toInt());
+    thread2->moveToThread(qtd2);
+    QObject::connect(qtd2, &QThread::started, thread2, &SecondUserThread::init);
+    qtd2->start();
+    QMetaObject::invokeMethod(thread2, "isConnOpen", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isOpen));
+    QVERIFY2(isOpen == 1, "Не удалось подключиться к БД пользователем 'test'");
 
-    QVERIFY(cut->isLock() == 1);    // карта заблокирована, пользователь онлайн
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 1);    // карта заблокирована, другой пользователь онлайн
+    QMetaObject::invokeMethod(thread2, "initCUT", Qt::BlockingQueuedConnection, Q_ARG(int, testData.value("id").toInt()));
+    QMetaObject::invokeMethod(thread2, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);    // карта не заблокирована, т. к. в `user_lock` записан id этого пользователя
+    QMetaObject::invokeMethod(thread2, "setCUTLock", Qt::BlockingQueuedConnection, Q_ARG(bool, false));
+    QMetaObject::invokeMethod(thread1, "setCUTLock", Qt::BlockingQueuedConnection, Q_ARG(bool, true));
+    QMetaObject::invokeMethod(thread2, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 1);    // карта заблокирована первым пользователем
 
-    cut->load();
-    QVERIFY(cut->lockDateTime().secsTo(now) < 5);
-    cut->lock(false);
-    QVERIFY(cut->isLock() == 0);    // карта не заблокирована, пользователь онлайн
+    QMetaObject::invokeMethod(thread1, "loadCUT", Qt::BlockingQueuedConnection);    // перезагрузка модели, чтобы очистить кэш
+    QMetaObject::invokeMethod(thread1, "setCUTLock", Qt::BlockingQueuedConnection, Q_ARG(bool, false));
+    QMetaObject::invokeMethod(thread2, "loadCUT", Qt::BlockingQueuedConnection);
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);    // карта не заблокирована
+    QMetaObject::invokeMethod(thread2, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);    // карта не заблокирована
 
-    userDbData->set_id(testData.value("lockUserId").toInt());    // для имитации блокировки другим пользователем
-    cut->lock(true);
-    userDbData->set_id(uidBackup);
-    QVERIFY(cut->isLock() == 1);    // карта заблокирована, пользователь онлайн
-    cut->set_lockDateTime(now.addSecs(-1000));
-    cut->commit();
-    QVERIFY(cut->isLock() == 0);    // карта не заблокирована (таймаут), пользователь онлайн
+    // Возможна очень редкая ситуация, когда карточка ремона открывается разными пользователями почти одновременно и запрос для
+    // блокировки от первого пользователя мог еще не выполниться, в то время когда второй проверяет блокировку; при подключении
+    // к удалённому серверу (ping timeout >5ms) и выполнению блокировки в транзакции (BEGIN ... COMMIT) этот тест выявлял
+    // описанную проблему, однако при проверке с локальным сервером задержки очень маленькие и проблема не проявлялась;
+    // теоретически, проблема может проявляться и при тормозах ПК; тест требует доработки, поэтому закомментирован.
+/*  query->exec("# проверка блокировки при почти одновременном открытии карты ремонта разными пользователями");
+    QMetaObject::invokeMethod(thread1, "loadCUT", Qt::QueuedConnection);    // при открытии карточки ремонта сперва загружаются данные таблицы `workshop`
+    QThread::msleep(2); // задержка на ответ на запрос SELECT, обработку результата и загрузку данных о блокировке
+    QMetaObject::invokeMethod(thread2, "loadCUT", Qt::QueuedConnection);    // а тем временем второй пользователь тоже открывает карточку ремонта
+    QMetaObject::invokeMethod(thread1, "setCUTLock", Qt::QueuedConnection, Q_ARG(bool, true));
+//    QThread::usleep(50); // аналогичная задержка для второго пользователя
+    QMetaObject::invokeMethod(thread2, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    if(isLocked == 0)
+        QMetaObject::invokeMethod(thread2, "setCUTLock", Qt::QueuedConnection, Q_ARG(bool, true));
+    QMetaObject::invokeMethod(thread2, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 1);    // карта заблокирована
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);    // карта не заблокирована
+*/
 
-    cut->lock(false);
+    // тайм-аут блокировки
+    query->exec("# тайм-аут блокировки");
+    QMetaObject::invokeMethod(thread2, "setCUTLock", Qt::BlockingQueuedConnection, Q_ARG(QVariant, userDbData->id()), Q_ARG(QDateTime, now.addSecs(-1000)));
+    QMetaObject::invokeMethod(thread1, "isCUTLocked", Qt::BlockingQueuedConnection, Q_RETURN_ARG(bool, isLocked));
+    QVERIFY(isLocked == 0);    // карта не заблокирована (таймаут), пользователь онлайн
+
+    qtd1->terminate();
+    qtd2->terminate();
 }
 
 void TClassTest::test_actualCosts()
@@ -457,7 +623,7 @@ void TClassTest::test_actualCosts()
 //    QSKIP("");
     auto cut = std::make_unique<SRepairModel>();
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->setDatabase(db);
     cut->setPrimaryKey(testData.value("id").toInt());

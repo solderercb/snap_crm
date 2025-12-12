@@ -33,6 +33,7 @@ class SUserSettings {
         int currentOffice() {return 1;};
     };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SUserSettings *userDbData;
 
 #endif // GLOBAL_H

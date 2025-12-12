@@ -24,6 +24,7 @@ void Global::throwError(const int type, const QString&)
     throw (ThrowType)type;
 }
 
+QMap<QString, QVariant> *loginCreds = new QMap<QString, QVariant>;
 SAppLog *appLog;
 SUserActivityModel *userActivityLog = new SUserActivityModel();
 QLocale sysLocale = QLocale::system();

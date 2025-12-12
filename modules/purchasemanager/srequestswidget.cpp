@@ -12,10 +12,10 @@ SPartsRequests::SPartsRequests(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_model = new SPartsRequestsModel(this, QSqlDatabase::database("connMain"));
+    m_model = new SPartsRequestsModel(this, QSqlDatabase::database(TdConn::main()));
     m_model->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
     ui->tableView->setModel(m_model);
-    ui->tableView->setQuery(QUERY_SEL_PARTS_REQUESTS_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setQuery(QUERY_SEL_PARTS_REQUESTS_STATIC, QSqlDatabase::database(TdConn::main()));
     ui->tableView->setGrouping(QStringList{"t1.`id`"});    // default GROUP part of query
     ui->tableView->setMinimumHeight(110);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &SPartsRequests::tableRowSelected);

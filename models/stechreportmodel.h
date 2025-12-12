@@ -26,7 +26,6 @@ class SClientModel;
     TABLE_FIELD(notes, notes, QString, 1)
 
 // Список дополнительных полей для отчетов
-// Описание смотри в sdatabaserecord_new.h
 #undef ADDITIONAL_REPORT_FIELDS
 #define ADDITIONAL_REPORT_FIELDS                                            \
     ADDITIONAL_REPORT_FIELD(client, client)                                 \

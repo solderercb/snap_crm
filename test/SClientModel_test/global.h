@@ -53,6 +53,7 @@ public:
     bool viewClientPassportData = 1;
 };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SComSettings *comSettings;
 extern SUserSettings *userDbData;
 extern SSqlQueryModel *usersModel;

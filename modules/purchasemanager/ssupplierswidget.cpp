@@ -30,7 +30,7 @@ SPartSuppliers::~SPartSuppliers()
 
 void SPartSuppliers::initModels()
 {
-    m_model = new SPartSuppliersModel(this, QSqlDatabase::database("connThird"));
+    m_model = new SPartSuppliersModel(this, QSqlDatabase::database(TdConn::session()));
     m_model->setEditStrategy(QSqlTableModel::EditStrategy::OnManualSubmit);
     connect(m_model, &SPartSuppliersModel::modelReset, this, &SPartSuppliers::modelReset);
 }
@@ -96,7 +96,7 @@ void SPartSuppliers::clearModel()
 void SPartSuppliers::copyLinks(const int id)
 {
     QSqlQueryModel *old = new QSqlQueryModel();
-    old->setQuery(QUERY_SEL_PRT_RQST_SUPPLIERS(id), QSqlDatabase::database("connMain"));
+    old->setQuery(QUERY_SEL_PRT_RQST_SUPPLIERS(id), QSqlDatabase::database(TdConn::main()));
     if(old->rowCount())
     {
         auto result = QMessageBox::question(this, tr("Копирование заявки"), tr("Скопировать ссылки?"), QMessageBox::Yes, QMessageBox::No);

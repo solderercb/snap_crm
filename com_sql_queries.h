@@ -2,6 +2,7 @@
 #define COM_SQL_QUERIES_H
 
 #include <appVer>
+#include <TdConn>
 
 #define QUERY_SEL_CLIENT_AD_TYPES           QString("SELECT `name`, `id` FROM visit_sources WHERE `enabled` ORDER BY `position` ASC;")
 #define QUERY_SEL_CLIENT_MATCH_STATIC       QString(\
@@ -452,7 +453,7 @@
                                                         "  `to_user` AS 'user',\n"\
                                                         "  `is_realization`,\n"\
                                                         "  `return_percent`,\n"\
-                                                        "  0 AS 'state',\n"\
+                                                        "  `state`,\n"\
                                                         "  `notes` AS 'notes',\n"\
                                                         "  `item_id`,\n"\
                                                         "  `in_price`,\n"\
@@ -755,7 +756,7 @@
                                                 .arg(date2)\
                                                 .arg(statuses)\
                                                 .arg(user),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_REPAIR_WORKS(id, user)    QString(                                                                                      \
                                                 "SELECT                                                                                       \n"\
@@ -778,7 +779,7 @@
                                                 )\
                                                 .arg(id)\
                                                 .arg(user),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_REPAIR_PARTS(id, user)    QString(                                                                                      \
                                                 "SELECT                                                                                       \n"\
@@ -806,7 +807,7 @@
                                                 )\
                                                 .arg(id)\
                                                 .arg(user),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_EXTRA_CHARGES(date1, date2, user)    QString(                                             \
                                                 "SELECT                                                         \n"\
@@ -824,7 +825,7 @@
                                                 .arg(date1)\
                                                 .arg(date2)\
                                                 .arg(user),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_SALE_DOCS(date1, date2, user)    QString(                                                                   \
                                                 "SELECT                                                                           \n"\
@@ -863,7 +864,7 @@
                                                 .arg(parentTab->periodBegin())\
                                                 .arg(parentTab->periodEnd())\
                                                 .arg(parentTab->employeeId()),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_SALE_PARTS(doc)    QString(                                                                                 \
                                                 "SELECT                                                                           \n"\
@@ -886,7 +887,7 @@
                                                 "  t1.`document_id` = %1"                                                            \
                                                 )\
                                                 .arg(doc),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_PARTS(user)    QString(                                                                                 \
                                                 "SELECT                                                                          \n"\
@@ -904,7 +905,7 @@
                                                 " WHERE (t1.`to_user` = %1) AND ((1 = t1.`state`) OR (2 = t1.`state`))             "\
                                                 )\
                                                 .arg(parentTab->employeeId()),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_PAYMENTS(date1, date2, user)    QString(                                                                   \
                                                 "SELECT                                                                          \n"\
@@ -933,7 +934,7 @@
                                                 .arg(date1)\
                                                 .arg(date2)\
                                                 .arg(user),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_RECEPTED_DEVICES(date1, date2, user)    QString(                                                             \
                                                 "SELECT                                                                            \n"\
@@ -949,7 +950,7 @@
                                                 .arg(date1)\
                                                 .arg(date2)\
                                                 .arg(user),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_SALARY_ISSUED_DEVICES(date1, date2, user)    QString(                                                               \
                                                 "SELECT                                                                            \n"\
@@ -967,7 +968,7 @@
                                                 .arg(date1)\
                                                 .arg(date2)\
                                                 .arg(user),\
-                                                QSqlDatabase::database("connMain")
+                                                QSqlDatabase::database(TdConn::main())
 
 #define QUERY_SEL_TECH_REPORTS_STATIC           QString(                                                                              \
                                                 "SELECT                                                                            \n"\

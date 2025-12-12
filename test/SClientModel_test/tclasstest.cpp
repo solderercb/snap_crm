@@ -83,7 +83,7 @@ void TClassTest::initAuxiliaryModels()
     clientBinaryProperties->setObjectName("clientBinaryProperties");
     clientBinaryProperties->setHorizontalHeaderLabels({"name", "bitfield", "dbField, shortName"});
 
-    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database("connMain"));
+    clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database(TdConn::main()));
     clientAdTypesList->setObjectName("clientAdTypesList");
 
     selector = new QList<QStandardItem*>();
@@ -95,8 +95,8 @@ void TClassTest::prepareDb()
 {
     QFile file;
     QByteArray fileContent;
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
-    query->exec("SHOW TRIGGERS FROM `ascapp_test`;");
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
+    query->exec("SHOW TRIGGERS FROM `snap_app_test`;");
     while(query->next())
     {
         if(query->value(0).toString().compare("balance_fuckuper") == 0)
@@ -118,16 +118,16 @@ void TClassTest::initTestCase()
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec("ROLLBACK;");
 
 }
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
     initAuxiliaryModels();
     prepareDb();
@@ -249,7 +249,7 @@ void TClassTest::test_optionsList()
 void TClassTest::test_balanceOnOff()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
@@ -290,7 +290,7 @@ void TClassTest::test_balanceOnOff()
 void TClassTest::test_updateBalance()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
@@ -360,7 +360,7 @@ void TClassTest::test_updateBalanceFail()
     if(!emulateBalanceFail)
         QSKIP("Trigger 'balance_fuckuper' not detected. Please apply the 'balance_fuckuper.sql' snippet to the test database first.");
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     query->exec(QString("# =========================================== %1").arg(__func__));
@@ -422,7 +422,7 @@ void TClassTest::test_noPermissions()
 
     auto cut = std::make_unique<SClientModel>();
     cut->setPrimaryKey(testData.value("id1").toInt());
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
     cut->initSqlQuery(db);

@@ -40,6 +40,7 @@ public:
     int rowHeight() {return 16;};
 };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SUserSettings *userDbData;
 extern SStandardItemModel *currencyListModel;
 extern SStandardItemModel *engineersModel;

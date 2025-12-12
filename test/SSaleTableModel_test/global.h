@@ -40,6 +40,8 @@ public:
     int company() {return 1;};
     int currentOffice() {return 1;};
     int rowHeight() {return 16;};
+    int payRepair(){return 50;};
+    int payRepairQuick(){return 50;};
 };
 
 class SComSettings
@@ -54,6 +56,7 @@ public:
     bool addGoodsFromWarehouse = 1;
 };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SAppLog *appLog;
 extern QLocale sysLocale;
 extern SComSettings *comSettings;

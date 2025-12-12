@@ -25,7 +25,7 @@ SComments::SComments(QWidget *parent) :
     ui->setupUi(this);
     initTableMenu();
 
-    m_query = new QSqlQuery(QSqlDatabase::database("connThird"));
+    m_query = new QSqlQuery(QSqlDatabase::database(TdConn::session()));
     commentsModel = new SCommentsModel();
     connect(commentsModel, &SCommentsModel::modelReset, this, &SComments::updateTable);
 

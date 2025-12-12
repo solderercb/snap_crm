@@ -4,7 +4,7 @@
 #include <SUserSettings>
 #include <QSqlField>
 
-STableSalaryExtraModel::STableSalaryExtraModel(QObject *parent) : SEditableBaseModel(parent, QSqlDatabase::database("connThird"))
+STableSalaryExtraModel::STableSalaryExtraModel(QObject *parent) : SEditableBaseModel(parent, QSqlDatabase::database(TdConn::session()))
 {
     setEditStrategy(OnManualSubmit);
     setTable("additional_payments");

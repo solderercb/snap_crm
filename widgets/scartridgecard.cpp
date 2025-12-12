@@ -68,7 +68,7 @@ void SCartridgeCard::initModels()
 {
     bool nErr = 1;
     QString query;
-    QSqlQuery q(QSqlDatabase::database("connMain"));
+    QSqlQuery q(QSqlDatabase::database(TdConn::main()));
 
     query = QUERY_SEL_CARTRIDGE_CAT_ID;
     QUERY_EXEC_TH(&q,nErr,query);
@@ -79,7 +79,7 @@ void SCartridgeCard::initModels()
     m_vendorsModel = new SSqlQueryModel(this);
     m_deviceClassId = q.value(0).toInt();
     query = QUERY_SEL_DEVICE_MAKERS(q.value(1).toString());
-    m_vendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    m_vendorsModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
 
     if(m_vendorsModel->lastError().isValid())
         Global::errorMsg(m_vendorsModel->lastError(), errQuerySelDeviceMakers);
@@ -109,7 +109,7 @@ void SCartridgeCard::configureWidgets()
     ui->spinBoxTonerWeight->setMaximum(500);
     ui->comboBoxColor->setModel(m_cartridgeColors);
     ui->comboBoxColor->setCurrentIndex(-1);
-    ui->tableViewMaterials->setQuery(QUERY_SEL_CARTRIDGE_MATERIALS, QSqlDatabase::database("connMain"));
+    ui->tableViewMaterials->setQuery(QUERY_SEL_CARTRIDGE_MATERIALS, QSqlDatabase::database(TdConn::main()));
 
     connect(ui->tableViewMaterials, &materialsTable::clicked, this, &SCartridgeCard::materialSelected);
     connect(ui->tableViewMaterials, &materialsTable::tonerWeightChanged, this, &SCartridgeCard::setTonerWeight);

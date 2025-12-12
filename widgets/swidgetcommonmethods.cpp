@@ -48,7 +48,7 @@ void SWidgetCommonMethods::submitCoreRoutine(const bool standAlone)
     SSingleRowModel::checkSystemTime();
 
     if(standAlone)
-        query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+        query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
 
     for(int stage = 0; stage < commitStages(); ++stage)
     {
@@ -86,7 +86,7 @@ bool SWidgetCommonMethods::submitCoreRoutineWithExceptionHandler()
     {
         if (type != Global::ThrowType::ConnLost)
         {
-            auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+            auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
             QUERY_COMMIT_ROLLBACK(query, 0);
         }
 

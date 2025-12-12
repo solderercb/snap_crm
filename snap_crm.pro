@@ -70,6 +70,7 @@ SOURCES += \
     models/scartridgematerialmodel.cpp \
     models/scartridgematerialsmodel.cpp \
     models/scartridgerepairmodel.cpp \
+    models/scompanymodel.cpp \
     models/scomsettings.cpp \
     models/seditablebasemodel.cpp \
     models/sfieldmodel.cpp \
@@ -137,6 +138,7 @@ SOURCES += \
     tabsalary.cpp \
     tabsettings.cpp \
     tabtechreports.cpp \
+    threadconnections.cpp \
     widgets/qtooltipper.cpp \
     widgets/ssaletabsettingsmenu.cpp \
     widgets/salarytabwidgets/spagesalaryextra.cpp \
@@ -265,6 +267,7 @@ HEADERS  += \
     models/scartridgematerialmodel.h \
     models/scartridgematerialsmodel.h \
     models/scartridgerepairmodel.h \
+    models/scompanymodel.h \
     models/scomsettings.h \
     models/scomsettingstypes.h \
     models/seditablebasemodel.h \
@@ -336,6 +339,7 @@ HEADERS  += \
     tabsalary.h \
     tabsettings.h \
     tabtechreports.h \
+    threadconnections.h \
     widgets/qtooltipper.h \
     widgets/ssaletabsettingsmenu.h \
     widgets/salarytabwidgets/spagesalaryextra.h \

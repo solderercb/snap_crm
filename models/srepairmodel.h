@@ -75,7 +75,6 @@ class SRepairStatusLog;
     TABLE_FIELD(termsControl, termsControl, bool, 0)
 
 // Список дополнительных полей для отчетов
-// Описание смотри в sdatabaserecord_new.h
 #undef ADDITIONAL_REPORT_FIELDS
 #define ADDITIONAL_REPORT_FIELDS                                            \
     ADDITIONAL_REPORT_FIELD(class, devClass)                                \

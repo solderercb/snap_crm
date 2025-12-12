@@ -2,6 +2,8 @@
 #include "qtestcase.h"
 #include <iostream>
 #include <QTextCodec>
+#include <TdConn>
+#include <ProjectGlobals>
 
 QString TDebugStuff::m_settingsPath;
 
@@ -19,7 +21,7 @@ void TDebugStuff::readSettings()
 
     if(!file.exists())
         QSKIP("");
-    debugOptions = std::make_unique<QSettings>(file.fileName(), QSettings::IniFormat);
+    debugOptions = std::make_shared<QSettings>(file.fileName(), QSettings::IniFormat);
     debugOptions->setIniCodec(QTextCodec::codecForName("UTF-8"));
 }
 
@@ -40,25 +42,25 @@ void TDebugStuff::connect()
             tmp = debugOptions->value(allKeys.at(i));
             if(tmp.isValid())
             {
-                debugLoginOptions.insert(allKeys.at(i), tmp);
+                loginCreds->insert(allKeys.at(i), tmp);
             }
 
         }
         debugOptions->endGroup();
 
         connections.clear();
-        connMain = QSqlDatabase::addDatabase("QMYSQL", "connMain");
+        connMain = QSqlDatabase::addDatabase("QMYSQL", TdConn::main());
         connections.append(&connMain);
-        connThird = QSqlDatabase::addDatabase("QMYSQL", "connThird");
+        connThird = QSqlDatabase::addDatabase("QMYSQL", TdConn::session());
         connections.append(&connThird);
 
         for (int i=0; i<connections.size(); i++)
         {
-            connections[i]->setUserName(debugLoginOptions.value("user", "user").toString());
-            connections[i]->setPassword(debugLoginOptions.value("password", "password").toString());
-            connections[i]->setHostName(debugLoginOptions.value("host", "127.0.0.2").toString());
-            connections[i]->setPort(debugLoginOptions.value("port", 3306).toInt());
-            connections[i]->setDatabaseName(debugLoginOptions.value("database", "service").toString());
+            connections[i]->setUserName(loginCreds->value("user", "user").toString());
+            connections[i]->setPassword(loginCreds->value("password", "password").toString());
+            connections[i]->setHostName(loginCreds->value("host", "127.0.0.1").toString());
+            connections[i]->setPort(loginCreds->value("port", 3306).toInt());
+            connections[i]->setDatabaseName(loginCreds->value("database", "service").toString());
         }
 
         for (int i = 0; i<connections.size(); i++)  // открываем соединения
@@ -66,10 +68,10 @@ void TDebugStuff::connect()
         if (connMain.open())
         {
             // установка режимов; начиная с MySQL v5.7.5 по умолчанию включен режим  ONLY_FULL_GROUP_BY
-            QSqlQuery querySetSqlMode = QSqlQuery(QSqlDatabase::database("connMain"));
+            QSqlQuery querySetSqlMode = QSqlQuery(QSqlDatabase::database(TdConn::main()));
             querySetSqlMode.exec("SET SESSION sql_mode = sys.list_drop(@@session.sql_mode, 'ONLY_FULL_GROUP_BY');");
 
-            auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+            auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
 
             query->exec("SELECT `version`, `version_snap` FROM `config` WHERE `id` = 1;");
             query->first();
@@ -105,7 +107,7 @@ bool TDebugStuff::testRecordExists(const QString &table, QMap<QString, QVariant>
         return 0;
 
     debugOptions->beginGroup(table);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     auto id = debugOptions->value("id");
 

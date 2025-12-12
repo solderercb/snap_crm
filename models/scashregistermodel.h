@@ -33,7 +33,6 @@
     TABLE_FIELD(payment_item_sign, paymentItemSign, int, 1)
 
 // Список дополнительных полей для отчетов
-// Описание смотри в sdatabaserecord_new.h
 #undef ADDITIONAL_REPORT_FIELDS
 #define ADDITIONAL_REPORT_FIELDS                                            \
     ADDITIONAL_REPORT_FIELD(invoiceNum, invoiceNum)                         \

@@ -38,7 +38,7 @@ void SDeviceMatch::findDevice()
             query_where << QUERY_SEL_DEVICE_MATCH_BY_FIELDS.arg(fieldClauses.values().join("\n      OR "));   // условие поиска по доп. полям
 
         query = QUERY_SEL_DEVICE_MATCH.arg((query_where.count()>0?query_where.join("\n  OR "):""));
-        tableModel->setQuery(query, QSqlDatabase::database("connMain"));
+        tableModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
 
         // изменяем размер столбцов под содержимое.
         // TODO: нужно бы создать свой класс с наследованием QTableView, реализовать в нём пропорциональное изменение ширин столбцов

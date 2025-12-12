@@ -30,6 +30,7 @@ SOURCES +=  \
     ../../models/sstoresaleitemmodel.cpp \
     ../../models/srepairsaleitemmodel.cpp \
     ../../models/sworkmodel.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     global.cpp \
     applog.cpp \
@@ -50,8 +51,9 @@ HEADERS += \
     ../../models/sstoresaleitemmodel.h \
     ../../models/srepairsaleitemmodel.h \
     ../../models/sworkmodel.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
-    com_sql_queries.h \
+    ../../com_sql_queries.h \
     ssqlquerymodel.h \
     sstoreitemmodel.h \
     scartridgecardmodel.h \

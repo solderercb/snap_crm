@@ -8,7 +8,7 @@
 #include <SCartridgeMaterialModel>
 
 SCartridgeMaterialsModel::SCartridgeMaterialsModel(QObject *parent) :
-    SEditableBaseModel(parent, QSqlDatabase::database("connThird"))
+    SEditableBaseModel(parent, QSqlDatabase::database(TdConn::session()))
 {
     setEditStrategy(OnManualSubmit);
     setTable("materials");

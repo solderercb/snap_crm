@@ -184,7 +184,7 @@ void SPageSalarySummary::addOldBalanceValue()
         return;
     }
 
-    QSqlQuery query(QSqlDatabase::database("connMain"));
+    QSqlQuery query(QSqlDatabase::database(TdConn::main()));
     query.exec(QString(
                "SELECT `balance` FROM salary WHERE `user_id` = %1 AND `type` = 0 ORDER BY `period_from` DESC LIMIT 1")
                .arg(parentTab->m_userModel->id()));

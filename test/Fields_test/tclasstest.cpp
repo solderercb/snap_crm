@@ -102,23 +102,23 @@ void TClassTest::initTestCase()
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec("ROLLBACK;");
 
 }
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 
 void TClassTest::test_fieldsForNewRepair()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
     auto query = std::make_shared<QSqlQuery>(db);
     std::shared_ptr<SFieldValueModel> f = nullptr;
@@ -192,7 +192,7 @@ void TClassTest::test_fieldsForNewRepair()
 void TClassTest::test_fieldsForNewRepair_commitAfterThrow()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
     auto query = std::make_shared<QSqlQuery>(db);
     std::shared_ptr<SFieldValueModel> f = nullptr;
@@ -229,7 +229,7 @@ void TClassTest::test_demo()
 {
 //    QSKIP("");
     auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
 
     cut->initDemo();
@@ -249,7 +249,7 @@ void TClassTest::test_demo()
 void TClassTest::test_loadRepairFields()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
     auto query = std::make_shared<QSqlQuery>(db);
     std::shared_ptr<SFieldValueModel> f = nullptr;
@@ -280,7 +280,7 @@ void TClassTest::test_loadRepairFields()
 void TClassTest::test_loadFieldModel()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     std::unique_ptr<SFieldModel> cut = nullptr;
     auto query = std::make_shared<QSqlQuery>(db);
     debugStuff->startSqlLog(db, __func__);
@@ -307,7 +307,7 @@ void TClassTest::test_editField()
 {
 //    QSKIP("");
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
     auto query = std::make_shared<QSqlQuery>(db);
     std::shared_ptr<SFieldValueModel> f = nullptr;
@@ -390,7 +390,7 @@ void TClassTest::test_editField_commitAfterThrow()
 {
     //    QSKIP("");
 
-        auto db = QSqlDatabase::database("connThird");
+        auto db = QSqlDatabase::database(TdConn::session());
         auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
         auto query = std::make_shared<QSqlQuery>(db);
         std::shared_ptr<SFieldValueModel> f = nullptr;
@@ -420,7 +420,7 @@ void TClassTest::test_editField_commitAfterThrow()
 void TClassTest::test_secondAttemptToEnableEdit()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
     auto query = std::make_shared<QSqlQuery>(db);
     std::shared_ptr<SFieldValueModel> f = nullptr;
@@ -445,7 +445,7 @@ void TClassTest::test_clear()
 {
 //    QSKIP("");
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto cut = std::make_unique<SFieldsModel>(std::make_unique<SRepairField>());
     auto query = std::make_shared<QSqlQuery>(db);
 

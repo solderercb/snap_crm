@@ -298,7 +298,7 @@ void SUserSettings::savePrinterSettings()
 void SUserSettings::updateLoginTimestamp()
 {
     bool nErr = 1;
-    QSqlQuery query(QSqlDatabase::database("connThird"));
+    QSqlQuery query(QSqlDatabase::database(TdConn::session()));
 
     try
     {

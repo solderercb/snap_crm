@@ -78,23 +78,19 @@ void windowsDispatcher::connectOK()
     {
         createMainWindow();
     }
-
-    if(debugLoginOptions)
-        delete debugLoginOptions;
 }
 
 void windowsDispatcher::createChooseOfficeWindow()
 {
-    if(debugLoginOptions)
-        if(debugLoginOptions->contains("office"))
+    if(loginCreds->contains("office"))
+    {
+        userDbData->set_currentOffice(loginCreds->value("office").toInt());
+        if(SOfficeModel::current()->id())
         {
-            userDbData->set_currentOffice(debugLoginOptions->value("office").toInt());
-            if(SOfficeModel::current()->id())
-            {
-                createMainWindow();
-                return;
-            }
+            createMainWindow();
+            return;
         }
+    }
 
     chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
     QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));

@@ -114,52 +114,52 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="478"/>
+        <location filename="../loginwindow.cpp" line="469"/>
         <source>Не удалось обновить базу данных.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="479"/>
+        <location filename="../loginwindow.cpp" line="470"/>
         <source>Не удалось обновить базу данных. Есть пользователи онлайн.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="480"/>
+        <location filename="../loginwindow.cpp" line="471"/>
         <source>Попытка подключения к старой версии БД. Обратитесь к администратору.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="481"/>
+        <location filename="../loginwindow.cpp" line="472"/>
         <source>Учетная запись отключена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="484"/>
+        <location filename="../loginwindow.cpp" line="475"/>
         <source>Требуется обновление программы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="488"/>
+        <location filename="../loginwindow.cpp" line="479"/>
         <source>Пользователь не обладает привилегией PROCESS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="495"/>
+        <location filename="../loginwindow.cpp" line="486"/>
         <source>Локальное время и время сервера не совпадают</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="496"/>
+        <location filename="../loginwindow.cpp" line="487"/>
         <source>Необрабатанное исключение</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="545"/>
+        <location filename="../loginwindow.cpp" line="536"/>
         <source>Select ASC application executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="547"/>
+        <location filename="../loginwindow.cpp" line="538"/>
         <source>Executable (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -835,7 +835,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../com_sql_queries.h" line="597"/>
+        <location filename="../com_sql_queries.h" line="598"/>
         <source>Ошибка целостности данных баланса (id = %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1678,42 +1678,42 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="449"/>
+        <location filename="../models/sclientmodel.cpp" line="454"/>
         <source>На балансе недостаточно средств, продолжить?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="688"/>
+        <location filename="../models/sclientmodel.cpp" line="694"/>
         <source>All</source>
         <translation>Все клиенты</translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="689"/>
+        <location filename="../models/sclientmodel.cpp" line="695"/>
         <source>Companies</source>
         <translation>Организации</translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="690"/>
+        <location filename="../models/sclientmodel.cpp" line="696"/>
         <source>Brokers</source>
         <translation>Посредники</translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="691"/>
+        <location filename="../models/sclientmodel.cpp" line="697"/>
         <source>Suppliers</source>
         <translation>Поставщики</translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="692"/>
+        <location filename="../models/sclientmodel.cpp" line="698"/>
         <source>Regulars</source>
         <translation>Постоянные клиенты</translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="693"/>
+        <location filename="../models/sclientmodel.cpp" line="699"/>
         <source>Problematic</source>
         <translation>Проблемные клиенты</translation>
     </message>
     <message>
-        <location filename="../models/sclientmodel.cpp" line="694"/>
+        <location filename="../models/sclientmodel.cpp" line="700"/>
         <source>Resellers</source>
         <translation>Реализаторы</translation>
     </message>
@@ -4545,7 +4545,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SPhonesModel</name>
     <message>
-        <location filename="../models/sphonesmodel.cpp" line="108"/>
+        <location filename="../models/sphonesmodel.cpp" line="109"/>
         <source>Номер %1 задан основным</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4568,7 +4568,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="695"/>
+        <location filename="../models/srepairmodel.cpp" line="687"/>
         <source>Результат диагностики изменён на &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4603,17 +4603,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="698"/>
+        <location filename="../models/srepairmodel.cpp" line="690"/>
         <source>Предварительная стоимость ремонта: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="699"/>
+        <location filename="../models/srepairmodel.cpp" line="691"/>
         <source>Стоимость ремонта в результатах диагностики изменёна на %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/srepairmodel.cpp" line="700"/>
+        <location filename="../models/srepairmodel.cpp" line="692"/>
         <source>Статус информирования клиента изменён на &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4975,52 +4975,52 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SStoreItemModel</name>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="355"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="360"/>
         <source>Списание %1 по причение возврата %2ед. товара %3, находившегося на реализации</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="357"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="362"/>
         <source>Списание %1 за %2ед. товара %3, находившегося на реализации, по причение отмены выдачи ремонта</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="363"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="368"/>
         <source>Зачисление %1 за %2ед. проданного товара %3, находившегося на реализации</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="383"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="388"/>
         <source>Ошибка целостности данных item_id = %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="399"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="404"/>
         <source>PriceOptionService</source>
         <translation>цена для сервиса</translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="400"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="405"/>
         <source>PriceOptionRetail</source>
         <translation>цена розница</translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="401"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="406"/>
         <source>PriceOptionWholesale</source>
         <translation>цена опт</translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="402"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="407"/>
         <source>PriceOptionWholesale2</source>
         <translation>цена опт 2</translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="403"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="408"/>
         <source>PriceOptionWholesale3</source>
         <translation>цена опт 3</translation>
     </message>
     <message>
-        <location filename="../models/sstoreitemmodel.cpp" line="404"/>
+        <location filename="../models/sstoreitemmodel.cpp" line="409"/>
         <source>PriceOptionWarranty</source>
         <translation>Гарантия</translation>
     </message>
@@ -6637,12 +6637,12 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1469"/>
+        <location filename="../models/ssaletablemodel.cpp" line="1478"/>
         <source>Успешно</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../models/ssaletablemodel.cpp" line="1470"/>
+        <location filename="../models/ssaletablemodel.cpp" line="1479"/>
         <source>Список работ и деталей сохранён</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7904,54 +7904,54 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="197"/>
+        <location filename="../tabrepair.cpp" line="193"/>
         <source>Ремонт</source>
         <comment>repair tab title</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="206"/>
+        <location filename="../tabrepair.cpp" line="202"/>
         <source>Данные не сохранены</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="206"/>
+        <location filename="../tabrepair.cpp" line="202"/>
         <source>Статус, результат диагностики, согласованная сумма или список работ и деталей не сохранены!
 Сохранить перед закрытием?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="412"/>
+        <location filename="../tabrepair.cpp" line="413"/>
         <source>было в другом СЦ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="414"/>
+        <location filename="../tabrepair.cpp" line="415"/>
         <source>данные не важны</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="416"/>
+        <location filename="../tabrepair.cpp" line="417"/>
         <source>срочный</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="418"/>
+        <location filename="../tabrepair.cpp" line="419"/>
         <source>повтор</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="420"/>
+        <location filename="../tabrepair.cpp" line="421"/>
         <source>гарантия</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="422"/>
+        <location filename="../tabrepair.cpp" line="423"/>
         <source>чек при выдаче</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabrepair.cpp" line="424"/>
+        <location filename="../tabrepair.cpp" line="425"/>
         <source>предоплата: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8748,13 +8748,13 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="426"/>
+        <location filename="../tabsale.cpp" line="425"/>
         <source>Цена ниже закупочной, продолжить?
 &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tabsale.cpp" line="461"/>
+        <location filename="../tabsale.cpp" line="460"/>
         <source>Быстрое создание клиента из формы продажи</source>
         <translation type="unfinished"></translation>
     </message>

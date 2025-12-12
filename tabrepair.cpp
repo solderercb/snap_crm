@@ -102,8 +102,6 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
     additionalFieldsModel = new SFieldsModel(std::make_unique<SRepairField>());
     statusesProxyModel = new SSortFilterProxyModel;
     statusesProxyModel->setSourceModel(comSettings->repairStatusesVariantCopy().Model);
-    connect(repairModel, &SRepairModel::modelUpdated, this, &tabRepair::updateWidgets);
-    connect(repairModel, &SRepairModel::modelUpdated, this, [=]{modelRO = repairModel->isLock();});
 
     ui->comboBoxPlace->setButtons("Clear");
     ui->comboBoxPlace->setModel(repairBoxesModel);
@@ -149,14 +147,12 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
 
     try
     {
+        checkViewPermission();
         m_repairLockUpdateTimer = new QTimer(this);
         m_repairLockUpdateTimer->setSingleShot(true);
         connect(m_repairLockUpdateTimer, &QTimer::timeout, this, [=]{setLock();});
-        checkViewPermission();
         logUserActivity();
         loadData();
-        setLock();
-        m_repairLockUpdateTimer->start(repairModel->lockTimeout()*1000);
     }
     catch(Global::ThrowType)
     {
@@ -261,9 +257,14 @@ void tabRepair::loadData()
         statusesProxyModel->setFilterRegularExpression("");
         updateStatesModel();
         setWidgetsParams(repairModel->stateId());
-        updateWidgets();
     }
-
+    modelRO = repairModel->isLock();
+    setLock();  // запрос для блокировки нужно отправить как можно раньше
+    updateWidgets();
+    // Возможна очень редкая ситуация, когда карточка ремона открывается разными пользователями почти одновременно; при разных
+    // обстоятельствах (задержка передачи по сети, тормознутость ПК и пр.) запрос для блокировки от первого пользователя мог еще
+    // не выполниться, в то время когда второй проверяет блокировку
+    // TODO: возможно, стоит добавить повторную проверку блокировки через небольшой промежуток времени и затем ещё раз обновить виджеты.
 }
 
 void tabRepair::reloadData()
@@ -430,15 +431,18 @@ void tabRepair::fillExtraInfo()
 
 void tabRepair::setLock(bool state)
 {
-    if(repairModel->isDirty())   // таймер может сработать во время выполнения какой-то операции; результат не предсказуем
-    {
-        m_repairLockUpdateTimer->start(1000);  // откладываем блокировку на x миллисекунд
-        return;
-    }
+    bool nErr = 1;
+    if(!modelRO)
+        nErr = repairModel->lock(state);
 
-    if(state && modelRO)
+    if(state && (modelRO || !nErr))
     {
         i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
+
+        // если произошел сбой выполнения запроса для блокировки
+        emit updateTabTitle(this);
+        modelRO = 1;
+
         return;
     }
 
@@ -448,10 +452,6 @@ void tabRepair::setLock(bool state)
         i_tabIcon = nullptr;
     }
 
-    if(modelRO)
-        return;
-
-    repairModel->lock(state);
     m_repairLockUpdateTimer->start(repairModel->lockTimeout()*1000);
 }
 
@@ -637,7 +637,7 @@ void tabRepair::checkViewPermission()
     int repManager = 0;
     int repEngineer = 0;
     QStringList userRoles = userDbData->roles().split(',');
-    QSqlQuery query(QSqlDatabase::database("connMain"));
+    QSqlQuery query(QSqlDatabase::database(TdConn::main()));
 
     query.exec(QUERY_SEL_REPAIR_MNGR_ENGR(repair_id));
     if(query.first())

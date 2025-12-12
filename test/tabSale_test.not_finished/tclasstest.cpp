@@ -91,16 +91,16 @@ void TClassTest::initTestCase()
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec("ROLLBACK;");
 
 }
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 

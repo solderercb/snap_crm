@@ -16,6 +16,7 @@ INCLUDEPATH += $${PWD}/include
 
 SOURCES +=  \
     ../../models/sfieldmodel.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../../widgets/scombobox.cpp \
     ../../widgets/sdateedit.cpp \
@@ -34,6 +35,7 @@ SOURCES +=  \
 
 HEADERS += \
     ../../models/sfieldmodel.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../../widgets/scombobox.h \
     ../../widgets/sdateedit.h \

@@ -23,6 +23,7 @@ SOURCES +=  \
     ../../models/slogrecordmodel.cpp \
     ../../models/srepairmodel.cpp \
     ../../models/srepairstatuslog.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../slocalsettings.cpp \
     ../tdebugstuff.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     ../../models/slogrecordmodel.h \
     ../../models/srepairmodel.h \
     ../../models/srepairstatuslog.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../slocalsettings.h \
     ../tdebugstuff.h \

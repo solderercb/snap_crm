@@ -35,7 +35,7 @@ signals:
 public:
     enum WidgetType {LineEdit = 1, ComboBox, DateEdit, dummy};
     explicit SFieldModel(QObject *parent = nullptr);
-    explicit SFieldModel(const int id, QSqlDatabase database = QSqlDatabase::database("connMain"), QObject *parent = nullptr);
+    explicit SFieldModel(const int id, QSqlDatabase database = QSqlDatabase::database(TdConn::main()), QObject *parent = nullptr);
     ~SFieldModel();
 #include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
 public:

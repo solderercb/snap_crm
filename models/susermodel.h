@@ -97,7 +97,6 @@ class SClientModel;
     TABLE_FIELD(animation, animation, QString, 0)
 
 // Список дополнительных полей для отчетов
-// Описание смотри в sdatabaserecord_new.h
 #undef ADDITIONAL_REPORT_FIELDS
 #define ADDITIONAL_REPORT_FIELDS                                            \
     ADDITIONAL_REPORT_FIELD(photo, photo)                                   \
@@ -122,6 +121,8 @@ public:
     SClientModel* clientModel();
     void setClientModel(SClientModel *model);
     bool commit() override;
+    static QString fullLongName(const QString &surname, const QString &name, const QString &patronymic);   // Фамилия Имя Отчество
+    static QString fullShortName(const QString &surname, const QString &name, const QString &patronymic);  // Фамилия И. О.
 private:
     QDate m_salaryRateStartDate;
     SClientModel* m_clientModel = nullptr;

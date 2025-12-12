@@ -22,6 +22,7 @@ SOURCES +=  \
     ../../models/ssinglerowmodel.cpp \
     ../../tabcommon.cpp \
     ../../tabsale.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../tdebugstuff.cpp \
     ../slocalsettings.cpp \
@@ -36,6 +37,7 @@ HEADERS += \
     ../../models/ssinglerowmodel.h \
     ../../tabcommon.h \
     ../../tabsale.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../tdebugstuff.h \
     ../slocalsettings.h \

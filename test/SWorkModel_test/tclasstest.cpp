@@ -112,16 +112,16 @@ void TClassTest::initTestCase()
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec("ROLLBACK;");
 
 }
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 
@@ -135,7 +135,7 @@ void TClassTest::test_newModel()
 //    QSKIP("");
 
     auto cut = std::make_unique<SWorkModel>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     cut->set_name("");
@@ -181,7 +181,7 @@ void TClassTest::test_newModel2()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::NewWork);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 11);
@@ -217,7 +217,7 @@ void TClassTest::test_noChanges()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ExistWork);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 0);
@@ -236,7 +236,7 @@ void TClassTest::test_changeNameFromEmpty()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeNameFromEmpty);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 1);
@@ -258,7 +258,7 @@ void TClassTest::test_changeName()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeName);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 1);
@@ -281,7 +281,7 @@ void TClassTest::test_changeQty()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeQty);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 1);
@@ -304,7 +304,7 @@ void TClassTest::test_changePriceFromEmpty()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangePriceFromEmpty);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 1);
@@ -326,7 +326,7 @@ void TClassTest::test_changePrice()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangePrice);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 1);
@@ -349,7 +349,7 @@ void TClassTest::test_changeEngineer()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeEngineer);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 3);
@@ -372,7 +372,7 @@ void TClassTest::test_changeWarrantyFromEmpty()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeWarrantyFromEmpty);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 1);
@@ -394,7 +394,7 @@ void TClassTest::test_changeWarranty()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeWarranty);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 1);
@@ -417,7 +417,7 @@ void TClassTest::test_changeNameAndPrice()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeNameAndPrice);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 2);
@@ -435,7 +435,7 @@ void TClassTest::test_changeEngineerAndWarranty()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ChangeEngineerAndWarranty);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 4);
@@ -454,7 +454,7 @@ void TClassTest::test_remove()
 //    QSKIP("");
 
     auto cut = prepareModel(DataSet::ExistWork);
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QCOMPARE(cut->cache.count(), 0);

@@ -22,6 +22,7 @@ SOURCES +=  \
     ../../models/sclientmodel.cpp \
     ../../models/sphonemodel.cpp \
     ../../models/sphonesmodel.cpp \
+    ../../threadconnections.cpp \
     ../../squerylog.cpp \
     ../slocalsettings.cpp \
     ../tdebugstuff.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     ../../models/sclientmodel.h \
     ../../models/sphonemodel.h \
     ../../models/sphonesmodel.h \
+    ../../threadconnections.h \
     ../../squerylog.h \
     ../slocalsettings.h \
     ../tdebugstuff.h \

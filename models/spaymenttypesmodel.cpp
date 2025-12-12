@@ -33,7 +33,7 @@ SPaymentTypesModel::SPaymentTypesModel(const int type, QObject *parent) : SStand
 void SPaymentTypesModel::loadExtraTypes(const int type, const bool loadArchive)
 {
     QList<QStandardItem*> *paymentTypeItem;
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery query = QSqlQuery(QSqlDatabase::database(TdConn::main()));
     QSqlRecord *record;
 
     query.exec(QUERY_SEL_EXTRA_PAYMENT_TYPES(type, loadArchive));

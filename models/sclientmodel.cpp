@@ -365,11 +365,11 @@ bool SClientModel::setBalanceEnabled(bool state)
 
 void SClientModel::loadBalance()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird")); // это не ошибка, используется соединение для записи в БД
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session())); // это не ошибка, используется соединение для записи в БД
     query->exec(wrapSelectQueryFields(fieldForSelectQuery(C_balance)));
     query->first();
     if(query->isValid())
-        m_record->setValue(C_balance, query->value(0));
+        setCacheData(C_balance, query->value(0), ModifiedField::Executed);
 }
 
 QString SClientModel::balanceStr()
@@ -380,7 +380,6 @@ QString SClientModel::balanceStr()
 void SClientModel::createBalanceObj()
 {
     balanceLog = new SBalanceLogRecordModel(id());
-    loadBalance();
 }
 
 SBalanceLogRecordModel *SClientModel::balanceObj()
@@ -404,13 +403,17 @@ bool SClientModel::updateBalance(const double amount, const QString &text)
         Global::throwError(Global::ThrowType::InputError);
 
     bool nErr = 1;
+
+    // загрузка актуального значения поля перед его обновлением (могло быть изменено на другой вкладке или другим пользователем)
+    loadBalance();
+
     balanceLog->set_reason(text);
     balanceLog->set_client(id());
     // Выбор офиса пользователем не предусмотрен; используется текущее значение из класса userDbData
     nErr &= balanceLog->commit(amount);
     double newAmount = balance() + amount;
 
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     checkSystemTime();
     set_balance(newAmount);
     QString q = wrapUpdateQueryPairs(fieldForUpdateQuery(C_balance) + fieldValueHandler(newAmount));
@@ -442,6 +445,8 @@ bool SClientModel::updateBalance(const double amount, const QString &text, const
 */
 bool SClientModel::balanceEnough(const double amount)
 {
+    loadBalance();
+
     if( amount < 0 && balance() >= -amount )
         return 1;
 
@@ -477,7 +482,7 @@ void SClientModel::updateRepairs(const int val)
         return;
 
     bool nErr = 1;
-    auto sql = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    auto sql = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     QString query = wrapSelectQueryFields(fieldForSelectQuery(C_repairs));
     QUERY_EXEC_TH(sql, nErr, query);
     sql->first();
@@ -494,7 +499,7 @@ void SClientModel::updatePurchases(int items)
     // в АСЦ с кол-вом покупок то ли глюк, то ли странная задумка: в таблице клиентов отображается кол-во РН, а в самой карте клиента кол-во записей в таблице store_sales
     // TODO: разобраться с этим
     bool nErr = 1;
-    auto sql = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    auto sql = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     QString query = wrapSelectQueryFields(fieldForSelectQuery(C_purchases));
     QUERY_EXEC_TH(sql, nErr, query);
     sql->first();
@@ -553,6 +558,7 @@ bool SClientModel::commit()
         initMandatoryField(C_web_password, genWebPass());
         initMandatoryField(C_creator, userDbData->id());
         initMandatoryField(C_notes, "");
+        initMandatoryField(C_adType, QVariant());
     }
 
     nErr &= SSingleRowJModel::commit();

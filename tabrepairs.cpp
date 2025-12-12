@@ -41,7 +41,7 @@ tabRepairs::tabRepairs(bool type, MainWindow *parent) :
 
     ui->tableView->setModel(repairs_table);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->tableView->setQuery(QUERY_SEL_WORKSHOP_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setQuery(QUERY_SEL_WORKSHOP_STATIC, QSqlDatabase::database(TdConn::main()));
     ui->tableView->setUniqueIdColumn(STableRepairsModel::Columns::Id);
 
     if(!permissions->receptDevices || type == 1)
@@ -344,7 +344,7 @@ void tabRepairs::lineEditSearchReturnPressed()
 {
     QString s = ui->lineEditSearch->text();
     int pos = 0;
-    QSqlQuery* num_validator = new QSqlQuery(QSqlDatabase::database("connMain"));   // запрос к БД для проверки валидности введённого номера ремонта
+    QSqlQuery* num_validator = new QSqlQuery(QSqlDatabase::database(TdConn::main()));   // запрос к БД для проверки валидности введённого номера ремонта
     QRegularExpression re("\\d+");  // только цифры
     QRegularExpressionValidator v(re, 0);
 

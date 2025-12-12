@@ -35,7 +35,7 @@ QWidget *SSettingsBase::widget(const int index)
 
 void SSettingsBase::load()
 {
-    SSingleRowModelBase::initSqlQuery(QSqlDatabase::database("connMain"));
+    SSingleRowModelBase::initSqlQuery(QSqlDatabase::database(TdConn::main()));
     SSingleRowModelBase::load();
 }
 
@@ -209,7 +209,7 @@ void SSettingsBase::save()
 {
     collectWidgetsData();
 
-    setDatabase(QSqlDatabase::database("connThird")); // переключение сессии до вызова isDirty()
+    setDatabase(QSqlDatabase::database(TdConn::session())); // переключение сессии до вызова isDirty()
 
     if(!isDirty())
         return;

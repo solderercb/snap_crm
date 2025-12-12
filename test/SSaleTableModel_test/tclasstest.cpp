@@ -59,6 +59,7 @@ private slots:
     void test_workshop_add_item();
     void test_workshop_add_item_from_basket();
     void test_workshop_removeUncommitedRow();
+    void test_workshop_add_item_from_basket_and_remove_uncommited();
     void test_workshop_sale();
     void test_workshop_unsale();
     void test_workshop_markRemoveItem();
@@ -138,17 +139,17 @@ void TClassTest::initTestCase()
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
 }
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
 //    QVERIFY(SSingleRowModel::checkSystemTime() == 1);
     initAuxiliaryModels();
 }
@@ -292,7 +293,7 @@ void TClassTest::test_store_add_item()
 {
 //    QSKIP("");
     auto cut = std::make_unique<StoreSaleModel>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     int added = 0;
 
@@ -421,7 +422,7 @@ void TClassTest::test_store_sale()
 {
 //    QSKIP("");
     auto cut = std::make_unique<StoreSaleModel>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     cut->setRowCount(0);
@@ -445,7 +446,7 @@ void TClassTest::test_store_sale()
 void TClassTest::test_store_load()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
     auto cut = std::make_unique<StoreSaleModel>();
     cut->setState(StoreSaleModel::Sold);
@@ -478,7 +479,7 @@ void TClassTest::test_store_mark_row_remove_and_unmark()
 void TClassTest::test_store_unsale()
 {
 //    QSKIP("");
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     auto cut = std::make_unique<StoreSaleModel>();
     cut->setConnection(db);
@@ -515,7 +516,7 @@ void TClassTest::test_store_signal_amount_changed()
         amountWorks = am_wk;
     };
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     auto cut = std::make_unique<StoreSaleModel>();
     connect(cut.get(), &StoreSaleModel::amountChanged, this, slot);
@@ -550,7 +551,7 @@ void TClassTest::test_store_price_col_change()
 {
 //    QSKIP("");
     auto cut = std::make_unique<StoreSaleModel>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
 
     cut->setRowCount(0);
@@ -651,7 +652,7 @@ void TClassTest::test_workshop_add_custom_work()
 {
 //    QSKIP("");
     auto cut = std::make_unique<WorkshopSaleModel>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->setEditStrategy(WorkshopSaleModel::EditStrategy::OnManualSubmit);
 
@@ -665,7 +666,7 @@ void TClassTest::test_workshop_add_work_from_pricelist()
 {
 //    QSKIP("");
     auto cut = std::make_unique<WorkshopSaleModel>();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->setEditStrategy(WorkshopSaleModel::EditStrategy::OnManualSubmit);
     cut->setRepairId(2);
@@ -707,6 +708,8 @@ void TClassTest::test_workshop_add_item()
 
     QVERIFY(work->isDirty() == 1);
     QVERIFY(item->isDirty() == 1);
+    QVERIFY(work->payRepair() != 0);
+    QVERIFY(work->payRepairQuick() != 0);
     QVERIFY(item->m_storeItem->id() != 0);
 }
 
@@ -714,11 +717,23 @@ void TClassTest::test_workshop_add_item_from_basket()
 {
 //    QSKIP("");
     auto cut = std::make_unique<WorkshopSaleModel>();
+    auto db = QSqlDatabase::database(TdConn::session());
+    cut->setConnection(db);
+    auto query = std::make_unique<QSqlQuery>(db);
     cut->setEditStrategy(WorkshopSaleModel::EditStrategy::OnManualSubmit);
     cut->setRepairId(2);
 
     cut->addItemFromBasket(testData.value("basketItemId").toInt());
     QCOMPARE(cut->rowCount(), 2); // при добавлении детали в пустую таблицу должна добавться работа
+
+    auto updatedRows = 0;
+    foreach (auto c, cut->singleRowModel(1)->cache)
+    {
+//        qDebug() << "key:" << cut->singleRowModel(1)->cache.key(c) << "; data:" << c->data() << "; state:" << c->state();
+        if(c->state() == SSingleRowModelBase::ModifiedField::Updated)
+            updatedRows++;
+    }
+    QCOMPARE(updatedRows, 2); // в незакоммиченой модели должны быть "грязными" два поля: id ремонта и статус
     cut->setData(cut->index(0, SSaleTableModel::Columns::Warranty), testData.value("warranty").toInt());
     QCOMPARE(cut->m_modified.count(), 2);
     auto work = static_cast<SWorkModel*>(cut->cacheItem(0).get());
@@ -727,6 +742,19 @@ void TClassTest::test_workshop_add_item_from_basket()
     QVERIFY(work->isDirty() == 1);
     QVERIFY(item->isDirty() == 1);
     QVERIFY(item->m_storeItem->id() != 0);
+
+    QCOMPARE(item->commitedData(SRepairSaleItemModel::C_state).value_or(-1), SRepairSaleItemModel::EngineerBasket);
+    QCOMPARE(item->m_storeItem->cache.count(), 1);  // в кэше SStoreItemModel должен быть только один элемент — primaryKey (id) в статусе Executed (4)
+//    qDebug() << "item->m_storeItem:";
+//    foreach (auto c, item->m_storeItem->cache)
+//    {
+//        qDebug() << "key:" << item->m_storeItem->cache.key(c) << "; data:" << c->data() << "; state:" << c->state();
+//    }
+    debugStuff->startSqlLog(db, __func__);
+    query->exec(QString("# =========================================== %1").arg(__func__));
+    query->exec("BEGIN;");
+    cut->commit();
+    query->exec("ROLLBACK;");
 }
 
 void TClassTest::test_workshop_removeUncommitedRow()
@@ -743,11 +771,38 @@ void TClassTest::test_workshop_removeUncommitedRow()
     QCOMPARE(cut->m_modified.count(), 0);
 }
 
+void TClassTest::test_workshop_add_item_from_basket_and_remove_uncommited()
+{
+//    QSKIP("");
+    auto cut = std::make_unique<WorkshopSaleModel>();
+    cut->setEditStrategy(WorkshopSaleModel::EditStrategy::OnManualSubmit);
+    cut->setRepairId(2);
+
+    cut->addItemFromBasket(testData.value("basketItemId").toInt());
+    QCOMPARE(cut->rowCount(), 2); // при добавлении детали в пустую таблицу должна добавться работа
+    cut->setData(cut->index(0, SSaleTableModel::Columns::Warranty), testData.value("warranty").toInt());
+    QCOMPARE(cut->m_modified.count(), 2);
+    auto work = static_cast<SWorkModel*>(cut->cacheItem(0).get());
+    auto item = static_cast<SRepairSaleItemModel*>(cut->cacheItem(1).get());
+
+    QVERIFY(work->isDirty() == 1);
+    QVERIFY(item->isDirty() == 1);
+    QVERIFY(item->m_storeItem->id() != 0);
+    QCOMPARE(item->m_storeItem->id(), 45);
+
+    cut->removeRow(1);  // удаление товара
+    QCOMPARE(cut->rowCount(), 1);
+    QVERIFY(cut->m_recordsPendingRemoveMap.count() == 0);
+    QVERIFY(item->m_storeItem->isDirty() == 0);
+    QVERIFY(item->m_storeItem->m_commitedExpense == 1);
+    QVERIFY(item->m_storeItem->m_newExpense == 1);
+}
+
 void TClassTest::test_workshop_sale()
 {
 //    QSKIP("");
     auto cut = workshopModel_with_work_and_item();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     cut->setConnection(db);
     auto query = std::make_unique<QSqlQuery>(db);
 
@@ -771,7 +826,7 @@ void TClassTest::test_workshop_unsale()
 {
 //    QSKIP("");
     auto cut = workshopModel_with_work_and_item();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     cut->setConnection(db);
     auto query = std::make_unique<QSqlQuery>(db);
 
@@ -791,7 +846,7 @@ void TClassTest::test_workshop_markRemoveItem()
 {
 //    QSKIP("");
     auto cut = workshopModel_with_work_and_item();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     cut->setConnection(db);
     auto query = std::make_unique<QSqlQuery>(db);
 
@@ -817,7 +872,7 @@ void TClassTest::test_workshop_markRemoveWork()
 {
 //    QSKIP("");
     auto cut = workshopModel_with_work_and_item();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     cut->setConnection(db);
     auto query = std::make_unique<QSqlQuery>(db);
 
@@ -844,7 +899,7 @@ void TClassTest::test_workshop_restoreMarkedRemoveItem()
 {
 //    QSKIP("");
     auto cut = workshopModel_with_work_and_item();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     cut->setConnection(db);
     auto query = std::make_unique<QSqlQuery>(db);
 
@@ -864,7 +919,7 @@ void TClassTest::test_workshop_removeWork()
 {
 //    QSKIP("");
     auto cut = workshopModel_with_work_and_item();
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     cut->setConnection(db);
     auto query = std::make_unique<QSqlQuery>(db);
 

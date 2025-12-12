@@ -82,7 +82,7 @@ void tabRepairNew::initDataModels()
 {
     repairModel = new SRepairModel(this);
     deviceClassesModel = new SSqlQueryModel();
-    deviceClassesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database("connMain"));
+    deviceClassesModel->setQuery(QUERY_SEL_DEVICES, QSqlDatabase::database(TdConn::main()));
     deviceVendorsModel = new SSqlQueryModel();
     devicesModel = new SSqlQueryModel();
     classProblemsModel = new QSqlQueryModel();
@@ -466,7 +466,7 @@ void tabRepairNew::changeDeviceClass(int index)
     classId = deviceClassesModel->databaseIDByRow(index);
 
     query = QUERY_SEL_DEVICE_MAKERS(deviceClassesModel->index(index, 2).data().toString());
-    deviceVendorsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    deviceVendorsModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
 
     if(deviceVendorsModel->lastError().isValid())
         Global::errorMsg(deviceVendorsModel->lastError(), errQuerySelDeviceMakers);
@@ -477,17 +477,17 @@ void tabRepairNew::changeDeviceClass(int index)
 
     // Заполнение модели выпадающего списка неисправностей
     query = QUERY_SEL_DEVICE_FAULTS(classId);
-    classProblemsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    classProblemsModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
     ui->comboBoxProblem->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка комплектности
     query = QUERY_SEL_DEVICE_SET(classId);
-    classIncomingSetsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    classIncomingSetsModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
     ui->comboBoxIncomingSet->setCurrentIndex(-1);
 
     // Заполнение модели выпадающего списка внешнего вида
     query = QUERY_SEL_DEVICE_EXTERIOR(classId);
-    classExteriorsModel->setQuery(query, QSqlDatabase::database("connMain"));
+    classExteriorsModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
     ui->comboBoxExterior->setCurrentIndex(-1);
 
     additionalFields->init(classId);
@@ -513,7 +513,7 @@ void tabRepairNew::changeDeviceVendor(int index)
     QString query;
 
     query = QUERY_SEL_DEVICE_MODELS.arg(deviceClassId).arg(deviceVendorId);
-    devicesModel->setQuery(query, QSqlDatabase::database("connMain"));
+    devicesModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
     ui->comboBoxDevice->setCurrentIndex(-1);
 }
 
@@ -521,7 +521,7 @@ void tabRepairNew::reloadDevicesModel()
 {
     QString current = ui->comboBoxDevice->currentText();
     QString query = devicesModel->query().lastQuery();
-    devicesModel->setQuery(query, QSqlDatabase::database("connMain"));
+    devicesModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
     ui->comboBoxDevice->setCurrentText(current);
 }
 
@@ -550,7 +550,7 @@ void tabRepairNew::fillDeviceCreds(int id)
 
     m_prevRepair = 0;
     QSqlQueryModel* queryDevice = new QSqlQueryModel();
-    queryDevice->setQuery(QUERY_SEL_DEVICE(id), QSqlDatabase::database("connMain"));
+    queryDevice->setQuery(QUERY_SEL_DEVICE(id), QSqlDatabase::database(TdConn::main()));
 
     if(queryDevice->rowCount())
     {
@@ -1106,7 +1106,7 @@ void tabRepairNew::randomFill()
         {
             if (QRandomGenerator::global()->bounded(100) > 50)  // 50/50 или берём ремонт из базы или записываем значение "из другой БД"
             { // в данном случае это просто чтобы проверка обязательных полей проходила успешно; вызова функции заполнения полей значениями предыдущего ремонта не будет (пока)
-                QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+                QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
                 query->exec(QString("SELECT `id` FROM `workshop` WHERE `state` IN (8,12,16) AND `id` < %1 ORDER BY `id` DESC LIMIT 1 ").arg(QRandomGenerator::global()->bounded(24900)));
                 query->first();
                 if(query->isValid())

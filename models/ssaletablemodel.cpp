@@ -140,7 +140,7 @@ void SSaleTableModel::addCustomWork()
             case Columns::Warranty: field->setValue(0); break;
             case Columns::User: field->setValue(userDbData->id()); break;
             case Columns::Realization: field->setValue(0); break;
-            case Columns::RetPercent: field->setValue(0); break;
+            case Columns::RetPercent: field->setValue(userDbData->payRepair()); break;
             case Columns::State: field->setValue(0); break;
             case Columns::Notes: field->setValue(""); break;
             case Columns::ItemId: field->setValue(0); break;
@@ -751,14 +751,14 @@ QString SSaleTableModel::reportPerformer()
 QSqlDatabase SSaleTableModel::loadConnection() const
 {
     if(!m_connection)
-        return QSqlDatabase::database("connMain");
+        return QSqlDatabase::database(TdConn::main());
     return *(m_connection.get());
 }
 
 QSqlDatabase SSaleTableModel::commitConnection() const
 {
     if(!m_connection)
-        return QSqlDatabase::database("connThird");
+        return QSqlDatabase::database(TdConn::session());
     return *(m_connection.get());
 }
 
@@ -1188,7 +1188,6 @@ bool WorkshopSaleModel::initSingleRowModel(const QSqlRecord &record, std::shared
     for(int i = 0; ret && (i < record.count()); i++)
     {
         QVariant value = record.value(i);
-        mapper->setExtraData(i, value);
         mapper->initSingleRowModelField(i, value);
     }
 
@@ -1271,7 +1270,17 @@ void WorkshopSaleModel::removeRow(const int row)
 void WorkshopSaleModel::markRowRemove(const int row)
 {
     auto rmUncommited = [&](const int r){
-        if(m_editStrategy == OnManualSubmit && !data(index(r, Columns::Id)).toInt())
+        bool uncommited = 0;
+        auto model = singleRowModel(r);
+        auto mapper = dynamic_cast<MapperForSingleRowModel*>(model.get());
+        if(mapper)
+        {
+            int srm_index = mapper->singleRowModelIndex(Columns::ObjId);
+            if(srm_index >= 0)
+                uncommited = !model->commitedData(srm_index).value_or(0).toInt();
+        }
+
+        if(m_editStrategy == OnManualSubmit && uncommited)
         {
             // если текущая запись еще не закоммичена, то просто удаляем её
             SSaleTableModel::removeRows(r, 1);

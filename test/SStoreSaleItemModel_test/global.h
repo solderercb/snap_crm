@@ -37,6 +37,7 @@ class SUserSettings {
         int currentOffice() {return 1;};
     };
 
+extern QMap<QString, QVariant> *loginCreds;
 extern SAppLog *appLog;
 extern QLocale sysLocale;
 extern SUserSettings *userDbData;

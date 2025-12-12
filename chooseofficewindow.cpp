@@ -39,6 +39,7 @@ void chooseOfficeWindow::accept()
     int comboBoxOfficeIndex = ui->officesComboBox->currentIndex();
     if (comboBoxOfficeIndex >= 0)
     {
+        loginCreds->insert("office", officesModel->databaseIDByRow(comboBoxOfficeIndex));
         userDbData->set_currentOffice(officesModel->databaseIDByRow(comboBoxOfficeIndex));
         emit officeChoosed();
         this->deleteLater();

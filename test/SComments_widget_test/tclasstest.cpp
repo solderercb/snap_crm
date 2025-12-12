@@ -85,17 +85,17 @@ void TClassTest::initTestCase()
 
 void TClassTest::cleanupTestCase()
 {
-    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connMain"));
+    auto query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::main()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
-    query = std::make_unique<QSqlQuery>(QSqlDatabase::database("connThird"));
+    query = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
     query->exec(QString("# =========================================== %1").arg(__func__));
     query->exec("ROLLBACK;");
 }
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
 //    QVERIFY(SSingleRowModel::checkSystemTime() == 1);
     initAuxiliaryModels();
 }
@@ -107,7 +107,7 @@ void TClassTest::test_new_widget()
     cut->setParentTab(tab.get());
     cut->setMode(SCommentModel::Repair);
 
-    auto db = QSqlDatabase::database("connMain");
+    auto db = QSqlDatabase::database(TdConn::main());
     auto query = std::make_unique<QSqlQuery>(db);
 
     QVERIFY(cut->commentsModel != nullptr);
@@ -129,7 +129,7 @@ void TClassTest::test_add_one_comment()
     cut->setParentTab(tab.get());
     cut->setMode(SCommentModel::Repair);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->commentsModel->setConnection(db);
 
@@ -161,7 +161,7 @@ void TClassTest::test_add_two_comments()
     cut->commentsModel->setObjId(1);
     cut->commentsModel->setColumnCount(4);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->commentsModel->setConnection(db);
 
@@ -200,7 +200,7 @@ void TClassTest::test_add_three_comments()
     cut->commentsModel->setObjId(1);
     cut->commentsModel->setColumnCount(4);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->commentsModel->setConnection(db);
 
@@ -242,7 +242,7 @@ void TClassTest::test_edit_comment()
     cut->setParentTab(tab.get());
     cut->setMode(SCommentModel::Repair);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->commentsModel->setConnection(db);
 
@@ -278,7 +278,7 @@ void TClassTest::test_edit_recent_comment()
     cut->setParentTab(tab.get());
     cut->setMode(SCommentModel::Repair);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->commentsModel->setConnection(db);
 
@@ -307,7 +307,7 @@ void TClassTest::test_remove_comment()
     cut->setParentTab(tab.get());
     cut->setMode(SCommentModel::Repair);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->commentsModel->setConnection(db);
 
@@ -338,7 +338,7 @@ void TClassTest::test_context_menu()
     cut->setParentTab(tab.get());
     cut->setMode(SCommentModel::Repair);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     cut->commentsModel->setConnection(db);
 

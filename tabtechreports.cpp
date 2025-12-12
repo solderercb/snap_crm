@@ -34,7 +34,7 @@ tabTechReports::tabTechReports(MainWindow *parent) :
 
     m_tableModel = new STableTechReportsModel(this);
     ui->tableView->setModel(m_tableModel);
-    ui->tableView->setQuery(QUERY_SEL_TECH_REPORTS_STATIC, QSqlDatabase::database("connMain"));
+    ui->tableView->setQuery(QUERY_SEL_TECH_REPORTS_STATIC, QSqlDatabase::database(TdConn::main()));
     ui->tableView->setUniqueIdColumn(STableTechReportsModel::Columns::Id);
     connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &tabTechReports::buttonRefreshClicked);
     connect(ui->pushButtonPrint, &QPushButton::clicked, this, &tabTechReports::buttonPrintClicked);

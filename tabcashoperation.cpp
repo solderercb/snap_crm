@@ -426,7 +426,7 @@ void tabCashOperation::updateReasonWidget()
 {
     ui->lineEditReason->setReadOnly(m_reasonRO);
     if(m_reasonRO)
-        ui->lineEditReason->setText(m_generatedReason);
+        ui->lineEditReason->setText(m_cashRegisterModel->reason());
 }
 
 void tabCashOperation::updateAmountWidget()
@@ -544,6 +544,7 @@ void tabCashOperation::updateWidgets()
     ui->checkBoxPrintCheck->setVisible(m_checkBoxPrintVisible);
     ui->comboBoxPaymentAccount->setEnabled(!m_paymentAccountRO);
     ui->toolButtonApplyPaymentSystem->hide();
+    ui->checkBoxAutoReason->setChecked(m_reasonRO);
     updateReasonWidget();
     ui->buttonRevert->setVisible(m_buttonRevertVisible);
 }
@@ -625,7 +626,6 @@ void tabCashOperation::load(const int orderId)
 
     m_orderType = m_cashRegisterModel->operationType();
     m_amount = m_cashRegisterModel->amount();
-    m_generatedReason = m_cashRegisterModel->reason();
     if(m_amount >= 0)
     {
         initPKO();
@@ -659,7 +659,7 @@ void tabCashOperation::clientModelUpdated()
 {
     m_cashRegisterModel->set_client(m_clientModel->id());
     if(m_orderId <= 0)
-        m_generatedReason = m_cashRegisterModel->constructReason(m_linkId);
+        m_cashRegisterModel->constructReason(m_linkId);
     updateReasonWidget();
 }
 
@@ -774,7 +774,7 @@ void tabCashOperation::operationTypeChanged(int index)
     {
         m_orderType = m_operationTypesModel->databaseIDByRow(index);
         m_cashRegisterModel->set_operationType(m_orderType); // необходимо сразу задать тип ордера, чтобы работал метод constructReason
-        m_generatedReason = m_cashRegisterModel->constructReason(m_linkId);
+        m_cashRegisterModel->constructReason(m_linkId);
         if(m_orderType > SCashRegisterModel::ExpCustom)
         {
             fillClientCreds(expenditureTypesModel->clientByDatabaseId(m_orderType));
@@ -971,7 +971,7 @@ void tabCashOperation::amountChanged(double amountAbs)
 
     m_amount = amountAbsToSign(amountAbs);
     m_cashRegisterModel->set_amount(m_amount);
-    m_generatedReason = m_cashRegisterModel->constructReason(m_linkId);
+    m_cashRegisterModel->constructReason(m_linkId);
     updateReasonWidget();
 }
 
@@ -1050,7 +1050,7 @@ void tabCashOperation::randomFill()
 
 void tabCashOperation::dbgRandomRepair()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     for(int j = 0; j < 3; j++)
     {
@@ -1070,7 +1070,7 @@ void tabCashOperation::dbgRandomRepair()
 
 void tabCashOperation::dbgRandomDocument(int type)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     for(int j = 0; j < 3; j++)
     {
@@ -1087,7 +1087,7 @@ void tabCashOperation::dbgRandomDocument(int type)
 
 void tabCashOperation::dbgRandomInvoice()
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
 
     for(int j = 0; j < 3; j++)
     {

@@ -43,7 +43,7 @@ void SClientInputFormBase::fillCreds(int id)
 #ifdef QT_DEBUG
 int SClientInputFormBase::randomClientIdFromDB(const QString &filterField, QVariant filterValue)
 {
-    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database("connMain"));
+    QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
     int id = 0;
     QString f;
 

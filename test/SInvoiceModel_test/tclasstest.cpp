@@ -3,6 +3,7 @@
 #include "../tdebugstuff.h"
 #include "../../models/sinvoicemodel.h"
 #include <SLogRecordModel>
+#include <ProjectGlobals>
 
 class TClassTest : public QObject
 {
@@ -46,7 +47,7 @@ void TClassTest::cleanupTestCase()
 
 void TClassTest::test_connection()
 {
-    QVERIFY(QSqlDatabase::database("connMain").isOpen() == 1);
+    QVERIFY(QSqlDatabase::database(TdConn::main()).isOpen() == 1);
     QVERIFY(SSingleRowModel::checkSystemTime() == 1);
 }
 
@@ -65,7 +66,7 @@ void TClassTest::test_query_generators()
     QMap<QString, QVariant> testData;
     debugStuff->testRecordExists("invoice", testData);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     cut->load(testData.value("id").toInt());
@@ -73,7 +74,7 @@ void TClassTest::test_query_generators()
     QCOMPARE(cut->id(), testData.value("id").toInt());
     QCOMPARE(cut->state(), SInvoiceModel::State::Payed);
 //    qDebug() << "[" << this << "] () | : " << cut->i_query->lastQuery();
-    query->exec(QString("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` LIKE '%1' AND `TABLE_NAME` LIKE 'invoice';").arg(debugStuff->debugLoginOptions.value("database").toString()));
+    query->exec(QString("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` LIKE '%1' AND `TABLE_NAME` LIKE 'invoice';").arg(loginCreds->value("database").toString()));
     QVERIFY(query->size() == cut->m_namesMap->count());
     QVERIFY(cut->isIndexValid(cut->size()) == 0);
     QVERIFY(cut->isIndexValid(SInvoiceModel::C_type) == 1);
@@ -107,7 +108,7 @@ void TClassTest::test_extra_fields()
     QMap<QString, QVariant> testData;
     debugStuff->testRecordExists("invoice", testData);
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
     cut->load(testData.value("id").toInt());
@@ -131,7 +132,7 @@ void TClassTest::test_commit()
     cut->set_total(testData.value("total").toDouble());
     cut->set_notes("test_notes");
 
-    auto db = QSqlDatabase::database("connThird");
+    auto db = QSqlDatabase::database(TdConn::session());
     auto query = std::make_unique<QSqlQuery>(db);
     query->exec(QString("# =========================================== %1").arg(__func__));
 

@@ -35,7 +35,7 @@ private:
     QSqlDatabase connNtfy;
     QSqlDatabase connThird;
 //    QSqlDatabase connFourth;
-    QTimer *debugLoginDelay;
+    std::unique_ptr<QTimer> debugLoginDelay;
     void statusBarMsg(const QString&, int delay = 2500);
     QTimer *statusBarDelay;
     SSLOptionsDialog *modalWidget;
@@ -47,7 +47,7 @@ private:
     QStringList usersOnline();
     bool updateDB(int);
     void closeConnections();
-    void debugInitLoginOptions();
+    bool setDebugLoginCreds();
     void fillConnectionParams();
     void startMaintanaceTool();
 public slots:
