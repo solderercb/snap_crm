@@ -20,13 +20,20 @@ SPhonesModel::~SPhonesModel()
 
 SPhoneModel *SPhonesModel::primary()
 {
-    if(m_phonesList.isEmpty())  // если в БД нет телефонных номеров клиента
+    if(m_phonesList.isEmpty())
     {
         SPhoneModel *dummyPhone = new SPhoneModel(this);
 
-        dummyPhone->setPrimaryKey(1);
-        dummyPhone->setCacheData(SPhoneModel::C_client, m_client, SSingleRowModelBase::ModifiedField::Executed);
-        m_phonesList.append(dummyPhone);
+        if(m_client)   // если в БД нет телефонных номеров клиента
+        {
+            dummyPhone->setPrimaryKey(1);
+            dummyPhone->setCacheData(SPhoneModel::C_client, m_client, SSingleRowModelBase::ModifiedField::Executed); // чтобы модель осталась чистой после вызова SPhonesModel::add()
+        }
+        else    // если новый клиент
+        {
+            dummyPhone->set_primary();  // Первый всегда основной
+        }
+        add(dummyPhone);
     }
 
     return m_phonesList.first();

@@ -55,6 +55,7 @@ LoginWindow::LoginWindow(QObject*) :
     connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
     connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
     connect(ui->pushButtonSettingsImport, &QPushButton::clicked, this, &LoginWindow::selectAscExe);
+    connect(ui->editDBName, &QLineEdit::returnPressed, this, &LoginWindow::btnLoginHandler);
 
     if(userLocalData->FontFamily.value.isEmpty())
         userLocalData->FontFamily.value = "Segoe UI";
@@ -313,6 +314,7 @@ void LoginWindow::closeConnections()
 bool LoginWindow::setDebugLoginCreds()
 {
     QVariant tmp;
+    QStringList creds = {"user", "password", "host", "port", "database"};
     if(debugOptions == nullptr)
         return 0;
 
@@ -328,10 +330,19 @@ bool LoginWindow::setDebugLoginCreds()
         if(tmp.isValid())
         {
             loginCreds->insert(allKeys.at(i), tmp);
+            creds.removeOne(allKeys.at(i));
         }
-
     }
     debugOptions->endGroup();
+
+    if(creds.contains("port"))
+    {
+        loginCreds->insert("port", 3306);
+        creds.removeOne("port");
+    }
+
+    if(creds.empty())
+        loginCreds->insert("isDebug", 1);
 
     return 1;
 }
@@ -375,7 +386,7 @@ void LoginWindow::btnLoginHandler()
     }
     for (int i=0; i<connections.size(); i++)
     {
-        if(!loginCreds->contains("password")) // по наличию пароля в контейнере определяем отладочный/рабочий режим
+        if(!loginCreds->contains("isDebug"))
         {
             // паролем пользователя БД — это MD5-хэш пароля пользователя АСЦ; это сделано для того, чтобы пользователь не мог получить доступ непосредственно к базе
             // TODO: Придумать механизм защиты (например, нестандартный инициализирующий вектор для алгоритма MD5 или другой алгоритм) с которым будет скомпилировано

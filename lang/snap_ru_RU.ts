@@ -114,52 +114,52 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="469"/>
+        <location filename="../loginwindow.cpp" line="480"/>
         <source>Не удалось обновить базу данных.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="470"/>
+        <location filename="../loginwindow.cpp" line="481"/>
         <source>Не удалось обновить базу данных. Есть пользователи онлайн.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="471"/>
+        <location filename="../loginwindow.cpp" line="482"/>
         <source>Попытка подключения к старой версии БД. Обратитесь к администратору.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="472"/>
+        <location filename="../loginwindow.cpp" line="483"/>
         <source>Учетная запись отключена</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="475"/>
+        <location filename="../loginwindow.cpp" line="486"/>
         <source>Требуется обновление программы</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="479"/>
+        <location filename="../loginwindow.cpp" line="490"/>
         <source>Пользователь не обладает привилегией PROCESS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="486"/>
+        <location filename="../loginwindow.cpp" line="497"/>
         <source>Локальное время и время сервера не совпадают</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="487"/>
+        <location filename="../loginwindow.cpp" line="498"/>
         <source>Необрабатанное исключение</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="536"/>
+        <location filename="../loginwindow.cpp" line="547"/>
         <source>Select ASC application executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../loginwindow.cpp" line="538"/>
+        <location filename="../loginwindow.cpp" line="549"/>
         <source>Executable (*.exe)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4545,7 +4545,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SPhonesModel</name>
     <message>
-        <location filename="../models/sphonesmodel.cpp" line="109"/>
+        <location filename="../models/sphonesmodel.cpp" line="116"/>
         <source>Номер %1 задан основным</source>
         <translation type="unfinished"></translation>
     </message>
