@@ -93,10 +93,10 @@ void SCartridgeForm::configureWidgets()
     connect(ui->toolButtonRemove, &QToolButton::clicked, this, &SCartridgeForm::removeWidget);
     ui->comboBoxState->view()->setMinimumWidth(230);
     ui->labelRepeatWarranty->setVisible(false);
-    initWorksMenu();
 
     if(m_repairId)
     {
+        initWorksMenu();
         m_lineEditStyleSheet.replace("background: #FFFFFF;", "background-color: rgba(255, 255, 255, 0);");
         m_spinBoxStyleSheet.replace("background: #FFFFFF;", "background-color: rgba(255, 255, 255, 0);");
         ui->lineEditSerial->setStyleSheet(m_lineEditStyleSheet);
