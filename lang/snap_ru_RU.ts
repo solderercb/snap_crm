@@ -1154,21 +1154,21 @@
     <message>
         <location filename="../widgets/scartridgeform.ui" line="429"/>
         <location filename="../widgets/scartridgeform.ui" line="464"/>
-        <location filename="../widgets/scartridgeform.cpp" line="405"/>
+        <location filename="../widgets/scartridgeform.cpp" line="406"/>
         <source>Фотовал</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../widgets/scartridgeform.ui" line="480"/>
         <location filename="../widgets/scartridgeform.ui" line="677"/>
-        <location filename="../widgets/scartridgeform.cpp" line="400"/>
+        <location filename="../widgets/scartridgeform.cpp" line="401"/>
         <source>Чип</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../widgets/scartridgeform.ui" line="629"/>
         <location filename="../widgets/scartridgeform.ui" line="864"/>
-        <location filename="../widgets/scartridgeform.cpp" line="410"/>
+        <location filename="../widgets/scartridgeform.cpp" line="411"/>
         <source>Ракель</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1220,17 +1220,17 @@
     <message>
         <location filename="../widgets/scartridgeform.ui" line="832"/>
         <location filename="../widgets/scartridgeform.ui" line="896"/>
-        <location filename="../widgets/scartridgeform.cpp" line="395"/>
+        <location filename="../widgets/scartridgeform.cpp" line="396"/>
         <source>Заправка</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="254"/>
+        <location filename="../widgets/scartridgeform.cpp" line="255"/>
         <source>Повтор</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/scartridgeform.cpp" line="257"/>
+        <location filename="../widgets/scartridgeform.cpp" line="258"/>
         <source>Гарантия</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2407,7 +2407,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/sdialogissuerepair.cpp" line="386"/>
+        <location filename="../widgets/sdialogissuerepair.cpp" line="387"/>
         <source>Списание %1 за ремонт №%2</source>
         <translation type="unfinished"></translation>
     </message>

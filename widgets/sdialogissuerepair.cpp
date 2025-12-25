@@ -366,7 +366,8 @@ void SDialogIssueRepair::commit(const int stage)
         {
             case Global::RepStateIds::ReadyNoRepair:    // выдача без ремонта с оплатой (например, оплата диагностики)
             case Global::RepStateIds::ReadyNoRepair | AmountZero:
-            case Global::RepStateIds::ReadyNoRepair | InCredit: newState = Global::RepStateIds::ReturnedNoRepair; break;
+            case Global::RepStateIds::ReadyNoRepair | InCredit:
+            case Global::RepStateIds::ReadyNoRepair | AmountZero | InCredit: newState = Global::RepStateIds::ReturnedNoRepair; break;
             case Global::RepStateIds::GetIn | QuickRepair:
             case Global::RepStateIds::Ready:
             case Global::RepStateIds::Ready | QuickRepair:  // этот вариант на тот случай, если в каком-то ремонте по ошибке установлена галочка "Быстрый ремонт" (например, из-за косяков предыдущих ревизий)

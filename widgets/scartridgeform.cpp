@@ -93,6 +93,7 @@ void SCartridgeForm::configureWidgets()
     connect(ui->toolButtonRemove, &QToolButton::clicked, this, &SCartridgeForm::removeWidget);
     ui->comboBoxState->view()->setMinimumWidth(230);
     ui->labelRepeatWarranty->setVisible(false);
+    initWorksMenu();
 
     if(m_repairId)
     {
@@ -248,7 +249,7 @@ void SCartridgeForm::updateWidgets()
     updateStatesModel();
     updateWidgetsFlagsToState();
     updateWorksCheckBoxes();
-    updateWorksMenu();
+    updateWorksActionsCheckedState();
     ui->labelRepeatWarranty->setVisible(false);
     if(m_repair->isRepeat() || m_prevRepairsCount)
         updateLabelRepeatWarranty(tr("Повтор"));
@@ -652,7 +653,7 @@ void SCartridgeForm::beginSaveState(const int stateId)
     m_repair->set_stateId(stateId);
 }
 
-void SCartridgeForm::updatePreagreedAmount(SCartridgeMaterialModel *material, const bool state)
+void SCartridgeForm::updatePreagreedAmount(std::shared_ptr<SCartridgeMaterialModel> material, const bool state)
 {
     m_amount = 0;
     preagreedAmounts.insert(material->type(), (material->price()+material->worksPrice())*(state?1:0));
@@ -783,11 +784,10 @@ bool SCartridgeForm::checkWorkMaterialItemCount()
         }
     }
 
-    SCartridgeMaterialModel *material;
+    m_workMaterialItemId = 0;
+    auto material =  m_cartridgeCard->material((SWorkModel::Type)m_workType);
     auto workMaterial = std::make_unique<QSqlQuery>(QSqlDatabase::database(TdConn::session()));
 
-    m_workMaterialItemId = 0;
-    material =  m_cartridgeCard->material((SWorkModel::Type)m_workType);
     if(material->articul()) // если артикул не задан, подразумевается работа без склада
     {
         workMaterial->exec(QUERY_SEL_CARTRIDGE_MATERIAL(material->articul(), material->count()));
@@ -807,9 +807,8 @@ void SCartridgeForm::beginAddWorkAndPart()
 {
     int rowWork = m_BOQModel->rowCount();
     int rowItem = -1;
-    SCartridgeMaterialModel *material;
+    auto material =  m_cartridgeCard->material((SWorkModel::Type)m_workType);
 
-    material =  m_cartridgeCard->material((SWorkModel::Type)m_workType);
     m_BOQModel->addCustomWork();
     m_BOQModel->setData(m_BOQModel->index(rowWork, SSaleTableModel::Columns::Name), material->workName());
     m_BOQModel->setData(m_BOQModel->index(rowWork, SSaleTableModel::Columns::Count), 1);
@@ -983,28 +982,28 @@ void SCartridgeForm::saveTotalSumms()
 
 void SCartridgeForm::setRefill(bool state)
 {
-    SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Toner);
+    auto material = m_cartridgeCard->material(SCartridgeMaterialModel::Toner);
     if(material)
         updatePreagreedAmount(material, state);
 }
 
 void SCartridgeForm::setChipReplace(bool state)
 {
-    SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Chip);
+    auto material = m_cartridgeCard->material(SCartridgeMaterialModel::Chip);
     if(material)
         updatePreagreedAmount(material, state);
 }
 
 void SCartridgeForm::setDrumReplace(bool state)
 {
-    SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Drum);
+    auto material = m_cartridgeCard->material(SCartridgeMaterialModel::Drum);
     if(material)
         updatePreagreedAmount(material, state);
 }
 
 void SCartridgeForm::setBladeReplace(bool state)
 {
-    SCartridgeMaterialModel *material = m_cartridgeCard->material(SCartridgeMaterialModel::Blade);
+    auto material = m_cartridgeCard->material(SCartridgeMaterialModel::Blade);
     if(material)
         updatePreagreedAmount(material, state);
 }
@@ -1101,10 +1100,10 @@ void SCartridgeForm::updateComment()
 
 void SCartridgeForm::initWorksMenu()
 {
-    QMenu *works_menu = new QMenu();
+    QMenu *works_menu = new QMenu(this);
     QMetaEnum types = SWorkModel::staticMetaObject.enumerator(SWorkModel::staticMetaObject.indexOfEnumerator("Type"));
     SWorkModel::Type type;
-    SCartridgeMaterialModel *material;
+    std::shared_ptr<SCartridgeMaterialModel> material;
 
     for(int i = SWorkModel::Type::CartridgeReplaceOfWorn; i < types.keyCount(); i++)
     {
@@ -1134,6 +1133,7 @@ void SCartridgeForm::updateWorksMenu()
 {
     QMenu *menu = ui->toolButtonOtherWorksMenu->menu();
 
+    // TODO: сделать обновление вместо замены на новый объект
     initWorksMenu();
 
     if(menu)

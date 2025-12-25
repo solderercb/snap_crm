@@ -41,13 +41,13 @@ void SCartridgeCardModel::loadError(const int type)
 void SCartridgeCardModel::initMaterials()
 {
     QSqlQuery query(QSqlDatabase::database(TdConn::main()));
-    SCartridgeMaterialModel *material;
+    std::shared_ptr<SCartridgeMaterialModel> material;
 
     removeMaterials();
     query.exec(QString("SELECT `id` FROM `materials` WHERE `card_id` = %1;").arg(id()));
     while(query.next())
     {
-        material = new SCartridgeMaterialModel();
+        material = std::make_shared<SCartridgeMaterialModel>();
         material->setInitializerCardId(id());
         material->load(query.value(0).toInt());
         m_materials.insert(material->type(), material);
@@ -56,14 +56,7 @@ void SCartridgeCardModel::initMaterials()
 
 void SCartridgeCardModel::removeMaterials()
 {
-    SCartridgeMaterialModel *material;
-
-    while(!m_materials.isEmpty())
-    {
-        material = m_materials.last();
-        m_materials.remove(m_materials.lastKey());
-        delete material;
-    }
+    m_materials.clear();
 }
 
 bool SCartridgeCardModel::commit()
@@ -87,12 +80,12 @@ bool SCartridgeCardModel::commit()
  * позволит предупредить мастера/приёмщика/клиента о превывшении ресурса
  */
 
-SCartridgeMaterialModel *SCartridgeCardModel::material(const SCartridgeMaterialModel::Type type)
+std::shared_ptr<SCartridgeMaterialModel> SCartridgeCardModel::material(const SCartridgeMaterialModel::Type type)
 {
     return m_materials.value(type, nullptr);
 }
 
-SCartridgeMaterialModel *SCartridgeCardModel::material(const SWorkModel::Type type)
+std::shared_ptr<SCartridgeMaterialModel> SCartridgeCardModel::material(const SWorkModel::Type type)
 {
     switch(type)
     {

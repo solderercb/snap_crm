@@ -28,16 +28,17 @@ public:
     ~SCartridgeCardModel();
 #include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
 public:
+    using SSingleRowModel::load;
     void load(const int id);
     void loadError(const int type);
     void initMaterials();
     void removeMaterials();
     bool commit();
-    SCartridgeMaterialModel *material(const SCartridgeMaterialModel::Type type);
-    SCartridgeMaterialModel *material(const SWorkModel::Type type);
+    std::shared_ptr<SCartridgeMaterialModel> material(const SCartridgeMaterialModel::Type type);
+    std::shared_ptr<SCartridgeMaterialModel> material(const SWorkModel::Type type);
     bool isMaterialSet(const int type);
 private:
-    QMap<int, SCartridgeMaterialModel*> m_materials;
+    QMap<int, std::shared_ptr<SCartridgeMaterialModel>> m_materials;
 };
 
 #endif // SCARTRIDGECARDMODEL_H

@@ -107,7 +107,7 @@ private:
     void updateLabelRepeatWarranty(const QString text);
     void updateStatesModel();
     void beginSaveState(const int stateId);
-    void updatePreagreedAmount(SCartridgeMaterialModel *material, const bool state);
+    void updatePreagreedAmount(std::shared_ptr<SCartridgeMaterialModel> material, const bool state);
     void setDefaultStyleSheets();
     void updateWidgetsFlagsToState();
     bool checkStateAcl(const int);
