@@ -251,6 +251,13 @@ int SPageSalarySummary::checkInput()
         return 1;
     }
 
+    if(((m_paymentType == SSalaryModel::Salary) && (ui->doubleSpinBoxSalarySumm->value() == 0) && (m_earningSinceLastPay == 0)) ||
+       ((m_paymentType == SSalaryModel::Subsistence) && (ui->doubleSpinBoxSubsistenceSumm->value() == 0)))
+    {
+        new shortlivedNotification(this, tr("Ошибка"), tr("Указана неправильная сумма"), QColor("#FFC7AD"), QColor("#FFA477"));
+        return 1;
+    }
+
     if(m_paymentType == SSalaryModel::Salary && ui->doubleSpinBoxSalarySumm->value() != m_earningSinceLastPay)
     {
         int tmp = createUserClientCardMsgBox();
@@ -364,10 +371,10 @@ void SPageSalarySummary::commitPayment()
         {
             QString reason;
             if(amount > m_earningSinceLastPay)
-                reason = tr("Списание средств с баланса сотрудника-клиента при выплате заработной платы");
+                reason = tr("Списание средств с баланса сотрудника-клиента при выплате заработной платы в размере %amount%");
             else
-                reason = tr("Зачисление разницы заработка и выплаченной суммы на баланс сотрудника-клиента");
-            m_userClient->updateBalance(m_earningSinceLastPay - amount, reason);
+                reason = tr("Зачисление разницы заработка и выплаченной суммы на баланс сотрудника-клиента в размере %amount%");
+            m_userClient->updateBalance(m_earningSinceLastPay - amount, reason.replace("%amount%", sysLocale.toCurrencyString(abs(m_earningSinceLastPay - amount))));
             salaryModel->set_balanceRecord(m_userClient->balanceObj()->id());
             salaryModel->commit();
         }

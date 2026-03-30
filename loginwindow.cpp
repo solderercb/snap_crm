@@ -51,9 +51,9 @@ LoginWindow::LoginWindow(QObject*) :
     statusBarDelay = new QTimer();
     statusBarDelay->setSingleShot(true);
 
-    connect(statusBarDelay, SIGNAL(timeout()), this, SLOT(clearStatusLabel()));
-    connect(ui->btnLogin,SIGNAL(clicked()),this,SLOT(btnLoginHandler()));
-    connect(ui->btnCancel,SIGNAL(clicked()),this,SLOT(btnCancelHandler()));
+    connect(statusBarDelay, &QTimer::timeout, this, &LoginWindow::clearStatusLabel);
+    connect(ui->btnLogin, &QPushButton::clicked, this, &LoginWindow::btnLoginHandler);
+    connect(ui->btnCancel, &QPushButton::clicked, this, &LoginWindow::btnCancelHandler);
     connect(ui->pushButtonSettingsImport, &QPushButton::clicked, this, &LoginWindow::selectAscExe);
     connect(ui->editDBName, &QLineEdit::returnPressed, this, &LoginWindow::btnLoginHandler);
 
@@ -135,6 +135,8 @@ bool LoginWindow::checkAppVer()
     queryCheckAppVer.first();
     appVer = queryCheckAppVer.value(0).toString().split('.');
 
+    if(appVer.count() != 4)
+        throw 7;
     if( appVer.at(3).toInt() > APP_COMMIT )
         throw 5;
     else if(appVer.at(3).toInt() < APP_COMMIT)
@@ -242,50 +244,54 @@ bool LoginWindow::updateDB(int startFrom)
 
     if (loginCreds->value("user").toString() == "admin")  // только админ может обновлять БД
     {
-        qDebug() << "startFrom =" << startFrom;
+//        qDebug() << "startFrom =" << startFrom;
         if(usersOnline().isEmpty())
         {
+            bool nErr = 1;
             queryUpdate.exec(QUERY_BEGIN);
-            try
+            if(startFrom) // обновление структуры БД
             {
-                if(startFrom) // обновление структуры БД
+                // TODO: переключение БД в режим обслуживания (на всякий случай, чтобы пользователи не смогли подключиться во время обновления)
+                while(nErr && QFile::exists(fileName = ":/schema-updates/script" + QString::number(i).rightJustified(6, '0') + ".sql"))
                 {
-                    // TODO: переключение БД в режим обслуживания (на всякий случай, чтобы пользователи не смогли подключиться во время обновления)
-                    while(QFile::exists(fileName = ":/schema-updates/script" + QString::number(i).rightJustified(6, '0') + ".sql"))
-                    {
-                        qDebug() << "fileName = " << fileName;
-                        file.setFileName(fileName);
-                        file.open(QIODevice::ReadOnly);
-                        fileContent = file.readAll();
-                        file.close();
-                        // TODO: предусмотреть наличие директивы DELIMITER в скриптах
-                        qDebug() << "queries:" << fileContent;
-                        if(!queryUpdate.exec(QString::fromLocal8Bit(fileContent)))
-                            throw 1;
-                        if(!queryUpdate.exec(QUERY_INS_SCHEMAVERSIONS("SNAP.schema-updates.script" + QString::number(i).rightJustified(6, '0') + ".sql")))
-                            throw 1;
-                        i++;
-                    }
-                    // TODO: переключение БД в обычный режим
+//                    qDebug() << "fileName = " << fileName;
+                    file.setFileName(fileName);
+                    file.open(QIODevice::ReadOnly);
+                    fileContent = file.readAll();
+                    file.close();
+                    // TODO: предусмотреть наличие директивы DELIMITER в скриптах
+//                    qDebug() << "queries:" << fileContent;
+                    if(queryUpdate.exec(QString::fromLocal8Bit(fileContent)))
+                        nErr = queryUpdate.exec(QUERY_INS_SCHEMAVERSIONS("SNAP.schema-updates.script" + QString::number(i).rightJustified(6, '0') + ".sql"));
+                    else
+                        nErr = 0;
+                    i++;
                 }
-                else    // обновление значения `config`.`version_snap`
-                {
-                    if(!queryUpdate.exec(QUERY_UPD_APP_VER(APP_VER_STR)))
-                        throw 1;
-                }
+                // TODO: переключение БД в обычный режим
+            }
+            else    // обновление значения `config`.`version_snap`
+            {
+                nErr = queryUpdate.exec(QUERY_UPD_APP_VER(APP_VER_STR));
+            }
+
+            if(nErr)
+            {
                 queryUpdate.exec(QUERY_COMMIT);
                 // TODO: отправка служебного уведомления, что база обновлена (например, для случаев, когда компьютер находился в спящем режиме)
             }
-            catch (int)
+            else
             {
+//                qDebug().noquote() << "[" << this << "] " << DBG_FUNC_NAME << DBG_VAR_OUT(queryUpdate.lastError());
+                appLog->appendRecord(tr("Не удалось выполнить запрос(-ы) обновления базы данных:"));
+                appLog->appendRecord(queryUpdate.lastQuery());
+                appLog->appendRecord(queryUpdate.lastError().databaseText());
                 queryUpdate.exec(QUERY_ROLLBACK);
-                // TODO: запись в журнал приложения причины ошибки обновления
-                return 1;
+                throw 1;
             }
         }
         else
         {
-            qDebug() << "usersOnline(): " << usersOnline();
+//            qDebug() << "usersOnline(): " << usersOnline();
             // TODO: отправка служебного сообщения и инициация закрытия приложения у пользователей
             throw 2;
         }
@@ -488,6 +494,7 @@ void LoginWindow::btnLoginHandler()
                     break;
                 }
                 case 6: statusBarMsg(tr("Пользователь не обладает привилегией PROCESS")); break;
+                case 7: statusBarMsg(tr("Некорректное значение в `config`.`version_snap`")); break;
             }
             closeConnections();
         }
@@ -504,7 +511,7 @@ void LoginWindow::btnLoginHandler()
 
 void LoginWindow::btnCancelHandler()
 {
-    emit this->btnCancelClick();
+    emit closeWindow();
 }
 
 void LoginWindow::clearStatusLabel()
@@ -553,5 +560,10 @@ void LoginWindow::selectAscExe()
         localSettings->import(userLocalData);
         fillConnectionParams();
     }
+}
+
+void LoginWindow::closeEvent (QCloseEvent *)
+{
+    emit closeWindow();
 }
 

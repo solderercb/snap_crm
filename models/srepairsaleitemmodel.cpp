@@ -391,8 +391,12 @@ bool SRepairSaleItemModel::setData(const int index, const QVariant &value)
     if(index < 0)
         return 1;
 
-    if(index == Columns::C_itemId)
-        m_storeItem->setPrimaryKey(value);
+    switch(index)
+    {
+        case Columns::C_itemId: m_storeItem->setPrimaryKey(value); break;
+        case Columns::C_created: return SSingleRowJModel::setData(Columns::C_created, QDateTime::currentDateTime()); // нужно для корректной установки времени добавления товара
+        default: break;
+    }
 
     return SSingleRowJModel::setData(index, value);
 }

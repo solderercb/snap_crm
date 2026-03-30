@@ -690,11 +690,20 @@ QListView::item  {
            <property name="sizeAdjustPolicy">
             <enum>QAbstractScrollArea::AdjustToContents</enum>
            </property>
+           <property name="undoRedoEnabled">
+            <bool>false</bool>
+           </property>
            <property name="lineWrapMode">
             <enum>QPlainTextEdit::WidgetWidth</enum>
            </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
            <property name="plainText">
             <string/>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
            </property>
           </widget>
          </item>
@@ -1255,8 +1264,49 @@ QListView::item  {
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>buttonMedia</tabstop>
+  <tabstop>leftScrollArea</tabstop>
+  <tabstop>lineEditRepairId</tabstop>
+  <tabstop>lineEditDevice</tabstop>
+  <tabstop>lineEditSN</tabstop>
+  <tabstop>textEditClient</tabstop>
+  <tabstop>lineEditPrimaryPhone</tabstop>
+  <tabstop>lineEditInDate</tabstop>
+  <tabstop>lineEditOutDate</tabstop>
+  <tabstop>lineEditExtPrevRepair</tabstop>
+  <tabstop>lineEditOffice</tabstop>
+  <tabstop>lineEditManager</tabstop>
+  <tabstop>lineEditEngineer</tabstop>
+  <tabstop>lineEditPreagreedAmount</tabstop>
+  <tabstop>listWidgetExtraInfo</tabstop>
+  <tabstop>lineEditColor</tabstop>
+  <tabstop>comboBoxPlace</tabstop>
+  <tabstop>lineEditWarrantyLabel</tabstop>
+  <tabstop>lineEditPrevRepair</tabstop>
+  <tabstop>pushButtonSetOutMessage</tabstop>
+  <tabstop>pushButtonCreateTask</tabstop>
+  <tabstop>comboBoxState</tabstop>
+  <tabstop>toolButtonSaveState</tabstop>
+  <tabstop>comboBoxNotifyStatus</tabstop>
+  <tabstop>pushButtonCreatePrepayOrder</tabstop>
+  <tabstop>pushButtonDebtReceived</tabstop>
+  <tabstop>pushButtonCreateInvoice</tabstop>
+  <tabstop>lineEditInvoice</tabstop>
+  <tabstop>lineEditInvoicePaymentDate</tabstop>
+  <tabstop>lineEditInvoiceAmount</tabstop>
+  <tabstop>pushButtonManualUpdateRepairData</tabstop>
+  <tabstop>rightScrollArea</tabstop>
+  <tabstop>lineEditProblem</tabstop>
+  <tabstop>lineEditIncomingSet</tabstop>
+  <tabstop>lineEditExterior</tabstop>
+  <tabstop>textEditDiagResult</tabstop>
+  <tabstop>doubleSpinBoxAmount</tabstop>
+  <tabstop>pushButtonSaveDiagAmount</tabstop>
+  <tabstop>pushButtonGetout</tabstop>
+  <tabstop>buttonCall</tabstop>
   <tabstop>buttonClientCard</tabstop>
+  <tabstop>buttonHistory</tabstop>
+  <tabstop>buttonMedia</tabstop>
+  <tabstop>buttonAdm</tabstop>
  </tabstops>
  <resources/>
  <connections>

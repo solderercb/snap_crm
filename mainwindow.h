@@ -35,6 +35,7 @@ class MainWindow : public QMainWindow
 signals:
 	void DBConnectErr(const QString &message);
 	void DBConnectOK();
+    void closeWindow();
 public:
     static MainWindow* getInstance(windowsDispatcher *parent = nullptr);
     ~MainWindow();

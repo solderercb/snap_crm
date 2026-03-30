@@ -182,7 +182,7 @@ QString SSingleRowModelBase::fieldValueHandler(const QVariant &value)
         case QVariant::Invalid: str_value = "NULL"; break;
         case QVariant::String:
         case QVariant::ByteArray:
-        case QVariant::UserType: str_value = "'" + value.toString().replace('\'',"\\\'") + "'"; break;
+        case QVariant::UserType: str_value = "'" + value.toString().replace('\\',"\\\\").replace('\'',"\\\'") + "'"; break;
         case QVariant::DateTime: {
             QDateTime dt = value.toDateTime();
             if(dt.timeZone() != QTimeZone::utc())
@@ -355,6 +355,15 @@ bool SSingleRowModelBase::isFieldDirty(const int index)
 {
     auto f = cache.constFind(index);
     if(f == cache.constEnd() || !((*f)->state() & (ModifiedField::Updated | ModifiedField::Failed)))
+        return 0;
+
+    return 1;
+}
+
+bool SSingleRowModelBase::isFieldCommited(const int index)
+{
+    auto f = cache.constFind(index);
+    if(f == cache.constEnd() || !((*f)->state() & (ModifiedField::None | ModifiedField::Commited)))
         return 0;
 
     return 1;

@@ -403,6 +403,20 @@ void tabRepairs::buttonRefreshClicked()
 
 void tabRepairs::buttonPrintClicked()
 {
+    if(repairs_table->canFetchMore())
+    {
+        QString caption = ui->tableView->mode()?tr("Печать списка картриджей"):tr("Печать списка ремонтов");
+        QMessageBox resBtn( QMessageBox::Question, caption,
+                            tr("Похоже, список достаточно большой. При подготовке к печати может показаться, что программа зависла. Продолжить?"),
+                            QMessageBox::No | QMessageBox::Yes);
+        QAbstractButton *noButton = resBtn.button(QMessageBox::No);
+        resBtn.setDefaultButton(QMessageBox::No);
+        resBtn.setWindowModality(Qt::ApplicationModal);
+        resBtn.exec();
+        if (resBtn.clickedButton() == noButton)
+            return;
+    }
+
     ui->tableView->enableAutorefresh(0);
     tabPrintDialog *tab = tabPrintDialog::create(ui->tableView->mode()?(Global::Reports::cartridges):(Global::Reports::repairs));
     if(userDbData->autoRefreshWorkspace())

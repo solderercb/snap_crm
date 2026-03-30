@@ -156,6 +156,7 @@ public:
     WorkshopSaleModel *BOQModel() const;
     int lockTimeout();
     void setFieldsFailed() override;
+    void setFieldsCommited() override;
 private:
     SRepairStatusLog *m_repairStatusLog;
     SCartridgeRepairModel *m_cartridgeRepair = nullptr;

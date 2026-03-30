@@ -2,6 +2,7 @@
 #include <exception>
 #include <QDebug>
 #include <ProjectGlobals>
+#include <SAppLog>
 
 SApplication::SApplication(int& argc, char** argv) :
     QApplication(argc, argv)
@@ -35,4 +36,11 @@ bool SApplication::notify(QObject *receiver, QEvent *event)
     }
     return done;
 
+}
+
+void SApplication::quit()
+{
+    appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Normal application exit");
+    appLog->appendRecord("\r\n\r\n\r\n");
+    QApplication::quit();
 }

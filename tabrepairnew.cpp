@@ -464,8 +464,9 @@ void tabRepairNew::changeDeviceClass(int index)
     int classId = 0;
     QString query;
     classId = deviceClassesModel->databaseIDByRow(index);
+    QStringList vendorsList = deviceClassesModel->index(index, 2).data().toString().split(',');
 
-    query = QUERY_SEL_DEVICE_MAKERS(deviceClassesModel->index(index, 2).data().toString());
+    query = QUERY_SEL_DEVICE_MAKERS(vendorsList.filter(QRegularExpression("\\d+")).join(','));
     deviceVendorsModel->setQuery(query, QSqlDatabase::database(TdConn::main()));
 
     if(deviceVendorsModel->lastError().isValid())
@@ -837,6 +838,7 @@ void tabRepairNew::commitRepair()
         repairModel->BOQModel()->setRepairId(m_repair);
         repairModel->BOQModel()->commit(WorkshopSaleModel::Link);
 
+        repairModel->set_diagnosticResult(tr("Диагностика не проводилась"));
         m_quickRepairIssueList.append(repairModel);
         dialogIssue = new SDialogIssueRepair(m_quickRepairIssueList, this);   // Диалоговое окно не отображается
         dialogIssue->setPayFromBalance(ui->checkBoxQuickRepairPayFromBalance->isChecked());

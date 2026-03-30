@@ -15,6 +15,7 @@ class chooseOfficeWindow : public QDialog
 
 signals:
     void officeChoosed();
+    void closeWindow();
 public:
     explicit chooseOfficeWindow(windowsDispatcher *parent = nullptr);
     ~chooseOfficeWindow();
@@ -24,7 +25,8 @@ private:
     windowsDispatcher *windowsDispatcherObj;    // для доступа к моделям данных пользователя, компаний, офисов
 
 private slots:
-    void accept();
+    void accept() override;
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // CHOOSEOFFICEWINDOW_H

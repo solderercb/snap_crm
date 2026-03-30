@@ -43,7 +43,8 @@ private:
 #endif
 public slots:
 private slots:
-    void updateForms();
+    void reloadFormsData();
+    void updateFormsWidgets();
     void createDialogIssue();
     void createCartridgeCardForm(const int id);
     void closeCartridgeCardForm();

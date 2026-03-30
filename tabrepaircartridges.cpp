@@ -26,6 +26,7 @@ tabRepairCartridges::tabRepairCartridges(MainWindow *parent) :
                                                 }");
     connect(ui->buttonIssue, &QPushButton::clicked, this, &tabRepairCartridges::createDialogIssue);
     connect(ui->buttonSetReadyToIssue, &QPushButton::clicked, this, &tabRepairCartridges::manualSubmit);
+    connect(ui->buttonRefresh, &QPushButton::clicked, this, &tabRepairCartridges::reloadFormsData);
 }
 
 bool tabRepairCartridges::eventFilter(QObject *watched, QEvent *event)
@@ -162,9 +163,19 @@ const QList<SCartridgeForm *> tabRepairCartridges::existentForms()
     return ui->scrollAreaWidgetContents->findChildren<SCartridgeForm *>();
 }
 
+/* обновление моделей данных и виджетов форм
+*/
+void tabRepairCartridges::reloadFormsData()
+{
+    for(auto form : existentForms())
+    {
+        form->update();
+    }
+}
+
 /* обновление виджетов на формах
 */
-void tabRepairCartridges::updateForms()
+void tabRepairCartridges::updateFormsWidgets()
 {
     for(auto form : existentForms())
     {
@@ -258,7 +269,7 @@ void tabRepairCartridges::throwHandler(int)
         form->model()->setFieldsFailed();
     }
 
-    updateForms();
+    updateFormsWidgets();
 }
 
 void tabRepairCartridges::closeTab()
@@ -282,7 +293,7 @@ void tabRepairCartridges::createDialogIssue()
     m_dialogIssue = new SDialogIssueRepair(list, Qt::SplashScreen, this);
     connect(m_dialogIssue, &SDialogIssueRepair::printWorksLists, [=](){tabPrintDialog::printCartridgeWorksReports(list, false);});
     connect(m_dialogIssue, &SDialogIssueRepair::issueSuccessfull, this, &tabRepairCartridges::closeTab);
-    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::updateForms);
+    connect(m_dialogIssue, &SDialogIssueRepair::issueFailed, this, &tabRepairCartridges::updateFormsWidgets);
 }
 
 #ifdef QT_DEBUG

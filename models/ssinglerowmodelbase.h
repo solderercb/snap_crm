@@ -27,6 +27,7 @@ public:
     virtual void signalDataToBeChanged(const int index, QVariant &data) = 0;
     virtual void signalDataChanged(const int index, QVariant &data) = 0;
     bool isFieldDirty(const int index);
+    bool isFieldCommited(const int index);
     virtual bool isDirty();
     static QDate localDate(const QDate &utcDate);
     static QDate localDate(const QVariant &utcDate);

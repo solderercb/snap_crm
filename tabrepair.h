@@ -1,6 +1,8 @@
 #ifndef TABREPAIR_H
 #define TABREPAIR_H
 
+#define ADDITIONAL_FIELDS_ROW_OFFSET 3
+
 #include <tabCommon>
 
 class QWidget;
@@ -68,7 +70,7 @@ private:
     QTimer *m_repairLockUpdateTimer = nullptr;
     OpType m_opType;
     void fillExtraInfo();
-    void setLock(bool state = 1);
+    void updateLock(bool state = 1);
     void createAdditionalFieldsWidgets();
     void delAdditionalFieldsWidgets();
     void setInfoWidgetVisible(QWidget *w, bool state = 1);

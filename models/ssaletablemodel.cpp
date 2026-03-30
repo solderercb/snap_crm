@@ -376,6 +376,19 @@ void SSaleTableModel::setRepairId(int id)
     m_objId = id;
 }
 
+void SSaleTableModel::setAllCommited()
+{
+    for(int i = 0; i < rowCount(); i++)
+    {
+        auto rec = cacheItem(i);
+
+        if(!rec)
+            continue;
+
+        rec->setFieldsCommited();
+    }
+}
+
 std::shared_ptr<SSingleRowJModel> SSaleTableModel::singleRowModel(const int row)
 {
     auto model = cacheItem(row);
@@ -1578,6 +1591,8 @@ bool WorkshopSaleModel::removeRows()
 
     if(nErr)
     {
+        // TODO: нужно доработать контейнер записей на удаление, добавив статусы выполнения запросов аналогичные ModifiedField;
+        // это необходимо для отката изменений в случае возникновения сбоя после обработки строк
         m_recordsPendingRemoveMap.clear();
         endResetModel();
     }

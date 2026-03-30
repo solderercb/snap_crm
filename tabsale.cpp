@@ -139,7 +139,13 @@ void tabSale::initPriceColModel()
 {
     m_priceColProxyModel = new SSortFilterProxyModel();
     m_priceColProxyModel->setSourceModel(priceColModel);
-    m_priceColProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + QString::number(SStoreItemModel::PriceOptionWarranty) + ")).*$"));
+    QStringList disabledItems = {QString::number(SStoreItemModel::PriceOptionWarranty)};
+    if(!comSettings->isPriceColRoznVisible()) disabledItems.append(QString::number(SStoreItemModel::PriceOptionRetail));
+    if(!comSettings->isPriceColServiceVisible()) disabledItems.append(QString::number(SStoreItemModel::PriceOptionService));
+    if(!comSettings->isPriceColOptVisible()) disabledItems.append(QString::number(SStoreItemModel::PriceOptionWholesale));
+    if(!comSettings->isPriceColOpt2Visible()) disabledItems.append(QString::number(SStoreItemModel::PriceOptionWholesale2));
+    if(!comSettings->isPriceColOpt3Visible()) disabledItems.append(QString::number(SStoreItemModel::PriceOptionWholesale3));
+    m_priceColProxyModel->setFilterRegularExpression(QRegularExpression("^(?!(" + disabledItems.join('|') + ")).*$"));
     m_priceColProxyModel->setFilterKeyColumn(1);
 }
 
@@ -511,7 +517,6 @@ void tabSale::clearClientCreds(bool hideCoincidence)
         clientModel->clear();
 
     m_client = 0;
-    bool updatePriceOption = tableModel->state() != StoreSaleModel::New || !docModel->isDirty();
     price_col = 2;
     ui->comboBoxPriceCol->setCurrentText(priceColModel->getDisplayRole(price_col, 1));
     ui->lineEditClientLastName->setReadOnly(false);     // разрешаем ввод текста (вдруг он был запрещён)

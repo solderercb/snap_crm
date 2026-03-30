@@ -35,6 +35,7 @@
 #include <SRepairStatusLog>
 #include <SSortFilterProxyModel>
 #include <SSqlQueryModel>
+#include <SCartridgeForm>
 
 QMap<int, tabRepair*> tabRepair::p_instance;
 
@@ -150,7 +151,7 @@ tabRepair::tabRepair(int rep_id, MainWindow *parent) :
         checkViewPermission();
         m_repairLockUpdateTimer = new QTimer(this);
         m_repairLockUpdateTimer->setSingleShot(true);
-        connect(m_repairLockUpdateTimer, &QTimer::timeout, this, [=]{setLock();});
+        connect(m_repairLockUpdateTimer, &QTimer::timeout, this, [=]{updateLock();});
         logUserActivity();
         loadData();
     }
@@ -195,8 +196,8 @@ QString tabRepair::tabTitle()
 
 bool tabRepair::tabCloseRequest()
 {
-    // Проверка на несохранённые статус ремонта (если в настройках не включено автосохранение), результат диагностики или список работ и деталей
-    // TODO: Проверка несохранённого комментария
+    // Проверка на несохранённые статус ремонта (если в настройках не включено автосохранение), результат диагностики или
+    // список работ и деталей
     if((!userDbData->saveStateOnClose() && (ui->comboBoxState->currentIndex() >= 0)) || (!m_autosaveDiag && (m_diagChanged || m_spinBoxAmountChanged)) || ui->widgetBOQ->isDirty())
     {
         auto result = QMessageBox::question(this, tr("Данные не сохранены"), tr("Статус, результат диагностики, согласованная сумма или список работ и деталей не сохранены!\nСохранить перед закрытием?"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel);
@@ -212,8 +213,15 @@ bool tabRepair::tabCloseRequest()
         }
     }
 
+    // Проверка неотправленного комментария
+    if(ui->widgetComments->isDirty())
+    {
+        QMessageBox::question(this, tr("Незавершенный комментарий"), tr("Поле для ввода комментария не пустое. Возможно вы забыли его сохранить."), QMessageBox::Ok);
+        return 0;
+    }
+
     m_repairLockUpdateTimer->stop();
-    setLock(0);
+    updateLock(0);
     return 1;
 }
 
@@ -258,8 +266,8 @@ void tabRepair::loadData()
         updateStatesModel();
         setWidgetsParams(repairModel->stateId());
     }
-    modelRO = repairModel->isLock();
-    setLock();  // запрос для блокировки нужно отправить как можно раньше
+    modelRO = 1;
+    updateLock();
     updateWidgets();
     // Возможна очень редкая ситуация, когда карточка ремона открывается разными пользователями почти одновременно; при разных
     // обстоятельствах (задержка передачи по сети, тормознутость ПК и пр.) запрос для блокировки от первого пользователя мог еще
@@ -372,11 +380,9 @@ void tabRepair::updateWidgets()
     ui->lineEditIncomingSet->setText(repairModel->complect());
     ui->lineEditExterior->setText(repairModel->look());
 
-    for(int i = ui->gridLayoutDeviceSummary->rowCount() - 1; i > 2; i-- )
-    {
-        ui->gridLayoutDeviceSummary->itemAtPosition(i, 1)->widget()->deleteLater();
-        ui->gridLayoutDeviceSummary->itemAtPosition(i, 0)->widget()->deleteLater();
-    }
+    // Виджеты полей Неисправность, Комплектность и Состояние статичные (отображаются всегда);
+    // Внимание! Все остальные виджеты в gridLayoutDeviceSummary (начиная со строки ADDITIONAL_FIELDS_ROW_OFFSET) адаляются!
+    // Виджеты поля Примечание и доп. поля инициализируются если они не пустые
     createAdditionalFieldsWidgets();
     ui->textEditDiagResult->blockSignals(true);
     ui->textEditDiagResult->setText(repairModel->diagnosticResult());
@@ -399,7 +405,7 @@ void tabRepair::updateWidgets()
     ui->comboBoxState->setEnabled(m_comboBoxStateEnabled && !modelRO);
     ui->toolButtonSaveState->setEnabled(m_buttonSaveStateEnabled && !modelRO);
 
-    ui->widgetBOQ->setReadOnly(m_BOQModelRO);
+    ui->widgetBOQ->setReadOnly(modelRO || m_BOQModelRO);
     ui->widgetBOQ->updateWidgets();
     ui->widgetPartsRequests->setVisible(ui->widgetPartsRequests->requestCount() > 0);
 }
@@ -429,50 +435,76 @@ void tabRepair::fillExtraInfo()
         ui->listWidgetExtraInfo->setHidden(false);
 }
 
-void tabRepair::setLock(bool state)
+void tabRepair::updateLock(bool state)
 {
-    bool nErr = 1;
-    if(!modelRO)
-        nErr = repairModel->lock(state);
+    bool newState = modelRO;
+    if(modelRO)
+        newState = repairModel->isLock();
 
-    if(state && (modelRO || !nErr))
+    if(!newState)
+        newState = !repairModel->lock(state);
+
+    if(newState != modelRO)
     {
-        i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
-
-        // если произошел сбой выполнения запроса для блокировки
-        emit updateTabTitle(this);
-        modelRO = 1;
-
-        return;
+        modelRO = newState;
+        updateWidgets();
     }
 
-    if(!state && i_tabIcon)
+    if(modelRO)
+    {
+        if(!i_tabIcon)
+        {
+            i_tabIcon = new QIcon(":/icons/light/1F512_32.png");
+            emit updateTabTitle(this);
+        }
+    }
+    else if(i_tabIcon)
     {
         delete i_tabIcon;
         i_tabIcon = nullptr;
+        emit updateTabTitle(this);
     }
 
-    m_repairLockUpdateTimer->start(repairModel->lockTimeout()*1000);
+    // если карточка заблокирована другим пользователем, то интервал обновления статуса блокировки 5с
+    // если заблокировал я, то интервал 30с (задан в SRepairModel)
+    m_repairLockUpdateTimer->start((modelRO?5:repairModel->lockTimeout())*1000);
 }
 
+/* Инициализация виджетов доп. полей
+ * Поле с примечанием для клиента (`ext_notes`) также инициализируется в этом методе
+*/
 void tabRepair::createAdditionalFieldsWidgets()
 {
-    delAdditionalFieldsWidgets();
-    int i;
-
-    i = 0;
-    foreach(auto field, additionalFieldsModel->valuesList())
+    int row = ADDITIONAL_FIELDS_ROW_OFFSET;
+    for(int i = ui->gridLayoutDeviceSummary->rowCount() - 1; i > (row - 1); i-- )
     {
-        QLabel *label = new QLabel(field->name());  // эти объекты удаляются в методе delAdditionalFieldsWidgets()
+        ui->gridLayoutDeviceSummary->itemAtPosition(i, 1)->widget()->deleteLater();
+        ui->gridLayoutDeviceSummary->itemAtPosition(i, 0)->widget()->deleteLater();
+    }
+    delAdditionalFieldsWidgets();
+
+    auto initFieldPair = [&](const QString &name, const QString &value){
+        QLabel *label = new QLabel(name);  // эти объекты удаляются в методе delAdditionalFieldsWidgets()
         QLineEdit *lineEdit = new QLineEdit();
         additionalFieldsWidgets.append(label);
         additionalFieldsWidgets.append(lineEdit);
-        lineEdit->setText(field->value());
+        lineEdit->setText(value);
         lineEdit->setReadOnly(true);
-        ui->gridLayoutDeviceSummary->addWidget(label, i + 3, 0 );
-        ui->gridLayoutDeviceSummary->addWidget(lineEdit, i + 3, 1);
-        i++;
+        ui->gridLayoutDeviceSummary->addWidget(label, row, 0 );
+        ui->gridLayoutDeviceSummary->addWidget(lineEdit, row, 1);
+        row++;
+    };
+
+    if(!repairModel->extNotes().isEmpty())
+        initFieldPair(tr("Примечание"), repairModel->extNotes());
+
+    foreach(auto field, additionalFieldsModel->valuesList())
+    {
+        initFieldPair(field->name(), field->value());
     }
+
+    if(!repairModel->issued().isNull() && !repairModel->rejectReason().isEmpty())
+        initFieldPair(tr("Причина отказа"), repairModel->rejectReason());
 }
 
 void tabRepair::delAdditionalFieldsWidgets()
@@ -688,8 +720,12 @@ void tabRepair::buttonClientClicked()
 
 void tabRepair::updateStatesModel()
 {
+    QString allowedStates;
     int stateId = repairModel->stateId();
-    QString allowedStates = comSettings->repairStatusesVariantCopy()[stateId].ContainsStr.join('|');
+    if(repairModel->cartridge())
+        allowedStates = SCartridgeForm::allowedStates(stateId);
+    else
+        allowedStates = comSettings->repairStatusesVariantCopy()[stateId].ContainsStr.join('|');
     ui->comboBoxState->blockSignals(true);
     statusesProxyModel->setFilterRegularExpression(QString("\\b(%1)\\b").arg(allowedStates));
     ui->comboBoxState->setCurrentIndex(-1);

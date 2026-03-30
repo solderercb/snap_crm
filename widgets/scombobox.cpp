@@ -123,6 +123,8 @@ bool SComboBox::eventFilterComboBox(QEvent *e)
             case Qt::Key_Space: show = m_lineEditRO; break;
             case Qt::Key_Enter:
             case Qt::Key_Return: show = m_lineEditRO || (currentText() == ""); filter = (currentText() != ""); break;
+            case Qt::Key_Tab:
+            case Qt::Key_Backtab: if(static_cast<QKeyEvent*>(e)->modifiers() & Qt::ControlModifier){e->ignore(); return false;} break;
             default: ;
         }
         if(show)

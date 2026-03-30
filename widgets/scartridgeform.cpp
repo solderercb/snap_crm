@@ -57,7 +57,7 @@ void SCartridgeForm::initModels()
 
         m_BOQModel = new WorkshopSaleModel();
         m_BOQModel->setPriceColumn(SStoreItemModel::PriceOptionService);
-        connect(m_BOQModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms);
+//        connect(m_BOQModel, &SSaleTableModel::amountChanged, this, &SCartridgeForm::updateTotalSumms); // обновление поля с суммой в методе updateWidgets()
         connect(m_BOQModel, &SSaleTableModel::tableSaved, this, &SCartridgeForm::saveTotalSumms);
         connect(m_BOQModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateLists);
         connect(m_BOQModel, &SSaleTableModel::modelReset, this, &SCartridgeForm::updateWorksActionsCheckedState);
@@ -158,6 +158,8 @@ void SCartridgeForm::load()
     }
 
     loadCardData();
+
+    // TODO: деактивация формы, наглядно дающая понять, что произошла ошибка
 }
 
 void SCartridgeForm::loadCardData()
@@ -165,17 +167,12 @@ void SCartridgeForm::loadCardData()
     m_cartridgeCard->load(m_cardId);
 }
 
-void SCartridgeForm::reloadData()
+void SCartridgeForm::update()
 {
-    try
-    {
-        m_repair->load(m_repairId);
-        m_BOQModel->loadTable(m_repairId);
-    }
-    catch (Global::ThrowType)
-    {
-        // TODO: деактивация формы, наглядно дающая понять, что произошла ошибка
-    }
+    load();
+    updateWorksMenu();
+    updateHeader();
+    updateWidgets();
 }
 
 void SCartridgeForm::randomFill()
@@ -945,9 +942,8 @@ int SCartridgeForm::isReady()
     return 0;
 }
 
-void SCartridgeForm::updateStatesModel()
+QString SCartridgeForm::allowedStates(const int stateId)
 {
-    int stateId = m_repair->stateId();
     QString allowedStates;
 
     switch(stateId)
@@ -958,8 +954,16 @@ void SCartridgeForm::updateStatesModel()
         case Global::RepStateIds::ReadyNoRepair: allowedStates = "---"; break;
         default: allowedStates = "---";
     }
+
+    return allowedStates;
+}
+
+void SCartridgeForm::updateStatesModel()
+{
+    int stateId = m_repair->stateId();
+
     ui->comboBoxState->blockSignals(true);
-    statusesProxyModel->setFilterRegularExpression(QString("\\b(%1)\\b").arg(allowedStates));
+    statusesProxyModel->setFilterRegularExpression(QString("\\b(%1)\\b").arg(allowedStates(stateId)));
     ui->comboBoxState->setCurrentIndex(-1);
     // QComboBox::setPlaceholderText(const QString&) https://bugreports.qt.io/browse/QTBUG-90595
     ui->comboBoxState->setPlaceholderText(comSettings->repairStatusesVariantCopy()[stateId].Name);
@@ -977,6 +981,7 @@ void SCartridgeForm::saveTotalSumms()
 {
     m_repair->set_realRepairCost(m_BOQModel->amountTotal());
     m_repair->set_partsCost(m_BOQModel->amountItems());
+    m_repair->updateLastSave();
     m_repair->commit();
 }
 
@@ -1100,6 +1105,9 @@ void SCartridgeForm::updateComment()
 
 void SCartridgeForm::initWorksMenu()
 {
+    if(!m_repairId)
+        return;
+
     QMenu *works_menu = new QMenu(this);
     QMetaEnum types = SWorkModel::staticMetaObject.enumerator(SWorkModel::staticMetaObject.indexOfEnumerator("Type"));
     SWorkModel::Type type;
@@ -1214,8 +1222,8 @@ void SCartridgeForm::beginCommit()
     switch(m_opType)
     {
         case SaveState: beginSaveState(statusesProxyModel->databaseIDByRow(ui->comboBoxState->currentIndex())); break;
-        case AddWorkAndPart: beginAddWorkAndPart(); break;
-        case RemoveWorkAndPart: beginRemoveWorkAndPart(); break;
+        case AddWorkAndPart: return;
+        case RemoveWorkAndPart: beginRemoveWorkAndPart(); return;
         case CreateRepair:beginCreateRepair(); break;
         case SaveInformedState: beginSaveInformedState(); break;
         case SaveEngineer: m_repair->setEngineerIndex(ui->comboBoxEngineer->currentIndex()); break;
@@ -1249,11 +1257,12 @@ bool SCartridgeForm::skip(const int stage)
 
 void SCartridgeForm::beginCommit(const int stage)
 {
-    if(stage == 0)
+    if(m_opType == AddWorkAndPart)
     {
-        switch(m_opType)
+        switch(stage)
         {
-            case AddWorkAndPart: beginSaveState(Global::RepStateIds::InWork); break;
+            case 0: beginSaveState(Global::RepStateIds::InWork); break;
+            case 1: beginAddWorkAndPart(); break;
             default: ;
         }
     }
@@ -1274,8 +1283,16 @@ void SCartridgeForm::commit(const int stage)
     m_BOQModel->commit();
 }
 
-void SCartridgeForm::endCommit(const int)
+void SCartridgeForm::endCommit(const int stage)
 {
+    switch((stage << 4) | m_opType)
+    {
+        case ((0 << 4) | RemoveWorkAndPart):
+        case ((1 << 4) | AddWorkAndPart): m_BOQModel->setAllCommited(); break;
+        default: ;
+    }
+
+    m_repair->setFieldsCommited();
 }
 
 void SCartridgeForm::endBOQCommit()
@@ -1316,13 +1333,14 @@ void SCartridgeForm::endCommit()
 
 void SCartridgeForm::undoBOQModelChanges()
 {
-    // TODO: отмена изменений в модели работ и деталей
-    // Реализация механизма отложена на будущее, т. к. потребует сущетсвенно доработки модели.
-    // В данном случае модель работает по принципу ручного сохранения изменений в БД. Однако,
-    // если сбой произойдёт по середине сессии, то часть данных уже будет записана (в одну из таблиц),
-    // а соответствующие флаги полей изменят свой статус, что не позволит по этим флагам определить
-    // какие из изменений нужно отменить.
+    for(int i = m_BOQModel->rowCount() - 1; i >= 0; i--)
+    {
+        auto model = m_BOQModel->cacheItem(i);
+        if(!model || model->isFieldCommited(SSaleTableModel::Columns::Id))
+            continue;
 
+        m_BOQModel->removeRow(i);
+    }
 }
 
 void SCartridgeForm::throwHandler(int type)

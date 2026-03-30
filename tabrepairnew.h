@@ -55,7 +55,7 @@ private:
     bool m_isQuick = 0;
     QString m_checkBoxIsCheckNeededText;
     QList<SRepairModel*> m_quickRepairIssueList;
-    bool m_stickersCount = 0;
+    int m_stickersCount = 0;
     int m_endCommitOp = CloseTab;
     void setDefaultStyleSheets();
     void getDevices();

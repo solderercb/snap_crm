@@ -62,10 +62,10 @@ void SRepairStatusLog::setDataRework(const int index, QVariant &data)
 void SRepairStatusLog::setAllState(ModifiedField::State state)
 {
     CacheMap::iterator i = cache.find(C_status);
-    if(i != cache.end())
-    {
-        setState(*i, state);
-    }
+    if((i == cache.end()) || ((*i)->state()&ModifiedField::Commited))   // статус Commited изменять нельзя
+        return;
+
+    setState(*i, state);
 }
 
 /* Переопределённый метод

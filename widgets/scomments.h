@@ -39,6 +39,7 @@ public:
     void setParentTab(tabCommon*);
     void setMode(const int);
     void load(const int);
+    bool isDirty();
 private:
     enum OpType {Commit, Delete};
     Ui::SComments *ui;

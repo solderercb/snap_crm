@@ -47,6 +47,11 @@ tabPrintDialog::tabPrintDialog(MainWindow *parent, QMap<QString, QVariant> repor
     tabPrintDialog(parent, (Global::Reports)report_vars.value("type").toInt())
 {
     m_reportVars = report_vars;
+    switch(m_reportType)
+    {
+        case Global::Reports::rep_label: ui->spinBoxCopies->setValue(m_reportVars.value("copies", 1).toInt()); break;
+        default: ;
+    }
     startRender();
 }
 
@@ -689,7 +694,12 @@ void tabPrintDialog::reportRenderFinished()
     selectPrinter();
 
     progressUpdateTimer->stop();
-    setDefaultWidgetFocus();
+    auto *tw = qobject_cast<QTabWidget*>(this->parentWidget()->parentWidget());
+    bool activeTab = 0;
+    if(tw)
+        activeTab = (tw->currentWidget() == this);
+    if(activeTab)
+        setDefaultWidgetFocus();
 
     // Сразу после завершения рендеринга страницы не доступны и виджет предпросмотра оказывается пустым.
     // Чтобы этого избежать был придуман костыль. С заданным интервалом производится вызов метода, заменяющего виджет

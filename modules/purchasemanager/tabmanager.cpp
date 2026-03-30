@@ -44,10 +44,11 @@ tabPurchaseManager::tabPurchaseManager(MainWindow *parent) :
 
     // TODO: подумать над дополнительным ограничением пользователю смотреть все заявки
     // (в АСЦ пользователь может просматривать только заявки по которым он назначен ответственным).
+    m_manager = usersModel->rowByDatabaseID(userDbData->id());
     ui->comboBoxManager->setModel(usersModel);
     ui->comboBoxManager->setButtons("Clear");
     ui->comboBoxManager->setPlaceholderText(tr("Все"));
-    ui->comboBoxManager->setCurrentIndex(usersModel->rowByDatabaseID(userDbData->id()));
+    ui->comboBoxManager->setCurrentIndex(m_manager);
     ui->labelManager->setVisible(permissions->viewAllPartsRequests);
     ui->comboBoxManager->setVisible(permissions->viewAllPartsRequests);
 
@@ -358,7 +359,7 @@ void tabPurchaseManager::confirmChanges(int &result, int mask, int buttons)
         result = QMessageBox::question(this,
                                        tr("Данные не сохранены"),
                                        tr("Заявки были отредактированы!\nСохранить?"),
-                                       buttons);
+                                       (QMessageBox::StandardButtons)buttons);
     }
 
     if(result == QMessageBox::Yes)

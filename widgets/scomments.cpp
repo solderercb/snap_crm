@@ -60,6 +60,11 @@ void SComments::load(const int id)
     commentsModel->load(id);
 }
 
+bool SComments::isDirty()
+{
+    return !ui->plainTextEdit->isEmpty();
+}
+
 void SComments::initTableMenu()
 {
     tableMenu = new QMenu(this);
@@ -153,7 +158,7 @@ int SComments::checkInput()
 
     if(m_opType == Commit)
     {
-        return ui->plainTextEdit->isEmpty();
+        return ui->plainTextEdit->toPlainText().simplified().isEmpty();
     }
     else if(m_opType == Delete)
     {

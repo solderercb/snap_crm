@@ -711,6 +711,7 @@ void TClassTest::test_workshop_add_item()
     QVERIFY(work->payRepair() != 0);
     QVERIFY(work->payRepairQuick() != 0);
     QVERIFY(item->m_storeItem->id() != 0);
+    QVERIFY(item->created().isNull() == 0);
 }
 
 void TClassTest::test_workshop_add_item_from_basket()

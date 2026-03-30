@@ -79,6 +79,7 @@ public:
     void setDocumentId(int);
     void setRepairId(int);
     virtual bool commit(int operation) = 0;
+    virtual void setAllCommited();
     virtual bool endModelChange() = 0;
     virtual bool isRowMarkedRemove(const int) const = 0;
     int itemsAffected();

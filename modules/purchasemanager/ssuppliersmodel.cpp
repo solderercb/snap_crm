@@ -39,7 +39,7 @@ QVariant SPartSuppliersModel::data(const QModelIndex &index, int role) const
     {
         bool state = 0;
         if(m_newCheckedId)
-            state = (index.siblingAtColumn(Columns::Id).data().toInt() == m_newCheckedId);
+            state = (index.siblingAtColumn(Columns::Id).data().toInt() == m_newCheckedId.value());
         else
             state = unformattedData(index).toBool();
         return state?Qt::Checked:Qt::Unchecked;
@@ -125,7 +125,7 @@ bool SPartSuppliersModel::select()
 {
     if(m_postSubmitAction == PostSubmitAction::SelectById)
     {
-        m_newCheckedId = 0;
+        m_newCheckedId = std::nullopt;
         m_postSubmitAction = PostSubmitAction::DefaultSelect;
         updateFilter(m_requestId);
         return true;
@@ -143,7 +143,7 @@ bool SPartSuppliersModel::select(const int requestId)
 {
     bool ret = 1;
     m_requestId = requestId;
-    m_newCheckedId = 0;
+    m_newCheckedId = std::nullopt;
     updateFilter(m_requestId);
     if(!query().isActive()) // select() вызывается в QSqlTableModel::setFilter() если isActive() возвращает true, второй вызов не нужен
         ret = select();
@@ -211,15 +211,15 @@ bool SPartSuppliersModel::submit()
 
 void SPartSuppliersModel::submitAll()
 {
-    if(m_requestId)
-        m_postSubmitAction = PostSubmitAction::NoSelect;
+    if(!isDirty())  // если изменился только выбор ссылки, нужно выполнить запрос SELECT; если изменились другие данные таблицы, то запрос будет выполнен внутри submitAll()
+        m_postSubmitAction = PostSubmitAction::SelectById;
 
     SSingleRowModel::checkSystemTime();
 
     if(m_newCheckedId)
     {
         QString q;
-        q = QUERY_UPD_PRT_RQST_SUPPLIERS_SEL(m_newCheckedId, m_requestId);
+        q = QUERY_UPD_PRT_RQST_SUPPLIERS_SEL(m_newCheckedId.value(), m_requestId);
         QSqlQuery query(this->database());
         QUERY_EXEC_TH(&query,1,q);
     }
@@ -227,13 +227,8 @@ void SPartSuppliersModel::submitAll()
     if(!SRelationalBaseModel::submitAll())
         Global::throwError(lastError(), tr("Не удалось сохранить список ссылок к заявке на закупку | %1").arg(lastError().text()));
 
-    if(m_newCheckedId)
-    {
-        QModelIndexList il = match(index(0, 0), Qt::DisplayRole, m_newCheckedId);
-        emit dataChanged(il.first(), il.first().siblingAtColumn(Supplier));
-    }
 
-    m_newCheckedId = 0;
+    m_newCheckedId = std::nullopt;
 }
 
 int SPartSuppliersModel::predefSupplierId()
@@ -310,7 +305,7 @@ bool SPartSuppliersModel::setCheckStateExclusive(const QModelIndex &checkedIndex
         if(id)
             emit QSqlTableModel::dataChanged(idx, idx);
         else
-            ret &= setData(idx, (i == checkedIndex.row())?Qt::Checked:Qt::Unchecked, Qt::EditRole);
+            ret &= setData(idx, (i == checkedIndex.row())?1:0, Qt::EditRole);
     }
 
     return ret;

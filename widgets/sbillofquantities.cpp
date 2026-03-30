@@ -84,6 +84,8 @@ void SBillOfQuantities::linkWithRepairModel(SRepairModel *model)
 void SBillOfQuantities::setReadOnly(bool state)
 {
     m_modelRO = state;
+    if(state && m_modelAdmEdit)
+        return;
     m_model->setState(m_modelRO?WorkshopSaleModel::State::RO:WorkshopSaleModel::State::RW);
 }
 

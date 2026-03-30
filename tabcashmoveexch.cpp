@@ -136,6 +136,7 @@ void tabCashMoveExch::switchTabToViewMode()
     m_reasonRO = 1;
     m_showCheckBoxPrint = 0;
     updateWidgets();
+    p_instance = nullptr;
 }
 
 void tabCashMoveExch::endCommit()

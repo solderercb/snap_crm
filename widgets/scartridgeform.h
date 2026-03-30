@@ -64,10 +64,11 @@ public:
     int isReady();
     void load();
     void loadCardData();
-    void reloadData();
+    void update();
     void updateWidgets();
     void randomFill();
     void setRepair(int id);
+    static QString allowedStates(const int stateId);
 private:
     enum OpType {CreateRepair = 0, SaveEngineer, SaveState, AddWorkAndPart, RemoveWorkAndPart, SaveComment, SavePlace, SaveInformedState};
     Ui::SCartridgeForm *ui;

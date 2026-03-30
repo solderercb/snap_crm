@@ -21,12 +21,13 @@ class LoginWindow : public QWidget
 	Q_OBJECT
 
 signals:
-	void btnCancelClick();
+    void closeWindow();
     void DBConnectOK();
 
 public:
     explicit LoginWindow(QObject *parent = nullptr);
 	~LoginWindow();
+    void closeEvent(QCloseEvent *event) override;
 private:
 	Ui::LoginWindow *ui;
     QGraphicsPixmapItem *logo;

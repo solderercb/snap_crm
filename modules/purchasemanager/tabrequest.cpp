@@ -425,6 +425,7 @@ void tabPartRequest::switchTabToViewMode()
     m_partRequest->load(m_requestId);
     ui->widgetSuppliers->setRequestState(m_partRequest->state());
     ui->widgetSuppliers->select(m_requestId);
+    ui->widgetComments->load(m_requestId);
 }
 
 void tabPartRequest::prepareForRepeatedOp()

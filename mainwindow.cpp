@@ -179,9 +179,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //    } else {
 //        event->accept();
 //    }
-    appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Normal application exit");
-    appLog->appendRecord("\r\n\r\n\r\n");
+
     userActivityLog->appendRecordStandalone("Logout");
+    emit closeWindow();
 }
 
 void MainWindow::createMenu()
@@ -470,6 +470,11 @@ bool MainWindow::event(QEvent *event)
         if(keyEvent->modifiers().testFlag(Qt::ControlModifier) && keyEvent->key() == Qt::Key_W)
         {
             int tabId = ui->tabWidget->tabBar()->currentIndex();
+            if(tabId == -1)
+            {
+                event->accept();
+                return true;
+            }
             switchToLastUsedTab();
             ui->tabWidget->tabBar()->tabCloseRequested(tabId);
         }

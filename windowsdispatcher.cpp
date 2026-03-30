@@ -29,8 +29,8 @@ windowsDispatcher::windowsDispatcher(QObject *parent) :
     appLog->appendRecord(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + " Application start");
     LoginWindow *windowLogin = new LoginWindow(this);
 
-    QObject::connect(windowLogin,SIGNAL(DBConnectOK()),this,SLOT(connectOK()));
-    QObject::connect(windowLogin,SIGNAL(btnCancelClick()),this,SIGNAL(quit()));
+    QObject::connect(windowLogin, &LoginWindow::DBConnectOK, this, &windowsDispatcher::connectOK);
+    QObject::connect(windowLogin, &LoginWindow::closeWindow, this, &windowsDispatcher::quit);
 
     windowLogin->show();
 }
@@ -93,7 +93,8 @@ void windowsDispatcher::createChooseOfficeWindow()
     }
 
     chooseOfficeWindow *windowChooseOffice = new chooseOfficeWindow(this);
-    QObject::connect(windowChooseOffice, SIGNAL(officeChoosed()), this, SLOT(createMainWindow()));
+    QObject::connect(windowChooseOffice, &chooseOfficeWindow::officeChoosed, this, &windowsDispatcher::createMainWindow);
+    QObject::connect(windowChooseOffice, &chooseOfficeWindow::closeWindow, this, &windowsDispatcher::quit);
     windowChooseOffice->show();
 }
 
@@ -101,6 +102,7 @@ void windowsDispatcher::createMainWindow()
 {
     userDbData->set_company(SOfficeModel::current()->defaultCompany());
     MainWindow *windowMain = MainWindow::getInstance(this); // указатель должен объявляться именно здесь, по другому компилятор ругается
+    QObject::connect(windowMain, &MainWindow::closeWindow, this, &windowsDispatcher::quit);
     windowMain->show();
     windowMain->createTabRepairs(); // по-умолчанию создаём вкладку Ремонты
 }

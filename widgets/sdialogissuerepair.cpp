@@ -289,7 +289,8 @@ bool SDialogIssueRepair::manualSubmit()
 {
     getWidgetsValues();
 
-    SWidget::manualSubmit();
+    if(!SWidget::manualSubmit())
+        return 0;
 
     if(ui->checkBoxWorksDocPrint->isChecked())
     {

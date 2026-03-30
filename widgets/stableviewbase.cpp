@@ -492,8 +492,8 @@ void STableViewBase::horizontalScrollbarValueChanged(int value)
 
 void STableViewBase::horizontalHeaderSectionClicked(const int logicalIndex)
 {
-    if(m_autorefreshTimer)
-        m_autorefreshTimer->stop();
+    layoutChanged(0, 0, 0);
+
     toggleOrder(logicalIndex);
 }
 
@@ -589,6 +589,10 @@ void STableViewBase::pasteFromClipboard()
     for(int i = 0; i < values.count() && visualColumn < horizontalHeader()->count(); i++, visualColumn++)
     {
         int logicalColumn = horizontalHeader()->logicalIndex(visualColumn);
+
+        while(horizontalHeader()->isSectionHidden(logicalColumn))
+            logicalColumn = horizontalHeader()->logicalIndex(++visualColumn);
+
         QModelIndex index = focusedIndex.siblingAtColumn(logicalColumn);
 
         if(!(index.flags()&Qt::ItemIsEditable))
@@ -1191,17 +1195,17 @@ QModelIndexList STableViewBase::selectionList()
 /* Сохранение списка выделенных строк для восстановления после обновления модели
  * Только при режиме выбора строк целиком
 */
-void STableViewBase::saveSelection()
+void STableViewBase::saveRowsSelection()
 {
     if(selectionBehavior() != QAbstractItemView::SelectRows)
         return;
 
-    foreach(QModelIndex index, selectionList())
+    foreach(QModelIndex index, selectionModel()->selectedRows(m_uniqueIdColumn))
     {
         m_selectionList.append(index.data());
     }
-    m_currentIndexRow = currentIndex().row();
-    m_currentIndexColumn = currentIndex().column();
+    m_lastCurrentIndexPrimaryKey = currentIndex().siblingAtColumn(m_uniqueIdColumn).data();
+    m_lastCurrentIndexColumn = currentIndex().column();
 }
 
 bool STableViewBase::hasSavedSelection()
@@ -1212,7 +1216,7 @@ bool STableViewBase::hasSavedSelection()
 /* Восстановление выделенных строк из ранее сохранённого списка
  * Только при режиме выбора строк целиком
 */
-void STableViewBase::restoreSelection()
+void STableViewBase::restoreRowsSelection()
 {
     if(selectionBehavior() != QAbstractItemView::SelectRows)
         return;
@@ -1222,9 +1226,12 @@ void STableViewBase::restoreSelection()
 
     QVariant data;
     QItemSelection selection;
+    int newCurrentIndexRow = -1;
     for(int i = 0; i < model()->rowCount() && m_selectionList.size(); i++)
     {
         data = model()->index(i, m_uniqueIdColumn).data();
+        if(m_lastCurrentIndexPrimaryKey == data)
+            newCurrentIndexRow = i;
         if(m_selectionList.contains(data))
         {
             m_selectionList.removeOne(data);
@@ -1241,7 +1248,10 @@ void STableViewBase::restoreSelection()
     // таблицы положение восстанавливается неправильно если таблица не на виду (например, пользователь переключился
     // на другую вкладку). Чтобы положение восстанавливалось всегда сигналы блокируются.
     selectionModel()->blockSignals(true);
-    selectionModel()->setCurrentIndex(model()->index(m_currentIndexRow, m_currentIndexColumn), QItemSelectionModel::Rows);
+    if(newCurrentIndexRow >= 0)
+        selectionModel()->setCurrentIndex(model()->index(newCurrentIndexRow, m_lastCurrentIndexColumn), QItemSelectionModel::Rows);
+    else
+        selectionModel()->setCurrentIndex(QModelIndex(), QItemSelectionModel::Rows);
     selectionModel()->blockSignals(false);
 
     m_selectionList.clear();    // если вдруг в списке остались элементы
@@ -1402,7 +1412,7 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
         return;
 
     if(preserveSelection)
-        saveSelection();
+        saveRowsSelection();
 
     if(preserveScrollPos)
         saveScrollPos();
@@ -1424,7 +1434,7 @@ void STableViewBase::refresh(bool preserveScrollPos, bool preserveSelection)
         horizontalHeader()->setSortIndicator(m_sortColumn, m_sortOrder);
         horizontalHeader()->blockSignals(false);
     }
-    restoreSelection();
+    restoreRowsSelection();
 }
 
 /* Обновление таблицы с обнулением положения прокрутки и снятия выделения

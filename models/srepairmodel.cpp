@@ -546,7 +546,9 @@ bool SRepairModel::isLock()
 {
     bool nErr = 1;
     QUERY_EXEC(i_query, nErr)(QUERY_SEL_REPAIR_LOCK(loginCreds->value("database").toString(), id()));
-    i_query->first();
+    if(!i_query->first())
+        return 1;
+
     if(i_query->value(0).toInt() == userDbData->id()) // имеется запись о блокировке, но пользователь совпадает
         return 0;
 
@@ -698,4 +700,10 @@ void SRepairModel::setFieldsFailed()
 {
     SSingleRowJModel::setFieldsFailed();
     m_repairStatusLog->setFieldsFailed();
+}
+
+void SRepairModel::setFieldsCommited()
+{
+    SSingleRowJModel::setFieldsCommited();
+    m_repairStatusLog->setFieldsCommited();
 }

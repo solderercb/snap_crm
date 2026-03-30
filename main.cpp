@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     windowsDispatcher *windowsDispatcherObj = new windowsDispatcher(nullptr);   // в main.cpp не может быть слотов, приходится создавать лишний объект
 
-    QObject::connect(windowsDispatcherObj,SIGNAL(quit()),&app,SLOT(quit()));
+    QObject::connect(windowsDispatcherObj, &windowsDispatcher::quit, &app, &SApplication::quit);
 
     return app.exec();
 }

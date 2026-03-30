@@ -1,4 +1,5 @@
 #include "sstoreitemmodel.h"
+#include <cmath>
 #include <QSqlQuery>
 #include <ProjectGlobals>
 #include <ProjectQueries>
@@ -343,10 +344,14 @@ bool SStoreItemModel::dealerRoyalty(const SBalanceLogRecordModel::RoyaltyReason 
     if(!isRealization())
         return 1;
 
-    double royaltyForItem = inPrice() + (price() - inPrice())*returnPercent()/100;
+    double royaltyForItem = 0;
+    if(price() > inPrice())
+        royaltyForItem = inPrice() + (price() - inPrice())*returnPercent()/100;
+    else
+        royaltyForItem = inPrice();
     QString logText;
 
-    if(royaltyForItem == 0)
+    if(std::round(royaltyForItem * 10000.0)/10000.0 == 0)
         return 1;
 
     SClientModel dealer;

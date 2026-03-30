@@ -90,7 +90,16 @@ tabReceptCartridge* tabReceptCartridge::getInstance(MainWindow *parent)   // sin
 
 bool tabReceptCartridge::tabCloseRequest()
 {
-    // TODO: сделать проверку не сохранённых данных перед закрытием
+    if(existentForms().count())
+    {
+        auto result = QMessageBox::question(this,
+                                       tr("Данные не сохранены"),
+                                       tr("Закрыть вкладку без оформления картриджей в списке?"),
+                                       QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::Cancel));
+
+        if(result == QMessageBox::Cancel)
+            return 0;
+    }
     return 1;
 }
 

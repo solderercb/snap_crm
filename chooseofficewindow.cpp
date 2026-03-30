@@ -45,3 +45,8 @@ void chooseOfficeWindow::accept()
         this->deleteLater();
     }
 }
+
+void chooseOfficeWindow::closeEvent(QCloseEvent*)
+{
+    emit closeWindow();
+}

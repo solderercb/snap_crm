@@ -37,7 +37,7 @@ private:
     int m_requestState;
     bool m_itemsEditableFlagOverride = 0;
     int m_postSubmitAction = PostSubmitAction::DefaultSelect;
-    int m_newCheckedId = 0;
+    std::optional<int> m_newCheckedId = std::nullopt;
     int m_predefSupplierId = 0;
     bool m_highlightRows = 0;
     int m_highlightId = -1;

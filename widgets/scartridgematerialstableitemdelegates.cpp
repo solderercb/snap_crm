@@ -34,7 +34,7 @@ QWidget *SCartridgeMaterialsTableItemDelegates::createEditor(QWidget *parent, co
         case materialsTable::Column::SalarySumm:
             w = createDoubleSpinBox(parent, index); break;
         case materialsTable::Column::Articul:
-            w = createSpinBox(parent, index); static_cast<QSpinBox*>(w)->setButtonSymbols(QSpinBox::NoButtons); static_cast<QSpinBox*>(w)->setMaximum((int)((((long)1) << 31) - 1)); break;
+            w = createSpinBox(parent, index); static_cast<QSpinBox*>(w)->setButtonSymbols(QSpinBox::NoButtons); static_cast<QSpinBox*>(w)->setMaximum((int)((((unsigned long)1) << 31) - 1)); break;
         default:
             w = QStyledItemDelegate::createEditor(parent, option, index);
     }

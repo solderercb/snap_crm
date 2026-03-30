@@ -119,9 +119,9 @@ protected:
     virtual void clearVScrollPos();
     virtual void restoreVScrollPos();
     virtual void restoreHScrollPos();
-    void saveSelection();
+    void saveRowsSelection();
     bool hasSavedSelection();
-    void restoreSelection();
+    void restoreRowsSelection();
     bool initHeaders();
     void setDatabase(const QSqlDatabase &database);
     QString formatFilterGroup(const FilterList &filter);
@@ -147,8 +147,8 @@ private:
     QStringList *m_grouping = nullptr;
     int m_uniqueIdColumn = -1;
     QList<QVariant> m_selectionList;
-    int m_currentIndexRow = -1;
-    int m_currentIndexColumn = -1;
+    QVariant m_lastCurrentIndexPrimaryKey = QVariant(); // значение столбца Primary key (m_uniqueIdColumn) последней выделенной строки до обновления таблицы
+    int m_lastCurrentIndexColumn = -1;  // последний выделенный столбец до обновления таблицы
     QTimer *m_layoutSaveTimer = nullptr;
     int m_autorefreshTimeout = 0;
     int m_restoreSelectionTrig = 0;
