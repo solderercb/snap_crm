@@ -20,7 +20,7 @@ public:
     void setTotal(int column, QVariant value);
     void setData(QModelIndex index, QVariant value);
     void setData(const int row, const int column, QVariant value);
-private:
+protected:
     QStandardItemModel *m_dataModel;
 public slots:
     void applyGridlayout();

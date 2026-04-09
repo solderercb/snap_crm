@@ -21,6 +21,13 @@ SStandardItemModel::~SStandardItemModel()
 SStandardItemModel *SStandardItemModel::modelFromEnum(QMetaEnum &_enum, QString (*contextTr)(const char *, const char *, int))
 {
     SStandardItemModel *list = new SStandardItemModel();
+    modelFromEnum(list, _enum, contextTr);
+
+    return list;
+}
+
+void SStandardItemModel::modelFromEnum(QStandardItemModel *model, QMetaEnum &_enum, QString (*contextTr)(const char *, const char *, int))
+{
     QList<QStandardItem*> *item;
     if(contextTr == nullptr)
     {
@@ -31,11 +38,9 @@ SStandardItemModel *SStandardItemModel::modelFromEnum(QMetaEnum &_enum, QString 
     {
         item = new QList<QStandardItem*>();
         *item << new QStandardItem(contextTr(_enum.key(i), nullptr, -1)) << new QStandardItem(QString::number(_enum.value(i)));
-        list->appendRow(*item);
+        model->appendRow(*item);
     }
-    list->setHorizontalHeaderLabels({"name", "id"});
-
-    return list;
+    model->setHorizontalHeaderLabels({"name", "id"});
 }
 
 bool SStandardItemModel::isSingleRowModelExists(const int row)

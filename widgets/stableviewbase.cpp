@@ -287,6 +287,20 @@ void STableViewBase::setDefaultLayoutParams()
     }
 }
 
+/* Некоторые параметры в файлах АСЦ могут иметь неподходящее значение.
+ * В этом методе импортированные значения обновляются правильными.
+*/
+void STableViewBase::updateImportedLayoutParams()
+{
+    // параметр Visible может отсутствовать; значение по умолчанию для такого случая true
+    // TODO: добавить в QSerializer параметр по умолчанию для QS_FIELD
+    for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
+    {
+        if(i_gridLayout->$GridControl.Columns[i].ActualWidth)
+            i_gridLayout->$GridControl.Columns[i].Visible = true;
+    }
+}
+
 /* Скрытие/отображение столбца в макете
 */
 void STableViewBase::setColumnLayoutHidden(const int column, const bool state)
@@ -315,16 +329,16 @@ void STableViewBase::setDefaultColumnParams(const int column, const QString &lab
 void STableViewBase::readLayout()
 {
     initHeaders();
-    if( (!localSettings->read(i_gridLayout, m_layoutVariant))/* || (i_gridLayout->$GridControl.Columns.size() != i_defaultHeaderLabels.size())*/ )
+    int fileStatus = localSettings->read(i_gridLayout, m_layoutVariant);
+    if(fileStatus == SLocalSettings::FileStatus::NotFound)/* || (i_gridLayout->$GridControl.Columns.size() != i_defaultHeaderLabels.size())*/
     {
         setDefaultLayoutParams();
         localSettings->save(i_gridLayout, m_layoutVariant);
     }
-    for(int i = 0; i < i_gridLayout->$GridControl.Columns.size(); i++)
-    {   // в настройках АСЦ параметр Visible может отсутствовать; значение по умолчанию для такого случая true
-        // TODO: добавить в QSerializer параметр по умолчанию для QS_FIELD
-        if(i_gridLayout->$GridControl.Columns[i].ActualWidth)
-            i_gridLayout->$GridControl.Columns[i].Visible = true;
+    else if(fileStatus == SLocalSettings::FileStatus::Imported)
+    {
+        updateImportedLayoutParams();
+        localSettings->save(i_gridLayout, m_layoutVariant);
     }
 
     applyGridlayout();

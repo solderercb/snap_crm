@@ -15,6 +15,7 @@
 #include <SStandardItemModel>
 #include <SSqlQueryModel>
 #include <SPaymentTypesModel>
+#include <SCashRegisterModel>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -50,8 +51,8 @@ SSqlQueryModel *engineersModel = new SSqlQueryModel;
 SSqlQueryModel *itemBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *repairBoxesModel = new SSqlQueryModel;
 SSqlQueryModel *paymentSystemsModel = new SSqlQueryModel;
-SPaymentTypesModel *receiptTypesModel;
-SPaymentTypesModel *expenditureTypesModel;
+std::shared_ptr<SPaymentTypesModel> receiptTypesModel;
+std::shared_ptr<SPaymentTypesModel> expenditureTypesModel;
 SStandardItemModel* clientsTypesList;
 SSqlQueryModel* clientAdTypesList = new SSqlQueryModel;
 SStandardItemModel *notifyStatusesModel = new SStandardItemModel();
@@ -157,10 +158,8 @@ void initGlobalModels()
     paymentSystemsModel->setQuery(QUERY_SEL_PAYMENT_SYSTEMS, QSqlDatabase::database(TdConn::main()));
     paymentSystemsModel->setObjectName("paymentSystemsModel");
 
-    receiptTypesModel = new SPaymentTypesModel(SPaymentTypesModel::Type::PKO);
-    receiptTypesModel->setObjectName("receiptTypesModel"); // TODO: возможно, тоже нужны прокси-модели для отображения типов ПКО и РКО в соответствии с правами пользователя
-    expenditureTypesModel = new SPaymentTypesModel(SPaymentTypesModel::Type::RKO);
-    expenditureTypesModel->setObjectName("expenditureTypesModel");
+    receiptTypesModel = SCashRegisterModel::paymentTypesList(SPaymentTypesModel::Type::PKO);
+    expenditureTypesModel = SCashRegisterModel::paymentTypesList(SPaymentTypesModel::Type::RKO);
 
     clientAdTypesList->setQuery(QUERY_SEL_CLIENT_AD_TYPES, QSqlDatabase::database(TdConn::main()));
     clientAdTypesList->setObjectName("clientAdTypesList");

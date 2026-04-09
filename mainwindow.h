@@ -82,16 +82,16 @@ public slots:
     void switchToLastUsedTab();
     void createTabTechReports();
     void createTabPurchaseManager();
+    void createTabCashOperation( int, QMap<int, QVariant> data = QMap<int, QVariant>() );
+    void createTabCashMoveExch();
     QWidget *createTabPartRequest(const int id);
     void reactivateCallerTab(QWidget *);
 private slots:
     void reactivateTabRepairNew(int);
     void createTabPrint(QMap<QString, QVariant>); // Создание вкладки предпросмотра/печати только через слот; прямой вызов функции с вкладки приёма в ремонт приводил к падению программы.
-    void createTabCashOperations();
-    void createTabCashOperation( int, QMap<int, QVariant> data = QMap<int, QVariant>() );
+    void createTabCashbox();
     void createTabNewPKO();
     void createTabNewRKO();
-    void createTabCashMoveExch();
     void createTabDocuments(int type = 0, QWidget *caller = nullptr);
     void createTabInvoices(int type = 0, QWidget *caller = nullptr);
     void createTabWarehouseItems(int type = 0, QWidget *caller = nullptr);
@@ -99,7 +99,6 @@ private slots:
     void createTabSalary();
     void createTabReceptCartridge();
     void createTabStoreItems();
-    void createTabCashOrders();
     void createTabTasks();
     bool closeTab(int index);
     void updateTabTitle(QWidget*);

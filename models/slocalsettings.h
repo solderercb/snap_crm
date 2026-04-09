@@ -25,9 +25,10 @@ public:
                       ClientsMatchGrid, RepairsMatchGrid, TechReportsGrid};
     Q_ENUM(SettingsVariant)
     enum Operation {SaveFile = 0, ReadFile};
+    enum FileStatus {NotFound, Imported, ReadSuccess, AccessDenied};
     static QString appSettingsPath();
-    bool import(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
-    bool read(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
+    int import(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
+    int read(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
     bool save(QSerializer *obj, SettingsVariant variant = UserSettings, const QString subVariant = "");
     QString ascAppDataPath(const QString &executablePath);
 protected:
@@ -39,7 +40,7 @@ private:
     bool genSettingsFileFullPath(QFile &file, Operation op);
     bool genAscSettingsFileFullPath(QFile &file);
     bool openFile(QFile &file, QIODevice::OpenModeFlag mode = QIODevice::ReadOnly);
-    bool read(QSerializer *obj, QFile &file);
+    int read(QSerializer *obj, QFile &file);
     bool save(QSerializer *obj, QFile &file);
     QString base32StringSuitableForDirName(const QByteArray &payloadSha1);
 };

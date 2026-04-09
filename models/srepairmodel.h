@@ -136,7 +136,7 @@ public:
     int boxIndex();
     void setBoxIndex(const int index);
     void boxChanged(const int newId);
-    double paymentsAmount(const SCashRegisterModel::PaymentType type = (SCashRegisterModel::PaymentType)0);
+    double paymentsAmount(const int paymentType = 0);
     void addPrepay(double amount, QString reason = QString());
     double realWorksCost();
     double realPartsCost();

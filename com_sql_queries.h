@@ -56,7 +56,7 @@
 #define QUERY_SEL_REPAIR_BOXES              QString("SELECT `name`, `id`,`places`, `color` FROM `boxes` WHERE `non_items` = 1 ORDER BY `name`;")
 #define QUERY_SEL_PAYMENT_SYSTEMS           QString("SELECT `name`, `system_id`, `system_data`, `id` FROM `payment_systems` WHERE `is_enable` = 1 ORDER BY `name`;")
 #define QUERY_SEL_PAYMENT_TYPE(id)          QString("SELECT `name`, `id`,  `type`,  `client`,  `periodic`,  `pay_date`,  `def_summ`,  `reason`,  `is_archive`,  `updated_at`,  `payment_system` FROM `payment_types` WHERE `id` = %1;").arg((id))
-#define QUERY_SEL_EXTRA_PAYMENT_TYPES(type, archive) QString("SELECT  `name`, `id`, `type`, `client`, `periodic`, `pay_date`, `def_summ`, `reason`, `is_archive`, `updated_at`, `payment_system` FROM `payment_types` WHERE `type` = %1 AND IF(%2, 1, `is_archive` = 0);").arg((type)).arg((archive))
+#define QUERY_SEL_EXTRA_PAYMENT_TYPES(idOffset, type, archive) QString("SELECT  `name`, %1 + `id` AS 'id', `type`, `client`, `periodic`, `pay_date`, `def_summ`, `reason`, `is_archive`, `updated_at`, `payment_system` FROM `payment_types` WHERE `type` = %2 AND IF(%3, 1, `is_archive` = 0);").arg((idOffset)).arg((type)).arg((archive))
 #define QUERY_SEL_DEVICE(id)                QString("SELECT  `id`,  `type`,  `maker`,  `model`, `serial_number`,  `client` FROM `workshop` WHERE `id` = %1").arg((id))
 #define QUERY_SEL_DEVICES                   QString("SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`;")
 #define QUERY_SEL_DEVICE_MAKERS(device)     QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1) ORDER BY FIELD(`id`, %1);").arg((device))
@@ -176,6 +176,67 @@
                                                 "ON t1.`id` = t2.`customer`                                                 \n"\
                                                 "  AND t2.`type` = 1                                                          "\
                                             )
+
+#define QUERY_SEL_CASHBOX_STATIC            QString(                                                                           \
+                                                "SELECT                                                                     \n"\
+                                                "  t1.`id`,                                                                 \n"\
+                                                "  t1.`created`,                                                            \n"\
+                                                "  t1.`office`,                                                             \n"\
+                                                "  IF(`payment_system` = 0, t1.`summa`, 0) AS 'amountByCash',               \n"\
+                                                "  IF(`payment_system` = 1, t1.`summa`, 0) AS 'amountCashless',             \n"\
+                                                "  IF(`payment_system` = -1, t1.`summa`, 0) AS 'amountByCard',              \n"\
+                                                "  IF(`payment_system` > 1, t1.`summa`, 0) AS 'amountOtherType',            \n"\
+                                                "  t1.`type`,                                                               \n"\
+                                                "  IF(t2.`type`,                                                            \n"\
+                                                "     IF(LENGTH(TRIM(t2.`ur_name`)), t2.`ur_name`, t2.`name`),              \n"\
+                                                "     CONCAT_WS(' ', t2.`surname`, t2.`name`, t2.`patronymic`)) AS 'client',\n"\
+                                                "  t1.`user`,                                                               \n"\
+                                                "  t1.`notes`,                                                              \n"\
+                                                "  t1.`is_backdate`,                                                        \n"\
+                                                "  t2.`short_name` AS 'client_short_name'                                   \n"\
+                                                "FROM                                                                       \n"\
+                                                "  `cash_orders` AS t1                                                      \n"\
+                                                "  LEFT JOIN `clients` AS t2                                                \n"\
+                                                "    ON t1.`client` = t2.`id`                                                 "\
+                                            )
+
+#define QUERY_SEL_CASHBOX_BALANCES(columns, office) QString(                                                                   \
+                                                "SELECT                                                                     \n"\
+                                                "%1                                                                         \n"\
+                                                "FROM `cash_orders`                                                         \n"\
+                                                "WHERE `office` IN (%2)                                                     \n"\
+                                                "  AND `created` < NOW();                                                     "\
+                                            )                                                                                  \
+                                            .arg((columns))                                                                    \
+                                            .arg((office))
+
+#define QUERY_SEL_CASHBOX_CUSTOM_SYSTEMS_IDS_BALANCES(office)   QString(                                                       \
+                                                "SELECT                                                                     \n"\
+                                                "  `system_id`,                                                             \n"\
+                                                "  `office`                                                                 \n"\
+                                                "FROM                                                                       \n"\
+                                                "  `payment_systems`                                                        \n"\
+                                                "WHERE                                                                      \n"\
+                                                "  `is_enable` = 1                                                          \n"\
+                                                "  AND `office` IN (%1) OR `office` IS NULL                                 \n"\
+                                                "  AND `is_show_balance` = 1;                                                 "\
+                                                )                                                                              \
+                                                .arg((office))
+
+#define QUERY_SEL_CASHBOX_MONTH_STAT(sysClause, officeClause) QString(                                                         \
+                                                "SELECT                                                                     \n"\
+                                                "  SUM(IF(`summa` > 0, `summa`, 0)) AS 'receipts',                          \n"\
+                                                "  SUM(IF(`summa` < 0, `summa`, 0)) AS 'expenditures',                      \n"\
+                                                "  SUM(`summa`) AS 'total'                                                  \n"\
+                                                "FROM `cash_orders`                                                         \n"\
+                                                "WHERE                                                                      \n"\
+                                                "  `payment_system` %1                                                      \n"\
+                                                "  AND `office` IN (%2)                                                     \n"\
+                                                "  AND `created` > DATE_FORMAT(NOW(), '%Y-%m-01 00:00:00')                  \n"\
+                                                "  AND `created` < NOW();                                                     "\
+                                            )                                                                                  \
+                                            .arg((sysClause))                                                                  \
+                                            .arg((officeClause))
 
 #define QUERY_SEL_WORKSHOP_STATIC           QString(\
                                                 "SELECT\n"\

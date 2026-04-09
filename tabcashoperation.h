@@ -47,7 +47,7 @@ private:
     enum EndCommitOp {SwitchToViewMode, PrepareRepeat, PaymentSystemChanged};
     static QMap<int, tabCashOperation*> p_instance;
     SCashRegisterModel *m_cashRegisterModel = nullptr;
-    SPaymentTypesModel *m_operationTypesModel;
+    std::shared_ptr<SPaymentTypesModel> m_operationTypesModel;
     SSortFilterProxyModel *m_paymentAccountsProxyModel;
     int m_initialOrderId = 0;
     int m_orderId = 0;
@@ -87,7 +87,7 @@ private:
     void initCashRegisterModel();
     void initPKO();
     void initRKO();
-    void setOrderTypeModel(SPaymentTypesModel *model);
+    void setOrderTypeModel(std::shared_ptr<SPaymentTypesModel> model);
     void resetWidgetsSettings();
     void resetLinkVariables();
     void deleteLinkObject();

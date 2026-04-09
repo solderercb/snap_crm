@@ -7,6 +7,8 @@
 
 #include <SSingleRowJModel>
 
+class SPaymentTypesModel;
+
 #include "ssinglerowmodel_predef.h"     // этот файл нужно подключать после ssinglerowmodel.h и до списка элементов
 #define TABLE_FIELDS                                                        \
     TABLE_FIELD(id, id, int, 1)                                             \
@@ -56,11 +58,22 @@ public:
                      RecptPrepayRepair = 12, RecptBalance = 13, RecptGoods = 14, RecptRepair = 15,
                      ExpInvoiceUndo = 16, RecptInvoice = 17, MoveCash = 18, ExpDealer = 19, ExpRevert = 20,
                      ExpCustom = 50};
+    Q_ENUM(PaymentType)
+
+    // списки фильтров модели; на вкладках создания РКО и ПКО в комбобоксе выбора типа НЕ будет этих элементов:
+    constexpr static int tabRKOFilterTypes[] = {AddSubCash, ExpCustom, ExpDealer, ExpGoods, ExpInvoiceUndo,
+                                                ExpRepair, ExpSalary, ExpSubsist, MoveCash, RecptBalance,
+                                                RecptGoods, RecptInvoice, RecptPrepayRepair, RecptRepair, RecptSimple};
+    constexpr static int tabPKOFilterTypes[] = {AddSubCash, ExpBalance, ExpCustom, ExpDealer, ExpGoods, ExpInvoice,
+                                                ExpInvoiceUndo, ExpRepair, ExpRevert, ExpSalary, ExpSimple, ExpSubsist,
+                                                ExpZ, MoveCash};
     explicit SCashRegisterModel(QObject *parent = nullptr);
     explicit SCashRegisterModel(int systemId, QObject *parent = nullptr);
     ~SCashRegisterModel();
 #include "ssinglerowmodel_init.h"     // этот файл нужно подключать именно здесь
 public:
+    static std::shared_ptr<SPaymentTypesModel> paymentTypesList();
+    static std::shared_ptr<SPaymentTypesModel> paymentTypesList(const int type);
     void load() override;
     void load(int);
     bool commit() override;
@@ -86,6 +99,7 @@ private:
     void documentChanged(int id);
     void repairChanged(int id);
     void invoiceChanged(int id);
+    void translateNames();
 public Q_SLOTS:
     // эти методы возвращают данные дополнительных полей в отчетах
     QVariant invoiceNum(){return "not_implemented";};

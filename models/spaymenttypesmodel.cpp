@@ -1,56 +1,97 @@
 #include "spaymenttypesmodel.h"
-#include <SCashRegisterModel>
+#include <ProjectGlobals>
 #include <ProjectQueries>
+#include <SCashRegisterModel>
+#include <SStandardItemModel>
 
-SPaymentTypesModel::SPaymentTypesModel(const int type, QObject *parent) : SStandardItemModel(parent)
+SPaymentTypesModel::SPaymentTypesModel(QObject *parent) : SSortFilterProxyModel(parent)
 {
-    QVector<QString> paymentTypesList;
-    QVector<int> paymentTypeIdsList;
-    QList<QStandardItem*> *paymentTypeItem;
+    m_fullModel = new QConcatenateTablesProxyModel();
+    SSortFilterProxyModel::setSourceModel(m_fullModel);
+    setFilterKeyColumn(1);
 
-    if(type == Type::PKO)
+    QMetaEnum typesEnum = SCashRegisterModel::staticMetaObject.enumerator(SCashRegisterModel::staticMetaObject.indexOfEnumerator("PaymentType"));
+    m_predefTypes = SStandardItemModel::modelFromEnum(typesEnum, SCashRegisterModel::tr);
+    m_predefTypes->setObjectName("PaymentTypesModel");
+    m_predefTypes->setHorizontalHeaderLabels({"name", "id"});
+
+    m_fullModel->addSourceModel(m_predefTypes);
+}
+
+SPaymentTypesModel::SPaymentTypesModel(const int type, QObject *parent) : SPaymentTypesModel(parent)
+{
+    m_type = type;
+    std::vector<int> filter;
+
+    loadExtraTypes(false);
+
+    switch(m_type)
     {
-        // TODO: потенциальные проблемы!!! Описание см. в tabCashOperation::orderTypeChanged(int)
-        paymentTypesList << tr("Приходный кассовый ордер без привязки") << tr("Предоплата за стоимость ремонта или деталей") << tr("Поступление средств на баланс клиента") << tr("Поступление денег в счет продажи товаров (РН)") << tr("Оплата ремонта") << tr("Оплата по счету");
-        paymentTypeIdsList << SCashRegisterModel::RecptSimple << SCashRegisterModel::RecptPrepayRepair << SCashRegisterModel::RecptBalance << SCashRegisterModel::RecptGoods << SCashRegisterModel::RecptRepair << SCashRegisterModel::RecptInvoice;
-    }
-    else
-    {
-        paymentTypesList << tr("Расходный кассовый ордер без привязки") << tr("Оплата приходной накладной") << tr("Списание средств с баланса клиента") << tr("Z отчёт (выемка средств из кассы)") << tr("Возвратный РКО");
-        paymentTypeIdsList << SCashRegisterModel::ExpSimple << SCashRegisterModel::ExpInvoice << SCashRegisterModel::ExpBalance << SCashRegisterModel::ExpZ << SCashRegisterModel::ExpRevert;
+        case Type::PKO: filter.assign(std::begin(SCashRegisterModel::tabPKOFilterTypes), std::end(SCashRegisterModel::tabPKOFilterTypes)); setObjectName("receiptTypesModel"); break;
+        case Type::RKO: filter.assign(std::begin(SCashRegisterModel::tabRKOFilterTypes), std::end(SCashRegisterModel::tabRKOFilterTypes)); setObjectName("expenditureTypesModel"); break;
+        default: ;
     }
 
-    for (int i=0; i<paymentTypesList.size(); i++)
-    {
-        paymentTypeItem = new QList<QStandardItem*>();
-        *paymentTypeItem << new QStandardItem(paymentTypesList.at(i)) << new QStandardItem(QString::number(paymentTypeIdsList.at(i)));
-        appendRow(*paymentTypeItem);
-    }
-    setHorizontalHeaderLabels({"name", "id"});
-    loadExtraTypes(type, false);
+    filterTypes(filter);
+}
+
+SPaymentTypesModel::~SPaymentTypesModel()
+{
+    delete m_fullModel;
+    delete m_predefTypes;
+}
+
+void SPaymentTypesModel::setSourceModel(QAbstractItemModel *model)
+{
+    m_fullModel->addSourceModel(model);
 }
 
 void SPaymentTypesModel::loadExtraTypes(const int type, const bool loadArchive)
 {
-    QList<QStandardItem*> *paymentTypeItem;
-    QSqlQuery query = QSqlQuery(QSqlDatabase::database(TdConn::main()));
-    QSqlRecord *record;
-
-    query.exec(QUERY_SEL_EXTRA_PAYMENT_TYPES(type, loadArchive));
-    while(query.next())
+    if(!m_extraTypes)
     {
-        paymentTypeItem = new QList<QStandardItem*>();
-        record = new QSqlRecord(query.record());
-        *paymentTypeItem << new QStandardItem(record->value(0).toString()); // "name"
-        for(int i = 2; i < record->count(); i++)
-        {
-            paymentTypeItem->first()->setData(record->value(i), Qt::UserRole + i);  // другие данные шаблона прячем в UserRole
-        }
-        // TODO: В АСЦ v3.7.31.1123 есть шаблоны только РКО
-        *paymentTypeItem << new QStandardItem( QString::number(record->value(1).toInt() + SCashRegisterModel::ExpCustom) );    // "id"
-        appendRow(*paymentTypeItem);
-        delete record;
+        m_extraTypes = std::make_unique<QSqlQueryModel>();
+        m_fullModel->addSourceModel(m_extraTypes.get());  // в объединённой модели будут только столбцы name и id
     }
+
+    QString typeStr;
+    if(type == Type::All)
+        typeStr = "`type`";
+    else
+        typeStr = QString::number(type);
+
+    m_extraTypes->setQuery(QUERY_SEL_EXTRA_PAYMENT_TYPES(SCashRegisterModel::ExpCustom, typeStr, loadArchive), QSqlDatabase::database(TdConn::main()));
+}
+
+/* Загрузка дополнительных типов кассовых операций при инициализации модели.
+ * По умолчанию загружаются все настроенные пользователем шаблоны, в т. ч. архивные; это необходимо для отображения всплывающей подсказки на вкладке Финансы.
+ * В АСЦ v3.7.31.1123 есть шаблоны только РКО (Настройки -» Финансы -» Расходный кассовый ордер)
+*/
+void SPaymentTypesModel::loadExtraTypes(const bool loadArchive)
+{
+    loadExtraTypes(m_type, loadArchive);
+}
+
+void SPaymentTypesModel::filterTypes(std::vector<int> filter)
+{
+    QStringList regexp;
+
+
+    if(!filter.empty())
+    {
+        foreach (auto type, filter)
+        {
+            regexp.append(QString("(^%1$)").arg(type));
+        }
+
+        setFilterRegExp("^(?!" + regexp.join('|') + ").*$");
+        setFilterKeyColumn(1);
+    }
+}
+
+QModelIndex SPaymentTypesModel::extraTypeModelIndex(const int typeId)
+{
+    return m_fullModel->mapToSource(mapToSource(this->index(rowByDatabaseID(typeId), 0)));
 }
 
 QVariant SPaymentTypesModel::dataByDatabaseId(int id, int role)
@@ -63,21 +104,21 @@ QVariant SPaymentTypesModel::dataByDatabaseId(int id, int role)
 */
 QString SPaymentTypesModel::reasonByDatabaseId(int id)
 {
-    return dataByDatabaseId(id, Qt::UserRole + 7).toString();
+    return extraTypeModelIndex(id).siblingAtColumn(ExtraTypeFields::Reason).data().toString();
 }
 
 int SPaymentTypesModel::clientByDatabaseId(int id)
 {
-    return dataByDatabaseId(id, Qt::UserRole + 3).toInt();
+    return extraTypeModelIndex(id).siblingAtColumn(ExtraTypeFields::Client).data().toInt();
 }
 
 double SPaymentTypesModel::defaultAmountByDatabaseId(int id)
 {
-    return dataByDatabaseId(id, Qt::UserRole + 6).toDouble();
+    return extraTypeModelIndex(id).siblingAtColumn(ExtraTypeFields::Amount).data().toDouble();
 }
 
 int SPaymentTypesModel::paymentSystemByDatabaseId(int id)
 {
-    return dataByDatabaseId(id, Qt::UserRole + 10).toInt();
+    return extraTypeModelIndex(id).siblingAtColumn(ExtraTypeFields::PaymenSystem).data().toInt();
 }
 

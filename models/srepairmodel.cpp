@@ -358,11 +358,11 @@ void SRepairModel::boxChanged(const int newId)
  *  - всех (вызов без параметров);
  *  - указанного типа (например, предоплат).
 */
-double SRepairModel::paymentsAmount(const SCashRegisterModel::PaymentType type)
+double SRepairModel::paymentsAmount(const int paymentType)
 {
     double summ;
     QSqlQuery *query = new QSqlQuery(QSqlDatabase::database(TdConn::main()));
-    query->exec(QUERY_SEL_REPAIR_PAYMENTS(id(), QString::number(type)));
+    query->exec(QUERY_SEL_REPAIR_PAYMENTS(id(), QString::number(paymentType)));
     query->first();
     summ = query->value(0).toDouble();
     delete query;

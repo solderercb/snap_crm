@@ -43,5 +43,17 @@
     <file>light/antenna_2b_32.png</file>
     <file>light/antenna_3b_32.png</file>
     <file>light/antenna_4b_32.png</file>
+    <file>light/1F4B0_32.png</file>
+    <file>light/1F4B3_32.png</file>
+    <file>light/1F4B8_32.png</file>
+    <file>light/1F5CE_32.png</file>
+    <file>light/1F6C8_32.png</file>
+    <file>light/1F91D_32.png</file>
+    <file>light/1F477_32.png</file>
+    <file>light/ExpGoods_32.png</file>
+    <file>light/ExpInvoiceUndo_32.png</file>
+    <file>light/ExpRepair_32.png</file>
+    <file>light/ExpRevert_32.png</file>
+    <file>light/ExpZ_32.png</file>
   </qresource>
 </RCC>

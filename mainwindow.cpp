@@ -46,6 +46,7 @@
 #include <tabClients>
 #include <tabClient>
 #include <tabPrintDialog>
+#include <tabCashbox>
 #include <tabCashOperation>
 #include <tabCashMoveExch>
 #include <tabSettings>
@@ -355,7 +356,7 @@ void MainWindow::createMenu()
     finances_button->setPopupMode(QToolButton::MenuButtonPopup);
     finances_button->setText(tr("Финансы"));
     ui->toolBar->addWidget(finances_button);
-    QObject::connect(finances_button, SIGNAL(clicked()), this, SLOT(createTabCashOperations()));
+    QObject::connect(finances_button, SIGNAL(clicked()), this, SLOT(createTabCashbox()));
     ui->toolBar->addSeparator();
 
     /* Кнопка Настройки и меню */
@@ -458,7 +459,7 @@ bool MainWindow::event(QEvent *event)
                 case Qt::Key_F1: createTabRepairs(); break;
                 case Qt::Key_F2: createTabStoreItems(); break;
                 case Qt::Key_F3: createTabClients(); break;
-                case Qt::Key_F4: createTabCashOrders(); break;
+                case Qt::Key_F4: createTabCashbox(); break;
 //                case Qt::Key_F5: break;   // в АСЦ нет реакции на эту кнопку
                 case Qt::Key_F6: createTabTasks(); break;
                 case Qt::Key_F7: createTabSettings(); break;
@@ -600,11 +601,6 @@ void MainWindow::createTabStoreItems()
 
 }
 
-void MainWindow::createTabCashOrders()
-{
-
-}
-
 void MainWindow::createTabTasks()
 {
 
@@ -624,9 +620,19 @@ void MainWindow::createTabPrint(QMap<QString, QVariant> report_vars)
 
 /*  Вкладка со списком проведённых кассовых операций
  */
-void MainWindow::createTabCashOperations()
+void MainWindow::createTabCashbox()
 {
+    if(!permissions->viewCashOrders)
+        return;
 
+    tabCashbox *subwindow = tabCashbox::getInstance(this);
+    if (ui->tabWidget->indexOf(subwindow) == -1) // Если такой вкладки еще нет, то добавляем
+        ui->tabWidget->addTab(subwindow, subwindow->tabTitle());
+    subwindow->setFocusSearchField();
+
+//    QObject::connect(subwindow,SIGNAL(generatePrintout(QMap<QString,QVariant>)), this, SLOT(createTabPrint(QMap<QString,QVariant>)));
+
+    ui->tabWidget->setCurrentWidget(subwindow);
 }
 
 /* Вкладка создания новой кассовой операции или просмотра проведённой операции
@@ -1221,6 +1227,7 @@ void MainWindow::test_scheduler_handler()  // обработик таймера 
 //        createTabNewPKO();
 //        createTabCashOperation(36192);
 //        createTabCashOperation(42268);
+        createTabCashbox();
 //        createTabClient(143);
 //        createTabCashMoveExch();
 //        createTabClients();

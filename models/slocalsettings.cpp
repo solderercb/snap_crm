@@ -159,7 +159,7 @@ bool SLocalSettings::openFile(QFile &file, QIODevice::OpenModeFlag mode)
     return 1;
 }
 
-bool SLocalSettings::import(QSerializer *obj, SettingsVariant variant, const QString subVariant)
+int SLocalSettings::import(QSerializer *obj, SettingsVariant variant, const QString subVariant)
 {
     QFile file;
     QByteArray data;
@@ -167,10 +167,10 @@ bool SLocalSettings::import(QSerializer *obj, SettingsVariant variant, const QSt
 
     genSettingsFileName(file, subVariant);
     if(!genAscSettingsFileFullPath(file))
-        return 0;
+        return FileStatus::NotFound;
 
     if(!openFile(file, QIODevice::ReadOnly))
-        return 0;
+        return FileStatus::AccessDenied;
 
     data = file.readAll();
     switch(m_settingsVariant)
@@ -190,27 +190,27 @@ bool SLocalSettings::import(QSerializer *obj, SettingsVariant variant, const QSt
     }
     file.close();
 
-    return 1;
+    return FileStatus::Imported;
 }
 
-bool SLocalSettings::read(QSerializer *obj, QFile &file)
+int SLocalSettings::read(QSerializer *obj, QFile &file)
 {
     QByteArray data;
     if(!openFile(file, QIODevice::ReadOnly))
-        return 0;
+        return FileStatus::AccessDenied;
 
     data = file.readAll();
     obj->fromXml(data);
 
     file.close();
 
-    return 1;
+    return FileStatus::ReadSuccess;
 }
 
-bool SLocalSettings::read(QSerializer *obj, SettingsVariant variant, const QString subVariant)
+int SLocalSettings::read(QSerializer *obj, SettingsVariant variant, const QString subVariant)
 {
     QFile file;
-    bool ret = 1;
+    int ret;
     m_settingsVariant = variant;
 
     genSettingsFileName(file, subVariant);

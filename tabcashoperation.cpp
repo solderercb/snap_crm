@@ -16,6 +16,7 @@
 #include <SPaymentTypesModel>
 #include <SSqlQueryModel>
 #include <SClientSelectForm>
+#include <tabcashbox>
 
 QMap<int, tabCashOperation*> tabCashOperation::p_instance;
 
@@ -147,7 +148,7 @@ void tabCashOperation::initRKO()
     setOrderTypeModel(expenditureTypesModel);
 }
 
-void tabCashOperation::setOrderTypeModel(SPaymentTypesModel *model)
+void tabCashOperation::setOrderTypeModel(std::shared_ptr<SPaymentTypesModel> model)
 {
     bool prevState = ui->comboBoxOperationType->signalsBlocked();
 
@@ -155,7 +156,7 @@ void tabCashOperation::setOrderTypeModel(SPaymentTypesModel *model)
         ui->comboBoxOperationType->blockSignals(true);
 
     m_operationTypesModel = model;
-    ui->comboBoxOperationType->setModel(model);
+    ui->comboBoxOperationType->setModel(model.get());
 
     if(m_orderId > 0)
     {
@@ -318,6 +319,7 @@ void tabCashOperation::endCommit()
     }
 
     updateWidgets();
+    tabCashbox::refreshIfTabExists();
     if(ui->checkBoxPrintCheck->isChecked())
         print();
 }

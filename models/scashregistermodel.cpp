@@ -2,6 +2,7 @@
 #include <SAmountToWords>
 #include <SUserSettings>
 #include <SPaymentTypesModel>
+#include <SStandardItemModel>
 #include <ProjectGlobals>
 #include <ProjectQueries>
 #include <SSqlQueryModel>
@@ -25,6 +26,28 @@ SCashRegisterModel::SCashRegisterModel(int systemId, QObject *parent) :
 
 SCashRegisterModel::~SCashRegisterModel()
 {
+}
+
+/* Метод возвращает полный список типов кассовых операций, в том числе архивных.
+ * Этот список нужен для отображения названия операции в таблице на вкладке Финансы.
+*/
+std::shared_ptr<SPaymentTypesModel> SCashRegisterModel::paymentTypesList()
+{
+    auto list = std::make_shared<SPaymentTypesModel>();
+    list->loadExtraTypes();
+    list->setObjectName("PaymentTypesFullModel");
+
+    return list;
+}
+
+/* Метод возвращает список типов кассовых операций, соответствующих указанной группе type.
+ * Такой список используется на вкладке создания кассовой операции.
+*/
+std::shared_ptr<SPaymentTypesModel> SCashRegisterModel::paymentTypesList(const int type)
+{
+    auto list = std::make_shared<SPaymentTypesModel>(type);
+
+    return list;
 }
 
 void SCashRegisterModel::load()
@@ -194,6 +217,30 @@ void SCashRegisterModel::invoiceChanged(int)
 {
 //    i_logRecord->setType(SLogRecordModel::Invoice);   // В АСЦ v3.7.31.1123 не реализовано
 //    i_logRecord->setInvoiceId(m_invoice);
+}
+
+void SCashRegisterModel::translateNames()
+{
+    tr("ExpSimple");
+    tr("ExpInvoice");
+    tr("ExpZ");
+    tr("ExpBalance");
+    tr("ExpSubsist");
+    tr("ExpSalary");
+    tr("AddSubCash");
+    tr("ExpRepair");
+    tr("ExpGoods");
+    tr("RecptSimple");
+    tr("RecptPrepayRepair");
+    tr("RecptBalance");
+    tr("RecptGoods");
+    tr("RecptRepair");
+    tr("ExpInvoiceUndo");
+    tr("RecptInvoice");
+    tr("MoveCash");
+    tr("ExpDealer");
+    tr("ExpRevert");
+    tr("ExpCustom");
 }
 
 /* Установка текста записи в журнале

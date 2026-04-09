@@ -14,7 +14,7 @@ class SPeriodSelector : public QWidget
 {
     Q_OBJECT
 signals:
-    void refreshButtonClicked();
+    void refreshButtonClicked();    
 public:
     enum MovingInterval {Day, Week, Month, Quarter, Year};
     Q_ENUM(MovingInterval);

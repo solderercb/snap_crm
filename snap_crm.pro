@@ -79,6 +79,7 @@ SOURCES += \
     models/ssinglerowjmodel.cpp \
     models/ssinglerowmodel.cpp \
     models/ssinglerowmodelbase.cpp \
+    models/stablecashboxmodel.cpp \
     models/sworkpricemodel.cpp \
     modules/purchasemanager/srequest.cpp \
     modules/purchasemanager/sgroupingmodel.cpp \
@@ -133,6 +134,7 @@ SOURCES += \
     sapplication.cpp \
     modules/purchasemanager/tabrequest.cpp \
     modules/purchasemanager/tabmanager.cpp \
+    tabcashbox.cpp \
     tabreceptcartridge.cpp \
     tabrepaircartridges.cpp \
     tabsalary.cpp \
@@ -140,6 +142,7 @@ SOURCES += \
     tabtechreports.cpp \
     threadconnections.cpp \
     widgets/qtooltipper.cpp \
+    widgets/scashboxwidget.cpp \
     widgets/ssaletabsettingsmenu.cpp \
     widgets/salarytabwidgets/spagesalaryextra.cpp \
     widgets/salarytabwidgets/spagesalaryitems.cpp \
@@ -200,6 +203,7 @@ SOURCES += \
     widgets/stableviewboqitemdelegates.cpp \
     widgets/stableviewboqstore.cpp \
     widgets/stableviewboqworkshop.cpp \
+    widgets/stableviewcashbox.cpp \
     widgets/stableviewclients.cpp \
     widgets/stableviewclientsitemdelegates.cpp \
     modules/purchasemanager/ssupplierstable.cpp \
@@ -277,6 +281,7 @@ HEADERS  += \
     models/ssinglerowjmodel.h \
     models/ssinglerowmodel.h \
     models/ssinglerowmodelbase.h \
+    models/stablecashboxmodel.h \
     models/sworkpricemodel.h \
     modules/purchasemanager/srequest.h \
     modules/purchasemanager/sgroupingmodel.h \
@@ -334,6 +339,7 @@ HEADERS  += \
     sapplication.h \
     modules/purchasemanager/tabrequest.h \
     modules/purchasemanager/tabmanager.h \
+    tabcashbox.h \
     tabreceptcartridge.h \
     tabrepaircartridges.h \
     tabsalary.h \
@@ -341,6 +347,7 @@ HEADERS  += \
     tabtechreports.h \
     threadconnections.h \
     widgets/qtooltipper.h \
+    widgets/scashboxwidget.h \
     widgets/ssaletabsettingsmenu.h \
     widgets/salarytabwidgets/spagesalaryextra.h \
     widgets/salarytabwidgets/spagesalaryitems.h \
@@ -401,6 +408,7 @@ HEADERS  += \
     widgets/stableviewboqitemdelegates.h \
     widgets/stableviewboqstore.h \
     widgets/stableviewboqworkshop.h \
+    widgets/stableviewcashbox.h \
     widgets/stableviewclients.h \
     widgets/stableviewclientsitemdelegates.h \
     modules/purchasemanager/ssupplierstable.h \
@@ -439,11 +447,13 @@ FORMS += \
     models/ssloptionsdialog.ui \
     modules/purchasemanager/tabrequest.ui \
     modules/purchasemanager/tabmanager.ui \
+    tabcashbox.ui \
     tabreceptcartridge.ui \
     tabrepaircartridges.ui \
     tabsalary.ui \
     tabsettings.ui \
     tabtechreports.ui \
+    widgets/scashboxwidget.ui \
     widgets/ssaletabsettingsmenu.ui \
     widgets/salarytabwidgets/spagesalaryextra.ui \
     widgets/salarytabwidgets/spagesalaryitems.ui \

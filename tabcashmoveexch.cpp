@@ -11,6 +11,7 @@
 #include <SSortFilterProxyModel>
 #include <SSqlQueryModel>
 #include <FlashPopup>
+#include <tabcashbox>
 
 tabCashMoveExch* tabCashMoveExch::p_instance;
 
@@ -147,6 +148,7 @@ void tabCashMoveExch::endCommit()
         case SwitchToViewMode: switchTabToViewMode(); break;
     }
 
+    tabCashbox::refreshIfTabExists();
     if(ui->checkBoxPrintCheck->isChecked())
         print();
 }

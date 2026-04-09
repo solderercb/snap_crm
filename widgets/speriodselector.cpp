@@ -272,7 +272,9 @@ void SPeriodSelector::movePeriod(const int direction)
         case MovingInterval::Year: newPeriodBegin = QDate(m_periodBegin.year() + direction, 1, 1); newPeriodEnd = QDate(m_periodEnd.year() + direction, 12, 31); break;
         default: break;
     }
+    ui->dateEditPeriodBegin->blockSignals(true);
     ui->dateEditPeriodBegin->setDate(newPeriodBegin);
+    ui->dateEditPeriodBegin->blockSignals(false);
     ui->dateEditPeriodEnd->setDate(newPeriodEnd);
 }
 
@@ -317,12 +319,14 @@ void SPeriodSelector::periodBeginChanged(const QDate date)
     m_periodBegin = ui->dateEditPeriodBegin->date();
     if(!m_isPeriodAjustable)
         setDefaultPeriod();
+    emit refreshButtonClicked();
 }
 
 void SPeriodSelector::periodEndChanged(const QDate date)
 {
     Q_UNUSED(date)
     m_periodEnd = ui->dateEditPeriodEnd->date();
+    emit refreshButtonClicked();
 }
 
 void SPeriodSelector::movePrevPeriod()
