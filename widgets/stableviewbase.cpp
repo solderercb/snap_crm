@@ -330,15 +330,12 @@ void STableViewBase::readLayout()
 {
     initHeaders();
     int fileStatus = localSettings->read(i_gridLayout, m_layoutVariant);
-    if(fileStatus == SLocalSettings::FileStatus::NotFound)/* || (i_gridLayout->$GridControl.Columns.size() != i_defaultHeaderLabels.size())*/
+    switch(fileStatus)
     {
-        setDefaultLayoutParams();
-        localSettings->save(i_gridLayout, m_layoutVariant);
-    }
-    else if(fileStatus == SLocalSettings::FileStatus::Imported)
-    {
-        updateImportedLayoutParams();
-        localSettings->save(i_gridLayout, m_layoutVariant);
+        case SLocalSettings::FileStatus::Imported: updateImportedLayoutParams(); localSettings->save(i_gridLayout, m_layoutVariant); break;
+        case SLocalSettings::FileStatus::NotFound:
+        case SLocalSettings::FileStatus::AccessDenied: setDefaultLayoutParams(); localSettings->save(i_gridLayout, m_layoutVariant); break;
+        default: ;
     }
 
     applyGridlayout();

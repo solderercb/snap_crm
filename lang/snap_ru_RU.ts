@@ -5256,32 +5256,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>STableViewBase</name>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="726"/>
+        <location filename="../widgets/stableviewbase.cpp" line="723"/>
         <source>Автоширина</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="732"/>
+        <location filename="../widgets/stableviewbase.cpp" line="729"/>
         <source>Размер по содержимому</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="737"/>
+        <location filename="../widgets/stableviewbase.cpp" line="734"/>
         <source>Вписать все</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="742"/>
+        <location filename="../widgets/stableviewbase.cpp" line="739"/>
         <source>Сделать значением по умолчанию</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="747"/>
+        <location filename="../widgets/stableviewbase.cpp" line="744"/>
         <source>Скрыть</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/stableviewbase.cpp" line="753"/>
+        <location filename="../widgets/stableviewbase.cpp" line="750"/>
         <source>Выбрать столбцы</source>
         <translation type="unfinished"></translation>
     </message>

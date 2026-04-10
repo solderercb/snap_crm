@@ -127,12 +127,14 @@ bool SLocalSettings::genSettingsFileFullPath(QFile &file, Operation op)
 
 bool SLocalSettings::genAscSettingsFileFullPath(QFile &file)
 {
+    if(userLocalData->ASCExecutablePath.value.isEmpty())
+        return 0;
+
     switch(m_settingsVariant)
     {
         case UserSettings:
-            if(userLocalData->ASCExecutablePath.value.isEmpty())
+            if(!QDir::setCurrent(ascAppDataPath(userLocalData->ASCExecutablePath.value)))
                 return 0;
-            QDir::setCurrent(ascAppDataPath(userLocalData->ASCExecutablePath.value));
             if (!selMostRecentSettingFile(file.fileName()))     // если найдутся файлы настроек АСЦ, то QDir::current будет обновлена
                 return 0;
             break;
@@ -140,7 +142,8 @@ bool SLocalSettings::genAscSettingsFileFullPath(QFile &file)
             // в АСЦ CRM до версии 3.7.37.1184 (включительно) файл имел имя "-<категория>-<имя_пользователя>.xml", например, "-0-admin.xml"
             file.setFileName(file.fileName().replace(metaObject()->enumerator(metaObject()->indexOfEnumerator("SettingsVariant")).valueToKey(m_settingsVariant), "")); Q_FALLTHROUGH();
         default:
-            QDir::setCurrent(QFileInfo(userLocalData->ASCExecutablePath.value).absolutePath() + QString("/cfg"));
+            if(!QDir::setCurrent(QFileInfo(userLocalData->ASCExecutablePath.value).absolutePath() + QString("/cfg")))
+                return 0;
     }
 
     file.setFileName(QDir::current().absolutePath() + "/" + file.fileName()); // установка абсолютного пути к файлу
