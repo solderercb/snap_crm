@@ -212,7 +212,10 @@ void tabSale::updateWidgets()
             fillClientCreds(client);
         }
         else
+        {
+            m_client = 0;
             ui->checkBoxAnonymous->setChecked(true);
+        }
 
         ui->comboBoxPriceCol->setCurrentIndex(docModel->priceOptionIndex());
         ui->comboBoxPriceCol->setEnabled(false);
@@ -544,37 +547,39 @@ void tabSale::clearClientCreds(bool hideCoincidence)
 
 void tabSale::fillClientCreds(int id)
 {
-    if(m_client == id)
-        return;
+    if(m_client != id)
+    {
+        clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
+        bool updatePriceOption = tableModel->state() != StoreSaleModel::New || !docModel->isDirty();
+        m_client = id;                // установка нового значения должна выполняться после очистки
+        clientModel->load(m_client);
+        docModel->set_client(m_client);
+        tableModel->setClient(m_client);
+        cashRegister->set_client(m_client);
+        ui->lineEditClientFirstName->setText(clientModel->firstName());
+        ui->lineEditClientLastName->setText(clientModel->lastName());
+        ui->lineEditClientPatronymic->setText(clientModel->patronymicName());
+        ui->lineEditClientFirstName->setReadOnly(true);
+        ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
+        ui->lineEditClientPatronymic->setReadOnly(true);
 
-    clearClientCreds(false);    // очищаем данные клиента, но не прячем таблицу совпадений
-    bool updatePriceOption = tableModel->state() != StoreSaleModel::New || !docModel->isDirty();
-    m_client = id;                // установка нового значения должна выполняться после очистки
-    clientModel->load(m_client);
-    docModel->set_client(m_client);
-    tableModel->setClient(m_client);
-    cashRegister->set_client(m_client);
-    ui->lineEditClientFirstName->setText(clientModel->firstName());
-    ui->lineEditClientLastName->setText(clientModel->lastName());
-    ui->lineEditClientPatronymic->setText(clientModel->patronymicName());
-    ui->lineEditClientFirstName->setReadOnly(true);
-    ui->lineEditClientLastName->setReadOnly(true);  // запрет на изменение, если клиент из базы
-    ui->lineEditClientPatronymic->setReadOnly(true);
+        ui->comboBoxClientPhoneType->setCurrentIndex(clientModel->phones()->primary()->maskIndex());
+        ui->lineEditClientPhone->setText(clientModel->phones()->primary()->phone());
+        ui->lineEditClientPhone->setReadOnly(true);
+        ui->comboBoxClientPhoneType->setEnabled(false);
 
-    ui->comboBoxClientPhoneType->setCurrentIndex(clientModel->phones()->primary()->maskIndex());
-    ui->lineEditClientPhone->setText(clientModel->phones()->primary()->phone());
-    ui->lineEditClientPhone->setReadOnly(true);
-    ui->comboBoxClientPhoneType->setEnabled(false);
+        ui->pushButtonCreateTabClient->setEnabled(permissions->viewClients);
+        ui->comboBoxClientAdType->setEnabled(false);
+        ui->checkBoxAnonymous->setChecked(false);
 
-    ui->pushButtonCreateTabClient->setEnabled(permissions->viewClients);
-    ui->comboBoxClientAdType->setEnabled(false);
-    ui->checkBoxAnonymous->setChecked(false);
-
-    if(updatePriceOption)
-        ui->comboBoxPriceCol->setCurrentIndex(clientModel->priceColumnIndex());
-    ui->comboBoxClientAdType->setCurrentIndex(clientModel->adTypeIndex());
+        if(updatePriceOption)
+            ui->comboBoxPriceCol->setCurrentIndex(clientModel->priceColumnIndex());
+        ui->comboBoxClientAdType->setCurrentIndex(clientModel->adTypeIndex());
+    }
     if(clientModel->isBalanceEnabled())
     {
+        if(m_client == id)
+            clientModel->loadBalance(); // на всякий случай
         setBalanceWidgetsVisible(true);
         ui->checkBoxSaleInCredit->setEnabled(true);
         ui->lineEditBalance->setText(sysLocale.toString(clientModel->balance(), 'f', 2));
@@ -1168,7 +1173,7 @@ void tabSale::randomFill()
 {
     int i;
 
-    if (test_scheduler_counter == 1)   // клиент
+    if (test_scheduler_counter == 100)   // клиент
     {
         int val = QRandomGenerator::global()->bounded(100);
         if (val > 66)  // или выбираем из уже имеющихся клиентов или создаём нового или включаем галочку анонимный

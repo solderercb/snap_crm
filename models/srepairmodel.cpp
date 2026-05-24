@@ -307,6 +307,7 @@ void SRepairModel::stateChanged(const int stateId)
         default: appendLogText(tr("Статус заказа изменён на \"%1\"").arg(comSettings->repairStatusesVariantCopy()[stateId].Name));
     }
 
+    m_repairStatusLog->set_created(QDateTime::currentDateTime());
     m_repairStatusLog->set_repair(this->id());
     m_repairStatusLog->set_status(stateId);
     m_repairStatusLog->set_manager(currentManagerId()); // менеджер и мастер могут быть изменены между сменами статуса

@@ -296,7 +296,11 @@ bool SPartSuppliersModel::setCheckStateExclusive(const QModelIndex &checkedIndex
 {
     bool ret = 1;
 
-    m_newCheckedId = checkedIndex.siblingAtColumn(Columns::Id).data().toInt();
+    auto idData = checkedIndex.siblingAtColumn(Columns::Id).data();
+    if(idData.isNull())
+        m_newCheckedId = std::nullopt;
+    else
+        m_newCheckedId = idData.toInt();
     for(int i = 0; i < rowCount(); i++)
     {
         QModelIndex idx = index(i, Columns::Select);

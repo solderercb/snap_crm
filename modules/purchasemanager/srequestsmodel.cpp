@@ -72,7 +72,7 @@ bool SPartsRequestsModel::setData(const QModelIndex &index, const QVariant &valu
         switch (index.column())
         {
             case 0: return toggleCheckBox(index);
-            case Columns::State: emit stateChanged((SPartRequest::State)value.toInt()); break;
+            case Columns::State: if(value.toInt() == -1) return 1; emit stateChanged((SPartRequest::State)value.toInt()); break;
             default: break;
         }
     }
