@@ -58,7 +58,7 @@
 #define QUERY_SEL_PAYMENT_TYPE(id)          QString("SELECT `name`, `id`,  `type`,  `client`,  `periodic`,  `pay_date`,  `def_summ`,  `reason`,  `is_archive`,  `updated_at`,  `payment_system` FROM `payment_types` WHERE `id` = %1;").arg((id))
 #define QUERY_SEL_EXTRA_PAYMENT_TYPES(idOffset, type, archive) QString("SELECT  `name`, %1 + `id` AS 'id', `type`, `client`, `periodic`, `pay_date`, `def_summ`, `reason`, `is_archive`, `updated_at`, `payment_system` FROM `payment_types` WHERE `type` = %2 AND IF(%3, 1, `is_archive` = 0);").arg((idOffset)).arg((type)).arg((archive))
 #define QUERY_SEL_DEVICE(id)                QString("SELECT  `id`,  `type`,  `maker`,  `model`, `serial_number`,  `client` FROM `workshop` WHERE `id` = %1").arg((id))
-#define QUERY_SEL_DEVICES                   QString("SELECT `name`, `id`, `company_list` FROM `devices` WHERE `enable` = 1 AND `refill` = 0 ORDER BY `position`;")
+#define QUERY_SEL_DEVICES                   QString("SELECT `name`, `id`, `company_list` FROM `devices` WHERE (`enable` = 1 OR `enable` IS NULL) AND `refill` = 0 ORDER BY `position`;")
 #define QUERY_SEL_DEVICE_MAKERS(device)     QString("SELECT `name`, `id` FROM `device_makers` WHERE `id` IN (%1) ORDER BY FIELD(`id`, %1);").arg((device))
 #define QUERY_SEL_DEVICE_MODELS             QString("SELECT `name`, `id` FROM `device_models` WHERE `device` = %1 AND `maker` = %2 ORDER BY `name` ASC;")
 #define QUERY_SEL_DEVICE_FAULTS(device)     QString(\

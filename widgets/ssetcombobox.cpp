@@ -631,7 +631,11 @@ void SSetComboBox::resizeEvent(QResizeEvent*)
 void SSetComboBox::addRandomItem()
 {
     // нормальное добавление
-    int i = QRandomGenerator::global()->bounded(model()->rowCount());
+    auto m = model();
+    if(!m || m->rowCount() == 0)
+        return;
+
+    int i = QRandomGenerator::global()->bounded(m->rowCount());
     addItem(model()->index(i, 0).data().toString());
     if (daughterLineEdits.isEmpty())
     {
